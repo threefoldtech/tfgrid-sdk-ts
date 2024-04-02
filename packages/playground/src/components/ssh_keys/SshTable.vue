@@ -17,14 +17,14 @@
         show-select
         :no-data-text="capitalize(`No keys found.`)"
         class="pa-5"
-        v-model:selectedKeys="selectedKeys"
+        v-model="selectedKeys"
         :loading="loading"
         :headers="headers"
         :items="sshKeys"
         loading-text="Loading..."
+        @click:row="(_, { item }) => $emit('view', item.raw)"
       >
         <template #loading> </template>
-        <!-- :on-click:row="() => {}" -->
         <template #[`item.createdAt`]="{ item }">
           <v-tooltip location="bottom" :text="`The date when this SSH key was created.`">
             <template #activator="{ props }">
@@ -61,21 +61,6 @@
           </v-tooltip>
         </template>
 
-        <template #[`item.viewing`]="{ item }">
-          <v-tooltip :text="`View ${item.raw.name}'s key.`" location="bottom">
-            <template #activator="{ props }">
-              <v-btn
-                @click="$emit('view', item.raw)"
-                v-bind="props"
-                color="grey-lighten-1"
-                variant="text"
-                :disabled="loading"
-                icon="mdi-eye"
-              ></v-btn>
-            </template>
-          </v-tooltip>
-        </template>
-
         <template #[`item.activation`]="{ item }">
           <v-tooltip
             location="bottom"
@@ -83,18 +68,15 @@
             :text="`The '${item.raw.name}' key is currently activated and will be utilized in deployments.`"
           >
             <template #activator="{ props }">
-              <v-btn
+              <VCheckboxBtn
+                class="d-inline"
                 :disabled="loading"
                 v-bind="props"
                 :loading="item.raw.activating"
                 color="secondary"
-                variant="elevated"
                 @click="activateKey(item.raw)"
-                prepend-icon="mdi-check"
-                width="100"
-              >
-                Active
-              </v-btn>
+                :model-value="item.raw.isActive"
+              />
             </template>
           </v-tooltip>
 
@@ -104,38 +86,19 @@
             :text="`Click to activate the '${item.raw.name}' for use in deployments.`"
           >
             <template #activator="{ props }">
-              <v-btn
+              <VCheckboxBtn
+                class="d-inline"
                 :disabled="loading"
                 v-bind="props"
                 :loading="item.raw.activating"
                 :color="theme.name.value === AppThemeSelection.light ? '' : 'grey-lighten-1'"
-                variant="tonal"
                 @click="activateKey(item.raw)"
-                width="100"
-              >
-                Inactive
-              </v-btn>
+                :model-value="item.raw.isActive"
+              />
             </template>
           </v-tooltip>
         </template>
 
-        <template #[`item.deletion`]="{ item }">
-          <v-tooltip location="bottom" :text="`Delete ${item.raw.name}`">
-            <template #activator="{ props }">
-              <v-btn
-                :disabled="loading || item.raw.deleting"
-                :loading="item.raw.deleting"
-                @click="deleteKey(item.raw)"
-                color="grey-lighten-1"
-                variant="text"
-                v-bind="props"
-                class="ml-2"
-                icon="mdi-trash-can-outline"
-              >
-              </v-btn>
-            </template>
-          </v-tooltip>
-        </template>
         <template #bottom></template>
       </v-data-table>
     </div>
@@ -232,16 +195,9 @@ export default defineComponent({
         key: "fingerPrint",
       },
       {
-        title: "Activation",
+        title: "Active",
         key: "activation",
-      },
-      {
-        title: "Viewing",
-        key: "viewing",
-      },
-      {
-        title: "Deletion",
-        key: "deletion",
+        sortable: false,
       },
     ];
 
