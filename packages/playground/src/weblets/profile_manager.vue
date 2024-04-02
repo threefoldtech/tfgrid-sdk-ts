@@ -236,7 +236,7 @@
                       class="mr-2"
                       @click="openAcceptTerms = termsLoading = false"
                       v-show="!termsLoading"
-                      color="white"
+                      :color="theme.name.value === AppThemeSelection.light ? 'black' : 'white'"
                       variant="outlined"
                       id="accept-terms-and-condation"
                       :text="capitalize('go back')"
