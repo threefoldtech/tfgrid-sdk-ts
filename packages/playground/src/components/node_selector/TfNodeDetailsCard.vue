@@ -194,7 +194,7 @@
           v-if="node?.dedicated && node?.status !== 'down'"
           class="ml-4"
           :node="(node as GridNode)"
-          @updateTable="$emit('reloadTable')"
+          @updateTable="$emit('reload-table', node.nodeId)"
         />
       </div>
     </template>
@@ -224,7 +224,7 @@ export default {
   },
   emits: {
     "node:select": (node: NodeInfo) => true || node,
-    reloadTable: () => true,
+    "reload-table": (id: number) => id,
   },
   setup(props) {
     const node = ref(props.node);
