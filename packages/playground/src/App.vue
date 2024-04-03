@@ -177,7 +177,7 @@
                 @click="openSidebar = true"
                 icon="mdi-menu"
                 variant="tonal"
-                class="mr-2"
+                class="mr-2 mb-4"
               />
             </div>
 
@@ -214,11 +214,28 @@ const navbarConfig = ref();
 
 const hasGrid = computed(() => !!gridStore.grid);
 
+// eslint-disable-next-line no-undef
+const permanent = ref(window.innerWidth > 980);
+const openSidebar = ref(permanent.value);
+
+function setSidebarOnResize() {
+  permanent.value =
+    window.innerWidth >
+    ($route.meta && "sidebarBreakpoint" in $route.meta && typeof $route.meta["sidebarBreakpoint"] === "number"
+      ? $route.meta.sidebarBreakpoint
+      : 980);
+  openSidebar.value = permanent.value;
+}
+
+window.addEventListener("resize", setSidebarOnResize);
+
 watch(
   () => $route.meta,
   meta => {
     (document.title = "Threefold Dashboard" + (meta && "title" in meta ? ` | ${meta.title}` : ``)),
       (navbarConfig.value = meta.navbarConfig);
+
+    setSidebarOnResize();
   },
 );
 function navigateToHome() {
@@ -395,10 +412,6 @@ const routes: AppRoute[] = [
     ],
   },
 ];
-
-// eslint-disable-next-line no-undef
-const permanent = window.innerWidth > 980;
-const openSidebar = ref(permanent);
 
 const baseUrl = import.meta.env.BASE_URL;
 

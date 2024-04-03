@@ -605,4 +605,35 @@ export default {
     }
   }
 }
+
+@media (max-width: 850px) {
+  .tf-layout-container {
+    display: block !important;
+
+    > div {
+      width: 100% !important;
+      margin: 0 !important;
+    }
+
+    .tf-filter-item {
+      flex-basis: calc(50% - 16px);
+    }
+
+    .tf-filter-item:nth-of-type(2n) {
+      margin-left: 32px;
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .tf-layout-container {
+    .tf-filter-item {
+      flex-basis: 100%;
+    }
+
+    .tf-filter-item {
+      margin-left: 0 !important;
+    }
+  }
+}
 </style>

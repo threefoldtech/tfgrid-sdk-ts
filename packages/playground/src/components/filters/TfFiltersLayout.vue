@@ -1,5 +1,5 @@
 <template>
-  <div class="d-flex">
+  <div class="tf-layout-container d-flex">
     <div :style="{ width }">
       <slot name="filters" />
     </div>
@@ -10,7 +10,7 @@
 </template>
 
 <script lang="ts">
-const WIDTH_SIZE = 320;
+const WIDTH_SIZE = 300;
 
 export default {
   name: "TfFiltersLayout",

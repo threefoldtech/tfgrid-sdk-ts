@@ -254,3 +254,16 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+@media (max-width: 1350px) {
+  .tf-layout-container {
+    display: block !important;
+
+    > div {
+      width: 100% !important;
+      margin: 0 !important;
+    }
+  }
+}
+</style>

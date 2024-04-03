@@ -21,7 +21,7 @@ import { useRouter } from "vue-router";
 import type { AsyncRule, SyncRule } from "../input_validator.vue";
 import { useFiltersContainerService } from "./TfFiltersContainer.vue";
 
-const colProps = { class: "py-1", cols: 12 };
+const colProps = { class: "tf-filter-item py-1", cols: 12 };
 
 function normalizeValue(v: string) {
   if (v === "true") return true;
