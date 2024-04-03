@@ -26,7 +26,13 @@
     >
       Reserve
     </v-btn>
-
+    <span v-if="node.rentedByTwinId === 0" class="ml-2">
+      <v-tooltip text="You must acquire a minimum of 2 TFTs in order to reserve any node." location="bottom">
+        <template #activator="{ props }">
+          <VIcon icon="mdi-information-outline" v-bind="props" />
+        </template>
+      </v-tooltip>
+    </span>
     <v-btn
       size="small"
       color="error"
@@ -43,12 +49,14 @@
 <script lang="ts">
 import type { GridNode } from "@threefold/gridproxy_client";
 import { InsufficientBalanceError } from "@threefold/types";
-import { computed, onMounted, type PropType, ref } from "vue";
+import { computed, type PropType, ref, watch } from "vue";
 
 import { useProfileManager } from "@/stores";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
-import { getGrid, loadBalance } from "@/utils/grid";
+import { getGrid } from "@/utils/grid";
 import { notifyDelaying } from "@/utils/notifications";
+
+import { useProfileManagerController } from "../../components/profile_manager_controller.vue";
 
 export default {
   name: "ReserveBtn",
@@ -60,6 +68,7 @@ export default {
   },
   setup(props, { emit }) {
     const profileManager = useProfileManager();
+    const profileManagerController = useProfileManagerController();
     const profile = computed(() => {
       return profileManager.profile ?? null;
     });
@@ -69,14 +78,20 @@ export default {
     const loadingReserveNode = ref(false);
     const disableButton = ref(false);
     const hasInsufficientBalance = ref(false);
-    onMounted(async () => {
-      const grid = await getGrid(profileManager.profile!);
-      const balance = await loadBalance(grid!);
-      const b = balance.free - balance.locked;
-      if (b < 2) {
-        hasInsufficientBalance.value = true;
-      }
-    });
+    const balance = profileManagerController.balance;
+    const freeBalance = computed(() => balance.value?.free ?? 0);
+
+    watch(
+      freeBalance,
+      (newFreeBalance, _) => {
+        if (newFreeBalance < 2) {
+          hasInsufficientBalance.value = true;
+        } else {
+          hasInsufficientBalance.value = false;
+        }
+      },
+      { immediate: true },
+    );
 
     function removeReserve() {
       openUnreserveDialog.value = true;
