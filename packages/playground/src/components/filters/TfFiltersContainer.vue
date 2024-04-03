@@ -2,30 +2,33 @@
   <VCard>
     <VCardTitle
       class="d-flex align-center"
-      :style="[
-        collapsible ? { cursor: 'pointer' } : {},
-        collapsible && filterOpened ? { 'background-color': 'rgba(var(--v-theme-primary), 0.2)' } : {},
-      ]"
+      :style="[collapsible ? { cursor: 'pointer' } : {}]"
       @click="collapsible ? (filterOpened = !filterOpened) : undefined"
     >
       <span>Filters</span>
       <VSpacer />
       <VBtn
-        :variant="collapsible ? 'flat' : 'outlined'"
+        variant="outlined"
         :disabled="loading || !valid || empty"
         @click.stop="clear"
         text="Clear"
-        class="mr-2"
         density="compact"
       />
       <VBtn
-        :variant="collapsible ? 'flat' : 'outlined'"
+        variant="outlined"
         color="primary"
         density="compact"
         :disabled="!valid || !changed"
         @click.stop="apply"
         text="Apply"
         :loading="loading"
+        class="mx-2"
+      />
+      <VBtn
+        :icon="filterOpened ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+        density="compact"
+        variant="flat"
+        v-if="collapsible"
       />
     </VCardTitle>
 
