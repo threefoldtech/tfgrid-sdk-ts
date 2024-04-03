@@ -375,7 +375,7 @@ export default {
   flex-direction: column !important;
   font-size: 0.7rem;
   font-weight: bold;
-  background-color: #424242;
+  background-color: rgb(var(--v-speed-chip));
   padding: 5px 12px;
   border-radius: 9999px;
 }

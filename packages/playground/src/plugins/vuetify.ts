@@ -41,6 +41,7 @@ const vuetify = createVuetify({
         variables: {
           "footer-color-link": "#fff",
           "footer-color-header": "#74DDC3",
+          "speed-chip": "#424242",
         },
       },
       light: {
@@ -56,6 +57,7 @@ const vuetify = createVuetify({
         variables: {
           "footer-color-link": "#333",
           "footer-color-header": "#1aa18f",
+          "speed-chip": "#EEEEEE",
         },
       },
     },

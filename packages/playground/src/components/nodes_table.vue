@@ -23,8 +23,6 @@
           :disable-sort="true"
           :hover="true"
         >
-          <template #loading />
-
           <tbody class="mx-4 my-4">
             <tr v-for="node in modelValue" v-bind:key="node.id" @click="openSheet($event, node)">
               <TfNodeDetailsCard
@@ -33,6 +31,9 @@
                 @reload-table="$emit('reloadTable', node.nodeId)"
               />
             </tr>
+            <p v-if="modelValue && modelValue.length === 0 && !loading" class="mx-4 mt-10 text-center">
+              No data available
+            </p>
           </tbody>
         </v-data-table-server>
       </v-col>
