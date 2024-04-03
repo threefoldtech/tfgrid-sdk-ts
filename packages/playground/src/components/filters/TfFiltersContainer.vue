@@ -1,65 +1,75 @@
 <template>
-  <VExpansionPanels :model-value="[0]">
-    <VExpansionPanel eager>
-      <VExpansionPanelTitle class="text-h6"> Filters </VExpansionPanelTitle>
-      <VExpansionPanelText eager>
-        <VForm :disabled="loading">
+  <VCard>
+    <VCardTitle
+      class="d-flex align-center"
+      :style="[collapsible ? { cursor: 'pointer' } : {}]"
+      @click="collapsible ? (filterOpened = !filterOpened) : undefined"
+    >
+      <span>Filters</span>
+      <VSpacer />
+      <VBtn
+        variant="outlined"
+        :disabled="loading || !valid || empty"
+        @click.stop="clear"
+        text="Clear"
+        density="compact"
+      />
+      <VBtn
+        variant="outlined"
+        color="primary"
+        density="compact"
+        :disabled="!valid || !changed"
+        @click.stop="apply"
+        text="Apply"
+        :loading="loading"
+        class="mx-2"
+      />
+      <VBtn
+        :icon="filterOpened ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+        density="compact"
+        variant="flat"
+        v-if="collapsible"
+      />
+    </VCardTitle>
+
+    <VDivider />
+
+    <VRow no-gutters v-show="valid && (changed || (!loading && !empty))">
+      <VAlert color="info" variant="tonal" class="rounded-0">
+        <span>
+          {{ changed ? "Filter options were updated but not applied." : "" }} Click
+          <VCard
+            class="d-inline pa-1"
+            v-text="changed ? 'Apply' : 'Clear'"
+            flat
+            :color="$vuetify.theme.global.name === 'light' ? 'info' : undefined"
+          />
+          {{ changed ? "in order to reload your data." : "to reset your selected filters." }}
+        </span>
+      </VAlert>
+    </VRow>
+
+    <VCardText :style="{ maxHeight: '750px', overflowY: 'auto' }" :class="{ 'pa-0': collapsible && !filterOpened }">
+      <VExpandTransition mode="in-out">
+        <VForm :disabled="loading" v-show="!collapsible || filterOpened">
           <FormValidator valid-on-init v-model="valid">
             <VContainer fluid>
               <VRow no-gutters>
                 <slot />
               </VRow>
-
-              <VRow class="mb-4" no-gutters v-show="valid && (changed || (!loading && !empty))">
-                <VAlert type="info" variant="tonal">
-                  <span>
-                    {{ changed ? "Filter options were updated but not applied." : "" }} Click
-                    <VCard
-                      class="d-inline pa-1"
-                      v-text="changed ? 'Apply' : 'Clear'"
-                      flat
-                      :color="$vuetify.theme.global.name === 'light' ? 'info' : undefined"
-                    />
-                    {{ changed ? "in order to reload your data." : "to reset your selected filters." }}
-                  </span>
-                </VAlert>
-              </VRow>
-
-              <VRow no-gutters>
-                <VDivider />
-              </VRow>
-            </VContainer>
-
-            <VContainer fluid>
-              <VRow no-gutters>
-                <VSpacer />
-                <VBtn
-                  variant="outlined"
-                  :disabled="loading || !valid || empty"
-                  @click="clear"
-                  text="Clear"
-                  class="mr-2"
-                />
-                <VBtn
-                  variant="outlined"
-                  color="primary"
-                  :disabled="!valid || !changed"
-                  @click="apply"
-                  text="Apply"
-                  :loading="loading"
-                />
-              </VRow>
             </VContainer>
           </FormValidator>
         </VForm>
-      </VExpansionPanelText>
-    </VExpansionPanel>
-  </VExpansionPanels>
+      </VExpandTransition>
+    </VCardText>
+  </VCard>
 </template>
 
 <script lang="ts">
+import { watch } from "vue";
+import { onUnmounted } from "vue";
 import { computed, type ComputedRef, inject, onMounted, provide, ref } from "vue";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 
 const key = Symbol("key:filters-container");
 
@@ -87,6 +97,7 @@ export default {
   },
   setup(_, ctx) {
     const router = useRouter();
+    const route = useRoute();
     const filters = ref(new Map<string, ComputedRef<FilterService>>());
 
     const valid = ref(false);
@@ -134,7 +145,20 @@ export default {
       ctx.emit("apply");
     }
 
-    return { empty, changed, clear, apply, valid };
+    const collapsible = ref(false);
+    const filterOpened = ref(true);
+
+    const breakpoint = route.meta.filtersCollapsibleBreakpoint as number;
+
+    function onResize() {
+      collapsible.value = breakpoint > window.innerWidth;
+    }
+
+    onMounted(() => typeof breakpoint === "number" && window.addEventListener("resize", onResize));
+    onUnmounted(() => typeof breakpoint === "number" && window.removeEventListener("resize", onResize));
+    typeof breakpoint === "number" && onResize();
+
+    return { empty, changed, clear, apply, valid, collapsible, filterOpened };
   },
 };
 </script>

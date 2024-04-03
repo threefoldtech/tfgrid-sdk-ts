@@ -1,6 +1,6 @@
 <template>
   <VCard
-    class="rounded-0 w-100 pb-3"
+    class="tf-node-card rounded-0 w-100 pb-3"
     :class="{ 'selected-node': status !== 'Init' }"
     :color="
       status === 'Valid'
@@ -70,7 +70,7 @@
 
     <template #append>
       <template v-if="node">
-        <div class="d-flex">
+        <div class="d-flex align-center">
           <VTooltip
             :text="dedicated ? 'This node is dedicated for one user only' : 'Multiple users can deploy on this node'"
             location="top"
@@ -150,7 +150,7 @@
 
     <template #text>
       <VRow>
-        <VCol>
+        <VCol class="tf-node-resource">
           <ResourceDetails
             name="CPU"
             :used="node?.used_resources.cru ?? 0"
@@ -159,7 +159,7 @@
             :cpuType="dmi?.processor[0]?.version"
           />
         </VCol>
-        <VCol>
+        <VCol class="tf-node-resource">
           <ResourceDetails
             name="Memory"
             :used="node?.used_resources.mru ?? 0"
@@ -171,7 +171,7 @@
       </VRow>
 
       <VRow>
-        <VCol>
+        <VCol class="tf-node-resource">
           <ResourceDetails
             name="SSD Disks"
             :used="node?.used_resources.sru ?? 0"
@@ -179,7 +179,7 @@
             :text="sruText"
           />
         </VCol>
-        <VCol>
+        <VCol class="tf-node-resource">
           <ResourceDetails
             name="HDD Disks"
             :used="node?.used_resources.hru ?? 0"
