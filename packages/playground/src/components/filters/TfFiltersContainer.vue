@@ -1,22 +1,29 @@
 <template>
   <VCard>
-    <VCardTitle class="d-flex align-center">
+    <VCardTitle
+      class="d-flex align-center"
+      :style="[
+        collapsible ? { cursor: 'pointer' } : {},
+        collapsible && filterOpened ? { 'background-color': 'rgba(var(--v-theme-primary), 0.2)' } : {},
+      ]"
+      @click="collapsible ? (filterOpened = !filterOpened) : undefined"
+    >
       <span>Filters</span>
       <VSpacer />
       <VBtn
-        variant="outlined"
+        :variant="collapsible ? 'flat' : 'outlined'"
         :disabled="loading || !valid || empty"
-        @click="clear"
+        @click.stop="clear"
         text="Clear"
         class="mr-2"
         density="compact"
       />
       <VBtn
-        variant="outlined"
+        :variant="collapsible ? 'flat' : 'outlined'"
         color="primary"
         density="compact"
         :disabled="!valid || !changed"
-        @click="apply"
+        @click.stop="apply"
         text="Apply"
         :loading="loading"
       />
@@ -39,23 +46,27 @@
       </VAlert>
     </VRow>
 
-    <VCardText :style="{ maxHeight: '750px', overflowY: 'auto' }">
-      <VForm :disabled="loading">
-        <FormValidator valid-on-init v-model="valid">
-          <VContainer fluid>
-            <VRow no-gutters>
-              <slot />
-            </VRow>
-          </VContainer>
-        </FormValidator>
-      </VForm>
+    <VCardText :style="{ maxHeight: '750px', overflowY: 'auto' }" :class="{ 'pa-0': collapsible && !filterOpened }">
+      <VExpandTransition mode="in-out">
+        <VForm :disabled="loading" v-show="!collapsible || filterOpened">
+          <FormValidator valid-on-init v-model="valid">
+            <VContainer fluid>
+              <VRow no-gutters>
+                <slot />
+              </VRow>
+            </VContainer>
+          </FormValidator>
+        </VForm>
+      </VExpandTransition>
     </VCardText>
   </VCard>
 </template>
 
 <script lang="ts">
+import { watch } from "vue";
+import { onUnmounted } from "vue";
 import { computed, type ComputedRef, inject, onMounted, provide, ref } from "vue";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 
 const key = Symbol("key:filters-container");
 
@@ -83,6 +94,7 @@ export default {
   },
   setup(_, ctx) {
     const router = useRouter();
+    const route = useRoute();
     const filters = ref(new Map<string, ComputedRef<FilterService>>());
 
     const valid = ref(false);
@@ -130,7 +142,20 @@ export default {
       ctx.emit("apply");
     }
 
-    return { empty, changed, clear, apply, valid };
+    const collapsible = ref(false);
+    const filterOpened = ref(true);
+
+    const breakpoint = route.meta.filtersCollapsibleBreakpoint as number;
+
+    function onResize() {
+      collapsible.value = breakpoint > window.innerWidth;
+    }
+
+    onMounted(() => typeof breakpoint === "number" && window.addEventListener("resize", onResize));
+    onUnmounted(() => typeof breakpoint === "number" && window.removeEventListener("resize", onResize));
+    typeof breakpoint === "number" && onResize();
+
+    return { empty, changed, clear, apply, valid, collapsible, filterOpened };
   },
 };
 </script>
