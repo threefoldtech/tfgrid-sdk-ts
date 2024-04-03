@@ -18,7 +18,6 @@
     </v-dialog>
     <v-btn
       size="small"
-      variant="outlined"
       :loading="loadingReserveNode"
       v-if="node.rentedByTwinId === 0"
       :disabled="disableButton || hasInsufficientBalance"
@@ -31,7 +30,6 @@
     <v-btn
       size="small"
       color="error"
-      variant="outlined"
       :loading="loadingUnreserveBtn"
       :disabled="disableButton"
       v-if="node.rentedByTwinId === profile?.twinId"
@@ -45,7 +43,7 @@
 <script lang="ts">
 import type { GridNode } from "@threefold/gridproxy_client";
 import { InsufficientBalanceError } from "@threefold/types";
-import { onMounted, type PropType, ref } from "vue";
+import { computed, onMounted, type PropType, ref } from "vue";
 
 import { useProfileManager } from "@/stores";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
@@ -62,7 +60,9 @@ export default {
   },
   setup(props, { emit }) {
     const profileManager = useProfileManager();
-    const profile = profileManager.profile;
+    const profile = computed(() => {
+      return profileManager.profile ?? null;
+    });
     const openUnreserveDialog = ref(false);
     const loadingUnreserveNode = ref(false);
     const loadingUnreserveBtn = ref(false);
@@ -85,7 +85,7 @@ export default {
     async function unReserveNode() {
       loadingUnreserveNode.value = true;
       try {
-        const grid = await getGrid(profile!);
+        const grid = await getGrid(profile.value!);
         createCustomToast(`Verify contracts for node ${props.node.nodeId}`, ToastType.info);
 
         const result = (await grid?.contracts.getActiveContracts({ nodeId: +props.node.nodeId })) as any;
@@ -122,9 +122,9 @@ export default {
 
     async function reserveNode() {
       try {
-        if (profile) {
+        if (profile.value) {
           loadingReserveNode.value = true;
-          const grid = await getGrid(profile);
+          const grid = await getGrid(profile.value);
           createCustomToast("Transaction Submitted", ToastType.info);
           await grid?.nodes.reserve({ nodeId: +props.node.nodeId });
           createCustomToast(`Transaction succeeded node ${props.node.nodeId} Reserved`, ToastType.success);

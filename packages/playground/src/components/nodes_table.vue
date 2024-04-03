@@ -26,7 +26,11 @@
 
           <tbody class="mx-4 my-4">
             <tr v-for="node in modelValue" v-bind:key="node.id" @click="openSheet($event, node)">
-              <TfNodeDetailsCard :node="node" />
+              <TfNodeDetailsCard
+                :key="node.rentedByTwinId"
+                :node="node"
+                @reload-table="$emit('reloadTable', node.nodeId)"
+              />
             </tr>
           </tbody>
         </v-data-table-server>

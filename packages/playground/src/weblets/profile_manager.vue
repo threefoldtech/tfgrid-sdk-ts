@@ -38,7 +38,7 @@
                     height="24px"
                     width="24px"
                     class="ml-2"
-                    href="https://www.manual.grid.tf/documentation/developers/tfchain/tfchain.html#contract-locking"
+                    :href="`${MANUAL_URL}/documentation/developers/tfchain/tfchain.html#contract-locking`"
                     target="_blank"
                   />
                 </template>
@@ -69,11 +69,7 @@
       <v-alert variant="tonal" class="mb-6">
         <p :style="{ maxWidth: '880px' }">
           Please visit
-          <a
-            class="app-link"
-            href="https://manual.grid.tf/threefold_token/storing_tft/tf_connect_app.html"
-            target="_blank"
-          >
+          <a class="app-link" :href="`${MANUAL_URL}/threefold_token/storing_tft/tf_connect_app.html`" target="_blank">
             the manual
           </a>
           get started.
@@ -231,22 +227,31 @@
                   </PasswordInputWrapper>
                 </template>
               </VTooltip>
+
               <v-dialog v-model="openAcceptTerms" fullscreen>
-                <iframe
-                  v-show="!termsLoading"
-                  src="https://library.threefold.me/info/legal/#/"
-                  frameborder="0"
-                  style="background-color: white"
-                  allow="fullscreen"
-                  height="95%"
-                  width="100%"
-                  sandbox="allow-forms allow-modals allow-scripts allow-popups allow-same-origin "
-                  @load="termsLoading = false"
-                ></iframe>
-                <v-btn @click="shouldActivateAccount ? activateAccount() : createNewAccount()" v-show="!termsLoading">
-                  accept terms and conditions
-                </v-btn>
-                <v-card v-show="termsLoading" :style="{ height: '100%' }">
+                <v-card @scroll="onScroll" v-if="!termsLoading">
+                  <v-card-text class="pa-15" v-html="acceptTermsContent"></v-card-text>
+                  <div class="terms-footer">
+                    <v-btn
+                      class="mr-2"
+                      @click="openAcceptTerms = termsLoading = false"
+                      v-show="!termsLoading"
+                      :color="theme.name.value === AppThemeSelection.light ? 'black' : 'white'"
+                      variant="outlined"
+                      id="accept-terms-and-condation"
+                      :text="capitalize('go back')"
+                    />
+                    <v-btn
+                      @click="shouldActivateAccount ? activateAccount() : createNewAccount()"
+                      v-show="!termsLoading"
+                      color="primary"
+                      id="accept-terms-and-condation"
+                      :disabled="disableTermsBtn"
+                      :text="capitalize('accept terms and conditions')"
+                    />
+                  </div>
+                </v-card>
+                <v-card v-else :style="{ height: '100%' }">
                   <v-card-text class="d-flex justify-center align-center" :style="{ height: '100%' }">
                     <v-progress-circular indeterminate />
                   </v-card-text>
@@ -387,7 +392,7 @@
                 Scan the QR code using
                 <a
                   class="app-link"
-                  href="https://www.manual.grid.tf/documentation/threefold_token/storing_tft/tf_connect_app.html"
+                  :href="`${MANUAL_URL}/documentation/threefold_token/storing_tft/tf_connect_app.html`"
                   target="_blank"
                 >
                   ThreeFold Connect
@@ -442,6 +447,7 @@ import { isAddress } from "@polkadot/util-crypto";
 import { KeypairType } from "@threefold/grid_client";
 import { validateMnemonic } from "bip39";
 import Cryptr from "cryptr";
+import { marked } from "marked";
 import md5 from "md5";
 import { computed, onMounted, type Ref, ref, watch } from "vue";
 import { nextTick } from "vue";
@@ -473,6 +479,7 @@ interface Credentials {
 const keyType = ["sr25519", "ed25519"];
 const keypairType = ref(KeypairType.sr25519);
 const enableReload = ref(true);
+const disableTermsBtn = ref(true);
 
 const theme = useTheme();
 const qrCodeText = ref("");
@@ -611,6 +618,7 @@ function getTabs() {
 const termsLoading = ref(false);
 const profileManager = useProfileManager();
 const openAcceptTerms = ref(false);
+const acceptTermsContent = ref("");
 const mnemonic = ref("");
 const isValidForm = ref(false);
 
@@ -859,10 +867,67 @@ function validateConfirmPassword(value: string) {
     return { message: "Passwords should match." };
   }
 }
+
+function parseAcceptTermsImage(tempDiv: HTMLDivElement, url: string) {
+  const imageElements = tempDiv.querySelectorAll("img");
+  imageElements.forEach(imgElement => {
+    imgElement.setAttribute("src", url + "legal__legal_header_.jpg");
+    // Update the style of the image.
+    imgElement.setAttribute("class", "info-legal-image");
+  });
+}
+
+function parseAcceptTermsLink(tempDiv: HTMLDivElement) {
+  const url = "https://library.threefold.me/info/legal#";
+  const linkElements = tempDiv.querySelectorAll("a");
+  linkElements.forEach(linkElement => {
+    const currentDomainMatch = linkElement.href.match(/^(https?:\/\/[^\\/]+)/);
+    if (
+      (currentDomainMatch && linkElement.href.includes("localhost")) ||
+      (currentDomainMatch && linkElement.href.includes("dashboard")) // To update only internal links
+    ) {
+      const currentDomain = currentDomainMatch[1];
+      linkElement.href = linkElement.href.replace(currentDomain, url);
+    }
+  });
+}
+watch(openAcceptTerms, async () => {
+  if (openAcceptTerms.value) {
+    try {
+      const url = "https://library.threefold.me/info/legal/";
+      const response = await fetch(url + "readme.md");
+      const mdContent = await response.text();
+      const parsedContent = marked.parse(mdContent);
+
+      const tempDiv = document.createElement("div");
+      tempDiv.innerHTML = parsedContent;
+
+      parseAcceptTermsImage(tempDiv, url);
+      parseAcceptTermsLink(tempDiv);
+
+      const updatedHtmlContent = tempDiv.innerHTML;
+      acceptTermsContent.value = updatedHtmlContent;
+    } catch (error) {
+      console.error("Error fetching or parsing Markdown content:", error);
+    } finally {
+      termsLoading.value = false;
+    }
+  }
+});
+
+function onScroll(e: UIEvent) {
+  const target = e.target as HTMLElement;
+  if (target.scrollTop + target.clientHeight >= target.scrollHeight) {
+    if (!termsLoading.value) {
+      disableTermsBtn.value = false;
+    }
+  }
+}
 </script>
 
 <script lang="ts">
 import { TwinNotExistError } from "@threefold/types";
+import { capitalize } from "vue";
 
 import QrcodeGenerator from "../components/qrcode_generator.vue";
 import type { Profile } from "../stores/profile_manager";
@@ -899,5 +964,28 @@ export default {
   .v-btn {
     font-size: 0.875rem !important;
   }
+}
+.info-legal-image {
+  width: 100%;
+  box-shadow: 0px 0px 5px 0px #ffffff75;
+  border-radius: 5px;
+  margin-bottom: 30px;
+}
+.terms-footer {
+  padding: 30px;
+  display: flex;
+  justify-content: center;
+  background: #2f4f4f2e;
+  margin-left: 15px;
+  margin-right: 15px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  border: 1px solid #00000029;
+}
+
+.terms-footer button {
+  padding: 13px !important;
+  height: auto !important;
+  border-radius: 6px;
 }
 </style>
