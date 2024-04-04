@@ -53,11 +53,9 @@
       <VExpandTransition mode="in-out">
         <VForm :disabled="loading" v-show="!collapsible || filterOpened">
           <FormValidator valid-on-init v-model="valid">
-            <VContainer fluid>
-              <VRow no-gutters>
-                <slot />
-              </VRow>
-            </VContainer>
+            <VRow no-gutters>
+              <slot />
+            </VRow>
           </FormValidator>
         </VForm>
       </VExpandTransition>
