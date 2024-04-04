@@ -9,6 +9,57 @@
     <TfFiltersLayout>
       <template #filters>
         <TfFiltersContainer class="mb-4" @apply="loadNodes(true)" :loading="loading">
+          <TfFilter query-route="dedicated" v-model="filters.dedicated">
+            <v-switch
+              color="primary"
+              inset
+              label="Dedicated Nodes (Only)"
+              v-model="filters.dedicated"
+              density="compact"
+              hide-details
+            />
+          </TfFilter>
+          <TfFilter query-route="gateway" v-model="filters.gateway">
+            <v-switch
+              color="primary"
+              inset
+              label="Gateways (Only)"
+              v-model="filters.gateway"
+              density="compact"
+              hide-details
+            />
+          </TfFilter>
+
+          <TfFilter query-route="gpu" v-model="filters.gpu">
+            <v-switch
+              color="primary"
+              inset
+              label="GPU Node (Only)"
+              v-model="filters.gpu"
+              density="compact"
+              hide-details
+            />
+          </TfFilter>
+
+          <TfFilter class="mt-4" query-route="node-status" v-model="filters.status">
+            <v-select
+              :model-value="filters.status || undefined"
+              @update:model-value="filters.status = $event || ''"
+              :items="[
+                { title: 'Up', value: NodeStatus.Up },
+                { title: 'Down', value: NodeStatus.Down },
+                { title: 'Standby', value: NodeStatus.Standby },
+              ]"
+              label="Select Nodes Status"
+              item-title="title"
+              item-value="value"
+              variant="outlined"
+              clearable
+              @click:clear="filters.status = ''"
+              density="compact"
+            />
+          </TfFilter>
+
           <TfFilter
             query-route="node-id"
             :rules="[
@@ -91,6 +142,121 @@
               </TfFilter>
             </template>
           </TfSelectLocation>
+
+          <TfFilter
+            query-route="free-public-ips"
+            :rules="[
+              validators.isNumeric('This field accepts numbers only.', {
+                no_symbols: true,
+              }),
+              validators.min('The node id should be larger then zero.', 1),
+              validators.startsWith('The node id start with zero.', '0'),
+              validators.validateResourceMaxNumber('This value is out of range.'),
+            ]"
+            v-model="filters.publicIPs"
+          >
+            <template #input="{ props }">
+              <VTextField
+                label="Free Public IPs"
+                variant="outlined"
+                v-model="filters.publicIPs"
+                density="compact"
+                v-bind="props"
+              >
+                <template #append-inner>
+                  <VTooltip text="Filter by free Public IPs">
+                    <template #activator="{ props }">
+                      <VIcon icon="mdi-information-outline" v-bind="props" />
+                    </template>
+                  </VTooltip>
+                </template>
+              </VTextField>
+            </template>
+          </TfFilter>
+
+          <TfFilter
+            query-route="free-ssd"
+            v-model="filters.freeSSD"
+            :rules="[
+              validators.isNumeric('This field accepts numbers only.'),
+              validators.min('The free ssd should be larger than zero.', 1),
+              validators.validateResourceMaxNumber('This value is out of range.'),
+            ]"
+          >
+            <template #input="{ props }">
+              <VTextField
+                label="Free SSD (GB)"
+                variant="outlined"
+                v-model="filters.freeSSD"
+                density="compact"
+                v-bind="props"
+              >
+                <template #append-inner>
+                  <VTooltip text="Filter by the minimum available amount of SSD in the node.">
+                    <template #activator="{ props }">
+                      <VIcon icon="mdi-information-outline" v-bind="props" />
+                    </template>
+                  </VTooltip>
+                </template>
+              </VTextField>
+            </template>
+          </TfFilter>
+
+          <TfFilter
+            query-route="free-hdd"
+            v-model="filters.freeHDD"
+            :rules="[
+              validators.isNumeric('This field accepts numbers only.'),
+              validators.min('The free hdd should be larger than zero.', 1),
+              validators.validateResourceMaxNumber('This value is out of range.'),
+            ]"
+          >
+            <template #input="{ props }">
+              <VTextField
+                label="Free HDD (GB)"
+                variant="outlined"
+                v-model="filters.freeHDD"
+                density="compact"
+                v-bind="props"
+              >
+                <template #append-inner>
+                  <VTooltip text="Filter by the minimum available amount of HDD in the node.">
+                    <template #activator="{ props }">
+                      <VIcon icon="mdi-information-outline" v-bind="props" />
+                    </template>
+                  </VTooltip>
+                </template>
+              </VTextField>
+            </template>
+          </TfFilter>
+
+          <TfFilter
+            query-route="free-ram"
+            v-model="filters.freeRAM"
+            :rules="[
+              validators.isNumeric('This field accepts numbers only.'),
+              validators.min('The free ram should be larger than zero.', 1),
+              validators.validateResourceMaxNumber('This value is out of range.'),
+            ]"
+          >
+            <template #input="{ props }">
+              <VTextField
+                label="Free RAM (GB)"
+                variant="outlined"
+                v-model="filters.freeRAM"
+                density="compact"
+                v-bind="props"
+              >
+                <template #append-inner>
+                  <VTooltip text="Filter by the minimum available amount of RAM in the node.">
+                    <template #activator="{ props }">
+                      <VIcon icon="mdi-information-outline" v-bind="props" />
+                    </template>
+                  </VTooltip>
+                </template>
+              </VTextField>
+            </template>
+          </TfFilter>
 
           <TfFilter
             query-route="min-ssd"
@@ -202,172 +368,6 @@
                 </template>
               </VTextField>
             </template>
-          </TfFilter>
-
-          <TfFilter
-            query-route="free-ssd"
-            v-model="filters.freeSSD"
-            :rules="[
-              validators.isNumeric('This field accepts numbers only.'),
-              validators.min('The free ssd should be larger than zero.', 1),
-              validators.validateResourceMaxNumber('This value is out of range.'),
-            ]"
-          >
-            <template #input="{ props }">
-              <VTextField
-                label="Free SSD (GB)"
-                variant="outlined"
-                v-model="filters.freeSSD"
-                density="compact"
-                v-bind="props"
-              >
-                <template #append-inner>
-                  <VTooltip text="Filter by the minimum available amount of SSD in the node.">
-                    <template #activator="{ props }">
-                      <VIcon icon="mdi-information-outline" v-bind="props" />
-                    </template>
-                  </VTooltip>
-                </template>
-              </VTextField>
-            </template>
-          </TfFilter>
-
-          <TfFilter
-            query-route="free-hdd"
-            v-model="filters.freeHDD"
-            :rules="[
-              validators.isNumeric('This field accepts numbers only.'),
-              validators.min('The free hdd should be larger than zero.', 1),
-              validators.validateResourceMaxNumber('This value is out of range.'),
-            ]"
-          >
-            <template #input="{ props }">
-              <VTextField
-                label="Free HDD (GB)"
-                variant="outlined"
-                v-model="filters.freeHDD"
-                density="compact"
-                v-bind="props"
-              >
-                <template #append-inner>
-                  <VTooltip text="Filter by the minimum available amount of HDD in the node.">
-                    <template #activator="{ props }">
-                      <VIcon icon="mdi-information-outline" v-bind="props" />
-                    </template>
-                  </VTooltip>
-                </template>
-              </VTextField>
-            </template>
-          </TfFilter>
-
-          <TfFilter
-            query-route="free-ram"
-            v-model="filters.freeRAM"
-            :rules="[
-              validators.isNumeric('This field accepts numbers only.'),
-              validators.min('The free ram should be larger than zero.', 1),
-              validators.validateResourceMaxNumber('This value is out of range.'),
-            ]"
-          >
-            <template #input="{ props }">
-              <VTextField
-                label="Free RAM (GB)"
-                variant="outlined"
-                v-model="filters.freeRAM"
-                density="compact"
-                v-bind="props"
-              >
-                <template #append-inner>
-                  <VTooltip text="Filter by the minimum available amount of RAM in the node.">
-                    <template #activator="{ props }">
-                      <VIcon icon="mdi-information-outline" v-bind="props" />
-                    </template>
-                  </VTooltip>
-                </template>
-              </VTextField>
-            </template>
-          </TfFilter>
-          <TfFilter
-            query-route="free-public-ips"
-            :rules="[
-              validators.isNumeric('This field accepts numbers only.', {
-                no_symbols: true,
-              }),
-              validators.min('The node id should be larger then zero.', 1),
-              validators.startsWith('The node id start with zero.', '0'),
-              validators.validateResourceMaxNumber('This value is out of range.'),
-            ]"
-            v-model="filters.publicIPs"
-          >
-            <template #input="{ props }">
-              <VTextField
-                label="Free Public IPs"
-                variant="outlined"
-                v-model="filters.publicIPs"
-                density="compact"
-                v-bind="props"
-              >
-                <template #append-inner>
-                  <VTooltip text="Filter by free Public IPs">
-                    <template #activator="{ props }">
-                      <VIcon icon="mdi-information-outline" v-bind="props" />
-                    </template>
-                  </VTooltip>
-                </template>
-              </VTextField>
-            </template>
-          </TfFilter>
-
-          <TfFilter query-route="node-status" v-model="filters.status">
-            <v-select
-              :model-value="filters.status || undefined"
-              @update:model-value="filters.status = $event || ''"
-              :items="[
-                { title: 'Up', value: NodeStatus.Up },
-                { title: 'Down', value: NodeStatus.Down },
-                { title: 'Standby', value: NodeStatus.Standby },
-              ]"
-              label="Select Nodes Status"
-              item-title="title"
-              item-value="value"
-              variant="outlined"
-              clearable
-              @click:clear="filters.status = ''"
-              density="compact"
-            />
-          </TfFilter>
-
-          <TfFilter query-route="gateway" v-model="filters.gateway">
-            <v-switch
-              color="primary"
-              inset
-              label="Gateways (Only)"
-              v-model="filters.gateway"
-              density="compact"
-              hide-details
-            />
-          </TfFilter>
-
-          <TfFilter query-route="gpu" v-model="filters.gpu">
-            <v-switch
-              color="primary"
-              inset
-              label="GPU Node (Only)"
-              v-model="filters.gpu"
-              density="compact"
-              hide-details
-            />
-          </TfFilter>
-
-          <TfFilter query-route="dedicated" v-model="filters.dedicated">
-            <v-switch
-              color="primary"
-              inset
-              label="Dedicated Nodes (Only)"
-              v-model="filters.dedicated"
-              density="compact"
-              hide-details
-            />
           </TfFilter>
         </TfFiltersContainer>
       </template>

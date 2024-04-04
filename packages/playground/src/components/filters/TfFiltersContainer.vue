@@ -24,7 +24,7 @@
         />
         <VBtn
           variant="outlined"
-          color="primary"
+          color="secondary"
           density="compact"
           :disabled="!valid || !changed"
           @click.stop="apply"
