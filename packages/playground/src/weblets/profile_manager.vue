@@ -475,7 +475,6 @@ const disableTermsBtn = ref(true);
 
 const theme = useTheme();
 const qrCodeText = ref("");
-const isValid = ref<boolean>(false);
 const props = defineProps({
   modelValue: {
     required: false,
@@ -820,12 +819,10 @@ async function storeAndLogin() {
   } catch (e) {
     if (e instanceof TwinNotExistError) {
       isNonActiveMnemonic.value = true;
-      isValid.value = true;
       openAcceptTerms.value = true;
       termsLoading.value = true;
     }
     enableReload.value = false;
-    isValid.value = false;
     return {
       message: normalizeError(e, "Something went wrong. please try again."),
     };
