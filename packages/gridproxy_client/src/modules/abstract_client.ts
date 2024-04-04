@@ -13,6 +13,12 @@ export abstract class AbstractClient<B, Q> {
   }
 
   public builder(queries: Partial<Q> = {}): B {
+    for (const key of Object.keys(queries)) {
+      if (!queries[key]) {
+        delete queries[key];
+      }
+    }
+
     return new this.__Builder(this.uri, queries);
   }
 }
