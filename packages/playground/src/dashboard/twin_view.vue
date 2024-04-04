@@ -62,7 +62,7 @@
                 <v-col>
                   <v-list-item v-if="!editEmail">
                     <div style="display: flex; justify-content: space-between">
-                      {{ profileManager.profile?.email ? profileManager.profile?.email : "None" }}
+                      {{ email }}
                       <v-icon @click="editEmail = true">mdi-pencil</v-icon>
                     </div>
                   </v-list-item>
@@ -193,7 +193,7 @@ import { useProfileManager } from "../stores";
 import type { FarmInterface } from "../types";
 import { createCustomToast, ToastType } from "../utils/custom_toast";
 import { getFarms } from "../utils/get_farms";
-import { getGrid, storeEmail } from "../utils/grid";
+import { getGrid, readEmail, storeEmail } from "../utils/grid";
 
 const profileManager = useProfileManager();
 
@@ -226,6 +226,7 @@ const apps = [
 onMounted(async () => {
   const profile = profileManager.profile!;
   const grid = await getGrid(profile);
+  email.value = await readEmail(grid!);
   if (!grid) {
     createCustomToast("Fetch Grid Failed", ToastType.danger);
 
@@ -268,8 +269,8 @@ async function saveEmail() {
   try {
     loading.value = true;
     savingEmail.value = true;
+    profileManager.updateEmail(email.value);
     await storeEmail(grid!, email.value);
-    profileManager.profile!.email = email.value;
     editEmail.value = false;
     loading.value = false;
     savingEmail.value = false;

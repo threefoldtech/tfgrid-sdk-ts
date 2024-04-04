@@ -43,6 +43,11 @@ const useProfileManager = defineStore("profile-manager", {
         this.profile.pk = pk;
       }
     },
+    updateEmail(email: string) {
+      if (this.profile) {
+        this.profile.email = email;
+      }
+    },
     clear() {
       this.profile = null;
     },
