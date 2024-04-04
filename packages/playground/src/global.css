@@ -135,7 +135,8 @@ a {
 }
 
 .v-list-item-title,
-.v-label--clickable {
+.v-label--clickable,
+.v-btn {
   font-size: 0.875rem !important;
 }
 
