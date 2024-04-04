@@ -149,8 +149,8 @@ export default {
       error: null,
     };
 
-    onMounted(() => form?.register(uid, fakeService));
-    onUnmounted(() => form?.unregister(uid));
+    onMounted(() => form?.register(uid.toString(), fakeService));
+    onUnmounted(() => form?.unregister(uid.toString()));
 
     const invalid = computed(() => {
       return (
@@ -186,7 +186,7 @@ export default {
     watch(
       status,
       status => {
-        form?.updateStatus(uid, status);
+        form?.updateStatus(uid.toString(), status);
         bindStatus(status);
       },
       { deep: true, immediate: true },
