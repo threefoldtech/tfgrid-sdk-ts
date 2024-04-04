@@ -93,7 +93,8 @@ export default {
 </script>
 
 <style>
-.tf-filter-item .v-label {
+.tf-filter-item .v-label,
+.v-btn {
   font-size: 14px !important;
 }
 </style>
