@@ -14,7 +14,7 @@ export abstract class AbstractClient<B, Q> {
 
   public builder(queries: Partial<Q> = {}): B {
     for (const key of Object.keys(queries)) {
-      if (!queries[key]) {
+      if (queries[key] === undefined || queries[key] === "" || queries[key] === null) {
         delete queries[key];
       }
     }
