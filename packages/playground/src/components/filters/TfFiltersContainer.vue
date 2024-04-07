@@ -1,70 +1,89 @@
 <template>
-  <VCard>
-    <VCardTitle
-      class="d-flex align-center"
-      :style="[collapsible ? { cursor: 'pointer' } : {}]"
-      @click="collapsible ? (filterOpened = !filterOpened) : undefined"
-    >
-      <span>Filters</span>
-      <VSpacer />
-      <VBtn
-        variant="outlined"
-        :disabled="loading || !valid || empty"
-        @click.stop="clear"
-        text="Clear"
-        density="compact"
-      />
-      <VBtn
-        variant="outlined"
-        color="secondary"
-        density="compact"
-        :disabled="!valid || !changed"
-        @click.stop="apply"
-        text="Apply"
-        :loading="loading"
-        class="mx-2"
-      />
-      <VBtn
-        :icon="filterOpened ? 'mdi-chevron-up' : 'mdi-chevron-down'"
-        density="compact"
-        variant="flat"
-        v-if="collapsible"
-      />
-    </VCardTitle>
+  <div
+    class="d-flex flex-column"
+    :style="{
+      height: !collapsible ? 'calc(750px + 48px)' : 'auto',
+      background: 'rgb(var(--v-theme-surface))',
+      color: 'rgba(var(--v-theme-on-surface), var(--v-high-emphasis-opacity))',
+    }"
+  >
+    <div>
+      <VCardTitle
+        class="d-flex align-center"
+        :style="[collapsible ? { cursor: 'pointer' } : {}]"
+        @click="collapsible ? (filterOpened = !filterOpened) : undefined"
+      >
+        <span>Filters</span>
+        <VSpacer />
+        <VBtn
+          variant="outlined"
+          :disabled="loading || !valid || empty"
+          @click.stop="clear"
+          text="Clear"
+          density="compact"
+        />
+        <VBtn
+          variant="outlined"
+          color="secondary"
+          density="compact"
+          :disabled="!valid || !changed"
+          @click.stop="apply"
+          text="Apply"
+          :loading="loading"
+          class="mx-2"
+        />
+        <VBtn
+          :icon="filterOpened ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+          density="compact"
+          variant="flat"
+          v-if="collapsible"
+        />
+      </VCardTitle>
+    </div>
 
     <VDivider />
 
-    <VRow no-gutters v-show="valid && (changed || (!loading && !empty))">
-      <VAlert color="info" variant="tonal" class="rounded-0">
-        <span>
-          {{ changed ? "Filter options were updated but not applied." : "" }} Click
-          <VCard
-            class="d-inline pa-1"
-            v-text="changed ? 'Apply' : 'Clear'"
-            flat
-            :color="$vuetify.theme.global.name === 'light' ? 'info' : undefined"
-          />
-          {{ changed ? "in order to reload your data." : "to reset your selected filters." }}
-        </span>
-      </VAlert>
-    </VRow>
+    <div>
+      <VRow no-gutters v-show="valid && (changed || (!loading && !empty))">
+        <VAlert color="info" variant="tonal" class="rounded-0">
+          <span>
+            {{ changed ? "Filter options were updated but not applied." : "" }} Click
+            <VCard
+              class="d-inline pa-1"
+              v-text="changed ? 'Apply' : 'Clear'"
+              flat
+              :color="$vuetify.theme.global.name === 'light' ? 'info' : undefined"
+            />
+            {{ changed ? "in order to reload your data." : "to reset your selected filters." }}
+          </span>
+        </VAlert>
+      </VRow>
+    </div>
 
-    <VCardText :style="{ maxHeight: '750px', overflowY: 'auto' }" :class="{ 'pa-0': collapsible && !filterOpened }">
-      <VExpandTransition mode="in-out">
-        <VForm :disabled="loading" v-show="!collapsible || filterOpened">
-          <FormValidator valid-on-init v-model="valid">
-            <VRow no-gutters>
-              <slot />
-            </VRow>
-          </FormValidator>
-        </VForm>
-      </VExpandTransition>
-    </VCardText>
-  </VCard>
+    <div
+      class="flex-grow-1"
+      :style="{
+        overflowY: 'auto',
+      }"
+    >
+      <div>
+        <VExpandTransition mode="in-out">
+          <VForm :disabled="loading" v-show="!collapsible || filterOpened">
+            <FormValidator valid-on-init v-model="valid">
+              <VContainer fluid>
+                <VRow no-gutters>
+                  <slot />
+                </VRow>
+              </VContainer>
+            </FormValidator>
+          </VForm>
+        </VExpandTransition>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
-import { watch } from "vue";
 import { onUnmounted } from "vue";
 import { computed, type ComputedRef, inject, onMounted, provide, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
