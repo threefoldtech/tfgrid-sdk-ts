@@ -15,8 +15,8 @@ function _applyRules(rules: Array<(value: string) => { message: string } | void>
 export const cruRules = _applyRules([
   required("CPU is required."),
   isInt("CPU must be a valid integer."),
-  min("CPU min is 1 cores.", 1),
-  max("CPU max is 256 cores.", 256),
+  min("Minimum allowed cpu cores is 1", 1),
+  max("Maximum allowed cpu cores is 256.", 256),
 ]);
 
 export const mruRules = _applyRules([

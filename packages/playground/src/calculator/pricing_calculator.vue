@@ -173,7 +173,7 @@
           <VRow v-else>
             <VCol cols="12">
               <VAlert type="error">
-                Please provide a valid data inorder to calculate your deployment price correctly.
+                Please provide a valid data in order to calculate your deployment price correctly.
               </VAlert>
             </VCol>
           </VRow>
