@@ -24,9 +24,9 @@
         ]"
         #="{ props }"
       >
-        <input-tooltip tooltip="SMTP admin email.">
+        <input-tooltip :tooltip="isDiscourse ? 'SMTP admin email, Username or API key.' : 'SMTP admin email'">
           <v-text-field
-            :label="isDiscourse ? 'Admin Email/Username' : 'Admin Email'"
+            label="Admin Email"
             placeholder="email@example.com"
             v-model="$props.modelValue.username"
             v-bind="props"
