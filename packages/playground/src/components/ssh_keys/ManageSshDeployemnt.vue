@@ -154,13 +154,13 @@ export default defineComponent({
       error: null,
     };
 
-    onMounted(() => form?.register(uid, fakeService));
-    onUnmounted(() => form?.unregister(uid));
+    onMounted(() => form?.register(`${uid}`, fakeService));
+    onUnmounted(() => form?.unregister(`${uid}`));
 
     watch(
       () => selectedKeys.value.length,
       num => {
-        form?.updateStatus(uid, num === 0 ? ValidatorStatus.Invalid : ValidatorStatus.Valid);
+        form?.updateStatus(`${uid}`, num === 0 ? ValidatorStatus.Invalid : ValidatorStatus.Valid);
       },
       { immediate: true },
     );
