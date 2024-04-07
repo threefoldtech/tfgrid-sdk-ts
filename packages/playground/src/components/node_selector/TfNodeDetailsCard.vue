@@ -291,7 +291,9 @@ export default {
 
     const price_usd = computed(() => {
       if (isGridNode(node.value)) {
-        return node.value?.price_usd;
+        // convert extra fee from mili usd to usd
+        const extraFee = node.value?.extraFee / 1000;
+        return node.value?.price_usd + extraFee;
       }
       return null;
     });

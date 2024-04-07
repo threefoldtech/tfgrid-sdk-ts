@@ -108,6 +108,7 @@ export interface GridNode {
     download: number;
   };
   price_usd: number;
+  extraFee: number;
 }
 
 export class GatewaysClient extends AbstractClient<GatewayBuilder, GatewaysQuery> {

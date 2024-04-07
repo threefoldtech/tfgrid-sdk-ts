@@ -352,6 +352,7 @@ export const nodeInitializer: GridNode = {
     download: 0,
   },
   price_usd: 0,
+  extraFee: 0,
 };
 
 export interface SSHKeyData {
