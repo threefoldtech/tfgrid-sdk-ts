@@ -353,3 +353,20 @@ export const nodeInitializer: GridNode = {
   },
   price_usd: 0,
 };
+
+export interface SSHKeyData {
+  id: number;
+  publicKey: string;
+  name: string;
+  createdAt: string;
+  isActive: boolean;
+  fingerPrint?: string;
+  deleting?: boolean;
+  activating?: boolean;
+}
+
+export enum SSHCreationMethod {
+  None = "",
+  Generate = "generate",
+  Import = "import",
+}
