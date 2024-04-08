@@ -1,4 +1,4 @@
-from utils.utils import generate_leters, generate_string, get_seed, valid_amount, invalid_address, invalid_amount, invalid_amount_negtive
+from utils.utils import generate_leters, generate_string, get_email, get_seed, valid_amount, invalid_address, invalid_amount, invalid_amount_negtive
 from pages.transfer import TransferPage
 from pages.dashboard import DashboardPage
 
@@ -10,7 +10,7 @@ def before_test_setup(browser):
     password = generate_string()
     dashboard_page.open_and_load()
     dashboard_page.import_account(get_seed())
-    dashboard_page.click_button(dashboard_page.connect_your_wallet(password))
+    dashboard_page.click_button(dashboard_page.connect_your_wallet(get_email(), password))
     transfer_page.navigate()
     return transfer_page
 
@@ -86,7 +86,7 @@ def test_twin_id(browser):
     assert transfer_page.wait_for('Cannot transfer to yourself')
     assert transfer_page.get_id_submit().is_enabled() == False
     transfer_page.recipient_id_input(999999999)
-    assert transfer_page.wait_for('Invalid Twin ID. This ID has no Twin.')
+    assert transfer_page.wait_for('This twin id doesn')
     assert transfer_page.get_id_submit().is_enabled() == False
     cases = [' ', generate_string(), invalid_address(), generate_leters()]
     for case in cases:

@@ -17,7 +17,6 @@ def get_seed():
                 "You must add account seed either in Config.ini or by exporting TFCHAIN_MNEMONICS.")
     return str(seed)
 
-
 def get_node_seed():
     config = configparser.ConfigParser()
     config.read('Config.ini')
@@ -29,7 +28,6 @@ def get_node_seed():
             print(
                 "You must add account seed either in Config.ini or by exporting TFCHAIN_NODE_MNEMONICS.")
     return str(seed)
-
 
 def get_stellar_address():
     config = configparser.ConfigParser()
@@ -43,29 +41,31 @@ def get_stellar_address():
                 "You must add account stellar address either in Config.ini or by exporting STELLAR_ADDRESS.")
     return str(address)
 
-
-def get_hex():
+def get_email():
     config = configparser.ConfigParser()
     config.read('Config.ini')
-    hex_seed = config['Utils']['hex_seed']
+    hex_seed = config['Utils']['email']
     if (hex_seed == ''):
         try:
-            hex_seed = json.loads(os.environ["TFCHAIN_HEX"])
+            hex_seed = json.loads(os.environ["EMAIL"])
         except:
             print(
-                "You must add account Hex Seed either in Config.ini or by exporting TFCHAIN_MNEMONICS.")
+                "You must add account Email either in Config.ini or by exporting EMAIL.")
     return str(hex_seed)
-
 
 def generate_string():
     chars = string.ascii_uppercase + string.digits
     return (''.join(random.choice(chars) for _ in range(10)))
 
-
 def generate_leters():
     chars = string.digits
     return (''.join(random.choice(chars) for _ in range(10)))
 
+def generate_email():
+    random_uppercase_chars = random.choices(string.ascii_uppercase, k=5)
+    random_uppercase_chars_string = ''.join(random_uppercase_chars)
+    email = generate_string() +'@'+ generate_string() +'.'+ random_uppercase_chars_string
+    return email
 
 def generate_ip():
     first = ['2']
@@ -81,7 +81,6 @@ def generate_ip():
                   )+''.join(random.choice(second))+'/'
     ip += ''.join(random.choice(port))
     return ip
-
 
 def generate_gateway():
     first = ['1', '2']
@@ -99,7 +98,6 @@ def generate_gateway():
                                ''.join(random.choice(second))
     return gateway
 
-
 def generate_inavalid_ip():
     first = ['6', '7', '8', '9']
     second = ['6', '7', '8', '9']
@@ -114,7 +112,6 @@ def generate_inavalid_ip():
                   )+''.join(random.choice(second))+'/'
     ip += str(port)
     return ip
-
 
 def generate_inavalid_gateway():
     first = ['6', '7', '8', '9']
@@ -132,7 +129,6 @@ def generate_inavalid_gateway():
                                ''.join(random.choice(second))
     return gateway
 
-
 def valid_amount():
     decimal = ((random.randrange(1, 9)))
     rational = (str(random.uniform(0.001, 0.1)))
@@ -140,23 +136,19 @@ def valid_amount():
     list = [decimal, float(sum)]
     return (random.choice(list))
 
-
 def invalid_amount():
     rational = (str(random.uniform(100, 10000)))
     return rational
-
 
 def invalid_amount_negtive():
     negative = (str(random.randrange(1, 99)))
     negative = '-'+negative
     return negative
 
-
 def invalid_address():
     chars = string.ascii_uppercase + string.digits
     begin = '5'
     return (begin+''.join(random.choice(chars) for _ in range(47)))
-
 
 def randomize_public_ipv4():
     ips = ['1.0.0.0', '9.255.255.255', '11.0.0.0', '126.255.255.255', '129.0.0.0', '169.253.255.255',
@@ -165,7 +157,6 @@ def randomize_public_ipv4():
     ip = random.choice(ips)
     ip_subnet = ip + '/' + random.choice(['26', '27', '28', '29'])
     return ip_subnet, ip
-
 
 def byte_converter(value):
     if value != '0':

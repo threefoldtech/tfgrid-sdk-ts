@@ -61,3 +61,8 @@ class GridProxy:
         r = requests.post(Base.gridproxy_url + 'nodes?farm_ids=' + farms[:-1])
         details = r.json()
         return details
+    
+    def get_stats(self):
+        r = requests.post('https://stats.' + Base.net + '.grid.tf/api/stats-summary')
+        stats_json = r.json()
+        return list(stats_json.values())
