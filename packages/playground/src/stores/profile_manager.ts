@@ -16,7 +16,7 @@ export interface Profile {
   email: string;
 }
 
-interface State {
+export interface State {
   profile: Profile | null;
 }
 
