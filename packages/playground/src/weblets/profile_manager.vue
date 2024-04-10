@@ -69,7 +69,7 @@
       <v-alert variant="tonal" class="mb-6">
         <p :style="{ maxWidth: '880px' }">
           Please visit
-          <a class="app-link" :href="`${MANUAL_URL}/threefold_token/storing_tft/tf_connect_app.html`" target="_blank">
+          <a class="app-link" :href="`${MANUAL_URL}/documentation/threefold_token/storing_tft/tf_connect_app.html`" target="_blank">
             the manual
           </a>
           get started.
