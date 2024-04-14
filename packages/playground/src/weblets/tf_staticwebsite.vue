@@ -40,12 +40,12 @@
         ]"
         #="{ props }"
       >
-        <input-tooltip tooltip="Github Repository to serve.">
+        <input-tooltip tooltip="Github Repository https url to serve.">
           <v-text-field label="Github Repository" v-model="githubUrl" v-bind="props" />
         </input-tooltip>
       </input-validator>
 
-      <input-tooltip tooltip="Github Branch to serve (optional).">
+      <input-tooltip tooltip="Github Branch name to serve (optional).">
         <v-text-field label="Github Branch" v-model="githubBranch" />
       </input-tooltip>
       <input-validator :value="root" :rules="[validators.required('HTML Directory is required.')]" #="{ props }">
