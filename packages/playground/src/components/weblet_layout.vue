@@ -85,7 +85,7 @@
           </div>
         </div>
 
-        <a :href="`${MANUAL_URL}/knowledge_base/cloud/pricing/pricing.html`" target="_blank" class="app-link">
+        <a :href="manual.pricing" target="_blank" class="app-link">
           Learn more about the pricing and how to unlock discounts.
         </a>
       </v-alert>
@@ -111,6 +111,8 @@
 import { events, type GridClient, type NodeInfo } from "@threefold/grid_client";
 import debounce from "lodash/debounce.js";
 import { computed, ref, watch } from "vue";
+
+import { manual } from "@/utils/manual";
 
 import { useProfileManager } from "../stores";
 import { getGrid, loadBalance } from "../utils/grid";

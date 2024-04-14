@@ -225,7 +225,7 @@
               <span>
                 If the vote count is insufficient and the time limit is reached, the proposal will be rejected.
               </span>
-              <a :href="`${MANUAL_URL}/documentation/dashboard/tfchain/tf_dao.html`" target="_blank">How to vote?</a>
+              <a :href="manual.dao" target="_blank">How to vote?</a>
               <br />
               <br />
               <h3>How do we count weight:</h3>
@@ -258,6 +258,8 @@ import type { Proposal, Proposals } from "@threefold/tfchain_client";
 import type moment from "moment";
 import { createToast } from "mosha-vue-toastify";
 import { onMounted, ref } from "vue";
+
+import { manual } from "@/utils/manual";
 
 import { useProfileManager } from "../stores";
 import type { FarmInterface } from "../types";
