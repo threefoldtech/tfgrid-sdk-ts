@@ -259,6 +259,28 @@
           </TfFilter>
 
           <TfFilter
+            query-route="num-gpu"
+            v-model="filters.numGpu"
+            :rules="[
+              validators.isNumeric('This field accepts numbers only.'),
+              validators.min('The number of gpus should be larger than zero.', 1),
+              validators.validateResourceMaxNumber('This value is out of range.'),
+            ]"
+          >
+            <template #input="{ props }">
+              <VTextField density="compact" label="Num GPU" variant="outlined" v-model="filters.numGpu" v-bind="props">
+                <template #append-inner>
+                  <VTooltip text="Filter by the number of gpus in the node.">
+                    <template #activator="{ props }">
+                      <VIcon icon="mdi-information-outline" v-bind="props" />
+                    </template>
+                  </VTooltip>
+                </template>
+              </VTextField>
+            </template>
+          </TfFilter>
+
+          <TfFilter
             query-route="min-ssd"
             v-model="filters.minSSD"
             :rules="[
@@ -460,6 +482,7 @@ export default {
       gpu: false,
       publicIPs: "",
       dedicated: false,
+      numGpu: "",
     });
 
     const loading = ref<boolean>(true);
@@ -506,6 +529,7 @@ export default {
             dedicated: filters.value.dedicated || undefined,
             sortBy: SortBy.Status,
             sortOrder: SortOrder.Asc,
+            numGpu: +filters.value.numGpu || undefined,
           },
           { loadFarm: true },
         );
