@@ -1,10 +1,10 @@
 <template>
   <v-card class="pa-6 mb-4">
     <div>
-      <h2 class="text-light">
+      <h3 class="text-light">
         <v-icon> mdi-cog-sync </v-icon>
         Manage SSH Keys
-      </h2>
+      </h3>
       <p class="mt-2">
         Facilitating access to deployed machines involves the incorporation or adaptation of SSH keys, with the
         flexibility to manage multiple keys seamlessly, allowing users to switch between them. Moreover, users can
@@ -63,22 +63,8 @@
     @delete="deleteKey($event)"
     @view="viewSelectedKey"
     @export="exportKeys($event)"
-    :header-icon="'mdi-key-chain-variant'"
-    :header-title="'Active Keys'"
-    :ssh-keys="activeKeys"
-    :loading="loading"
-    :deleting="deleting"
-  />
-
-  <ssh-table
-    v-if="!migrating"
-    @active="setActiveKey"
-    @inactive="setInactiveKey"
-    @delete="deleteKey($event)"
-    @view="viewSelectedKey"
-    @export="exportKeys($event)"
     :header-icon="'mdi-key-chain'"
-    :header-title="'All Keys'"
+    :header-title="'SSH Keys'"
     :ssh-keys="allKeys"
     :loading="loading"
     :deleting="deleting"
@@ -130,7 +116,7 @@ import { createCustomToast, ToastType } from "@/utils/custom_toast";
 import { formatSSHKeyTableCreatedAt } from "@/utils/date";
 import { getGrid, getMetadata, storeSSH } from "@/utils/grid";
 import { downloadAsFile, downloadAsJson } from "@/utils/helpers";
-
+import { generateSSHKeyName } from "@/utils/strings";
 export default defineComponent({
   name: "SSHView",
   components: {
@@ -249,8 +235,12 @@ export default defineComponent({
     const migrateOldKey = async (publicSSHKey: string) => {
       migrating.value = true;
       const parts = publicSSHKey.split(" ");
-      const keyName = parts[parts.length - 1];
-
+      let keyName = "";
+      if (parts.length < 3) {
+        keyName = generateSSHKeyName();
+      } else {
+        keyName = parts[parts.length - 1];
+      }
       const newKey: SSHKeyData = {
         createdAt: formatSSHKeyTableCreatedAt(new Date()),
         name: keyName,
