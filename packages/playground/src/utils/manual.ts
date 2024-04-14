@@ -14,4 +14,5 @@ export const manual = {
   billing_pricing: `${BASE}/dashboard/deploy/dedicated_machines.html#billing--pricing`,
   discount_levels: `${BASE}/wiki/cloudunits/pricing/staking_discount_levels.html#staking-discount-levels`,
   tfchain_stellar_bridge: `${BASE}/documentation/threefold_token/tft_bridges/tfchain_stellar_bridge.html`,
+  minting_receipts: `${BASE}/documentation/farmers/3node_building/minting_receipts.html`,
 };
