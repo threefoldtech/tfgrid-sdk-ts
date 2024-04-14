@@ -15,16 +15,33 @@ class TFKVStoreBackend implements BackendStorageInterface {
     this.client = new TFClient(url, mnemonic, storeSecret, keypairType);
   }
 
+  private async cleanFragments(key: string, start: number) {
+    let k = `${key}.${start}`;
+    let value = await this.client.kvStore.get({ key: k });
+    if (!value) {
+      return [];
+    }
+    const extrinsics: SubmittableExtrinsic<"promise", ISubmittableResult>[] = [];
+    while (value) {
+      extrinsics.push(await this.client.kvStore.delete({ key: k }));
+      start++;
+      k = `${key}.${start}`;
+      value = await this.client.kvStore.get({ key: k });
+    }
+    return extrinsics;
+  }
+
   @crop
   async set(key: string, value: string) {
     if (!value || value === '""') {
       return await this.remove(key);
     }
-    const extrinsics: SubmittableExtrinsic<"promise", ISubmittableResult>[] = [];
+    let extrinsics: SubmittableExtrinsic<"promise", ISubmittableResult>[] = [];
     const splits = this.split(key, value);
     for (const k of Object.keys(splits)) {
       extrinsics.push(await this.client.kvStore.set({ key: k, value: splits[k] }));
     }
+    extrinsics = extrinsics.concat(await this.cleanFragments(key, Object.keys(splits).length));
     return extrinsics;
   }
 
@@ -36,10 +53,11 @@ class TFKVStoreBackend implements BackendStorageInterface {
     }
     let i = 0;
     let val = value;
+    let k = key;
     while (val) {
       i++;
-      key = `${key}.${i}`;
-      val = await this.client.kvStore.get({ key });
+      k = `${key}.${i}`;
+      val = await this.client.kvStore.get({ key: k });
       value = `${value}${val}`;
     }
     return value;
@@ -51,15 +69,9 @@ class TFKVStoreBackend implements BackendStorageInterface {
     if (!value) {
       return;
     }
-    let i = 0;
-    let val = value;
-    const extrinsics: SubmittableExtrinsic<"promise", ISubmittableResult>[] = [];
-    while (val) {
-      extrinsics.push(await this.client.kvStore.delete({ key }));
-      i++;
-      key = `${key}.${i}`;
-      val = await this.client.kvStore.get({ key });
-    }
+
+    const extrinsics: SubmittableExtrinsic<"promise", ISubmittableResult>[] = await this.cleanFragments(key, 1);
+    extrinsics.push(await this.client.kvStore.delete({ key }));
     return extrinsics;
   }
 

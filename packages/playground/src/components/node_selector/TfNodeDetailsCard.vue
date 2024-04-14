@@ -1,6 +1,6 @@
 <template>
   <VCard
-    class="rounded-0 w-100"
+    class="tf-node-card rounded-0 w-100 pb-3"
     :class="{ 'selected-node': status !== 'Init' }"
     :color="
       status === 'Valid'
@@ -16,7 +16,7 @@
       onClick: selectable
         ? () => {
             if (status === 'Init' && node) {
-              $emit('node:select', node);
+              $emit('node:select', (node as NodeInfo));
             }
           }
         : undefined,
@@ -45,10 +45,10 @@
 
     <template #title>
       Node ID: {{ node?.nodeId }}
-      <VTooltip text="Node Serial Number" v-if="node && node.serialNumber">
+      <VTooltip text="Node Serial Number" v-if="node && serialNumber">
         <template #activator="{ props }">
           <VChip size="x-small" v-bind="props">
-            <span class="font-weight-bold" v-text="checkSerialNumber(node?.serialNumber)" />
+            <span class="font-weight-bold" v-text="checkSerialNumber(serialNumber)" />
           </VChip>
         </template>
       </VTooltip>
@@ -63,43 +63,115 @@
 
     <template #subtitle>
       <span v-if="node"> Farm: <span class="font-weight-bold" v-text="node.farmName" /> </span>
+      <span class="ml-2" v-if="node">
+        Uptime: <span class="font-weight-bold" v-text="toReadableDate(node.uptime)" />
+      </span>
     </template>
 
     <template #append>
       <template v-if="node">
-        <VChip v-if="node?.hasGPU" color="secondary" text="Node Has GPU" />
-        <VChip class="mx-2" color="primary" :text="node?.certificationType" />
-        <VChip
-          :color="node?.rentedByTwinId === 0 ? 'secondary' : 'success'"
-          :text="(node?.rentedByTwinId === 0 ? 'Shared' : 'Dedicated') + ' Node'"
-        />
+        <div class="d-flex align-center">
+          <VTooltip
+            :text="dedicated ? 'This node is dedicated for one user only' : 'Multiple users can deploy on this node'"
+            location="top"
+            v-if="node"
+          >
+            <template #activator="{ props }">
+              <VChip
+                v-bind="props"
+                class="mr-2"
+                :color="dedicated ? 'success' : 'secondary'"
+                :text="dedicated ? 'Dedicated' : 'Shared'"
+              />
+            </template>
+          </VTooltip>
+
+          <VTooltip text="Node Status" location="top" v-if="node && node.status">
+            <template #activator="{ props }">
+              <VChip
+                v-bind="props"
+                :color="node?.status === 'up' ? 'success' : 'error'"
+                class="mr-2"
+                :text="capitalize(node.status)"
+              />
+            </template>
+          </VTooltip>
+
+          <VTooltip
+            v-if="rentable || rented"
+            location="top"
+            :text="
+              rentable ? 'You can rent it exclusively for your workloads' : 'Rented as full node for a single user'
+            "
+          >
+            <template #activator="{ props }">
+              <VChip
+                v-if="rentable || rented"
+                v-bind="props"
+                class="mr-2"
+                color="secondary"
+                :text="rentable ? 'Rentable' : 'Rented'"
+              />
+            </template>
+          </VTooltip>
+
+          <VChip v-if="num_gpu" class="mr-2" color="secondary" :text="num_gpu + ' GPU'" />
+
+          <VTooltip v-if="node && node.certificationType" location="top" text="Certification type">
+            <template #activator="{ props }">
+              <VChip
+                v-bind="props"
+                class="mr-2"
+                color="primary"
+                :text="
+                  node?.certificationType === 'Diy' ? node?.certificationType.toUpperCase() : node?.certificationType
+                "
+              />
+            </template>
+          </VTooltip>
+
+          <VTooltip v-if="speed" location="top" text="Network Speed Test">
+            <template #activator="{ props }">
+              <span v-bind="props" v-if="speed?.upload && speed?.download" class="speed-chip mr-2 grey-darken-3">
+                <span>
+                  <v-icon icon="mdi-arrow-up"></v-icon>
+                  <span class="mx-1"> {{ formatSpeed(speed.upload) }}</span>
+                </span>
+                <span>
+                  <v-icon icon="mdi-arrow-down"></v-icon>
+                  <span class="mx-1">{{ formatSpeed(speed.download) }}</span>
+                </span>
+              </span>
+            </template>
+          </VTooltip>
+        </div>
       </template>
     </template>
 
     <template #text>
       <VRow>
-        <VCol>
-          <InputTooltip tooltip="CPU can be greater than 100% due to overprovisioning." align-center>
-            <ResourceDetails
-              name="CPU"
-              :used="node?.used_resources.cru ?? 0"
-              :total="node?.total_resources.cru ?? 0"
-              :text="cruText"
-            />
-          </InputTooltip>
+        <VCol class="tf-node-resource">
+          <ResourceDetails
+            name="CPU"
+            :used="node?.used_resources.cru ?? 0"
+            :total="node?.total_resources.cru ?? 0"
+            :text="cruText"
+            :cpuType="dmi?.processor[0]?.version"
+          />
         </VCol>
-        <VCol>
+        <VCol class="tf-node-resource">
           <ResourceDetails
             name="Memory"
             :used="node?.used_resources.mru ?? 0"
             :total="node?.total_resources.mru ?? 0"
             :text="mruText"
+            :memoryType="dmi?.memory[0]?.type"
           />
         </VCol>
       </VRow>
 
       <VRow>
-        <VCol>
+        <VCol class="tf-node-resource">
           <ResourceDetails
             name="SSD Disks"
             :used="node?.used_resources.sru ?? 0"
@@ -107,7 +179,7 @@
             :text="sruText"
           />
         </VCol>
-        <VCol>
+        <VCol class="tf-node-resource">
           <ResourceDetails
             name="HDD Disks"
             :used="node?.used_resources.hru ?? 0"
@@ -116,49 +188,124 @@
           />
         </VCol>
       </VRow>
+      <div class="mt-5 ml-auto text-right">
+        <span v-if="price_usd" class="font-weight-bold">{{ price_usd }} USD/Month</span>
+        <reserve-btn
+          v-if="node?.dedicated && node?.status !== 'down'"
+          class="ml-4"
+          :node="(node as GridNode)"
+          @updateTable="$emit('reload-table', node.nodeId)"
+        />
+      </div>
     </template>
   </VCard>
 </template>
-
 <script lang="ts">
 import type { NodeInfo } from "@threefold/grid_client";
 import type { GridNode } from "@threefold/gridproxy_client";
-import { computed, type PropType, ref } from "vue";
+import { computed, ref } from "vue";
+import { capitalize } from "vue";
 
+import ReserveBtn from "@/dashboard/components/reserve_action_btn.vue";
 import { getCountryCode } from "@/utils/get_nodes";
+import toReadableDate from "@/utils/to_readable_data";
 
 import formatResourceSize from "../../utils/format_resource_size";
 import ResourceDetails from "./node_details_internals/ResourceDetails.vue";
 
 export default {
   name: "TfNodeDetailsCard",
-  components: { ResourceDetails },
+  components: { ResourceDetails, ReserveBtn },
   props: {
-    node: Object as PropType<NodeInfo>,
-    status: String as PropType<"Init" | "Pending" | "Invalid" | "Valid">,
+    node: Object as () => NodeInfo | GridNode,
+    status: String as () => "Init" | "Pending" | "Invalid" | "Valid",
     selectable: Boolean,
     flat: Boolean,
   },
   emits: {
     "node:select": (node: NodeInfo) => true || node,
+    "reload-table": (id: number) => id,
   },
   setup(props) {
+    const node = ref(props.node);
     const countryFlagSrc = computed(() => {
-      const conuntryCode = getCountryCode(props.node as unknown as GridNode);
-
-      if (conuntryCode.length > 2) {
+      const countryCode = getCountryCode(props.node as GridNode);
+      if (countryCode.length > 2) {
         return "";
       }
 
       const imageUrl =
-        conuntryCode.toLocaleLowerCase() != "ch"
-          ? `https://www.worldatlas.com/r/w425/img/flag/${conuntryCode?.toLocaleLowerCase()}-flag.jpg`
-          : `https://www.worldatlas.com/r/w425/img/flag/${conuntryCode?.toLocaleLowerCase()}-flag.png`;
+        countryCode.toLowerCase() !== "ch"
+          ? `https://www.worldatlas.com/r/w425/img/flag/${countryCode.toLowerCase()}-flag.jpg`
+          : `https://www.worldatlas.com/r/w425/img/flag/${countryCode.toLowerCase()}-flag.png`;
 
       return imageUrl;
     });
 
-    function normalizeBytesResourse(name: "mru" | "sru" | "hru") {
+    // A guard to check node type
+    function isGridNode(node: unknown): node is GridNode {
+      return !!node && typeof node === "object" && "num_gpu" in node;
+    }
+
+    const dedicated = computed(() => {
+      if (isGridNode(node.value)) {
+        return node.value?.dedicated;
+      }
+      return null;
+    });
+
+    const serialNumber = computed(() => {
+      if (isGridNode(node.value)) {
+        return null;
+      }
+      return node.value?.serialNumber;
+    });
+
+    const num_gpu = computed(() => {
+      if (isGridNode(node.value)) {
+        return node.value?.num_gpu;
+      }
+      return node.value?.hasGPU;
+    });
+
+    const rentable = computed(() => {
+      if (isGridNode(node.value)) {
+        return node.value?.rentable;
+      }
+      return null;
+    });
+
+    const rented = computed(() => {
+      if (isGridNode(node.value)) {
+        return node.value?.rented;
+      }
+      return null;
+    });
+
+    const speed = computed(() => {
+      if (isGridNode(node.value)) {
+        return node.value?.speed;
+      }
+      return null;
+    });
+
+    const price_usd = computed(() => {
+      if (isGridNode(node.value)) {
+        // convert extra fee from mili usd to usd
+        const extraFee = node.value?.extraFee / 1000;
+        return node.value?.price_usd + extraFee;
+      }
+      return null;
+    });
+
+    const dmi = computed(() => {
+      if (isGridNode(node.value)) {
+        return node.value?.dmi;
+      }
+      return null;
+    });
+
+    function normalizeBytesResource(name: "mru" | "sru" | "hru") {
       return () => {
         if (!props.node) {
           return "";
@@ -184,11 +331,34 @@ export default {
     const cruText = computed(() =>
       props.node ? `${props.node.used_resources.cru} / ${props.node.total_resources.cru} (Cores)` : "",
     );
-    const mruText = computed(normalizeBytesResourse("mru"));
-    const sruText = computed(normalizeBytesResourse("sru"));
-    const hruText = computed(normalizeBytesResourse("hru"));
+    const mruText = computed(normalizeBytesResource("mru"));
+    const sruText = computed(normalizeBytesResource("sru"));
+    const hruText = computed(normalizeBytesResource("hru"));
 
-    return { cruText, mruText, sruText, hruText, checkSerialNumber, countryFlagSrc };
+    function formatSpeed(speed: number): string {
+      return formatResourceSize(speed, true).toLocaleLowerCase() + "ps";
+    }
+
+    return {
+      cruText,
+      mruText,
+      sruText,
+      hruText,
+      countryFlagSrc,
+      toReadableDate,
+      dedicated,
+      serialNumber,
+      num_gpu,
+      rentable,
+      rented,
+      speed,
+      price_usd,
+      dmi,
+      checkSerialNumber,
+      capitalize,
+      formatResourceSize,
+      formatSpeed,
+    };
   },
 };
 </script>
@@ -200,5 +370,15 @@ export default {
   border-radius: 50%;
   color: white;
   font-weight: 700;
+}
+
+.speed-chip {
+  display: flex;
+  flex-direction: column !important;
+  font-size: 0.7rem;
+  font-weight: bold;
+  background-color: rgb(var(--v-speed-chip));
+  padding: 5px 12px;
+  border-radius: 9999px;
 }
 </style>

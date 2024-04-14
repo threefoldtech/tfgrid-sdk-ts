@@ -1,6 +1,6 @@
 <template>
   <div class="d-flex" v-if="!disabled">
-    <v-tooltip :text="tooltip || 'None!'" :location="location">
+    <v-tooltip :text="tooltip || 'None!'" :location="location" :width="width ? width : ''">
       <template #activator="{ props }">
         {{ getPropsRef(props) }}
         <div class="d-flex" :class="{ 'w-100': !inline, 'align-center': alignCenter }">
@@ -49,6 +49,10 @@ export default {
     },
     location: {
       type: String as PropType<VTooltip["location"]>,
+      required: false,
+    },
+    width: {
+      type: String,
       required: false,
     },
     disabled: Boolean,

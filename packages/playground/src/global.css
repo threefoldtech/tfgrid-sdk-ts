@@ -110,6 +110,18 @@ a {
   font-weight: 600 !important;
 }
 
+.v-data-table-header__content {
+  justify-content: center !important;
+  text-align: center !important;
+}
+
+.v-data-table__td {
+  text-align: center;
+}
+.v-data-table__tbody {
+  text-align: center !important;
+}
+
 .font-14 {
   font-size: 14px !important;
 }
@@ -123,6 +135,16 @@ a {
 }
 
 .v-list-item-title,
-.v-label--clickable {
+.v-label--clickable,
+.v-btn {
   font-size: 0.875rem !important;
+}
+
+.md-blockquote {
+  margin-top: 40px;
+  margin-bottom: 40px;
+  padding: 30px;
+  background: #2f4f4f2e;
+  border-radius: 4px;
+  border-left: 5px solid #1c81dd;
 }

@@ -51,7 +51,7 @@
             If you don't know what the Captain root domain is, make sure to read the
             <a
               target="_blank"
-              href="https://www.manual.grid.tf/documentation/dashboard/solutions/caprover.html"
+              :href="`${MANUAL_URL}/documentation/dashboard/solutions/caprover.html`"
               :style="{ color: 'inherit' }"
             >
               quick start documentation.
@@ -77,6 +77,8 @@
             </input-tooltip>
           </input-validator>
         </password-input-wrapper>
+
+        <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
       </template>
 
       <template #leader>
@@ -114,6 +116,7 @@ const domain = ref("");
 const password = ref(generatePassword(10));
 const leader = ref(createWorker(generateName({ prefix: "cr" })));
 const workers = ref<CW[]>([]);
+const selectedSSHKeys = ref("");
 
 async function deploy() {
   layout.value.setStatus("deploy");
@@ -134,14 +137,14 @@ async function deploy() {
           { key: "SWM_NODE_MODE", value: "leader" },
           { key: "CAPROVER_ROOT_DOMAIN", value: domain.value },
           { key: "CAPTAIN_IMAGE_VERSION", value: "latest" },
-          { key: "PUBLIC_KEY", value: profileManager.profile!.ssh },
+          { key: "PUBLIC_KEY", value: selectedSSHKeys.value },
           { key: "DEFAULT_PASSWORD", value: password.value },
           { key: "CAPTAIN_IS_DEBUG", value: "true" },
         ]),
         ...workers.value.map(worker =>
           normalizeCaproverWorker(worker, [
             { key: "SWM_NODE_MODE", value: "worker" },
-            { key: "PUBLIC_KEY", value: profileManager.profile!.ssh },
+            { key: "PUBLIC_KEY", value: selectedSSHKeys.value },
           ]),
         ),
       ],
@@ -183,6 +186,10 @@ function normalizeCaproverWorker(worker: CW, envs: Env[]): Machine {
     certified: worker.certified,
   };
 }
+
+function updateSSHkeyEnv(selectedKeys: string) {
+  selectedSSHKeys.value = selectedKeys;
+}
 </script>
 
 <script lang="ts">
@@ -190,6 +197,7 @@ import { createNetwork } from "@/utils/deploy_helpers";
 
 import CaproverWorker, { createWorker } from "../components/caprover_worker.vue";
 import ExpandableLayout from "../components/expandable_layout.vue";
+import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";
 import rootFs from "../utils/root_fs";
 
@@ -198,6 +206,7 @@ export default {
   components: {
     CaproverWorker,
     ExpandableLayout,
+    ManageSshDeployemnt,
   },
 };
 </script>

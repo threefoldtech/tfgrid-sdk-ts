@@ -85,7 +85,7 @@
       <input-tooltip
         inline
         tooltip="Click to know more about dedicated machines."
-        href="https://www.manual.grid.tf/documentation/dashboard/deploy/dedicated_machines.html"
+        :href="`${MANUAL_URL}/documentation/dashboard/deploy/dedicated_machines.html`"
       >
         <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
       </input-tooltip>
@@ -110,6 +110,8 @@
         }"
         v-model="selectionDetails"
       />
+
+      <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
     </form-validator>
 
     <template #footer-actions>
@@ -152,6 +154,7 @@ const certified = ref(false);
 const rootFilesystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solution.value?.memory ?? 0));
 const selectionDetails = ref<SelectionDetails>();
 const mycelium = ref(false);
+const selectedSSHKeys = ref("");
 
 async function deploy() {
   layout.value.setStatus("deploy");
@@ -190,7 +193,7 @@ async function deploy() {
           mycelium: mycelium.value,
           publicIpv4: ipv4.value,
           envs: [
-            { key: "SSH_KEY", value: profileManager.profile!.ssh },
+            { key: "SSH_KEY", value: selectedSSHKeys.value },
             { key: "USERNAME", value: username.value },
             { key: "PASSWORD", value: password.value },
             { key: "UMBREL_DISK", value: "/umbrelDisk" },
@@ -210,15 +213,20 @@ async function deploy() {
     layout.value.setStatus("failed", normalizeError(e, "Failed to deploy an Umbrel instance."));
   }
 }
+
+function updateSSHkeyEnv(selectedKeys: string) {
+  selectedSSHKeys.value = selectedKeys;
+}
 </script>
 
 <script lang="ts">
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
+import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";
 import type { SelectionDetails } from "../types/nodeSelector";
 
 export default {
   name: "TfUmbrel",
-  components: { SelectSolutionFlavor },
+  components: { SelectSolutionFlavor, ManageSshDeployemnt },
 };
 </script>

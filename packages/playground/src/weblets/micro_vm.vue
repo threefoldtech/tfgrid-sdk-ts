@@ -59,7 +59,7 @@
         <input-tooltip
           inline
           tooltip="Click to know more about dedicated machines."
-          href="https://www.manual.grid.tf/documentation/dashboard/deploy/dedicated_machines.html"
+          :href="`${MANUAL_URL}/documentation/dashboard/deploy/dedicated_machines.html`"
         >
           <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
         </input-tooltip>
@@ -82,6 +82,8 @@
           }"
           v-model="selectionDetails"
         />
+
+        <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
       </template>
 
       <template #env>
@@ -241,6 +243,7 @@ const dedicated = ref(false);
 const certified = ref(false);
 const rootFilesystemSize = computed(() => solution.value?.disk);
 const selectionDetails = ref<SelectionDetails>();
+const selectedSSHKeys = ref("");
 
 function layoutMount() {
   if (envs.value.length > 0) {
@@ -249,7 +252,7 @@ function layoutMount() {
 
   envs.value.unshift({
     key: "SSH_KEY",
-    value: profileManager.profile!.ssh,
+    value: selectedSSHKeys.value,
   });
 }
 
@@ -305,11 +308,16 @@ async function deploy() {
     layout.value.setStatus("failed", normalizeError(e, "Failed to deploy micro virtual machine instance."));
   }
 }
+
+function updateSSHkeyEnv(selectedKeys: string) {
+  selectedSSHKeys.value = selectedKeys;
+}
 </script>
 
 <script lang="ts">
 import ExpandableLayout from "../components/expandable_layout.vue";
 import SelectVmImage from "../components/select_vm_image.vue";
+import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";
 import type { solutionFlavor as SolutionFlavor } from "../types";
 import type { SelectionDetails } from "../types/nodeSelector";

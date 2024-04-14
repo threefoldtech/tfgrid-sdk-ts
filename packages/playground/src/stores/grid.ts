@@ -5,7 +5,7 @@ import { getGrid } from "@/utils/grid";
 
 import type { Profile } from "./profile_manager";
 
-interface IGrid {
+export interface IGrid {
   grid: GridClient;
   client: GridClient;
 }

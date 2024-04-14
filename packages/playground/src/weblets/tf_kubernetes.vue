@@ -60,6 +60,8 @@
             </input-tooltip>
           </password-input-wrapper>
         </input-validator>
+
+        <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
       </template>
 
       <template #master>
@@ -98,6 +100,7 @@ const name = ref(generateName({ prefix: "k8s" }));
 const clusterToken = ref(generatePassword(10));
 const master = ref(createWorker(generateName({ prefix: "mr" })));
 const workers = ref<K8sWorker[]>([]);
+const selectedSSHKeys = ref("");
 
 function addWorker() {
   workers.value.push(createWorker());
@@ -118,7 +121,7 @@ async function deploy() {
       clusterToken: clusterToken.value,
       master: master.value!,
       workers: workers.value,
-      sshKey: profileManager.profile!.ssh,
+      sshKey: selectedSSHKeys.value,
     });
 
     layout.value.reloadDeploymentsList();
@@ -128,11 +131,16 @@ async function deploy() {
     layout.value.setStatus("failed", normalizeError(e, "Failed to deploy kubernetes cluster."));
   }
 }
+
+function updateSSHkeyEnv(selectedKeys: string) {
+  selectedSSHKeys.value = selectedKeys;
+}
 </script>
 
 <script lang="ts">
 import ExpandableLayout from "../components/expandable_layout.vue";
 import K8SWorker from "../components/k8s_worker.vue";
+import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";
 import { normalizeError } from "../utils/helpers";
 
@@ -141,6 +149,7 @@ export default {
   components: {
     K8SWorker,
     ExpandableLayout,
+    ManageSshDeployemnt,
   },
 };
 </script>

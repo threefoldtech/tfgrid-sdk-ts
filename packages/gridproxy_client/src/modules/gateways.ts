@@ -47,6 +47,29 @@ export interface GPUCard {
   contract: number;
 }
 
+export interface DMI {
+  bios: {
+    vendor: string;
+    version: string;
+  };
+  baseboard: {
+    manufacturer: string;
+    product_name: string;
+  };
+  processor: [
+    {
+      version: string;
+      thread_count: string;
+    },
+  ];
+  memory: [
+    {
+      manufacturer: string;
+      type: string;
+    },
+  ];
+}
+
 export interface GridNode {
   id: string;
   nodeId: number;
@@ -77,6 +100,15 @@ export interface GridNode {
   cards: GPUCard[];
   num_gpu: number;
   healthy: boolean;
+  rentable: boolean;
+  rented: boolean;
+  dmi: DMI;
+  speed: {
+    upload: number;
+    download: number;
+  };
+  price_usd: number;
+  extraFee: number;
 }
 
 export class GatewaysClient extends AbstractClient<GatewayBuilder, GatewaysQuery> {

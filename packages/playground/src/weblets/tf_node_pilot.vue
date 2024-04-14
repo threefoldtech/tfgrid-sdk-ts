@@ -62,7 +62,7 @@
       <input-tooltip
         inline
         tooltip="Click to know more about dedicated machines."
-        href="https://www.manual.grid.tf/documentation/dashboard/deploy/dedicated_machines.html"
+        :href="`${MANUAL_URL}/documentation/dashboard/deploy/dedicated_machines.html`"
       >
         <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
       </input-tooltip>
@@ -87,6 +87,8 @@
         }"
         v-model="selectionDetails"
       />
+
+      <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
     </form-validator>
 
     <template #footer-actions>
@@ -118,6 +120,8 @@ const dedicated = ref(false);
 const certified = ref(false);
 const rootFilesystemSize = 2;
 const selectionDetails = ref<SelectionDetails>();
+const selectedSSHKeys = ref("");
+
 async function deploy() {
   layout.value.setStatus("deploy");
 
@@ -141,7 +145,7 @@ async function deploy() {
           publicIpv4: true,
           publicIpv6: true,
           planetary: false,
-          envs: [{ key: "SSH_KEY", value: profileManager.profile!.ssh }],
+          envs: [{ key: "SSH_KEY", value: selectedSSHKeys.value }],
           rootFilesystemSize,
           disks: [
             {
@@ -167,14 +171,20 @@ async function deploy() {
     layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Node Pilot instance."));
   }
 }
+
+function updateSSHkeyEnv(selectedKeys: string) {
+  selectedSSHKeys.value = selectedKeys;
+}
 </script>
 
 <script lang="ts">
+import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";
 import type { SelectionDetails } from "../types/nodeSelector";
 import { normalizeError } from "../utils/helpers";
 
 export default {
   name: "NodePilot",
+  components: { ManageSshDeployemnt },
 };
 </script>

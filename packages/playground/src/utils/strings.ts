@@ -24,3 +24,32 @@ function generateString(from: string, length: number): string {
   }
   return str;
 }
+
+export function generateSSHKeyName() {
+  // List of words to choose from
+  const words = [
+    "moon",
+    "earth",
+    "sun",
+    "star",
+    "galaxy",
+    "nebula",
+    "comet",
+    "planet",
+    "asteroid",
+    "satellite",
+    "mercury",
+    "venus",
+    "mars",
+    "jupiter",
+    "saturn",
+    "uranus",
+    "neptune",
+    "pluto",
+    "meteor",
+    "cosmos",
+  ];
+
+  const keyName = words.sort(() => Math.random() - 0.5)[0];
+  return keyName;
+}

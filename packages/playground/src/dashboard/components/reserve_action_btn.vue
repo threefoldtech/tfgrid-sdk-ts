@@ -18,35 +18,30 @@
     </v-dialog>
     <v-btn
       size="small"
-      outlined
       :loading="loadingReserveNode"
-      :disabled="disableButton"
       v-if="node.rentedByTwinId === 0"
+      :disabled="disableButton || hasInsufficientBalance"
       color="primary"
       @click.stop="reserveNode"
     >
       Reserve
     </v-btn>
-
+    <span v-if="node.rentedByTwinId === 0" class="ml-2">
+      <v-tooltip text="You must acquire a minimum of 2 TFTs in order to reserve any node." location="bottom">
+        <template #activator="{ props }">
+          <VIcon icon="mdi-information-outline" v-bind="props" />
+        </template>
+      </v-tooltip>
+    </span>
     <v-btn
       size="small"
-      outlined
       color="error"
       :loading="loadingUnreserveBtn"
       :disabled="disableButton"
-      v-if="node.rentedByTwinId === profileManager.profile?.twinId"
+      v-if="node.rentedByTwinId === profile?.twinId"
       @click.stop="removeReserve"
     >
       Unreserve
-    </v-btn>
-
-    <v-btn
-      size="small"
-      variant="text"
-      v-if="node.rentedByTwinId !== 0 && node.rentedByTwinId !== profileManager.profile?.twinId"
-      color="error"
-    >
-      Reserved
     </v-btn>
   </container>
 </template>
@@ -54,14 +49,14 @@
 <script lang="ts">
 import type { GridNode } from "@threefold/gridproxy_client";
 import { InsufficientBalanceError } from "@threefold/types";
-import { type PropType, ref } from "vue";
+import { computed, type PropType, ref, watch } from "vue";
 
 import { useProfileManager } from "@/stores";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
 import { getGrid } from "@/utils/grid";
 import { notifyDelaying } from "@/utils/notifications";
 
-const profileManager = useProfileManager();
+import { useProfileManagerController } from "../../components/profile_manager_controller.vue";
 
 export default {
   name: "ReserveBtn",
@@ -72,11 +67,31 @@ export default {
     },
   },
   setup(props, { emit }) {
+    const profileManager = useProfileManager();
+    const profileManagerController = useProfileManagerController();
+    const profile = computed(() => {
+      return profileManager.profile ?? null;
+    });
     const openUnreserveDialog = ref(false);
     const loadingUnreserveNode = ref(false);
     const loadingUnreserveBtn = ref(false);
     const loadingReserveNode = ref(false);
     const disableButton = ref(false);
+    const hasInsufficientBalance = ref(false);
+    const balance = profileManagerController.balance;
+    const freeBalance = computed(() => balance.value?.free ?? 0);
+
+    watch(
+      freeBalance,
+      (newFreeBalance, _) => {
+        if (newFreeBalance < 2) {
+          hasInsufficientBalance.value = true;
+        } else {
+          hasInsufficientBalance.value = false;
+        }
+      },
+      { immediate: true },
+    );
 
     function removeReserve() {
       openUnreserveDialog.value = true;
@@ -85,7 +100,7 @@ export default {
     async function unReserveNode() {
       loadingUnreserveNode.value = true;
       try {
-        const grid = await getGrid(profileManager.profile!);
+        const grid = await getGrid(profile.value!);
         createCustomToast(`Verify contracts for node ${props.node.nodeId}`, ToastType.info);
 
         const result = (await grid?.contracts.getActiveContracts({ nodeId: +props.node.nodeId })) as any;
@@ -121,11 +136,10 @@ export default {
     }
 
     async function reserveNode() {
-      const isLogged = profileManager.profile;
       try {
-        if (isLogged) {
+        if (profile.value) {
           loadingReserveNode.value = true;
-          const grid = await getGrid(profileManager.profile!);
+          const grid = await getGrid(profile.value);
           createCustomToast("Transaction Submitted", ToastType.info);
           await grid?.nodes.reserve({ nodeId: +props.node.nodeId });
           createCustomToast(`Transaction succeeded node ${props.node.nodeId} Reserved`, ToastType.success);
@@ -153,13 +167,14 @@ export default {
     return {
       openUnreserveDialog,
       loadingUnreserveNode,
-      unReserveNode,
       loadingReserveNode,
+      unReserveNode,
       reserveNode,
       removeReserve,
       disableButton,
       loadingUnreserveBtn,
-      profileManager,
+      profile,
+      hasInsufficientBalance,
     };
   },
 };

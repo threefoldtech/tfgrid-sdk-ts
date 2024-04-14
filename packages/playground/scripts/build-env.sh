@@ -6,8 +6,7 @@ STELLAR_NETWORK="${STELLAR_NETWORK:=test}"
 TIMEOUT="${TIMEOUT:=10000}"
 PAGE_SIZE="${PAGE_SIZE:=20}"
 MINTING_URL="https://alpha.minting.tfchain.grid.tf"
-STATS_URL="https://stats.grid.tf"
-
+MANUAL_URL="${MANUAL_URL:-https://www.manual.grid.tf}"
 
 STELLAR_ENV_Vars=(
     STELLAR_HORIZON_URL
@@ -93,7 +92,8 @@ window.env = {
   MINTING_URL: '$MINTING_URL',
   STATS_URL: '$STATS_URL',
   TIMEOUT: +'$TIMEOUT',
-  PAGE_SIZE: +'$PAGE_SIZE'
+  PAGE_SIZE: +'$PAGE_SIZE',
+  MANUAL_URL: '$MANUAL_URL'
 };
 "
 

@@ -17,6 +17,8 @@ export interface RouteMeta {
   info?: InfoMeta;
   publicPath?: boolean;
   requireSSH?: boolean;
+  sidebarBreakpoint?: number;
+  filtersCollapsibleBreakpoint?: number;
 }
 
 /**
@@ -426,7 +428,7 @@ function createTFFarmsRoutes(): RouteRecordRaw[] {
         {
           path: DashboardRoutes.Farms.FarmFinder,
           component: () => import("@/views/farms.vue"),
-          meta: { title: "Farm Finder", publicPath: true },
+          meta: { title: "Farm Finder", publicPath: true, sidebarBreakpoint: 1000, filtersCollapsibleBreakpoint: 1350 },
         },
         {
           path: DashboardRoutes.Farms.Simulator,
@@ -492,13 +494,13 @@ function createDeployRoutes(): RouteRecordRaw[] {
       children: [
         {
           path: DashboardRoutes.Deploy.PricingCalculator,
-          component: () => import("../calculator/resource_pricing.vue"),
+          component: () => import("../calculator/pricing_calculator.vue"),
           meta: { title: "Resource Pricing", publicPath: true },
         },
         {
           path: DashboardRoutes.Deploy.NodeFinder,
           component: () => import("@/views/nodes.vue"),
-          meta: { title: "Nodes", publicPath: true },
+          meta: { title: "Nodes", publicPath: true, sidebarBreakpoint: 1150, filtersCollapsibleBreakpoint: 850 },
         },
         {
           path: DashboardRoutes.Deploy.VirtualMachines,
