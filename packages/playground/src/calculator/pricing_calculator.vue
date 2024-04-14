@@ -8,13 +8,8 @@
       <VCardText>
         <VContainer fluid>
           <VAlert type="info" class="mb-10">
-            For more information about Threefold Pricing check
-            <a
-              class="app-link"
-              target="_blank"
-              href="https://manual.grid.tf/wiki/cloudunits/pricing/pricing.html#cloud-unit-pricing"
-              v-text="'here'"
-            />
+            For more information about Threefold Pricing check,
+            <a class="app-link" target="_blank" :href="manual.pricing" v-text="'Cloud Unit Pricing'" />
           </VAlert>
 
           <VForm
@@ -189,6 +184,8 @@ import { computed, ref } from "vue";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { VForm } from "vuetify/components/VForm";
 
+import { manual } from "@/utils/manual";
+
 import { calculator as Calculator } from "../../../grid_client/dist/es6";
 import { useProfileManagerController } from "../components/profile_manager_controller.vue";
 import { useAsync } from "../hooks";
@@ -289,6 +286,7 @@ export default {
       computePackageColor,
       normalizeError,
       profileManager,
+      manual,
     };
   },
 };

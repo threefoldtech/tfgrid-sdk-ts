@@ -34,29 +34,15 @@
         <v-col class="mb-2" cols="12" sm="3" md="2">
           <p class="text-subtitle-1 footer_header" color="secondary">Take Action</p>
           <div>
-            <a
-              color="error"
-              :href="`${MANUAL_URL}/documentation/threefold_token/buy_sell_tft/buy_sell_tft.html`"
-              class="app-link text-subtitle-2"
-              target="_blank"
+            <a color="error" :href="manual.buy_sell_tft" class="app-link text-subtitle-2" target="_blank"
               >Buy the Token</a
             >
           </div>
           <div>
-            <a
-              :href="`${MANUAL_URL}/documentation/farmers/farmers.html`"
-              class="app-link text-subtitle-2"
-              target="_blank"
-              >Start Farming</a
-            >
+            <a :href="manual.farmers" class="app-link text-subtitle-2" target="_blank">Start Farming</a>
           </div>
           <div>
-            <a
-              :href="`${MANUAL_URL}/knowledge_base/about/governance.html`"
-              class="app-link text-subtitle-2"
-              target="_blank"
-              >Governance</a
-            >
+            <a :href="manual.governance" class="app-link text-subtitle-2" target="_blank">Governance</a>
           </div>
         </v-col>
         <v-col class="mx-3 mb-3" cols="12" sm="3" md="2">
@@ -107,6 +93,7 @@ import { useTheme } from "vuetify";
 
 import { DashboardRoutes } from "@/router/routes";
 import { AppThemeSelection } from "@/utils/app_theme";
+import { manual } from "@/utils/manual";
 
 const theme = useTheme();
 

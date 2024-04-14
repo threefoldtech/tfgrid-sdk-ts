@@ -147,13 +147,7 @@
             <div class="text-center my-3">
               <p>
                 Scan the QR code using
-                <a
-                  class="app-link"
-                  :href="`${MANUAL_URL}/documentation/threefold_token/storing_tft/tf_connect_app.html`"
-                  target="_blank"
-                >
-                  ThreeFold Connect
-                </a>
+                <a class="app-link" :href="manual.tf_connect_app" target="_blank"> ThreeFold Connect </a>
                 to fund your account
               </p>
             </div>
@@ -187,6 +181,8 @@
 <script lang="ts" setup>
 import { generatePublicKey } from "@threefold/rmb_direct_client";
 import { onMounted, ref } from "vue";
+
+import { manual } from "@/utils/manual";
 
 import router from "../router";
 import { useProfileManager } from "../stores";

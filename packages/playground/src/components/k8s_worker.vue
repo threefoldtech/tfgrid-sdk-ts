@@ -75,11 +75,7 @@
       v-model.number="$props.modelValue.rootFsSize"
     />
 
-    <input-tooltip
-      inline
-      tooltip="Click to know more about dedicated machines."
-      :href="`${MANUAL_URL}/documentation/dashboard/deploy/dedicated_machines.html`"
-    >
+    <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
       <v-switch color="primary" inset label="Dedicated" v-model="$props.modelValue.dedicated" />
     </input-tooltip>
 
@@ -108,6 +104,8 @@
 
 <script lang="ts">
 import type { PropType } from "vue";
+
+import { manual } from "@/utils/manual";
 
 import Networks from "../components/networks.vue";
 import type { K8SWorker } from "../types";
@@ -142,7 +140,7 @@ export default {
     },
   },
   setup() {
-    return { rootFs };
+    return { rootFs, manual };
   },
 };
 </script>

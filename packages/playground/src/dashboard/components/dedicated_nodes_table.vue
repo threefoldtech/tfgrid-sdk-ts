@@ -43,17 +43,12 @@
                 <li>
                   {{ activeTab == 1 ? "You receive " : "You'll receive " }} 50% discount
                   {{ activeTab == 1 ? " as you reserve the " : " if you reserve an " }} entire
-                  <a target="_blank" :href="`${MANUAL_URL}/dashboard/deploy/dedicated_machines.html#billing--pricing`">
-                    node
-                  </a>
+                  <a target="_blank" :href="manual.billing_pricing"> node </a>
                 </li>
                 <li>
                   {{ activeTab == 1 ? "You're receiving " : "You'll be receiving " }} {{ item.raw.discount }}% discount
                   as per the
-                  <a
-                    target="_blank"
-                    :href="`${MANUAL_URL}/wiki/cloudunits/pricing/staking_discount_levels.html#staking-discount-levels`"
-                  >
+                  <a target="_blank" :href="manual.discount_levels">
                     <p style="display: inline">staking discounts</p>
                   </a>
                 </li>
@@ -171,6 +166,7 @@ import { VDataTableServer } from "vuetify/labs/VDataTable";
 
 import type { FilterOptions } from "@/types";
 import formatResourceSize from "@/utils/format_resource_size";
+import { manual } from "@/utils/manual";
 
 import NodeDetails from "./node_details.vue";
 import ReserveBtn from "./reserve_action_btn.vue";

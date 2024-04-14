@@ -49,13 +49,7 @@
 
           <p class="font-weight-bold mt-4">
             If you don't know what the Captain root domain is, make sure to read the
-            <a
-              target="_blank"
-              :href="`${MANUAL_URL}/documentation/dashboard/solutions/caprover.html`"
-              :style="{ color: 'inherit' }"
-            >
-              quick start documentation.
-            </a>
+            <a target="_blank" :href="manual.caprover" :style="{ color: 'inherit' }"> quick start documentation. </a>
           </p>
         </v-alert>
 
@@ -100,6 +94,8 @@
 
 <script lang="ts" setup>
 import { ref } from "vue";
+
+import { manual } from "@/utils/manual";
 
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";

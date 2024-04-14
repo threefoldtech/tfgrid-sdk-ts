@@ -60,11 +60,7 @@
         />
         <Networks v-model:mycelium="mycelium" />
 
-        <input-tooltip
-          inline
-          tooltip="Click to know more about dedicated machines."
-          :href="`${MANUAL_URL}/documentation/dashboard/deploy/dedicated_machines.html`"
-        >
+        <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
           <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
         </input-tooltip>
 
@@ -106,6 +102,8 @@ import type { GridClient } from "@threefold/grid_client";
 import { Buffer } from "buffer";
 import TweetNACL from "tweetnacl";
 import { computed, type Ref, ref } from "vue";
+
+import { manual } from "@/utils/manual";
 
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
