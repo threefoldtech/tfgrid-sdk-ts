@@ -67,13 +67,7 @@
           </v-container>
           <v-card-actions class="justify-end">
             <v-btn variant="outlined" color="anchor" class="mr-2 px-3" @click="closeDialog"> Close </v-btn>
-            <v-btn
-              variant="outlined"
-              color="secondary"
-              :href="`${MANUAL_URL}/documentation/threefold_token/tft_bridges/tft_bridges.html`"
-              target="_blank"
-              text="Learn more?"
-            />
+            <v-btn variant="outlined" color="secondary" :href="manual.tft_bridges" target="_blank" text="Learn more?" />
           </v-card-actions>
         </v-card-text>
       </v-card>
@@ -84,6 +78,8 @@
 <script setup lang="ts">
 import { Decimal } from "decimal.js";
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
+
+import { manual } from "@/utils/manual";
 
 import { useProfileManagerController } from "../components/profile_manager_controller.vue";
 import QrcodeGenerator from "../components/qrcode_generator.vue";

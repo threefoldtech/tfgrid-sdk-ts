@@ -17,12 +17,7 @@
     <div>
       Get TFT on Stellar using BTC or Credit card, then you can bridge it to your tfchain account using the Bridge in
       the dashboard section.
-      <v-btn
-        icon
-        small
-        @click.stop
-        :href="`${MANUAL_URL}/documentation/threefold_token/buy_sell_tft/buy_sell_tft.html`"
-        target="_blank"
+      <v-btn icon small @click.stop :href="manual.buy_sell_tft" target="_blank"
         ><v-icon>mdi-information-outline</v-icon></v-btn
       >
     </div>
@@ -31,6 +26,8 @@
 
 <script lang="ts">
 import { ref } from "vue";
+
+import { manual } from "@/utils/manual";
 
 import { useProfileManagerController } from "../components/profile_manager_controller.vue";
 import { useProfileManager } from "../stores";
@@ -63,6 +60,7 @@ export default {
     };
     return {
       loadingAddTFT,
+      manual,
       addTFT,
     };
   },

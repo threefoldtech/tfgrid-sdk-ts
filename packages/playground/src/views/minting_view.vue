@@ -28,6 +28,10 @@
       </FormValidator>
     </v-form>
     <v-container class="mt-8" v-if="item && item.Minting">
+      <VAlert type="info" class="mb-10">
+        For more information about Minting Receipts check,
+        <a class="app-link" target="_blank" :href="manual.minting_receipts" v-text="'Minting Receipts'" />
+      </VAlert>
       <v-card>
         <v-card-title class="font-weight-bold bg-primary">Node Info</v-card-title>
         <v-list class="custom-list">
@@ -181,6 +185,7 @@ import { ref } from "vue";
 
 import type { AsyncRule, RuleReturn } from "@/components/input_validator.vue";
 import { useInputRef } from "@/hooks/input_validator";
+import { manual } from "@/utils/manual";
 
 import { getMintingData } from "../utils/mintings";
 

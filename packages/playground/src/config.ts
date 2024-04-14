@@ -68,5 +68,3 @@ function defineGlobalProps(app: App<Element>) {
   app.config.globalProperties.validators = validators;
   app.config.globalProperties.MANUAL_URL = window.env.MANUAL_URL;
 }
-
-export const MANUAL_URL = window.env.MANUAL_URL;

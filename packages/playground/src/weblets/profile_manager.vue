@@ -38,7 +38,7 @@
                     height="24px"
                     width="24px"
                     class="ml-2"
-                    :href="`${MANUAL_URL}/documentation/developers/tfchain/tfchain.html#contract-locking`"
+                    :href="manual.contract_locking"
                     target="_blank"
                   />
                 </template>
@@ -69,13 +69,7 @@
       <v-alert variant="tonal" class="mb-6">
         <p :style="{ maxWidth: '880px' }">
           Please visit
-          <a
-            class="app-link"
-            :href="`${MANUAL_URL}/documentation/threefold_token/storing_tft/tf_connect_app.html`"
-            target="_blank"
-          >
-            the manual
-          </a>
+          <a class="app-link" :href="manual.tf_connect_app" target="_blank"> the manual </a>
           get started.
         </p>
       </v-alert>
@@ -386,13 +380,7 @@
             <section class="qr d-flex flex-column align-center">
               <p class="mb-4 text-center">
                 Scan the QR code using
-                <a
-                  class="app-link"
-                  :href="`${MANUAL_URL}/documentation/threefold_token/storing_tft/tf_connect_app.html`"
-                  target="_blank"
-                >
-                  ThreeFold Connect
-                </a>
+                <a class="app-link" :href="manual.tf_connect_app" target="_blank"> ThreeFold Connect </a>
                 to fund your account
               </p>
               <QrcodeGenerator
@@ -452,6 +440,7 @@ import { useTheme } from "vuetify";
 import router from "@/router";
 import { AppThemeSelection } from "@/utils/app_theme";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
+import { manual } from "@/utils/manual";
 
 import { useProfileManagerController } from "../components/profile_manager_controller.vue";
 import { useOnline } from "../hooks";
