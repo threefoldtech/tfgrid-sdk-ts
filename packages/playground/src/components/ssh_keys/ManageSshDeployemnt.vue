@@ -1,5 +1,5 @@
 <template>
-  <v-card class="" variant="tonal">
+  <v-card class="my-6" variant="tonal">
     <v-card-title>
       <v-icon>mdi-key-chain</v-icon>
       Manage SSH keys
@@ -17,7 +17,7 @@
 
     <v-card-actions>
       <VSpacer />
-      <v-btn color="primary" variant="flat" @click="openManageDialog = true" class="mr-2">Manage SSH keys</v-btn>
+      <v-btn color="primary" variant="flat" @click="openManageDialog = true" class="mr-2 my-1">Manage SSH keys</v-btn>
     </v-card-actions>
   </v-card>
 

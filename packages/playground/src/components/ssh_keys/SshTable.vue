@@ -1,10 +1,10 @@
 <template>
   <v-card class="pt-6 pl-6 pr-6 mb-4">
     <div class="head">
-      <h2 class="text-light">
+      <h3 class="text-light">
         <v-icon>{{ headerIcon }}</v-icon>
         {{ headerTitle }}
-      </h2>
+      </h3>
     </div>
 
     <div class="table mt-3">
@@ -74,7 +74,7 @@
                 v-bind="props"
                 :loading="item.raw.activating"
                 color="secondary"
-                @click="activateKey(item.raw)"
+                @click.stop="activateKey(item.raw)"
                 :model-value="item.raw.isActive"
               />
             </template>
@@ -92,7 +92,7 @@
                 v-bind="props"
                 :loading="item.raw.activating"
                 :color="theme.name.value === AppThemeSelection.light ? '' : 'grey-lighten-1'"
-                @click="activateKey(item.raw)"
+                @click.stop="activateKey(item.raw)"
                 :model-value="item.raw.isActive"
               />
             </template>
