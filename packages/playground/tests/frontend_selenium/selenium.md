@@ -23,11 +23,12 @@
 ### Second
 
 - You need to leave the server running and open a new terminal.
-- You can run selenium with pytest through the command line using `python3 -m pytest -v`
+- You can run selenium with pytest through the command line using `python3 -m pytest -v`.
 
 ### More options to run tests
 
-- You can also run single test file through the command line using `python3 -m pytest -v tests/file/test_file.py`
-- You can also run specific test cases through the command line using `python3 -m pytest -v tests/file/test_file.py::test_func`
-- You can also run collection of test cases through the command line using `python3 -m pytest -v -k 'test_func or test_func'`
-- You can also run all the tests and get an HTML report using [pytest-html](https://pypi.org/project/pytest-html/) package through the command line using `python3 -m pytest -v --html=report.html`
+- If you want to run the tests visually to see how they are running, you need to comment out the lines `16` and `33` in the [conftest.py](../frontend_selenium/tests/conftest.py).
+- You can also run single test file through the command line using `python3 -m pytest -v tests/file/test_file.py`.
+- You can also run specific test cases through the command line using `python3 -m pytest -v tests/file/test_file.py::test_func`.
+- You can also run collection of test cases through the command line using `python3 -m pytest -v -k 'test_func or test_func'`.
+- You can also run all the tests and get an HTML report using [pytest-html](https://pypi.org/project/pytest-html/) package through the command line using `python3 -m pytest -v --html=report.html`.
