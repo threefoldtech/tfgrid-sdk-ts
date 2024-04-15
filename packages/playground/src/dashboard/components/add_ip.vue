@@ -184,7 +184,9 @@ export default {
         };
       }
       if (
-        parseInt(toPublicIP.value.split("/")[0].split(".")[3]) - parseInt(publicIP.value.split("/")[0].split(".")[3]) >
+        parseInt(toPublicIP.value.split("/")[0].split(".")[3]) -
+          parseInt(publicIP.value.split("/")[0].split(".")[3]) +
+          1 >
         16
       ) {
         return {
