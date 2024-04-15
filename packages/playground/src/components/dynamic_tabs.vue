@@ -13,6 +13,7 @@
         }"
       />
       {{ tab.title }}
+      <v-chip color="info" v-if="tab.title === 'Workers'" class="ml-1">{{ tab.workers }}</v-chip>
       <v-chip color="info" v-if="forms[tabs.indexOf(tab)]?.pending" class="ml-1">
         Validating
         <v-progress-circular class="ml-1" indeterminate size="20" width="2" />
@@ -49,6 +50,7 @@ export interface Tab {
   value: string;
   icon?: string;
   imgPath?: string;
+  workers?: number;
 }
 
 const props = defineProps<{
