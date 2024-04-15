@@ -79,14 +79,15 @@ import {
   type NormalizedContract,
 } from "@/utils/contracts";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
-import { getGrid } from "@/utils/grid";
 
 import { queryClient } from "../clients";
+import { useGrid } from "../stores";
+import { updateGrid } from "../utils/grid";
 
 const isLoading = ref<boolean>(false);
 const profileManager = useProfileManager();
-const grid = ref<GridClient>();
-
+const gridStore = useGrid();
+const grid = gridStore.client as GridClient;
 const contracts = ref<NormalizedContract[]>([]);
 const nameContracts = ref<NormalizedContract[]>([]);
 const nodeContracts = ref<NormalizedContract[]>([]);
@@ -112,14 +113,13 @@ async function onMount() {
   totalCost.value = undefined;
   totalCostUSD.value = undefined;
   loadingErrorMessage.value = undefined;
+  updateGrid(grid, { projectName: "" });
 
   if (profileManager.profile) {
-    const _grid = await getGrid(profileManager.profile);
-    if (_grid) {
-      grid.value = _grid;
+    if (grid) {
       try {
         // Fetch user contracts, node status, and calculate total cost
-        contracts.value = await getUserContracts(grid.value);
+        contracts.value = await getUserContracts(grid);
         nodeInfo.value = await getNodeInfo(nodeIDs.value);
         contracts.value.map(contract => {
           const { nodeId } = contract;

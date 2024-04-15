@@ -227,13 +227,13 @@
 </template>
 
 <script lang="ts">
+import type { GridClient } from "@threefold/grid_client";
 import { onMounted, type PropType, ref } from "vue";
 
-import { useProfileManager } from "../stores";
+import { useGrid } from "../stores";
 import { ProjectName } from "../types";
 import type { SelectionDetails } from "../types/nodeSelector";
 import { deployGatewayName, type GridGateway, loadDeploymentGateways } from "../utils/gateway";
-import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
 import { generateName } from "../utils/strings";
 import IconActionBtn from "./icon_action_btn.vue";
@@ -247,7 +247,6 @@ export default {
     vm: { type: Array as PropType<any>, required: true },
   },
   setup(props) {
-    const profileManager = useProfileManager();
     const layout = useLayout();
     const gatewayTab = ref(0);
 
@@ -261,9 +260,10 @@ export default {
 
     const ip = props.vm.interfaces[0].ip as string;
     const networkName = props.vm.interfaces[0].network as string;
+    const gridStore = useGrid();
+    const grid = gridStore.client as GridClient;
 
     onMounted(async () => {
-      const grid = await getGrid(profileManager.profile!);
       oldPrefix.value =
         (props.vm.projectName.toLowerCase().includes(ProjectName.Fullvm.toLowerCase()) ? "fvm" : "vm") +
         grid!.config.twinId;
@@ -281,7 +281,6 @@ export default {
         gateways.value = [];
         gatewaysToDelete.value = [];
         loadingGateways.value = true;
-        const grid = await getGrid(profileManager.profile!, props.vm.projectName);
         const { gateways: gws, failedToList } = await loadDeploymentGateways(grid!);
         gateways.value = gws;
         failedToListGws.value = failedToList;
@@ -297,7 +296,6 @@ export default {
 
       try {
         const [x, y] = ip.split(".");
-        const grid = await getGrid(profileManager.profile!, props.vm.projectName);
 
         const data = {
           name: networkName,
@@ -330,7 +328,6 @@ export default {
     const deleting = ref(false);
     async function deleteSelectedGateways() {
       deleting.value = true;
-      const grid = await getGrid(profileManager.profile!, props.vm.projectName);
       const deletedGateways = new Set<GridGateway>();
       for (const gw of gatewaysToDelete.value) {
         await grid!.gateway
@@ -347,8 +344,6 @@ export default {
     }
 
     return {
-      profileManager,
-
       oldPrefix,
       prefix,
       layout,

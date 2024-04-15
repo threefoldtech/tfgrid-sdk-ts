@@ -81,19 +81,18 @@
 <script lang="ts" setup>
 import { ref } from "vue";
 
-import { useProfileManager } from "../stores";
+import { useGrid } from "../stores";
 import { addMachine, deleteMachine, loadVM } from "../utils/deploy_vm";
-import { getGrid } from "../utils/grid";
 import rootFs from "../utils/root_fs";
 
 const props = defineProps<{ master: any; data: any[]; projectName: string }>();
 const emits = defineEmits<{ (event: "close"): void; (event: "update:caprover", data: any): void }>();
 
-const profileManager = useProfileManager();
-
 const selectedWorkers = ref<any[]>([]);
 const deleting = ref(false);
 const deployedDialog = ref(false);
+const gridStore = useGrid();
+const grid = gridStore.client as GridClient;
 
 const worker = ref(createWorker());
 
@@ -112,8 +111,8 @@ async function deploy(layout: any) {
   layout.setStatus("deploy");
 
   try {
+    updateGrid(grid, { projectName: props.projectName });
     layout.value?.validateSSH();
-    const grid = await getGrid(profileManager.profile!, props.projectName);
 
     await layout.validateBalance(grid);
 
@@ -158,7 +157,6 @@ async function deploy(layout: any) {
 
 async function onDelete(cb: (workers: any[]) => void) {
   deleting.value = true;
-  const grid = await getGrid(profileManager.profile!, props.projectName);
   for (const worker of selectedWorkers.value) {
     console.log(props.master.name, worker.name);
 
@@ -184,8 +182,11 @@ async function onDelete(cb: (workers: any[]) => void) {
 </script>
 
 <script lang="ts">
+import type { GridClient } from "@threefold/grid_client";
+
 import CaproverWorker, { createWorker } from "../components/caprover_worker.vue";
 import ListTable from "../components/list_table.vue";
+import { updateGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
 import ManageWorkerDialog from "./manage_worker_dialog.vue";
 
