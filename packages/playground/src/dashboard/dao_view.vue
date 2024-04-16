@@ -53,9 +53,8 @@
             <v-divider class="mt-1 mb-5 text-red-700" />
 
             <v-card-text class="pb-0">
-              <v-row class="my-1">
+              <v-row class="my-1 mb-3">
                 <p class="font-weight-bold mr-3">Description:</p>
-
                 <span> {{ proposal.description }}</span>
               </v-row>
               <v-row v-if="expired(proposal.end)" class="my-1">
@@ -129,39 +128,76 @@
                       </v-progress-linear>
                     </div>
                   </v-row>
-                  <v-row v-else justify="center" class="">
-                    <v-progress-linear
-                      v-if="proposal.ayesProgress > proposal.nayesProgress"
-                      rounded
-                      v-model="proposal.ayesProgress"
-                      color="primary"
-                      height="24"
-                      :style="{
-                        width: '100%',
-                        color: '#fff',
-                      }"
-                    >
-                      <template v-slot:default="{ value }">
-                        <strong class="mx-3">Accepted </strong>
-                        <span>{{ !!(value % 1) ? value.toFixed(2) : value }}%</span>
+                  <v-row v-else justify="center">
+                    <v-tooltip style="border: 0px !important" width="220" location="top" :text="'tooltip'">
+                      <template #default>
+                        <v-card class="pa-2">
+                          <h3 class="mb-2 ml-2">
+                            Vote details ({{ proposal.ayes.length + proposal.nayes.length }}
+                            {{ proposal.ayes.length + proposal.nayes.length > 1 ? "votes" : "vote" }})
+                          </h3>
+                          <v-divider />
+                          <v-row class="mt-1">
+                            <v-col class="d-flex align-center ml-2">
+                              <p>Yes:</p>
+                            </v-col>
+                            <v-col class="d-flex align-center justify-end mr-2">
+                              <v-chip color="info">
+                                {{ proposal.ayes.length }} {{ proposal.ayes.length > 1 ? "votes" : "vote" }}
+                              </v-chip>
+                            </v-col>
+                          </v-row>
+                          <v-row class="mt-1">
+                            <v-col class="d-flex align-center ml-2">
+                              <p>No:</p>
+                            </v-col>
+                            <v-col class="d-flex align-center justify-end mr-2">
+                              <v-chip color="info">
+                                {{ proposal.nayes.length }} {{ proposal.nayes.length > 1 ? "votes" : "vote" }}
+                              </v-chip>
+                            </v-col>
+                          </v-row>
+                        </v-card>
                       </template>
-                    </v-progress-linear>
-                    <v-progress-linear
-                      v-else
-                      rounded
-                      v-model="proposal.nayesProgress"
-                      color="disable"
-                      height="24"
-                      :style="{
-                        width: '100%',
-                        color: '#333',
-                      }"
-                    >
-                      <template v-slot:default="{ value }">
-                        <strong class="mx-3">Rejected </strong>
-                        <span>{{ !!(value % 1) ? value.toFixed(2) : value }}%</span>
+
+                      <template #activator="{ props }">
+                        <v-progress-linear
+                          v-if="proposal.ayesProgress > proposal.nayesProgress"
+                          v-bind="props"
+                          rounded
+                          v-model="proposal.ayesProgress"
+                          color="primary"
+                          height="24"
+                          :style="{
+                            width: '100%',
+                            color: '#fff',
+                          }"
+                        >
+                          <template v-slot:default="{ value }">
+                            <strong class="mx-3">Accepted </strong>
+                            <span>{{ !!(value % 1) ? value.toFixed(2) : value }}%</span>
+                          </template>
+                        </v-progress-linear>
+
+                        <v-progress-linear
+                          v-else
+                          v-bind="props"
+                          rounded
+                          v-model="proposal.nayesProgress"
+                          color="disable"
+                          height="24"
+                          :style="{
+                            width: '100%',
+                            color: '#333',
+                          }"
+                        >
+                          <template v-slot:default="{ value }">
+                            <strong class="mx-3">Rejected </strong>
+                            <span>{{ !!(value % 1) ? value.toFixed(2) : value }}%</span>
+                          </template>
+                        </v-progress-linear>
                       </template>
-                    </v-progress-linear>
+                    </v-tooltip>
                   </v-row>
                 </v-container>
               </v-col>
@@ -350,7 +386,7 @@ async function castVote() {
   loadingVote.value = false;
 }
 </script>
-<style scoped>
+<style>
 .custom-container {
   width: 80%;
 }
@@ -359,5 +395,9 @@ async function castVote() {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+}
+.v-tooltip > .v-overlay__content {
+  padding: 0px 0px !important;
+  border: 1px solid #5a5959 !important;
 }
 </style>
