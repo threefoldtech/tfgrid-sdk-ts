@@ -46,9 +46,9 @@
               <v-card-title class="pa-0 mb-5 font-weight-bold" v-if="proposal.action">
                 {{ proposal.action }}
               </v-card-title>
-              <v-btn variant="outlined" color="secondary" v-bind:href="proposal.link" v-bind:target="'blank'"
-                >Details</v-btn
-              >
+              <v-btn variant="outlined" color="secondary" v-bind:href="proposal.link" v-bind:target="'blank'">
+                Go to Proposal
+              </v-btn>
             </div>
             <v-divider class="mt-1 mb-5 text-red-700" />
 
@@ -139,6 +139,16 @@
                           <v-divider />
                           <v-row class="mt-1">
                             <v-col class="d-flex align-center ml-2">
+                              <p>threshold:</p>
+                            </v-col>
+                            <v-col class="d-flex align-center justify-end mr-2">
+                              <v-chip color="info">
+                                {{ proposal.threshold }} {{ proposal.threshold > 1 ? "votes" : "vote" }}
+                              </v-chip>
+                            </v-col>
+                          </v-row>
+                          <v-row class="mt-1">
+                            <v-col class="d-flex align-center ml-2">
                               <p>Yes:</p>
                             </v-col>
                             <v-col class="d-flex align-center justify-end mr-2">
@@ -214,8 +224,8 @@
                 <input-tooltip tooltip="Select farm you wish to vote with">
                   <v-select
                     :items="userFarms"
-                    :item-title="item => `${item.name}`"
-                    :item-value="item => item.farmID"
+                    :item-title="(item: any) => `${item.name}`"
+                    :item-value="(item: any) => item.farmID"
                     label="Select a farm"
                     v-model="selectedFarm"
                     v-bind="props"
