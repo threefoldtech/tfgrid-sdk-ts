@@ -102,9 +102,7 @@
 </template>
 
 <script lang="ts">
-import crypto from "crypto";
-import { computed, defineComponent, ref } from "vue";
-import { onMounted } from "vue";
+import { computed, defineComponent, onMounted, ref } from "vue";
 import { generateKeyPair } from "web-ssh-keygen";
 
 import SshDataDialog from "@/components/ssh_keys/SshDataDialog.vue";
@@ -113,10 +111,9 @@ import SshTable from "@/components/ssh_keys/SshTable.vue";
 import { useProfileManager } from "@/stores";
 import { SSHCreationMethod, type SSHKeyData } from "@/types";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
-import { formatSSHKeyTableCreatedAt } from "@/utils/date";
-import { getGrid, getMetadata, storeSSH } from "@/utils/grid";
+import { getGrid, getMetadata } from "@/utils/grid";
 import { downloadAsFile, downloadAsJson } from "@/utils/helpers";
-import { generateSSHKeyName } from "@/utils/strings";
+import { calculateFingerprint, updateSSHKeysInChain } from "@/utils/ssh_keys";
 export default defineComponent({
   name: "SSHView",
   components: {
@@ -130,6 +127,7 @@ export default defineComponent({
     const isExporting = ref(false);
     const generatingSSH = ref(false);
     const generatedSSHKey = ref("");
+    const profileManager = useProfileManager();
     const selectedKey = ref<SSHKeyData>({
       id: 0,
       publicKey: "",
@@ -152,7 +150,7 @@ export default defineComponent({
     const addKey = async (key: SSHKeyData) => {
       savingKey.value = true;
       if (!key.fingerPrint) {
-        key.fingerPrint = calculateFingerprint(key.publicKey);
+        key.fingerPrint = await calculateFingerprint(key.publicKey);
       }
 
       allKeys.value.push(key);
@@ -207,7 +205,7 @@ export default defineComponent({
       });
 
       generatedSSHKey.value = keys.publicKey;
-      key.fingerPrint = calculateFingerprint(keys.publicKey);
+      key.fingerPrint = await calculateFingerprint(keys.publicKey);
       downloadAsFile("id_rsa", keys.privateKey);
       createCustomToast(`${key.name} key has been generated successfully.`, ToastType.success);
       generatingSSH.value = false;
@@ -232,32 +230,6 @@ export default defineComponent({
       isExporting.value = false;
     };
 
-    const migrateOldKey = async (publicSSHKey: string) => {
-      migrating.value = true;
-      const parts = publicSSHKey.split(" ");
-      let keyName = "";
-      if (parts.length < 3) {
-        keyName = generateSSHKeyName();
-      } else {
-        keyName = parts[parts.length - 1];
-      }
-      const newKey: SSHKeyData = {
-        createdAt: formatSSHKeyTableCreatedAt(new Date()),
-        name: keyName,
-        id: 1,
-        isActive: true,
-        publicKey: publicSSHKey,
-      };
-
-      allKeys.value.push(newKey);
-      await updateSSHKeysInChain();
-      newKey.fingerPrint = calculateFingerprint(publicSSHKey);
-      migrating.value = false;
-    };
-
-    const profileManager = useProfileManager();
-    const userSshKey = ref<SSHKeyData[] | string>(profileManager.profile!.ssh);
-
     const loading = ref<boolean>(false);
     const savingKey = ref<boolean>(false);
     const deleting = ref<boolean>(false);
@@ -265,68 +237,10 @@ export default defineComponent({
     const activeKeys = computed(() => (allKeys.value.length ? allKeys.value.filter(key => key.isActive) : []));
     const dialogType = ref<SSHCreationMethod>(SSHCreationMethod.None);
 
-    const parsePublicKey = (publicKey: string) => {
-      const parts = publicKey.split(" ");
-      return {
-        type: parts[0],
-        data: parts[1],
-        comment: parts[2],
-      };
-    };
-
-    const calculateFingerprint = (publicKey: string) => {
-      if (publicKey.length) {
-        const sshPublicKey = parsePublicKey(publicKey);
-        const md5 = crypto.createHash("md5");
-
-        if (sshPublicKey.data) {
-          md5.update(sshPublicKey.data);
-          const fingerprint = md5
-            .digest("hex")
-            .replace(/(.{2})(?=.)/g, "$1:")
-            .toUpperCase();
-          return fingerprint;
-        }
-      }
-      return "-";
-    };
-
-    const updateSSHKeysInChain = async () => {
-      const copiedKeys = allKeys.value.map(key => {
-        // Remove the fingerprint, activating, and deleting before saving the key to the chain
-        const { fingerPrint, activating, deleting, ...keyWithoutSensitiveProps } = key;
-        return keyWithoutSensitiveProps;
-      });
-
-      // Update the chain with the current sshkeys => this.allkeys
-      const grid = await getGrid(profileManager.profile!);
-      await getMetadata(grid!);
-      await storeSSH(grid!, copiedKeys);
-      profileManager.updateSSH(copiedKeys);
-    };
-
     onMounted(async () => {
-      if (typeof userSshKey.value === "string") {
-        migrateOldKey(userSshKey.value);
-      } else {
-        loading.value = true;
-        if (!userSshKey.value) {
-          profileManager.updateSSH(allKeys.value);
-        }
-
-        const grid = await getGrid(profileManager.profile!);
-        await getMetadata(grid!);
-
-        allKeys.value = userSshKey.value || [];
-        if (allKeys.value) {
-          // Calculate the fingerprint for each key after saving them to the chain
-          allKeys.value = allKeys.value.map(key => {
-            const fingerprint = calculateFingerprint(key.publicKey);
-            return { ...key, fingerPrint: fingerprint };
-          });
-        }
-        loading.value = false;
-      }
+      const grid = await getGrid(profileManager.profile!);
+      const { sshkey } = await getMetadata(grid!);
+      allKeys.value = sshkey;
     });
 
     return {
@@ -353,9 +267,6 @@ export default defineComponent({
       deleteKey,
       generateSSHKeys,
       exportKeys,
-      migrateOldKey,
-      calculateFingerprint,
-      updateSSHKeysInChain,
     };
   },
 });
