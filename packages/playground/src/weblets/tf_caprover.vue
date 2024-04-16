@@ -21,7 +21,7 @@
       :tabs="[
         { title: 'Config', value: 'config' },
         { title: 'Leader', value: 'leader' },
-        { title: 'Workers', value: 'workers' },
+        { title: 'Workers', value: 'workers', workers: workers.length },
       ]"
       ref="tabs"
     >
