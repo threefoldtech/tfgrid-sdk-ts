@@ -154,16 +154,14 @@
 </template>
 
 <script lang="ts" setup>
-import { capitalize, computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 
 import { getNodeHealthColor, NodeHealth } from "@/utils/get_nodes";
 
-import { useProfileManager } from "../stores";
-import { getGrid, updateGrid } from "../utils/grid";
+import { useGrid } from "../stores";
+import { updateGrid } from "../utils/grid";
 import { markAsFromAnotherClient } from "../utils/helpers";
 import { type LoadedDeployments, loadVms, mergeLoadedDeployments } from "../utils/load_deployment";
-
-const profileManager = useProfileManager();
 
 const props = defineProps<{
   projectName: string;
@@ -178,6 +176,8 @@ const items = ref<any[]>([]);
 const showDialog = ref(false);
 const showEncryption = ref(false);
 const showAllDeployments = ref(false);
+const gridStore = useGrid();
+const grid = gridStore.client as GridClient;
 const failedDeployments = ref<
   {
     name: string;
@@ -193,7 +193,7 @@ async function loadDeployments() {
 
   items.value = [];
   loading.value = true;
-  const grid = await getGrid(profileManager.profile!, props.projectName);
+  updateGrid(grid, { projectName: props.projectName });
   const chunk1 = await loadVms(grid!);
   if (chunk1.count > 0 && migrateGateways) {
     await migrateModule(grid!.gateway);
@@ -319,6 +319,8 @@ defineExpose({ loadDeployments });
 </script>
 
 <script lang="ts">
+import type { GridClient } from "@threefold/grid_client";
+
 import toHumanDate from "@/utils/date";
 
 import { ProjectName } from "../types";

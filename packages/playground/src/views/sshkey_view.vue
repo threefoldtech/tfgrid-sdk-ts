@@ -116,6 +116,7 @@
 </template>
 
 <script lang="ts">
+import type { GridClient } from "@threefold/grid_client";
 import crypto from "crypto";
 import { computed, defineComponent, ref } from "vue";
 import { onMounted } from "vue";
@@ -128,8 +129,10 @@ import { useProfileManager } from "@/stores";
 import { SSHCreationMethod, type SSHKeyData } from "@/types";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
 import { formatSSHKeyTableCreatedAt } from "@/utils/date";
-import { getGrid, getMetadata, storeSSH } from "@/utils/grid";
+import { getMetadata, storeSSH } from "@/utils/grid";
 import { downloadAsFile, downloadAsJson } from "@/utils/helpers";
+
+import { useGrid } from "../stores";
 
 export default defineComponent({
   name: "SSHView",
@@ -152,6 +155,8 @@ export default defineComponent({
       isActive: false,
     });
     const migrating = ref(false);
+    const gridStore = useGrid();
+    const grid = gridStore.client as GridClient;
 
     const openDialog = (type: SSHCreationMethod) => {
       dialogType.value = type;
@@ -309,7 +314,6 @@ export default defineComponent({
       });
 
       // Update the chain with the current sshkeys => this.allkeys
-      const grid = await getGrid(profileManager.profile!);
       await getMetadata(grid!);
       await storeSSH(grid!, copiedKeys);
       profileManager.updateSSH(copiedKeys);
@@ -324,7 +328,6 @@ export default defineComponent({
           profileManager.updateSSH(allKeys.value);
         }
 
-        const grid = await getGrid(profileManager.profile!);
         await getMetadata(grid!);
 
         allKeys.value = userSshKey.value || [];

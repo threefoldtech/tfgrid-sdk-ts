@@ -96,15 +96,18 @@
 </template>
 
 <script lang="ts">
+import type { GridClient } from "@threefold/grid_client";
 import { computed, defineComponent, type PropType, ref, watch } from "vue";
 
 import { type Profile, useProfileManager } from "@/stores/profile_manager";
 import { SSHCreationMethod, type SSHKeyData } from "@/types";
 import { formatSSHKeyTableCreatedAt } from "@/utils/date";
-import { type Balance, getGrid, loadBalance } from "@/utils/grid";
+import { type Balance, loadBalance } from "@/utils/grid";
 import { isEnoughBalance } from "@/utils/helpers";
 import { generateSSHKeyName } from "@/utils/strings";
 import { isValidSSHKey } from "@/utils/validators";
+
+import { useGrid } from "../../stores";
 
 export default defineComponent({
   emits: ["close", "save", "generate"],
@@ -143,6 +146,9 @@ export default defineComponent({
     const balance = ref<Balance>();
     const hasEnoughBalance = computed(() => isEnoughBalance(balance.value, 0.01));
     const loadingBalance = ref<boolean>(false);
+    const gridStore = useGrid();
+    const grid = gridStore.client as GridClient;
+
     let interval: any;
 
     watch(
@@ -210,7 +216,6 @@ export default defineComponent({
 
       try {
         loadingBalance.value = true;
-        const grid = await getGrid(profile);
         balance.value = await loadBalance(grid!);
         loadingBalance.value = false;
       } catch {

@@ -1,7 +1,7 @@
 import type { GridClient } from "@threefold/grid_client";
 
 import { formatConsumption } from "./contracts";
-import { getGrid, updateGrid } from "./grid";
+import { updateGrid } from "./grid";
 import { normalizeError } from "./helpers";
 import { migrateModule } from "./migration";
 
@@ -42,7 +42,7 @@ export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
 
   const projectName = grid.clientOptions.projectName || "";
   const grids = (await Promise.all(
-    machines.map(n => getGrid(grid.clientOptions, projectName ? `${projectName}/${n}` : n)),
+    machines.map(n => updateGrid(grid, { projectName: projectName ? `${projectName}/${n}` : n })),
   )) as GridClient[];
 
   const promises = machines.map(async (name, index) => {
@@ -164,7 +164,7 @@ export async function loadK8s(grid: GridClient) {
 
   const projectName = grid.clientOptions.projectName;
   const grids = (await Promise.all(
-    clusters.map(n => getGrid(grid.clientOptions, projectName ? `${projectName}/${n}` : n)),
+    clusters.map(n => updateGrid(grid, { projectName: projectName ? `${projectName}/${n}` : n })),
   )) as GridClient[];
   const failedDeployments: FailedDeployment[] = [];
 
