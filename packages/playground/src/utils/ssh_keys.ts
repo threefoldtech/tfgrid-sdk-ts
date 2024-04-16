@@ -2,7 +2,7 @@ import { KeypairType } from "@threefold/grid_client";
 import crypto from "crypto";
 
 import { useProfileManager } from "@/stores";
-import { type SSHKeyData } from "@/types";
+import { SSHKeyData } from "@/types";
 
 import { formatSSHKeyTableCreatedAt } from "./date";
 import { getGrid, getMetadata, storeSSH } from "./grid";
