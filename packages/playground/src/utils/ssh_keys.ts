@@ -1,14 +1,14 @@
-import { KeypairType } from "@threefold/grid_client";
+import { GridClient } from "@threefold/grid_client";
 import crypto from "crypto";
 
 import { useProfileManager } from "@/stores";
-import { SSHKeyData } from "@/types";
+import type { SSHKeyData } from "@/types";
 
 import { formatSSHKeyTableCreatedAt } from "./date";
-import { getGrid, getMetadata, storeSSH } from "./grid";
+import { getMetadata, storeSSH } from "./grid";
 import { generateSSHKeyName } from "./strings";
 
-export async function migrateOldKey(publicSSHKey: string) {
+export async function migrateOldKey(publicSSHKey: string, grid: GridClient) {
   const allKeys: SSHKeyData[] = [];
   const parts = publicSSHKey.split(" ");
   let keyName = "";
@@ -26,11 +26,11 @@ export async function migrateOldKey(publicSSHKey: string) {
   };
 
   allKeys.push(newKey);
-  await updateSSHKeysInChain();
+  await updateSSHKeysInChain(grid);
   newKey.fingerPrint = await calculateFingerprint(publicSSHKey);
 }
 
-export async function updateSSHKeysInChain() {
+export async function updateSSHKeysInChain(grid: GridClient) {
   const allKeys: SSHKeyData[] = [];
   const copiedKeys = allKeys.map(key => {
     // Remove the fingerprint, activating, and deleting before saving the key to the chain
@@ -40,10 +40,8 @@ export async function updateSSHKeysInChain() {
 
   // Update the chain with the current sshkeys => this.allkeys
   const profileManager = useProfileManager();
-
-  const grid = await getGrid(profileManager.profile!);
-  await getMetadata(grid!);
-  await storeSSH(grid!, copiedKeys);
+  await getMetadata(grid);
+  await storeSSH(grid, copiedKeys);
   profileManager.updateSSH(copiedKeys);
 }
 
@@ -73,19 +71,20 @@ export function parsePublicKey(publicKey: string) {
   };
 }
 
-export async function migrateSshKeys(mnemonic: string, keypairType: KeypairType) {
+export async function migrateSshKeys(grid: GridClient) {
   const profileManager = useProfileManager();
-  const grid = await getGrid({ mnemonic, keypairType });
-  const metaData = await getMetadata(grid!);
+  const userSshKey = profileManager.profile!.ssh;
   let allKeys: SSHKeyData[] = [];
 
-  if (typeof metaData.sshkey === "string") {
-    migrateOldKey(metaData.sshkey);
+  if (typeof userSshKey === "string") {
+    migrateOldKey(userSshKey, grid);
   } else {
-    if (!metaData.sshkey) {
+    if (!userSshKey) {
       profileManager.updateSSH(allKeys);
     }
-    allKeys = metaData.sshkey || [];
+
+    await getMetadata(grid!);
+    allKeys = userSshKey || [];
     if (allKeys) {
       // Calculate the fingerprint for each key after saving them to the chain
       allKeys = await Promise.all(
