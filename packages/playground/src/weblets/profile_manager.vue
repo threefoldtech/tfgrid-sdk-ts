@@ -433,28 +433,22 @@ import { validateMnemonic } from "bip39";
 import Cryptr from "cryptr";
 import { marked } from "marked";
 import md5 from "md5";
-import { computed, nextTick, onMounted, type Ref, ref, watch } from "vue";
+import { computed, onMounted, type Ref, ref, watch } from "vue";
+import { nextTick } from "vue";
 import { useTheme } from "vuetify";
 
 import router from "@/router";
 import { AppThemeSelection } from "@/utils/app_theme";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
-import { normalizeBalance, normalizeError } from "@/utils/helpers";
 import { manual } from "@/utils/manual";
-import { migrateSshKeys } from "@/utils/ssh_keys";
 
 import { useProfileManagerController } from "../components/profile_manager_controller.vue";
 import { useOnline } from "../hooks";
 import { useInputRef } from "../hooks/input_validator";
 import { useProfileManager } from "../stores";
-import {
-  activateAccountAndCreateTwin,
-  createAccount,
-  getGrid,
-  loadBalance,
-  loadProfile,
-  storeEmail,
-} from "../utils/grid";
+import { activateAccountAndCreateTwin, createAccount, getGrid, loadBalance, loadProfile } from "../utils/grid";
+import { storeEmail } from "../utils/grid";
+import { normalizeBalance, normalizeError } from "../utils/helpers";
 
 const items = ref([{ id: 1, name: "stellar" }]);
 const depositWallet = ref("");
@@ -794,7 +788,7 @@ async function __loadBalance(profile?: Profile, tries = 1) {
 }
 profileManagerController.set({ loadBalance: __loadBalance });
 
-async function login() {
+function login() {
   const credentials: Credentials = getCredentials();
   if (credentials.mnemonicHash && credentials.passwordHash) {
     if (credentials.passwordHash === md5(password.value)) {
@@ -803,7 +797,6 @@ async function login() {
       const keypairType = credentials.keypairTypeHash
         ? cryptr.decrypt(credentials.keypairTypeHash)
         : KeypairType.sr25519;
-      await migrateSshKeys(mnemonic, keypairType as KeypairType);
       activate(mnemonic, keypairType as KeypairType);
     }
   }
@@ -817,7 +810,6 @@ async function storeAndLogin() {
     const grid = await getGrid({ mnemonic: mnemonic.value, keypairType: keypairType.value });
     storeEmail(grid!, email.value);
     setCredentials(md5(password.value), mnemonicHash, keypairTypeHash, md5(email.value));
-    await migrateSshKeys(mnemonic.value, keypairType.value);
     activate(mnemonic.value, keypairType.value);
   } catch (e) {
     if (e instanceof TwinNotExistError) {
