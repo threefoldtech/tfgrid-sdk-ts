@@ -739,7 +739,7 @@ export function pattern(msg: string, config: RegexPattern) {
  * @returns True if the key is a valid SSH key, false otherwise.
  */
 export function isValidSSHKey(key: string): boolean {
-  const sshKeyRegex = /^ssh-rsa\s+[A-Za-z0-9+/]+[=]{0,3}(\s+.+)?\s*$/;
+  const sshKeyRegex = /^(ssh-rsa|ssh-dss|ecdsa-[a-zA-Z0-9-]+|ssh-ed25519)\s+(\S+)\s+(\S+)/;
   return sshKeyRegex.test(key);
 }
 
