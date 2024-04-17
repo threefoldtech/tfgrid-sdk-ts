@@ -68,11 +68,17 @@
             :text="`The '${item.raw.name}' key is currently activated and will be utilized in deployments.`"
           >
             <template #activator="{ props }">
+              <v-progress-circular
+                v-if="item.raw.activating"
+                :size="20"
+                :width="2"
+                color="info"
+                indeterminate
+              ></v-progress-circular>
               <VCheckboxBtn
+                v-else
                 class="d-inline"
-                :disabled="loading"
                 v-bind="props"
-                :loading="item.raw.activating"
                 color="secondary"
                 @click.stop="activateKey(item.raw)"
                 :model-value="item.raw.isActive"
@@ -86,11 +92,17 @@
             :text="`Click to activate the '${item.raw.name}' for use in deployments.`"
           >
             <template #activator="{ props }">
+              <v-progress-circular
+                v-if="item.raw.activating"
+                :size="20"
+                :width="2"
+                color="info"
+                indeterminate
+              ></v-progress-circular>
               <VCheckboxBtn
+                v-else
                 class="d-inline"
-                :disabled="loading"
                 v-bind="props"
-                :loading="item.raw.activating"
                 :color="theme.name.value === AppThemeSelection.light ? '' : 'grey-lighten-1'"
                 @click.stop="activateKey(item.raw)"
                 :model-value="item.raw.isActive"
