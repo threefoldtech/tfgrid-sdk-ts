@@ -189,7 +189,29 @@
         </VCol>
       </VRow>
       <div class="mt-5 ml-auto text-right">
-        <span v-if="price_usd" class="font-weight-bold">{{ price_usd }} USD/Month</span>
+        <v-tooltip bottom color="primary" close-delay="100" :disabled="!(node && node.dedicated)">
+          <template v-slot:activator="{ isActive, props }">
+            <span v-bind="props" v-on="isActive" class="font-weight-bold">{{ price_usd }} USD/Month</span>
+          </template>
+          <span>
+            Discounts:
+            <v-spacer />
+            <ul class="pl-2">
+              <li>
+                {{ rentedByUser ? "You receive " : "You'll receive " }} 50%
+                <a target="_blank" :href="manual?.billing_pricing"> discount </a>
+                {{ rentedByUser ? " as you reserve the " : " if you reserve an " }} entire node
+              </li>
+              <li>
+                {{ rentedByUser ? "You're receiving " : "You'll be receiving " }} {{ 0 }}% discount as per the
+                <a target="_blank" :href="manual?.discount_levels">
+                  <p style="display: inline">staking discounts</p>
+                </a>
+              </li>
+            </ul>
+          </span>
+        </v-tooltip>
+
         <reserve-btn
           v-if="node?.dedicated && node?.status !== 'down'"
           class="ml-4"
@@ -208,8 +230,10 @@ import { capitalize } from "vue";
 
 import ReserveBtn from "@/dashboard/components/reserve_action_btn.vue";
 import { getCountryCode } from "@/utils/get_nodes";
+import { manual } from "@/utils/manual";
 import toReadableDate from "@/utils/to_readable_data";
 
+import { useProfileManager } from "../../stores";
 import formatResourceSize from "../../utils/format_resource_size";
 import ResourceDetails from "./node_details_internals/ResourceDetails.vue";
 
@@ -227,7 +251,11 @@ export default {
     "reload-table": (id: number) => id,
   },
   setup(props) {
+    const profileManager = useProfileManager();
     const node = ref(props.node);
+    const rentedByUser = computed(() => {
+      return props.node?.rentedByTwinId === profileManager.profile?.twinId;
+    });
     const countryFlagSrc = computed(() => {
       const countryCode = getCountryCode(props.node as GridNode);
       if (countryCode.length > 2) {
@@ -354,6 +382,8 @@ export default {
       speed,
       price_usd,
       dmi,
+      manual,
+      rentedByUser,
       checkSerialNumber,
       capitalize,
       formatResourceSize,
