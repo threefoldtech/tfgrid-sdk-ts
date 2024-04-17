@@ -170,13 +170,15 @@ class GridClient {
   }
 
   getDefaultUrls(network: NetworkEnv): Record<string, string> {
-    const urls = { rmbProxy: "", substrate: "", graphql: "", activation: "", relay: "" };
-    const NETWORK = network !== NetworkEnv.main ? `${network}.` : "";
-    urls.rmbProxy = this.clientOptions.proxyURL ?? `https://gridproxy.${NETWORK}grid.tf`;
-    urls.relay = this.clientOptions.relayURL ?? `wss://relay.${NETWORK}grid.tf`;
-    urls.substrate = this.clientOptions.substrateURL ?? `wss://tfchain.${NETWORK}grid.tf/ws`;
-    urls.graphql = this.clientOptions.graphqlURL ?? `https://graphql.${NETWORK}grid.tf/graphql`;
-    urls.activation = this.clientOptions.activationURL ?? `https://activation.${NETWORK}grid.tf/activation/activate`;
+    const base = network === NetworkEnv.main ? "grid.tf" : `${network}.grid.tf`;
+    const { proxyURL, relayURL, substrateURL, graphqlURL, activationURL } = this.clientOptions;
+    const urls = {
+      rmbProxy: proxyURL || `https://gridproxy.${base}`,
+      relay: relayURL || `wss://relay.${base}`,
+      substrate: substrateURL || `wss://tfchain.${base}/ws`,
+      graphql: graphqlURL || `https://graphql.${base}/graphql`,
+      activation: activationURL || `https://activation.${base}/activation/activate`,
+    };
 
     return urls;
   }
