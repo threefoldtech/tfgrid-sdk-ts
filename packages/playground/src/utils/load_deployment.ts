@@ -78,16 +78,13 @@ export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
     try {
       const result = await Promise.race([machinePromise, timeoutPromise]);
       if (result instanceof Error && result.message === "Timeout") {
-        console.log(`%c[Error] Timeout loading deployment with name ${name}`, "color: rgb(207, 102, 121)");
+        console.error(`Timeout loading deployment with name ${name}`);
         return null;
       } else {
         return result;
       }
     } catch (e) {
-      console.log(
-        `%c[Error] failed to load deployment with name ${name}:\n${normalizeError(e, "No errors were provided.")}`,
-        "color: rgb(207, 102, 121)",
-      );
+      console.error(`Failed to load deployment with name ${name}:\n${normalizeError(e, "No errors were provided.")}`);
       failedDeployments.push({ name, nodes: nodeIds, contracts: contracts });
     }
   });
@@ -197,19 +194,16 @@ export async function loadK8s(grid: GridClient) {
 
       const result = await Promise.race([clusterPromise, timeoutPromise]);
       if (result instanceof Error && result.message === "Timeout") {
-        console.log(`%c[Error] Timeout loading deployment with name ${name}`, "color: rgb(207, 102, 121)");
+        console.error(`Timeout loading deployment with name ${name}`);
         return null;
       } else if ((result as any).masters.length === 0 && (result as any).workers.length === 0) {
-        console.log(`%c[Error] failed to load deployment with name ${name}}`, "color: rgb(207, 102, 121)");
+        console.error(`Failed to load deployment with name ${name}}`);
         failedDeployments.push({ name, nodes: nodeIds, contracts: contracts });
       } else {
         return result;
       }
     } catch (e) {
-      console.log(
-        `%c[Error] failed to load deployment with name ${name}:\n${normalizeError(e, "No errors were provided.")}`,
-        "color: rgb(207, 102, 121)",
-      );
+      console.error(`Failed to load deployment with name ${name}:\n${normalizeError(e, "No errors were provided.")}`);
       failedDeployments.push({ name, nodes: nodeIds, contracts: contracts });
     }
   });
