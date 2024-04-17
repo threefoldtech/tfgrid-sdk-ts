@@ -710,6 +710,10 @@ async function activate(mnemonic: string, keypairType: KeypairType) {
 
     profileManager.set({ ...profile, mnemonic });
     emit("update:modelValue", false);
+
+    if (grid) {
+      await migrateSshKeys(grid);
+    }
   } catch (e) {
     loginError.value = normalizeError(e, "Something went wrong while login.");
   } finally {
@@ -801,7 +805,6 @@ async function login() {
       const keypairType = credentials.keypairTypeHash
         ? cryptr.decrypt(credentials.keypairTypeHash)
         : KeypairType.sr25519;
-      await migrateSshKeys(mnemonic, keypairType as KeypairType);
       activate(mnemonic, keypairType as KeypairType);
     }
   }
