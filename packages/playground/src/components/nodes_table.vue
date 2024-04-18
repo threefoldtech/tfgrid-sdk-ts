@@ -100,3 +100,17 @@ export default {
   line-height: 60px;
 }
 </style>
+<style scoped>
+.v-data-table tbody tr {
+  position: relative;
+}
+.v-data-table tbody tr::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 0.5rem;
+  background-color: rgb(var(--v-theme-background));
+}
+</style>
