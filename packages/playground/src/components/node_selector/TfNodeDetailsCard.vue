@@ -198,15 +198,13 @@
             <v-spacer />
             <ul class="pl-2">
               <li>
-                {{ rentedByUser ? "You receive " : "You'll receive " }} 50%
-                <a target="_blank" :href="manual?.billing_pricing"> discount </a>
-                {{ rentedByUser ? " as you reserve the " : " if you reserve the " }} entire node
+                {{ rentedByUser ? "You receive " : "You'll receive " }} a 50%
+                <a target="_blank" :href="manual?.billing_pricing">discount</a>
+                {{ rentedByUser ? " as you reserve the" : " if you reserve the" }} entire node
               </li>
               <li>
-                {{ rentedByUser ? "You receive " : "You'll receive " }} {{ stakingDiscount }}% discount as per the
-                <a target="_blank" :href="manual?.discount_levels">
-                  <p style="display: inline">staking discounts</p>
-                </a>
+                {{ rentedByUser ? "You receive" : "You'll receive" }} a {{ stakingDiscount }}% discount as per the
+                <a target="_blank" :href="manual?.discount_levels"> staking discounts </a>
               </li>
             </ul>
           </span>
