@@ -224,7 +224,7 @@
 </template>
 <script lang="ts">
 import type { NodeInfo, NodeResources } from "@threefold/grid_client";
-import { CertificationType, GridNode } from "@threefold/gridproxy_client";
+import { CertificationType, type GridNode } from "@threefold/gridproxy_client";
 import { computed, onMounted, ref } from "vue";
 import { capitalize } from "vue";
 
