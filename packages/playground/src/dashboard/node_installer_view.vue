@@ -5,9 +5,13 @@
 </template>
 
 <script>
-export default {
-  data: () => ({
-    ruta: "https://bootstrap.grid.tf/",
-  }),
-};
+import { defineComponent } from "vue";
+
+export default defineComponent({
+  data() {
+    return {
+      ruta: "https://bootstrap.grid.tf/",
+    };
+  },
+});
 </script>
