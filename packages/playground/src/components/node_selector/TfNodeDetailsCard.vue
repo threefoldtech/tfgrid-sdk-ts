@@ -200,10 +200,10 @@
               <li>
                 {{ rentedByUser ? "You receive " : "You'll receive " }} 50%
                 <a target="_blank" :href="manual?.billing_pricing"> discount </a>
-                {{ rentedByUser ? " as you reserve the " : " if you reserve an " }} entire node
+                {{ rentedByUser ? " as you reserve the " : " if you reserve the " }} entire node
               </li>
               <li>
-                {{ rentedByUser ? "You're receiving " : "You'll be receiving " }} {{ 0 }}% discount as per the
+                {{ rentedByUser ? "You receive " : "You'll receive " }} {{ stakingDiscount }}% discount as per the
                 <a target="_blank" :href="manual?.discount_levels">
                   <p style="display: inline">staking discounts</p>
                 </a>
@@ -223,9 +223,9 @@
   </VCard>
 </template>
 <script lang="ts">
-import type { NodeInfo } from "@threefold/grid_client";
-import type { GridNode } from "@threefold/gridproxy_client";
-import { computed, ref } from "vue";
+import type { NodeInfo, NodeResources } from "@threefold/grid_client";
+import { CertificationType, GridNode } from "@threefold/gridproxy_client";
+import { computed, onMounted, ref } from "vue";
 import { capitalize } from "vue";
 
 import ReserveBtn from "@/dashboard/components/reserve_action_btn.vue";
@@ -235,6 +235,8 @@ import toReadableDate from "@/utils/to_readable_data";
 
 import { useProfileManager } from "../../stores";
 import formatResourceSize from "../../utils/format_resource_size";
+import { getGrid } from "../../utils/grid";
+import { toGigaBytes } from "../../utils/helpers";
 import ResourceDetails from "./node_details_internals/ResourceDetails.vue";
 
 export default {
@@ -253,6 +255,7 @@ export default {
   setup(props) {
     const profileManager = useProfileManager();
     const node = ref(props.node);
+    const stakingDiscount = ref<number>();
     const rentedByUser = computed(() => {
       return props.node?.rentedByTwinId === profileManager.profile?.twinId;
     });
@@ -270,6 +273,11 @@ export default {
       return imageUrl;
     });
 
+    onMounted(async () => {
+      if (props.node) {
+        stakingDiscount.value = (await getStakingDiscount()) || 0;
+      }
+    });
     // A guard to check node type
     function isGridNode(node: unknown): node is GridNode {
       return !!node && typeof node === "object" && "num_gpu" in node;
@@ -367,6 +375,26 @@ export default {
       return formatResourceSize(speed, true).toLocaleLowerCase() + "ps";
     }
 
+    async function getStakingDiscount() {
+      try {
+        const grid = await getGrid(profileManager.profile!);
+        const total_resources = props.node?.total_resources;
+        const { cru, hru, mru, sru } = total_resources as NodeResources;
+        const price = await grid?.calculator.calculateWithMyBalance({
+          cru,
+          hru: toGigaBytes(hru),
+          mru: toGigaBytes(mru),
+          sru: toGigaBytes(sru),
+          ipv4u: false,
+          certified: props.node?.certificationType === CertificationType.Certified,
+        });
+
+        return price?.dedicatedPackage.discount;
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
     return {
       cruText,
       mruText,
@@ -384,6 +412,7 @@ export default {
       dmi,
       manual,
       rentedByUser,
+      stakingDiscount,
       checkSerialNumber,
       capitalize,
       formatResourceSize,
