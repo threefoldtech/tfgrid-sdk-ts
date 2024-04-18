@@ -1,7 +1,7 @@
 <template>
   <v-card class="pt-6 pl-6 pr-6 mb-4">
     <div class="head">
-      <h3 class="text-light">
+      <h3 class="text-light text-subtitle-1">
         <v-icon>mdi-key-chain</v-icon>
         SSH Keys
       </h3>
