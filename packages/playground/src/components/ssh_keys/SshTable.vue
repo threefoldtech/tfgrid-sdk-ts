@@ -179,7 +179,7 @@ export default defineComponent({
         key: "name",
       },
       {
-        title: "Creation Datetime",
+        title: "Created At",
         key: "createdAt",
       },
       {

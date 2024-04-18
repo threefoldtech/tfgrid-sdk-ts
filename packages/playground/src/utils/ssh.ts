@@ -4,24 +4,55 @@ import { useProfileManager } from "@/stores/profile_manager";
 import type { SSHKeyData } from "@/types";
 
 import { createCustomToast, ToastType } from "./custom_toast";
-import { getGrid, storeSSH } from "./grid";
+import { getGrid, loadBalance, storeSSH } from "./grid";
 import { downloadAsJson } from "./helpers";
 
 /**
  * Manages SSH key operations including migration, updating, exporting, deleting, and listing.
  */
 class SSHKeysManagement {
+  private oldKey = "";
+  updateCost = 0.01;
+  private words = [
+    "moon",
+    "earth",
+    "sun",
+    "star",
+    "galaxy",
+    "nebula",
+    "comet",
+    "planet",
+    "asteroid",
+    "satellite",
+    "mercury",
+    "venus",
+    "mars",
+    "jupiter",
+    "saturn",
+    "uranus",
+    "neptune",
+    "pluto",
+    "meteor",
+    "cosmos",
+  ];
+
+  constructor() {
+    const profileManager = useProfileManager();
+    this.oldKey = profileManager.profile?.ssh as unknown as string;
+  }
+
   /**
    * Migrates an old SSH key string to the new SSHKeyData format.
-   * @param oldKey The old SSH key string to migrate.
    * @returns An array containing the migrated SSHKeyData.
    */
-  migrate(oldKey: string): SSHKeyData[] {
+  migrate(): SSHKeyData[] {
     const userKeys: SSHKeyData[] = [];
-    const parts = oldKey.split(" ");
+
     let keyName = "";
+    const parts = this.oldKey.split(" ");
+
     if (parts.length < 3) {
-      keyName = this.generateName();
+      keyName = this.generateName()!;
     } else {
       keyName = parts[parts.length - 1];
     }
@@ -30,7 +61,7 @@ class SSHKeysManagement {
       name: keyName,
       id: 1,
       isActive: true,
-      publicKey: oldKey,
+      publicKey: this.oldKey,
     };
     userKeys.push(newKey);
     return userKeys;
@@ -38,11 +69,10 @@ class SSHKeysManagement {
 
   /**
    * Checks if the SSH key has not been migrated yet.
-   * @param key The SSH key to check for migration.
    * @returns A boolean indicating whether the key has not been migrated.
    */
-  notMigrated(key: string | SSHKeyData[]): boolean {
-    return typeof key === "string";
+  migrated(): boolean {
+    return typeof this.oldKey !== "string";
   }
 
   /**
@@ -56,42 +86,40 @@ class SSHKeysManagement {
       createCustomToast(`Error occurred because the grid has not initialized yet.`, ToastType.danger);
       return;
     }
+
+    const balance = await loadBalance(grid!);
+    if (balance.free < this.updateCost) {
+      createCustomToast(
+        `Your wallet balance is insufficient to save your SSH key. To avoid losing your SSH key, please recharge your wallet.`,
+        ToastType.danger,
+      );
+      return;
+    }
+
     const copiedKeys = keys.map(
       ({ fingerPrint, activating, deleting, ...keyWithoutSensitiveProps }) => keyWithoutSensitiveProps,
     );
+
     await storeSSH(grid!, copiedKeys);
     profileManager.updateSSH(copiedKeys);
   }
 
   /**
-   * Generates a random name for an SSH key.
+   * Generates a random name for an SSH key that is not included in the blocked names<user keys>.
    * @returns The generated SSH key name.
+   * @throws Error if all names are blocked.
    */
-  generateName(): string {
-    const words = [
-      "moon",
-      "earth",
-      "sun",
-      "star",
-      "galaxy",
-      "nebula",
-      "comet",
-      "planet",
-      "asteroid",
-      "satellite",
-      "mercury",
-      "venus",
-      "mars",
-      "jupiter",
-      "saturn",
-      "uranus",
-      "neptune",
-      "pluto",
-      "meteor",
-      "cosmos",
-    ];
-    const keyName = words.sort(() => Math.random() - 0.5)[0];
-    return keyName;
+  generateName(): string | null {
+    // Filter out names that are already used
+    const blockedNames = this.list().map(key => key.name);
+    const availableNames = this.words.filter(name => !blockedNames.includes(name));
+
+    if (availableNames.length === 0) {
+      return null;
+    }
+
+    // Generate a random name from the available names
+    return availableNames[Math.floor(Math.random() * availableNames.length)];
   }
 
   /**
@@ -143,15 +171,24 @@ class SSHKeysManagement {
    * @returns An array of formatted SSHKeyData.
    */
   list(): SSHKeyData[] {
-    const profileManager = useProfileManager();
     let keys: SSHKeyData[] = [];
 
-    if (profileManager.profile!.ssh) {
-      keys = profileManager.profile!.ssh.map(key => ({
-        ...key,
-        fingerPrint: this.calculateFingerprint(key.publicKey),
-      }));
+    if (!this.migrated()) {
+      keys = this.migrate();
+    } else {
+      keys = this.oldKey as unknown as SSHKeyData[];
     }
+
+    // Profile created for the first time.
+    if (!keys) {
+      return [];
+    }
+
+    keys = keys.map(key => ({
+      ...key,
+      fingerPrint: this.calculateFingerprint(key.publicKey),
+    }));
+
     return keys;
   }
 
@@ -172,6 +209,24 @@ class SSHKeysManagement {
   isValidSSHKey(key: string): boolean {
     const sshKeyRegex = /^(ssh-rsa|ssh-dss|ecdsa-[a-zA-Z0-9-]+|ssh-ed25519)\s+(\S+)+\S/;
     return sshKeyRegex.test(key);
+  }
+
+  /**
+   * Checks if a given name is available by checking if there is another key with the same name.
+   * @param keyName - The key name to be validated.
+   * @returns True if the keyName is available to use, false otherwise.
+   */
+  availableName(keyName: string): boolean {
+    return !this.list().some(key => key.name === keyName);
+  }
+
+  /**
+   * Checks if a given SSH public key is available by checking if there is another key with the same public key.
+   * @param publicKey - The SSH public key to be validated.
+   * @returns True if the publicKey is available to use, false otherwise.
+   */
+  availablePublicKey(publicKey: string): boolean {
+    return !this.list().some(key => key.publicKey === publicKey);
   }
 }
 

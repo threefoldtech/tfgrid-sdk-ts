@@ -327,10 +327,10 @@ const routes: AppRoute[] = [
         tooltip: "Find or Publish your Flist on 0-Hub.",
       },
       {
-        title: "SSH Key",
+        title: "SSH Keys",
         icon: "mdi-key-plus",
         route: DashboardRoutes.Deploy.SSHKey,
-        tooltip: "Generate or update your SSH Key.",
+        tooltip: "Generate or update your SSH Keys.",
       },
     ],
   },
