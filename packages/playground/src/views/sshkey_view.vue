@@ -6,10 +6,8 @@
         Manage SSH Keys
       </h3>
       <p class="mt-2">
-        Facilitating access to deployed machines involves the incorporation or adaptation of SSH keys, with the
-        flexibility to manage multiple keys seamlessly, allowing users to switch between them. Moreover, users can
-        activate individual keys or enable them all, streamlining the process of distributing them to the machines and
-        effectively managing accessibility to the deployed nodes.
+        Manage SSH keys easily, switch between them, and activate or deactivate keys as needed for accessing deployed
+        machines. Simplify key distribution and effectively manage access to nodes.
       </p>
     </div>
   </v-card>
@@ -45,7 +43,7 @@
         "
         :loading="isExporting"
       >
-        Export
+        Export all
       </v-btn>
 
       <v-btn
@@ -74,11 +72,11 @@
   <!-- Dialogs -->
   <!-- Generate -->
   <ssh-form-dialog
+    v-if="dialogType === SSHCreationMethod.Generate"
     :open="dialogType === SSHCreationMethod.Generate"
     :all-keys="allKeys"
     :dialog-type="dialogType"
     :generating="generatingSSH"
-    :generated-ssh-key="generatedSSHKey"
     :saving-key="savingKey"
     @save="addKey($event)"
     @close="closeDialog"
@@ -87,11 +85,11 @@
 
   <!-- Import -->
   <ssh-form-dialog
+    v-if="dialogType === SSHCreationMethod.Import"
     :open="dialogType === SSHCreationMethod.Import"
     :all-keys="allKeys"
     :dialog-type="dialogType"
     :generating="generatingSSH"
-    :generated-ssh-key="generatedSSHKey"
     :saving-key="savingKey"
     @save="addKey($event)"
     @close="closeDialog"
@@ -125,7 +123,6 @@ const generatingSSH = ref<boolean>(false);
 
 const allKeys = ref<SSHKeyData[]>([]);
 const dialogType = ref<SSHCreationMethod>(SSHCreationMethod.None);
-const generatedSSHKey = ref("");
 const tableLoadingMessage = ref("");
 
 const selectedKey = ref<SSHKeyData>({
@@ -141,25 +138,23 @@ const sshKeysManagement = new SSHKeysManagement();
 
 onMounted(async () => {
   loading.value = true;
-  let profileSSH = profileManager.profile?.ssh;
-
-  if (sshKeysManagement.notMigrated(profileSSH!)) {
+  console.log(profileManager.profile?.ssh);
+  console.log(sshKeysManagement.migrated());
+  if (!sshKeysManagement.migrated()) {
     tableLoadingMessage.value = "Migrating your old key...";
     const migrationInterval = setInterval(async () => {
-      profileSSH = profileManager.profile?.ssh;
-      const migrated = !sshKeysManagement.notMigrated(profileSSH!);
+      const migrated = !sshKeysManagement.migrated();
       if (migrated) {
         clearInterval(migrationInterval);
         allKeys.value = sshKeysManagement.list();
-        loading.value = false;
         tableLoadingMessage.value = "";
       }
     }, 1000);
   } else {
     allKeys.value = sshKeysManagement.list();
     tableLoadingMessage.value = "";
-    loading.value = false;
   }
+  loading.value = false;
 });
 
 const openDialog = (type: SSHCreationMethod) => {
@@ -168,7 +163,6 @@ const openDialog = (type: SSHCreationMethod) => {
 
 const closeDialog = () => {
   dialogType.value = SSHCreationMethod.None;
-  generatedSSHKey.value = "";
 };
 
 const exportAllKeys = () => {
@@ -229,8 +223,8 @@ const generateSSHKeys = async (key: SSHKeyData) => {
     size: 4096,
   });
 
-  generatedSSHKey.value = keys.publicKey;
   key.fingerPrint = sshKeysManagement.calculateFingerprint(keys.publicKey);
+  key.publicKey = keys.publicKey;
 
   const copiedAllkeys = [...allKeys.value, key];
   await sshKeysManagement.update(copiedAllkeys);

@@ -708,10 +708,9 @@ async function activate(mnemonic: string, keypairType: KeypairType) {
     emit("update:modelValue", false);
     // Migrate the ssh-key
     const sshKeysManagement = new SSHKeysManagement();
-    const profileSSH = profileManager.profile?.ssh;
-
-    if (sshKeysManagement.notMigrated(profileSSH!)) {
-      const newKeys = sshKeysManagement.migrate(profileSSH as unknown as string);
+    if (!sshKeysManagement.migrated()) {
+      console.log(sshKeysManagement.migrated());
+      const newKeys = sshKeysManagement.migrate();
       await sshKeysManagement.update(newKeys);
     }
   } catch (e) {
