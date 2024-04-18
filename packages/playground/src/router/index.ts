@@ -408,7 +408,7 @@ function createTFFarmsRoutes(): RouteRecordRaw[] {
           meta: { title: "Farm Finder", publicPath: true, sidebarBreakpoint: 1000, filtersCollapsibleBreakpoint: 1350 },
         },
         {
-          path: DashboardRoutes.TFChain.NodeInstaller,
+          path: DashboardRoutes.Farms.NodeInstaller,
           component: () => import("../dashboard/node_installer_view.vue"),
           meta: { title: "Node Installer" },
         },

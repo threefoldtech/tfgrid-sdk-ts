@@ -24,7 +24,7 @@ enum FarmRoutes {
   BaseRoute = "/farms/",
   YourFarms = "/farms/your-farms/",
   FarmFinder = "/farms/farm-finder/",
-  NodeInstaller = "https://bootstrap.grid.tf/",
+  NodeInstaller = "/farms/node-installer/",
   Simulator = "/farms/simulator/",
 }
 
@@ -42,7 +42,6 @@ enum TFChainRoutes {
   TFTokenBridge = "/tf-chain/token-bridge/",
   TFTokenTransfer = "/tf-chain/token-transfer/",
   TFMintingReports = "/tf-chain/minting-reports/",
-  NodeInstaller = "/tf-chain/node-installer/",
 }
 
 enum OtherRoutes {
