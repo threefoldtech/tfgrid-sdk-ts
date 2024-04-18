@@ -8,8 +8,11 @@
     <template v-slot:default>
       <v-card>
         <v-toolbar color="primary" class="custom-toolbar">
-          <p v-if="$props.dialogType === SSHCreationMethod.Generate" class="mb-5">Add new SSH Key</p>
-          <p v-else-if="$props.dialogType === SSHCreationMethod.Import" class="mb-5">Import an exact SSH Key</p>
+          <p class="mb-5">
+            {{
+              $props.dialogType === SSHCreationMethod.Generate ? "Generate a new SSH Key" : "Import an exact SSH Key"
+            }}
+          </p>
         </v-toolbar>
 
         <v-card-text>
@@ -21,7 +24,7 @@
             <v-text-field
               hint="Leave this field empty to generate a name automatically, or enter a custom name to save it with your key."
               :rules="[
-                keyName.length < 15 || 'Please enter a key name with fewer than 15 characters.',
+                keyName.length < 30 || 'Please enter a key name with fewer than 30 characters.',
                 !keyName.includes(' ') || 'Key names cannot include spaces. Please use a name without spaces.',
               ]"
               class="mb-4"
@@ -32,7 +35,8 @@
           </input-tooltip>
 
           <v-alert width="95%" class="mb-4" type="info">
-            Updating or generating SSH key will cost you up to 0.01 TFT
+            {{ $props.dialogType === SSHCreationMethod.Generate ? "Generating" : "Importing" }}
+            a new SSH key will cost you up to 0.01 TFT
           </v-alert>
 
           <div v-if="$props.dialogType === SSHCreationMethod.Generate" class="create">
@@ -82,7 +86,7 @@
             <v-btn
               v-if="$props.dialogType === SSHCreationMethod.Import"
               :loading="$props.savingKey"
-              :disabled="!sshKey || !isValidSSHKey(sshKey)"
+              :disabled="!sshKey || !sshKeysManagement.isValidSSHKey(sshKey) || keyName.length >= 30"
               color="secondary"
               variant="outlined"
               text="Save"
@@ -100,11 +104,10 @@ import { computed, defineComponent, type PropType, ref, watch } from "vue";
 
 import { type Profile, useProfileManager } from "@/stores/profile_manager";
 import { SSHCreationMethod, type SSHKeyData } from "@/types";
-import { formatSSHKeyTableCreatedAt } from "@/utils/date";
+import { createCustomToast, ToastType } from "@/utils/custom_toast";
 import { type Balance, getGrid, loadBalance } from "@/utils/grid";
 import { isEnoughBalance } from "@/utils/helpers";
-import { generateSSHKeyName } from "@/utils/strings";
-import { isValidSSHKey } from "@/utils/validators";
+import SSHKeysManagement from "@/utils/ssh";
 
 export default defineComponent({
   emits: ["close", "save", "generate"],
@@ -137,6 +140,8 @@ export default defineComponent({
 
   setup(props, { emit }) {
     const profileManager = useProfileManager();
+    const sshKeysManagement = new SSHKeysManagement();
+
     const sshKey = ref<string>("");
     const keyName = ref<string>(generateUniqueSSHKeyName());
     const createdKey = ref<SSHKeyData | null>(null); // Initialize createdKey with null
@@ -150,17 +155,18 @@ export default defineComponent({
       isOpen => {
         if (isOpen) {
           const now = new Date();
-          const lastID = props.allKeys.length ? props.allKeys[props.allKeys.length - 1].id : 1;
+          const keyId = props.allKeys.length ? props.allKeys[props.allKeys.length - 1].id + 1 : 1;
 
-          keyName.value = generateUniqueSSHKeyName();
           sshKey.value = "";
           createdKey.value = {
-            id: lastID + 1,
+            id: keyId,
             publicKey: props.generatedSshKey as string,
-            createdAt: formatSSHKeyTableCreatedAt(now),
-            name: keyName.value.length === 0 ? generateUniqueSSHKeyName() : keyName.value,
+            createdAt: sshKeysManagement.formatDate(now),
+            name: keyName.value,
             isActive: true,
           };
+        } else {
+          keyName.value = generateUniqueSSHKeyName();
         }
       },
       { deep: true },
@@ -184,12 +190,22 @@ export default defineComponent({
       if (createdKey.value) {
         const isNewSSHKey = ref<boolean>(props.dialogType === SSHCreationMethod.Generate);
         createdKey.value.publicKey = isNewSSHKey.value ? props.generatedSshKey || "" : sshKey.value;
+        const parts = createdKey.value.publicKey.split(" ");
+
+        if (parts.length === 3) {
+          if (parts[parts.length - 1].length < 30) {
+            keyName.value = parts[parts.length - 1];
+          }
+        }
+
+        createdKey.value.name = keyName.value;
         emit("save", createdKey.value);
       }
     }
 
     function generateUniqueSSHKeyName(depth = 0): string {
-      const keyName: string = generateSSHKeyName();
+      const keyName: string = sshKeysManagement.generateName();
+
       if (!props.allKeys.length) {
         return keyName;
       }
@@ -241,7 +257,7 @@ export default defineComponent({
       return [
         (v: any) => !!v || "SSH key is required.",
         (v: string) =>
-          isValidSSHKey(v) ||
+          sshKeysManagement.isValidSSHKey(v) ||
           "The SSH key you provided is not valid. Please double-check that it is copied correctly and follows the correct format.",
       ];
     }
@@ -252,12 +268,12 @@ export default defineComponent({
       hasEnoughBalance,
       sshKey,
       SSHCreationMethod,
+      sshKeysManagement,
 
       generateUniqueSSHKeyName,
       createNewSSHKey,
       sshRules,
       generateSSHKey,
-      isValidSSHKey,
     };
   },
 });

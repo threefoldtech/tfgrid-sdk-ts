@@ -549,7 +549,7 @@ async function mounted() {
     password.value = sessionPassword;
 
     if (credentials.passwordHash) {
-      return login();
+      return await login();
     }
   } else {
     activeTab.value = 1;
@@ -704,6 +704,14 @@ async function activate(mnemonic: string, keypairType: KeypairType) {
 
     profileManager.set({ ...profile, mnemonic });
     emit("update:modelValue", false);
+    // Migrate the ssh-key
+    const sshKeysManagement = new SSHKeysManagement();
+    const profileSSH = profileManager.profile?.ssh;
+
+    if (sshKeysManagement.notMigrated(profileSSH!)) {
+      const newKeys = sshKeysManagement.migrate(profileSSH as unknown as string);
+      await sshKeysManagement.update(newKeys);
+    }
   } catch (e) {
     loginError.value = normalizeError(e, "Something went wrong while login.");
   } finally {
@@ -786,7 +794,7 @@ async function __loadBalance(profile?: Profile, tries = 1) {
 }
 profileManagerController.set({ loadBalance: __loadBalance });
 
-function login() {
+async function login() {
   const credentials: Credentials = getCredentials();
   if (credentials.mnemonicHash && credentials.passwordHash) {
     if (credentials.passwordHash === md5(password.value)) {
@@ -795,7 +803,7 @@ function login() {
       const keypairType = credentials.keypairTypeHash
         ? cryptr.decrypt(credentials.keypairTypeHash)
         : KeypairType.sr25519;
-      activate(mnemonic, keypairType as KeypairType);
+      await activate(mnemonic, keypairType as KeypairType);
     }
   }
 }
@@ -808,7 +816,7 @@ async function storeAndLogin() {
     const grid = await getGrid({ mnemonic: mnemonic.value, keypairType: keypairType.value });
     storeEmail(grid!, email.value);
     setCredentials(md5(password.value), mnemonicHash, keypairTypeHash, md5(email.value));
-    activate(mnemonic.value, keypairType.value);
+    await activate(mnemonic.value, keypairType.value);
   } catch (e) {
     if (e instanceof TwinNotExistError) {
       isNonActiveMnemonic.value = true;
@@ -899,6 +907,8 @@ function onScroll(e: UIEvent) {
 <script lang="ts">
 import { TwinNotExistError } from "@threefold/types";
 import { capitalize } from "vue";
+
+import SSHKeysManagement from "@/utils/ssh";
 
 import QrcodeGenerator from "../components/qrcode_generator.vue";
 import type { Profile } from "../stores/profile_manager";

@@ -2,8 +2,8 @@
   <v-card class="pt-6 pl-6 pr-6 mb-4">
     <div class="head">
       <h3 class="text-light">
-        <v-icon>{{ headerIcon }}</v-icon>
-        {{ headerTitle }}
+        <v-icon>mdi-key-chain</v-icon>
+        SSH Keys
       </h3>
     </div>
 
@@ -24,7 +24,11 @@
         loading-text="Loading..."
         @click:row="(_, { item }) => $emit('view', item.raw)"
       >
-        <template #loading> </template>
+        <template #loading>
+          <div class="w-100 text-center" v-if="loading && loadingMessage">
+            <small>{{ loadingMessage }}</small>
+          </div>
+        </template>
         <template #[`item.createdAt`]="{ item }">
           <v-tooltip location="bottom" :text="`The date when this SSH key was created.`">
             <template #activator="{ props }">
@@ -64,8 +68,11 @@
         <template #[`item.activation`]="{ item }">
           <v-tooltip
             location="bottom"
-            v-if="item.raw.isActive"
-            :text="`The '${item.raw.name}' key is currently activated and will be utilized in deployments.`"
+            :text="
+              item.raw.isActive
+                ? `The '${item.raw.name}' key is currently activated and will be utilized in deployments.`
+                : `Click to activate the '${item.raw.name}' for use in deployments.`
+            "
           >
             <template #activator="{ props }">
               <v-progress-circular
@@ -80,32 +87,9 @@
                 class="d-inline"
                 v-bind="props"
                 color="secondary"
-                @click.stop="activateKey(item.raw)"
+                @click.stop="toggleKeyActivation(item.raw)"
                 :model-value="item.raw.isActive"
-              />
-            </template>
-          </v-tooltip>
-
-          <v-tooltip
-            location="bottom"
-            v-else
-            :text="`Click to activate the '${item.raw.name}' for use in deployments.`"
-          >
-            <template #activator="{ props }">
-              <v-progress-circular
-                v-if="item.raw.activating"
-                :size="20"
-                :width="2"
-                color="info"
-                indeterminate
-              ></v-progress-circular>
-              <VCheckboxBtn
-                v-else
-                class="d-inline"
-                v-bind="props"
-                :color="theme.name.value === AppThemeSelection.light ? '' : 'grey-lighten-1'"
-                @click.stop="activateKey(item.raw)"
-                :model-value="item.raw.isActive"
+                :disabled="deleting"
               />
             </template>
           </v-tooltip>
@@ -165,11 +149,7 @@ export default defineComponent({
       type: Array as PropType<SSHKeyData[]>,
       required: true,
     },
-    headerTitle: {
-      type: String,
-      required: true,
-    },
-    headerIcon: {
+    loadingMessage: {
       type: String,
       required: true,
     },
@@ -183,7 +163,7 @@ export default defineComponent({
     },
   },
 
-  emits: ["inactive", "active", "delete", "view", "update:keys", "export"],
+  emits: ["delete", "view", "update:activation", "export"],
 
   setup(props, { emit }) {
     const selectedKeys = ref<number[]>([]); // IDs
@@ -226,20 +206,26 @@ export default defineComponent({
       emit("delete", [key]);
     };
 
-    const activateKey = (key: SSHKeyData) => {
-      if (key.isActive) {
-        emit("inactive", key);
-      } else {
-        emit("active", key);
-      }
+    const toggleKeyActivation = (key: SSHKeyData) => {
+      console.log(key.isActive);
+      emit("update:activation", key);
     };
 
-    return { headers, selectedKeys, capitalize, theme, AppThemeSelection, deleteSelected, deleteKey, activateKey };
+    return {
+      headers,
+      selectedKeys,
+      theme,
+      AppThemeSelection,
+      capitalize,
+      deleteSelected,
+      deleteKey,
+      toggleKeyActivation,
+    };
   },
 });
 </script>
 
-<style scoped>
+<style>
 .head {
   border-bottom: 1px solid #8d848d;
   padding-bottom: 15px;
@@ -252,5 +238,10 @@ export default defineComponent({
 }
 .activation {
   cursor: pointer;
+}
+.v-data-table-rows-loading td {
+  padding: 0 !important;
+  margin: 0 !important;
+  height: 25px !important;
 }
 </style>
