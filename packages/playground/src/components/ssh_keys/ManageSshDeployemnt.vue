@@ -17,7 +17,15 @@
 
     <v-card-actions>
       <VSpacer />
-      <v-btn color="primary" variant="flat" @click="openManageDialog = true" class="mr-2 my-1">Manage SSH keys</v-btn>
+      <v-btn
+        color="primary"
+        variant="flat"
+        @click="openManageDialog = true"
+        class="mr-2 my-1"
+        :disabled="sshKeys && sshKeys.length === 0"
+      >
+        Manage SSH keys
+      </v-btn>
     </v-card-actions>
   </v-card>
 
