@@ -144,7 +144,6 @@ class SSHKeysManagement {
    */
   list(): SSHKeyData[] {
     const profileManager = useProfileManager();
-    console.log("profileManager.profile!.ssh", profileManager.profile!.ssh);
     let keys: SSHKeyData[] = [];
 
     if (profileManager.profile!.ssh) {
