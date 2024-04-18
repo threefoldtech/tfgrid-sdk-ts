@@ -408,6 +408,11 @@ function createTFFarmsRoutes(): RouteRecordRaw[] {
           meta: { title: "Farm Finder", publicPath: true, sidebarBreakpoint: 1000, filtersCollapsibleBreakpoint: 1350 },
         },
         {
+          path: DashboardRoutes.TFChain.NodeInstaller,
+          component: () => import("../dashboard/node_installer_view.vue"),
+          meta: { title: "Node Installer" },
+        },
+        {
           path: DashboardRoutes.Farms.Simulator,
           component: () => import("../dashboard/simulator_view.vue"),
           meta: { title: "Twin", publicPath: true },

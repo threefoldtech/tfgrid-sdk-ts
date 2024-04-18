@@ -42,6 +42,7 @@ enum TFChainRoutes {
   TFTokenBridge = "/tf-chain/token-bridge/",
   TFTokenTransfer = "/tf-chain/token-transfer/",
   TFMintingReports = "/tf-chain/minting-reports/",
+  NodeInstaller = "/tf-chain/node-installer/",
 }
 
 enum OtherRoutes {

@@ -347,7 +347,7 @@ const routes: AppRoute[] = [
       {
         title: "Node Installer",
         icon: "mdi-earth",
-        url: DashboardRoutes.Farms.NodeInstaller,
+        route: DashboardRoutes.TFChain.NodeInstaller,
         tooltip: "Download Zero-OS Images.",
       },
       {
