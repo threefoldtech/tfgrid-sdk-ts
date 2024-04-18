@@ -107,7 +107,6 @@ import { generateKeyPair } from "web-ssh-keygen";
 import SshDataDialog from "@/components/ssh_keys/SshDataDialog.vue";
 import SshFormDialog from "@/components/ssh_keys/SshFormDialog.vue";
 import SshTable from "@/components/ssh_keys/SshTable.vue";
-import { useProfileManager } from "@/stores";
 import { SSHCreationMethod, type SSHKeyData } from "@/types";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
 import { downloadAsFile } from "@/utils/helpers";
@@ -133,13 +132,10 @@ const selectedKey = ref<SSHKeyData>({
   isActive: false,
 });
 
-const profileManager = useProfileManager();
 const sshKeysManagement = new SSHKeysManagement();
 
 onMounted(async () => {
   loading.value = true;
-  console.log(profileManager.profile?.ssh);
-  console.log(sshKeysManagement.migrated());
   if (!sshKeysManagement.migrated()) {
     tableLoadingMessage.value = "Migrating your old key...";
     const migrationInterval = setInterval(async () => {
