@@ -191,10 +191,14 @@
       </VRow>
       <div class="mt-5 ml-auto text-right">
         <v-tooltip bottom color="primary" close-delay="100" :disabled="!(node && node.dedicated)">
-          <template v-slot:activator="{ isActive, props }">
-            <span v-bind="props" v-on="isActive" class="font-weight-bold" v-if="node && node.dedicated"
-              >{{ price_usd }} USD/Month</span
+          <template v-slot:activator="{ isActive, props }" v-if="num_gpu!">
+            <span v-bind="props" v-on="isActive" class="font-weight-bold"
+              >{{ (price_usd! / 24 / 30).toFixed(2) }} USD/Hour</span
             >
+          </template>
+
+          <template v-slot:activator="{ isActive, props }" v-else>
+            <span v-bind="props" v-on="isActive" class="font-weight-bold">{{ price_usd }} USD/Month</span>
           </template>
           <span>
             Discounts:
@@ -213,18 +217,6 @@
             </ul>
           </span>
         </v-tooltip>
-        <VTooltip
-          location="left"
-          :text="`${(price_usd! / 24 / 30).toFixed(2)} USD/Hour`"
-          color="primary"
-          close-delay="100"
-        >
-          <template v-slot:activator="{ isActive, props }">
-            <span v-bind="props" v-on="isActive" class="font-weight-bold" v-if="!(node && node.dedicated)"
-              >{{ price_usd }} USD/Month</span
-            >
-          </template>
-        </VTooltip>
 
         <reserve-btn
           v-if="node?.dedicated && node?.status !== 'down'"
