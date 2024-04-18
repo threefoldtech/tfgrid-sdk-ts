@@ -162,11 +162,28 @@ const closeDialog = () => {
 };
 
 const exportAllKeys = () => {
+  isExporting.value = true;
   sshKeysManagement.export(allKeys.value);
+  isExporting.value = false;
 };
 
 const exportSelectedKeys = (keys: SSHKeyData[]) => {
-  sshKeysManagement.export(keys);
+  isExporting.value = true;
+  let exportKeys: SSHKeyData[] = [];
+
+  if (Array.isArray(keys) && keys.length > 0 && typeof keys[0] === "number") {
+    exportKeys = allKeys.value.filter(key => keys.includes(key.id as SSHKeyData & number));
+  } else {
+    exportKeys = keys as SSHKeyData[];
+  }
+
+  exportKeys.forEach(key => {
+    delete key.deleting;
+    delete key.activating;
+  });
+
+  sshKeysManagement.export(exportKeys);
+  isExporting.value = false;
 };
 
 const updateActivation = async (key: SSHKeyData) => {
