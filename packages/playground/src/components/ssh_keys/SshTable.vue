@@ -207,7 +207,6 @@ export default defineComponent({
     };
 
     const toggleKeyActivation = (key: SSHKeyData) => {
-      console.log(key.isActive);
       emit("update:activation", key);
     };
 

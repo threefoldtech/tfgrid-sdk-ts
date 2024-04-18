@@ -707,7 +707,6 @@ async function activate(mnemonic: string, keypairType: KeypairType) {
     // Migrate the ssh-key
     const sshKeysManagement = new SSHKeysManagement();
     if (!sshKeysManagement.migrated()) {
-      console.log(sshKeysManagement.migrated());
       const newKeys = sshKeysManagement.migrate();
       await sshKeysManagement.update(newKeys);
     }
