@@ -348,6 +348,12 @@ class Contracts extends QueryContracts {
     );
     return this.client.patchExtrinsic<ServiceContract>(extrinsic);
   }
+
+  @checkConnection
+  async unlockContract(contractId: number) {
+    const extrinsic = await this.client.api.tx.smartContractModule.billContractForBlock(contractId);
+    return this.client.patchExtrinsic<Contract>(extrinsic);
+  }
 }
 
 export {

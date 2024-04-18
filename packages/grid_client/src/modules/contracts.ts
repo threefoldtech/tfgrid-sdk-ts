@@ -271,6 +271,12 @@ class Contracts {
   async getDeletionTime(options: ContractGetModel): Promise<string | number> {
     return this.client.contracts.getDeletionTime(options);
   }
+
+  @expose
+  @validateInput
+  async unlockContract(contractID) {
+    return (await this.client.contracts.unlockContract(contractID)).apply();
+  }
 }
 
 export { Contracts as contracts };
