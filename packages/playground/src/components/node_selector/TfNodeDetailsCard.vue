@@ -64,7 +64,8 @@
     <template #subtitle>
       <span v-if="node"> Farm: <span class="font-weight-bold" v-text="node.farmName" /> </span>
       <span class="ml-2" v-if="node">
-        Uptime: <span class="font-weight-bold" v-text="toReadableDate(node.uptime)" />
+        Uptime:
+        <span class="font-weight-bold" v-text="toReadableDate(node.uptime)" />
       </span>
     </template>
 
@@ -191,7 +192,9 @@
       <div class="mt-5 ml-auto text-right">
         <v-tooltip bottom color="primary" close-delay="100" :disabled="!(node && node.dedicated)">
           <template v-slot:activator="{ isActive, props }">
-            <span v-bind="props" v-on="isActive" class="font-weight-bold">{{ price_usd }} USD/Month</span>
+            <span v-bind="props" v-on="isActive" class="font-weight-bold" v-if="node && node.dedicated"
+              >{{ price_usd }} USD/Month</span
+            >
           </template>
           <span>
             Discounts:
@@ -200,7 +203,8 @@
               <li>
                 {{ rentedByUser ? "You receive " : "You'll receive " }} a 50%
                 <a target="_blank" :href="manual?.billing_pricing">discount</a>
-                {{ rentedByUser ? " as you reserve the" : " if you reserve the" }} entire node
+                {{ rentedByUser ? " as you reserve the" : " if you reserve the" }}
+                entire node
               </li>
               <li>
                 {{ rentedByUser ? "You receive" : "You'll receive" }} a {{ stakingDiscount }}% discount as per the
@@ -209,6 +213,18 @@
             </ul>
           </span>
         </v-tooltip>
+        <VTooltip
+          location="left"
+          :text="`${(price_usd! / 24 / 30).toFixed(2)} USD/Hour`"
+          color="primary"
+          close-delay="100"
+        >
+          <template v-slot:activator="{ isActive, props }">
+            <span v-bind="props" v-on="isActive" class="font-weight-bold" v-if="!(node && node.dedicated)"
+              >{{ price_usd }} USD/Month</span
+            >
+          </template>
+        </VTooltip>
 
         <reserve-btn
           v-if="node?.dedicated && node?.status !== 'down'"
