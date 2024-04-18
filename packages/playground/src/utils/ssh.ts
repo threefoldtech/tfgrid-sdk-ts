@@ -144,10 +144,15 @@ class SSHKeysManagement {
    */
   list(): SSHKeyData[] {
     const profileManager = useProfileManager();
-    const keys = profileManager.profile!.ssh.map(key => ({
-      ...key,
-      fingerPrint: this.calculateFingerprint(key.publicKey),
-    }));
+    console.log("profileManager.profile!.ssh", profileManager.profile!.ssh);
+    let keys: SSHKeyData[] = [];
+
+    if (profileManager.profile!.ssh) {
+      keys = profileManager.profile!.ssh.map(key => ({
+        ...key,
+        fingerPrint: this.calculateFingerprint(key.publicKey),
+      }));
+    }
     return keys;
   }
 
