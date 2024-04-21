@@ -14,11 +14,6 @@
         { value: 20, title: '20' },
         { value: 50, title: '50' },
       ]"
-      :footer-props="{
-        itemsPerPageText: 'Items per page',
-        itemsPerPageAllText: 'All',
-        showFirstLastPage: true,
-      }"
       :page="page"
       @update:items-per-page="size => updateIPPageSize(size)"
       @update:page="page => updateIPPage(page)"
