@@ -8,11 +8,6 @@
     </div>
 
     <div class="table mt-3">
-      <v-alert type="info">
-        Clicking on the <strong>Active</strong> or <strong>Inactive</strong> status will toggle the
-        <strong>activation</strong>/<strong>deactivation</strong> of the key.
-      </v-alert>
-
       <v-data-table
         show-select
         :no-data-text="capitalize(`No keys found.`)"
@@ -22,7 +17,7 @@
         :headers="headers"
         :items="sshKeys"
         loading-text="Loading..."
-        @click:row="(_, { item }) => $emit('view', item.raw)"
+        @click:row="(_: any, { item }: any) => $emit('view', item.raw)"
       >
         <template #loading>
           <div class="w-100 text-center" v-if="loading && loadingMessage">
