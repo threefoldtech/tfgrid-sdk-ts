@@ -701,7 +701,9 @@ async function activate(mnemonic: string, keypairType: KeypairType) {
   try {
     const grid = await getGrid({ mnemonic, keypairType });
     const profile = await loadProfile(grid!);
-
+    if (email.value) {
+      profile.email = email.value;
+    }
     profileManager.set({ ...profile, mnemonic });
     emit("update:modelValue", false);
   } catch (e) {
@@ -807,7 +809,6 @@ async function storeAndLogin() {
   try {
     const grid = await getGrid({ mnemonic: mnemonic.value, keypairType: keypairType.value });
     storeEmail(grid!, email.value);
-    profileManager.updateEmail(email.value);
     setCredentials(md5(password.value), mnemonicHash, keypairTypeHash, md5(email.value));
     activate(mnemonic.value, keypairType.value);
   } catch (e) {

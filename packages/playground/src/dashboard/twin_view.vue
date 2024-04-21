@@ -222,6 +222,7 @@ const apps = [
 onMounted(async () => {
   const profile = profileManager.profile!;
   const grid = await getGrid(profile);
+
   if (!grid) {
     createCustomToast("Fetch Grid Failed", ToastType.danger);
 
