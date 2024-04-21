@@ -189,7 +189,15 @@ const exportSelectedKeys = (keys: SSHKeyData[]) => {
 const updateActivation = async (key: SSHKeyData) => {
   activating.value = key.activating = true;
   key.isActive = !key.isActive;
-  await sshKeysManagement.update(allKeys.value);
+
+  try {
+    await sshKeysManagement.update(allKeys.value);
+  } catch (e: any) {
+    createCustomToast(e.message, ToastType.danger);
+    activating.value = key.activating = false;
+    return;
+  }
+
   createCustomToast(
     `The activation of ${key.name} key has been ${key.isActive ? "enabled" : "disabled"}.`,
     ToastType.success,
@@ -202,7 +210,15 @@ const deleteKey = async (selectedKeys: SSHKeyData[]) => {
   const ids: number[] = selectedKeys.map(key => key.id);
   const keysToNotDelete = allKeys.value.filter(_key => !ids.includes(_key.id));
   selectedKeys.map(key => (key.deleting = true));
-  await sshKeysManagement.update(keysToNotDelete);
+
+  try {
+    await sshKeysManagement.update(keysToNotDelete);
+  } catch (e: any) {
+    createCustomToast(e.message, ToastType.danger);
+    deleting.value = false;
+    return;
+  }
+
   selectedKeys.map(key => (key.deleting = false));
   allKeys.value = keysToNotDelete;
   createCustomToast(
@@ -219,7 +235,13 @@ const addKey = async (key: SSHKeyData) => {
   }
 
   const copiedAllkeys = [...allKeys.value, key];
-  await sshKeysManagement.update(copiedAllkeys);
+  try {
+    await sshKeysManagement.update(copiedAllkeys);
+  } catch (e: any) {
+    createCustomToast(e.message, ToastType.danger);
+    savingKey.value = false;
+    return;
+  }
   loading.value = true;
   allKeys.value = copiedAllkeys;
   savingKey.value = false;
@@ -240,7 +262,16 @@ const generateSSHKeys = async (key: SSHKeyData) => {
   key.publicKey = keys.publicKey;
 
   const copiedAllkeys = [...allKeys.value, key];
-  await sshKeysManagement.update(copiedAllkeys);
+
+  try {
+    await sshKeysManagement.update(copiedAllkeys);
+  } catch (e: any) {
+    createCustomToast(e.message, ToastType.danger);
+    generatingSSH.value = false;
+    loading.value = false;
+    return;
+  }
+
   loading.value = true;
   downloadAsFile("id_rsa", keys.privateKey);
   createCustomToast(`${key.name} key has been generated successfully.`, ToastType.success);
