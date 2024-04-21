@@ -101,6 +101,7 @@
 </template>
 
 <script lang="ts" setup>
+import { InsufficientBalanceError } from "@threefold/types";
 import { defineComponent, onMounted, ref } from "vue";
 import { generateKeyPair } from "web-ssh-keygen";
 
@@ -192,7 +193,15 @@ const updateActivation = async (key: SSHKeyData) => {
   try {
     await sshKeysManagement.update(allKeys.value);
   } catch (e: any) {
-    createCustomToast(e.message, ToastType.danger);
+    if (e instanceof InsufficientBalanceError) {
+      createCustomToast(
+        "Your wallet balance is insufficient to save your SSH key. To avoid losing your SSH key, please recharge your wallet.",
+        ToastType.danger,
+      );
+    } else {
+      createCustomToast(e.message, ToastType.danger);
+    }
+
     activating.value = key.activating = false;
     return;
   }
@@ -215,7 +224,15 @@ const deleteKey = async (selectedKeys: SSHKeyData[]) => {
   try {
     await sshKeysManagement.update(keysToNotDelete);
   } catch (e: any) {
-    createCustomToast(e.message, ToastType.danger);
+    if (e instanceof InsufficientBalanceError) {
+      createCustomToast(
+        "Your wallet balance is insufficient to save your SSH key. To avoid losing your SSH key, please recharge your wallet.",
+        ToastType.danger,
+      );
+    } else {
+      createCustomToast(e.message, ToastType.danger);
+    }
+
     deleting.value = false;
     return;
   }
@@ -236,13 +253,23 @@ const addKey = async (key: SSHKeyData) => {
   }
 
   const copiedAllkeys = [...allKeys.value, key];
+
   try {
     await sshKeysManagement.update(copiedAllkeys);
   } catch (e: any) {
-    createCustomToast(e.message, ToastType.danger);
+    if (e instanceof InsufficientBalanceError) {
+      createCustomToast(
+        "Your wallet balance is insufficient to save your SSH key. To avoid losing your SSH key, please recharge your wallet.",
+        ToastType.danger,
+      );
+    } else {
+      createCustomToast(e.message, ToastType.danger);
+    }
+
     savingKey.value = false;
     return;
   }
+
   loading.value = true;
   allKeys.value = copiedAllkeys;
   savingKey.value = false;
@@ -267,7 +294,15 @@ const generateSSHKeys = async (key: SSHKeyData) => {
   try {
     await sshKeysManagement.update(copiedAllkeys);
   } catch (e: any) {
-    createCustomToast(e.message, ToastType.danger);
+    if (e instanceof InsufficientBalanceError) {
+      createCustomToast(
+        "Your wallet balance is insufficient to save your SSH key. To avoid losing your SSH key, please recharge your wallet.",
+        ToastType.danger,
+      );
+    } else {
+      createCustomToast(e.message, ToastType.danger);
+    }
+
     generatingSSH.value = false;
     loading.value = false;
     return;
