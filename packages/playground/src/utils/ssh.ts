@@ -90,7 +90,7 @@ class SSHKeysManagement {
 
     const balance = await loadBalance(grid!);
     if (balance.free === balance.locked || balance.free < this.updateCost) {
-      throw new InsufficientBalanceError(
+      throw new Error(
         "Your wallet balance is insufficient to save your SSH key. To avoid losing your SSH key, please recharge your wallet.",
       );
     }
