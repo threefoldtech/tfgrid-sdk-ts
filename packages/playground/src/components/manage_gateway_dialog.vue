@@ -285,7 +285,6 @@ export default {
         gatewaysToDelete.value = [];
         loadingGateways.value = true;
         updateGrid(grid, { projectName: props.vm.projectName });
-        console.log("props.vm.projectName", props.vm.projectName);
 
         const { gateways: gws, failedToList } = await loadDeploymentGateways(grid!);
         gateways.value = gws;
