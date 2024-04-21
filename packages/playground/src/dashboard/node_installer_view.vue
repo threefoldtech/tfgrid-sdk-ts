@@ -1,6 +1,6 @@
 <template>
   <div>
-    <iframe :src="ruta" height="1400" width="100%"></iframe>
+    <iframe :src="url" height="1400" width="100%"></iframe>
   </div>
 </template>
 
@@ -10,7 +10,7 @@ import { defineComponent } from "vue";
 export default defineComponent({
   data() {
     return {
-      ruta: "https://bootstrap.grid.tf/",
+      url: "https://bootstrap.grid.tf/",
     };
   },
 });
