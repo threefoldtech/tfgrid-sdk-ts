@@ -104,6 +104,7 @@
 </template>
 
 <script lang="ts">
+import { TFChainErrors } from "@threefold/types";
 import { contains } from "cidr-tools";
 import { getIPRange } from "get-ip-range";
 import { default as PrivateIp } from "private-ip";
@@ -183,7 +184,9 @@ export default {
         };
       }
       if (
-        parseInt(toPublicIP.value.split("/")[0].split(".")[3]) - parseInt(publicIP.value.split("/")[0].split(".")[3]) >
+        parseInt(toPublicIP.value.split("/")[0].split(".")[3]) -
+          parseInt(publicIP.value.split("/")[0].split(".")[3]) +
+          1 >
         16
       ) {
         return {
@@ -259,8 +262,13 @@ export default {
         createCustomToast("IP is added successfully.", ToastType.success);
         showDialogue.value = false;
       } catch (error) {
-        console.log(error);
-        createCustomToast(`Failed to add IP. ${error}`, ToastType.danger);
+        if (error instanceof TFChainErrors.tfgridModule.IpExists) {
+          console.log(error);
+          createCustomToast(`IP already exists.`, ToastType.danger);
+        } else {
+          console.log(error);
+          createCustomToast(`Failed to add IP. ${error}`, ToastType.danger);
+        }
       } finally {
         isAdding.value = false;
         reset();

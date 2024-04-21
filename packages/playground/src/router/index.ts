@@ -618,12 +618,6 @@ function createDeployRoutes(): RouteRecordRaw[] {
         },
 
         {
-          path: DashboardRoutes.Deploy.DedicatedMachines,
-          component: () => import("../dashboard/dedicated_nodes_view.vue"),
-          meta: { title: "Dedicated Nodes" },
-        },
-
-        {
           path: DashboardRoutes.Deploy.Applications,
           meta: { title: "Applications" },
           children: createApplicationsRoutes(),

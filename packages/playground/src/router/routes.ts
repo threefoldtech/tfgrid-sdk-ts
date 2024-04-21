@@ -4,7 +4,6 @@ enum DeployRoutes {
   NodeFinder = "/deploy/node-finder/",
   VirtualMachines = "/deploy/virtual-machines/",
   Orchestrators = "/deploy/orchestrators/",
-  DedicatedMachines = "/deploy/dedicated-nodes/",
   Applications = "/deploy/applications/",
   YourContracts = "/deploy/your-contracts/",
   Images = "https://hub.grid.tf/",

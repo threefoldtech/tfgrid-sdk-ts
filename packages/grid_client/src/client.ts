@@ -170,53 +170,16 @@ class GridClient {
   }
 
   getDefaultUrls(network: NetworkEnv): Record<string, string> {
-    const urls = { rmbProxy: "", substrate: "", graphql: "", activation: "", relay: "" };
+    const base = network === NetworkEnv.main ? "grid.tf" : `${network}.grid.tf`;
+    const { proxyURL, relayURL, substrateURL, graphqlURL, activationURL } = this.clientOptions;
+    const urls = {
+      rmbProxy: proxyURL || `https://gridproxy.${base}`,
+      relay: relayURL || `wss://relay.${base}`,
+      substrate: substrateURL || `wss://tfchain.${base}/ws`,
+      graphql: graphqlURL || `https://graphql.${base}/graphql`,
+      activation: activationURL || `https://activation.${base}/activation/activate`,
+    };
 
-    if (network === NetworkEnv.dev) {
-      urls.rmbProxy = this.clientOptions.proxyURL ? this.clientOptions.proxyURL : "https://gridproxy.dev.grid.tf";
-      urls.relay = this.clientOptions.relayURL ? this.clientOptions.relayURL : "wss://relay.dev.grid.tf";
-      urls.substrate = this.clientOptions.substrateURL
-        ? this.clientOptions.substrateURL
-        : "wss://tfchain.dev.grid.tf/ws";
-      urls.graphql = this.clientOptions.graphqlURL
-        ? this.clientOptions.graphqlURL
-        : "https://graphql.dev.grid.tf/graphql";
-      urls.activation = this.clientOptions.activationURL
-        ? this.clientOptions.activationURL
-        : "https://activation.dev.grid.tf/activation/activate";
-    } else if (network === NetworkEnv.test) {
-      urls.rmbProxy = this.clientOptions.proxyURL ? this.clientOptions.proxyURL : "https://gridproxy.test.grid.tf";
-      urls.relay = this.clientOptions.relayURL ? this.clientOptions.relayURL : "wss://relay.test.grid.tf";
-      urls.substrate = this.clientOptions.substrateURL
-        ? this.clientOptions.substrateURL
-        : "wss://tfchain.test.grid.tf/ws";
-      urls.graphql = this.clientOptions.graphqlURL
-        ? this.clientOptions.graphqlURL
-        : "https://graphql.test.grid.tf/graphql";
-      urls.activation = this.clientOptions.activationURL
-        ? this.clientOptions.activationURL
-        : "https://activation.test.grid.tf/activation/activate";
-    } else if (network === NetworkEnv.qa) {
-      urls.rmbProxy = this.clientOptions.proxyURL ? this.clientOptions.proxyURL : "https://gridproxy.qa.grid.tf";
-      urls.relay = this.clientOptions.relayURL ? this.clientOptions.relayURL : "wss://relay.qa.grid.tf";
-      urls.substrate = this.clientOptions.substrateURL
-        ? this.clientOptions.substrateURL
-        : "wss://tfchain.qa.grid.tf/ws";
-      urls.graphql = this.clientOptions.graphqlURL
-        ? this.clientOptions.graphqlURL
-        : "https://graphql.qa.grid.tf/graphql";
-      urls.activation = this.clientOptions.activationURL
-        ? this.clientOptions.activationURL
-        : "https://activation.qa.grid.tf/activation/activate";
-    } else if (network === NetworkEnv.main) {
-      urls.rmbProxy = this.clientOptions.proxyURL ? this.clientOptions.proxyURL : "https://gridproxy.grid.tf";
-      urls.relay = this.clientOptions.relayURL ? this.clientOptions.relayURL : "wss://relay.grid.tf";
-      urls.substrate = this.clientOptions.substrateURL ? this.clientOptions.substrateURL : "wss://tfchain.grid.tf/ws";
-      urls.graphql = this.clientOptions.graphqlURL ? this.clientOptions.graphqlURL : "https://graphql.grid.tf/graphql";
-      urls.activation = this.clientOptions.activationURL
-        ? this.clientOptions.activationURL
-        : "https://activation.grid.tf/activation/activate";
-    }
     return urls;
   }
 
