@@ -234,6 +234,7 @@ import { useGrid } from "../stores";
 import { ProjectName } from "../types";
 import type { SelectionDetails } from "../types/nodeSelector";
 import { deployGatewayName, type GridGateway, loadDeploymentGateways } from "../utils/gateway";
+import { updateGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
 import { generateName } from "../utils/strings";
 import IconActionBtn from "./icon_action_btn.vue";
@@ -264,6 +265,8 @@ export default {
     const grid = gridStore.client as GridClient;
 
     onMounted(async () => {
+      updateGrid(grid, { projectName: "" });
+
       oldPrefix.value =
         (props.vm.projectName.toLowerCase().includes(ProjectName.Fullvm.toLowerCase()) ? "fvm" : "vm") +
         grid!.config.twinId;
@@ -281,6 +284,9 @@ export default {
         gateways.value = [];
         gatewaysToDelete.value = [];
         loadingGateways.value = true;
+        updateGrid(grid, { projectName: props.vm.projectName });
+        console.log("props.vm.projectName", props.vm.projectName);
+
         const { gateways: gws, failedToList } = await loadDeploymentGateways(grid!);
         gateways.value = gws;
         failedToListGws.value = failedToList;

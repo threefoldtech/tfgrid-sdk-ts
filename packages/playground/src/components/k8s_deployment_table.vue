@@ -144,16 +144,15 @@ import { onMounted, ref } from "vue";
 
 import { getNodeHealthColor, NodeHealth } from "@/utils/get_nodes";
 
-import { useGrid } from "../stores";
-import { updateGrid } from "../utils/grid";
+import { useProfileManager } from "../stores";
+import { getGrid, updateGrid } from "../utils/grid";
 import { markAsFromAnotherClient } from "../utils/helpers";
 import { type K8S, type LoadedDeployments, loadK8s, mergeLoadedDeployments } from "../utils/load_deployment";
+const profileManager = useProfileManager();
 const showDialog = ref(false);
 const showEncryption = ref(false);
 const showAllDeployments = ref(false);
 const failedDeployments = ref<any[]>([]);
-const gridStore = useGrid();
-const grid = gridStore.client as GridClient;
 
 const props = defineProps<{
   projectName: string;
@@ -170,8 +169,7 @@ onMounted(loadDeployments);
 async function loadDeployments() {
   items.value = [];
   loading.value = true;
-  updateGrid(grid, { projectName: props.projectName });
-
+  const grid = await getGrid(profileManager.profile!, props.projectName);
   const chunk1 = await loadK8s(grid!);
   const chunk2 = await loadK8s(updateGrid(grid!, { projectName: props.projectName.toLowerCase() }));
   let chunk3: LoadedDeployments<K8S> = { count: 0, items: [], failedDeployments: [] };
@@ -204,8 +202,6 @@ defineExpose({ loadDeployments });
 </script>
 
 <script lang="ts">
-import type { GridClient } from "@threefold/grid_client";
-
 import toHumanDate from "@/utils/date";
 
 import AccessDeploymentAlert from "./AccessDeploymentAlert.vue";
