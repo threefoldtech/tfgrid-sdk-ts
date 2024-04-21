@@ -1,11 +1,10 @@
-import { InsufficientBalanceError } from "@threefold/types";
 import crypto from "crypto";
 
 import { useProfileManager } from "@/stores/profile_manager";
 import type { SSHKeyData } from "@/types";
 
 import { createCustomToast, ToastType } from "./custom_toast";
-import { getGrid, loadBalance, storeSSH } from "./grid";
+import { getGrid, storeSSH } from "./grid";
 import { downloadAsJson } from "./helpers";
 
 /**
@@ -83,16 +82,10 @@ class SSHKeysManagement {
   async update(keys: SSHKeyData[]): Promise<void> {
     const profileManager = useProfileManager();
     const grid = await getGrid(profileManager.profile!);
+
     if (!grid) {
       createCustomToast(`Error occurred because the grid has not initialized yet.`, ToastType.danger);
       return;
-    }
-
-    const balance = await loadBalance(grid!);
-    if (balance.free === balance.locked || balance.free < this.updateCost) {
-      throw new Error(
-        "Your wallet balance is insufficient to save your SSH key. To avoid losing your SSH key, please recharge your wallet.",
-      );
     }
 
     const copiedKeys = keys.map(
