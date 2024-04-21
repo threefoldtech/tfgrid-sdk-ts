@@ -85,7 +85,11 @@ export default {
     }));
 
     filtersContainerService.register(props.value.queryRoute, service);
-    onUnmounted(() => filtersContainerService.unregister(props.value.queryRoute));
+    onUnmounted(() => {
+      const changed = props.value.modelValue !== initialValue;
+      changed && ctx.emit("update:model-value", initialValue);
+      filtersContainerService.unregister(props.value.queryRoute, changed);
+    });
 
     return { colProps };
   },
