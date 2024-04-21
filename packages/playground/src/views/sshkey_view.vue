@@ -188,7 +188,6 @@ const exportSelectedKeys = (keys: SSHKeyData[]) => {
 
 const updateActivation = async (key: SSHKeyData) => {
   activating.value = key.activating = true;
-  key.isActive = !key.isActive;
 
   try {
     await sshKeysManagement.update(allKeys.value);
@@ -197,6 +196,8 @@ const updateActivation = async (key: SSHKeyData) => {
     activating.value = key.activating = false;
     return;
   }
+
+  key.isActive = !key.isActive;
 
   createCustomToast(
     `The activation of ${key.name} key has been ${key.isActive ? "enabled" : "disabled"}.`,
