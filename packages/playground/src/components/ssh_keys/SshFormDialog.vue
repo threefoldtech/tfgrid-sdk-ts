@@ -32,7 +32,7 @@
 
             <v-alert width="95%" class="mb-4" type="info">
               {{ $props.dialogType === SSHCreationMethod.Generate ? "Generating" : "Importing" }}
-              a new SSH key will cost you up to 0.01 TFT
+              a new SSH key will cost you up to {{ sshKeysManagement.updateCost }} TFT
             </v-alert>
 
             <div v-if="$props.dialogType === SSHCreationMethod.Generate" class="create">
@@ -98,14 +98,12 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, defineComponent, type PropType, ref, watch } from "vue";
+import { defineComponent, type PropType, ref, watch } from "vue";
 import { onMounted } from "vue";
 
 import { type Profile, useProfileManager } from "@/stores/profile_manager";
 import { SSHCreationMethod, type SSHKeyData } from "@/types";
-import { createCustomToast, ToastType } from "@/utils/custom_toast";
 import { type Balance, getGrid, loadBalance } from "@/utils/grid";
-import { isEnoughBalance } from "@/utils/helpers";
 import SSHKeysManagement from "@/utils/ssh";
 
 const props = defineProps({
@@ -145,7 +143,6 @@ const sshKey = ref<string>("");
 const keyName = ref<string>("");
 const createdKey = ref<SSHKeyData | null>(null); // Initialize createdKey with null
 const balance = ref<Balance>();
-const hasEnoughBalance = computed(() => isEnoughBalance(balance.value, 0.01));
 const loadingBalance = ref<boolean>(false);
 let interval: any;
 
