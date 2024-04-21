@@ -119,6 +119,15 @@
           <v-btn variant="outlined" color="anchor" class="mr-2 px-3" @click="contractStateDialog = false">
             Close
           </v-btn>
+          <v-btn
+            :disabled="freeBalance < getAmountLocked()"
+            variant="outlined"
+            color="warning"
+            class="mr-2 px-3"
+            @click="unlockContract([selectedItem.contractId])"
+          >
+            Unlock Contact
+          </v-btn>
         </v-card-actions>
       </v-card-text>
     </v-card>
@@ -161,6 +170,7 @@ import { createCustomToast, ToastType } from "@/utils/custom_toast";
 import { downloadAsJson, normalizeError } from "@/utils/helpers";
 
 import ListTable from "../../components/list_table.vue";
+import { useProfileManagerController } from "../profile_manager_controller.vue";
 
 const props = defineProps({
   contracts: {
@@ -219,7 +229,9 @@ const loadingContractId = ref<number>();
 const selectedContracts = ref<NormalizedContract[]>([]);
 const contracts = ref<Ref<NormalizedContract[]>>(props.contracts);
 const selectedItem = ref();
-
+const profileManagerController = useProfileManagerController();
+const balance = profileManagerController.balance;
+const freeBalance = computed(() => balance.value?.free ?? 0);
 // Function to show details of a contract
 async function showDetails(value: any) {
   failedContractId.value = undefined;
@@ -260,6 +272,7 @@ async function contractLockDetails(item: any) {
       );
       contractStateDialog.value = false;
     });
+
   loadingShowDetails.value = false;
 }
 
@@ -300,6 +313,12 @@ async function onDelete() {
     }
   }
   deleting.value = false;
+}
+// function to unlock grace period contracts
+async function unlockContract(contractIds: number[]) {
+  for (const id of contractIds) {
+    await props.grid.value?.contracts.unlockContract(id);
+  }
 }
 </script>
 
