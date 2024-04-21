@@ -48,13 +48,11 @@
       <input-tooltip tooltip="Github Branch name to serve (optional).">
         <v-text-field label="Github Branch" v-model="githubBranch" />
       </input-tooltip>
-      <input-validator :value="root" :rules="[validators.required('HTML Directory is required.')]" #="{ props }">
-        <input-tooltip
-          tooltip="HTML Directory to serve. Note that this field is case-sensitive so make sure you provide the correct directory"
-        >
-          <v-text-field label="HTML Directory" v-model="root" v-bind="props" />
-        </input-tooltip>
-      </input-validator>
+      <input-tooltip
+        tooltip="HTML directory to be served. Please ensure correct casing, as this field is case-sensitive. If the directory is the root of the repository, it should not be added."
+      >
+        <v-text-field label="HTML Directory" v-model="root" />
+      </input-tooltip>
 
       <SelectSolutionFlavor
         v-model="solution"
@@ -193,7 +191,7 @@ async function deploy() {
             { key: "SSH_KEY", value: profileManager.profile!.ssh },
             { key: "GITHUB_URL", value: githubUrl.value },
             { key: "GITHUB_BRANCH", value: githubBranch.value },
-            { key: "ROOT", value: root.value },
+            { key: "HTML_DIR", value: root.value ? "website/" + root.value : "website" },
             { key: "USER_DOMAIN", value: selectionDetails.value?.domain?.enabledCustomDomain ? domain.value : "" },
             { key: "STATICWEBSITE_DOMAIN", value: domain.value },
           ],
