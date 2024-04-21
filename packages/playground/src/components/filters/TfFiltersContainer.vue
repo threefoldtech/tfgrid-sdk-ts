@@ -99,7 +99,7 @@ export interface FilterService {
 
 export interface FiltersContainerService {
   register(name: string, service: ComputedRef<FilterService>): void;
-  unregister(name: string): void;
+  unregister(name: string, changed?: boolean): void;
 }
 
 export function useFiltersContainerService() {
@@ -129,7 +129,15 @@ export default {
         filters.value.set(name, service);
       },
 
-      unregister(name) {
+      unregister(name, changed) {
+        if (changed) {
+          const query = { ...router.currentRoute.value.query };
+          if (name in query) {
+            delete query[name];
+            router.replace({ query });
+            ctx.emit("apply");
+          }
+        }
         filters.value.delete(name);
       },
     };

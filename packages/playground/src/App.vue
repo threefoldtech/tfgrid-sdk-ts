@@ -303,12 +303,6 @@ const routes: AppRoute[] = [
         tooltip: "Deploy your orchestrator instances.",
       },
       {
-        title: "Dedicated Machines",
-        icon: "mdi-resistor-nodes",
-        route: DashboardRoutes.Deploy.DedicatedMachines,
-        tooltip: "Explore dedicated machines available on the ThreeFold grid.",
-      },
-      {
         title: "Applications",
         icon: "mdi-lightbulb-on-outline",
         route: DashboardRoutes.Deploy.Applications,

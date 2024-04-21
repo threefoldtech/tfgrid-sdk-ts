@@ -95,7 +95,7 @@
       </template>
 
       <template #[`item.mycelium`]="{ item }">
-        {{ item.value.myceliumIP || "-" }}
+        {{ item.value.masters[0].myceliumIP || "-" }}
       </template>
 
       <template #[`item.status`]="{ item }">

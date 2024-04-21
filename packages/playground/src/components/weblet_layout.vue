@@ -36,11 +36,7 @@
     </v-card-text>
 
     <template v-if="dedicated && !status">
-      <v-alert class="mb-4 mx-4" type="info" variant="tonal">
-        You need to rent a node from the
-        <router-link to="/deploy/dedicated-nodes" class="app-link">Dedicated Machines page</router-link>
-        before deploying on it.
-      </v-alert>
+      <v-alert class="mb-4 mx-4" type="info" variant="tonal"> You need to rent a node before deploying on it. </v-alert>
     </template>
 
     <template v-if="$slots['footer-actions'] && (profileManager.profile || disableAlerts)">
