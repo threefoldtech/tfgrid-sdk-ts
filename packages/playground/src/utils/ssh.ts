@@ -1,3 +1,4 @@
+import { InsufficientBalanceError } from "@threefold/types";
 import crypto from "crypto";
 
 import { useProfileManager } from "@/stores/profile_manager";
@@ -88,12 +89,10 @@ class SSHKeysManagement {
     }
 
     const balance = await loadBalance(grid!);
-    if (balance.free < this.updateCost) {
-      createCustomToast(
-        `Your wallet balance is insufficient to save your SSH key. To avoid losing your SSH key, please recharge your wallet.`,
-        ToastType.danger,
+    if (balance.free === balance.locked || balance.free < this.updateCost) {
+      throw new InsufficientBalanceError(
+        "Your wallet balance is insufficient to save your SSH key. To avoid losing your SSH key, please recharge your wallet.",
       );
-      return;
     }
 
     const copiedKeys = keys.map(
