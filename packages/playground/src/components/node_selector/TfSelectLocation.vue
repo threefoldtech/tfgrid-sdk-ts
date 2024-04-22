@@ -33,13 +33,18 @@ export default {
     modelValue: Object as PropType<SelectedLocation>,
     title: String,
     status: String as PropType<NodeStatus>,
+    onlyWithNodes: { type: Boolean, default: () => undefined },
   },
   emits: {
     "update:model-value": (value?: SelectedLocation) => true || value,
   },
   setup(props, ctx) {
     const selectedLocation = computed(() => props.modelValue || {});
-    const locationsTask = useAsync(getLocations, { init: true, default: {}, defaultArgs: [props.status] });
+    const locationsTask = useAsync(getLocations, {
+      init: true,
+      default: {},
+      defaultArgs: [props.status, { onlyWithNodes: props.onlyWithNodes }],
+    });
     const regions = computed(() => ["All Regions", ...Object.keys(locationsTask.value.data as Locations)]);
     const countries = computed(() => {
       const res = ["All Countries"];
