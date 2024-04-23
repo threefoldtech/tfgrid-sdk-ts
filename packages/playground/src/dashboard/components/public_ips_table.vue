@@ -30,6 +30,27 @@
           <h4 class="text-center font-weight-medium">Public IPs</h4>
         </v-alert>
       </template>
+      <template #[`item.data-table-select`]="{ item }">
+        <div class="d-flex align-center justify-space-between">
+          <div class="d-flex" @click.stop>
+            <v-progress-circular
+              v-if="isRemoving && itemsToDelete.includes(item?.value)"
+              class="ml-3"
+              color="error"
+              :width="2"
+              :size="20"
+              indeterminate
+            />
+            <v-checkbox-btn
+              v-else
+              color="primary"
+              :disabled="deleting || isRemoving"
+              :model-value="itemsToDelete.includes(item.value)"
+            />
+          </div>
+        </div>
+      </template>
+
       <template #[`item.ip`]="{ item }">
         {{ item.value.ip || "-" }}
       </template>
@@ -47,7 +68,8 @@
             color="error"
             variant="outlined"
             prepend-icon="mdi-delete"
-            :disabled="itemsToDelete.length === 0 || deleting"
+            :loading="deleting"
+            :disabled="itemsToDelete.length === 0 || isRemoving"
             @click="showDialogue = true"
           >
             Delete
@@ -71,14 +93,7 @@
         </v-card-text>
         <v-card-actions class="justify-end px-5 pb-5 pt-0">
           <v-btn @click="showDialogue = false" variant="outlined" color="anchor">Close</v-btn>
-          <v-btn
-            variant="outlined"
-            text="Confirm"
-            color="error"
-            :loading="isRemoving"
-            :disabled="isRemoving"
-            @click="removeFarmIp()"
-          ></v-btn>
+          <v-btn variant="outlined" text="Confirm" color="error" @click="removeFarmIps"></v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -106,6 +121,7 @@ export default {
   setup(props) {
     const gridStore = useGrid();
     const headers = [
+      { title: "PLACEHOLDER", key: "data-table-select" },
       {
         title: "IP",
         align: "center",
@@ -169,23 +185,23 @@ export default {
       }
       loadingIps.value = false;
     }
-    async function removeFarmIp() {
+    async function removeFarmIps() {
       try {
+        showDialogue.value = false;
         isRemoving.value = true;
         for (const item of itemsToDelete.value) {
           await gridStore.grid.farms.removeFarmIp({
             ip: item.ip,
             farmId: props.farmId,
           });
-          createCustomToast("IP is deleted successfully!", ToastType.success);
-          await getFarmByID(props.farmId);
         }
+        createCustomToast("IPs is deleted successfully!", ToastType.success);
+        await getFarmByID(props.farmId);
       } catch (error) {
         console.log(error);
         createCustomToast("Failed to delete IP!", ToastType.danger);
       } finally {
         isRemoving.value = false;
-        showDialogue.value = false;
         itemsToDelete.value = [];
       }
     }
@@ -208,7 +224,7 @@ export default {
       showDialogue,
       isRemoving,
       itemsToDelete,
-      removeFarmIp,
+      removeFarmIps,
       page,
       size,
       updateIPPage,
