@@ -130,14 +130,14 @@
             <template #activator="{ props }">
               <div v-bind="props">
                 <v-btn
-                  :disabled="freeBalance > getAmountLocked"
+                  :disabled="freeBalance < getAmountLocked"
                   variant="outlined"
                   color="primary"
                   class="mr-2 px-3"
                   @click="unlockContract(selectedItem.contractId)"
                   :loading="unlockContractLoading"
                 >
-                  Unlock Contact
+                  Unlock Contract
                 </v-btn>
               </div>
             </template>
