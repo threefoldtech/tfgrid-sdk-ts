@@ -1,4 +1,5 @@
 import { Client, QueryClient } from "./client";
+import type { ExtrinsicResult } from "./types";
 import { checkConnection } from "./utils";
 
 enum Certification {
@@ -89,7 +90,16 @@ class Farms extends QueryFarms {
   @checkConnection
   async removeFarmIp(options: RemoveFarmIPOptions) {
     const extrinsic = this.client.api.tx.tfgridModule.removeFarmIp(options.farmId, options.ip);
-    return this.client.patchExtrinsic(extrinsic);
+    return this.client.patchExtrinsic<void>(extrinsic);
+  }
+
+  @checkConnection
+  async removeFarmIps(options: RemoveFarmIPOptions[]) {
+    const extrinsics: ExtrinsicResult<void>[] = [];
+    for (const option of options) {
+      extrinsics.push(await this.removeFarmIp(option));
+    }
+    await this.client.applyAllExtrinsics<void>(extrinsics);
   }
 
   @checkConnection

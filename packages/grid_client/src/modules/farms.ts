@@ -42,6 +42,13 @@ class Farms {
   @expose
   @validateInput
   @checkBalance
+  async removeFarmIps(options: RemoveFarmIPModel[]) {
+    return await this.client.farms.removeFarmIps(options);
+  }
+
+  @expose
+  @validateInput
+  @checkBalance
   async addStellarAddress(options: AddStellarAddressToFarmModel) {
     return (await this.client.farms.addStellarAddress(options)).apply();
   }
