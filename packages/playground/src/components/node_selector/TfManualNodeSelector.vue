@@ -2,6 +2,7 @@
   <div>
     <TfNodeDetailsCard
       v-show="modelValue || placeholderNode"
+      @update:node="bindModelValue"
       flat
       :node="modelValue || placeholderNode"
       :status="
@@ -225,7 +226,7 @@ export default {
       ctx.emit("update:status", status || ValidatorStatus.Init);
     }
 
-    return { nodeId, validationTask, placeholderNode };
+    return { nodeId, validationTask, placeholderNode, bindModelValue };
   },
 };
 </script>

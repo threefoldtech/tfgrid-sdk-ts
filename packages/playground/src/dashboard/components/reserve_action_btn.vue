@@ -47,6 +47,7 @@
 </template>
 
 <script lang="ts">
+import type { NodeInfo } from "@threefold/grid_client";
 import type { GridNode } from "@threefold/gridproxy_client";
 import { InsufficientBalanceError } from "@threefold/types";
 import { computed, type PropType, ref, watch } from "vue";
@@ -63,7 +64,7 @@ export default {
   props: {
     node: {
       required: true,
-      type: Object as PropType<GridNode>,
+      type: Object as PropType<GridNode | NodeInfo>,
     },
   },
   setup(props, { emit }) {

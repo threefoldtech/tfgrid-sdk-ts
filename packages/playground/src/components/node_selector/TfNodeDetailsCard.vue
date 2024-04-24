@@ -221,8 +221,8 @@
         <reserve-btn
           v-if="node?.dedicated && node?.status !== 'down'"
           class="ml-4"
-          :node="(node as GridNode)"
-          @updateTable="$emit('reload-table', node.nodeId)"
+          :node="node"
+          @updateTable="updateNodeCard"
         />
       </div>
     </template>
@@ -256,9 +256,10 @@ export default {
   },
   emits: {
     "node:select": (node: NodeInfo) => true || node,
+    "update:node": (node: NodeInfo) => true || node,
     "reload-table": (id: number) => id,
   },
-  setup(props) {
+  setup(props, ctx) {
     const profileManager = useProfileManager();
     const node = ref(props.node);
     const stakingDiscount = ref<number>();
@@ -385,7 +386,7 @@ export default {
       try {
         const grid = await getGrid(profileManager.profile!);
         const total_resources = props.node?.total_resources;
-        const { cru, hru, mru, sru } = total_resources as NodeResources;
+        const { cru = 0, hru, mru, sru } = total_resources as NodeResources;
         const price = await grid?.calculator.calculateWithMyBalance({
           cru,
           hru: toGigaBytes(hru),
@@ -398,6 +399,22 @@ export default {
         return price?.dedicatedPackage.discount;
       } catch (err) {
         console.error(err);
+      }
+    }
+
+    function updateNodeCard() {
+      if (props.node) {
+        const node = {
+          ...props.node,
+          rented: !props.node.rented,
+          rentable: !props.node.rentable,
+          rentedByTwinId: rentedByUser.value ? profileManager.profile?.twinId : 0,
+        };
+
+        ctx.emit("update:node", node as NodeInfo);
+        if (isGridNode(props.node)) {
+          ctx.emit("reload-table", props.node.nodeId);
+        }
       }
     }
 
@@ -423,6 +440,7 @@ export default {
       capitalize,
       formatResourceSize,
       formatSpeed,
+      updateNodeCard,
     };
   },
 };
