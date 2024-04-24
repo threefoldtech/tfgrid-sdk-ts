@@ -54,10 +54,10 @@
             class="overflow-auto px-4"
             v-if="loadedNodes.length"
           >
-            <template v-for="node in loadedNodes" :key="node.id">
+            <template v-for="(node, index) in loadedNodes" :key="node.id">
               <div class="my-4">
                 <TfNodeDetailsCard
-                  :node="node"
+                  v-model:node="loadedNodes[index]"
                   :selected="!validFilters || filtersUpdated ? false : $props.modelValue === node"
                   selectable
                   @node:select="bindModelValueAndValidate"

@@ -116,11 +116,11 @@ export default {
           openUnreserveDialog.value = false;
           loadingUnreserveBtn.value = true;
           notifyDelaying();
-          emit("updateTable");
           disableButton.value = true;
           setTimeout(() => {
             disableButton.value = false;
             loadingUnreserveBtn.value = false;
+            emit("updateTable");
           }, 20000);
         }
       } catch (e) {
@@ -144,11 +144,11 @@ export default {
           await grid?.nodes.reserve({ nodeId: +props.node.nodeId });
           createCustomToast(`Transaction succeeded node ${props.node.nodeId} Reserved`, ToastType.success);
           notifyDelaying();
-          emit("updateTable");
           disableButton.value = true;
           setTimeout(() => {
             disableButton.value = false;
             loadingReserveNode.value = false;
+            emit("updateTable");
           }, 20000);
         } else {
           createCustomToast("Please Login first to continue.", ToastType.danger);
