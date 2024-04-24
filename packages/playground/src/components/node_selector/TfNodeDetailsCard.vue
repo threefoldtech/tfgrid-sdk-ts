@@ -222,7 +222,7 @@
           v-if="node?.dedicated && node?.status !== 'down'"
           class="ml-4"
           :node="(node as GridNode)"
-          @updateTable="$emit('reload-table', node.nodeId)"
+          @updateTable="onReserveChange"
         />
       </div>
     </template>
@@ -257,8 +257,9 @@ export default {
   emits: {
     "node:select": (node: NodeInfo) => true || node,
     "reload-table": (id: number) => id,
+    "update:node": (node: NodeInfo | GridNode) => true || node,
   },
-  setup(props) {
+  setup(props, ctx) {
     const profileManager = useProfileManager();
     const node = ref(props.node);
     const stakingDiscount = ref<number>();
@@ -401,6 +402,29 @@ export default {
       }
     }
 
+    function onReserveChange() {
+      if (!node.value) {
+        return;
+      }
+
+      const n = { ...node.value } as NodeInfo | GridNode;
+      const gotReserved = n.rentedByTwinId === 0;
+
+      if (gotReserved) {
+        n.rentedByTwinId = profileManager.profile!.twinId;
+        if ("rented" in n) {
+          n.rented = true;
+        }
+      } else {
+        n.rentedByTwinId = 0;
+        if ("rented" in n) {
+          n.rented = false;
+        }
+      }
+
+      ctx.emit("update:node", n);
+    }
+
     return {
       cruText,
       mruText,
@@ -423,6 +447,7 @@ export default {
       capitalize,
       formatResourceSize,
       formatSpeed,
+      onReserveChange,
     };
   },
 };

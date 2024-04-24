@@ -4,6 +4,11 @@
       v-show="modelValue || placeholderNode"
       flat
       :node="modelValue || placeholderNode"
+      @update:node="
+        if ($props.modelValue) {
+          $emit('update:model-value', $event as any);
+        }
+      "
       :status="
         validationTask.loading
           ? 'Pending'
