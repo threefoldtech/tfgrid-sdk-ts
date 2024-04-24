@@ -1,3 +1,4 @@
+import { ContractLock } from "@threefold/tfchain_client";
 import { DeploymentKeyDeletionError, InsufficientBalanceError } from "@threefold/types";
 import * as PATH from "path";
 
@@ -19,6 +20,7 @@ import {
   ContractsByAddress,
   ContractsByTwinId,
   ContractState,
+  ContractStates,
   CreateServiceContractModel,
   GetActiveContractsModel,
   GetDedicatedNodePriceModel,
@@ -270,6 +272,30 @@ class Contracts {
   @validateInput
   async getDeletionTime(options: ContractGetModel): Promise<string | number> {
     return this.client.contracts.getDeletionTime(options);
+  }
+  @expose
+  @validateInput
+  async getGracePeriodCost() {
+    const contractsLock: ContractLock = {
+      amountLocked: 0,
+      cycles: 0,
+      lockUpdated: 0,
+    };
+    const contracts = await this.listMyContracts({ state: [ContractStates.GracePeriod] });
+    if (contracts == undefined) return contractsLock;
+    const gracePeriodIds = contracts.nameContracts.map(item => parseInt(item.contractID));
+    gracePeriodIds.concat(
+      contracts.nodeContracts.map(item => parseInt(item.contractID)),
+      contracts.rentContracts.map(item => parseInt(item.contractID)),
+    );
+
+    for (const id of gracePeriodIds) {
+      const contractLock = await this.contractLock({ id });
+      contractsLock.amountLocked += contractLock.amountLocked;
+      contractsLock.cycles += contractLock.cycles;
+      contractsLock.lockUpdated += contractsLock.lockUpdated;
+    }
+    return contractsLock;
   }
 
   @expose
