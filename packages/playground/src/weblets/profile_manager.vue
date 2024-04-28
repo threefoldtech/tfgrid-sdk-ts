@@ -207,7 +207,7 @@
               </VTooltip>
 
               <v-dialog v-model="openAcceptTerms" fullscreen>
-                <v-card @scroll="onScroll" v-if="!termsLoading">
+                <v-card v-if="!termsLoading">
                   <v-card-text class="pa-15" v-html="acceptTermsContent"></v-card-text>
                   <div class="terms-footer">
                     <v-btn
@@ -222,8 +222,6 @@
                       @click="shouldActivateAccount ? activateAccount() : createNewAccount()"
                       v-show="!termsLoading"
                       color="primary"
-                      id="accept-terms-and-condation"
-                      :disabled="disableTermsBtn"
                       :text="capitalize('accept terms and conditions')"
                     />
                   </div>
@@ -463,8 +461,6 @@ interface Credentials {
 const keyType = ["sr25519", "ed25519"];
 const keypairType = ref(KeypairType.sr25519);
 const enableReload = ref(true);
-const disableTermsBtn = ref(true);
-
 const theme = useTheme();
 const qrCodeText = ref("");
 const props = defineProps({
@@ -892,22 +888,6 @@ watch(openAcceptTerms, async () => {
     }
   }
 });
-
-function onScroll(e: UIEvent) {
-  const buttonElement = document.getElementById("accept-terms-and-condation");
-
-  if (!buttonElement) {
-    return;
-  }
-
-  const buttonRect = buttonElement.getBoundingClientRect();
-  const windowHeight = window.innerHeight || document.documentElement.clientHeight;
-
-  // Check if the top of the button is within the viewport
-  if (buttonRect.top >= 0 && buttonRect.bottom <= windowHeight) {
-    disableTermsBtn.value = false;
-  }
-}
 </script>
 
 <script lang="ts">
