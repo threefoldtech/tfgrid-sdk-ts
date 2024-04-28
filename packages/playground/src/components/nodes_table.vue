@@ -45,7 +45,7 @@ import { getNodeStatusColor, getNodeTypeColor } from "@/utils/get_nodes";
 
 import TfNodeDetailsCard from "./node_selector/TfNodeDetailsCard.vue";
 export default {
-  emits: ["update:page", "update:size", "open-dialog", "reloadTable"],
+  emits: ["update:page", "update:size", "open-dialog"],
   props: {
     size: {
       required: true,

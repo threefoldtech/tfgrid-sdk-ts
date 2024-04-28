@@ -431,7 +431,7 @@ import NodesTable from "@/components/nodes_table.vue";
 import router from "@/router";
 import { useProfileManager } from "@/stores";
 import type { GridProxyRequestConfig } from "@/types";
-import { getNode, requestNodes } from "@/utils/get_nodes";
+import { requestNodes } from "@/utils/get_nodes";
 import { convertToBytes } from "@/utils/get_nodes";
 
 import TfFilter from "../components/filters/TfFilter.vue";
@@ -535,19 +535,6 @@ export default {
       }
     }
 
-    async function requestNode() {
-      loading.value = true;
-      try {
-        const node = await getNode(nodeId.value, nodeOptions);
-        const index = nodes.value.findIndex(node => node.nodeId === nodeId.value);
-        nodes.value[index] = node;
-      } catch (error) {
-        console.log(error);
-      } finally {
-        loading.value = false;
-      }
-    }
-
     const checkSelectedNode = async () => {
       if (route.query.nodeId) {
         selectedNodeId.value = +route.query.nodeId;
@@ -572,11 +559,6 @@ export default {
       isDialogOpened.value = true;
     };
 
-    function reloadTable(id: number) {
-      nodeId.value = id;
-      setTimeout(requestNode, 20000);
-    }
-
     return {
       profileManager,
       loading,
@@ -587,7 +569,6 @@ export default {
       closeDialog,
       requestNodes,
       isDialogOpened,
-      reloadTable,
       filters,
       NodeStatus,
       size,
