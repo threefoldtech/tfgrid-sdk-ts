@@ -256,7 +256,6 @@ export default {
   },
   emits: {
     "node:select": (node: NodeInfo) => true || node,
-    "reload-table": (id: number) => id,
     "update:node": (node: NodeInfo | GridNode) => true || node,
   },
   setup(props, ctx) {
@@ -412,15 +411,12 @@ export default {
 
       if (gotReserved) {
         n.rentedByTwinId = profileManager.profile!.twinId;
-        if ("rented" in n) {
-          n.rented = true;
-        }
+        n.rented = true;
       } else {
         n.rentedByTwinId = 0;
-        if ("rented" in n) {
-          n.rented = false;
-        }
+        n.rented = false;
       }
+      n.rentable = !n.rented;
 
       ctx.emit("update:node", n);
     }

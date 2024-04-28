@@ -400,7 +400,6 @@
                     page = $event;
                     loadNodes();
                   "
-                  @reload-table="reloadTable"
                   :count="nodesCount"
                   :loading="loading"
                   v-model:selectedNode="selectedNodeId"

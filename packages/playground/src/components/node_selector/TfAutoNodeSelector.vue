@@ -57,6 +57,7 @@
             <template v-for="(node, index) in loadedNodes" :key="node.id">
               <div class="my-4">
                 <TfNodeDetailsCard
+                  :key="node.rentedByTwinId"
                   v-model:node="loadedNodes[index]"
                   :selected="!validFilters || filtersUpdated ? false : $props.modelValue === node"
                   selectable
@@ -72,7 +73,6 @@
                   "
                 />
               </div>
-              <!-- <div class="border-b" :style="{ borderBottomWidth: '2px !important' }" /> -->
             </template>
 
             <VContainer v-if="loadedNodes.length > 0 && pagination.page !== -1">
