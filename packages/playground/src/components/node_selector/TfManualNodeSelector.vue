@@ -2,8 +2,10 @@
   <div>
     <TfNodeDetailsCard
       v-show="modelValue || placeholderNode"
+      :key="modelValue?.rentedByTwinId"
       flat
       :node="modelValue || placeholderNode"
+      @update:node="$emit('update:model-value', $event as any)"
       :status="
         validationTask.loading
           ? 'Pending'
