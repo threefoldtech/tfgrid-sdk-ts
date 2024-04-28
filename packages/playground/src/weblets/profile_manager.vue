@@ -216,7 +216,6 @@
                       v-show="!termsLoading"
                       :color="theme.name.value === AppThemeSelection.light ? 'black' : 'white'"
                       variant="outlined"
-                      id="accept-terms-and-condation"
                       :text="capitalize('go back')"
                     />
                     <v-btn
@@ -895,11 +894,18 @@ watch(openAcceptTerms, async () => {
 });
 
 function onScroll(e: UIEvent) {
-  const target = e.target as HTMLElement;
-  if (target.scrollTop + target.clientHeight >= target.scrollHeight) {
-    if (!termsLoading.value) {
-      disableTermsBtn.value = false;
-    }
+  const buttonElement = document.getElementById("accept-terms-and-condation");
+
+  if (!buttonElement) {
+    return;
+  }
+
+  const buttonRect = buttonElement.getBoundingClientRect();
+  const windowHeight = window.innerHeight || document.documentElement.clientHeight;
+
+  // Check if the top of the button is within the viewport
+  if (buttonRect.top >= 0 && buttonRect.bottom <= windowHeight) {
+    disableTermsBtn.value = false;
   }
 }
 </script>
