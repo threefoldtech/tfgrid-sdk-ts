@@ -191,8 +191,15 @@ const updateActivation = async (key: SSHKeyData) => {
   activating.value = key.activating = true;
 
   try {
+    key.isActive = !key.isActive;
     await sshKeysManagement.update(allKeys.value);
+    createCustomToast(
+      `The activation of ${key.name} key has been ${key.isActive ? "enabled" : "disabled"}.`,
+      ToastType.success,
+    );
+    activating.value = key.activating = false;
   } catch (e: any) {
+    key.isActive = !key.isActive;
     if (e instanceof InsufficientBalanceError) {
       createCustomToast(
         "Your wallet balance is insufficient to save your SSH key. To avoid losing your SSH key, please recharge your wallet.",
@@ -205,14 +212,6 @@ const updateActivation = async (key: SSHKeyData) => {
     activating.value = key.activating = false;
     return;
   }
-
-  key.isActive = !key.isActive;
-
-  createCustomToast(
-    `The activation of ${key.name} key has been ${key.isActive ? "enabled" : "disabled"}.`,
-    ToastType.success,
-  );
-  activating.value = key.activating = false;
 };
 
 const deleteKey = async (selectedKeys: SSHKeyData[]) => {
