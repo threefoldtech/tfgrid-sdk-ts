@@ -16,8 +16,8 @@
           </v-card>
         </v-menu>
       </v-col>
-      <v-col cols="9">
-        <v-card outlined>
+      <v-col cols="9" class="text-start">
+        <v-card outlined class="pa-4">
           <v-card-title>
             <span class="headline">Minting Details</span>
           </v-card-title>
@@ -26,7 +26,7 @@
               <v-container>
                 <v-row>
                   <v-col cols="10">
-                    <v-card-text>
+                    <v-card-text style="box-shadow: none">
                       <span class="font-weight-bold">Date of Payout :</span>
                       {{ getDateFromTimestamp(receipt.endPeriodTimestamp) }}
                       <br />
@@ -34,7 +34,7 @@
                       <span v-if="receipt.fixupReward">+ {{ receipt.fixupReward || 0 }} TFT FixedUp</span>
                       <br />
                       <span class="font-weight-bold">Cloud Units :</span>
-                      <ul>
+                      <ul class="pl-4">
                         <li inset v-for="(val, key) in receipt.cloud_units" :key="key">
                           <b style="text-transform: uppercase">{{ key }}:</b> {{ val }}
                         </li>
