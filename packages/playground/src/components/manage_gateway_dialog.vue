@@ -118,7 +118,7 @@
         <div v-show="gatewayTab === 1">
           <form-validator v-model="valid">
             <input-tooltip
-              :tooltip="`Selecting custom domain sets subdomain as gateway name. Prefix (${prefix}) is the deployment name.`"
+              :tooltip="`Selecting custom domain sets subdomain as gateway name. Prefix(${prefix}) is solution name, twin ID, and deployment name.`"
             >
               <input-validator
                 :value="subdomain"
@@ -263,13 +263,12 @@ export default {
     const networkName = props.vm.interfaces[0].network as string;
 
     onMounted(async () => {
+      const grid = await getGrid(profileManager.profile!);
       oldPrefix.value =
         (props.vm.projectName.toLowerCase().includes(ProjectName.Fullvm.toLowerCase()) ? "fvm" : "vm") +
-        profileManager.profile!.twinId +
-        props.vm.name;
-
-      prefix.value = props.vm.name;
-      subdomain.value = generateName({}, 35 - prefix.value.length > 5 ? 5 : 35 - prefix.value.length);
+        grid!.config.twinId;
+      prefix.value = oldPrefix.value + props.vm.name;
+      subdomain.value = generateName({}, 35 - prefix.value.length > 7 ? 7 : 35 - prefix.value.length);
       await loadGateways();
     });
 
