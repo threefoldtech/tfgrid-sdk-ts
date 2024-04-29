@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-row>
-      <v-col cols="3">
+      <v-col cols="12" md="5">
         <v-menu ref="menu" v-model="showMenu" :close-on-content-click="false" transition="scale-transition">
           <template v-slot:activator="{ props }">
             <v-text-field v-bind="props" label="Select Month and Year" readonly :model-value="selectedData" />
@@ -16,34 +16,31 @@
           </v-card>
         </v-menu>
       </v-col>
-      <v-col cols="9" class="text-start">
-        <v-card outlined class="pa-4">
-          <v-card-title>
-            <span class="headline">Minting Details</span>
-          </v-card-title>
+      <v-col cols="12" md="7" class="text-start">
+        <v-card outlined class="pa-2 border">
           <div class="receipt-body" v-if="receipts?.length">
-            <v-card outlined v-for="receipt in receipts" :key="receipt.hash">
+            <v-card style="box-shadow: none" outlined v-for="receipt in receipts" :key="receipt.hash">
               <v-container>
                 <v-row>
-                  <v-col cols="10">
-                    <v-card-text style="box-shadow: none">
-                      <span class="font-weight-bold">Date of Payout :</span>
-                      {{ getDateFromTimestamp(receipt.endPeriodTimestamp) }}
-                      <br />
-                      <span class="font-weight-bold">Node TFT Amount :</span> {{ receipt.tft || 0 }} TFT
-                      <span v-if="receipt.fixupReward">+ {{ receipt.fixupReward || 0 }} TFT FixedUp</span>
-                      <br />
-                      <span class="font-weight-bold">Cloud Units :</span>
-                      <ul class="pl-4">
-                        <li inset v-for="(val, key) in receipt.cloud_units" :key="key">
-                          <b style="text-transform: uppercase">{{ key }}:</b> {{ val }}
-                        </li>
-                      </ul>
-                    </v-card-text>
-                  </v-col>
-                  <v-col cols="2">
-                    <v-chip class="ma-4 me-auto" small :color="getChipColor(receipt.type)">{{ receipt.type }} </v-chip>
-                  </v-col>
+                  <v-card-text class="pa-3">
+                    <h2 class="mb-1 font-weight-medium">
+                      Minting Details<v-chip class="ma-2 me-auto" small :color="getChipColor(receipt.type)"
+                        >{{ receipt.type }}
+                      </v-chip>
+                    </h2>
+                    <span class="font-weight-bold">Date of Payout :</span>
+                    {{ getDateFromTimestamp(receipt.endPeriodTimestamp) }}
+                    <br />
+                    <span class="font-weight-bold">Node TFT Amount :</span> {{ receipt.tft || 0 }} TFT
+                    <span v-if="receipt.fixupReward">+ {{ receipt.fixupReward || 0 }} TFT FixedUp</span>
+                    <br />
+                    <span class="font-weight-bold">Cloud Units :</span>
+                    <ul class="pl-4">
+                      <li inset v-for="(val, key) in receipt.cloud_units" :key="key">
+                        <b style="text-transform: uppercase">{{ key }}:</b> {{ val }}
+                      </li>
+                    </ul>
+                  </v-card-text>
                 </v-row>
               </v-container>
             </v-card>
@@ -51,6 +48,7 @@
           <div v-else>
             <v-card-text class="font-weight-bold">No receipts found for this month</v-card-text>
           </div>
+          <v-divider class="my-2"></v-divider>
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn color="secondary" variant="outlined" @click="downloadNodeReceipt" :disabled="!node.receipts"
