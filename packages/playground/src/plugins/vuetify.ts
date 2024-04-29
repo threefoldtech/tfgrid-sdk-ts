@@ -15,6 +15,12 @@ const vuetify = createVuetify({
       width: 7,
       color: "primary",
     },
+    VBtn: {
+      VProgressCircular: {
+        size: 20,
+        width: 5,
+      },
+    },
   },
   components,
   directives,
