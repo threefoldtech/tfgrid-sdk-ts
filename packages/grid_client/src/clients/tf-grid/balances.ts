@@ -19,7 +19,7 @@ class TFBalances extends Balances {
   }
 
   async getMoreFunds() {
-    if (this.client.url !== "wss://tfchain.dev.grid.tf/ws" && this.client.url !== "wss://tfchain.qa.grid.tf/ws") {
+    if (!this.client.url.includes("qa") && !this.client.url.includes("dev")) {
       throw new GridClientError("Unable to get more TFTs.");
     }
     await this.client.connect();
