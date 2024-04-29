@@ -41,8 +41,6 @@ export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
   const failedDeployments: FailedDeployment[] = [];
 
   const projectName = grid.clientOptions.projectName || "";
-  console.log("projectName from load dep", projectName);
-
   const grids = (await Promise.all(
     machines.map(n => getGrid(grid.clientOptions, projectName ? `${projectName}/${n}` : n)),
   )) as GridClient[];

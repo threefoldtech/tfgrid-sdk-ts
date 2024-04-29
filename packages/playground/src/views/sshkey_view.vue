@@ -101,7 +101,6 @@
 </template>
 
 <script lang="ts" setup>
-import type { GridClient } from "@threefold/grid_client";
 import { InsufficientBalanceError } from "@threefold/types";
 import { defineComponent, onMounted, ref } from "vue";
 import { generateKeyPair } from "web-ssh-keygen";
