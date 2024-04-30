@@ -91,26 +91,22 @@
           >
             <template #[`item.name`]="{ item }">
               {{
-                item.value.name.slice(
-                  item.value.name.startsWith(prefix)
-                    ? prefix.length
-                    : item.value.name.startsWith(oldPrefix)
-                    ? oldPrefix.length
-                    : 0,
+                item.name.slice(
+                  item.name.startsWith(prefix) ? prefix.length : item.name.startsWith(oldPrefix) ? oldPrefix.length : 0,
                 )
               }}
             </template>
 
             <template #[`item.tls_passthrough`]="{ item }">
-              {{ item.value.tls_passthrough ? "Yes" : "No" }}
+              {{ item.tls_passthrough ? "Yes" : "No" }}
             </template>
 
             <template #[`item.status`]="{ item }">
-              {{ item.value.status.toUpperCase() }}
+              {{ item.status.toUpperCase() }}
             </template>
 
             <template #[`item.actions`]="{ item }">
-              <IconActionBtn tooltip="Visit" icon="mdi-web" color="anchor" :href="'https://' + item.value.domain" />
+              <IconActionBtn tooltip="Visit" icon="mdi-web" color="anchor" :href="'https://' + item.domain" />
             </template>
           </list-table>
         </div>
