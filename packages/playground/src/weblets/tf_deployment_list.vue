@@ -26,13 +26,9 @@
             @click="openDialog(tabs[activeTab].value, item)"
           />
 
-          <IconActionBtn icon="mdi-cog" tooltip="Manage Domains" @click="dialog = item.value.deploymentName" />
+          <IconActionBtn icon="mdi-cog" tooltip="Manage Domains" @click="dialog = item.deploymentName" />
 
-          <ManageGatewayDialog
-            v-if="dialog === item.value.deploymentName"
-            :vm="item.value"
-            @close="dialog = undefined"
-          />
+          <ManageGatewayDialog v-if="dialog === item.deploymentName" :vm="item" @close="dialog = undefined" />
         </template>
 
         <template #VM-actions="{ item }">
@@ -45,15 +41,11 @@
           <IconActionBtn
             icon="mdi-cog"
             tooltip="Manage Domains"
-            :disabled="item.value.fromAnotherClient"
-            @click="dialog = item.value.deploymentName"
+            :disabled="item.fromAnotherClient"
+            @click="dialog = item.deploymentName"
           />
 
-          <ManageGatewayDialog
-            v-if="dialog === item.value.deploymentName"
-            :vm="item.value"
-            @close="dialog = undefined"
-          />
+          <ManageGatewayDialog v-if="dialog === item.deploymentName" :vm="item" @close="dialog = undefined" />
         </template>
 
         <template #CapRover-actions="{ item }">
@@ -66,18 +58,19 @@
             tooltip="Admin Panel"
             color="anchor"
             icon="mdi-view-dashboard"
-            :href="'http://captain.' + item.value.env.CAPROVER_ROOT_DOMAIN"
+            :href="'http://captain.' + item.env.CAPROVER_ROOT_DOMAIN"
           />
-          <IconActionBtn icon="mdi-cog" tooltip="Manage Workers" @click="dialog = item.value.deploymentName" />
+          <IconActionBtn icon="mdi-cog" tooltip="Manage Workers" @click="dialog = item.deploymentName" />
 
           <ManageCaproverWorkerDialog
-            v-if="dialog === item.value.deploymentName"
-            :master="item.value"
-            :data="item.value.workers || []"
-            :project-name="item.value.projectName"
+            v-if="dialog === item.deploymentName"
+            :master="item"
+            :data="item.workers || []"
+            :project-name="item.projectName"
             @close="dialog = undefined"
-            @update:caprover="item.value = $event"
           />
+          <!-- TODO: fix reasign caprover after update -->
+          <!-- @update:caprover="item = $event" -->
         </template>
 
         <template #Peertube-actions="{ item }">
@@ -90,7 +83,7 @@
             tooltip="Visit"
             icon="mdi-web"
             color="anchor"
-            :href="'https://' + item.value.env.PEERTUBE_WEBSERVER_HOSTNAME"
+            :href="'https://' + item.env.PEERTUBE_WEBSERVER_HOSTNAME"
           />
         </template>
 
@@ -104,7 +97,7 @@
             tooltip="Visit"
             icon="mdi-web"
             color="anchor"
-            :href="'https://' + item.value.env.FUNKWHALE_HOSTNAME"
+            :href="'https://' + item.env.FUNKWHALE_HOSTNAME"
           />
         </template>
 
@@ -118,14 +111,9 @@
             tooltip="Admin Panel"
             color="anchor"
             icon="mdi-view-dashboard"
-            :href="'http://' + item.value.env.DOMAIN_NAME + '/admin/'"
+            :href="'http://' + item.env.DOMAIN_NAME + '/admin/'"
           />
-          <IconActionBtn
-            tooltip="Visit"
-            icon="mdi-web"
-            color="anchor"
-            :href="'https://' + item.value.env.DOMAIN_NAME"
-          />
+          <IconActionBtn tooltip="Visit" icon="mdi-web" color="anchor" :href="'https://' + item.env.DOMAIN_NAME" />
         </template>
 
         <template #Presearch-actions="{ item }">
@@ -142,7 +130,7 @@
             icon="mdi-eye-outline"
             @click="openDialog(tabs[activeTab].value, item)"
           />
-          <IconActionBtn tooltip="Visit" color="anchor" icon="mdi-web" :href="item.value.env.SITE_URL" />
+          <IconActionBtn tooltip="Visit" color="anchor" icon="mdi-web" :href="item.env.SITE_URL" />
         </template>
 
         <template #Discourse-actions="{ item }">
@@ -155,7 +143,7 @@
             tooltip="Visit"
             icon="mdi-web"
             color="anchor"
-            :href="'https://' + item.value.env.DISCOURSE_HOSTNAME"
+            :href="'https://' + item.env.DISCOURSE_HOSTNAME"
           />
         </template>
 
@@ -169,7 +157,7 @@
             tooltip="Visit"
             icon="mdi-web"
             color="anchor"
-            :href="'https://' + item.value.env.DIGITALTWIN_APPID"
+            :href="'https://' + item.env.DIGITALTWIN_APPID"
           />
         </template>
 
@@ -183,7 +171,7 @@
             tooltip="Visit"
             icon="mdi-web"
             color="anchor"
-            :href="'https://' + item.value.env.CASPERLABS_HOSTNAME"
+            :href="'https://' + item.env.CASPERLABS_HOSTNAME"
           />
         </template>
 
@@ -193,12 +181,7 @@
             icon="mdi-eye-outline"
             @click="openDialog(tabs[activeTab].value, item)"
           />
-          <IconActionBtn
-            tooltip="Visit"
-            icon="mdi-web"
-            color="anchor"
-            :href="'https://' + item.value.env.OWNCLOUD_DOMAIN"
-          />
+          <IconActionBtn tooltip="Visit" icon="mdi-web" color="anchor" :href="'https://' + item.env.OWNCLOUD_DOMAIN" />
         </template>
 
         <template #Nextcloud-actions="{ item }">
@@ -211,13 +194,13 @@
             tooltip="Open Nextcloud"
             color="anchor"
             icon="mdi-web"
-            :href="'https://' + item.value.env.NEXTCLOUD_DOMAIN"
+            :href="'https://' + item.env.NEXTCLOUD_DOMAIN"
           />
           <IconActionBtn
             tooltip="Nextcloud Setup"
             color="anchor"
             icon="mdi-view-dashboard"
-            :href="'https://' + item.value.env.NEXTCLOUD_AIO_LINK"
+            :href="'https://' + item.env.NEXTCLOUD_AIO_LINK"
           />
         </template>
 
@@ -231,7 +214,7 @@
             tooltip="Visit"
             icon="mdi-web"
             color="anchor"
-            :href="'https://' + item.value.env.SUBSQUID_WEBSERVER_HOSTNAME + '/graphql'"
+            :href="'https://' + item.env.SUBSQUID_WEBSERVER_HOSTNAME + '/graphql'"
           />
         </template>
 
@@ -253,10 +236,7 @@
             tooltip="Visit"
             icon="mdi-web"
             color="anchor"
-            :href="
-              'http://' +
-              (item.value.publicIP?.ip ? item.value.publicIP.ip.slice(0, -3) : '[' + item.value.planetary + ']')
-            "
+            :href="'http://' + (item.publicIP?.ip ? item.publicIP.ip.slice(0, -3) : '[' + item.planetary + ']')"
           />
         </template>
 
@@ -272,11 +252,11 @@
             icon="mdi-view-dashboard"
             :href="
               'http://' +
-              (item.value.publicIP?.ip
-                ? item.value.publicIP.ip.slice(0, -3)
-                : item.value.planetary
-                ? '[' + item.value.planetary + ']'
-                : item.value.interfaces[0].ip)
+              (item.publicIP?.ip
+                ? item.publicIP.ip.slice(0, -3)
+                : item.planetary
+                ? '[' + item.planetary + ']'
+                : item.interfaces[0].ip)
             "
           />
         </template>
@@ -287,12 +267,12 @@
             icon="mdi-eye-outline"
             @click="openDialog(tabs[activeTab].value, item)"
           />
-          <IconActionBtn tooltip="Visit" color="anchor" icon="mdi-web" :href="'https://' + item.value.env.WP_URL" />
+          <IconActionBtn tooltip="Visit" color="anchor" icon="mdi-web" :href="'https://' + item.env.WP_URL" />
           <IconActionBtn
             tooltip="Admin Panel"
             color="anchor"
             icon="mdi-view-dashboard"
-            :href="'https://' + item.value.env.WP_URL + '/wp-admin'"
+            :href="'https://' + item.env.WP_URL + '/wp-admin'"
           />
         </template>
       </VmDeploymentTable>
@@ -314,16 +294,16 @@
 
             <IconActionBtn
               icon="mdi-cog"
-              :disabled="item.value.fromAnotherClient"
+              :disabled="item.fromAnotherClient"
               tooltip="Manage Workers"
-              @click="dialog = item.value.deploymentName"
+              @click="dialog = item.deploymentName"
             />
 
             <ManageK8SWorkerDialog
-              v-if="dialog === item.value.deploymentName"
-              :data="item.value"
+              v-if="dialog === item.deploymentName"
+              :data="item"
               @close="dialog = undefined"
-              @update:k8s="item.value.workers = $event.workers"
+              @update:k8s="item.workers = $event.workers"
             />
           </template>
         </K8sDeploymentTable>
@@ -442,13 +422,13 @@ async function onDelete(k8s = false) {
 }
 
 const VMS: string[] = [ProjectName.Fullvm, ProjectName.VM, ProjectName.NodePilot];
-function openDialog(project: string, item?: { value: any }): void {
+function openDialog(project: string, item?: any): void {
   const key: keyof typeof deploymentListEnvironments = VMS.includes(project)
     ? "vm"
     : project === ProjectName.Kubernetes
     ? "k8s"
     : (project.toLowerCase() as any);
-  layout.value.openDialog(item?.value, deploymentListEnvironments[key]);
+  layout.value.openDialog(item, deploymentListEnvironments[key]);
 }
 
 function clickOpenDialog(_: MouseEvent, { item }: any) {

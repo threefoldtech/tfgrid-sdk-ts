@@ -73,47 +73,47 @@
       :sort-by="sortBy"
     >
       <template #[`item.name`]="{ item }">
-        {{ item.value.name }}
+        {{ item.name }}
       </template>
 
       <template #[`item.ipv4`]="{ item }">
-        {{ item.value.publicIP?.ip?.split("/")?.[0] || item.value.publicIP?.ip || "-" }}
+        {{ item.publicIP?.ip?.split("/")?.[0] || item.publicIP?.ip || "-" }}
       </template>
 
       <template #[`item.ipv6`]="{ item }">
-        {{ item.value.publicIP?.ip6.replace(/\/64$/, "") || "-" }}
+        {{ item.publicIP?.ip6.replace(/\/64$/, "") || "-" }}
       </template>
 
       <template #[`item.planetary`]="{ item }">
-        {{ item.value.planetary || "-" }}
+        {{ item.planetary || "-" }}
       </template>
 
       <template #[`item.mycelium`]="{ item }">
-        {{ item.value.myceliumIP || "-" }}
+        {{ item.myceliumIP || "-" }}
       </template>
 
       <template #[`item.wireguard`]="{ item }">
-        {{ item.value.interfaces?.[0]?.ip || "-" }}
+        {{ item.interfaces?.[0]?.ip || "-" }}
       </template>
 
       <template #[`item.flist`]="{ item }">
-        <v-tooltip :text="item.value.flist" location="bottom right">
+        <v-tooltip :text="item.flist" location="bottom right">
           <template #activator="{ props }">
             <p v-bind="props">
-              {{ item.value.flist.replace("https://hub.grid.tf/", "").replace(".flist", "") }}
+              {{ item.flist.replace("https://hub.grid.tf/", "").replace(".flist", "") }}
             </p>
           </template>
         </v-tooltip>
       </template>
 
       <template #[`item.billing`]="{ item }">
-        {{ item.value.billing }}
+        {{ item.billing }}
       </template>
       <template #[`item.created`]="{ item }">
-        {{ toHumanDate(item.value.created) }}
+        {{ toHumanDate(item.created) }}
       </template>
       <template #[`item.actions`]="{ item }">
-        <v-chip color="error" variant="tonal" v-if="deleting && ($props.modelValue || []).includes(item.value)">
+        <v-chip color="error" variant="tonal" v-if="deleting && ($props.modelValue || []).includes(item)">
           Deleting...
         </v-chip>
         <v-btn-group variant="tonal" v-else>
@@ -122,15 +122,15 @@
       </template>
 
       <template #[`item.status`]="{ item }">
-        <v-chip :color="getNodeHealthColor(item.value.status as string).color">
-          <v-tooltip v-if="item.value.status == NodeHealth.Error" activator="parent" location="top">{{
-            item.value.message
+        <v-chip :color="getNodeHealthColor(item.status as string).color">
+          <v-tooltip v-if="item.status == NodeHealth.Error" activator="parent" location="top">{{
+            item.message
           }}</v-tooltip>
-          <v-tooltip v-if="item.value.status == NodeHealth.Paused" activator="parent" location="top"
+          <v-tooltip v-if="item.status == NodeHealth.Paused" activator="parent" location="top"
             >The deployment contract is in grace period</v-tooltip
           >
           <span class="text-uppercase">
-            {{ getNodeHealthColor(item.value.status as string).type }}
+            {{ getNodeHealthColor(item.status as string).type }}
           </span>
         </v-chip>
       </template>
