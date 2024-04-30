@@ -1,3 +1,4 @@
+import type { GridClient } from "@threefold/grid_client";
 import StellarSdk from "stellar-sdk";
 import validator from "validator";
 import type { Options } from "validator/lib/isBoolean";
@@ -769,5 +770,13 @@ export async function isValidStellarAddress(target: string): Promise<RuleReturn>
         ? "Address does not have a valid trustline to TFT"
         : "Address not found";
     return { message };
+  }
+}
+
+export async function isValidSubdomain(grid: GridClient, subdomain: string) {
+  const valid = await grid.contracts.get_name_contract({ name: subdomain });
+  console.log({ valid });
+  if (subdomain && !!valid) {
+    return { message: "Subdomain  already exists." };
   }
 }
