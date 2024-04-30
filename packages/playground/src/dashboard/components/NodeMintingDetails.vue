@@ -1,25 +1,29 @@
 <template>
   <v-container>
-    <v-row>
-      <v-col cols="12 pb-0">
-        <v-menu ref="menu" v-model="showMenu" :close-on-content-click="false" transition="scale-transition">
-          <template v-slot:activator="{ props }">
-            <v-text-field v-bind="props" label="Select Month and Year" readonly :model-value="selectedData" />
-          </template>
+    <v-menu ref="menu" v-model="showMenu" :close-on-content-click="false" transition="scale-transition">
+      <template v-slot:activator="{ props }">
+        <v-text-field v-bind="props" label="Select Month and Year" readonly :model-value="selectedData" />
+      </template>
 
-          <v-card>
-            <v-card-text class="d-flex">
-              <v-select v-model="selectedMonth" :items="months" label="Month"></v-select>
-
-              <v-select v-model="selectedYear" :items="years" label="Year"></v-select>
-            </v-card-text>
-          </v-card>
-        </v-menu>
-      </v-col>
-      <v-col cols="12" class="text-start pt-0">
-        <v-card outlined class="pa-2 border">
-          <div class="receipt-body" v-if="receipts?.length">
-            <v-card style="box-shadow: none" outlined v-for="receipt in receipts" :key="receipt.hash">
+      <v-card>
+        <v-card-text class="d-flex">
+          <v-select v-model="selectedMonth" :items="months" label="Month"></v-select>
+          <v-select v-model="selectedYear" :items="years" label="Year"></v-select>
+        </v-card-text>
+      </v-card>
+    </v-menu>
+    <v-card outlined class="pa-2 border">
+      <div class="receipt-body" v-if="receipts?.length">
+        <v-row>
+          <v-col
+            class="text-start"
+            cols="12"
+            md="12"
+            :lg="receipts.length > 1 ? '6' : '12'"
+            v-for="receipt in receipts"
+            :key="receipt.hash"
+          >
+            <v-card style="box-shadow: none" outlined>
               <v-container>
                 <v-row>
                   <v-list class="custom-list" density="compact">
@@ -69,38 +73,22 @@
                       </v-row>
                     </div>
                   </v-list>
-                  <!-- <h2 class="mb-1 font-weight-medium">
-                    Minting Details<v-chip class="ma-2 me-auto" small :color="getChipColor(receipt.type)"
-                      >{{ receipt.type }}
-                    </v-chip>
-                  </h2>
-                  <br />
-                  <span class="font-weight-bold">Node TFT Amount :</span> {{ receipt.tft || 0 }} TFT
-                  <span v-if="receipt.fixupReward">+ {{ receipt.fixupReward || 0 }} TFT FixedUp</span>
-                  <br />
-                  <span class="font-weight-bold">Cloud Units :</span>
-                  <ul class="pl-4">
-                    <li inset v-for="(val, key) in receipt.cloud_units" :key="key">
-                      <b style="text-transform: uppercase">{{ key }}:</b> {{ val }}
-                    </li>
-                  </ul> -->
                 </v-row>
               </v-container>
             </v-card>
-          </div>
-          <div v-else>
-            <v-card-text class="font-weight-bold">No receipts found for this month</v-card-text>
-          </div>
-          <!-- <v-divider class="my-2"></v-divider> -->
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color="secondary" variant="outlined" @click="downloadNodeReceipt" :disabled="!node.receipts"
-              >Download Node Receipt</v-btn
-            >
-          </v-card-actions>
-        </v-card>
-      </v-col>
-    </v-row>
+          </v-col>
+        </v-row>
+      </div>
+      <div v-else>
+        <v-card-text class="font-weight-bold">No receipts found for this month</v-card-text>
+      </div>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn color="secondary" variant="outlined" @click="downloadNodeReceipt" :disabled="!node.receipts"
+          >Download Node Receipt</v-btn
+        >
+      </v-card-actions>
+    </v-card>
   </v-container>
 </template>
 
