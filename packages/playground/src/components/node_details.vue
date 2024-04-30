@@ -177,7 +177,7 @@ export default {
             router.replace({ query });
           } catch (err: any) {
             isError.value = true;
-            errorMessage.value = `Failed to load node with ID ${props.nodeId} due ${err.message}. The node might be offline or unresponsive. You can try requesting it again.`;
+            errorMessage.value = `Failed to load node details with ID ${props.nodeId} as node isn't reachable over RMB or GridProxy. The node might be offline or unresponsive. Please, try requesting it again.`;
           }
         } finally {
           loading.value = false;
