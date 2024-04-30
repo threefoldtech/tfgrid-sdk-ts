@@ -204,6 +204,7 @@ class Client {
   }
 
   async disconnect() {
+    if (this.con.readyState === this.con.CONNECTING) await this.waitForOpenConnection();
     if (this.__pingPongTimeout) clearTimeout(this.__pingPongTimeout);
     this.con.removeAllListeners();
     await this.waitForResponses();
