@@ -1,4 +1,4 @@
-import type { FarmFilterOptions, FarmInfo, FilterOptions, GridClient, NodeInfo } from "@threefold/grid_client";
+import type { FarmFilterOptions, FarmInfo, FilterOptions, NodeInfo } from "@threefold/grid_client";
 import type { NodeStatus } from "@threefold/gridproxy_client";
 import { GridClientErrors } from "@threefold/types";
 import type { DeepPartial } from "utility-types";
@@ -18,7 +18,16 @@ import type {
 } from "../types/nodeSelector";
 import { normalizeError } from "./helpers";
 
-export async function getLocations(status?: NodeStatus): Promise<Locations> {
+export interface GetLocationsConfig {
+  /**
+   * @default true
+   */
+  onlyWithNodes?: boolean;
+}
+
+export async function getLocations(status?: NodeStatus, config: GetLocationsConfig = {}): Promise<Locations> {
+  const { onlyWithNodes = true } = config;
+
   const countries = await gqlClient.countries({
     name: true,
     region: true,
@@ -49,7 +58,8 @@ export async function getLocations(status?: NodeStatus): Promise<Locations> {
         country.name = con.name;
       }
     });
-    if (allowedCountriesList.includes(country.name)) {
+
+    if (allowedCountriesList.includes(country.name) || !onlyWithNodes) {
       const region = country.region !== "unknown region" ? country.region : country.subregion;
       locations[region] = locations[region] || [];
       locations[region].push(country.name);
