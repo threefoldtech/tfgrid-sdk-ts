@@ -773,10 +773,9 @@ export async function isValidStellarAddress(target: string): Promise<RuleReturn>
   }
 }
 
-export async function isValidSubdomain(grid: GridClient, subdomain: string) {
-  const valid = await grid.contracts.get_name_contract({ name: subdomain });
-  console.log({ valid });
-  if (subdomain && !!valid) {
-    return { message: "Subdomain  already exists." };
+export async function isAvailableName(grid: GridClient, name: string) {
+  const valid = await grid.contracts.get_name_contract({ name });
+  if (name && !!valid) {
+    return { message: "Name is already taken." };
   }
 }
