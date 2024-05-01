@@ -39,7 +39,7 @@
                         </v-col>
                         <v-col class="py-1">
                           <v-list-item>
-                            <div style="display: flex; justify-content: end">
+                            <div style="display: flex; justify-content: end; text-align: end">
                               {{ getDateFromTimestamp(receipt.endPeriodTimestamp) }}
                             </div>
                           </v-list-item>
@@ -59,14 +59,56 @@
                           </v-list-item>
                         </v-col>
                       </v-row>
-                      <v-row v-for="(val, key) in receipt.cloud_units" :key="key" class="row-style">
+                      <v-row class="row-style">
                         <v-col class="py-1" cols="1" sm="2" style="min-width: fit-content">
-                          <v-list-item style="text-transform: uppercase"> {{ key }} :</v-list-item>
+                          <v-list-item style="text-transform: uppercase"> CU :</v-list-item>
                         </v-col>
                         <v-col class="py-1">
                           <v-list-item>
                             <div style="display: flex; justify-content: end">
-                              {{ val }}
+                              {{ receipt.cloud_units.cu }}
+                              <input-tooltip
+                                tooltip="Compute Unit (CU): The amount of data processing power"
+                                :align-center="true"
+                                :class="'d-flex align-center'"
+                                location="right center"
+                              />
+                            </div>
+                          </v-list-item>
+                        </v-col>
+                      </v-row>
+                      <v-row class="row-style">
+                        <v-col class="py-1" cols="1" sm="2" style="min-width: fit-content">
+                          <v-list-item style="text-transform: uppercase"> SU :</v-list-item>
+                        </v-col>
+                        <v-col class="py-1">
+                          <v-list-item>
+                            <div style="display: flex; justify-content: end">
+                              {{ receipt.cloud_units.su }} GB
+                              <input-tooltip
+                                tooltip="Storage Unit (SU): The amount of storage capacity"
+                                :align-center="true"
+                                :class="'d-flex align-center'"
+                                location="right center"
+                              />
+                            </div>
+                          </v-list-item>
+                        </v-col>
+                      </v-row>
+                      <v-row class="row-style">
+                        <v-col class="py-1" cols="1" sm="2" style="min-width: fit-content">
+                          <v-list-item style="text-transform: uppercase"> NU :</v-list-item>
+                        </v-col>
+                        <v-col class="py-1">
+                          <v-list-item>
+                            <div style="display: flex; justify-content: end">
+                              {{ receipt.cloud_units.nu }} GB
+                              <input-tooltip
+                                tooltip="Network Unit (NU): The amount of data that travels in and out of storage units or compute units"
+                                :align-center="true"
+                                :class="'d-flex align-center'"
+                                location="right center"
+                              />
                             </div>
                           </v-list-item>
                         </v-col>
