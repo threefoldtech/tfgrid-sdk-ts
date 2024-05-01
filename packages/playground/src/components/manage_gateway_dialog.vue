@@ -223,7 +223,7 @@ import { deployGatewayName, type GridGateway, loadDeploymentGateways } from "../
 import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
 import { generateName } from "../utils/strings";
-import { isValidSubdomain } from "../utils/validators";
+import { isAvailableName } from "../utils/validators";
 import IconActionBtn from "./icon_action_btn.vue";
 import ListTable from "./list_table.vue";
 import { useLayout } from "./weblet_layout.vue";
@@ -336,7 +336,7 @@ export default {
 
     async function validateSubdomain() {
       const grid = await getGrid(profileManager.profile!, props.vm.projectName);
-      return await isValidSubdomain(grid!, subdomain.value);
+      return await isAvailableName(grid!, subdomain.value);
     }
 
     return {
