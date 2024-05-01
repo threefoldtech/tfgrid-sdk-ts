@@ -34,7 +34,7 @@
                     </h3>
                     <div class="border">
                       <v-row class="row-style">
-                        <v-col class="py-1" cols="1" sm="2" style="min-width: fit-content">
+                        <v-col class="py-1" cols="4" sm="4" style="min-width: fit-content justify-end">
                           <v-list-item> Date of Payout :</v-list-item>
                         </v-col>
                         <v-col class="py-1">
@@ -61,7 +61,7 @@
                       </v-row>
                       <v-row v-for="(val, key) in receipt.cloud_units" :key="key" class="row-style">
                         <v-col class="py-1" cols="1" sm="2" style="min-width: fit-content">
-                          <v-list-item> {{ key }} :</v-list-item>
+                          <v-list-item style="text-transform: uppercase"> {{ key }} :</v-list-item>
                         </v-col>
                         <v-col class="py-1">
                           <v-list-item>
