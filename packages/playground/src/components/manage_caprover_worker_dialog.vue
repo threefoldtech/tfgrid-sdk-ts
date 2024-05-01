@@ -27,11 +27,11 @@
         v-model="selectedWorkers"
       >
         <template #[`item.index`]="{ item }">
-          {{ data.indexOf(item?.value) + 1 }}
+          {{ data.indexOf(item) + 1 }}
         </template>
 
         <template #[`item.disk`]="{ item }">
-          {{ calcDiskSize(item.value.mounts) }}
+          {{ calcDiskSize(item.mounts) }}
         </template>
       </ListTable>
     </template>
