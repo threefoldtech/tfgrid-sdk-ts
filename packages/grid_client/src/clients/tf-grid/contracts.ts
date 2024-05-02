@@ -1,4 +1,5 @@
 import {
+  Contract,
   ContractLock,
   ContractLockOptions,
   Contracts,
@@ -333,6 +334,25 @@ class TFContracts extends Contracts {
     return ids;
   }
 
+  async batchUnlockContracts(ids: number[]) {
+    const extrinsics: ExtrinsicResult<Contract>[] = [];
+    for (const id of ids) {
+      extrinsics.push(await this.unlock(id));
+    }
+    await this.client.applyAllExtrinsics(extrinsics);
+    return ids;
+  }
+  async unlockMyContracts(graphqlURL: string) {
+    const contracts = await this.listMyContracts({
+      stateList: [ContractStates.GracePeriod],
+      graphqlURL,
+    });
+    const ids: number[] = [];
+    for (const contract of contracts.nameContracts) ids.push(parseInt(contract.contractID));
+    for (const contract of contracts.nodeContracts) ids.push(parseInt(contract.contractID));
+    for (const contract of contracts.rentContracts) ids.push(parseInt(contract.contractID));
+    return await this.batchUnlockContracts(ids);
+  }
   async getDedicatedNodeExtraFee(options: GetDedicatedNodePriceOptions): Promise<number> {
     // converting fees from milli to usd before getting
     const fee = new Decimal(await super.getDedicatedNodeExtraFee(options));

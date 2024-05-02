@@ -295,8 +295,14 @@ class Contracts {
 
   @expose
   @validateInput
-  async unlockContract(contractID) {
-    return (await this.client.contracts.unlockContract(contractID)).apply();
+  async unlockContract(ids: number[]) {
+    return await this.client.contracts.batchUnlockContracts(ids);
+  }
+
+  @expose
+  @validateInput
+  async unlockMyContracts() {
+    return await this.client.contracts.unlockMyContracts(this.config.graphqlURL);
   }
 }
 
