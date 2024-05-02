@@ -279,6 +279,7 @@ class Contracts {
       nameContracts: {},
       nodeContracts: {},
       rentContracts: {},
+      totalAmountLocked: 0,
     };
     const contracts = await this.listMyContracts({ state: [ContractStates.GracePeriod] });
     if (contracts == undefined) return LockedContracts;
@@ -288,6 +289,7 @@ class Contracts {
         LockedContracts[type][parseInt(contract.contractID)] = await this.contractLock({
           id: parseInt(contract.contractID),
         });
+        LockedContracts.totalAmountLocked += LockedContracts[type][parseInt(contract.contractID)].amountLocked;
       }
     }
     return LockedContracts;

@@ -106,6 +106,7 @@ export interface LockContracts {
   nameContracts: LockDetails;
   nodeContracts: LockDetails;
   rentContracts: LockDetails;
+  totalAmountLocked: number;
 }
 
 class TFContracts extends Contracts {
