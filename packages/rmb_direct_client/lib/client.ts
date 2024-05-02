@@ -185,9 +185,17 @@ class Client {
     }
   }
 
+  private dropPingEnvelope() {
+    for (const id of this.responses.keys()) {
+      const envelope = this.responses.get(id);
+      if (envelope?.has_ping) this.responses.delete(id);
+    }
+  }
+
   private async waitForResponses(timeoutInSeconds = 2 * 60): Promise<void> {
     const start = new Date().getTime();
     while (new Date().getTime() < start + timeoutInSeconds * 1000) {
+      this.dropPingEnvelope();
       if (this.responses.size === 0) return;
       this.logPendingResponses();
       await new Promise(f => setTimeout(f, 1000));
@@ -196,6 +204,7 @@ class Client {
   }
 
   async disconnect() {
+    if (this.con.readyState === this.con.CONNECTING) await this.waitForOpenConnection();
     if (this.__pingPongTimeout) clearTimeout(this.__pingPongTimeout);
     this.con.removeAllListeners();
     await this.waitForResponses();
