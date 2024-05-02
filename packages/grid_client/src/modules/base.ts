@@ -16,12 +16,12 @@ import { DeploymentFactory } from "../primitives/deployment";
 import { Network } from "../primitives/network";
 import { Nodes } from "../primitives/nodes";
 import { BackendStorage, BackendStorageType } from "../storage/backend";
+import { Volume } from "../zos";
 import { Deployment } from "../zos/deployment";
 import { PublicIPResult } from "../zos/public_ip";
 import { QuantumSafeFS, QuantumSafeFSResult } from "../zos/qsfs";
 import { Workload, WorkloadTypes } from "../zos/workload";
 import { Zmachine, ZmachineResult } from "../zos/zmachine";
-import { Zmount } from "../zos/zmount";
 import { ContractStates } from "./models";
 
 const modulesNames = {
@@ -335,9 +335,12 @@ class BaseModule {
     for (const deployment of deployments) {
       if (deployment.contract_id !== contractId) continue;
       for (const workload of deployment.workloads) {
-        if (workload.type === WorkloadTypes.zmount && workload.name === name) {
+        if (
+          (workload.type === WorkloadTypes.zmount || workload.type === WorkloadTypes.volume) &&
+          workload.name === name
+        ) {
           return {
-            size: (workload.data as Zmount).size,
+            size: (workload.data as Volume).size,
             state: workload.result.state,
             message: workload.result.message,
           };
