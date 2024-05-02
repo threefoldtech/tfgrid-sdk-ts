@@ -66,6 +66,7 @@
             variant="outlined"
             :text="isRemoving ? 'Deleting..' : 'Confirm'"
             color="error"
+            :disabled="isRemoving"
             @click="removeFarmIps"
           ></v-btn>
         </v-card-actions>

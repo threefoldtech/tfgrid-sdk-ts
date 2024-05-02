@@ -90,16 +90,7 @@ class Farms extends QueryFarms {
   @checkConnection
   async removeFarmIp(options: RemoveFarmIPOptions) {
     const extrinsic = this.client.api.tx.tfgridModule.removeFarmIp(options.farmId, options.ip);
-    return this.client.patchExtrinsic<void>(extrinsic);
-  }
-
-  @checkConnection
-  async removeFarmIps(options: RemoveFarmIPOptions[]) {
-    const extrinsics: ExtrinsicResult<void>[] = [];
-    for (const option of options) {
-      extrinsics.push(await this.removeFarmIp(option));
-    }
-    await this.client.applyAllExtrinsics<void>(extrinsics);
+    return this.client.patchExtrinsic<Farm>(extrinsic);
   }
 
   @checkConnection
