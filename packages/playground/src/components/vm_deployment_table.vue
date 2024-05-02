@@ -117,7 +117,16 @@
           Deleting...
         </v-chip>
         <v-btn-group variant="tonal" v-else>
-          <slot :name="projectName + '-actions'" :item="item"></slot>
+          <slot
+            :name="projectName + '-actions'"
+            :item="item"
+            :update="(newItem: any) => {
+              const index = items.findIndex(i => i.contractId === newItem.contractId)
+              if (index > -1) {
+                items[index] = newItem
+              }
+            }"
+          ></slot>
         </v-btn-group>
       </template>
 

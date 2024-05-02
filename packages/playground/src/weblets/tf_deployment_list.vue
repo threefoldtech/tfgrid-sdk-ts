@@ -48,7 +48,7 @@
           <ManageGatewayDialog v-if="dialog === item.deploymentName" :vm="item" @close="dialog = undefined" />
         </template>
 
-        <template #CapRover-actions="{ item }">
+        <template #CapRover-actions="{ item, update }">
           <IconActionBtn
             tooltip="Show Details"
             icon="mdi-eye-outline"
@@ -68,9 +68,8 @@
             :data="item.workers || []"
             :project-name="item.projectName"
             @close="dialog = undefined"
+            @update:caprover="update($event)"
           />
-          <!-- TODO: fix reasign caprover after update -->
-          <!-- @update:caprover="item = $event" -->
         </template>
 
         <template #Peertube-actions="{ item }">

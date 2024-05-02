@@ -12,7 +12,7 @@
     hide-no-data
     :return-object="returnObject"
   >
-    <template #[`column.data-table-select`]>
+    <template #[`header.data-table-select`]>
       <div class="d-flex align-center justify-space-between">
         <span>#</span>
         <div class="d-flex">
@@ -26,12 +26,12 @@
       </div>
     </template>
 
-    <template #[`item.data-table-select`]="{ item, toggleSelect, index }">
+    <template #[`item.data-table-select`]="{ item, index }">
       <div class="d-flex align-center justify-space-between">
         <span>{{ index + 1 }}</span>
         <div class="d-flex" @click.stop>
           <v-progress-circular
-            v-if="deleting && selectedItems.includes(item?.value)"
+            v-if="deleting && selectedItems.includes(item)"
             class="ml-3"
             color="red"
             :width="2"
@@ -42,7 +42,7 @@
             v-else
             color="primary"
             :disabled="deleting || loading"
-            :model-value="selectedItems.includes(item.value)"
+            :model-value="selectedItems.includes(item)"
             @update:model-value="toggleSelect(item)"
           />
         </div>
@@ -113,7 +113,15 @@ export default {
       },
     );
 
-    return { selectedItems, onUpdateSelection };
+    function toggleSelect(item: any) {
+      if (selectedItems.value.includes(item)) {
+        selectedItems.value = selectedItems.value.filter(i => i !== item);
+      } else {
+        selectedItems.value = [...selectedItems.value, item];
+      }
+    }
+
+    return { selectedItems, onUpdateSelection, toggleSelect };
   },
 };
 </script>
