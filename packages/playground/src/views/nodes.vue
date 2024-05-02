@@ -140,6 +140,7 @@
               filters.country = $event?.country || '';
               filters.region = $event?.region || '';
             "
+            :only-with-nodes="false"
           >
             <template #region="{ props }">
               <TfFilter query-route="region" v-model="filters.region">

@@ -1,5 +1,5 @@
 <template>
-  <VBottomNavigation :height="debugOpened === 0 ? openHeight : undefined">
+  <VBottomNavigation class="border" :height="debugOpened === 0 ? openHeight : undefined">
     <v-expansion-panels :model-value="debugOpened" @update:model-value="bindDebugOpened" :multiple="false">
       <v-expansion-panel eager>
         <v-expansion-panel-title :class="{ 'text-error': !!connectDB.error }">

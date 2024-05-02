@@ -696,7 +696,9 @@ async function activate(mnemonic: string, keypairType: KeypairType) {
   try {
     const grid = await getGrid({ mnemonic, keypairType });
     const profile = await loadProfile(grid!);
-
+    if (email.value) {
+      profile.email = email.value;
+    }
     profileManager.set({ ...profile, mnemonic });
     emit("update:modelValue", false);
     // Migrate the ssh-key
