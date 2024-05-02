@@ -1,8 +1,7 @@
-import { ContractLock } from "@threefold/tfchain_client";
 import { DeploymentKeyDeletionError, InsufficientBalanceError } from "@threefold/types";
 import * as PATH from "path";
 
-import { GqlNameContract, GqlNodeContract, GqlRentContract } from "../clients/tf-grid";
+import { GqlNameContract, GqlNodeContract, GqlRentContract, LockContracts } from "../clients/tf-grid";
 import { TFClient } from "../clients/tf-grid/client";
 import { GridClientConfig } from "../config";
 import { events } from "../helpers/events";
@@ -275,27 +274,23 @@ class Contracts {
   }
   @expose
   @validateInput
-  async getGracePeriodCost() {
-    const contractsLock: ContractLock = {
-      amountLocked: 0,
-      cycles: 0,
-      lockUpdated: 0,
+  async getContractsLockDetails() {
+    const LockedContracts: LockContracts = {
+      nameContracts: {},
+      nodeContracts: {},
+      rentContracts: {},
     };
     const contracts = await this.listMyContracts({ state: [ContractStates.GracePeriod] });
-    if (contracts == undefined) return contractsLock;
-    const gracePeriodIds = contracts.nameContracts.map(item => parseInt(item.contractID));
-    gracePeriodIds.concat(
-      contracts.nodeContracts.map(item => parseInt(item.contractID)),
-      contracts.rentContracts.map(item => parseInt(item.contractID)),
-    );
-
-    for (const id of gracePeriodIds) {
-      const contractLock = await this.contractLock({ id });
-      contractsLock.amountLocked += contractLock.amountLocked;
-      contractsLock.cycles += contractLock.cycles;
-      contractsLock.lockUpdated += contractsLock.lockUpdated;
+    if (contracts == undefined) return LockedContracts;
+    const contractTypes = ["nameContracts", "nodeContracts", "rentContracts"];
+    for (const type of contractTypes) {
+      for (const contract of contracts[type]) {
+        LockedContracts[type][parseInt(contract.contractID)] = await this.contractLock({
+          id: parseInt(contract.contractID),
+        });
+      }
     }
-    return contractsLock;
+    return LockedContracts;
   }
 
   @expose

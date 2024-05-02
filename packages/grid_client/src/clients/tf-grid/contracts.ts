@@ -1,4 +1,5 @@
 import {
+  ContractLock,
   ContractLockOptions,
   Contracts,
   ExtrinsicResult,
@@ -97,6 +98,13 @@ export interface GetConsumptionOptions {
 
 export interface CancelMyContractOptions {
   graphqlURL: string;
+}
+
+export type LockDetails = { [key: number]: ContractLock };
+export interface LockContracts {
+  nameContracts: LockDetails;
+  nodeContracts: LockDetails;
+  rentContracts: LockDetails;
 }
 
 class TFContracts extends Contracts {
