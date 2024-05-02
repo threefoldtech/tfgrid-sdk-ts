@@ -41,6 +41,17 @@
             />
           </TfFilter>
 
+          <TfFilter query-route="rentable" v-model="filters.rentable" v-if="profileManager.profile">
+            <v-switch
+              color="primary"
+              inset
+              label="Rentable (Only)"
+              v-model="filters.rentable"
+              density="compact"
+              hide-details
+            />
+          </TfFilter>
+
           <TfFilter class="mt-4" query-route="node-status" v-model="filters.status">
             <v-select
               :model-value="filters.status || undefined"
@@ -129,6 +140,7 @@
               filters.country = $event?.country || '';
               filters.region = $event?.region || '';
             "
+            :only-with-nodes="false"
           >
             <template #region="{ props }">
               <TfFilter query-route="region" v-model="filters.region">
@@ -419,6 +431,7 @@ import { useRoute } from "vue-router";
 import NodeDetails from "@/components/node_details.vue";
 import NodesTable from "@/components/nodes_table.vue";
 import router from "@/router";
+import { useProfileManager } from "@/stores";
 import type { GridProxyRequestConfig } from "@/types";
 import { getNode, requestNodes } from "@/utils/get_nodes";
 import { convertToBytes } from "@/utils/get_nodes";
@@ -428,6 +441,7 @@ import TfFiltersContainer from "../components/filters/TfFiltersContainer.vue";
 import TfFiltersLayout from "../components/filters/TfFiltersLayout.vue";
 import TfSelectFarm from "../components/node_selector/TfSelectFarm.vue";
 import TfSelectLocation from "../components/node_selector/TfSelectLocation.vue";
+
 export default {
   components: {
     NodesTable,
@@ -439,6 +453,7 @@ export default {
     TfFiltersLayout,
   },
   setup() {
+    const profileManager = useProfileManager();
     const size = ref(window.env.PAGE_SIZE);
     const page = ref(1);
     const nodeId = ref<number>(0);
@@ -460,6 +475,7 @@ export default {
       gpu: false,
       publicIPs: "",
       dedicated: false,
+      rentable: false,
     });
 
     const loading = ref<boolean>(true);
@@ -506,6 +522,8 @@ export default {
             dedicated: filters.value.dedicated || undefined,
             sortBy: SortBy.Status,
             sortOrder: SortOrder.Asc,
+            rentable: filters.value.rentable && profileManager.profile ? filters.value.rentable : undefined,
+            availableFor: filters.value.rentable && profileManager.profile ? profileManager.profile.twinId : undefined,
           },
           { loadFarm: true },
         );
@@ -562,6 +580,7 @@ export default {
     }
 
     return {
+      profileManager,
       loading,
       nodesCount,
       nodes,

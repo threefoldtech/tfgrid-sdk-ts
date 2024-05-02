@@ -1,5 +1,5 @@
 <template>
-  <v-footer class="py-5 mainfooter border mt-5">
+  <v-footer class="py-3 mainfooter mt-5">
     <v-container>
       <v-row justify="center" no-gutters>
         <v-col class="px-4" cols="12" md="4">
@@ -9,7 +9,7 @@
                 ? baseUrl + 'images/logoTF_dark.png'
                 : baseUrl + 'images/logoTF_light.png'
             }`"
-            width="160px"
+            width="140px"
             @click="navigateToHome"
             class="clickable-logo"
           />
@@ -81,8 +81,8 @@
           </div>
         </v-col>
       </v-row>
-      <v-divider class="my-4" />
-      <div class="text-center">{{ new Date().getFullYear() }} — ThreeFoldTech</div>
+      <v-divider class="my-3 w-25 mx-auto" />
+      <div class="text-center mb-12">{{ new Date().getFullYear() }} — ThreeFoldTech</div>
     </v-container>
   </v-footer>
 </template>
