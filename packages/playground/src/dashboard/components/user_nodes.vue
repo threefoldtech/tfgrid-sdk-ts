@@ -46,35 +46,9 @@
               <v-alert class="pa-5" style="height: 20px">
                 <h4 class="text-center font-weight-medium">Resource Units Reserved</h4>
               </v-alert>
-              <v-card-item>
-                <v-row class="mt-5 mb-5">
-                  <v-col v-for="(value, key) in item.total_resources" :key="key" align="center">
-                    <p class="text-center">{{ getKey(key) }}</p>
-                    <v-flex class="text-truncate">
-                      <v-tooltip bottom class="d-none">
-                        <template v-slot:activator="{ props }">
-                          <v-progress-circular
-                            v-bind="props"
-                            :rotate="-90"
-                            :model-value="getPercentage(item, key)"
-                            class="my-3"
-                          />
-                          <template v-if="item.used_resources">
-                            <p v-if="item.total_resources[key] > 1000">
-                              {{ byteToGB(item.used_resources[key]) }} / {{ byteToGB(item.total_resources[key]) }} GB
-                            </p>
-                            <p v-else-if="item.total_resources[key] == 0">NA</p>
-                            <p v-else>
-                              {{ item.used_resources[key] }} /
-                              {{ item.total_resources[key] }}
-                            </p>
-                          </template>
-                        </template>
-                      </v-tooltip>
-                    </v-flex>
-                  </v-col>
-                </v-row>
-              </v-card-item>
+              <v-card-text class="pb-8">
+                <NodeResources :node="item" />
+              </v-card-text>
             </v-card>
 
             <v-card class="mt-4" v-if="network == 'main'" focusable single model-value>
@@ -130,6 +104,7 @@ import { createCustomToast, ToastType } from "@/utils/custom_toast";
 import { getNodeStatusColor } from "@/utils/get_nodes";
 import { calculateUptime, getNodeAvailability, getNodeMintingFixupReceipts, type NodeInterface } from "@/utils/node";
 
+import NodeResources from "../../components/node_resources.vue";
 import NodeMintingDetails from "./NodeMintingDetails.vue";
 import PublicConfig from "./public_config.vue";
 import SetExtraFee from "./set_extra_fee.vue";
@@ -141,6 +116,7 @@ export default {
     PublicConfig,
     SetExtraFee,
     CardDetails,
+    NodeResources,
   },
   setup() {
     const profileManager = useProfileManager();
