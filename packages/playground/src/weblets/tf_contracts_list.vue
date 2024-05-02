@@ -9,6 +9,17 @@
     <section class="d-flex align-center">
       <v-card-title class="font-weight-bold d-flex align-center title ma-0 pa-0"> Contracts List </v-card-title>
       <v-spacer />
+      <v-btn
+        prepend-icon="mdi-cash"
+        class="mr-2"
+        color="warning"
+        variant="outlined"
+        :disabled="isLoading"
+        @click="unlockDialog = true"
+        v-if="lockedContracts?.totalAmountLocked"
+      >
+        Unlock all
+      </v-btn>
       <v-btn prepend-icon="mdi-refresh" color="info" variant="outlined" :disabled="isLoading" @click="onMount">
         refresh
       </v-btn>
@@ -35,7 +46,53 @@
       <small v-else> loading total cost... </small>
     </template>
   </v-card>
+  <!-- locked amount Dialog -->
+  <v-dialog width="800" v-model="unlockDialog" v-if="lockedContracts?.totalAmountLocked">
+    <v-card>
+      <v-card-title class="text-h5 mt-2"> Contracts lock Details</v-card-title>
+      <v-card-text>
+        <v-row class="d-flex justify-center">
+          Amount Locked:
+          {{ lockedContracts?.totalAmountLocked }}
+          TFTs.
+        </v-row>
 
+        <v-alert class="ma-4" type="info" variant="tonal"
+          >The Contracts in Grace Period, which means that your workloads are suspended but not deleted; in order to
+          resume your workloads and restore their functionality, Please fund your account with the amount mentioned
+          above.</v-alert
+        >
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn variant="outlined" color="anchor" class="mr-2 px-3" @click="unlockDialog = false"> Close </v-btn>
+          <v-tooltip
+            :text="
+              freeBalance < lockedContracts?.totalAmountLocked
+                ? `You don't have enough balance to unlock your contracts`
+                : `Get your contracts ready again`
+            "
+            location="top center"
+          >
+            <template #activator="{ props }">
+              <div v-bind="props">
+                <v-btn
+                  :disabled="freeBalance < lockedContracts.totalAmountLocked"
+                  variant="outlined"
+                  color="primary"
+                  class="mr-2 px-3"
+                  @click="unlockAllContracts"
+                  :loading="unlockContractLoading"
+                >
+                  Unlock contracts
+                </v-btn>
+              </div>
+            </template>
+          </v-tooltip>
+        </v-card-actions>
+      </v-card-text>
+    </v-card>
+  </v-dialog>
   <!-- Contracts Tables -->
   <v-expansion-panels v-model="panel" multiple>
     <v-expansion-panel class="mb-4" :elevation="3" v-for="(table, idx) of contractsTables" :key="idx">
@@ -63,12 +120,13 @@
 </template>
 
 <script lang="ts" setup>
-import type { GridClient } from "@threefold/grid_client";
+import type { GridClient, LockContracts } from "@threefold/grid_client";
 import type { NodeStatus } from "@threefold/gridproxy_client";
 import { Decimal } from "decimal.js";
 import { computed, defineComponent, onMounted, type Ref, ref } from "vue";
 
 import ContractsTable from "@/components/contracts_list/contracts_table.vue";
+import { useProfileManagerController } from "@/components/profile_manager_controller.vue";
 import { useProfileManager } from "@/stores/profile_manager";
 import type { VDataTableHeader } from "@/types";
 import {
@@ -83,6 +141,9 @@ import { getGrid } from "@/utils/grid";
 
 import { queryClient } from "../clients";
 
+const profileManagerController = useProfileManagerController();
+const balance = profileManagerController.balance;
+const freeBalance = computed(() => balance.value?.free ?? 0);
 const isLoading = ref<boolean>(false);
 const profileManager = useProfileManager();
 const grid = ref<GridClient>();
@@ -94,10 +155,11 @@ const rentContracts = ref<NormalizedContract[]>([]);
 const loadingErrorMessage = ref<string>();
 const totalCost = ref<number>();
 const totalCostUSD = ref<number>();
-
+const lockedContracts = ref<LockContracts>();
+const unlockDialog = ref<boolean>(false);
 const panel = ref<number[]>([0, 1, 2]);
 const nodeInfo: Ref<{ [nodeId: number]: { status: NodeStatus; farmId: number } }> = ref({});
-
+const unlockContractLoading = ref<boolean>(false);
 // Computed property to get unique node IDs from contracts
 const nodeIDs = computed(() => {
   const allNodes = contracts.value.map(contract => contract.nodeId);
@@ -134,6 +196,7 @@ async function onMount() {
         totalCost.value = getTotalCost(contracts.value);
         const TFTInUSD = await queryClient.tftPrice.get();
         totalCostUSD.value = totalCost.value * (TFTInUSD / 1000);
+        lockedContracts.value = await grid.value.contracts.getContractsLockDetails();
       } catch (error: any) {
         // Handle errors and display toast messages
         loadingErrorMessage.value = error.message;
@@ -157,6 +220,23 @@ async function onMount() {
   isLoading.value = false;
 }
 
+async function unlockAllContracts() {
+  try {
+    unlockContractLoading.value = true;
+    await grid.value?.contracts.unlockMyContracts();
+    createCustomToast(
+      `your request to unlock contract your contracts has been processed successfully, Changes may take few minuets to reflect`,
+      ToastType.info,
+    );
+    setTimeout(() => onMount(), 30000);
+    unlockDialog.value = false;
+  } catch (e) {
+    createCustomToast(`Failed to unlock contract your contracts`, ToastType.danger);
+    console.error(e);
+  } finally {
+    unlockContractLoading.value = false;
+  }
+}
 const nodeStatus = computed(() => {
   const statusObject: { [x: number]: NodeStatus } = {};
   for (const nodeId in nodeInfo.value) {
