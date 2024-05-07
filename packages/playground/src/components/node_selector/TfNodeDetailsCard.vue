@@ -284,7 +284,7 @@ export default {
       return imageUrl;
     });
 
-    async function mounted() {
+    async function refreshStakingDiscount() {
       loadingStakingDiscount.value = true;
       if (props.node) {
         stakingDiscount.value = (await getStakingDiscount()) || 0;
@@ -292,12 +292,10 @@ export default {
       loadingStakingDiscount.value = false;
     }
 
-    onMounted(async () => await mounted());
-
     watch(
       () => profileManager.profile,
       async () => {
-        await mounted();
+        await refreshStakingDiscount();
       },
       { immediate: true, deep: true },
     );
