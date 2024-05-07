@@ -195,17 +195,17 @@ export default {
     }
 
     function gatewayCheck() {
-      const startIP = publicIP?.value.split("/")[0];
+      const firstIP = publicIP?.value.split("/")[0];
       const lastIP = toPublicIP?.value.split("/")[0];
 
-      if (startIP === gateway.value || lastIP === gateway.value) {
+      if (firstIP === gateway.value || lastIP === gateway.value) {
         return {
           message: "IPs cannot be the same.",
         };
       }
 
       if (type.value !== IPType.single) {
-        const range = getIPRange(startIP, lastIP);
+        const range = getIPRange(firstIP, lastIP);
         if (range.includes(gateway.value)) {
           return {
             message: "The gateway IP shouldn't be in the IPs range.",
