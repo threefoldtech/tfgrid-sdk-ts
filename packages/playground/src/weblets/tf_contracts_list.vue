@@ -47,21 +47,45 @@
     </template>
   </v-card>
   <!-- locked amount Dialog -->
-  <v-dialog width="800" v-model="unlockDialog" v-if="lockedContracts?.totalAmountLocked">
+  <v-dialog width="500" v-model="unlockDialog" v-if="lockedContracts?.totalAmountLocked">
     <v-card>
-      <v-card-title class="text-h5 mt-2"> Contracts lock Details</v-card-title>
+      <v-card-title class="text-h6 pa-0">
+        <v-toolbar color="primary" dark class="custom-toolbar">
+          <p class="mb-5">
+            Unlock All Contracts
+            <v-tooltip text="Grace period contracts documentation" location="bottom right">
+              <template #activator="{ props }">
+                <v-btn
+                  @click.stop
+                  v-bind="props"
+                  icon="mdi-information-outline"
+                  height="24px"
+                  width="24px"
+                  target="_blank"
+                  :href="manual.contract_locking"
+                />
+              </template>
+            </v-tooltip></p
+        ></v-toolbar>
+      </v-card-title>
       <v-card-text>
-        <v-row class="d-flex justify-center">
-          Amount Locked:
-          {{ lockedContracts?.totalAmountLocked }}
-          TFTs.
+        <v-row class="d-flex">
+          <v-alert class="ma-4" type="warning" variant="tonal">
+            <div>
+              Total Amount Locked:
+              <span class="font-weight-black"> {{ lockedContracts?.totalAmountLocked.toFixed(4) }}</span>
+              TFTs.
+            </div>
+            <div class="font-weigh-black" v-if="lockedContracts?.totalAmountLocked < freeBalance">
+              You have enough balance to unlock your contracts!
+            </div>
+            <div v-else>
+              You need to fund your account with:
+              <span class="font-weight-black"> {{ Math.ceil(lockedContracts?.totalAmountLocked - freeBalance) }}</span>
+              TFTs.
+            </div>
+          </v-alert>
         </v-row>
-
-        <v-alert class="ma-4" type="info" variant="tonal"
-          >The Contracts in Grace Period, which means that your workloads are suspended but not deleted; in order to
-          resume your workloads and restore their functionality, Please fund your account with the amount mentioned
-          above.</v-alert
-        >
 
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -79,8 +103,7 @@
                 <v-btn
                   :disabled="freeBalance < lockedContracts.totalAmountLocked"
                   variant="outlined"
-                  color="primary"
-                  class="mr-2 px-3"
+                  color="warning"
                   @click="unlockAllContracts"
                   :loading="unlockContractLoading"
                 >
@@ -139,6 +162,7 @@ import {
 } from "@/utils/contracts";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
 import { getGrid } from "@/utils/grid";
+import { manual } from "@/utils/manual";
 
 import { queryClient } from "../clients";
 
