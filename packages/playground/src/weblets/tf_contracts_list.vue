@@ -109,6 +109,7 @@
           :node-status="nodeStatus"
           :loading="table.loading"
           :contracts="table.contracts"
+          :locked-contracts="lockedContracts !== undefined ? lockedContracts[`${table.type}Contracts`] : {}"
           :grid="table.grid"
           :contracts-type="table.type"
           :table-headers="table.headers"
@@ -190,13 +191,14 @@ async function onMount() {
           }
           return contract;
         });
+        lockedContracts.value = await grid.value.contracts.getContractsLockDetails();
+
         nodeContracts.value = contracts.value.filter(c => c.type === ContractType.NODE);
         nameContracts.value = contracts.value.filter(c => c.type === ContractType.NAME);
         rentContracts.value = contracts.value.filter(c => c.type === ContractType.RENT);
         totalCost.value = getTotalCost(contracts.value);
         const TFTInUSD = await queryClient.tftPrice.get();
         totalCostUSD.value = totalCost.value * (TFTInUSD / 1000);
-        lockedContracts.value = await grid.value.contracts.getContractsLockDetails();
       } catch (error: any) {
         // Handle errors and display toast messages
         loadingErrorMessage.value = error.message;

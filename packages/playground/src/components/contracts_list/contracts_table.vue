@@ -68,6 +68,15 @@
 
     <template #footer-actions>
       <v-btn
+        v-if="Object.keys(props.lockedContracts).length > 0"
+        :disabled="!selectedLockedContracts"
+        color="warning"
+        variant="outlined"
+        @click="unlockDialog = true"
+        >Unlock</v-btn
+      >
+
+      <v-btn
         variant="outlined"
         color="anchor"
         prepend-icon="mdi-export-variant"
@@ -134,7 +143,7 @@
                   variant="outlined"
                   color="primary"
                   class="mr-2 px-3"
-                  @click="unlockContract(selectedItem.contractId)"
+                  @click="unlockContract([selectedItem.contractId])"
                   :loading="unlockContractLoading"
                 >
                   Unlock Contract
@@ -168,11 +177,36 @@
       </v-card-actions>
     </v-card>
   </v-dialog>
+
+  <v-dialog width="800" v-model="unlockDialog">
+    <v-card>
+      <v-card-title class="text-h5 mt-2"> Unlock the following contracts? </v-card-title>
+
+      <v-alert class="mx-4" type="warning" variant="tonal">Unlocking contracts may take a while to complete.</v-alert>
+      <v-card-text>
+        <v-chip class="ma-1" color="primary" label v-for="c in selectedContracts" :key="c.contractId">
+          {{ c.contractId }}
+        </v-chip>
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn color="anchor" variant="outlined" @click="unlockDialog = false"> Cancel </v-btn>
+        <v-btn
+          color="error"
+          variant="outlined"
+          :loading="unlockContractLoading"
+          @click="unlockContract(selectedContracts.map(contract => contract.contractId))"
+        >
+          Unlock
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script lang="ts" setup>
 // Import necessary types and libraries
-import { ContractStates, type GridClient } from "@threefold/grid_client";
+import { ContractStates, type GridClient, type LockDetails } from "@threefold/grid_client";
 import type { NodeStatus } from "@threefold/gridproxy_client";
 import type { ContractLock } from "@threefold/tfchain_client";
 import { DeploymentKeyDeletionError, TFChainErrors } from "@threefold/types";
@@ -211,6 +245,10 @@ const props = defineProps({
     type: Object as PropType<ContractType>,
     required: true,
   },
+  lockedContracts: {
+    type: Object as PropType<LockDetails>,
+    required: true,
+  },
 });
 const getAmountLocked = computed(() => {
   const amountLocked = contractLocked?.value?.amountLocked ?? 0;
@@ -246,6 +284,15 @@ const profileManagerController = useProfileManagerController();
 const balance = profileManagerController.balance;
 const freeBalance = computed(() => balance.value?.free ?? 0);
 const unlockContractLoading = ref(false);
+const unlockDialog = ref(false);
+
+const selectedLockedContracts = computed(() => {
+  if (selectedContracts.value.length == 0) return false;
+  for (const contract of selectedContracts.value) {
+    if (contract.state != ContractStates.GracePeriod) return false;
+  }
+  return true;
+});
 // Function to show details of a contract
 async function showDetails(value: any) {
   failedContractId.value = undefined;
@@ -330,7 +377,7 @@ async function onDelete() {
 }
 
 // function to unlock grace period contracts
-async function unlockContract(contractId: number) {
+async function unlockContract(contractId: number[]) {
   try {
     unlockContractLoading.value = true;
     await props.grid.value?.contracts.unlockContract(contractId);
