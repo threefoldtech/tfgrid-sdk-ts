@@ -77,6 +77,19 @@
                 </InputTooltip>
               </VCol>
 
+              <VCol cols="6">
+                <InputTooltip tooltip="Network bandwidth.">
+                  <VTextField
+                    label="Bandwidth"
+                    suffix="GB"
+                    min="0"
+                    max="1000000"
+                    :rules="[nuRules]"
+                    v-model="resources.nu"
+                  />
+                </InputTooltip>
+              </VCol>
+
               <VCol cols="12">
                 <InputTooltip tooltip="The amount of TFT to calculate discount.">
                   <VTextField
@@ -191,7 +204,7 @@ import { useProfileManagerController } from "../components/profile_manager_contr
 import { useAsync } from "../hooks";
 import { useProfileManager } from "../stores";
 import { normalizeError } from "../utils/helpers";
-import { balanceRules, cruRules, hruRules, mruRules, sruRules } from "../utils/pricing_calculator";
+import { balanceRules, cruRules, hruRules, mruRules, nuRules, sruRules } from "../utils/pricing_calculator";
 import { computePackageColor, normalizePrice } from "../utils/pricing_calculator";
 
 export default {
@@ -206,6 +219,7 @@ export default {
       mru: "1",
       sru: "25",
       hru: "100",
+      nu: "0",
       balance: "1",
       certified: false,
       ipv4: false,
@@ -274,6 +288,7 @@ export default {
       mruRules,
       sruRules,
       hruRules,
+      nuRules,
       balanceRules,
       userBalance,
       resources,
