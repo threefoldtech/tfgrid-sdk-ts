@@ -18,7 +18,7 @@
                 <v-text-field
                   v-bind="{ ...copyInputProps }"
                   :label="_key"
-                  v-model="currentKey[_key]"
+                  v-model="currentKey[_key as keyof SSHKeyData]"
                   :readonly="_key === 'fingerPrint'"
                   :rules="[(value: string) => !!value || `${_key} is required.`]"
                 />
