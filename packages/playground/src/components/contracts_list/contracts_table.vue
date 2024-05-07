@@ -178,28 +178,60 @@
     </v-card>
   </v-dialog>
 
-  <v-dialog width="800" v-model="unlockDialog">
+  <v-dialog width="500" v-model="unlockDialog">
     <v-card>
-      <v-card-title class="text-h5 mt-2"> Unlock the following contracts? </v-card-title>
-
-      <v-alert class="mx-4" type="warning" variant="tonal">Unlocking contracts may take a while to complete.</v-alert>
+      <v-card-title class="text-h5 pa-0">
+        <v-toolbar color="primary" dark class="custom-toolbar">
+          <p class="mb-9 mt-4">
+            Unlock the following Contract<span v-if="selectedContracts.length > 1">s</span>
+          </p></v-toolbar
+        >
+      </v-card-title>
       <v-card-text>
+        <v-alert class="my-4" type="warning" variant="tonal">
+          <div>
+            Selected contract<span v-if="selectedContracts.length > 1">s</span> Locked amount:
+            <span class="font-weight-bold">{{ lockedAmount.toFixed(4) }} </span> TFTs
+          </div>
+          <div v-if="lockedAmount < freeBalance">
+            You have enough balance to unlock your contract<span v-if="selectedContracts.length > 1">s</span>!
+          </div>
+          <div v-else-if="lockedAmount > 0">
+            You need to fund your account with:
+            <span class="font-weight-bold">{{ Math.ceil(lockedAmount - freeBalance) }} TFTs</span>
+          </div>
+        </v-alert>
         <v-chip class="ma-1" color="primary" label v-for="c in selectedContracts" :key="c.contractId">
           {{ c.contractId }}
         </v-chip>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="anchor" variant="outlined" @click="unlockDialog = false"> Cancel </v-btn>
+          <v-tooltip
+            :text="
+              freeBalance < lockedAmount
+                ? `You don't have enough balance to unlock your contract${selectedContracts.length > 1 ? `s` : ``}`
+                : `Get your contracts ready again`
+            "
+            location="top center"
+          >
+            <template #activator="{ props }">
+              <div v-bind="props">
+                <v-btn
+                  :disabled="lockedAmount > freeBalance"
+                  color="warning"
+                  variant="outlined"
+                  class="ml-2"
+                  :loading="unlockContractLoading"
+                  @click="unlockContract(selectedContracts.map(contract => contract.contractId))"
+                >
+                  Unlock
+                </v-btn>
+              </div>
+            </template>
+          </v-tooltip>
+        </v-card-actions>
       </v-card-text>
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn color="anchor" variant="outlined" @click="unlockDialog = false"> Cancel </v-btn>
-        <v-btn
-          color="error"
-          variant="outlined"
-          :loading="unlockContractLoading"
-          @click="unlockContract(selectedContracts.map(contract => contract.contractId))"
-        >
-          Unlock
-        </v-btn>
-      </v-card-actions>
     </v-card>
   </v-dialog>
 </template>
@@ -293,6 +325,18 @@ const selectedLockedContracts = computed(() => {
   }
   return true;
 });
+
+const lockedAmount = computed(() => {
+  let amount = 0;
+  if (!selectedLockedContracts.value) return amount;
+  else {
+    selectedContracts.value.forEach(item => {
+      amount += props.lockedContracts[item.contractId].amountLocked;
+    });
+    return amount;
+  }
+});
+
 // Function to show details of a contract
 async function showDetails(value: any) {
   failedContractId.value = undefined;
@@ -387,6 +431,7 @@ async function unlockContract(contractId: number[]) {
     );
     setTimeout(() => emits("update:unlock-contracts"), 30000);
     contractStateDialog.value = false;
+    unlockDialog.value = false;
   } catch (e) {
     createCustomToast(`Failed to unlock contract ${contractId}`, ToastType.danger);
     console.error(e);

@@ -58,6 +58,7 @@
                 <v-btn
                   @click.stop
                   v-bind="props"
+                  color="white"
                   icon="mdi-information-outline"
                   height="24px"
                   width="24px"
