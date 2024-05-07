@@ -34,10 +34,7 @@
         :value="githubUrl"
         :rules="[
           validators.required('Github Repository is required.'),
-          validators.isURL('Github Repository must be a valid URL.', {
-            protocols: ['https'],
-          }),
-          validators.isGithubRepo('Github Repository must end with .git'),
+          validators.isGithubRepo('Github Repository  must be a valid URL'),
         ]"
         #="{ props }"
       >
