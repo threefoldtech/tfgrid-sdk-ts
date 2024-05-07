@@ -36,6 +36,13 @@ export function maxLength(msg: string, max: number) {
   };
 }
 
+export function isGithubRepo(msg: string) {
+  return (value: string) => {
+    if (!value.endsWith(".git")) {
+      return { message: msg };
+    }
+  };
+}
 export function equal(msg: string, length: number) {
   return (value: string) => {
     if (value.length !== length) {

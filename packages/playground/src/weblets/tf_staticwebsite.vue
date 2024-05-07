@@ -37,6 +37,7 @@
           validators.isURL('Github Repository must be a valid URL.', {
             protocols: ['https'],
           }),
+          validators.isGithubRepo('Github Repository must end with .git'),
         ]"
         #="{ props }"
       >
@@ -87,6 +88,7 @@
         require-domain
         v-model="selectionDetails"
       />
+      <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
     </form-validator>
 
     <template #footer-actions>
@@ -130,6 +132,10 @@ const dedicated = ref(false);
 const certified = ref(false);
 const rootFilesystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solution.value?.memory ?? 0));
 const selectionDetails = ref<SelectionDetails>();
+const selectedSSHKeys = ref("");
+function updateSSHkeyEnv(selectedKeys: string) {
+  selectedSSHKeys.value = selectedKeys;
+}
 
 function finalize(deployment: any) {
   layout.value.reloadDeploymentsList();
@@ -188,7 +194,7 @@ async function deploy() {
           publicIpv4: ipv4.value,
           mycelium: mycelium.value,
           envs: [
-            { key: "SSH_KEY", value: profileManager.profile!.ssh },
+            { key: "SSH_KEY", value: selectedSSHKeys.value },
             { key: "GITHUB_URL", value: githubUrl.value },
             { key: "GITHUB_BRANCH", value: githubBranch.value },
             { key: "HTML_DIR", value: root.value ? "website/" + root.value : "website" },
@@ -235,12 +241,13 @@ async function deploy() {
 <script lang="ts">
 import Networks from "../components/networks.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
+import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";
 import type { SelectionDetails } from "../types/nodeSelector";
 import rootFs from "../utils/root_fs";
 
 export default {
   name: "TfStaticWebsite",
-  components: { SelectSolutionFlavor, Networks },
+  components: { SelectSolutionFlavor, Networks, ManageSshDeployemnt },
 };
 </script>
