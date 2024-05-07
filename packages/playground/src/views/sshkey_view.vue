@@ -97,7 +97,7 @@
   />
 
   <!-- View -->
-  <ssh-data-dialog :open="isViewKey" :selected-key="selectedKey" @close="isViewKey = false" />
+  <ssh-data-dialog :open="isViewKey" :selected-key="selectedKey" @close="isViewKey = false" @update="updateKeys" />
 </template>
 
 <script lang="ts" setup>
@@ -274,6 +274,17 @@ const addKey = async (key: SSHKeyData) => {
   savingKey.value = false;
   loading.value = false;
   closeDialog();
+};
+
+const updateKeys = async (updatedKey: any) => {
+  const index = allKeys.value.findIndex(key => key.id === updatedKey.value.id);
+  allKeys.value[index] = { ...updatedKey.value };
+  try {
+    await sshKeysManagement.update(allKeys.value);
+    createCustomToast("SSH Key updated successfully.", ToastType.success);
+  } catch (error) {
+    createCustomToast("Failed to update your SSH Key!", ToastType.danger);
+  }
 };
 
 const generateSSHKeys = async (key: SSHKeyData) => {
