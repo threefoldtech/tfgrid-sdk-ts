@@ -276,14 +276,16 @@ const addKey = async (key: SSHKeyData) => {
   closeDialog();
 };
 
-const updateKeys = async (updatedKey: any) => {
-  const index = allKeys.value.findIndex(key => key.id === updatedKey.value.id);
-  allKeys.value[index] = { ...updatedKey.value };
+const updateKeys = async (updatedKey: SSHKeyData) => {
+  const index = allKeys.value.findIndex(key => key.id === updatedKey.id);
+  allKeys.value[index] = { ...updatedKey };
   try {
     await sshKeysManagement.update(allKeys.value);
     createCustomToast("SSH Key updated successfully.", ToastType.success);
   } catch (error) {
-    createCustomToast("Failed to update your SSH Key!", ToastType.danger);
+    createCustomToast("Failed to update the SSH Key.", ToastType.danger);
+  } finally {
+    isViewKey.value = false;
   }
 };
 

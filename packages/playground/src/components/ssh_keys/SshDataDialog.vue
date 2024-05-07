@@ -91,6 +91,7 @@ export default defineComponent({
       newValue => {
         if (newValue) {
           currentKey.value = { ...props.selectedKey };
+          loading.value = false;
         }
       },
     );
@@ -99,14 +100,12 @@ export default defineComponent({
     const sshKeysManagement = new SSHKeysManagement();
     const updateKey = () => {
       loading.value = true;
-      ctx.emit("update", currentKey);
-      ctx.emit("close");
-      loading.value = false;
+      ctx.emit("update", currentKey.value);
     };
 
     function sshRules(value: any) {
       return [
-        (v: string) => !!v || "SSH key is required.",
+        (v: string) => !!v || " The SSH key is required.",
         (v: string) =>
           sshKeysManagement.isValidSSHKey(v) ||
           "The SSH key you provided is not valid. Please double-check that it is copied correctly and follows the correct format.",
