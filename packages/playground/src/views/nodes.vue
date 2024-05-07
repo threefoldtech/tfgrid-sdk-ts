@@ -13,39 +13,25 @@
             <v-switch
               color="primary"
               inset
-              label="Dedicated Nodes (Only)"
+              label="Dedicated Nodes"
               v-model="filters.dedicated"
               density="compact"
               hide-details
             />
           </TfFilter>
           <TfFilter query-route="gateway" v-model="filters.gateway">
-            <v-switch
-              color="primary"
-              inset
-              label="Gateways (Only)"
-              v-model="filters.gateway"
-              density="compact"
-              hide-details
-            />
+            <v-switch color="primary" inset label="Gateways" v-model="filters.gateway" density="compact" hide-details />
           </TfFilter>
 
           <TfFilter query-route="gpu" v-model="filters.gpu">
-            <v-switch
-              color="primary"
-              inset
-              label="GPU Node (Only)"
-              v-model="filters.gpu"
-              density="compact"
-              hide-details
-            />
+            <v-switch color="primary" inset label="GPU Node" v-model="filters.gpu" density="compact" hide-details />
           </TfFilter>
 
           <TfFilter query-route="rentable" v-model="filters.rentable" v-if="profileManager.profile">
             <v-switch
               color="primary"
               inset
-              label="Rentable (Only)"
+              label="Rentable"
               v-model="filters.rentable"
               density="compact"
               hide-details
@@ -140,6 +126,7 @@
               filters.country = $event?.country || '';
               filters.region = $event?.region || '';
             "
+            :only-with-nodes="false"
           >
             <template #region="{ props }">
               <TfFilter query-route="region" v-model="filters.region">
