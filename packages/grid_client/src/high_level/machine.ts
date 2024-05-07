@@ -401,6 +401,7 @@ class VMHL extends HighLevelBase {
       WorkloadTypes.ip,
       WorkloadTypes.ipv4, // TODO: remove deprecated
       WorkloadTypes.zmount,
+      WorkloadTypes.volume,
       WorkloadTypes.zmachine,
       WorkloadTypes.qsfs,
       WorkloadTypes.zlogs,

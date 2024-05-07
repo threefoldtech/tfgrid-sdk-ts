@@ -5,6 +5,7 @@ import { GatewayFQDNProxy, GatewayNameProxy, GatewayResult } from "./gateway";
 import { PublicIPv4, PublicIPv4Result } from "./ipv4"; // TODO: remove deprecated
 import { PublicIP, PublicIPResult } from "./public_ip";
 import { QuantumSafeFS, QuantumSafeFSResult } from "./qsfs";
+import { Volume, VolumeResult } from "./volume";
 import { WorkloadData, WorkloadDataResult } from "./workload_base";
 import { Zdb, ZdbResult } from "./zdb";
 import { Zlogs, ZlogsResult } from "./zlogs";
@@ -21,6 +22,7 @@ enum ResultStates {
 enum WorkloadTypes {
   zmachine = "zmachine",
   zmount = "zmount",
+  volume = "volume",
   network = "network",
   zdb = "zdb",
   ipv4 = "ipv4", // TODO: remove deprecated
@@ -41,6 +43,7 @@ class DeploymentResult {
       property: "__type",
       subTypes: [
         { value: ZmountResult, name: WorkloadTypes.zmount },
+        { value: VolumeResult, name: WorkloadTypes.volume },
         { value: WorkloadDataResult, name: WorkloadTypes.network },
         { value: ZmachineResult, name: WorkloadTypes.zmachine },
         { value: ZdbResult, name: WorkloadTypes.zdb },
@@ -55,6 +58,7 @@ class DeploymentResult {
   })
   data:
     | ZmountResult
+    | VolumeResult
     | ZmachineResult
     | ZdbResult
     | PublicIPResult
@@ -79,6 +83,7 @@ class Workload {
       property: "__type",
       subTypes: [
         { value: Zmount, name: WorkloadTypes.zmount },
+        { value: Volume, name: WorkloadTypes.volume },
         { value: Znet, name: WorkloadTypes.network },
         { value: Zmachine, name: WorkloadTypes.zmachine },
         { value: Zdb, name: WorkloadTypes.zdb },
@@ -94,6 +99,7 @@ class Workload {
   // TODO: remove public IPv4 deprecated
   data:
     | Zmount
+    | Volume
     | Znet
     | Zmachine
     | Zdb
