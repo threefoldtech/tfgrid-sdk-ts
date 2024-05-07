@@ -141,7 +141,7 @@
                 <v-btn
                   :disabled="freeBalance < getAmountLocked"
                   variant="outlined"
-                  color="primary"
+                  color="warning"
                   class="mr-2 px-3"
                   @click="unlockContract([selectedItem.contractId])"
                   :loading="unlockContractLoading"
