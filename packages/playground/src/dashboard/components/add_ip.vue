@@ -105,7 +105,6 @@
 
 <script lang="ts">
 import { TFChainErrors } from "@threefold/types";
-import { contains } from "cidr-tools";
 import { getIPRange } from "get-ip-range";
 import { default as PrivateIp } from "private-ip";
 import { ref, watch } from "vue";
@@ -128,28 +127,14 @@ export default {
     const valid = ref(false);
     const IPs = ref<string[]>();
     const items = ref<string[]>([IPType.single, IPType.range]);
-    const type = ref("Single");
+    const type = ref(IPType.single);
     const publicIP = ref("");
     const loading = ref(false);
     const isAdded = ref(false);
     const isAdding = ref(false);
-    const inRange = ref<boolean>();
     const showIPs = ref(false);
     const toPublicIP = ref("");
     const gateway = ref("");
-
-    watch(
-      [() => publicIP.value, () => gateway.value],
-      ([newPublicIP, newGateway], [_, _2]) => {
-        try {
-          inRange.value = contains(newPublicIP, newGateway);
-        } catch (e) {
-          inRange.value = false;
-        }
-        gatewayCheck();
-      },
-      { immediate: true },
-    );
 
     function ipcheck() {
       if (PrivateIp(publicIP.value.split("/")[0])) {
@@ -159,6 +144,14 @@ export default {
       }
       return undefined;
     }
+
+    watch(
+      type,
+      () => {
+        publicIP.value = toPublicIP.value = gateway.value = "";
+      },
+      { deep: true },
+    );
 
     function toIpCheck() {
       if (toPublicIP.value.split("/")[1] !== publicIP.value.split("/")[1]) {
@@ -202,16 +195,24 @@ export default {
     }
 
     function gatewayCheck() {
-      if (!inRange.value) {
-        return {
-          message: "Gateway IP not in the provided IP range.",
-        };
-      }
-      if (publicIP?.value.split("/")[0] === gateway.value || toPublicIP?.value.split("/")[0] === gateway.value) {
+      const startIP = publicIP?.value.split("/")[0];
+      const lastIP = toPublicIP?.value.split("/")[0];
+
+      if (startIP === gateway.value || lastIP === gateway.value) {
         return {
           message: "IPs cannot be the same.",
         };
       }
+
+      if (type.value !== IPType.single) {
+        const range = getIPRange(startIP, lastIP);
+        if (range.includes(gateway.value)) {
+          return {
+            message: "The gateway IP shouldn't be in the IPs range.",
+          };
+        }
+      }
+
       return undefined;
     }
 
@@ -289,7 +290,6 @@ export default {
       loading,
       isAdded,
       isAdding,
-      inRange,
       showIPs,
       IPType,
       showRange,
