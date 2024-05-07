@@ -205,13 +205,17 @@
             <v-spacer />
             <ul class="pl-2">
               <li>
-                {{ rentedByUser ? "You receive " : "You'll receive " }} a 50%
+                {{ rentedByUser ? "You receive " : "You'll receive " }} a
+                <strong class="mr-1">50%</strong>
                 <a target="_blank" :href="manual?.billing_pricing">discount</a>
                 {{ rentedByUser ? " as you reserve the" : " if you reserve the" }}
                 entire node
               </li>
               <li>
-                {{ rentedByUser ? "You receive" : "You'll receive" }} a {{ stakingDiscount }}% discount as per the
+                {{ rentedByUser ? "You receive" : "You'll receive" }} a
+                <VProgressCircular indeterminate size="10" width="1" color="info" v-if="loadingStakingDiscount" />
+                <strong v-else>{{ stakingDiscount }}%</strong>
+                discount as per the
                 <a target="_blank" :href="manual?.discount_levels"> staking discounts </a>
               </li>
             </ul>
@@ -231,7 +235,7 @@
 <script lang="ts">
 import type { NodeInfo, NodeResources } from "@threefold/grid_client";
 import { CertificationType, type GridNode } from "@threefold/gridproxy_client";
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { capitalize } from "vue";
 
 import ReserveBtn from "@/dashboard/components/reserve_action_btn.vue";
@@ -262,6 +266,7 @@ export default {
     const profileManager = useProfileManager();
     const node = ref(props.node);
     const stakingDiscount = ref<number>();
+    const loadingStakingDiscount = ref<boolean>(false);
     const rentedByUser = computed(() => {
       return props.node?.rentedByTwinId === profileManager.profile?.twinId;
     });
@@ -279,11 +284,24 @@ export default {
       return imageUrl;
     });
 
-    onMounted(async () => {
+    async function mounted() {
+      loadingStakingDiscount.value = true;
       if (props.node) {
         stakingDiscount.value = (await getStakingDiscount()) || 0;
       }
-    });
+      loadingStakingDiscount.value = false;
+    }
+
+    onMounted(async () => await mounted());
+
+    watch(
+      () => profileManager.profile,
+      async () => {
+        await mounted();
+      },
+      { immediate: true, deep: true },
+    );
+
     // A guard to check node type
     function isGridNode(node: unknown): node is GridNode {
       return !!node && typeof node === "object" && "num_gpu" in node;
@@ -427,7 +445,6 @@ export default {
       sruText,
       hruText,
       countryFlagSrc,
-      toReadableDate,
       dedicated,
       serialNumber,
       num_gpu,
@@ -438,6 +455,9 @@ export default {
       dmi,
       manual,
       rentedByUser,
+      loadingStakingDiscount,
+
+      toReadableDate,
       stakingDiscount,
       checkSerialNumber,
       capitalize,
