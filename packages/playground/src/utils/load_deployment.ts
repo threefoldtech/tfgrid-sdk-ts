@@ -127,9 +127,11 @@ export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
   );
 
   const data = vms.map((vm, index) => {
-    vm[0].billing = formatConsumption(consumptions[index] as number);
-    if (wireguards[index] && wireguards[index].length > 0) {
-      vm[0].wireguard = wireguards[index][0];
+    for (let i = 0; i < vm.length; i++) {
+      vm[i].billing = formatConsumption(consumptions[index] as number);
+      if (wireguards[index] && wireguards[index].length > 0) {
+        vm[i].wireguard = wireguards[index][0];
+      }
     }
 
     return vm;
