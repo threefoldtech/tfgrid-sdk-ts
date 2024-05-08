@@ -138,7 +138,6 @@
                       valid-message="Mnemonic or Hex Seed is valid."
                       #="{ props: validationProps }"
                       ref="mnemonicInput"
-                      :disable-validation="creatingAccount || activatingAccount || activating"
                     >
                       <v-row>
                         <v-col cols="12" md="9">
@@ -722,6 +721,7 @@ async function createNewAccount() {
   openAcceptTerms.value = false;
   termsLoading.value = false;
   enableReload.value = false;
+  mnemonicInput.value.reset();
   clearError();
   creatingAccount.value = true;
   try {
