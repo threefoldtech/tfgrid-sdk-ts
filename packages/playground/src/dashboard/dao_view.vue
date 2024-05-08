@@ -6,7 +6,7 @@
     </v-card>
 
     <div class="d-flex my-6 align-center justify-center" v-if="loadingProposals">
-      <v-progress-circular indeterminate />
+      <v-progress-circular indeterminate color="primary" />
     </div>
 
     <div v-else-if="proposals?.active?.length == 0 && proposals?.inactive?.length == 0">
@@ -143,7 +143,8 @@
                             </v-col>
                             <v-col class="d-flex align-center justify-end mr-2">
                               <v-chip color="info">
-                                {{ proposal.threshold }} {{ proposal.threshold > 1 ? "votes" : "vote" }}
+                                {{ proposal.threshold }}
+                                {{ proposal.threshold > 1 ? "votes" : "vote" }}
                               </v-chip>
                             </v-col>
                           </v-row>
@@ -153,7 +154,8 @@
                             </v-col>
                             <v-col class="d-flex align-center justify-end mr-2">
                               <v-chip color="info">
-                                {{ proposal.ayes.length }} {{ proposal.ayes.length > 1 ? "votes" : "vote" }}
+                                {{ proposal.ayes.length }}
+                                {{ proposal.ayes.length > 1 ? "votes" : "vote" }}
                               </v-chip>
                             </v-col>
                           </v-row>
@@ -163,7 +165,8 @@
                             </v-col>
                             <v-col class="d-flex align-center justify-end mr-2">
                               <v-chip color="info">
-                                {{ proposal.nayes.length }} {{ proposal.nayes.length > 1 ? "votes" : "vote" }}
+                                {{ proposal.nayes.length }}
+                                {{ proposal.nayes.length > 1 ? "votes" : "vote" }}
                               </v-chip>
                             </v-col>
                           </v-row>

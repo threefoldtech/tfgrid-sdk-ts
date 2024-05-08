@@ -9,7 +9,7 @@
         <v-row align="center" justify="center">
           <v-col cols="12" sm="6" md="4">
             <div class="d-flex my-6 align-center justify-center">
-              <v-progress-circular indeterminate v-if="loading" />
+              <v-progress-circular indeterminate v-if="loading" color="primary" />
             </div>
           </v-col>
         </v-row>

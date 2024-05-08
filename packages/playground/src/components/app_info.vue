@@ -12,7 +12,7 @@
     scrollable
   >
     <v-card v-if="loading" class="d-flex justify-center align-center pa-10">
-      <v-progress-circular indeterminate />
+      <v-progress-circular indeterminate color="primary" />
     </v-card>
     <v-card v-else class="markdown">
       <v-card-title class="font-weight-bold d-flex align-center text-h5 my-2" v-if="title">

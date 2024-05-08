@@ -19,7 +19,7 @@
 
     <v-row justify="center">
       <div class="d-flex my-6 align-center justify-center">
-        <v-progress-circular v-if="loading" indeterminate class="mt-10 mb-10" />
+        <v-progress-circular v-if="loading" indeterminate class="mt-10 mb-10" color="primary" />
       </div>
       <v-btn rounded="md" variant="flat" color="primary" class="mt-10" @click="getNodeHealthUrl">
         Check Node Health
