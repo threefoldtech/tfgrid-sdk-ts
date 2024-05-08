@@ -91,7 +91,7 @@
             <template #activator="{ props }">
               <VChip
                 v-bind="props"
-                :color="node?.status === 'up' ? 'success' : 'error'"
+                :color="getNodeStatusColor(node?.status)"
                 class="mr-2"
                 :text="capitalize(node.status)"
               />
@@ -437,6 +437,16 @@ export default {
       ctx.emit("update:node", n);
     }
 
+    function getNodeStatusColor(status: string): string {
+      if (status === "up") {
+        return "success";
+      } else if (status === "standby") {
+        return "warning";
+      } else {
+        return "error";
+      }
+    }
+
     return {
       cruText,
       mruText,
@@ -454,14 +464,15 @@ export default {
       manual,
       rentedByUser,
       loadingStakingDiscount,
+      stakingDiscount,
 
       toReadableDate,
-      stakingDiscount,
       checkSerialNumber,
       capitalize,
       formatResourceSize,
       formatSpeed,
       onReserveChange,
+      getNodeStatusColor,
     };
   },
 };
