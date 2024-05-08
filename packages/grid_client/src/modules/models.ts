@@ -340,7 +340,7 @@ class GetServiceContractModel {
   @Expose() @IsInt() @Min(1) serviceId: number;
 }
 class NameContractGetModel {
-  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
+  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength + 20) name: string;
 }
 
 class NodeContractUpdateModel {
