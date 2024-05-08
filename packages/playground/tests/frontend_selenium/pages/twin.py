@@ -10,9 +10,9 @@ This module contains Twin page elements.
 """
 class TwinPage:
 
-    logout_button = (By.XPATH, '/html/body/div[1]/div/div/main/header[1]/div/div[3]/button')
-    tfchain_button = (By.XPATH, '/html/body/div[1]/div/div/nav/div/div[1]/div/div/div[4]/div[1]/div[3]')
-    your_profile_button = (By.XPATH, '/html/body/div[1]/div/div/nav/div/div[1]/div/div/div[4]/div[2]/div[1]')
+    logout_button = (By.XPATH, "//button[.//span[text()=' Logout ']]")
+    tfchain_button = (By.XPATH, "//span[text()='TFChain']")
+    your_profile_button = (By.XPATH, "//span[text()='Your Profile']")
     twin_details_label = (By.XPATH, "//*[contains(text(), 'Twin Details')]")
     get_tft_button = (By.XPATH, "/html/body/div[1]/div/div/main/header/div/div[2]/div/div/div/div/button")
     locked_info_button = (By.XPATH, '/html/body/div[1]/div/div/main/header/div/div[3]/div[2]/p[2]/a/span[3]/i')

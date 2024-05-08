@@ -39,8 +39,8 @@ def test_valid_address(browser):
     """
     transfer_page = before_test_setup(browser)
     transfer_page.by_twin_address()
-    transfer_page.recipient_input('5FWW1F7XHaiRgPEqJdkv9nVgz94AVKXkTKNyfbLcY4rqpaNM')
     transfer_page.amount_tft_input(valid_amount())
+    transfer_page.recipient_input('5FWW1F7XHaiRgPEqJdkv9nVgz94AVKXkTKNyfbLcY4rqpaNM')
     assert transfer_page.wait_for_button(transfer_page.get_address_submit()).is_enabled() == True
 
 
@@ -112,8 +112,8 @@ def test_valid_amount(browser):
     """
     transfer_page = before_test_setup(browser)
     transfer_page.by_twin_address()
-    transfer_page.recipient_input('5FWW1F7XHaiRgPEqJdkv9nVgz94AVKXkTKNyfbLcY4rqpaNM')
     transfer_page.amount_tft_input(valid_amount())
+    transfer_page.recipient_input('5FWW1F7XHaiRgPEqJdkv9nVgz94AVKXkTKNyfbLcY4rqpaNM')
     assert transfer_page.wait_for_button(transfer_page.get_address_submit()).is_enabled() == True
 
 
@@ -129,6 +129,7 @@ def test_invalid_amount(browser):
     """
     transfer_page = before_test_setup(browser)
     transfer_page.by_twin_address()
+    transfer_page.amount_tft_input(2)
     transfer_page.recipient_input('5FWW1F7XHaiRgPEqJdkv9nVgz94AVKXkTKNyfbLcY4rqpaNM')
     balance = transfer_page.get_balance()
     cases = ['-900.009', invalid_amount_negtive()]
@@ -166,8 +167,8 @@ def test_transfer_tfts_on_tfchain_by_twin_address(browser):
     balance = transfer_page.get_balance()
     min_balance = float(balance)-1
     max_balance = float(balance)-1.1
-    transfer_page.recipient_input('5FWW1F7XHaiRgPEqJdkv9nVgz94AVKXkTKNyfbLcY4rqpaNM')
     transfer_page.amount_tft_input(1.01)
+    transfer_page.recipient_input('5FWW1F7XHaiRgPEqJdkv9nVgz94AVKXkTKNyfbLcY4rqpaNM')
     transfer_page.wait_for_button(transfer_page.get_address_submit()).click()
     assert transfer_page.wait_for('Transaction Complete!')
     assert format(float(max_balance),'.3f') <= format(float(transfer_page.get_balance_transfer(balance)),'.3f') <= format(float(min_balance),'.3f')

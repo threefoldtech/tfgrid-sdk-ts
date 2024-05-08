@@ -45,7 +45,6 @@ def test_tft_price(browser):
     usd_in_tft = float(dashboard_page.usd_price_result()[:-4])
     # Consider that the original value has a precision of 7 digits, but it's approximated to only 3 digits.
     # An error of 0.002 is considered acceptable.
-    print(tft_in_usd)
     assert math.isclose(dashboard_page.get_tft_price(), tft_in_usd, abs_tol=0.002)
     assert 0.99 < tft_in_usd * usd_in_tft < 1.1
 
@@ -152,7 +151,7 @@ def test_account_validation(browser):
     assert dashboard_page.wait_for('Passwords should match')
     dashboard_page.click_button(dashboard_page.connect_your_wallet(get_email(), '123456'))
     dashboard_page.open_profile()
-    assert dashboard_page.manual_link() == 'https://www.manual.grid.tf/threefold_token/storing_tft/tf_connect_app.html'
+    assert dashboard_page.manual_link() == 'https://www.manual.grid.tf/documentation/threefold_token/storing_tft/tf_connect_app.html'
     assert dashboard_page.get_mnemonic() == get_seed()
     assert dashboard_page.get_email() == get_email()
     assert grid_proxy.get_twin_address(dashboard_page.get_id()) == dashboard_page.get_address()

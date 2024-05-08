@@ -2,6 +2,7 @@ from utils.utils import generate_leters, generate_string, get_email, get_seed, g
 from pages.dashboard import DashboardPage
 from utils.grid_proxy import GridProxy
 from pages.bridge import BridgePage
+
 #  Time required for the run (11 cases) is approximately 3 minutes.
 
 

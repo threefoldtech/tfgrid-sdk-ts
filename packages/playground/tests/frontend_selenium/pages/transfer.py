@@ -1,7 +1,6 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.alert import Alert
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
@@ -11,23 +10,22 @@ This module contains Transfer page elements.
 
 class TransferPage:
 
-    logout_button = (By.XPATH, '/html/body/div[1]/div/div/main/header[1]/div/div[3]/button')
-    tfchain_button = (By.XPATH, '/html/body/div[1]/div/div/nav/div/div[1]/div/div/div[4]/div[1]/div[3]')
-    transfer_page = (By.XPATH, '/html/body/div[1]/div/div/nav/div/div[1]/div/div/div[4]/div[2]/div[4]')
-    twin_page = (By.XPATH, '/html/body/div[1]/div/div/nav/div/div[1]/div/div/div[4]/div[2]/div[1]')
-    twin_address_input = (By.XPATH, '/html/body/div[1]/div/div/main/div[1]/div[2]/div/div/div[2]/div[3]/div/div[2]/div/div[2]/div/div/div[1]/div/div[3]/input')
-    twin_address_amount_input = (By.XPATH, '/html/body/div[1]/div/div/main/div[1]/div[2]/div/div/div[2]/div[3]/div/div[2]/div/div[3]/div/div/div[1]/div/div[3]/input')
-    submit_id_button = (By.XPATH, '/html/body/div[1]/div/div/main/div[1]/div[2]/div/div/div[2]/div[3]/div/div[1]/div/div[4]/button[2]')
-    submit_address_button = (By.XPATH, '/html/body/div[1]/div/div/main/div[1]/div[2]/div/div/div[2]/div[3]/div/div[2]/div/div[4]/button[2]')
-    address = (By.XPATH, '/html/body/div[1]/div[3]/div/div/div/div')
+    logout_button = (By.XPATH, "//button[.//span[text()=' Logout ']]")
+    tfchain_button = (By.XPATH, "//span[text()='TFChain']")
+    transfer_page = (By.XPATH, "//span[text()='TF Token Transfer']")
+    twin_page = (By.XPATH, "//span[text()='Your Profile']")
+    twin_address_input = (By.XPATH, "(//label[text()='Recipient Address:']/following-sibling::input)[1]")
+    twin_address_amount_input = (By.XPATH, "(//label[text()='Transfer Amount:']/following-sibling::input)[2]")
+    submit_id_button = (By.XPATH, "(//button[.//span[text()='Send']])[1]")
+    submit_address_button =  (By.XPATH, "(//button[.//span[text()='Send']])[2]")
     twin_details = (By.XPATH, "//*[contains(text(), 'Twin Details')]")
     transfer_tft_title = (By.XPATH, "//*[contains(text(), 'Transfer TFTs on the TFChain')]")
     balance_text = (By.XPATH,'/html/body/div[1]/div/div/main/header/div/div[3]/div[2]/p[1]/strong')
     twin_address_text = (By.XPATH, '/html/body/div[1]/div/div/main/div/div[2]/div/div/div/div[2]/div[2]/div[1]/div/div[3]/div[2]/div/div/div/div[1]/span')
-    twin_id_input = (By.XPATH, '/html/body/div[1]/div/div/main/div[1]/div[2]/div/div/div[2]/div[3]/div/div[1]/div/div[2]/div/div/div[1]/div/div[3]/input')
-    twin_id_amount_input = (By.XPATH, '/html/body/div[1]/div/div/main/div[1]/div[2]/div/div/div[2]/div[3]/div/div[1]/div/div[3]/div/div/div[1]/div/div[3]/input')
+    twin_id_input = (By.XPATH, "//label[text()='Recipient Twin ID:']/following-sibling::input")
+    twin_id_amount_input = (By.XPATH, "//label[text()='Transfer Amount:']/following-sibling::input")
     twin_id_label = (By.XPATH, '/html/body/div[1]/div/div/main/div/div[2]/div/div/div/div[2]/div[2]/div[1]/div/div[1]/div[2]/div/div/div')
-    by_twin_address_button = (By.XPATH, "/html/body/div[1]/div/div/main/div[1]/div[2]/div/div/div[2]/div[2]/div/div/button[2]")
+    by_twin_address_button = (By.XPATH, "//button[.//span[text()='By Address']]")
 
 
     def __init__(self, browser):
@@ -39,10 +37,6 @@ class TransferPage:
         self.browser.find_element(*self.tfchain_button).click()
         self.browser.find_element(*self.transfer_page).click()
         WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.transfer_tft_title))
-
-    def recipient_list(self):
-        self.browser.find_element(*self.twin_address_input).click()
-        return self.browser.find_element(*self.address).text
 
     def recipient_input(self, data):
         self.browser.find_element(*self.twin_address_input).send_keys(Keys.CONTROL + "a")

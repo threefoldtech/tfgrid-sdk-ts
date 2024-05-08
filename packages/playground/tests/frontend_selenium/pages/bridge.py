@@ -11,21 +11,21 @@ This module contains Bridge page elements.
 
 class BridgePage:
 
-    logout_button = (By.XPATH, '/html/body/div[1]/div/div/main/header[1]/div/div[3]/button')
-    tfchain_button = (By.XPATH, '/html/body/div[1]/div/div/nav/div/div[1]/div/div/div[4]/div[1]/div[3]')
-    bridge_page = (By.XPATH, '/html/body/div[1]/div/div/nav/div/div[1]/div/div/div[4]/div[2]/div[3]')
+    logout_button = (By.XPATH, "//button[.//span[text()=' Logout ']]")
+    tfchain_button = (By.XPATH, "//span[text()='TFChain']")
+    bridge_page = (By.XPATH, "//span[text()='TF Token Bridge']")
     transfer_tft_title = (By.XPATH, "//*[contains(text(), 'Transfer TFT Across Chains')]")
     stellar_choose = (By.XPATH, "//*[contains(text(), 'stellar')]")
-    withdraw = (By.XPATH, "/html/body/div[1]/div/div/main/div[1]/div[2]/div/div/div[2]/div[3]/div/button[1]")
-    deposit = (By.XPATH, "/html/body/div[1]/div/div/main/div[1]/div[2]/div/div/div[2]/div[3]/div/button[2]")
-    howdone = (By.XPATH, "/html/body/div[1]/div/div/main/div[1]/div[2]/div/div/div[2]/div[3]/button")
+    withdraw = (By.XPATH, "//button[.//span[text()='Withdraw']]")
+    deposit =  (By.XPATH, "//button[.//span[text()='Deposit']]")
+    howdone =  (By.XPATH, "//button[.//span[text()='Learn How?']]")
     deposite_bridge_address = (By.XPATH, "(//input[@class='v-field__input'])[2]")
     twin_id_text = (By.XPATH,"(//input[@class='v-field__input'])[3]")
     twin_address_text = (By.XPATH, '/html/body/div[1]/div/div/main/div/div[2]/div/div/div/div[2]/div[2]/div[1]/div/div[3]/div[2]/div/div/div/div[1]/span')
-    twin_page = (By.XPATH, '/html/body/div[1]/div/div/nav/div/div[1]/div/div/div[4]/div[2]/div[1]')
+    twin_page = (By.XPATH, "//span[text()='Your Profile']")
     deposit_close_button = (By.XPATH, "//button[.//span[text()=' Close ']]")
     deposit_learn_button = (By.XPATH, "//a[.//span[text()='Learn more?']]")
-    stellar_address =(By.XPATH, "/html/body/div[2]/div[35]/div[2]/div/div[3]/div[1]/div[1]/div/div[3]/input")
+    stellar_address = (By.XPATH, "//label[text()='Stellar Target Wallet Address']/following-sibling::input")
     amount_tft = (By.XPATH, "//input[@class='v-field__input' and @type='number']")
     submit_button = (By.XPATH, "//button[.//span[text()='Send']]")
     balance_text = (By.XPATH,'/html/body/div[1]/div/div/main/header/div/div[3]/div[2]/p[1]/strong')
@@ -125,7 +125,12 @@ class BridgePage:
         return self.browser.find_element(*self.submit_button)
     
     def get_balance(self):
-        return self.browser.find_element(*self.balance_text).text[:-4]
+        new_balance = self.browser.find_element(*self.balance_text).text[:-4]
+        WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.transfer_tft_title))
+        while('Loadin' in new_balance):
+            self.wait_for(' Balance: ')
+            new_balance = self.browser.find_element(*self.balance_text).text[:-4]
+        return new_balance
     
     def get_balance_withdraw(self, balance):
         new_balance = self.browser.find_element(*self.balance_text).text[:-4]
