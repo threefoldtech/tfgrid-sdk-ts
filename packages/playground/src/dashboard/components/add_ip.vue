@@ -10,7 +10,7 @@
             <p class="mb-5">Add Public IP to Farm</p>
           </v-toolbar>
           <div class="pa-6">
-            <form-validator v-model="valid">
+            <form-validator ref="formValidator" v-model="valid">
               <v-select
                 :items="items"
                 label="Choose how to enter IP"
@@ -122,19 +122,32 @@ export default {
     },
   },
   setup(_, context) {
-    const showDialogue = ref(false);
     const gridStore = useGrid();
-    const valid = ref(false);
     const IPs = ref<string[]>();
     const items = ref<string[]>([IPType.single, IPType.range]);
     const type = ref(IPType.single);
-    const publicIP = ref("");
+
+    const showDialogue = ref(false);
+    const valid = ref(false);
     const loading = ref(false);
     const isAdded = ref(false);
     const isAdding = ref(false);
     const showIPs = ref(false);
+
+    const publicIP = ref("");
     const toPublicIP = ref("");
     const gateway = ref("");
+
+    const formValidator = ref();
+
+    watch(
+      [publicIP, toPublicIP, gateway],
+      async () => {
+        if (publicIP.value.length || toPublicIP.value.length || gateway.value.length)
+          await formValidator.value.validate();
+      },
+      { deep: true },
+    );
 
     function ipcheck() {
       if (PrivateIp(publicIP.value.split("/")[0])) {
@@ -205,10 +218,16 @@ export default {
       }
 
       if (type.value !== IPType.single) {
-        const range = getIPRange(firstIP, lastIP);
-        if (range.includes(gateway.value)) {
+        try {
+          const range = getIPRange(firstIP, lastIP);
+          if (range.includes(gateway.value)) {
+            return {
+              message: "The gateway IP shouldn't be in the IPs range.",
+            };
+          }
+        } catch (error: any) {
           return {
-            message: "The gateway IP shouldn't be in the IPs range.",
+            message: error.message,
           };
         }
       }
@@ -292,16 +311,18 @@ export default {
       isAdding,
       showIPs,
       IPType,
+      formValidator,
+      type,
+      publicIP,
+      toPublicIP,
+      gateway,
+
       showRange,
       addIPs,
       addFarmIp,
       ipcheck,
       toIpCheck,
       gatewayCheck,
-      type,
-      publicIP,
-      toPublicIP,
-      gateway,
     };
   },
 };
