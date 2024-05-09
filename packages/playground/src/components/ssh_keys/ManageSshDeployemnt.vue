@@ -83,7 +83,12 @@
   </v-dialog>
 
   <!-- View SSH Key -->
-  <ssh-data-dialog :open="isViewSSHKey" :selected-key="selectedKey" @close="onCloseSelectKey" />
+  <ssh-data-dialog
+    :open="isViewSSHKey"
+    :selected-key="selectedKey"
+    :all-keys="selectedKeys"
+    @close="onCloseSelectKey"
+  />
 </template>
 
 <script lang="ts">
