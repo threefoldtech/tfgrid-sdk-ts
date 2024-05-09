@@ -1,0 +1,138 @@
+import { FilterOptions, GatewayNameModel, generateString, MachinesModel } from "../src";
+import { config, getClient } from "./client_loader";
+import { log } from "./utils";
+
+async function deployVM(client, vms) {
+  try {
+    const res = await client.machines.deploy(vms);
+    log("================= Deploying Discourse =================");
+    log(res);
+    log("================= Deploying Discourse =================");
+    return res;
+  } catch (error) {
+    log("Error while Deploying the VM " + error);
+  }
+}
+
+async function deployGateway(client, gw) {
+  try {
+    const res = await client.gateway.deploy_name(gw);
+    log("================= Deploying name gateway =================");
+    log(res);
+    log("================= Deploying name gateway =================");
+  } catch (error) {
+    log("Error deploying gateway " + error);
+  }
+}
+
+async function getDeployment(client, vms) {
+  try {
+    const res = await client.machines.getObj(vms);
+    log("================= Getting VM deployment information =================");
+    log(res);
+    log(`You can access Discourse via the browser using: http://captain.${res[0].env.DISCOURSE_HOSTNAME}`);
+    log("================= Getting VM deployment information =================");
+    return res;
+  } catch (error) {
+    log("Error while getting the deployment " + error);
+  }
+}
+
+async function cancelDeployment(client, vms) {
+  try {
+    const res = await client.machines.delete(vms);
+    log("================= Canceling the deployment =================");
+    log(res);
+    log("================= Canceling the deployment =================");
+  } catch (error) {
+    log("Error while canceling the deployment " + error);
+  }
+}
+
+async function main() {
+  const grid3 = await getClient();
+
+  const vmQueryOptions: FilterOptions = {
+    cru: 4,
+    mru: 4, // GB
+    sru: 10,
+    farmId: 1,
+  };
+
+  const vms: MachinesModel = {
+    name: "newVMS5",
+    network: {
+      name: "wedtest",
+      ip_range: "10.249.0.0/16",
+    },
+    machines: [
+      {
+        name: "testvm",
+        node_id: +(await grid3.capacity.filterNodes(vmQueryOptions))[0].nodeId,
+        disks: [
+          {
+            name: "wedDisk",
+            size: 8,
+            mountpoint: "/var/lib/docker",
+          },
+        ],
+        public_ip: true,
+        public_ip6: false,
+        planetary: false,
+        mycelium: true,
+        cpu: 4,
+        memory: 1024 * 4,
+        rootfs_size: 0,
+        flist: "https://hub.grid.tf/tf-official-apps/forum-docker-v3.1.2.flist",
+        entrypoint: "/sbin/zinit init",
+        env: {
+          SSH_KEY: config.ssh_key,
+          DISCOURSE_HOSTNAME: "gent02.dev.grid.tf",
+          DISCOURSE_DEVELOPER_EMAILS: "test12@gmail.com",
+          DISCOURSE_SMTP_ADDRESS: "test12@gmail.com",
+          DISCOURSE_SMTP_PORT: "22",
+          DISCOURSE_SMTP_ENABLE_START_TLS: "false",
+          DISCOURSE_SMTP_USER_NAME: "",
+          DISCOURSE_SMTP_PASSWORD: "",
+          THREEBOT_PRIVATE_KEY: "",
+          FLASK_SECRET_KEY: generateString(8),
+        },
+      },
+    ],
+    metadata: "",
+    description: "discourse machine/node",
+  };
+
+  const vmDeployResult = await deployVM(grid3, vms);
+  const publicIP = vmDeployResult.public_ip;
+
+  const gatewayQueryOptions: FilterOptions = {
+    gateway: true,
+    farmId: 1,
+  };
+
+  const gw: GatewayNameModel = {
+    name: "discourse-gateway",
+    node_id: +(await grid3.capacity.filterNodes(gatewayQueryOptions))[0].nodeId,
+    tls_passthrough: false,
+    backends: [`http://${publicIP}:80`],
+  };
+
+  await deployGateway(grid3, gw);
+
+  //Deploy discourse
+  await deploy(grid3, vms);
+  await deployGateway(grid3, gw);
+
+  //Get the deployment
+  await getDeployment(grid3, vms.name);
+  await getDeployment(grid3, vms.name, gw.name);
+
+  //Uncomment the line below to cancel the deployment
+  // await cancel(grid3, { name: vms.name });
+  // await cancelDeployment(grid3, { name: gw.name });
+
+  await grid3.disconnect();
+}
+
+main();
