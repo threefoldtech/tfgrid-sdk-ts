@@ -13,7 +13,11 @@ const vuetify = createVuetify({
     VProgressCircular: {
       size: 50,
       width: 7,
-      color: "primary",
+    },
+    VBtn: {
+      VProgressCircular: {
+        color: undefined,
+      },
     },
   },
   components: {
