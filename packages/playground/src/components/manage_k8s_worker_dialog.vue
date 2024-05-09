@@ -48,18 +48,17 @@
 <script lang="ts" setup>
 import { ref } from "vue";
 
-import { useProfileManager } from "../stores";
+import { useGrid } from "../stores";
 import { deleteWorker, deployWorker, loadK8S } from "../utils/deploy_k8s";
-import { getGrid } from "../utils/grid";
 
 const props = defineProps<{ data: K8S }>();
 const emits = defineEmits<{ (event: "close"): void; (event: "update:k8s", data: any): void }>();
 
-const profileManager = useProfileManager();
-
 const worker = ref(createWorker());
 const selectedWorkers = ref<any[]>([]);
 const deleting = ref(false);
+const gridStore = useGrid();
+const grid = gridStore.client as GridClient;
 
 function calcDiskSize(disks: { size: number }[]) {
   return disks.reduce((t, d) => t + d.size, 0) / 1024 ** 3;
@@ -67,7 +66,6 @@ function calcDiskSize(disks: { size: number }[]) {
 
 async function deploy(layout: any) {
   layout.setStatus("deploy");
-  const grid = await getGrid(profileManager.profile!, props.data.projectName);
 
   deployWorker(grid!, {
     ...worker.value,
@@ -86,7 +84,6 @@ async function deploy(layout: any) {
 
 async function onDelete(cb: (workers: any[]) => void) {
   deleting.value = true;
-  const grid = await getGrid(profileManager.profile!, props.data.projectName);
 
   for (const worker of selectedWorkers.value) {
     try {
@@ -108,6 +105,8 @@ async function onDelete(cb: (workers: any[]) => void) {
 </script>
 
 <script lang="ts">
+import type { GridClient } from "@threefold/grid_client";
+
 import ListTable from "../components/list_table.vue";
 import type { K8S } from "../utils/load_deployment";
 import K8SWorker, { createWorker } from "./k8s_worker.vue";

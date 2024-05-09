@@ -33,7 +33,7 @@
           <v-progress-circular
             v-if="deleting && selectedItems.includes(item)"
             class="ml-3"
-            color="red"
+            color="error"
             :width="2"
             :size="20"
             indeterminate

@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { ContractStates, type GqlContracts, type GqlNodeContract, type GqlRentContract } from "@threefold/grid_client";
-import type { GridNode } from "@threefold/gridproxy_client";
 import uniq from "lodash/fp/uniq.js";
 import { onMounted, ref } from "vue";
 

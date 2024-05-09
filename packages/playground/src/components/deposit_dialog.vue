@@ -83,9 +83,8 @@ import { manual } from "@/utils/manual";
 
 import { useProfileManagerController } from "../components/profile_manager_controller.vue";
 import QrcodeGenerator from "../components/qrcode_generator.vue";
-import { useProfileManager } from "../stores";
+import { useGrid, useProfileManager } from "../stores";
 import { createCustomToast, ToastType } from "../utils/custom_toast";
-import { getGrid } from "../utils/grid";
 import CopyReadonlyInput from "./copy_readonly_input.vue";
 const depositDialog = ref(false);
 const emits = defineEmits(["close"]);
@@ -95,6 +94,8 @@ const loading = ref(false);
 const dots = ref(".");
 const interval = ref<number | null>(null);
 const ProfileManagerController = useProfileManagerController();
+const gridStore = useGrid();
+const grid = gridStore.client as GridClient;
 
 const apps = [
   {
@@ -141,7 +142,7 @@ onMounted(async () => {
   interval.value = window.setInterval(loadingDots, 500);
   try {
     loading.value = true;
-    const grid = await getGrid(profileManager.profile!);
+    updateGrid(grid, { projectName: "" });
     const address = profileManager.profile?.address as string;
     const receivedDeposit = await grid!.bridge.listenToMintCompleted({
       address: address,
@@ -171,7 +172,10 @@ onBeforeUnmount(() => {
 });
 </script>
 <script lang="ts">
+import type { GridClient } from "@threefold/grid_client";
 import { defineComponent } from "vue";
+
+import { updateGrid } from "../utils/grid";
 
 export default defineComponent({
   name: "DepositDialog",

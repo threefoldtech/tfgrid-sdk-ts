@@ -129,12 +129,11 @@ import { computed, type Ref, ref } from "vue";
 import { manual } from "@/utils/manual";
 
 import { useLayout } from "../components/weblet_layout.vue";
-import { useProfileManager } from "../stores";
+import { useGrid, useProfileManager } from "../stores";
 import type { Flist, solutionFlavor as SolutionFlavor } from "../types";
 import { ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
 import { deployGatewayName, getSubdomain, rollbackDeployment } from "../utils/gateway";
-import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
 import { generateName, generatePassword } from "../utils/strings";
 
@@ -156,6 +155,8 @@ const certified = ref(false);
 const ipv4 = ref(false);
 const mycelium = ref(false);
 const selectionDetails = ref<SelectionDetails>();
+const gridStore = useGrid();
+const grid = gridStore.client as GridClient;
 const selectedSSHKeys = ref("");
 
 function finalize(deployment: any) {
@@ -178,12 +179,11 @@ async function deploy() {
     ? selectionDetails.value.domain.customDomain
     : subdomain + "." + selectionDetails.value?.domain?.selectedDomain?.publicConfig.domain;
 
-  let grid: GridClient | null;
   let vm: any;
 
   try {
     layout.value?.validateSSH();
-    grid = await getGrid(profileManager.profile!, projectName);
+    updateGrid(grid, { projectName });
 
     await layout.value.validateBalance(grid!);
 
@@ -262,6 +262,7 @@ import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";
 import type { SelectionDetails } from "../types/nodeSelector";
+import { updateGrid } from "../utils/grid";
 import rootFs from "../utils/root_fs";
 
 export default {

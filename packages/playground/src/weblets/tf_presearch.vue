@@ -113,17 +113,15 @@ import { manual } from "@/utils/manual";
 
 import Network from "../components/networks.vue";
 import { useLayout } from "../components/weblet_layout.vue";
-import { useProfileManager } from "../stores";
+import { useGrid } from "../stores";
 import { type Flist, ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
-import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
 import rootFs from "../utils/root_fs";
 import { generateName } from "../utils/strings";
 
 const layout = useLayout();
 const tabs = ref();
-const profileManager = useProfileManager();
 const name = ref(generateName({ prefix: "ps" }));
 const code = ref("");
 const ipv4 = ref(false);
@@ -144,6 +142,8 @@ const certified = ref(false);
 const selectionDetails = ref<SelectionDetails>();
 const mycelium = ref(false);
 const selectedSSHKeys = ref("");
+const gridStore = useGrid();
+const grid = gridStore.client as GridClient;
 
 async function deploy() {
   layout.value.setStatus("deploy");
@@ -152,8 +152,7 @@ async function deploy() {
 
   try {
     layout.value?.validateSSH();
-    const grid = await getGrid(profileManager.profile!, projectName);
-
+    updateGrid(grid, { projectName });
     await layout.value.validateBalance(grid!);
 
     const vm = await deployVM(grid!, {
@@ -215,9 +214,12 @@ function updateSSHkeyEnv(selectedKeys: string) {
 </script>
 
 <script lang="ts">
+import type { GridClient } from "@threefold/grid_client";
+
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";
 import type { SelectionDetails } from "../types/nodeSelector";
+import { updateGrid } from "../utils/grid";
 
 export default {
   name: "TFPresearch",

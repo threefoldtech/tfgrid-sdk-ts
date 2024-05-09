@@ -168,7 +168,7 @@ const props = defineProps({
     required: true,
   },
   grid: {
-    type: Object as PropType<Ref<GridClient | undefined>>,
+    type: Object as PropType<GridClient>,
     required: true,
   },
   loading: {
@@ -228,7 +228,7 @@ async function showDetails(value: any) {
   loadingContractId.value = contractId;
 
   try {
-    const deployment = await props.grid.value?.zos.getDeployment({ contractId });
+    const deployment = await props.grid?.zos.getDeployment({ contractId });
     return layout.value.openDialog(deployment, false, true);
   } catch (e) {
     failedContractId.value = contractId;
@@ -244,12 +244,12 @@ async function contractLockDetails(item: any) {
   contractStateDialog.value = true;
   loadingShowDetails.value = true;
   selectedItem.value = item;
-  await props.grid.value?.contracts
+  await props.grid?.contracts
     .contractLock({ id: item.contractId })
     .then((data: ContractLock) => {
       contractLocked.value = data;
     })
-    .catch(err => {
+    .catch((err: any) => {
       layout.value.setStatus(
         "failed",
         normalizeError(err, `Failed to fetch the contract ${item.contractId} lock details.`),
@@ -275,7 +275,7 @@ async function onDelete() {
   deleting.value = true;
 
   try {
-    await props.grid.value?.contracts.batchCancelContracts({
+    await props.grid?.contracts.batchCancelContracts({
       ids: selectedContracts.value.map(c => c.contractId),
     });
     contracts.value = contracts.value.filter(c => !selectedContracts.value.includes(c));

@@ -12,12 +12,10 @@ const defaults = {
   VProgressCircular: {
     size: 50,
     width: 7,
-    color: "primary",
   },
   VBtn: {
     VProgressCircular: {
-      size: 20,
-      width: 5,
+      color: undefined,
     },
   },
 };

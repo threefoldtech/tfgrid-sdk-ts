@@ -349,9 +349,9 @@ import { getCurrentInstance, onUnmounted, type Ref, ref, watch } from "vue";
 import type { Tab } from "../components/dynamic_tabs.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { deploymentListEnvironments } from "../constants/deployment_list";
-import { useProfileManager } from "../stores";
+import { useGrid } from "../stores";
 import { deleteDeployment } from "../utils/delete_deployment";
-import { getGrid, updateGrid } from "../utils/grid";
+import { updateGrid } from "../utils/grid";
 
 const props = defineProps<{
   projectName?: ProjectName;
@@ -380,14 +380,14 @@ const tabs: Tab[] = [
   { title: "Wordpress", value: "Wordpress", imgPath: "images/icons/wordpress.png" },
 ];
 
-const profileManager = useProfileManager();
-
 const layout = useLayout();
 const dialog = ref<string>();
 const selectedItems = ref<any[]>([]);
 const deleting = ref(false);
 const deletingDialog = ref(false);
 const table = ref() as Ref<{ loadDeployments(): void }>;
+const gridStore = useGrid();
+const grid = gridStore.client as GridClient;
 
 const _idx = tabs.findIndex(t => t.value === props.projectName);
 const activeTab = ref(!props.projectName ? 0 : _idx) as Ref<number>;
@@ -397,7 +397,6 @@ async function onDelete(k8s = false) {
   deletingDialog.value = false;
   deleting.value = true;
   try {
-    const grid = await getGrid(profileManager.profile!);
     for (const item of selectedItems.value) {
       try {
         await deleteDeployment(updateGrid(grid!, { projectName: item.projectName }), {
@@ -446,6 +445,8 @@ onUnmounted(() => deploymentListManager?.unregister(uid));
 </script>
 
 <script lang="ts">
+import type { GridClient } from "@threefold/grid_client";
+
 import { useDeploymentListManager } from "../components/deployment_list_manager.vue";
 import IconActionBtn from "../components/icon_action_btn.vue";
 import K8sDeploymentTable from "../components/k8s_deployment_table.vue";
