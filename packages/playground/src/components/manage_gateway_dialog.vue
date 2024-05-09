@@ -97,6 +97,10 @@
               {{ item.tls_passthrough ? "Yes" : "No" }}
             </template>
 
+            <template #[`item.backends`]="{ item }">
+              {{ (Array.isArray(item.backends) ? item.backends[0] : item.backends) ?? "-" }}
+            </template>
+
             <template #[`item.status`]="{ item }">
               {{ item.status.toUpperCase() }}
             </template>
