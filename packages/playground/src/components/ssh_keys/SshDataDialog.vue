@@ -10,8 +10,12 @@
         <v-toolbar color="primary" class="custom-toolbar">
           <p class="mb-5">SSH-Key Details</p>
         </v-toolbar>
-
         <v-card-text>
+          <VAlert type="info" class="mb-5">
+            Updating your SSH key will lead to the loss of all associated deployments. Please consider this before
+            making any changes.
+          </VAlert>
+
           <template v-for="[_key, value] of Object.entries(selectedKey).sort()" :key="_key">
             <template v-if="!notNeededFields.includes(_key)">
               <CopyInputWrapper v-if="_key !== 'publicKey'" :data="value" #="{ props: copyInputProps }">
