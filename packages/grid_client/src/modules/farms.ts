@@ -39,6 +39,13 @@ class Farms {
     return (await this.client.farms.removeFarmIp(options)).apply();
   }
 
+  /**
+   * Removes farm IPs
+   *
+   * @param {RemoveFarmIPModel[]} options - An array of options to remove farm IPs
+   * @returns {Promise<void>} A promise that resolves when all farm IPs have been removed
+   */
+
   @expose
   @validateInput
   @checkBalance
