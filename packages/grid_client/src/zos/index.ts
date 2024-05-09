@@ -6,6 +6,7 @@ export * from "./workload";
 export * from "./zdb";
 export * from "./zmachine";
 export * from "./zmount";
+export * from "./volume";
 export * from "./znet";
 export * from "./gateway";
 export * from "./qsfs";

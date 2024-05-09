@@ -65,6 +65,7 @@ export function solutionHasGateway(projectName: ProjectName) {
     ProjectName.Funkwhale,
     ProjectName.Mastodon,
     ProjectName.Mattermost,
+    ProjectName.Casperlabs,
     ProjectName.Owncloud,
     ProjectName.Peertube,
     ProjectName.Subsquid,
