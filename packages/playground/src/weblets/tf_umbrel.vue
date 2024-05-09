@@ -123,11 +123,10 @@ import { manual } from "@/utils/manual";
 
 import Network from "../components/networks.vue";
 import { useLayout } from "../components/weblet_layout.vue";
-import { useProfileManager } from "../stores";
+import { useGrid, useProfileManager } from "../stores";
 import type { Flist, solutionFlavor as SolutionFlavor } from "../types";
 import { ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
-import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
 import rootFs from "../utils/root_fs";
 import { generateName, generatePassword } from "../utils/strings";
@@ -153,6 +152,8 @@ const rootFilesystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solut
 const selectionDetails = ref<SelectionDetails>();
 const mycelium = ref(false);
 const selectedSSHKeys = ref("");
+const gridStore = useGrid();
+const grid = gridStore.client as GridClient;
 
 async function deploy() {
   layout.value.setStatus("deploy");
@@ -161,7 +162,7 @@ async function deploy() {
 
   try {
     layout.value?.validateSSH();
-    const grid = await getGrid(profileManager.profile!, projectName);
+    updateGrid(grid, { projectName });
 
     await layout.value.validateBalance(grid!);
 
@@ -218,6 +219,10 @@ function updateSSHkeyEnv(selectedKeys: string) {
 </script>
 
 <script lang="ts">
+import type { GridClient } from "@threefold/grid_client";
+
+import { updateGrid } from "@/utils/grid";
+
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";
