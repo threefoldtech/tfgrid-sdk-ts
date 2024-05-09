@@ -1,3 +1,4 @@
+import { Contract } from "@threefold/tfchain_client";
 import { DeploymentKeyDeletionError, InsufficientBalanceError } from "@threefold/types";
 import * as PATH from "path";
 
@@ -272,9 +273,13 @@ class Contracts {
   async getDeletionTime(options: ContractGetModel): Promise<string | number> {
     return this.client.contracts.getDeletionTime(options);
   }
+  /**
+   * Retrieves lock details of contracts.
+   * @returns A Promise that resolves to an object of type LockContracts containing details of locked contracts.
+   */
   @expose
   @validateInput
-  async getContractsLockDetails() {
+  async getContractsLockDetails(): Promise<LockContracts> {
     const LockedContracts: LockContracts = {
       nameContracts: {},
       nodeContracts: {},
@@ -282,28 +287,39 @@ class Contracts {
       totalAmountLocked: 0,
     };
     const contracts = await this.listMyContracts({ state: [ContractStates.GracePeriod] });
+
     if (contracts == undefined) return LockedContracts;
+
     const contractTypes = ["nameContracts", "nodeContracts", "rentContracts"];
+
     for (const type of contractTypes) {
       for (const contract of contracts[type]) {
-        LockedContracts[type][parseInt(contract.contractID)] = await this.contractLock({
-          id: parseInt(contract.contractID),
-        });
-        LockedContracts.totalAmountLocked += LockedContracts[type][parseInt(contract.contractID)].amountLocked;
+        const contractID = parseInt(contract.contractID);
+        const contractLockDetails = await this.contractLock({ id: contractID });
+        LockedContracts[type][contractID] = contractLockDetails;
+        LockedContracts.totalAmountLocked += contractLockDetails.amountLocked;
       }
     }
     return LockedContracts;
   }
 
+  /**
+   * Unlocks multiple contracts.
+   * @param ids An array of contract IDs to be unlocked.
+   * @returns A Promise that resolves to an array of billed contracts representing the result of batch unlocking.
+   */
   @expose
   @validateInput
-  async unlockContract(ids: number[]) {
+  async unlockContract(ids: number[]): Promise<Contract[]> {
     return await this.client.contracts.batchUnlockContracts(ids);
   }
-
+  /**
+   * Unlocks contracts associated with the current user.
+   * @returns A Promise that resolves to an array of billed contracts.
+   */
   @expose
   @validateInput
-  async unlockMyContracts() {
+  async unlockMyContracts(): Promise<Contract[]> {
     return await this.client.contracts.unlockMyContracts(this.config.graphqlURL);
   }
 }
