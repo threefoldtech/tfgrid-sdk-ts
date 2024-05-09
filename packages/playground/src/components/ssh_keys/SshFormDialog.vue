@@ -102,9 +102,10 @@ import type { GridClient } from "@threefold/grid_client";
 import { defineComponent, type PropType, ref, watch } from "vue";
 import { onMounted } from "vue";
 
+import { useGrid } from "@/stores";
 import { type Profile, useProfileManager } from "@/stores/profile_manager";
 import { SSHCreationMethod, type SSHKeyData } from "@/types";
-import { type Balance, getGrid, loadBalance } from "@/utils/grid";
+import { type Balance, loadBalance } from "@/utils/grid";
 import SSHKeysManagement from "@/utils/ssh";
 
 const props = defineProps({
@@ -137,6 +138,8 @@ const props = defineProps({
 const emits = defineEmits(["close", "save", "generate"]);
 
 const profileManager = useProfileManager();
+const gridStore = useGrid();
+const grid = gridStore.client as unknown as GridClient;
 const sshKeysManagement = new SSHKeysManagement();
 const isValidForm = ref<boolean>(false);
 
@@ -219,7 +222,6 @@ async function __loadBalance(profile?: Profile, tries = 1) {
 
   try {
     loadingBalance.value = true;
-    const grid = await getGrid(profile);
     balance.value = await loadBalance(grid!);
     loadingBalance.value = false;
   } catch {

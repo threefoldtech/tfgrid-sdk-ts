@@ -229,7 +229,7 @@
   </VCard>
 </template>
 <script lang="ts">
-import type { NodeInfo, NodeResources } from "@threefold/grid_client";
+import type { GridClient, NodeInfo, NodeResources } from "@threefold/grid_client";
 import { CertificationType, type GridNode } from "@threefold/gridproxy_client";
 import { computed, onMounted, ref } from "vue";
 import { capitalize } from "vue";
@@ -239,9 +239,8 @@ import { getCountryCode } from "@/utils/get_nodes";
 import { manual } from "@/utils/manual";
 import toReadableDate from "@/utils/to_readable_data";
 
-import { useProfileManager } from "../../stores";
+import { useGrid, useProfileManager } from "../../stores";
 import formatResourceSize from "../../utils/format_resource_size";
-import { getGrid } from "../../utils/grid";
 import { toGigaBytes } from "../../utils/helpers";
 import ResourceDetails from "./node_details_internals/ResourceDetails.vue";
 
@@ -260,6 +259,8 @@ export default {
   },
   setup(props) {
     const profileManager = useProfileManager();
+    const gridStore = useGrid();
+    const grid = gridStore.client as unknown as GridClient;
     const node = ref(props.node);
     const stakingDiscount = ref<number>();
     const rentedByUser = computed(() => {
@@ -383,7 +384,6 @@ export default {
 
     async function getStakingDiscount() {
       try {
-        const grid = await getGrid(profileManager.profile!);
         const total_resources = props.node?.total_resources;
         const { cru, hru, mru, sru } = total_resources as NodeResources;
         const price = await grid?.calculator.calculateWithMyBalance({
