@@ -97,7 +97,13 @@
   />
 
   <!-- View -->
-  <ssh-data-dialog :open="isViewKey" :selected-key="selectedKey" @close="isViewKey = false" @update="updateKeys" />
+  <ssh-data-dialog
+    :open="isViewKey"
+    :all-keys="allKeys"
+    :selected-key="selectedKey"
+    @close="isViewKey = false"
+    @update="updateKeys"
+  />
 </template>
 
 <script lang="ts" setup>

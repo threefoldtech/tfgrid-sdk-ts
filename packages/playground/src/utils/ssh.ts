@@ -166,7 +166,7 @@ class SSHKeysManagement {
     let keys: SSHKeyData[] = [];
 
     if (!this.migrated()) {
-      keys = this.migrate();
+      return [];
     } else {
       keys = this.oldKey as unknown as SSHKeyData[];
     }

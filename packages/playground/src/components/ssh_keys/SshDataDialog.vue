@@ -20,7 +20,7 @@
                   :label="_key"
                   v-model="currentKey[_key as keyof SSHKeyData]"
                   :readonly="_key === 'fingerPrint'"
-                  :rules="[(value: string) => !!value || `${_key} is required.`]"
+                  :rules="[(value: string) => !!value || `${_key} is required.`, _key === 'name' ? validateName(currentKey.name): true]"
                 />
               </CopyInputWrapper>
               <CopyInputWrapper v-else :data="value" #="{ props: copyInputProps }">
@@ -81,6 +81,10 @@ export default defineComponent({
       type: Object as PropType<SSHKeyData>,
       required: true,
     },
+    allKeys: {
+      type: Object as PropType<SSHKeyData[]>,
+      required: true,
+    },
   },
   setup(props, ctx) {
     const currentKey = ref<SSHKeyData>(props.selectedKey);
@@ -109,7 +113,22 @@ export default defineComponent({
         (v: string) =>
           sshKeysManagement.isValidSSHKey(v) ||
           "The SSH key you provided is not valid. Please double-check that it is copied correctly and follows the correct format.",
+        (v: string) => {
+          if (v === props.selectedKey.publicKey) {
+            return true;
+          }
+          const found = props.allKeys.find(key => key.publicKey === v);
+          return found ? "You have another key with the same public key." : true;
+        },
       ];
+    }
+
+    function validateName(name: string): string | boolean {
+      if (name === props.selectedKey.name) {
+        return true;
+      }
+      const found = props.allKeys.find(key => key.name === name);
+      return found ? "You have another key with the same name." : true;
     }
 
     return {
@@ -119,6 +138,7 @@ export default defineComponent({
       currentKey,
       sshRules,
       loading,
+      validateName,
     };
   },
 });
