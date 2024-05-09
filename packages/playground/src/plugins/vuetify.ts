@@ -16,6 +16,8 @@ const defaults = {
   },
   VBtn: {
     VProgressCircular: {
+      size: undefined,
+      width: undefined,
       color: undefined,
     },
   },
