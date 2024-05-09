@@ -50,7 +50,7 @@
     </template>
 
     <!-- Forward slots to the host component -->
-    <template v-for="(_, slot) of $slots" v-slot:[slot]="scope">
+    <template v-for="slot in (Object.keys($slots) as any[])" v-slot:[slot]="scope">
       <slot :name="slot" v-bind="scope" />
     </template>
 

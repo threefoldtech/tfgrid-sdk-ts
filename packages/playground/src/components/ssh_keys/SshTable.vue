@@ -17,7 +17,7 @@
         :headers="headers"
         :items="sshKeys"
         loading-text="Loading..."
-        @click:row="(_: any, { item }: any) => $emit('view', item.raw)"
+        @click:row="(_: any, { item }: any) => $emit('view', item)"
       >
         <template #loading>
           <div class="w-100 text-center" v-if="loading && loadingMessage">
@@ -28,7 +28,7 @@
           <v-tooltip location="bottom" :text="`The date when this SSH key was created.`">
             <template #activator="{ props }">
               <v-chip color="primary" v-bind="props">
-                {{ item.raw.createdAt }}
+                {{ item.createdAt }}
               </v-chip>
             </template>
           </v-tooltip>
@@ -41,7 +41,7 @@
           >
             <template #activator="{ props }">
               <p v-bind="props">
-                {{ item.raw.name || "-" }}
+                {{ item.name || "-" }}
               </p>
             </template>
           </v-tooltip>
@@ -54,7 +54,7 @@
           >
             <template #activator="{ props }">
               <p v-bind="props">
-                {{ item.raw.fingerPrint || "-" }}
+                {{ item.fingerPrint || "-" }}
               </p>
             </template>
           </v-tooltip>
@@ -64,14 +64,14 @@
           <v-tooltip
             location="bottom"
             :text="
-              item.raw.isActive
-                ? `The '${item.raw.name}' key is currently activated and will be utilized in deployments.`
-                : `Click to activate the '${item.raw.name}' for use in deployments.`
+              item.isActive
+                ? `The '${item.name}' key is currently activated and will be utilized in deployments.`
+                : `Click to activate the '${item.name}' for use in deployments.`
             "
           >
             <template #activator="{ props }">
               <v-progress-circular
-                v-if="item.raw.activating"
+                v-if="item.activating"
                 :size="20"
                 :width="2"
                 color="info"
@@ -82,8 +82,8 @@
                 class="d-inline"
                 v-bind="props"
                 color="secondary"
-                @click.stop="toggleKeyActivation(item.raw)"
-                :model-value="item.raw.isActive"
+                @click.stop="toggleKeyActivation(item)"
+                :model-value="item.isActive"
                 :disabled="deleting"
               />
             </template>

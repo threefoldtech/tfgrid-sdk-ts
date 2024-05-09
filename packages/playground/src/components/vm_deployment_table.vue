@@ -117,16 +117,7 @@
           Deleting...
         </v-chip>
         <v-btn-group variant="tonal" v-else>
-          <slot
-            :name="projectName + '-actions'"
-            :item="item"
-            :update="(newItem: any) => {
-              const index = items.findIndex(i => i.contractId === newItem.contractId)
-              if (index > -1) {
-                items[index] = newItem
-              }
-            }"
-          ></slot>
+          <slot :name="projectName + '-actions'" :item="item" :update="updateItem"></slot>
         </v-btn-group>
       </template>
 
@@ -163,7 +154,7 @@
 </template>
 
 <script lang="ts" setup>
-import { capitalize, computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 
 import { getNodeHealthColor, NodeHealth } from "@/utils/get_nodes";
 
@@ -330,6 +321,13 @@ const failedDeploymentList = computed(() => {
     })
     .flat(1);
 });
+
+function updateItem(newItem: any) {
+  const index = items.value.findIndex(i => i.contractId === newItem.contractId);
+  if (index > -1) {
+    items.value[index] = newItem;
+  }
+}
 
 defineExpose({ loadDeployments });
 </script>
