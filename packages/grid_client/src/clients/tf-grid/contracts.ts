@@ -340,18 +340,17 @@ class TFContracts extends Contracts {
     for (const id of ids) {
       extrinsics.push(await this.unlock(id));
     }
-    await this.client.applyAllExtrinsics(extrinsics);
-    return ids;
+    return this.client.applyAllExtrinsics(extrinsics);
   }
   async unlockMyContracts(graphqlURL: string) {
     const contracts = await this.listMyContracts({
       stateList: [ContractStates.GracePeriod],
       graphqlURL,
     });
-    const ids: number[] = [];
-    for (const contract of contracts.nameContracts) ids.push(parseInt(contract.contractID));
-    for (const contract of contracts.nodeContracts) ids.push(parseInt(contract.contractID));
-    for (const contract of contracts.rentContracts) ids.push(parseInt(contract.contractID));
+    const ids: number[] = [...contracts.nameContracts, ...contracts.nodeContracts, ...contracts.rentContracts].map(
+      contract => parseInt(contract.contractID),
+    );
+
     return await this.batchUnlockContracts(ids);
   }
   async getDedicatedNodeExtraFee(options: GetDedicatedNodePriceOptions): Promise<number> {
