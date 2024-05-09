@@ -18,7 +18,6 @@
         <div class="d-flex my-6 align-center justify-center">
           <v-progress-circular
             indeterminate
-            color="primary"
             v-if="loadedNodes.length > 0 && (pageCountTask.loading || nodesTask.loading)"
           />
         </div>
@@ -34,7 +33,7 @@
         >
           <VContainer v-if="loadedNodes.length === 0 && (pageCountTask.loading || nodesTask.loading)">
             <VRow align="center" justify="center" class="pa-4">
-              <v-progress-circular indeterminate class="mr-2" color="primary" />
+              <v-progress-circular indeterminate class="mr-2" />
               Loading Nodes...
             </VRow>
           </VContainer>

@@ -223,7 +223,7 @@
                 </v-card>
                 <v-card v-else :style="{ height: '100%' }">
                   <v-card-text class="d-flex justify-center align-center" :style="{ height: '100%' }">
-                    <v-progress-circular indeterminate color="primary" />
+                    <v-progress-circular indeterminate />
                   </v-card-text>
                 </v-card>
               </v-dialog>

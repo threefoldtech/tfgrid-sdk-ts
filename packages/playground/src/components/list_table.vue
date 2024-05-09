@@ -58,7 +58,7 @@
       <v-row class="mt-5" v-if="loading && items.length === 0">
         <v-spacer />
         <div class="d-flex my-6 align-center justify-center">
-          <v-progress-circular indeterminate :width="3" :size="30" color="primary" />
+          <v-progress-circular indeterminate :width="3" :size="30" />
         </div>
         <v-spacer />
       </v-row>

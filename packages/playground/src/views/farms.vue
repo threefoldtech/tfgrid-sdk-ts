@@ -117,7 +117,7 @@
 
         <template v-if="loading">
           <div color="transparent" class="text-center">
-            <v-progress-circular indeterminate color="primary" />
+            <v-progress-circular indeterminate />
             <p>Loading farm details...</p>
           </div>
         </template>

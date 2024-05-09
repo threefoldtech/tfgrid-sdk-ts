@@ -2,7 +2,7 @@
   <td :colspan="columnsLen" v-if="dNodeLoading" style="text-align: center">
     <div class="pa-1">
       <div class="d-flex my-6 align-center justify-center">
-        <v-progress-circular :size="20" color="primary" />
+        <v-progress-circular :size="20" />
       </div>
     </div>
   </td>
