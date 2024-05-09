@@ -138,7 +138,6 @@
                       valid-message="Mnemonic or Hex Seed is valid."
                       #="{ props: validationProps }"
                       ref="mnemonicInput"
-                      :disable-validation="creatingAccount || activatingAccount || activating"
                     >
                       <v-row>
                         <v-col cols="12" md="9">
@@ -155,15 +154,10 @@
                               :disabled="creatingAccount || activatingAccount || activating"
                               @click:append="reloadValidation"
                             >
-                              <template
-                                v-slot:prepend-inner
-                                v-if="
-                                  (mnemonic && validateMnemonic(mnemonic)) ||
-                                  ((mnemonic.length === 64 || mnemonic.length === 66) &&
-                                    isAddress(mnemonic.length === 66 ? mnemonic : `0x${mnemonic}`))
-                                "
-                              >
-                                <v-icon color="green"> mdi-check </v-icon>
+                              <template v-slot:prepend-inner v-if="validationProps.hint || validationProps.error">
+                                <v-icon :color="validationProps.error ? 'red' : 'green'">
+                                  {{ validationProps.error ? "mdi-close" : "mdi-check" }}
+                                </v-icon>
                               </template></VTextField
                             >
                           </div>
@@ -207,7 +201,7 @@
               </VTooltip>
 
               <v-dialog v-model="openAcceptTerms" fullscreen>
-                <v-card @scroll="onScroll" v-if="!termsLoading">
+                <v-card v-if="!termsLoading">
                   <v-card-text class="pa-15" v-html="acceptTermsContent"></v-card-text>
                   <div class="terms-footer">
                     <v-btn
@@ -216,15 +210,12 @@
                       v-show="!termsLoading"
                       :color="theme.name.value === AppThemeSelection.light ? 'black' : 'white'"
                       variant="outlined"
-                      id="accept-terms-and-condation"
                       :text="capitalize('go back')"
                     />
                     <v-btn
                       @click="shouldActivateAccount ? activateAccount() : createNewAccount()"
                       v-show="!termsLoading"
                       color="primary"
-                      id="accept-terms-and-condation"
-                      :disabled="disableTermsBtn"
                       :text="capitalize('accept terms and conditions')"
                     />
                   </div>
@@ -464,8 +455,6 @@ interface Credentials {
 const keyType = ["sr25519", "ed25519"];
 const keypairType = ref(KeypairType.sr25519);
 const enableReload = ref(true);
-const disableTermsBtn = ref(true);
-
 const theme = useTheme();
 const qrCodeText = ref("");
 const props = defineProps({
@@ -701,7 +690,9 @@ async function activate(mnemonic: string, keypairType: KeypairType) {
   try {
     const grid = await getGrid({ mnemonic, keypairType });
     const profile = await loadProfile(grid!);
-
+    if (email.value) {
+      profile.email = email.value;
+    }
     profileManager.set({ ...profile, mnemonic });
     emit("update:modelValue", false);
     // Migrate the ssh-key
@@ -730,6 +721,7 @@ async function createNewAccount() {
   openAcceptTerms.value = false;
   termsLoading.value = false;
   enableReload.value = false;
+  mnemonicInput.value.reset();
   clearError();
   creatingAccount.value = true;
   try {
@@ -891,15 +883,6 @@ watch(openAcceptTerms, async () => {
     }
   }
 });
-
-function onScroll(e: UIEvent) {
-  const target = e.target as HTMLElement;
-  if (target.scrollTop + target.clientHeight >= target.scrollHeight) {
-    if (!termsLoading.value) {
-      disableTermsBtn.value = false;
-    }
-  }
-}
 </script>
 
 <script lang="ts">

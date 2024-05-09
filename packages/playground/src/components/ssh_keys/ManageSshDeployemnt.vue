@@ -55,7 +55,9 @@
               <v-chip
                 class="pa-5 ml-5 mt-5"
                 :variant="isKeySelected(_key) ? 'flat' : 'outlined'"
-                :color="isKeySelected(_key) ? 'primary' : 'white'"
+                :color="
+                  isKeySelected(_key) ? 'primary' : theme.name.value === AppThemeSelection.light ? 'primary' : 'white'
+                "
                 v-bind="props"
                 @click="selectKey(_key)"
               >
@@ -88,12 +90,14 @@
 import { noop } from "lodash";
 import { capitalize, defineComponent, getCurrentInstance, nextTick, onMounted, ref, watch } from "vue";
 import { onUnmounted } from "vue";
+import { useTheme } from "vuetify";
 
 import SshDataDialog from "@/components/ssh_keys/SshDataDialog.vue";
 import { useForm, ValidatorStatus } from "@/hooks/form_validator";
 import type { InputValidatorService } from "@/hooks/input_validator";
 import { DashboardRoutes } from "@/router/routes";
 import type { SSHKeyData } from "@/types";
+import { AppThemeSelection } from "@/utils/app_theme";
 import SSHKeysManagement from "@/utils/ssh";
 
 export default defineComponent({
@@ -110,6 +114,7 @@ export default defineComponent({
     const selectedKeys = ref<SSHKeyData[]>([]);
     const isViewSSHKey = ref<boolean>(false);
     const sshKeysManagement = new SSHKeysManagement();
+    const theme = useTheme();
 
     // Each key will be added then add `\n` as a new line.
     const selectedKeysString = ref<string>("");
@@ -186,6 +191,8 @@ export default defineComponent({
       selectedKeysString,
       DashboardRoutes,
       sshKeysManagement,
+      theme,
+      AppThemeSelection,
 
       capitalize,
       onSelectKey,
