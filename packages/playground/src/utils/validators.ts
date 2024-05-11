@@ -38,7 +38,7 @@ export function maxLength(msg: string, max: number) {
 
 export function isGithubRepo(msg: string) {
   return (value: string) => {
-    const githubRepoRegex = /^(?:https:\/\/github\.com\/|git@github\.com:)([a-zA-Z0-9_-]+)\/([a-zA-Z0-9_-]+)\.git$/;
+    const githubRepoRegex = /^https:\/\/github\.com\/([a-zA-Z0-9_-]+)\/([a-zA-Z0-9_-]+)\.git$/;
     if (!githubRepoRegex.test(value)) {
       return { message: msg };
     }

@@ -36,6 +36,7 @@
           validators.required('Github Repository is required.'),
           validators.isGithubRepo('Github Repository  must be a valid URL'),
         ]"
+        :async-rules="[isGithubRepoExist]"
         #="{ props }"
       >
         <input-tooltip tooltip="Github Repository https url to serve.">
@@ -232,6 +233,19 @@ async function deploy() {
     }
   }
   finalize(vm);
+}
+
+async function isGithubRepoExist(githubUrl: string) {
+  try {
+    const username = githubUrl.substring("https://github.com/".length, githubUrl.lastIndexOf("/"));
+
+    const reponame = githubUrl.substring(githubUrl.lastIndexOf("/") + 1, githubUrl.lastIndexOf(".git"));
+
+    const res = await fetch("https://api.github.com/repos/" + username + "/" + reponame);
+    if (res.status !== 200) throw new Error();
+  } catch (error) {
+    return { message: `Github repository doesn't exist.`, isExist: false };
+  }
 }
 </script>
 
