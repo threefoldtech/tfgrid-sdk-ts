@@ -5,6 +5,9 @@
       <p v-else>Configure your SMTP Server.</p>
     </v-alert>
 
+    <v-alert variant="tonal" type="warning" class="mt-3">
+      SMTP server requires IPv4. Please ensure that your network configuration supports IPv4.
+    </v-alert>
     <input-tooltip
       v-if="!persistent"
       inline
@@ -31,6 +34,7 @@
             v-model="$props.modelValue.username"
             v-bind="props"
             autofocus
+            class="mt-3"
           />
         </input-tooltip>
       </input-validator>
