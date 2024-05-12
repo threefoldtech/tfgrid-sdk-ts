@@ -55,6 +55,8 @@ yarn workspace @threefold/rmb_direct_client start
 - Git
 - Yarn
 
+PS: For modifications in `RMB Messages` refer to [DEVELOPER.README.md](DEVELOPERS.README.md) file.
+
 ## Contributors
 
 Contributions, issues, and feature requests are welcome!
