@@ -33,9 +33,8 @@
                   validators.pattern('Farm name should not contain whitespaces.', {
                     pattern: /^[^\s]+$/,
                   }),
-
-                  validateFarmName,
                 ]"
+                :async-rules="[validateFarmName]"
                 #="{ props }"
               >
                 <v-text-field
@@ -105,11 +104,11 @@ export default {
         isCreating.value = false;
       }
     }
-    function validateFarmName(name: string) {
+    async function validateFarmName(name: string) {
       if (!name.split("").every((c: string) => /[a-zA-Z0-9\-_]/.test(c))) {
         return { message: "Farm name can only contain alphabetic letters, numbers, '-' or '_'" };
       }
-      const names = props.userFarms.getFarmsNames();
+      const names = await props.userFarms.getFarmsNames();
       if (names.includes(props.name.toLocaleLowerCase())) {
         return { message: "Farm name already exists!" };
       }
