@@ -20,7 +20,7 @@
 </template>
 
 <script lang="ts">
-const methods = ["public-ipv4", "planetary-network-ip", "public-ipv6", "wireguard-ip"];
+const methods = ["public-ipv4", "planetary-network-ip", "public-ipv6", "wireguard-ip", "mycelium-network-ip"];
 
 export default {
   name: "AccessDeploymentAlert",

@@ -73,9 +73,8 @@ import { StrKey } from "stellar-sdk";
 import { onMounted, ref } from "vue";
 
 import { useProfileManagerController } from "../components/profile_manager_controller.vue";
-import { useProfileManager } from "../stores";
+import { useGrid } from "../stores";
 import { createCustomToast, ToastType } from "../utils/custom_toast";
-import { getGrid } from "../utils/grid";
 import { isValidStellarAddress } from "../utils/validators";
 const withdrawDialog = ref(false);
 const targetError = ref("");
@@ -84,9 +83,10 @@ const valid = ref(false);
 const validatingAddress = ref(false);
 const loadingWithdraw = ref(false);
 const ProfileManagerController = useProfileManagerController();
-const profileManager = useProfileManager();
 const amount = ref(2);
 const emits = defineEmits(["close"]);
+const gridStore = useGrid();
+const grid = gridStore.client as GridClient;
 
 const props = defineProps({
   selectedName: String,
@@ -130,7 +130,7 @@ async function validateAddress() {
 async function withdrawTFT(targetAddress: string, withdrawAmount: number) {
   loadingWithdraw.value = true;
   try {
-    const grid = await getGrid(profileManager.profile!);
+    updateGrid(grid, { projectName: "" });
     await grid?.bridge.swapToStellar({ amount: +withdrawAmount, target: targetAddress });
 
     await ProfileManagerController.reloadBalance();
@@ -150,7 +150,10 @@ const closeDialog = () => {
 };
 </script>
 <script lang="ts">
+import type { GridClient } from "@threefold/grid_client";
 import { defineComponent } from "vue";
+
+import { updateGrid } from "../utils/grid";
 
 export default defineComponent({
   name: "WithdrawDialog",

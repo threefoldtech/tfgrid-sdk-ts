@@ -127,15 +127,15 @@
 import type { GridClient } from "@threefold/grid_client";
 import { computed, type Ref, ref } from "vue";
 
+import { updateGrid } from "@/utils/grid";
 import { manual } from "@/utils/manual";
 
 import { useLayout } from "../components/weblet_layout.vue";
-import { useProfileManager } from "../stores";
+import { useGrid, useProfileManager } from "../stores";
 import type { Flist, solutionFlavor as SolutionFlavor } from "../types";
 import { ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
 import { deployGatewayName, getSubdomain, rollbackDeployment } from "../utils/gateway";
-import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
 import { generateName, generatePassword } from "../utils/strings";
 
@@ -158,7 +158,8 @@ const mycelium = ref(false);
 const rootFilesystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solution.value?.memory ?? 0));
 const selectionDetails = ref<SelectionDetails>();
 const selectedSSHKeys = ref("");
-
+const gridStore = useGrid();
+const grid = gridStore.client as GridClient;
 function finalize(deployment: any) {
   layout.value.reloadDeploymentsList();
   layout.value.setStatus("success", "Successfully deployed a Wordpress instance.");
@@ -168,6 +169,7 @@ async function deploy() {
   layout.value.setStatus("deploy");
 
   const projectName = ProjectName.Wordpress.toLowerCase() + "/" + name.value;
+  updateGrid(grid, { projectName });
 
   const subdomain = getSubdomain({
     deploymentName: name.value,
@@ -179,15 +181,12 @@ async function deploy() {
     ? selectionDetails.value.domain.customDomain
     : subdomain + "." + selectionDetails.value?.domain?.selectedDomain?.publicConfig.domain;
 
-  let grid: GridClient | null;
   let vm: any;
   try {
     layout.value?.validateSSH();
-    grid = await getGrid(profileManager.profile!, projectName);
+    await layout.value.validateBalance(grid);
 
-    await layout.value.validateBalance(grid!);
-
-    vm = await deployVM(grid!, {
+    vm = await deployVM(grid, {
       name: name.value,
       network: {
         addAccess: selectionDetails.value!.domain!.enableSelectedDomain,
@@ -246,7 +245,7 @@ async function deploy() {
   } catch (e) {
     layout.value.setStatus("deploy", "Rollbacking back due to fail to deploy gateway...");
 
-    await rollbackDeployment(grid!, name.value);
+    await rollbackDeployment(grid, name.value);
     layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Wordpress instance."));
   }
 }

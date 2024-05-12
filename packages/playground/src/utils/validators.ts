@@ -1,3 +1,4 @@
+import type { GridClient } from "@threefold/grid_client";
 import StellarSdk from "stellar-sdk";
 import validator from "validator";
 import type { Options } from "validator/lib/isBoolean";
@@ -733,16 +734,6 @@ export function pattern(msg: string, config: RegexPattern) {
   };
 }
 
-/**
- * Checks if a given string is a valid SSH key.
- * @param key - The SSH key string to be validated.
- * @returns True if the key is a valid SSH key, false otherwise.
- */
-export function isValidSSHKey(key: string): boolean {
-  const sshKeyRegex = /^(ssh-rsa|ssh-dss|ecdsa-[a-zA-Z0-9-]+|ssh-ed25519)\s+(\S+)\s+(\S+)/;
-  return sshKeyRegex.test(key);
-}
-
 export function isValidDecimalNumber(length: number, msg: string) {
   return (value: string) => {
     if (!(value.toString().split(".").length > 1 ? value.toString().split(".")[1].length <= length : true)) {
@@ -769,5 +760,12 @@ export async function isValidStellarAddress(target: string): Promise<RuleReturn>
         ? "Address does not have a valid trustline to TFT"
         : "Address not found";
     return { message };
+  }
+}
+
+export async function isAvailableName(grid: GridClient, name: string) {
+  const valid = await grid.contracts.get_name_contract({ name });
+  if (name && !!valid) {
+    return { message: "Name is already taken." };
   }
 }

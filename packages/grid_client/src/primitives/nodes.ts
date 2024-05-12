@@ -63,6 +63,10 @@ interface NodeInfo {
   rentedByTwinId: number;
   rentContractId: number;
   serialNumber?: string;
+  healthy: boolean;
+  rentable: boolean;
+  rented: boolean;
+  price_usd: number;
 }
 interface PublicConfig {
   domain: string;

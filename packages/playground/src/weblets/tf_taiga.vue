@@ -137,12 +137,11 @@ import { computed, type Ref, ref } from "vue";
 import { manual } from "@/utils/manual";
 
 import { useLayout } from "../components/weblet_layout.vue";
-import { useProfileManager } from "../stores";
+import { useGrid, useProfileManager } from "../stores";
 import type { Flist, solutionFlavor as SolutionFlavor } from "../types";
 import { ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
 import { deployGatewayName, getSubdomain, rollbackDeployment } from "../utils/gateway";
-import { getGrid } from "../utils/grid";
 import { generateName, generatePassword } from "../utils/strings";
 
 const layout = useLayout();
@@ -166,6 +165,8 @@ const smtp = ref(createSMTPServer());
 const rootFilesystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solution.value?.memory ?? 0));
 const selectionDetails = ref<SelectionDetails>();
 const selectedSSHKeys = ref("");
+const gridStore = useGrid();
+const grid = gridStore.client as GridClient;
 
 function finalize(deployment: any) {
   layout.value.reloadDeploymentsList();
@@ -188,12 +189,11 @@ async function deploy() {
     ? selectionDetails.value.domain.customDomain
     : subdomain + "." + selectionDetails.value?.domain?.selectedDomain?.publicConfig.domain;
 
-  let grid: GridClient | null;
   let vm: any;
 
   try {
     layout.value?.validateSSH();
-    grid = await getGrid(profileManager.profile!, projectName);
+    updateGrid(grid, { projectName });
 
     await layout.value.validateBalance(grid!);
 
@@ -283,6 +283,7 @@ import SmtpServer, { createSMTPServer } from "../components/smtp_server.vue";
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";
 import type { SelectionDetails } from "../types/nodeSelector";
+import { updateGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
 import rootFs from "../utils/root_fs";
 

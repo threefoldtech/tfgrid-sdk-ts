@@ -154,7 +154,7 @@
 </template>
 
 <script lang="ts" setup>
-import { capitalize, computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 
 import { getNodeHealthColor, NodeHealth } from "@/utils/get_nodes";
 
@@ -221,12 +221,17 @@ async function loadDeployments() {
   failedDeployments.value = vms.failedDeployments;
 
   count.value = vms.count;
-  items.value = vms.items.map(([leader, ...workers]) => {
-    if (workers.length) {
-      leader.workers = workers;
-    }
-    return leader;
-  });
+  items.value = vms.items
+    .map((vm: any) => {
+      if (props.projectName.toLowerCase() === ProjectName.Caprover.toLowerCase()) {
+        const [leader, ...workers] = vm;
+        leader.workers = workers;
+        return leader;
+      }
+
+      return vm;
+    })
+    .flat();
 
   loading.value = false;
 }
