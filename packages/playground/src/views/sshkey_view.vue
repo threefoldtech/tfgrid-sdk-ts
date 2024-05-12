@@ -12,6 +12,8 @@
     </div>
   </v-card>
 
+  <v-alert type="info"> Multiple keys support is coming up soon </v-alert>
+
   <v-card class="mb-3 pa-3" color="transparent">
     <v-col class="d-flex justify-end">
       <v-btn
