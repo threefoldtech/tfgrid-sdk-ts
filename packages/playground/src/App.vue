@@ -303,12 +303,6 @@ const routes: AppRoute[] = [
         tooltip: "Deploy your orchestrator instances.",
       },
       {
-        title: "Dedicated Machines",
-        icon: "mdi-resistor-nodes",
-        route: DashboardRoutes.Deploy.DedicatedMachines,
-        tooltip: "Explore dedicated machines available on the ThreeFold grid.",
-      },
-      {
         title: "Applications",
         icon: "mdi-lightbulb-on-outline",
         route: DashboardRoutes.Deploy.Applications,
@@ -327,10 +321,10 @@ const routes: AppRoute[] = [
         tooltip: "Find or Publish your Flist on 0-Hub.",
       },
       {
-        title: "SSH Key",
+        title: "SSH Keys",
         icon: "mdi-key-plus",
         route: DashboardRoutes.Deploy.SSHKey,
-        tooltip: "Generate or update your SSH Key.",
+        tooltip: "Generate or update your SSH Keys.",
       },
     ],
   },

@@ -39,7 +39,9 @@
           </VContainer>
 
           <VContainer v-if="loadedNodes.length === 0 && !(pageCountTask.loading || nodesTask.loading)">
-            <VAlert type="error" text="No Nodes were found!" />
+            <VAlert v-if="loadingError" type="error" :text="loadingError" />
+
+            <VAlert v-else type="error" text="No Nodes were found!" />
           </VContainer>
 
           <div
@@ -52,10 +54,11 @@
             class="overflow-auto px-4"
             v-if="loadedNodes.length"
           >
-            <template v-for="node in loadedNodes" :key="node.id">
+            <template v-for="(node, index) in loadedNodes" :key="node.id">
               <div class="my-4">
                 <TfNodeDetailsCard
-                  :node="node"
+                  :key="node.rentedByTwinId"
+                  v-model:node="loadedNodes[index]"
                   :selected="!validFilters || filtersUpdated ? false : $props.modelValue === node"
                   selectable
                   @node:select="bindModelValueAndValidate"
@@ -70,7 +73,6 @@
                   "
                 />
               </div>
-              <!-- <div class="border-b" :style="{ borderBottomWidth: '2px !important' }" /> -->
             </template>
 
             <VContainer v-if="loadedNodes.length > 0 && pagination.page !== -1">
@@ -141,6 +143,7 @@
 
 <script lang="ts">
 import type { FarmInfo, FilterOptions, NodeInfo } from "@threefold/grid_client";
+import { RequestError } from "@threefold/types";
 import equals from "lodash/fp/equals.js";
 import sample from "lodash/fp/sample.js";
 import { computed, nextTick, onMounted, onUnmounted, type PropType, ref } from "vue";
@@ -207,7 +210,11 @@ export default {
     const filters = computed(() => normalizeNodeFilters(props.filters, options.value));
 
     const reloadNodes = () => nodesTask.value.run(gridStore, props.filters, filters.value, pagination);
-
+    const loadingError = computed(() => {
+      if (!nodesTask.value.error) return "";
+      if (nodesTask.value.error instanceof RequestError) return "Failed to fetch nodes due to a network error";
+      else return "Something went wrong while getting nodes, please try again later";
+    });
     let initialized = false;
     onMounted(async () => {
       initialized = true;
@@ -314,7 +321,7 @@ export default {
       reloadNodes,
       resetPageAndReloadNodes,
       pagination,
-
+      loadingError,
       filtersUpdated,
       nodeInputValidateTask,
 

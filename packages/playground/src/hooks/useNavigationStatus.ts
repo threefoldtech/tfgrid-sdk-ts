@@ -2,6 +2,8 @@ import noop from "lodash/fp/noop.js";
 import { onMounted, onUnmounted, ref } from "vue";
 import { useRouter } from "vue-router";
 
+import { DeployRoutes } from "@/router/routes";
+
 export function useNavigationStatus() {
   const router = useRouter();
   const status = ref<"Loading" | "Success" | "Failed">("Success");
@@ -17,6 +19,10 @@ export function useNavigationStatus() {
     unSubscribeBeforeEach = router.beforeEach((to, _, next) => {
       currentToPath = to.fullPath;
       status.value = "Loading";
+
+      if (to.path.includes("/deploy/dedicated-nodes")) {
+        next(DeployRoutes.NodeFinder);
+      }
 
       return next();
     });

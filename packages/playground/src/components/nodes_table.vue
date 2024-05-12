@@ -6,7 +6,6 @@
           height="750px"
           :loading="loading"
           loading-text="Loading nodes..."
-          :headers="headers"
           :items="modelValue"
           :items-length="count"
           :items-per-page="$props.size"
@@ -24,12 +23,8 @@
           :hover="true"
         >
           <tbody class="mx-4 my-4">
-            <tr v-for="node in modelValue" v-bind:key="node.id" @click="openSheet($event, node)">
-              <TfNodeDetailsCard
-                :key="node.rentedByTwinId"
-                :node="node"
-                @reload-table="$emit('reloadTable', node.nodeId)"
-              />
+            <tr v-for="(node, index) in modelValue" v-bind:key="node.id" @click="openSheet($event, node)">
+              <TfNodeDetailsCard :key="node.rentedByTwinId" v-model:node="$props.modelValue[index]" />
             </tr>
             <p v-if="modelValue && modelValue.length === 0 && !loading" class="mx-4 mt-10 text-center">
               No data available
@@ -42,18 +37,15 @@
 </template>
 
 <script lang="ts">
-import { type GridNode, NodeStatus } from "@threefold/gridproxy_client";
+import type { GridNode } from "@threefold/gridproxy_client";
 import type { PropType } from "vue";
 import { capitalize } from "vue";
-import type { VDataTable } from "vuetify/labs/VDataTable";
 
-import formatResourceSize from "@/utils/format_resource_size";
 import { getNodeStatusColor, getNodeTypeColor } from "@/utils/get_nodes";
-import toReadableDate from "@/utils/to_readable_data";
 
 import TfNodeDetailsCard from "./node_selector/TfNodeDetailsCard.vue";
 export default {
-  emits: ["update:page", "update:size", "open-dialog", "reloadTable"],
+  emits: ["update:page", "update:size", "open-dialog"],
   props: {
     size: {
       required: true,
@@ -80,53 +72,11 @@ export default {
     TfNodeDetailsCard,
   },
   setup(_, { emit }) {
-    const nodeStatusOptions = [NodeStatus.Up, NodeStatus.Down];
-    const headers: VDataTable["headers"] = [
-      { title: "ID", key: "nodeId", sortable: false },
-      { title: "Farm ID", key: "farmId", align: "start", sortable: false },
-      { title: "Total Public IPs", key: "publicIps.total", align: "start", sortable: false },
-      { title: "Free Public IPs", key: "publicIps.free", align: "start", sortable: false },
-      {
-        title: "CPU",
-        key: "total_resources.cru",
-        align: "start",
-        sortable: false,
-      },
-      {
-        title: "RAM",
-        key: "total_resources.mru",
-        align: "start",
-        value: item => formatResourceSize(item.total_resources.mru),
-        sortable: false,
-      },
-      {
-        title: "SSD",
-        key: "total_resources.sru",
-        align: "start",
-        value: item => formatResourceSize(item.total_resources.sru),
-        sortable: false,
-      },
-      {
-        title: "HDD",
-        key: "total_resources.hru",
-        align: "start",
-        value: item => formatResourceSize(item.total_resources.hru),
-        sortable: false,
-      },
-      { title: "GPU", key: "num_gpu", align: "start", sortable: false },
-      { title: "Uptime", key: "uptime", align: "start", sortable: false, value: item => toReadableDate(item.uptime) },
-      { title: "Status", key: "status", align: "start", sortable: false },
-      { title: "Type", key: "dedicated", align: "start", sortable: false },
-      { title: "Actions", key: "actions", align: "start", sortable: false },
-    ];
-
     const openSheet = (_e: any, node: any) => {
       emit("open-dialog", node);
     };
 
     return {
-      headers,
-      nodeStatusOptions,
       getNodeStatusColor,
       getNodeTypeColor,
       openSheet,
@@ -146,16 +96,10 @@ export default {
   line-height: 60px;
 }
 </style>
-
 <style scoped>
-.v-data-table__thead {
-  display: none;
-}
-
 .v-data-table tbody tr {
   position: relative;
 }
-
 .v-data-table tbody tr::after {
   content: "";
   position: absolute;

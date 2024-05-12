@@ -18,6 +18,7 @@ class K8sModule extends BaseModule {
   workloadTypes = [
     WorkloadTypes.zmachine,
     WorkloadTypes.zmount,
+    WorkloadTypes.volume,
     WorkloadTypes.qsfs,
     WorkloadTypes.ip,
     WorkloadTypes.ipv4,

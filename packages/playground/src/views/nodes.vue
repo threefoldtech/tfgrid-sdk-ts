@@ -13,29 +13,26 @@
             <v-switch
               color="primary"
               inset
-              label="Dedicated Nodes (Only)"
+              label="Dedicated Nodes"
               v-model="filters.dedicated"
               density="compact"
               hide-details
             />
           </TfFilter>
           <TfFilter query-route="gateway" v-model="filters.gateway">
-            <v-switch
-              color="primary"
-              inset
-              label="Gateways (Only)"
-              v-model="filters.gateway"
-              density="compact"
-              hide-details
-            />
+            <v-switch color="primary" inset label="Gateways" v-model="filters.gateway" density="compact" hide-details />
           </TfFilter>
 
           <TfFilter query-route="gpu" v-model="filters.gpu">
+            <v-switch color="primary" inset label="GPU Node" v-model="filters.gpu" density="compact" hide-details />
+          </TfFilter>
+
+          <TfFilter query-route="rentable" v-model="filters.rentable" v-if="profileManager.profile">
             <v-switch
               color="primary"
               inset
-              label="GPU Node (Only)"
-              v-model="filters.gpu"
+              label="Rentable"
+              v-model="filters.rentable"
               density="compact"
               hide-details
             />
@@ -129,6 +126,7 @@
               filters.country = $event?.country || '';
               filters.region = $event?.region || '';
             "
+            :only-with-nodes="false"
           >
             <template #region="{ props }">
               <TfFilter query-route="region" v-model="filters.region">
@@ -411,7 +409,6 @@
                     page = $event;
                     loadNodes();
                   "
-                  @reload-table="reloadTable"
                   :count="nodesCount"
                   :loading="loading"
                   v-model:selectedNode="selectedNodeId"
@@ -441,8 +438,9 @@ import { useRoute } from "vue-router";
 import NodeDetails from "@/components/node_details.vue";
 import NodesTable from "@/components/nodes_table.vue";
 import router from "@/router";
+import { useProfileManager } from "@/stores";
 import type { GridProxyRequestConfig } from "@/types";
-import { getNode, requestNodes } from "@/utils/get_nodes";
+import { requestNodes } from "@/utils/get_nodes";
 import { convertToBytes } from "@/utils/get_nodes";
 
 import TfFilter from "../components/filters/TfFilter.vue";
@@ -450,6 +448,7 @@ import TfFiltersContainer from "../components/filters/TfFiltersContainer.vue";
 import TfFiltersLayout from "../components/filters/TfFiltersLayout.vue";
 import TfSelectFarm from "../components/node_selector/TfSelectFarm.vue";
 import TfSelectLocation from "../components/node_selector/TfSelectLocation.vue";
+
 export default {
   components: {
     NodesTable,
@@ -461,6 +460,7 @@ export default {
     TfFiltersLayout,
   },
   setup() {
+    const profileManager = useProfileManager();
     const size = ref(window.env.PAGE_SIZE);
     const page = ref(1);
     const nodeId = ref<number>(0);
@@ -483,6 +483,7 @@ export default {
       publicIPs: "",
       dedicated: false,
       numGpu: "",
+      rentable: false,
     });
 
     const loading = ref<boolean>(true);
@@ -530,6 +531,8 @@ export default {
             sortBy: SortBy.Status,
             sortOrder: SortOrder.Asc,
             numGpu: +filters.value.numGpu || undefined,
+            rentable: filters.value.rentable && profileManager.profile ? filters.value.rentable : undefined,
+            availableFor: filters.value.rentable && profileManager.profile ? profileManager.profile.twinId : undefined,
           },
           { loadFarm: true },
         );
@@ -538,19 +541,6 @@ export default {
         if (retCount) nodesCount.value = count ?? 0;
       } catch (err) {
         console.log(err);
-      } finally {
-        loading.value = false;
-      }
-    }
-
-    async function requestNode() {
-      loading.value = true;
-      try {
-        const node = await getNode(nodeId.value, nodeOptions);
-        const index = nodes.value.findIndex(node => node.nodeId === nodeId.value);
-        nodes.value[index] = node;
-      } catch (error) {
-        console.log(error);
       } finally {
         loading.value = false;
       }
@@ -580,12 +570,8 @@ export default {
       isDialogOpened.value = true;
     };
 
-    function reloadTable(id: number) {
-      nodeId.value = id;
-      setTimeout(requestNode, 20000);
-    }
-
     return {
+      profileManager,
       loading,
       nodesCount,
       nodes,
@@ -594,7 +580,6 @@ export default {
       closeDialog,
       requestNodes,
       isDialogOpened,
-      reloadTable,
       filters,
       NodeStatus,
       size,

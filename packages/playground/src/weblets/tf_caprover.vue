@@ -21,7 +21,7 @@
       :tabs="[
         { title: 'Config', value: 'config' },
         { title: 'Leader', value: 'leader' },
-        { title: 'Workers', value: 'workers' },
+        { title: 'Workers', value: 'workers', workers: workers.length },
       ]"
       ref="tabs"
     >
@@ -98,10 +98,9 @@ import { ref } from "vue";
 import { manual } from "@/utils/manual";
 
 import { useLayout } from "../components/weblet_layout.vue";
-import { useProfileManager } from "../stores";
+import { useGrid, useProfileManager } from "../stores";
 import { type CaproverWorker as CW, ProjectName } from "../types";
 import { deployVM, type Env, type Machine } from "../utils/deploy_vm";
-import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
 import { generateName, generatePassword } from "../utils/strings";
 
@@ -113,6 +112,8 @@ const password = ref(generatePassword(10));
 const leader = ref(createWorker(generateName({ prefix: "cr" })));
 const workers = ref<CW[]>([]);
 const selectedSSHKeys = ref("");
+const gridStore = useGrid();
+const grid = gridStore.client as GridClient;
 
 async function deploy() {
   layout.value.setStatus("deploy");
@@ -121,7 +122,7 @@ async function deploy() {
 
   try {
     layout.value?.validateSSH();
-    const grid = await getGrid(profileManager.profile!, projectName);
+    updateGrid(grid, { projectName });
 
     await layout.value.validateBalance(grid!);
 
@@ -189,12 +190,15 @@ function updateSSHkeyEnv(selectedKeys: string) {
 </script>
 
 <script lang="ts">
+import type { GridClient } from "@threefold/grid_client";
+
 import { createNetwork } from "@/utils/deploy_helpers";
 
 import CaproverWorker, { createWorker } from "../components/caprover_worker.vue";
 import ExpandableLayout from "../components/expandable_layout.vue";
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";
+import { updateGrid } from "../utils/grid";
 import rootFs from "../utils/root_fs";
 
 export default {
