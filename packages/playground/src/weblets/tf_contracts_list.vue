@@ -20,7 +20,16 @@
       >
         Unlock all
       </v-btn>
-      <v-btn prepend-icon="mdi-refresh" color="info" variant="outlined" :disabled="isLoading" @click="onMount">
+      <v-btn
+        prepend-icon="mdi-refresh"
+        color="info"
+        variant="outlined"
+        :disabled="isLoading"
+        @click="
+          contractsTable.forEach(t => t.reset());
+          onMount();
+        "
+      >
         refresh
       </v-btn>
     </section>
@@ -130,6 +139,7 @@
       <v-expansion-panel-text>
         <!-- Contracts Table Component -->
         <contracts-table
+          ref="contractsTable"
           :node-status="nodeStatus"
           :loading="table.loading"
           :contracts="table.contracts"
@@ -186,6 +196,7 @@ const unlockDialog = ref<boolean>(false);
 const panel = ref<number[]>([0, 1, 2]);
 const nodeInfo: Ref<{ [nodeId: number]: { status: NodeStatus; farmId: number } }> = ref({});
 const unlockContractLoading = ref<boolean>(false);
+const contractsTable = ref<(typeof ContractsTable)[]>([]);
 // Computed property to get unique node IDs from contracts
 const nodeIDs = computed(() => {
   const allNodes = contracts.value.map(contract => contract.nodeId);

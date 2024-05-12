@@ -439,6 +439,12 @@ async function unlockContract(contractId: number[]) {
     unlockContractLoading.value = false;
   }
 }
+
+defineExpose({
+  reset() {
+    selectedContracts.value = [];
+  },
+});
 </script>
 
 <script lang="ts">
