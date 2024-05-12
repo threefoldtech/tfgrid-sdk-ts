@@ -154,7 +154,7 @@
 </template>
 
 <script lang="ts" setup>
-import { capitalize, computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 
 import { getNodeHealthColor, NodeHealth } from "@/utils/get_nodes";
 
