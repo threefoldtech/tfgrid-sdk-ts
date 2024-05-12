@@ -89,7 +89,7 @@
         :disabled="!selectedLockedContracts"
         color="warning"
         variant="outlined"
-        @click="unlockDialog = true"
+        @click="openUnlockDialog"
         >Unlock</v-btn
       >
 
@@ -204,18 +204,21 @@
           </p></v-toolbar
         >
       </v-card-title>
-      <v-card-text>
+      <v-card-text v-if="loadingShowDetails">
+        <v-progress-circular indeterminate />
+      </v-card-text>
+      <v-card-text v-else>
         <v-alert class="my-4" type="warning" variant="tonal">
           <div>
             Selected contract<span v-if="selectedContracts.length > 1">s</span> Locked amount:
-            <span class="font-weight-bold">{{ lockedAmount.toFixed(4) }} </span> TFTs
+            <span class="font-weight-bold">{{ selectedLockedAmount.toFixed(4) }} </span> TFTs
           </div>
-          <div v-if="lockedAmount < freeBalance">
+          <div v-if="selectedLockedAmount < freeBalance">
             You have enough balance to unlock your contract<span v-if="selectedContracts.length > 1">s</span>!
           </div>
-          <div v-else-if="lockedAmount > 0">
+          <div v-else-if="selectedLockedAmount > 0">
             You need to fund your account with:
-            <span class="font-weight-bold">{{ Math.ceil(lockedAmount - freeBalance) }} TFTs</span>
+            <span class="font-weight-bold">{{ Math.ceil(selectedLockedAmount - freeBalance) }} TFTs</span>
           </div>
         </v-alert>
         <v-chip class="ma-1" color="primary" label v-for="c in selectedContracts" :key="c.contractId">
@@ -226,7 +229,7 @@
           <v-btn color="anchor" variant="outlined" @click="unlockDialog = false"> Cancel </v-btn>
           <v-tooltip
             :text="
-              freeBalance < lockedAmount
+              freeBalance < selectedLockedAmount
                 ? `You don't have enough balance to unlock your contract${selectedContracts.length > 1 ? `s` : ``}`
                 : `Get your contracts ready again`
             "
@@ -235,12 +238,12 @@
             <template #activator="{ props }">
               <div v-bind="props">
                 <v-btn
-                  :disabled="lockedAmount > freeBalance"
+                  :disabled="selectedLockedAmount > freeBalance"
                   color="warning"
                   variant="outlined"
                   class="ml-2"
                   :loading="unlockContractLoading"
-                  @click="unlockContract(selectedContracts.map(contract => contract.contractId))"
+                  @click="unlockContract(selectedContractsIds)"
                 >
                   Unlock
                 </v-btn>
@@ -259,6 +262,7 @@ import { ContractStates, type GridClient, type LockDetails } from "@threefold/gr
 import type { NodeStatus } from "@threefold/gridproxy_client";
 import type { ContractLock } from "@threefold/tfchain_client";
 import { DeploymentKeyDeletionError, TFChainErrors } from "@threefold/types";
+import { identical } from "lodash/fp";
 import { capitalize, computed, defineComponent, type PropType, type Ref, ref, watch } from "vue";
 
 import type { VDataTableHeader } from "@/types";
@@ -314,7 +318,7 @@ const isNodeInRentContracts = computed(() => {
   return false;
 });
 
-const emits = defineEmits(["update:deleted-contracts", "update:unlock-contracts"]);
+const emits = defineEmits(["update:deleted-contracts", "update:unlock-contracts", "update:lock-details"]);
 
 const layout = ref();
 const contractLocked = ref<ContractLock>();
@@ -334,7 +338,7 @@ const balance = profileManagerController.balance;
 const freeBalance = computed(() => balance.value?.free ?? 0);
 const unlockContractLoading = ref(false);
 const unlockDialog = ref(false);
-
+const selectedContractsIds = ref<number[]>([]);
 const selectedLockedContracts = computed(() => {
   if (selectedContracts.value.length == 0) return false;
   for (const contract of selectedContracts.value) {
@@ -342,17 +346,19 @@ const selectedLockedContracts = computed(() => {
   }
   return true;
 });
-
-const lockedAmount = computed(() => {
-  let amount = 0;
-  if (!selectedLockedContracts.value) return amount;
-  else {
-    selectedContracts.value.forEach(item => {
-      amount += props.lockedContracts[item.contractId].amountLocked;
-    });
-    return amount;
-  }
-});
+const selectedLockedAmount = ref(0);
+// const lockedAmount = computed(() => {
+//   let amount = 0;
+//   if (!selectedContractsIds.value.length) return 0;
+//   else {
+//     console.log
+//     selectedContractsIds.value.forEach(id => {
+//       console.log(props.lockedContracts[id])
+//       amount += props.lockedContracts[id].amountLocked;
+//     });
+//     return amount;
+//   }
+// });
 
 // Function to show details of a contract
 async function showDetails(value: any) {
@@ -373,6 +379,38 @@ async function showDetails(value: any) {
     createCustomToast(`Failed to load details of contract ID: ${contractId}`, ToastType.danger);
   } finally {
     loadingContractId.value = undefined;
+    loadingShowDetails.value = false;
+  }
+}
+
+async function openUnlockDialog() {
+  loadingShowDetails.value = true;
+  unlockDialog.value = true;
+  selectedContractsIds.value = selectedContracts.value.map(contract => contract.contractId);
+  selectedLockedAmount.value = 0;
+  const nodeIDsGracePeriod = new Set<number>();
+  try {
+    // make set of node ids on grace period.
+    for (const contract of selectedContracts.value) {
+      if (contract.type == ContractType.NODE && props.lockedContracts[contract.contractId]?.amountLocked == 0) {
+        if (contract.nodeId) nodeIDsGracePeriod.add(contract.nodeId);
+      }
+    }
+    for (const nodeId of nodeIDsGracePeriod) {
+      const rentContractId = await props.grid.nodes.getRentContractId({ nodeId });
+      if (rentContractId) {
+        selectedContractsIds.value.push(rentContractId);
+      }
+    }
+    for (const id of selectedContractsIds.value) {
+      if (props.lockedContracts[id]) selectedLockedAmount.value += props.lockedContracts[id].amountLocked;
+      else {
+        selectedLockedAmount.value += (await props.grid.contracts.contractLock({ id: id })).amountLocked || 0;
+      }
+    }
+  } catch (e) {
+    console.log("errror", e);
+  } finally {
     loadingShowDetails.value = false;
   }
 }
@@ -449,6 +487,7 @@ async function unlockContract(contractId: number[]) {
     setTimeout(() => emits("update:unlock-contracts"), 30000);
     contractStateDialog.value = false;
     unlockDialog.value = false;
+    selectedContractsIds.value = [];
   } catch (e) {
     createCustomToast(`Failed to unlock contract ${contractId}`, ToastType.danger);
     console.error(e);

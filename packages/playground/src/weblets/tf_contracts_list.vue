@@ -137,6 +137,8 @@
           :contracts-type="table.type"
           :table-headers="table.headers"
           @update:deleted-contracts="onDeletedContracts"
+          @update:unlock-contracts="onMount"
+          @update:lock-details="getContractsLockDetails"
         />
       </v-expansion-panel-text>
     </v-expansion-panel>
@@ -217,7 +219,7 @@ async function onMount() {
           }
           return contract;
         });
-        lockedContracts.value = await grid.contracts.getContractsLockDetails();
+        await getContractsLockDetails();
 
         nodeContracts.value = contracts.value.filter(c => c.type === ContractType.NODE);
         nameContracts.value = contracts.value.filter(c => c.type === ContractType.NAME);
@@ -289,6 +291,9 @@ function onDeletedContracts(_contracts: NormalizedContract[]) {
   contracts.value = _contracts;
   totalCost.value = undefined;
   totalCost.value = getTotalCost(contracts.value);
+}
+async function getContractsLockDetails() {
+  lockedContracts.value = await grid.contracts.getContractsLockDetails();
 }
 
 // Define base table headers for contracts tables
