@@ -333,8 +333,12 @@ export default {
       refreshPublicIPs.value = !refreshPublicIPs.value;
     }
 
-    function getFarmsNames() {
-      return farms.value?.map(farm => farm.name.toLocaleLowerCase());
+    async function getFarmsNames() {
+      const { data } = await gridProxyClient.farms.list({
+        retCount: true,
+        twinId,
+      });
+      return data.map(farm => farm.name.toLocaleLowerCase());
     }
 
     context.expose({ getFarmsNames, reloadFarms });
