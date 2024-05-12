@@ -238,6 +238,7 @@ export default {
           certified: resources.value.certified,
           balance:
             userBalance.value && resources.value.useCurrentBalance ? userBalance.value.free : +resources.value.balance,
+          nu: +resources.value.nu,
         });
       },
       {

@@ -71,7 +71,7 @@ class Calculator {
     const price = await this.getPrices();
     const cu = await this.calCU({ cru: options.cru, mru: options.mru });
     const su = await this.calSU({ hru: options.hru, sru: options.sru });
-    // const nu = await this.calNU({nu: options.nu});
+    const nu = await this.calNU({ nu: options.nu ? options.nu : 0 });
 
     const ipv4u = options.ipv4u ? 1 : 0;
 
@@ -79,7 +79,10 @@ class Calculator {
     const certifiedFactor = options.certified ? 1.25 : 1;
 
     const musd_month =
-      (cu * +price?.cu.value + su * +price?.su.value + ipv4u * price?.ipu.value) * certifiedFactor * 24 * 30;
+      (cu * +price?.cu.value + su * +price?.su.value + ipv4u * price?.ipu.value + nu * +price?.nu.value) *
+      certifiedFactor *
+      24 *
+      30;
     return { musd_month: musd_month, dedicatedDiscount: price.discountForDedicationNodes };
   }
   @expose
@@ -160,6 +163,7 @@ class Calculator {
       ipv4u: options.ipv4u,
       certified: options.certified,
       balance: balance,
+      nu: options.nu,
     });
     return calculate;
   }
