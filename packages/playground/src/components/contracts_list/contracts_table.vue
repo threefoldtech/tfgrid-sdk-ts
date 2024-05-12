@@ -23,7 +23,24 @@
 
       <template #[`item.state`]="{ item }">
         <v-tooltip
-          v-if="item && item.value.state === ContractStates.GracePeriod"
+          v-if="
+            item && item.value.state === ContractStates.GracePeriod && loadingShowDetails && item.value == selectedItem
+          "
+          :text="'Click here to check the amount of tokens needed to unlock your contract and resume your workload.'"
+          location="top center"
+        >
+          <template #activator="{ props }">
+            <VProgressCircular
+              v-bind="props"
+              :color="getStateColor(item.value.state)"
+              indeterminate
+              size="20"
+              width="3"
+            />
+          </template>
+        </v-tooltip>
+        <v-tooltip
+          v-else-if="item && item.value.state === ContractStates.GracePeriod"
           :text="'Click here to check the amount of tokens needed to unlock your contract and resume your workload.'"
           location="top center"
         >
@@ -242,7 +259,7 @@ import { ContractStates, type GridClient, type LockDetails } from "@threefold/gr
 import type { NodeStatus } from "@threefold/gridproxy_client";
 import type { ContractLock } from "@threefold/tfchain_client";
 import { DeploymentKeyDeletionError, TFChainErrors } from "@threefold/types";
-import { capitalize, computed, defineComponent, type PropType, type Ref, ref } from "vue";
+import { capitalize, computed, defineComponent, type PropType, type Ref, ref, watch } from "vue";
 
 import type { VDataTableHeader } from "@/types";
 import { ContractType, getNodeStateColor, getStateColor, type NormalizedContract } from "@/utils/contracts";
@@ -288,7 +305,7 @@ const getAmountLocked = computed(() => {
 });
 
 const isNodeInRentContracts = computed(() => {
-  if (props.contractsType == ContractType.NODE) {
+  if (props.contractsType == ContractType.NODE && selectedItem.value) {
     const nodeIds = contracts.value.map(contract => contract.nodeId).filter(nodeId => nodeId !== undefined) as number[];
     if (contractLocked.value && contractLocked.value.amountLocked === 0) {
       return nodeIds.includes(selectedItem.value.nodeId);
@@ -359,16 +376,15 @@ async function showDetails(value: any) {
     loadingShowDetails.value = false;
   }
 }
-
 // Function to fetch contract lock details
 async function contractLockDetails(item: any) {
-  contractStateDialog.value = true;
-  loadingShowDetails.value = true;
   selectedItem.value = item;
+  loadingShowDetails.value = true;
   await props.grid?.contracts
     .contractLock({ id: item.contractId })
     .then((data: ContractLock) => {
       contractLocked.value = data;
+      contractStateDialog.value = true;
     })
     .catch((err: any) => {
       layout.value.setStatus(
@@ -376,9 +392,10 @@ async function contractLockDetails(item: any) {
         normalizeError(err, `Failed to fetch the contract ${item.contractId} lock details.`),
       );
       contractStateDialog.value = false;
+    })
+    .finally(() => {
+      loadingShowDetails.value = false;
     });
-
-  loadingShowDetails.value = false;
 }
 
 // Function to export contract data as JSON
@@ -439,7 +456,9 @@ async function unlockContract(contractId: number[]) {
     unlockContractLoading.value = false;
   }
 }
-
+watch(contractStateDialog, contractStateDialog => {
+  if (!contractStateDialog) selectedItem.value = undefined;
+});
 defineExpose({
   reset() {
     selectedContracts.value = [];
