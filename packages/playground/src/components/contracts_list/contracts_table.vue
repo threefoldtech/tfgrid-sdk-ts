@@ -424,7 +424,7 @@ async function onDelete() {
 async function unlockContract(contractId: number[]) {
   try {
     unlockContractLoading.value = true;
-    await props.grid.value?.contracts.unlockContract(contractId);
+    await props.grid.contracts.unlockContract(contractId);
     createCustomToast(
       `your request to unlock contract ${contractId} has been processed successfully, Changes may take few minuets to reflect`,
       ToastType.info,
