@@ -55,10 +55,9 @@ export default {
         },
         {
           name: "Last Deployment",
-          value:
-            props.node.stats && props.node.stats.users
-              ? toHumanDate(props.node.stats.users.last_deployment_timestamp)
-              : "N/A",
+          value: props.node.stats?.users?.last_deployment_timestamp
+            ? toHumanDate(props.node.stats.users.last_deployment_timestamp)
+            : "N/A",
         },
       ];
     };
