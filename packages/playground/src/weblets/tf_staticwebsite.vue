@@ -31,21 +31,23 @@
       </input-validator>
 
       <input-validator
-        :value="githubUrl"
+        :value="gitUrl"
         :rules="[
-          validators.required('Github Repository is required.'),
-          validators.isGithubRepo('Github Repository  must be a valid URL'),
+          validators.required('Git https URL is required.'),
+          validators.isURL('Git URL must be a valid  https URL.', {
+            protocols: ['https'],
+          }),
         ]"
         :async-rules="[isGithubRepoExist]"
         #="{ props }"
       >
-        <input-tooltip tooltip="Github Repository https url to serve.">
-          <v-text-field label="Github Repository" v-model="githubUrl" v-bind="props" />
+        <input-tooltip tooltip="Git https url to serve.">
+          <v-text-field label="Git URL" v-model="gitUrl" v-bind="props" />
         </input-tooltip>
       </input-validator>
 
-      <input-tooltip tooltip="Github Branch name to serve (optional).">
-        <v-text-field label="Github Branch" v-model="githubBranch" />
+      <input-tooltip tooltip="Git Branch name to serve (optional).">
+        <v-text-field label="Git Branch" v-model="gitBranch" />
       </input-tooltip>
       <input-tooltip
         tooltip="HTML directory to be served. Please ensure correct casing, as this field is case-sensitive. If the directory is the root of the repository, it should not be added."
@@ -113,8 +115,8 @@ const layout = useLayout();
 const valid = ref(false);
 const profileManager = useProfileManager();
 const name = ref(generateName({ prefix: "sw" }));
-const githubUrl = ref("");
-const githubBranch = ref("");
+const gitUrl = ref("");
+const gitBranch = ref("");
 const root = ref("");
 const domain = ref();
 
@@ -193,8 +195,8 @@ async function deploy() {
           mycelium: mycelium.value,
           envs: [
             { key: "SSH_KEY", value: selectedSSHKeys.value },
-            { key: "GITHUB_URL", value: githubUrl.value },
-            { key: "GITHUB_BRANCH", value: githubBranch.value },
+            { key: "GITHUB_URL", value: gitUrl.value },
+            { key: "GITHUB_BRANCH", value: gitBranch.value },
             { key: "HTML_DIR", value: root.value ? "website/" + root.value : "website" },
             { key: "USER_DOMAIN", value: selectionDetails.value?.domain?.enabledCustomDomain ? domain.value : "" },
             { key: "STATICWEBSITE_DOMAIN", value: domain.value },
@@ -235,16 +237,18 @@ async function deploy() {
   finalize(vm);
 }
 
-async function isGithubRepoExist(githubUrl: string) {
-  try {
-    const username = githubUrl.substring("https://github.com/".length, githubUrl.lastIndexOf("/"));
+async function isGithubRepoExist(gitUrl: string) {
+  if (gitUrl.includes("github.com")) {
+    try {
+      gitUrl = gitUrl.replace("https://github.com", "");
+      gitUrl = gitUrl.replace("/", "");
+      gitUrl = gitUrl.replace(".git", "");
 
-    const reponame = githubUrl.substring(githubUrl.lastIndexOf("/") + 1, githubUrl.lastIndexOf(".git"));
-
-    const res = await fetch("https://api.github.com/repos/" + username + "/" + reponame);
-    if (res.status !== 200) throw new Error();
-  } catch (error) {
-    return { message: `Github repository doesn't exist.`, isExist: false };
+      const res = await fetch("https://api.github.com/repos/" + gitUrl);
+      if (res.status !== 200) throw new Error();
+    } catch (error) {
+      return { message: `Github repository doesn't exist.`, isExist: false };
+    }
   }
 }
 </script>
