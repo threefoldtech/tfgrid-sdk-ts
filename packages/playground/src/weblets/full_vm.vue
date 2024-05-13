@@ -162,6 +162,11 @@ const profileManager = useProfileManager();
 const solution = ref() as Ref<SolutionFlavor>;
 const images: VmImage[] = [
   {
+    name: "Ubuntu-23.10",
+    flist: "https://hub.grid.tf/petep.3bot/ubuntu23.10_mycelium.flist",
+    entryPoint: "/init.sh",
+  },
+  {
     name: "Ubuntu-22.04",
     flist: "https://hub.grid.tf/tf-official-vms/ubuntu-22.04.flist",
     entryPoint: "/init.sh",
@@ -174,6 +179,11 @@ const images: VmImage[] = [
   {
     name: "Ubuntu-18.04",
     flist: "https://hub.grid.tf/tf-official-vms/ubuntu-18.04-lts.flist",
+    entryPoint: "/init.sh",
+  },
+  {
+    name: "Arch",
+    flist: "https://hub.grid.tf/petep.3bot/arch_mycelium.flist",
     entryPoint: "/init.sh",
   },
   {
