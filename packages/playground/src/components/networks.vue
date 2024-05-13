@@ -25,7 +25,7 @@
               inset
               label="Public IPv4"
               :model-value="$props.ipv4"
-              @update:model-value="$emit('update:ipv4', $event)"
+              @update:model-value="$emit('update:ipv4', $event ?? undefined)"
             />
           </input-tooltip>
           <input-tooltip
@@ -39,7 +39,7 @@
               inset
               label="Public IPv6"
               :modelValue="$props.ipv6"
-              @update:modelValue="$emit('update:ipv6', $event)"
+              @update:modelValue="$emit('update:ipv6', $event ?? undefined)"
             />
           </input-tooltip>
           <input-tooltip
@@ -53,7 +53,7 @@
               inset
               label="Planetary Network"
               :modelValue="$props.planetary"
-              @update:modelValue="$emit('update:planetary', $event)"
+              @update:modelValue="$emit('update:planetary', $event ?? undefined)"
             />
           </input-tooltip>
           <input-tooltip
@@ -67,7 +67,7 @@
               inset
               label="mycelium"
               :modelValue="$props.mycelium"
-              @update:modelValue="$emit('update:mycelium', $event)"
+              @update:modelValue="$emit('update:mycelium', $event ?? undefined)"
             />
           </input-tooltip>
           <input-tooltip
@@ -81,7 +81,7 @@
               inset
               label="Add Wireguard Access"
               :modelValue="$props.wireguard"
-              @update:modelValue="$emit('update:wireguard', $event)"
+              @update:modelValue="$emit('update:wireguard', $event ?? undefined)"
             />
           </input-tooltip>
           <v-alert v-show="error" class="mb-2" type="warning" variant="tonal">

@@ -31,10 +31,10 @@
         </template>
 
         <template #[`item.disk`]="{ item }">
-          {{ calcDiskSize(item.value.mounts) }}
+          {{ calcDiskSize(item.mounts) }}
         </template>
         <template #[`item.mycelium`]="{ item }">
-          {{ item.value.myceliumIP || "-" }}
+          {{ item.myceliumIP || "-" }}
         </template>
       </ListTable>
     </template>

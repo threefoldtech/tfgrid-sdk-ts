@@ -19,6 +19,13 @@ export const cruRules = _applyRules([
   max("Maximum allowed cpu cores is 256.", 256),
 ]);
 
+export const nuRules = _applyRules([
+  required("Bandwidth is required."),
+  isInt("Bandwidth must be a valid integer."),
+  min("Minimum allowed bandwidth is 0.", 0),
+  max("Maximum allowed bandwidth is 1000000.", 1000000),
+]);
+
 export const mruRules = _applyRules([
   required("Memory is required."),
   min("Minimum allowed Memory size is 1 GB.", 1),

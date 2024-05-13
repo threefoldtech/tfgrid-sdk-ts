@@ -4,7 +4,7 @@ import { TFClient } from "../clients/tf-grid/client";
 import { GridClientConfig } from "../config";
 import { expose } from "../helpers/expose";
 import { validateInput } from "../helpers/validator";
-import { CalculatorModel, CUModel, SUModel } from "./models";
+import { CalculatorModel, CUModel, NUModel, SUModel } from "./models";
 
 export interface PricingInfo {
   dedicatedPrice: number;
@@ -49,6 +49,12 @@ class Calculator {
   async calSU(options: SUModel) {
     return options.hru / 1200 + options.sru / 200;
   }
+
+  @expose
+  @validateInput
+  async calNU(options: NUModel) {
+    return (options.nu * 1000) / 1e7;
+  }
   async getPrices() {
     const pricing = await this.client.pricingPolicies.get({ id: 1 });
     return pricing;
@@ -64,13 +70,18 @@ class Calculator {
     const price = await this.getPrices();
     const cu = await this.calCU({ cru: options.cru, mru: options.mru });
     const su = await this.calSU({ hru: options.hru, sru: options.sru });
+    const nu = await this.calNU({ nu: options.nu ? options.nu : 0 });
+
     const ipv4u = options.ipv4u ? 1 : 0;
 
     // certified node cotsts 25% more than DIY node
     const certifiedFactor = options.certified ? 1.25 : 1;
 
     const musd_month =
-      (cu * +price?.cu.value + su * +price?.su.value + ipv4u * price?.ipu.value) * certifiedFactor * 24 * 30;
+      (cu * +price?.cu.value + su * +price?.su.value + ipv4u * price?.ipu.value + nu * +price?.nu.value) *
+      certifiedFactor *
+      24 *
+      30;
     return { musd_month: musd_month, dedicatedDiscount: price.discountForDedicationNodes };
   }
   @expose
@@ -151,6 +162,7 @@ class Calculator {
       ipv4u: options.ipv4u,
       certified: options.certified,
       balance: balance,
+      nu: options.nu,
     });
     return calculate;
   }

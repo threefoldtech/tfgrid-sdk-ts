@@ -42,6 +42,19 @@ class Farms {
   @expose
   @validateInput
   @checkBalance
+  async removeFarmIps(options: RemoveFarmIPModel[]) {
+    /**
+     * Removes farm IPs
+     *
+     * @param {RemoveFarmIPModel[]} options - An array of options used to remove farm IPs
+     * @returns {Promise<void>} A promise that resolves when all farm IPs have been removed
+     */
+    return await this.client.farms.removeFarmIps(options);
+  }
+
+  @expose
+  @validateInput
+  @checkBalance
   async addStellarAddress(options: AddStellarAddressToFarmModel) {
     return (await this.client.farms.addStellarAddress(options)).apply();
   }

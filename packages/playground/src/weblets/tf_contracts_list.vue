@@ -50,37 +50,35 @@
   <!-- locked amount Dialog -->
   <v-dialog width="500" v-model="unlockDialog" v-if="lockedContracts?.totalAmountLocked">
     <v-card>
-      <v-card-title class="text-h6 pa-0">
-        <v-toolbar color="primary" dark class="custom-toolbar">
-          <p class="mb-5">
-            Unlock All Contracts
-            <v-tooltip text="Grace period contracts documentation" location="bottom right">
-              <template #activator="{ props }">
-                <v-btn
-                  @click.stop
-                  v-bind="props"
-                  color="white"
-                  icon="mdi-information-outline"
-                  height="24px"
-                  width="24px"
-                  target="_blank"
-                  :href="manual.contract_locking"
-                />
-              </template>
-            </v-tooltip></p
-        ></v-toolbar>
+      <v-card-title class="bg-primary">
+        Unlock All Contracts
+        <v-tooltip text="Grace period contracts documentation" location="bottom right">
+          <template #activator="{ props }">
+            <v-btn
+              @click.stop
+              v-bind="props"
+              color="white"
+              variant="text"
+              icon="mdi-information-outline"
+              height="24px"
+              width="24px"
+              target="_blank"
+              :href="manual.contract_locking"
+            />
+          </template>
+        </v-tooltip>
       </v-card-title>
       <v-card-text>
-        <v-row v-if="loadingLockDetails" class="d-flex flex-column justify-center align-center py-5">
+        <v-row v-if="loadingLockDetails" class="d-flex flex-column justify-center align-center py-4">
           <v-progress-circular indeterminate />
           <div class="text-subtitle-2 pt-2">Loading contracts lock details</div>
         </v-row>
         <v-row class="d-flex" v-else>
-          <v-alert class="ma-4" type="warning" variant="tonal">
-            <div class="font-weigh-black" v-if="lockedContracts?.totalAmountLocked < freeBalance">
-              You have enough balance to unlock your contracts!
-            </div>
-            <div v-else>
+          <v-alert v-if="lockedContracts?.totalAmountLocked < freeBalance" class="ma-4" type="success" variant="tonal">
+            <div class="font-weigh-black">You have enough balance to unlock your contracts!</div></v-alert
+          >
+          <v-alert v-else class="ma-4" type="warning" variant="tonal">
+            <div>
               You need to fund your account with
               <span class="font-weight-black">
                 {{ Math.ceil(lockedContracts?.totalAmountLocked - freeBalance) }} TFTs
@@ -104,7 +102,7 @@
             <template #activator="{ props }">
               <div v-bind="props">
                 <v-btn
-                  :disabled="freeBalance < lockedContracts.totalAmountLocked && !loadingLockDetails"
+                  :disabled="freeBalance < lockedContracts.totalAmountLocked || loadingLockDetails"
                   variant="outlined"
                   color="warning"
                   @click="unlockAllContracts"

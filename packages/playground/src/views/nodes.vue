@@ -257,6 +257,28 @@
           </TfFilter>
 
           <TfFilter
+            query-route="num-gpu"
+            v-model="filters.numGpu"
+            :rules="[
+              validators.isNumeric('This field accepts numbers only.'),
+              validators.min('The number of gpus should be larger than zero.', 1),
+              validators.validateResourceMaxNumber('This value is out of range.'),
+            ]"
+          >
+            <template #input="{ props }">
+              <VTextField density="compact" label="Num GPU" variant="outlined" v-model="filters.numGpu" v-bind="props">
+                <template #append-inner>
+                  <VTooltip text="Filter by the number of gpus in the node.">
+                    <template #activator="{ props }">
+                      <VIcon icon="mdi-information-outline" v-bind="props" />
+                    </template>
+                  </VTooltip>
+                </template>
+              </VTextField>
+            </template>
+          </TfFilter>
+
+          <TfFilter
             query-route="min-ssd"
             v-model="filters.minSSD"
             :rules="[
@@ -370,6 +392,17 @@
         </TfFiltersContainer>
       </template>
 
+      <v-row>
+        <v-spacer />
+        <v-col :style="{ maxWidth: '350px' }">
+          <v-select hide-details label="Sort By" clearable :items="sortItems" v-model="sortItem" return-object>
+            <template #item="{ props, item }">
+              <v-list-item v-bind="props" :title="item.title" :prepend-icon="item.raw.icon" />
+            </template>
+          </v-select>
+        </v-col>
+      </v-row>
+
       <div class="nodes">
         <div class="nodes-inner">
           <v-row>
@@ -377,6 +410,7 @@
               <div class="table">
                 <nodes-table
                   v-model="nodes"
+                  height="675px"
                   :size="size"
                   @update:size="
                     size = $event;
@@ -410,14 +444,14 @@
 
 <script lang="ts">
 import { type GridNode, NodeStatus, SortBy, SortOrder } from "@threefold/gridproxy_client";
-import { onMounted, ref } from "vue";
+import { sortBy } from "lodash";
+import { computed, onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 
 import NodeDetails from "@/components/node_details.vue";
 import NodesTable from "@/components/nodes_table.vue";
 import router from "@/router";
 import { useProfileManager } from "@/stores";
-import type { GridProxyRequestConfig } from "@/types";
 import { requestNodes } from "@/utils/get_nodes";
 import { convertToBytes } from "@/utils/get_nodes";
 
@@ -426,6 +460,19 @@ import TfFiltersContainer from "../components/filters/TfFiltersContainer.vue";
 import TfFiltersLayout from "../components/filters/TfFiltersLayout.vue";
 import TfSelectFarm from "../components/node_selector/TfSelectFarm.vue";
 import TfSelectLocation from "../components/node_selector/TfSelectLocation.vue";
+
+const sortItems = [
+  {
+    icon: "mdi-sort-ascending",
+    title: "USD Price: Low to High",
+    value: (nodes: GridNode[]) => sortBy(nodes, "price_usd"),
+  },
+  {
+    icon: "mdi-sort-descending",
+    title: "USD Price: High to Low",
+    value: (nodes: GridNode[]) => sortBy(nodes, "price_usd").reverse(),
+  },
+];
 
 export default {
   components: {
@@ -441,7 +488,6 @@ export default {
     const profileManager = useProfileManager();
     const size = ref(window.env.PAGE_SIZE);
     const page = ref(1);
-    const nodeId = ref<number>(0);
     const filters = ref({
       nodeId: "",
       farmId: "",
@@ -460,24 +506,22 @@ export default {
       gpu: false,
       publicIPs: "",
       dedicated: false,
+      numGpu: "",
       rentable: false,
     });
 
     const loading = ref<boolean>(true);
-    const nodes = ref<GridNode[]>([]);
+    const _nodes = ref<GridNode[]>([]);
+
+    const sortItem = ref<{ title: string; icon: string; value: (nodes: GridNode[]) => GridNode[] }>();
+    const nodes = computed(() => (sortItem.value?.value || ((x: GridNode[]) => x))(_nodes.value));
+
     const nodesCount = ref<number>(0);
     const selectedNodeId = ref<number>(0);
 
     const isDialogOpened = ref<boolean>(false);
 
     const route = useRoute();
-
-    const nodeOptions: GridProxyRequestConfig = {
-      loadTwin: true,
-      loadFarm: true,
-      loadStats: true,
-      loadGpu: false,
-    };
 
     async function loadNodes(retCount = false) {
       loading.value = true;
@@ -507,13 +551,14 @@ export default {
             dedicated: filters.value.dedicated || undefined,
             sortBy: SortBy.Status,
             sortOrder: SortOrder.Asc,
+            numGpu: +filters.value.numGpu || undefined,
             rentable: filters.value.rentable && profileManager.profile ? filters.value.rentable : undefined,
             availableFor: filters.value.rentable && profileManager.profile ? profileManager.profile.twinId : undefined,
           },
           { loadFarm: true },
         );
 
-        nodes.value = data;
+        _nodes.value = data;
         if (retCount) nodesCount.value = count ?? 0;
       } catch (err) {
         console.log(err);
@@ -549,6 +594,8 @@ export default {
     return {
       profileManager,
       loading,
+      sortItems,
+      sortItem,
       nodesCount,
       nodes,
       selectedNodeId,
