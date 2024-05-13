@@ -53,6 +53,13 @@ export default {
           name: "Number of Deployments",
           value: props.node.stats && props.node.stats.system ? props.node.stats.users.deployments.toString() : "N/A",
         },
+        {
+          name: "Last Deployment",
+          value:
+            props.node.stats && props.node.stats.system
+              ? toHumanDate(props.node.stats.users.last_deployment_timestamp)
+              : "N/A",
+        },
       ];
     };
 
