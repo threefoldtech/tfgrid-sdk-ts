@@ -12,70 +12,58 @@
     >
       <template #[`item.nodeStatus`]="{ item }">
         <v-chip
-          v-if="$props.nodeStatus && item.value.nodeId !== '-' && !$props.loading.value"
-          :color="getNodeStateColor($props.nodeStatus[item.value.nodeId])"
+          v-if="$props.nodeStatus && item.nodeId !== '-' && !$props.loading.value"
+          :color="getNodeStateColor($props.nodeStatus[item.nodeId])"
           class="text-capitalize"
         >
-          {{ $props.nodeStatus[item.value.nodeId] }}
+          {{ $props.nodeStatus[item.nodeId] }}
         </v-chip>
         <p v-else>-</p>
       </template>
 
       <template #[`item.state`]="{ item }">
         <v-tooltip
-          v-if="
-            item && item.value.state === ContractStates.GracePeriod && loadingShowDetails && item.value == selectedItem
-          "
+          v-if="item && item.state === ContractStates.GracePeriod && loadingShowDetails && item == selectedItem"
           :text="'Click here to check the amount of tokens needed to unlock your contract and resume your workload.'"
           location="top center"
         >
           <template #activator="{ props }">
-            <VProgressCircular
-              v-bind="props"
-              :color="getStateColor(item.value.state)"
-              indeterminate
-              size="20"
-              width="3"
-            />
+            <VProgressCircular v-bind="props" :color="getStateColor(item.state)" indeterminate size="20" width="3" />
           </template>
         </v-tooltip>
         <v-tooltip
-          v-else-if="item && item.value.state === ContractStates.GracePeriod"
+          v-else-if="item && item.state === ContractStates.GracePeriod"
           :text="'Click here to check the amount of tokens needed to unlock your contract and resume your workload.'"
           location="top center"
         >
           <template #activator="{ props }">
-            <v-chip
-              @click.stop="contractLockDetails(item.value)"
-              v-bind="props"
-              :color="getStateColor(item.value.state)"
-            >
-              {{ item.value.state === ContractStates.GracePeriod ? "Grace Period" : item.value.state }}
+            <v-chip @click.stop="contractLockDetails(item)" v-bind="props" :color="getStateColor(item.state)">
+              {{ item.state === ContractStates.GracePeriod ? "Grace Period" : item.state }}
             </v-chip>
           </template>
         </v-tooltip>
-        <v-chip v-else :color="getStateColor(item.value.state)">
-          {{ item.value.state }}
+        <v-chip v-else :color="getStateColor(item.state)">
+          {{ item.state }}
         </v-chip>
       </template>
 
       <template #[`item.consumption`]="{ item }">
-        <p v-if="item.raw.consumption !== 0">{{ item.raw.consumption.toFixed(3) }} TFT/hour</p>
+        <p v-if="item.consumption !== 0">{{ item.consumption.toFixed(3) }} TFT/hour</p>
         <p v-else>No Data Available</p>
       </template>
 
       <template #[`item.actions`]="{ item }">
-        <v-tooltip :text="failedContractId == item.value.contractId ? 'Retry' : 'Show Details'">
+        <v-tooltip :text="failedContractId == item.contractId ? 'Retry' : 'Show Details'">
           <template #activator="{ props }">
             <v-btn
-              :color="failedContractId == item.value.contractId ? 'error' : ''"
+              :color="failedContractId == item.contractId ? 'error' : ''"
               variant="tonal"
-              @click="showDetails(item.value)"
-              :disabled="(loadingShowDetails && loadingContractId !== item.value.contractId) || deleting"
-              :loading="loadingContractId == item.value.contractId"
+              @click="showDetails(item)"
+              :disabled="(loadingShowDetails && loadingContractId !== item.contractId) || deleting"
+              :loading="loadingContractId == item.contractId"
               v-bind="props"
             >
-              <v-icon class="pt-1" v-if="failedContractId == item.value.contractId">mdi-refresh</v-icon>
+              <v-icon class="pt-1" v-if="failedContractId == item.contractId">mdi-refresh</v-icon>
               <v-icon v-else>mdi-eye-outline</v-icon>
             </v-btn>
           </template>
@@ -432,7 +420,7 @@ function exportData() {
 }
 
 // Function called on clicking a row to show details
-const onClickRow = (_: any, data: any) => showDetails(data.item.value);
+const onClickRow = (_: any, data: any) => showDetails(data.item);
 
 // Function to handle contract deletion
 async function onDelete() {
