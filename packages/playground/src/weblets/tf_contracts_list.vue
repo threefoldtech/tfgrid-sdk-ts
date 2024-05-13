@@ -77,11 +77,6 @@
         </v-row>
         <v-row class="d-flex" v-else>
           <v-alert class="ma-4" type="warning" variant="tonal">
-            <div>
-              Total Amount Locked:
-              <span class="font-weight-black"> {{ lockedContracts?.totalAmountLocked.toFixed(4) }}</span>
-              TFTs.
-            </div>
             <div class="font-weigh-black" v-if="lockedContracts?.totalAmountLocked < freeBalance">
               You have enough balance to unlock your contracts!
             </div>
