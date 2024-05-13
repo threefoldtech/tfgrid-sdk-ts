@@ -4,7 +4,7 @@
 [![Lint](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/lint.yml/badge.svg)](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/lint.yml)
 [![Build](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/build.yml/badge.svg)](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/build.yml)
 
-The RMB Peer Client is a JavaScript library that enables communication with the ThreeFold Messaging Bus (RMB). It provides functionalities similar to the [Rust client](https://github.com/threefoldtech/rmb-rs).
+The RMB Peer Client is a TypeScript library that enables communication with the ThreeFold Messaging Bus (RMB). It provides functionalities similar to the [Rust client](https://github.com/threefoldtech/rmb-rs).
 
 ## Usage
 
