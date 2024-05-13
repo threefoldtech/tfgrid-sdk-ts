@@ -117,7 +117,7 @@ export default {
         isSetting.value = true;
         await gridStore.grid.contracts.setDedicatedNodeExtraFee({
           nodeId: props.nodeId,
-          extraFee: +fee.value / 1000,
+          extraFee: +fee.value,
         });
         createCustomToast("Additional fee is set successfully.", ToastType.success);
         await getExtraFee();
