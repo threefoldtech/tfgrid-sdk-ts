@@ -18,6 +18,7 @@ class MachinesModule extends BaseModule {
   workloadTypes = [
     WorkloadTypes.zmachine,
     WorkloadTypes.zmount,
+    WorkloadTypes.volume,
     WorkloadTypes.qsfs,
     WorkloadTypes.ip,
     WorkloadTypes.ipv4,

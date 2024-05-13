@@ -10,7 +10,7 @@
             <p class="mb-5">Add Public IP to Farm</p>
           </v-toolbar>
           <div class="pa-6">
-            <form-validator v-model="valid">
+            <form-validator ref="formValidator" v-model="valid">
               <v-select
                 :items="items"
                 label="Choose how to enter IP"
@@ -105,7 +105,6 @@
 
 <script lang="ts">
 import { TFChainErrors } from "@threefold/types";
-import { contains } from "cidr-tools";
 import { getIPRange } from "get-ip-range";
 import { default as PrivateIp } from "private-ip";
 import { ref, watch } from "vue";
@@ -123,32 +122,31 @@ export default {
     },
   },
   setup(_, context) {
-    const showDialogue = ref(false);
     const gridStore = useGrid();
-    const valid = ref(false);
     const IPs = ref<string[]>();
     const items = ref<string[]>([IPType.single, IPType.range]);
-    const type = ref("Single");
-    const publicIP = ref("");
+    const type = ref(IPType.single);
+
+    const showDialogue = ref(false);
+    const valid = ref(false);
     const loading = ref(false);
     const isAdded = ref(false);
     const isAdding = ref(false);
-    const inRange = ref<boolean>();
     const showIPs = ref(false);
+
+    const publicIP = ref("");
     const toPublicIP = ref("");
     const gateway = ref("");
 
+    const formValidator = ref();
+
     watch(
-      [() => publicIP.value, () => gateway.value],
-      ([newPublicIP, newGateway], [_, _2]) => {
-        try {
-          inRange.value = contains(newPublicIP, newGateway);
-        } catch (e) {
-          inRange.value = false;
-        }
-        gatewayCheck();
+      [publicIP, toPublicIP, gateway],
+      async () => {
+        if (publicIP.value.length || toPublicIP.value.length || gateway.value.length)
+          await formValidator.value.validate();
       },
-      { immediate: true },
+      { deep: true },
     );
 
     function ipcheck() {
@@ -159,6 +157,14 @@ export default {
       }
       return undefined;
     }
+
+    watch(
+      type,
+      () => {
+        publicIP.value = toPublicIP.value = gateway.value = "";
+      },
+      { deep: true },
+    );
 
     function toIpCheck() {
       if (toPublicIP.value.split("/")[1] !== publicIP.value.split("/")[1]) {
@@ -202,16 +208,30 @@ export default {
     }
 
     function gatewayCheck() {
-      if (!inRange.value) {
-        return {
-          message: "Gateway IP not in the provided IP range.",
-        };
-      }
-      if (publicIP?.value.split("/")[0] === gateway.value || toPublicIP?.value.split("/")[0] === gateway.value) {
+      const firstIP = publicIP?.value.split("/")[0];
+      const lastIP = toPublicIP?.value.split("/")[0];
+
+      if (firstIP === gateway.value || lastIP === gateway.value) {
         return {
           message: "IPs cannot be the same.",
         };
       }
+
+      if (type.value !== IPType.single) {
+        try {
+          const range = getIPRange(firstIP, lastIP);
+          if (range.includes(gateway.value)) {
+            return {
+              message: "The gateway IP shouldn't be in the IPs range.",
+            };
+          }
+        } catch (error: any) {
+          return {
+            message: error.message,
+          };
+        }
+      }
+
       return undefined;
     }
 
@@ -289,19 +309,20 @@ export default {
       loading,
       isAdded,
       isAdding,
-      inRange,
       showIPs,
       IPType,
+      formValidator,
+      type,
+      publicIP,
+      toPublicIP,
+      gateway,
+
       showRange,
       addIPs,
       addFarmIp,
       ipcheck,
       toIpCheck,
       gatewayCheck,
-      type,
-      publicIP,
-      toPublicIP,
-      gateway,
     };
   },
 };

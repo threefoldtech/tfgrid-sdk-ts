@@ -25,28 +25,31 @@
 </template>
 
 <script lang="ts">
+import type { GridClient } from "@threefold/grid_client";
 import { ref } from "vue";
 
 import { manual } from "@/utils/manual";
 
 import { useProfileManagerController } from "../components/profile_manager_controller.vue";
-import { useProfileManager } from "../stores";
+import { useGrid } from "../stores";
 import { createCustomToast, ToastType } from "../utils/custom_toast";
-import { getGrid } from "../utils/grid";
+import { updateGrid } from "../utils/grid";
 
 export default {
   name: "FundsCard",
   setup() {
     const loadingAddTFT = ref(false);
-    const profileManager = useProfileManager();
     const ProfileManagerController = useProfileManagerController();
+    const gridStore = useGrid();
+    const grid = gridStore.client as GridClient;
+
     const addTFT = async () => {
       if (window.env.NETWORK !== "dev" && window.env.NETWORK !== "qa") {
         window.open("https://gettft.com/gettft/", "_blank");
       } else {
         loadingAddTFT.value = true;
         try {
-          const grid = await getGrid(profileManager.profile!);
+          updateGrid(grid, { projectName: "" });
           await grid?.balance.getMoreFunds();
           await ProfileManagerController.reloadBalance();
           loadingAddTFT.value = false;

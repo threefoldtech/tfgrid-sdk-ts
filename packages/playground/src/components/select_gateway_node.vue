@@ -45,16 +45,15 @@
 </template>
 
 <script lang="ts" setup>
-import type { FilterOptions } from "@threefold/grid_client";
+import type { FilterOptions, GridClient } from "@threefold/grid_client";
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 
 import { ValidatorStatus } from "@/hooks/form_validator";
 
-import { useProfileManager } from "../stores";
+import { useGrid } from "../stores";
 import type { GatewayNode } from "../types";
 import type { FarmInterface } from "../types";
 import { loadGatewayNodes } from "../utils/gateway";
-import { getGrid } from "../utils/grid";
 
 const props = defineProps<{
   modelValue?: GatewayNode;
@@ -64,14 +63,14 @@ const props = defineProps<{
 }>();
 const emits = defineEmits<{ (event: "update:model-value", value: GatewayNode | undefined): void }>();
 
-const profileManager = useProfileManager();
-
 const loading = ref(false);
 const items = ref<any[]>([]);
 const page = ref(1);
 const size = 50;
 const validator = ref();
 const gatewayOption = ref("");
+const gridStore = useGrid();
+const grid = gridStore.client as GridClient;
 
 onMounted(loadNextPage);
 onUnmounted(() => emits("update:model-value", undefined));
@@ -88,7 +87,6 @@ watch(
 async function loadNextPage() {
   loading.value = true;
   validator.value?.setStatus(ValidatorStatus.Init);
-  const grid = await getGrid(profileManager.profile!);
   let nodes = [];
   gatewayOption.value = "farm";
   const options: gatewayFilters = {

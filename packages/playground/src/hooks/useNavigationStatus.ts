@@ -20,7 +20,7 @@ export function useNavigationStatus() {
       currentToPath = to.fullPath;
       status.value = "Loading";
 
-      if (to.path === "/deploy/dedicated-nodes/") {
+      if (to.path.includes("/deploy/dedicated-nodes")) {
         next(DeployRoutes.NodeFinder);
       }
 

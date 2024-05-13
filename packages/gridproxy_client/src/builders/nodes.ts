@@ -72,6 +72,7 @@ export interface NodesQuery {
   healthy: boolean;
   sortBy: SortBy;
   sortOrder: SortOrder;
+  numGpu: number;
 }
 
 const NODES_MAPPER: BuilderMapper<NodesQuery> = {
@@ -114,6 +115,7 @@ const NODES_MAPPER: BuilderMapper<NodesQuery> = {
   healthy: "healthy",
   sortBy: "sort_by",
   sortOrder: "sort_order",
+  numGpu: "num_gpu",
 };
 
 const NODES_VALIDATOR: BuilderValidator<NodesQuery> = {
@@ -165,6 +167,7 @@ const NODES_VALIDATOR: BuilderValidator<NodesQuery> = {
   healthy: assertBoolean,
   sortBy: assertString,
   sortOrder: assertString,
+  numGpu: assertInt,
 };
 
 export class NodesBuilder extends AbstractBuilder<NodesQuery> {

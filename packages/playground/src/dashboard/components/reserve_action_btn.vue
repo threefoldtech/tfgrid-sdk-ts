@@ -47,16 +47,18 @@
 </template>
 
 <script lang="ts">
+import type { GridClient } from "@threefold/grid_client";
 import type { GridNode } from "@threefold/gridproxy_client";
 import { InsufficientBalanceError } from "@threefold/types";
 import { computed, type PropType, ref, watch } from "vue";
 
 import { useProfileManager } from "@/stores";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
-import { getGrid } from "@/utils/grid";
 import { notifyDelaying } from "@/utils/notifications";
 
 import { useProfileManagerController } from "../../components/profile_manager_controller.vue";
+import { useGrid } from "../../stores";
+import { updateGrid } from "../../utils/grid";
 
 export default {
   name: "ReserveBtn",
@@ -80,6 +82,8 @@ export default {
     const hasInsufficientBalance = ref(false);
     const balance = profileManagerController.balance;
     const freeBalance = computed(() => balance.value?.free ?? 0);
+    const gridStore = useGrid();
+    const grid = gridStore.client as GridClient;
 
     watch(
       freeBalance,
@@ -100,7 +104,7 @@ export default {
     async function unReserveNode() {
       loadingUnreserveNode.value = true;
       try {
-        const grid = await getGrid(profile.value!);
+        updateGrid(grid, { projectName: "" });
         createCustomToast(`Verify contracts for node ${props.node.nodeId}`, ToastType.info);
 
         const result = (await grid?.contracts.getActiveContracts({ nodeId: +props.node.nodeId })) as any;
@@ -116,11 +120,11 @@ export default {
           openUnreserveDialog.value = false;
           loadingUnreserveBtn.value = true;
           notifyDelaying();
-          emit("updateTable");
           disableButton.value = true;
           setTimeout(() => {
             disableButton.value = false;
             loadingUnreserveBtn.value = false;
+            emit("updateTable");
           }, 20000);
         }
       } catch (e) {
@@ -139,16 +143,15 @@ export default {
       try {
         if (profile.value) {
           loadingReserveNode.value = true;
-          const grid = await getGrid(profile.value);
           createCustomToast("Transaction Submitted", ToastType.info);
           await grid?.nodes.reserve({ nodeId: +props.node.nodeId });
           createCustomToast(`Transaction succeeded node ${props.node.nodeId} Reserved`, ToastType.success);
           notifyDelaying();
-          emit("updateTable");
           disableButton.value = true;
           setTimeout(() => {
             disableButton.value = false;
             loadingReserveNode.value = false;
+            emit("updateTable");
           }, 20000);
         } else {
           createCustomToast("Please Login first to continue.", ToastType.danger);

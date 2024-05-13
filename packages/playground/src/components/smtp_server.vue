@@ -139,13 +139,16 @@ defineProps<{
 </script>
 
 <script lang="ts">
+import { useProfileManager } from "../stores";
 import type { SMTPServer } from "../types";
 import { generatePassword } from "../utils/strings";
+
+const profileManager = useProfileManager();
 
 export function createSMTPServer(options: Partial<SMTPServer> = {}): SMTPServer {
   return {
     enabled: options.enabled || false,
-    username: options.username || "",
+    username: profileManager.profile?.email || options.username || "",
     email: options.email || "",
     hostname: options.hostname || "smtp.gmail.com",
     port: options.port || 587,

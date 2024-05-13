@@ -127,9 +127,11 @@ export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
   );
 
   const data = vms.map((vm, index) => {
-    vm[0].billing = formatConsumption(consumptions[index] as number);
-    if (wireguards[index] && wireguards[index].length > 0) {
-      vm[0].wireguard = wireguards[index][0];
+    for (let i = 0; i < vm.length; i++) {
+      vm[i].billing = formatConsumption(consumptions[index] as number);
+      if (wireguards[index] && wireguards[index].length > 0) {
+        vm[i].wireguard = wireguards[index][0];
+      }
     }
 
     return vm;
@@ -197,7 +199,7 @@ export async function loadK8s(grid: GridClient) {
         console.error(`Timeout loading deployment with name ${name}`);
         return null;
       } else if ((result as any).masters.length === 0 && (result as any).workers.length === 0) {
-        console.error(`Failed to load deployment with name ${name}}`);
+        console.error(`Failed to load deployment with name ${name}`);
         failedDeployments.push({ name, nodes: nodeIds, contracts: contracts });
       } else {
         return result;

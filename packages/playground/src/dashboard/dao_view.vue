@@ -300,6 +300,7 @@
   </div>
 </template>
 <script lang="ts" setup>
+import type { GridClient } from "@threefold/grid_client";
 import type { Proposal, Proposals } from "@threefold/tfchain_client";
 import type moment from "moment";
 import { createToast } from "mosha-vue-toastify";
@@ -307,10 +308,10 @@ import { onMounted, ref } from "vue";
 
 import { manual } from "@/utils/manual";
 
-import { useProfileManager } from "../stores";
+import { useGrid, useProfileManager } from "../stores";
 import type { FarmInterface } from "../types";
 import { getFarms } from "../utils/get_farms";
-import { getGrid } from "../utils/grid";
+import { updateGrid } from "../utils/grid";
 
 const loadingProposals = ref(true);
 const activeTab = ref(0);
@@ -334,8 +335,11 @@ const tabs = [
   { title: "Executable", content: inactiveProposals },
 ];
 
+const gridStore = useGrid();
+const grid = gridStore.client as GridClient;
+
 onMounted(async () => {
-  const grid = await getGrid(profile.value);
+  updateGrid(grid, { projectName: "" });
 
   if (grid) {
     proposals.value = await grid?.dao.get();
@@ -364,7 +368,6 @@ function filteredProposals(proposals: Proposal[] | undefined) {
 }
 async function castVote() {
   loadingVote.value = true;
-  const grid = await getGrid(profile.value);
 
   if (grid) {
     try {

@@ -73,64 +73,64 @@
       :sort-by="sortBy"
     >
       <template #[`item.name`]="{ item }">
-        {{ item.value.name }}
+        {{ item.name }}
       </template>
 
       <template #[`item.ipv4`]="{ item }">
-        {{ item.value.publicIP?.ip?.split("/")?.[0] || item.value.publicIP?.ip || "-" }}
+        {{ item.publicIP?.ip?.split("/")?.[0] || item.publicIP?.ip || "-" }}
       </template>
 
       <template #[`item.ipv6`]="{ item }">
-        {{ item.value.publicIP?.ip6.replace(/\/64$/, "") || "-" }}
+        {{ item.publicIP?.ip6.replace(/\/64$/, "") || "-" }}
       </template>
 
       <template #[`item.planetary`]="{ item }">
-        {{ item.value.planetary || "-" }}
+        {{ item.planetary || "-" }}
       </template>
 
       <template #[`item.mycelium`]="{ item }">
-        {{ item.value.myceliumIP || "-" }}
+        {{ item.myceliumIP || "-" }}
       </template>
 
       <template #[`item.wireguard`]="{ item }">
-        {{ item.value.interfaces?.[0]?.ip || "-" }}
+        {{ item.interfaces?.[0]?.ip || "-" }}
       </template>
 
       <template #[`item.flist`]="{ item }">
-        <v-tooltip :text="item.value.flist" location="bottom right">
+        <v-tooltip :text="item.flist" location="bottom right">
           <template #activator="{ props }">
             <p v-bind="props">
-              {{ item.value.flist.replace("https://hub.grid.tf/", "").replace(".flist", "") }}
+              {{ item.flist.replace("https://hub.grid.tf/", "").replace(".flist", "") }}
             </p>
           </template>
         </v-tooltip>
       </template>
 
       <template #[`item.billing`]="{ item }">
-        {{ item.value.billing }}
+        {{ item.billing }}
       </template>
       <template #[`item.created`]="{ item }">
-        {{ toHumanDate(item.value.created) }}
+        {{ toHumanDate(item.created) }}
       </template>
       <template #[`item.actions`]="{ item }">
-        <v-chip color="error" variant="tonal" v-if="deleting && ($props.modelValue || []).includes(item.value)">
+        <v-chip color="error" variant="tonal" v-if="deleting && ($props.modelValue || []).includes(item)">
           Deleting...
         </v-chip>
         <v-btn-group variant="tonal" v-else>
-          <slot :name="projectName + '-actions'" :item="item"></slot>
+          <slot :name="projectName + '-actions'" :item="item" :update="updateItem"></slot>
         </v-btn-group>
       </template>
 
       <template #[`item.status`]="{ item }">
-        <v-chip :color="getNodeHealthColor(item.value.status as string).color">
-          <v-tooltip v-if="item.value.status == NodeHealth.Error" activator="parent" location="top">{{
-            item.value.message
+        <v-chip :color="getNodeHealthColor(item.status as string).color">
+          <v-tooltip v-if="item.status == NodeHealth.Error" activator="parent" location="top">{{
+            item.message
           }}</v-tooltip>
-          <v-tooltip v-if="item.value.status == NodeHealth.Paused" activator="parent" location="top"
+          <v-tooltip v-if="item.status == NodeHealth.Paused" activator="parent" location="top"
             >The deployment contract is in grace period</v-tooltip
           >
           <span class="text-uppercase">
-            {{ getNodeHealthColor(item.value.status as string).type }}
+            {{ getNodeHealthColor(item.status as string).type }}
           </span>
         </v-chip>
       </template>
@@ -154,7 +154,7 @@
 </template>
 
 <script lang="ts" setup>
-import { capitalize, computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 
 import { getNodeHealthColor, NodeHealth } from "@/utils/get_nodes";
 
@@ -221,12 +221,17 @@ async function loadDeployments() {
   failedDeployments.value = vms.failedDeployments;
 
   count.value = vms.count;
-  items.value = vms.items.map(([leader, ...workers]) => {
-    if (workers.length) {
-      leader.workers = workers;
-    }
-    return leader;
-  });
+  items.value = vms.items
+    .map((vm: any) => {
+      if (props.projectName.toLowerCase() === ProjectName.Caprover.toLowerCase()) {
+        const [leader, ...workers] = vm;
+        leader.workers = workers;
+        return leader;
+      }
+
+      return vm;
+    })
+    .flat();
 
   loading.value = false;
 }
@@ -257,6 +262,8 @@ const filteredHeaders = computed(() => {
     ProjectName.Subsquid,
     ProjectName.Umbrel,
     ProjectName.Nextcloud,
+    ProjectName.Funkwhale,
+    ProjectName.Casperlabs,
   ] as string[];
 
   const WireguardSolutions = [ProjectName.VM, ProjectName.Fullvm, ProjectName.Umbrel] as string[];
@@ -314,6 +321,13 @@ const failedDeploymentList = computed(() => {
     })
     .flat(1);
 });
+
+function updateItem(newItem: any) {
+  const index = items.value.findIndex(i => i.contractId === newItem.contractId);
+  if (index > -1) {
+    items.value[index] = newItem;
+  }
+}
 
 defineExpose({ loadDeployments });
 </script>

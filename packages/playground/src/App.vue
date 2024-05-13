@@ -148,14 +148,18 @@
           height="50"
         >
           <v-row>
-            <v-breadcrumbs class="ma-3" :items="navbarConfig.path" active-color="secondary">
+            <v-breadcrumbs class="ma-3" :items="navbarConfig.path">
               <template v-slot:divider>
                 <v-icon icon="mdi-chevron-right"></v-icon>
               </template>
               <template v-slot:item="{ item }">
-                <router-link :to="item.to" :class="{ 'clickable-item': !item.disabled }">
+                <component
+                  :is="item.to ? 'router-link' : 'span'"
+                  :to="item.to"
+                  :class="{ 'text-secondary text-decoration-none': !!item.to }"
+                >
                   {{ item.title }}
-                </router-link>
+                </component>
               </template>
             </v-breadcrumbs>
           </v-row>
@@ -321,10 +325,10 @@ const routes: AppRoute[] = [
         tooltip: "Find or Publish your Flist on 0-Hub.",
       },
       {
-        title: "SSH Key",
+        title: "SSH Keys",
         icon: "mdi-key-plus",
         route: DashboardRoutes.Deploy.SSHKey,
-        tooltip: "Generate or update your SSH Key.",
+        tooltip: "Generate or update your SSH Keys.",
       },
     ],
   },

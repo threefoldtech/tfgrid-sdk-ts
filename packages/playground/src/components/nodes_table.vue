@@ -23,12 +23,8 @@
           :hover="true"
         >
           <tbody class="mx-4 my-4">
-            <tr v-for="node in modelValue" v-bind:key="node.id" @click="openSheet($event, node)">
-              <TfNodeDetailsCard
-                :key="node.rentedByTwinId"
-                :node="node"
-                @reload-table="$emit('reloadTable', node.nodeId)"
-              />
+            <tr v-for="(node, index) in modelValue" v-bind:key="node.id" @click="openSheet($event, node)">
+              <TfNodeDetailsCard :key="node.rentedByTwinId" v-model:node="$props.modelValue[index]" />
             </tr>
             <p v-if="modelValue && modelValue.length === 0 && !loading" class="mx-4 mt-10 text-center">
               No data available
@@ -49,7 +45,7 @@ import { getNodeStatusColor, getNodeTypeColor } from "@/utils/get_nodes";
 
 import TfNodeDetailsCard from "./node_selector/TfNodeDetailsCard.vue";
 export default {
-  emits: ["update:page", "update:size", "open-dialog", "reloadTable"],
+  emits: ["update:page", "update:size", "open-dialog"],
   props: {
     size: {
       required: true,

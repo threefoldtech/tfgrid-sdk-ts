@@ -110,8 +110,8 @@ import { computed, ref, watch } from "vue";
 
 import { manual } from "@/utils/manual";
 
-import { useProfileManager } from "../stores";
-import { getGrid, loadBalance } from "../utils/grid";
+import { useGrid, useProfileManager } from "../stores";
+import { loadBalance, updateGrid } from "../utils/grid";
 import { normalizeBalance } from "../utils/helpers";
 
 const props = defineProps({
@@ -155,6 +155,9 @@ const profileManager = useProfileManager();
 const webletLayoutContainer = ref<VCard>();
 const status = ref<WebletStatus>();
 const message = ref<string>();
+const gridStore = useGrid();
+const grid = gridStore.client as GridClient;
+
 function onLogMessage(msg: string) {
   if (typeof msg === "string") {
     message.value = msg;
@@ -298,7 +301,7 @@ async function loadCost(profile: { mnemonic: string }) {
   }
 
   costLoading.value = true;
-  const grid = await getGrid(profile);
+  updateGrid(grid, { projectName: "" });
   const { sharedPrice, dedicatedPrice } = await grid!.calculator.calculateWithMyBalance({
     cru: typeof props.cpu === "number" ? props.cpu : 0,
     sru: typeof props.disk === "number" ? props.disk : 0,
