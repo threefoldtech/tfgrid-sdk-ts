@@ -3,7 +3,7 @@
     <v-row>
       <v-col>
         <v-data-table-server
-          height="750px"
+          :height="height || '750px'"
           :loading="loading"
           loading-text="Loading nodes..."
           :items="modelValue"
@@ -67,6 +67,7 @@ export default {
       required: true,
       type: Boolean,
     },
+    height: String,
   },
   components: {
     TfNodeDetailsCard,
