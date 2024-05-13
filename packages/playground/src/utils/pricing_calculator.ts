@@ -22,7 +22,7 @@ export const cruRules = _applyRules([
 export const nuRules = _applyRules([
   required("Bandwidth is required."),
   isInt("Bandwidth must be a valid integer."),
-  min("Minimum allowed bandwidth is 0", 0),
+  min("Minimum allowed bandwidth is 0.", 0),
   max("Maximum allowed bandwidth is 1000000.", 1000000),
 ]);
 

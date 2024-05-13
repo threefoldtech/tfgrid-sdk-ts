@@ -53,7 +53,6 @@ class Calculator {
   @expose
   @validateInput
   async calNU(options: NUModel) {
-    // what is this number
     return (options.nu * 1000) / 1e7;
   }
   async getPrices() {

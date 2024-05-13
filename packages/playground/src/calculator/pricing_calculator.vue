@@ -78,19 +78,20 @@
               </VCol>
 
               <VCol cols="6">
-                <InputTooltip tooltip="Network bandwidth.">
+                <InputTooltip tooltip="To input network bandwidth, The public IPv4 should be enabled.">
                   <VTextField
                     label="Bandwidth"
                     suffix="GB"
                     min="0"
                     max="1000000"
+                    :disabled="!resources.ipv4"
                     :rules="[nuRules]"
                     v-model="resources.nu"
                   />
                 </InputTooltip>
               </VCol>
 
-              <VCol cols="12">
+              <VCol cols="6">
                 <InputTooltip tooltip="The amount of TFT to calculate discount.">
                   <VTextField
                     label="Balance"
@@ -294,7 +295,6 @@ export default {
       userBalance,
       resources,
       priceTask,
-
       dedicatedPriceUSD,
       dedicatedPriceTFT,
       sharedPriceUSD,
