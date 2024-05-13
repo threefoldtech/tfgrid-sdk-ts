@@ -38,16 +38,16 @@
             class="py-4 px-8 border border-anchor"
             :style="{ backgroundColor: 'rgb(var(--v-theme-background))' }"
             :colspan="columns.length"
-            key="item.id"
+            :key="item.id"
           >
-            <card-details :loading="false" title="Node Details" :items="getNodeDetails(item.raw)"></card-details>
+            <card-details :loading="false" title="Node Details" :items="getNodeDetails(item)"></card-details>
 
             <v-card class="mt-4">
               <v-alert class="pa-5" style="height: 20px">
                 <h4 class="text-center font-weight-medium">Resource Units Reserved</h4>
               </v-alert>
               <v-card-text class="pb-8">
-                <NodeResources :node="item.raw" />
+                <NodeResources :node="item" />
               </v-card-text>
             </v-card>
 
@@ -56,7 +56,7 @@
                 <h4 class="text-center font-weight-medium">Node Statistics</h4>
               </v-alert>
               <v-card-item>
-                <NodeMintingDetails :node="item.value" />
+                <NodeMintingDetails :node="item" />
               </v-card-item>
             </v-card>
           </td>
@@ -64,28 +64,28 @@
       </template>
 
       <template #[`item.status`]="{ item }">
-        <v-chip :color="getNodeStatusColor(item.raw.status as string).color">
-          {{ capitalize(item.raw.status as string) }}
+        <v-chip :color="getNodeStatusColor(item.status as string).color">
+          {{ capitalize(item.status as string) }}
         </v-chip>
       </template>
 
       <template #[`item.actions`]="{ item }">
         <PublicConfig
           class="me-2"
-          :nodeId="item.raw.nodeId"
-          :farmId="item.raw.farmId"
+          :nodeId="item.nodeId"
+          :farmId="item.farmId"
           @remove-config="config => toggleConfig(item, config)"
           @add-config="config => toggleConfig(item, config)"
         />
-        <SetExtraFee class="me-2" :nodeId="item.raw.nodeId" />
+        <SetExtraFee class="me-2" :nodeId="item.nodeId" />
       </template>
 
       <template v-slot:[`item.country`]="{ item }">
-        {{ item.raw.country || "-" }}
+        {{ item.country || "-" }}
       </template>
 
       <template v-slot:[`item.serialNumber`]="{ item }">
-        {{ item.raw.serialNumber || "-" }}
+        {{ item.serialNumber || "-" }}
       </template>
     </v-data-table-server>
   </div>
@@ -268,7 +268,7 @@ export default {
     }
 
     function toggleConfig(item: any, config: PublicConfigModel) {
-      item.raw.publicConfig = config;
+      item.publicConfig = config;
       reloadNodes();
     }
 

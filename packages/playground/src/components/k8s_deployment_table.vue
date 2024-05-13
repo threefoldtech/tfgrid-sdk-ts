@@ -91,23 +91,23 @@
       :sort-by="sortBy"
     >
       <template #[`item.created`]="{ item }">
-        {{ toHumanDate(item.value.masters[0].created) }}
+        {{ toHumanDate(item.masters[0].created) }}
       </template>
 
       <template #[`item.mycelium`]="{ item }">
-        {{ item.value.masters[0].myceliumIP || "-" }}
+        {{ item.masters[0].myceliumIP || "-" }}
       </template>
 
       <template #[`item.status`]="{ item }">
-        <v-chip :color="getNodeHealthColor(item.value.masters[0].status as string).color">
-          <v-tooltip v-if="item.value.masters[0].status == NodeHealth.Error" activator="parent" location="top">{{
-            item.value.masters[0].message
+        <v-chip :color="getNodeHealthColor(item.masters[0].status as string).color">
+          <v-tooltip v-if="item.masters[0].status == NodeHealth.Error" activator="parent" location="top">{{
+            item.masters[0].message
           }}</v-tooltip>
-          <v-tooltip v-if="item.value.masters[0].status == NodeHealth.Paused" activator="parent" location="top"
+          <v-tooltip v-if="item.masters[0].status == NodeHealth.Paused" activator="parent" location="top"
             >The deployment contract is in grace period</v-tooltip
           >
           <span class="text-uppercase">
-            {{ getNodeHealthColor(item.value.masters[0].status as string).type }}
+            {{ getNodeHealthColor(item.masters[0].status as string).type }}
           </span>
         </v-chip>
       </template>

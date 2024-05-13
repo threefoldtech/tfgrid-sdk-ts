@@ -29,14 +29,14 @@
         </v-alert>
       </template>
       <template #[`item.ip`]="{ item }">
-        {{ item.value.ip || "-" }}
+        {{ item.ip || "-" }}
       </template>
       <template #[`item.gateway`]="{ item }">
-        {{ item.value.gateway || "-" }}
+        {{ item.gateway || "-" }}
       </template>
 
-      <template #[`item.contract_id`]="{ item }">
-        {{ item.value.contract_id || "-" }}
+      <template #[`item.contractId`]="{ item }">
+        {{ item.contractId ?? "-" }}
       </template>
       <template #[`item.actions`]="{ item, index }">
         <v-btn
@@ -46,7 +46,7 @@
           @click="
             () => {
               showDialogue = true;
-              itemToDelete = { ip: item.raw.ip, index };
+              itemToDelete = { ip: item.ip, index };
             }
           "
           :disabled="loading"

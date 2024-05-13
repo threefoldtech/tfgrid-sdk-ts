@@ -22,7 +22,7 @@
     <VListItemSubtitle class="pt-3 mb-2 text-caption d-flex align-center">
       <span v-text="log.data.timestamp" />
       <VSpacer />
-      <template v-if="collapsable">
+      <div v-show="collapsable">
         <VBtn @click="collapsed = !collapsed" size="xs" class="pa-1 text-body-1 text-info">
           <div class="d-flex align-center">
             <VIcon :icon="collapsed ? 'mdi-chevron-down' : 'mdi-chevron-up'" class="mr-1 text-body-1" />
@@ -30,7 +30,7 @@
           </div>
         </VBtn>
         &nbsp;|&nbsp;
-      </template>
+      </div>
       <VBtn @click="copyLog(log.data.message)" size="xs" class="pa-1 text-link text-body-1">
         <div class="d-flex align-center">
           <VIcon icon="mdi-content-copy" size="xs" class="mr-1 text-caption" />

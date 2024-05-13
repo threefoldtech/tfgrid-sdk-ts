@@ -44,8 +44,8 @@
             :error-messages="domainsTask.error?.message"
             @vue:mounted="selectedDomain && ($refs.domainInput as VInput).validate()"
             :rules="[d => (d ? true : 'Domain is required.')]"
-            @update:menu="opened => !opened && $nextTick().then(($refs.domainInput as VInput).validate)"
-            @blur="$nextTick().then(($refs.domainInput as VInput).validate)"
+            @update:menu="opened => !opened && $nextTick().then(() => ($refs.domainInput as VInput).validate())"
+            @blur="$nextTick().then(() => ($refs.domainInput as VInput).validate())"
             return-object
           >
             <template #append-item v-if="pagination.page !== -1">
