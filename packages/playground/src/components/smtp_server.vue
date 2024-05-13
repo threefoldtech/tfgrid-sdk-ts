@@ -6,7 +6,7 @@
     </v-alert>
 
     <v-alert variant="tonal" type="warning" class="mt-3">
-      SMTP server requires IPv4. Please ensure that your network configuration supports IPv4.
+      SMTP functionality requires IPv4. Enabling SMTP will automatically activate IPv4.
     </v-alert>
     <input-tooltip
       v-if="!persistent"
