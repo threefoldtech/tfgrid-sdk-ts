@@ -118,7 +118,7 @@ class Contracts {
   @expose
   @validateInput
   async getDedicatedNodeExtraFee(options: GetDedicatedNodePriceModel) {
-    return await this.client.contracts.getDedicatedNodeExtraFee(options);
+    return (await this.client.contracts.getDedicatedNodeExtraFee(options)) * 1000;
   }
 
   @expose

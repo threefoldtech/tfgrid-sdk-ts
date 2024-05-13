@@ -33,6 +33,7 @@
                   validators.required('Fee is required.'),
                   validators.isNumeric('Fee must be a valid number.'),
                   validators.min('Fee must be a 0 or more.', 0),
+                  validators.max('Maximum allowed fee is 1000000000000000', 1000000000000000),
                 ]"
                 #="{ props }"
               >
@@ -116,7 +117,7 @@ export default {
         isSetting.value = true;
         await gridStore.grid.contracts.setDedicatedNodeExtraFee({
           nodeId: props.nodeId,
-          extraFee: +fee.value,
+          extraFee: +fee.value / 1000,
         });
         createCustomToast("Additional fee is set successfully.", ToastType.success);
         await getExtraFee();
@@ -124,6 +125,7 @@ export default {
         createCustomToast("Failed to set additional fees!", ToastType.danger);
       } finally {
         isSetting.value = false;
+        showDialogue.value = false;
       }
     }
 
