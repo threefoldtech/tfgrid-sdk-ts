@@ -9,6 +9,9 @@
     <section class="d-flex align-center">
       <v-card-title class="font-weight-bold d-flex align-center title ma-0 pa-0"> Contracts List </v-card-title>
       <v-spacer />
+      <v-btn class="mr-2" variant="outlined" color="warning" @click="openUnlockDialog" :loading="unlockContractLoading">
+        Unlock contracts
+      </v-btn>
       <v-btn
         prepend-icon="mdi-refresh"
         color="info"
@@ -68,7 +71,11 @@
         ></v-toolbar>
       </v-card-title>
       <v-card-text>
-        <v-row class="d-flex">
+        <v-row v-if="loadingLockDetails" class="d-flex flex-column justify-center align-center py-5">
+          <v-progress-circular indeterminate />
+          <div class="text-subtitle-2 pt-2">Loading contracts lock details</div>
+        </v-row>
+        <v-row class="d-flex" v-else>
           <v-alert class="ma-4" type="warning" variant="tonal">
             <div>
               Total Amount Locked:
@@ -79,9 +86,11 @@
               You have enough balance to unlock your contracts!
             </div>
             <div v-else>
-              You need to fund your account with:
-              <span class="font-weight-black"> {{ Math.ceil(lockedContracts?.totalAmountLocked - freeBalance) }}</span>
-              TFTs.
+              You need to fund your account with
+              <span class="font-weight-black">
+                {{ Math.ceil(lockedContracts?.totalAmountLocked - freeBalance) }} TFTs
+              </span>
+              to resume your contracts
             </div>
           </v-alert>
         </v-row>
@@ -100,7 +109,7 @@
             <template #activator="{ props }">
               <div v-bind="props">
                 <v-btn
-                  :disabled="freeBalance < lockedContracts.totalAmountLocked"
+                  :disabled="freeBalance < lockedContracts.totalAmountLocked && !loadingLockDetails"
                   variant="outlined"
                   color="warning"
                   @click="unlockAllContracts"
@@ -163,7 +172,6 @@ import {
   type NormalizedContract,
 } from "@/utils/contracts";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
-import { getGrid } from "@/utils/grid";
 import { manual } from "@/utils/manual";
 
 import { queryClient } from "../clients";
@@ -172,7 +180,7 @@ import { updateGrid } from "../utils/grid";
 
 const profileManagerController = useProfileManagerController();
 const balance = profileManagerController.balance;
-const freeBalance = computed(() => balance.value?.free ?? 0);
+const freeBalance = computed(() => balance.value?.free ?? 0 - (balance.value?.locked ?? 0));
 const isLoading = ref<boolean>(false);
 const profileManager = useProfileManager();
 const gridStore = useGrid();
@@ -190,6 +198,7 @@ const panel = ref<number[]>([0, 1, 2]);
 const nodeInfo: Ref<{ [nodeId: number]: { status: NodeStatus; farmId: number } }> = ref({});
 const unlockContractLoading = ref<boolean>(false);
 const contractsTable = ref<(typeof ContractsTable)[]>([]);
+const loadingLockDetails = ref(false);
 // Computed property to get unique node IDs from contracts
 const nodeIDs = computed(() => {
   const allNodes = contracts.value.map(contract => contract.nodeId);
@@ -250,6 +259,19 @@ async function onMount() {
   isLoading.value = false;
 }
 
+async function openUnlockDialog() {
+  loadingLockDetails.value = true;
+  unlockDialog.value = true;
+  try {
+    await getContractsLockDetails();
+  } catch (e) {
+    createCustomToast(`Failed to get contracts lock details`, ToastType.danger);
+    console.error(e);
+  } finally {
+    loadingLockDetails.value = false;
+  }
+}
+
 async function unlockAllContracts() {
   try {
     unlockContractLoading.value = true;
@@ -265,6 +287,7 @@ async function unlockAllContracts() {
     console.error(e);
   } finally {
     unlockContractLoading.value = false;
+    unlockDialog.value = false;
   }
 }
 const nodeStatus = computed(() => {
