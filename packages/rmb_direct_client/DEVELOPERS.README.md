@@ -1,17 +1,23 @@
-# Types update `Developers`
+# Types Update Guide for Developers
 
 ## Introduction
 
-To reflect changes in messages sent over the RMB in the client, the following steps are needed
+This guide outlines the steps to update the types used in the `RMB direct` Client to reflect changes in messages sent over the RMB.
 
-1. Update [types.proto](lib/types.proto)
-2. Install the protobuf [v21.2](https://github.com/protocolbuffers/protobuf/releases/tag/v21.2)
-3. Install [cmake](https://github.com/naftalimurgor/CMake.sh)
-4. Build the [protobuf](https://github.com/protocolbuffers/protobuf/blob/main/cmake/README.md#c-version)
-5. Run [build.sh](build.sh)
+### Steps
 
-PS: This like also can help you https://grpc.io/docs/protoc-installation/
+1. **Update types.proto File**: Update the [types.proto](lib/types.proto) file with any changes to the message structure.
+
+2. **Install Protobuf v21.2**: Install Protobuf version [v21.2](https://github.com/protocolbuffers/protobuf/releases/tag/v21.2) on your system.
+
+3. **Install CMake**: Install [CMake](https://github.com/naftalimurgor/CMake.sh) on your system.
+
+4. **Build Protobuf**: Follow the instructions in the [protobuf README](https://github.com/protocolbuffers/protobuf/blob/main/cmake/README.md#c-version) to build the protobuf library.
+
+5. **Run build.sh Script**: Execute the [build.sh](build.sh) script to generate the necessary TypeScript files.
+
+> **Note:** Refer to [gRPC Protoc Installation](https://grpc.io/docs/protoc-installation/) for additional help.
 
 ## Usage
 
-Update the client accordingly to the auto-generated [types.ts](lib/types/lib/types.ts)
+After updating the types, ensure that the client is updated accordingly to utilize the auto-generated [types.ts](lib/types/lib/types.ts) file.
