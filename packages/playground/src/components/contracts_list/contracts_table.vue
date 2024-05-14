@@ -466,6 +466,7 @@ async function unlockContract(contractId: number[]) {
     contractStateDialog.value = false;
     unlockDialog.value = false;
     rentContractIds.value = [];
+    selectedContracts.value = [];
   } catch (e) {
     createCustomToast(`Failed to unlock contract ${contractId}`, ToastType.danger);
     console.error(e);
