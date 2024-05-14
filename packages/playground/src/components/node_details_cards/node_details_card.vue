@@ -47,11 +47,17 @@ export default {
         { name: "Certification Type", value: props.node.certificationType },
         {
           name: "Number of Workloads",
-          value: props.node.stats && props.node.stats.system ? props.node.stats.users.workloads.toString() : "N/A",
+          value: props.node.stats && props.node.stats.users ? props.node.stats.users.workloads.toString() : "N/A",
         },
         {
           name: "Number of Deployments",
-          value: props.node.stats && props.node.stats.system ? props.node.stats.users.deployments.toString() : "N/A",
+          value: props.node.stats && props.node.stats.users ? props.node.stats.users.deployments.toString() : "N/A",
+        },
+        {
+          name: "Last Deployment",
+          value: props.node.stats?.users?.last_deployment_timestamp
+            ? toHumanDate(props.node.stats.users.last_deployment_timestamp)
+            : "N/A",
         },
       ];
     };
