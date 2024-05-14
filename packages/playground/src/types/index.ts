@@ -281,6 +281,7 @@ export const nodeStatsInitializer: NodeStats = {
   users: {
     deployments: 0,
     workloads: 0,
+    last_deployment_timestamp: 0,
   },
 };
 
