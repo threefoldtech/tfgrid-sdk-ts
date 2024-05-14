@@ -162,11 +162,6 @@ const profileManager = useProfileManager();
 const solution = ref() as Ref<SolutionFlavor>;
 const images: VmImage[] = [
   {
-    name: "Ubuntu-23.10",
-    flist: "https://hub.grid.tf/petep.3bot/ubuntu23.10_mycelium.flist",
-    entryPoint: "/sbin/zinit init",
-  },
-  {
     name: "Ubuntu-22.04",
     flist: "https://hub.grid.tf/tf-official-vms/ubuntu-22.04.flist",
     entryPoint: "/init.sh",
