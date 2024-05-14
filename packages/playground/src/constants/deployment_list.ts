@@ -126,7 +126,7 @@ export const deploymentListEnvironments = {
 
   static_website: {
     SSH_KEY: _ssh,
-    GITHUB_URL: "Cloned Repository https URL",
+    GITHUB_URL: "HTTPS URL for git repository",
     ROOT: "HTML Directory",
   },
 
