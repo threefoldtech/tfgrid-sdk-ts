@@ -201,7 +201,7 @@ const images = [
   {
     name: "Ubuntu-23.10",
     flist: "https://hub.grid.tf/petep.3bot/ubuntu23.10_mycelium.flist",
-    entryPoint: "/init.sh",
+    entryPoint: "/zinit.sh",
   },
   {
     name: "Ubuntu-22.04",
@@ -211,7 +211,7 @@ const images = [
   {
     name: "Arch",
     flist: "https://hub.grid.tf/petep.3bot/arch_mycelium.flist",
-    entryPoint: "/init.sh",
+    entryPoint: "/zinit.sh",
   },
   {
     name: "Debian-12",
