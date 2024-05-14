@@ -153,8 +153,10 @@
           <VRow class="text-center text-body-1 text-black" v-else-if="valid">
             <VCol cols="6">
               <div
-                class="rounded pa-4 h-100 d-flex justify-center align-center"
-                :style="{ background: computePackageColor(priceTask.data?.dedicatedPackage.package) }"
+                class="rounded pa-4 h-100"
+                :style="{
+                  background: computePackageColor(priceTask.data?.dedicatedPackage.package),
+                }"
               >
                 <p>
                   Cost of reserving a <strong v-text="'Dedicated Node'" /> of the same specifications<br />
@@ -162,19 +164,26 @@
                   <strong v-else v-text="dedicatedPriceUSD + ' USD/month, ' + dedicatedPriceTFT + ' TFT/month'" />. A
                   user can reserve an entire node then use it exclusively to deploy solutions
                 </p>
+                <br />
+                <coupon />
               </div>
             </VCol>
             <VCol cols="6">
               <div
-                class="rounded pa-4 h-100 d-flex justify-center align-center"
-                :style="{ background: computePackageColor(priceTask.data?.sharedPackage.package) }"
+                class="rounded pa-4 h-100"
+                :style="{
+                  background: computePackageColor(priceTask.data?.sharedPackage.package),
+                }"
               >
                 <p>
-                  Cost of reservation on a <strong v-text="'Shared Node'" /><br />
+                  Cost of reservation on a
+                  <strong v-text="'Shared Node'" /><br />
                   <strong v-text="'Loading...'" v-if="priceTask.loading" />
                   <strong v-else v-text="sharedPriceUSD + ' USD/month, ' + sharedPriceTFT + ' TFT/month'" />. Shared
                   Nodes allow several users to host various workloads on a single node
                 </p>
+                <br />
+                <coupon />
               </div>
             </VCol>
           </VRow>
@@ -201,15 +210,16 @@ import type { VForm } from "vuetify/components/VForm";
 import { manual } from "@/utils/manual";
 
 import { calculator as Calculator } from "../../../grid_client/dist/es6";
+import coupon from "../components/coupon.vue";
 import { useProfileManagerController } from "../components/profile_manager_controller.vue";
 import { useAsync } from "../hooks";
 import { useProfileManager } from "../stores";
 import { normalizeError } from "../utils/helpers";
 import { balanceRules, cruRules, hruRules, mruRules, nuRules, sruRules } from "../utils/pricing_calculator";
 import { computePackageColor, normalizePrice } from "../utils/pricing_calculator";
-
 export default {
   name: "PricingCalculator",
+  components: { coupon },
   setup() {
     const calculator = new Calculator(new QueryClient(window.env.SUBSTRATE_URL));
     const profileManager = useProfileManager();
@@ -227,7 +237,10 @@ export default {
       useCurrentBalance: true,
     });
 
-    const tftPriceTask = useAsync(() => calculator.tftPrice(), { init: true, default: 0 });
+    const tftPriceTask = useAsync(() => calculator.tftPrice(), {
+      init: true,
+      default: 0,
+    });
     const priceTask = useAsync(
       () => {
         return calculator.calculate({
