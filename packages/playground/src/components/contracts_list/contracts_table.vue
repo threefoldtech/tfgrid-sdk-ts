@@ -219,7 +219,7 @@
             :text="
               freeBalance < selectedLockedAmount
                 ? `You don't have enough balance to unlock your contract${selectedContracts.length > 1 ? `s` : ``}`
-                : `Get your contracts ready again`
+                : `Unlock your contract${selectedContracts.length > 1 ? `s` : ``} from the grace period state.`
             "
             location="top center"
           >
