@@ -277,7 +277,7 @@ async function unlockAllContracts() {
     unlockContractLoading.value = true;
     await grid.contracts.unlockMyContracts();
     createCustomToast(
-      `your request to unlock contract your contracts has been processed successfully, Changes may take few minuets to reflect`,
+      `Your request to unlock your contracts has been processed successfully. Changes may take a few minutes to reflect`,
       ToastType.info,
     );
     setTimeout(() => onMount(), 30000);
