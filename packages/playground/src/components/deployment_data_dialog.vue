@@ -164,6 +164,8 @@ const contract = computed(() => contracts.value?.[activeTab.value] ?? {});
 const code = computed(() => JSON.stringify(props.data || {}, undefined, 2));
 const html = computed(() => hljs.highlight(code.value, { language: "json" }).value);
 const profileManager = useProfileManager();
+const gridStore = useGrid();
+const grid = gridStore.client as GridClient;
 
 function copy() {
   navigator.clipboard.writeText(code.value);
@@ -196,7 +198,6 @@ function getValue(key: string) {
 
 async function getGrafanaUrl() {
   isLoading.value = true;
-  const grid = await getGrid(profileManager.profile!);
   if (grid) {
     if (contract.value.type !== ContractType.NAME) {
       const nodeId = await grid.capacity.getNodeIdFromContractId({
@@ -213,8 +214,6 @@ getGrafanaUrl();
 
 async function getGPUInfo() {
   loadingCard.value = true;
-
-  const grid = await getGrid(profileManager.profile!);
   if (grid) {
     const nodeId = await grid.capacity.getNodeIdFromContractId({
       contractId: contract.value.contractId,
@@ -302,13 +301,14 @@ function getTooltipText(contract: any, index: number) {
 </script>
 
 <script lang="ts">
+import type { GridClient } from "@threefold/grid_client";
+
 import { useProfileManager } from "@/stores/profile_manager";
 import { ContractType } from "@/utils/contracts";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
 import { GrafanaStatistics } from "@/utils/get_metrics_url";
-import { getGrid } from "@/utils/grid";
 
-import type { NodeInfo } from "../../../grid_client/dist/es6";
+import { useGrid } from "../stores";
 import type { Disk } from "../utils/deploy_vm";
 import CopyReadonlyInput from "./copy_readonly_input.vue";
 import { HighlightDark, HighlightLight } from "./highlight_themes";

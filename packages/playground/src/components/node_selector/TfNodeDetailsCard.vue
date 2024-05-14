@@ -91,7 +91,7 @@
             <template #activator="{ props }">
               <VChip
                 v-bind="props"
-                :color="node?.status === 'up' ? 'success' : 'error'"
+                :color="getNodeStatusColor(node?.status)"
                 class="mr-2"
                 :text="capitalize(node.status)"
               />
@@ -205,13 +205,17 @@
             <v-spacer />
             <ul class="pl-2">
               <li>
-                {{ rentedByUser ? "You receive " : "You'll receive " }} a 50%
+                {{ rentedByUser ? "You receive " : "You'll receive " }} a
+                <strong class="mr-1">50%</strong>
                 <a target="_blank" :href="manual?.billing_pricing">discount</a>
                 {{ rentedByUser ? " as you reserve the" : " if you reserve the" }}
                 entire node
               </li>
               <li>
-                {{ rentedByUser ? "You receive" : "You'll receive" }} a {{ stakingDiscount }}% discount as per the
+                {{ rentedByUser ? "You receive" : "You'll receive" }} a
+                <VProgressCircular indeterminate size="10" width="1" color="info" v-if="loadingStakingDiscount" />
+                <strong v-else>{{ stakingDiscount }}%</strong>
+                discount as per the
                 <a target="_blank" :href="manual?.discount_levels"> staking discounts </a>
               </li>
             </ul>
@@ -229,9 +233,9 @@
   </VCard>
 </template>
 <script lang="ts">
-import type { NodeInfo, NodeResources } from "@threefold/grid_client";
+import type { GridClient, NodeInfo, NodeResources } from "@threefold/grid_client";
 import { CertificationType, type GridNode } from "@threefold/gridproxy_client";
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { capitalize } from "vue";
 
 import ReserveBtn from "@/dashboard/components/reserve_action_btn.vue";
@@ -239,9 +243,8 @@ import { getCountryCode } from "@/utils/get_nodes";
 import { manual } from "@/utils/manual";
 import toReadableDate from "@/utils/to_readable_data";
 
-import { useProfileManager } from "../../stores";
+import { useGrid, useProfileManager } from "../../stores";
 import formatResourceSize from "../../utils/format_resource_size";
-import { getGrid } from "../../utils/grid";
 import { toGigaBytes } from "../../utils/helpers";
 import ResourceDetails from "./node_details_internals/ResourceDetails.vue";
 
@@ -260,8 +263,11 @@ export default {
   },
   setup(props, ctx) {
     const profileManager = useProfileManager();
+    const gridStore = useGrid();
+    const grid = gridStore.client as unknown as GridClient;
     const node = ref(props.node);
     const stakingDiscount = ref<number>();
+    const loadingStakingDiscount = ref<boolean>(false);
     const rentedByUser = computed(() => {
       return props.node?.rentedByTwinId === profileManager.profile?.twinId;
     });
@@ -279,11 +285,22 @@ export default {
       return imageUrl;
     });
 
-    onMounted(async () => {
+    async function refreshStakingDiscount() {
+      loadingStakingDiscount.value = true;
       if (props.node) {
         stakingDiscount.value = (await getStakingDiscount()) || 0;
       }
-    });
+      loadingStakingDiscount.value = false;
+    }
+
+    watch(
+      () => profileManager.profile,
+      async () => {
+        await refreshStakingDiscount();
+      },
+      { immediate: true, deep: true },
+    );
+
     // A guard to check node type
     function isGridNode(node: unknown): node is GridNode {
       return !!node && typeof node === "object" && "num_gpu" in node;
@@ -383,7 +400,6 @@ export default {
 
     async function getStakingDiscount() {
       try {
-        const grid = await getGrid(profileManager.profile!);
         const total_resources = props.node?.total_resources;
         const { cru, hru, mru, sru } = total_resources as NodeResources;
         const price = await grid?.calculator.calculateWithMyBalance({
@@ -421,13 +437,22 @@ export default {
       ctx.emit("update:node", n);
     }
 
+    function getNodeStatusColor(status: string): string {
+      if (status === "up") {
+        return "success";
+      } else if (status === "standby") {
+        return "warning";
+      } else {
+        return "error";
+      }
+    }
+
     return {
       cruText,
       mruText,
       sruText,
       hruText,
       countryFlagSrc,
-      toReadableDate,
       dedicated,
       serialNumber,
       num_gpu,
@@ -438,12 +463,16 @@ export default {
       dmi,
       manual,
       rentedByUser,
+      loadingStakingDiscount,
       stakingDiscount,
+
+      toReadableDate,
       checkSerialNumber,
       capitalize,
       formatResourceSize,
       formatSpeed,
       onReserveChange,
+      getNodeStatusColor,
     };
   },
 };

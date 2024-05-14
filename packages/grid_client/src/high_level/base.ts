@@ -28,6 +28,7 @@ class HighLevelBase {
       WorkloadTypes.ipv4, // TODO: remove deprecated
       WorkloadTypes.zmachine,
       WorkloadTypes.zmount,
+      WorkloadTypes.volume,
       WorkloadTypes.zdb,
       WorkloadTypes.qsfs,
       WorkloadTypes.gatewayfqdnproxy,
@@ -172,6 +173,7 @@ class HighLevelBase {
       WorkloadTypes.ipv4, // TODO: remove deprecated
       WorkloadTypes.zmachine,
       WorkloadTypes.zmount,
+      WorkloadTypes.volume,
       WorkloadTypes.zdb,
       WorkloadTypes.qsfs,
       WorkloadTypes.gatewayfqdnproxy,

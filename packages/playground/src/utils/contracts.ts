@@ -139,7 +139,7 @@ export type ContractsTableType = {
   type: ContractType;
   icon: string;
   title: string;
-  grid: Ref<GridClient | undefined>;
+  grid: GridClient;
   contracts: Ref<NormalizedContract[]>;
   loading: Ref<boolean>;
 };

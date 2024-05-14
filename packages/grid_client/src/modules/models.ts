@@ -340,7 +340,7 @@ class GetServiceContractModel {
   @Expose() @IsInt() @Min(1) serviceId: number;
 }
 class NameContractGetModel {
-  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
+  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength + 20) name: string;
 }
 
 class NodeContractUpdateModel {
@@ -654,6 +654,7 @@ class CalculatorModel {
   @Expose() @IsBoolean() @IsNotEmpty() ipv4u: boolean;
   @Expose() @IsBoolean() @IsOptional() certified?: boolean;
   @Expose() @IsOptional() @IsNumber() @Min(0) balance?: number;
+  @Expose() @IsOptional() @IsNumber() @Min(0) nu?: number;
 }
 
 class CUModel {
@@ -664,6 +665,10 @@ class CUModel {
 class SUModel {
   @Expose() @IsNumber() @IsNotEmpty() @Min(0) hru: number; // GB
   @Expose() @IsNumber() @IsNotEmpty() @Min(0) sru: number; // GB
+}
+
+class NUModel {
+  @Expose() @IsNumber() @IsNotEmpty() @Min(0) nu: number; // GB
 }
 
 class BatchModel<T> {
@@ -939,6 +944,7 @@ export {
   CalculatorModel,
   CUModel,
   SUModel,
+  NUModel,
   BatchModel,
   ZOSGetDeploymentModel,
   ZOSNodeModel,

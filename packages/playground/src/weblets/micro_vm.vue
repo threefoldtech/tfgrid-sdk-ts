@@ -189,15 +189,13 @@ import { manual } from "@/utils/manual";
 import Network from "../components/networks.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import { useLayout } from "../components/weblet_layout.vue";
-import { useProfileManager } from "../stores";
+import { useGrid } from "../stores";
 import { type Flist, ProjectName } from "../types";
 import { deployVM, type Disk, type Env } from "../utils/deploy_vm";
-import { getGrid } from "../utils/grid";
 import { generateName } from "../utils/strings";
 
 const layout = useLayout();
 const tabs = ref();
-const profileManager = useProfileManager();
 
 const images = [
   {
@@ -242,6 +240,8 @@ const certified = ref(false);
 const rootFilesystemSize = computed(() => solution.value?.disk);
 const selectionDetails = ref<SelectionDetails>();
 const selectedSSHKeys = ref("");
+const gridStore = useGrid();
+const grid = gridStore.client as GridClient;
 
 function layoutMount() {
   if (envs.value.length > 0) {
@@ -269,7 +269,7 @@ async function deploy() {
   const projectName = ProjectName.VM.toLowerCase() + "/" + name.value;
 
   try {
-    const grid = await getGrid(profileManager.profile!, projectName);
+    updateGrid(grid, { projectName });
 
     await layout.value.validateBalance(grid!);
 
@@ -315,12 +315,15 @@ watch(selectedSSHKeys, layoutMount, { deep: true });
 </script>
 
 <script lang="ts">
+import type { GridClient } from "@threefold/grid_client";
+
 import ExpandableLayout from "../components/expandable_layout.vue";
 import SelectVmImage from "../components/select_vm_image.vue";
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";
 import type { solutionFlavor as SolutionFlavor } from "../types";
 import type { SelectionDetails } from "../types/nodeSelector";
+import { updateGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
 
 const solution = ref() as Ref<SolutionFlavor>;

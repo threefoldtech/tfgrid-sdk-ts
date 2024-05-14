@@ -38,8 +38,9 @@ export default {
   name: "FundsCard",
   setup() {
     const loadingAddTFT = ref(false);
-    const profileManager = useProfileManager();
     const ProfileManagerController = useProfileManagerController();
+    const profileManager = useProfileManager();
+
     const addTFT = async () => {
       if (window.env.NETWORK !== "dev" && window.env.NETWORK !== "qa") {
         window.open("https://gettft.com/gettft/", "_blank");
