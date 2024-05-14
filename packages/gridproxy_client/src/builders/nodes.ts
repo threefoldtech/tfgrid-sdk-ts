@@ -25,6 +25,7 @@ export enum SortBy {
   NumGPU = "num_gpu",
   ExtraFee = "extra_fee",
   Status = "status",
+  FreeCRU = "free_cru",
 }
 
 export enum SortOrder {
