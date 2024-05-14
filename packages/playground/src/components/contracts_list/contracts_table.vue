@@ -137,7 +137,7 @@
             :text="
               freeBalance < getAmountLocked
                 ? `You don't have enough balance to unlock this contract`
-                : `Get your contract ready again`
+                : `Unlock this contract from the grace period state.`
             "
             location="top center"
           >
