@@ -33,7 +33,7 @@
                   validators.required('Fee is required.'),
                   validators.isNumeric('Fee must be a valid number.'),
                   validators.min('Fee must be a 0 or more.', 0),
-                  validators.max('Maximum allowed fee is 1000000000000000', 1000000000000000),
+                  validators.max('Maximum allowed fee is 1000000', 10000000),
                 ]"
                 #="{ props }"
               >
