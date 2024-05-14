@@ -9,8 +9,15 @@
     <section class="d-flex align-center">
       <v-card-title class="font-weight-bold d-flex align-center title ma-0 pa-0"> Contracts List </v-card-title>
       <v-spacer />
-      <v-btn class="mr-2" variant="outlined" color="warning" @click="openUnlockDialog" :loading="unlockContractLoading">
-        Unlock contracts
+      <v-btn
+        v-if="lockedContracts?.totalAmountLocked && !isLoading"
+        class="mr-2"
+        variant="outlined"
+        color="warning"
+        @click="openUnlockDialog"
+        :loading="unlockContractLoading"
+      >
+        Unlock All
       </v-btn>
       <v-btn
         prepend-icon="mdi-refresh"
