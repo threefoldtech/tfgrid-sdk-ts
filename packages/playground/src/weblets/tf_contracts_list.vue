@@ -81,11 +81,11 @@
           <div class="text-subtitle-2 pt-2">Loading contracts lock details</div>
         </v-row>
         <v-row class="d-flex" v-else>
-          <v-alert v-if="lockedContracts?.totalAmountLocked < freeBalance" class="ma-4" type="success" variant="tonal">
-            <div class="font-weigh-black">You have enough balance to unlock your contracts!</div></v-alert
-          >
-          <v-alert v-else class="ma-4" type="warning" variant="tonal">
-            <div>
+          <v-alert class="ma-4" type="warning" variant="tonal">
+            <div v-if="lockedContracts?.totalAmountLocked < freeBalance" class="font-weigh-black">
+              You have enough balance to unlock your contracts!
+            </div>
+            <div v-else>
               You need to fund your account with
               <span class="font-weight-black">
                 {{ Math.ceil(lockedContracts?.totalAmountLocked - freeBalance) }} TFTs
