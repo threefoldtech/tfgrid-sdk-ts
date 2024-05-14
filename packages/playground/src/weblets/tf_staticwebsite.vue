@@ -36,6 +36,7 @@
           validators.required('Git https URL is required.'),
           validators.isURL('Git URL must be a valid  https URL.', {
             protocols: ['https'],
+            require_protocol: true,
           }),
         ]"
         :async-rules="[isGithubRepoExist]"
