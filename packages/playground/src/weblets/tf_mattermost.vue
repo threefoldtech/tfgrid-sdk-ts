@@ -42,7 +42,7 @@
           :medium="{ cpu: 2, memory: 4, disk: 50 }"
           :large="{ cpu: 4, memory: 16, disk: 100 }"
         />
-        <Networks v-model:mycelium="mycelium" />
+        <Networks v-model:mycelium="mycelium" v-model:ipv4="ipv4" />
 
         <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
           <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
@@ -68,7 +68,6 @@
 
         <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
       </template>
-
       <template #smtp>
         <SmtpServer v-model="smtp" />
       </template>
@@ -82,7 +81,7 @@
 
 <script lang="ts" setup>
 import type { GridClient } from "@threefold/grid_client";
-import { computed, type Ref, ref } from "vue";
+import { computed, type Ref, ref, watch } from "vue";
 
 import { manual } from "@/utils/manual";
 
@@ -218,6 +217,23 @@ async function deploy() {
 function updateSSHkeyEnv(selectedKeys: string) {
   selectedSSHKeys.value = selectedKeys;
 }
+
+watch(
+  () => smtp.value.enabled,
+  newValue => {
+    if (newValue) {
+      ipv4.value = true;
+    }
+  },
+);
+watch(
+  () => ipv4.value,
+  newValue => {
+    if (!newValue && smtp.value.enabled) {
+      smtp.value.enabled = false;
+    }
+  },
+);
 </script>
 
 <script lang="ts">

@@ -194,7 +194,7 @@ async function loadFarms(retCount = false) {
 }
 
 const openSheet = (_e: any, { item }: any) => {
-  openDialog(item.value);
+  openDialog(item);
 };
 
 const openDialog = (item: Farm) => {

@@ -90,19 +90,23 @@
             no-data-text="No domains attached to this virtual machine."
           >
             <template #[`item.name`]="{ item }">
-              {{ item.value.name }}
+              {{ item.name }}
             </template>
 
             <template #[`item.tls_passthrough`]="{ item }">
-              {{ item.value.tls_passthrough ? "Yes" : "No" }}
+              {{ item.tls_passthrough ? "Yes" : "No" }}
+            </template>
+
+            <template #[`item.backends`]="{ item }">
+              {{ (Array.isArray(item.backends) ? item.backends[0] : item.backends) ?? "-" }}
             </template>
 
             <template #[`item.status`]="{ item }">
-              {{ item.value.status.toUpperCase() }}
+              {{ item.status.toUpperCase() }}
             </template>
 
             <template #[`item.actions`]="{ item }">
-              <IconActionBtn tooltip="Visit" icon="mdi-web" color="anchor" :href="'https://' + item.value.domain" />
+              <IconActionBtn tooltip="Visit" icon="mdi-web" color="anchor" :href="'https://' + item.domain" />
             </template>
           </list-table>
         </div>

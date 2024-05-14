@@ -1,6 +1,6 @@
 import { CertificationType, type GridNode, type NodeStats, NodeStatus } from "@threefold/gridproxy_client";
 import { capitalize } from "vue";
-import type { VDataTable } from "vuetify/lib/labs/components";
+import type { VDataTable } from "vuetify/components";
 
 import type { AsyncRule, SyncRule } from "@/components/input_validator.vue";
 
@@ -87,7 +87,7 @@ export interface Flist {
   entryPoint: string;
 }
 
-export type VDataTableHeader = VDataTable["headers"];
+export type VDataTableHeader = { title: string; key: string; sortable?: boolean; [key: string]: any }[];
 
 export enum ProjectName {
   Kubernetes = "Kubernetes",
@@ -281,6 +281,7 @@ export const nodeStatsInitializer: NodeStats = {
   users: {
     deployments: 0,
     workloads: 0,
+    last_deployment_timestamp: 0,
   },
 };
 
