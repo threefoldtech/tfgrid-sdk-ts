@@ -382,7 +382,9 @@ async function openUnlockDialog() {
       }
     }
   } catch (e) {
-    console.log("errror", e);
+    createCustomToast("Failed to load contracts lock details, please try again later", ToastType.danger);
+    console.log(e);
+    unlockDialog.value = false;
   } finally {
     loadingShowDetails.value = false;
   }
