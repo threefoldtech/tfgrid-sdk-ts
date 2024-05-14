@@ -153,37 +153,43 @@
           <VRow class="text-center text-body-1 text-black" v-else-if="valid">
             <VCol cols="6">
               <div
-                class="rounded pa-4 h-100"
+                class="rounded pa-4 discount"
                 :style="{
                   background: computePackageColor(priceTask.data?.dedicatedPackage.package),
                 }"
               >
                 <p>
-                  Cost of reserving a <strong v-text="'Dedicated Node'" /> of the same specifications<br />
+                  Cost of reserving a <strong v-text="'Dedicated Node '" />
                   <strong v-text="'Loading...'" v-if="priceTask.loading" />
-                  <strong v-else v-text="dedicatedPriceUSD + ' USD/month, ' + dedicatedPriceTFT + ' TFT/month'" />. A
-                  user can reserve an entire node then use it exclusively to deploy solutions
+                  <strong v-else v-text="dedicatedPriceUSD + ' USD/month, ' + dedicatedPriceTFT + ' TFT/month.'" />
                 </p>
-                <br />
-                <coupon />
+                <section class="card" v-if="priceTask.data?.dedicatedPackage.package !== 'gold'">
+                  <p class="card-info">
+                    <b>Too expensive?</b> can upgrade to <b>Gold package</b> to get discount up to 60% when you fund
+                    your wallet with <b>{{ Math.ceil(114.473 * 18) }}</b> TFT
+                  </p>
+                </section>
               </div>
             </VCol>
             <VCol cols="6">
               <div
-                class="rounded pa-4 h-100"
+                class="rounded pa-4 h-100 discount"
                 :style="{
                   background: computePackageColor(priceTask.data?.sharedPackage.package),
                 }"
               >
                 <p>
                   Cost of reservation on a
-                  <strong v-text="'Shared Node'" /><br />
+                  <strong v-text="'Shared Node '" />
                   <strong v-text="'Loading...'" v-if="priceTask.loading" />
-                  <strong v-else v-text="sharedPriceUSD + ' USD/month, ' + sharedPriceTFT + ' TFT/month'" />. Shared
-                  Nodes allow several users to host various workloads on a single node
+                  <strong v-else v-text="sharedPriceUSD + ' USD/month, ' + sharedPriceTFT + ' TFT/month.'" />
                 </p>
-                <br />
-                <coupon />
+                <section class="card" v-if="priceTask.data?.sharedPackage.package !== 'gold'">
+                  <p class="card-info">
+                    <b>Too expensive?</b> can upgrade to <b>Gold package</b> to get discount up to 60% when you fund
+                    your wallet with <b>{{ Math.ceil(228.947 * 18) }}</b> TFT
+                  </p>
+                </section>
               </div>
             </VCol>
           </VRow>
@@ -210,7 +216,6 @@ import type { VForm } from "vuetify/components/VForm";
 import { manual } from "@/utils/manual";
 
 import { calculator as Calculator } from "../../../grid_client/dist/es6";
-import coupon from "../components/coupon.vue";
 import { useProfileManagerController } from "../components/profile_manager_controller.vue";
 import { useAsync } from "../hooks";
 import { useProfileManager } from "../stores";
@@ -219,7 +224,6 @@ import { balanceRules, cruRules, hruRules, mruRules, nuRules, sruRules } from ".
 import { computePackageColor, normalizePrice } from "../utils/pricing_calculator";
 export default {
   name: "PricingCalculator",
-  components: { coupon },
   setup() {
     const calculator = new Calculator(new QueryClient(window.env.SUBSTRATE_URL));
     const profileManager = useProfileManager();
@@ -320,3 +324,30 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.discount {
+  display: flex;
+  flex-direction: column;
+  background: #f4f4f4;
+  border-radius: 8px;
+  padding: 15px 30px;
+  -webkit-mask-image: radial-gradient(circle at 10px, transparent 10px, red 10.5px),
+    radial-gradient(circle at 0px 0px, red 0px, transparent 0.5px);
+  -webkit-mask-position: -10px, -0px -0px;
+  -webkit-mask-size: 100% 23px, 100%;
+  -webkit-mask-composite: source-out, destination-over;
+  mask-composite: subtract, add;
+}
+
+.discount p {
+  padding: 10px;
+}
+
+.card {
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin: 0 15px;
+}
+</style>
