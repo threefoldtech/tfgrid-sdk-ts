@@ -1,5 +1,8 @@
 <template>
   <div>
+    <v-alert v-if="errorMessage" type="error" variant="tonal">
+      {{ errorMessage }}
+    </v-alert>
     <v-alert v-if="!loading && count && items.length < count" type="warning" variant="tonal">
       Failed to load <strong>{{ count - items.length }}</strong> deployment{{ count - items.length > 1 ? "s" : "" }}.
 
@@ -177,6 +180,7 @@ const count = ref<number>();
 const items = ref<any[]>([]);
 const showDialog = ref(false);
 const showEncryption = ref(false);
+const errorMessage = ref<string>("");
 const showAllDeployments = ref(false);
 const failedDeployments = ref<
   {
@@ -194,44 +198,50 @@ async function loadDeployments() {
   items.value = [];
   loading.value = true;
   const grid = await getGrid(profileManager.profile!, props.projectName);
-  const chunk1 = await loadVms(grid!);
-  if (chunk1.count > 0 && migrateGateways) {
-    await migrateModule(grid!.gateway);
-  }
-
-  const chunk2 = await loadVms(updateGrid(grid!, { projectName: props.projectName.toLowerCase() }));
-  if (chunk2.count > 0 && migrateGateways) {
-    await migrateModule(grid!.gateway);
-  }
-  let chunk3: LoadedDeployments<any[]> = { count: 0, items: [], failedDeployments: [] };
-  if (showAllDeployments.value) {
-    chunk3 =
-      props.projectName.toLowerCase() === ProjectName.VM.toLowerCase()
-        ? await loadVms(updateGrid(grid!, { projectName: "" }))
-        : { count: 0, items: [], failedDeployments: [] };
-
-    if (chunk3.count > 0 && migrateGateways) {
+  try {
+    const chunk1 = await loadVms(grid!);
+    if (chunk1.count > 0 && migrateGateways) {
       await migrateModule(grid!.gateway);
     }
 
-    chunk3.items = chunk3.items.map(markAsFromAnotherClient);
-  }
+    const chunk2 = await loadVms(updateGrid(grid!, { projectName: props.projectName.toLowerCase() }));
+    if (chunk2.count > 0 && migrateGateways) {
+      await migrateModule(grid!.gateway);
+    }
+    let chunk3: LoadedDeployments<any[]> = { count: 0, items: [], failedDeployments: [] };
+    if (showAllDeployments.value) {
+      chunk3 =
+        props.projectName.toLowerCase() === ProjectName.VM.toLowerCase()
+          ? await loadVms(updateGrid(grid!, { projectName: "" }))
+          : { count: 0, items: [], failedDeployments: [] };
 
-  const vms = mergeLoadedDeployments(chunk1, chunk2, chunk3 as any);
-  failedDeployments.value = vms.failedDeployments;
-
-  count.value = vms.count;
-  items.value = vms.items
-    .map((vm: any) => {
-      if (props.projectName.toLowerCase() === ProjectName.Caprover.toLowerCase()) {
-        const [leader, ...workers] = vm;
-        leader.workers = workers;
-        return leader;
+      if (chunk3.count > 0 && migrateGateways) {
+        await migrateModule(grid!.gateway);
       }
 
-      return vm;
-    })
-    .flat();
+      chunk3.items = chunk3.items.map(markAsFromAnotherClient);
+    }
+
+    const vms = mergeLoadedDeployments(chunk1, chunk2, chunk3 as any);
+    failedDeployments.value = vms.failedDeployments;
+
+    count.value = vms.count;
+    items.value = vms.items
+      .map((vm: any) => {
+        if (props.projectName.toLowerCase() === ProjectName.Caprover.toLowerCase()) {
+          const [leader, ...workers] = vm;
+          leader.workers = workers;
+          return leader;
+        }
+
+        return vm;
+      })
+      .flat();
+  } catch (err) {
+    errorMessage.value = `Failed to load Deployments: ${err}`;
+  } finally {
+    loading.value = false;
+  }
 
   loading.value = false;
 }
