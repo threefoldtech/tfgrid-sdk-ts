@@ -336,7 +336,7 @@ class TFContracts extends Contracts {
   }
 
   async batchUnlockContracts(ids: number[]) {
-    const extrinsics: ExtrinsicResult<Contract>[] = [];
+    const extrinsics: ExtrinsicResult<number>[] = [];
     for (const id of ids) {
       extrinsics.push(await this.unlock(id));
     }
@@ -351,7 +351,12 @@ class TFContracts extends Contracts {
       contract => parseInt(contract.contractID),
     );
 
-    return await this.batchUnlockContracts(ids);
+    const billableContractsIDs: number[] = [];
+    for (const id of ids) {
+      if ((await this.getConsumption({ id, graphqlURL })) > 0) billableContractsIDs.push(id);
+    }
+
+    return await this.batchUnlockContracts(billableContractsIDs);
   }
   async getDedicatedNodeExtraFee(options: GetDedicatedNodePriceOptions): Promise<number> {
     // converting fees from milli to usd before getting

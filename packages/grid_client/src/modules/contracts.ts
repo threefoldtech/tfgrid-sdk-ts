@@ -310,7 +310,7 @@ class Contracts {
    */
   @expose
   @validateInput
-  async unlockContract(ids: number[]): Promise<Contract[]> {
+  async unlockContract(ids: number[]): Promise<number[]> {
     return await this.client.contracts.batchUnlockContracts(ids);
   }
   /**
@@ -319,7 +319,7 @@ class Contracts {
    */
   @expose
   @validateInput
-  async unlockMyContracts(): Promise<Contract[]> {
+  async unlockMyContracts(): Promise<number[]> {
     return await this.client.contracts.unlockMyContracts(this.config.graphqlURL);
   }
 }
