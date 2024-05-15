@@ -2,6 +2,11 @@ import type { Contract, ExtrinsicResult } from "@threefold/tfchain_client";
 
 import { BaseModule } from "../../../grid_client/dist/es6/modules/base";
 
+/**
+ * `_migrateOldFullVMs` is a function is implemented to list all old `FullVM` that listed in the old `Playground` with type `Fullvm`
+ * @param `module` takes the `module` which is an instance of the `BaseModule`.
+ * @returns Applying the extrinsic in the chain with the batch request.
+ */
 async function _migrateOldFullVMs(module: BaseModule) {
   module.moduleName = "Fullvm"; // Load old deployments that deployed with `Fullvm` type.
   const deploymentNames = await module._list();
