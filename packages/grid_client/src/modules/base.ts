@@ -177,8 +177,6 @@ class BaseModule {
 
   private async getMyContracts(fetch = false) {
     if (fetch || !this.contracts) {
-      console.log("modulesNames:", modulesNames[this.moduleName]);
-      console.log("moduleName: ", this.moduleName);
       let contracts = await this.tfClient.contracts.listMyNodeContracts({
         graphqlURL: this.config.graphqlURL,
         type: modulesNames[this.moduleName] ?? this.moduleName,
