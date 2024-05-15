@@ -72,10 +72,17 @@
       :headers="[
         { title: 'PLACEHOLDER', key: 'data-table-select' },
         { title: 'Name', key: 'name' },
-        { title: 'Public IPv4', key: 'ipv4', sortable: false },
-        { title: 'Public IPv6', key: 'ipv6', sortable: false },
-        { title: 'Planetary Network IP', key: 'planetary', sortable: false },
-        { title: 'Mycelium Network IP', key: 'mycelium', sortable: false },
+        {
+          title: 'Networks',
+          key: 'networks',
+          sortable: false,
+          children: [
+            { title: 'Public IPv4', key: 'ipv4', sortable: false },
+            { title: 'Public IPv6', key: 'ipv6', sortable: false },
+            { title: 'Planetary IP', key: 'planetary', sortable: false },
+            { title: 'Mycelium IP', key: 'mycelium', sortable: false },
+          ],
+        },
         { title: 'Workers', key: 'workersLength' },
         { title: 'Billing Rate', key: 'billing' },
         { title: 'Created At', key: 'created' },
