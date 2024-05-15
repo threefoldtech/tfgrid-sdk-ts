@@ -381,6 +381,7 @@ async function openUnlockDialog() {
         selectedLockedAmount.value += (await getLockDetails(rentContractId)).amountLocked || 0;
       }
     }
+    await profileManagerController.reloadBalance();
   } catch (e) {
     createCustomToast("Failed to load contracts lock details, please try again later", ToastType.danger);
     console.log(e);
@@ -397,6 +398,7 @@ async function getLockDetails(contractId: number) {
 async function contractLockDetails(item: any) {
   selectedItem.value = item;
   loadingShowDetails.value = true;
+  await profileManagerController.reloadBalance();
   await getLockDetails(item.contractId)
     .then((data: ContractLock) => {
       contractLocked.value = data;

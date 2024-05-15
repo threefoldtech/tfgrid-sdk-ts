@@ -264,6 +264,7 @@ async function openUnlockDialog() {
   unlockDialog.value = true;
   try {
     await getContractsLockDetails();
+    await profileManagerController.reloadBalance();
   } catch (e) {
     createCustomToast(`Failed to get contracts lock details`, ToastType.danger);
     console.error(e);
