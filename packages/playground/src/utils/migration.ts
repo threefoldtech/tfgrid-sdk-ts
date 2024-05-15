@@ -14,11 +14,9 @@ async function _migrateOldFullVMs(module: BaseModule) {
     deploymentNames.map(deploymentName => module.getDeploymentContracts(deploymentName)),
   );
 
-  const extrinsics: ExtrinsicResult<Contract>[] = [];
-
-  const loadUpdateExtrinsics = async () => {
-    return await Promise.all(
-      contracts.flat().map(async contract => {
+  const loadUpdateExtrinsics = () => {
+    return Promise.all(
+      contracts.flat().map(contract => {
         const oldData = JSON.parse(contract.deploymentData || "{}") as unknown as {
           type: string;
           name: string;
@@ -30,30 +28,31 @@ async function _migrateOldFullVMs(module: BaseModule) {
         }
 
         oldData.type = "vm";
-
-        const extrinsic = await module.tfClient.contracts.updateNode({
+        BaseModule.newContracts.push(contract);
+        return module.tfClient.contracts.updateNode({
           id: +contract.contractID,
           data: JSON.stringify(oldData),
           hash: contract.deploymentHash,
         });
-
-        extrinsics.push(extrinsic);
-        BaseModule.newContracts.push(contract);
       }),
     );
   };
 
   if (deploymentNames.length) {
-    await loadUpdateExtrinsics();
-    return await module.tfClient.applyAllExtrinsics<Contract>(extrinsics);
+    const extrinsics = await loadUpdateExtrinsics().then(exts => exts.filter(Boolean) as ExtrinsicResult<Contract>[]);
+    return module.tfClient.applyAllExtrinsics<Contract>(extrinsics);
   }
 }
 
 export async function migrateModule(module: BaseModule) {
-  await _migrateOldFullVMs(module);
-  module.moduleName = "vm";
-  await module._list(); // force grid_client migration
+  const moduleName = module.moduleName;
+  // To list only `Full` and `Micro` VMs.
+  if (module.moduleName === "machines") {
+    await _migrateOldFullVMs(module);
+  }
 
+  module.moduleName = moduleName;
+  await module._list(); // force grid_client migration
   const path = module.getNewDeploymentPath();
   const keys = await module.backendStorage.list(path);
 
