@@ -206,16 +206,13 @@ const headers: VDataTableHeader = [
   { title: "ID", key: "farmId", sortable: false },
   { title: "Name", key: "name", sortable: false },
   {
-    title: "Total Public IPs",
-    key: "totalPublicIp",
-    align: "start",
+    title: "Public IPs",
+    key: "publicIps",
     sortable: false,
-  },
-  {
-    title: "Available Public IPs",
-    key: "freePublicIp",
-    align: "start",
-    sortable: false,
+    children: [
+      { title: "Total", key: "totalPublicIp", sortable: false },
+      { title: "Available", key: "freePublicIp", sortable: false },
+    ],
   },
   {
     title: "Certification Type",
