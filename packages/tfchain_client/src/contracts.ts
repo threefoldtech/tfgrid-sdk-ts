@@ -353,7 +353,7 @@ class Contracts extends QueryContracts {
    *
    *
    * @param {number} contractId - Contract id to be unlocked.
-   * @returns {Promise<Contract>} A promise that resolves to a `Contract` object
+   * @returns {Promise<ExtrinsicResult<number>>} A promise that resolves to a `ExtrinsicResult<number>`
    * @note This call doesn't guarantee that the contract will be resumed, it just triggers the billing of it, if the accounts has enough funds the contract will be resumed
    *
    */
