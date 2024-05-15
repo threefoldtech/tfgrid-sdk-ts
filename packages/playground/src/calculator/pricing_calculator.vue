@@ -343,7 +343,7 @@ export default {
 
 <style scoped>
 .discount p {
-  padding: 10px;
+  padding: 10px 0;
 }
 
 .card {
