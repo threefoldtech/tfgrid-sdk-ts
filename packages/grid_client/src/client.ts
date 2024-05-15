@@ -41,6 +41,7 @@ class GridClient {
   stellar: modules.stellar;
   blockchain: modules.blockchain;
   calculator: modules.calculator;
+  tft: modules.TFT;
   utility: modules.utility;
   farmerbot: modules.farmerbot;
   farms: modules.farms;
