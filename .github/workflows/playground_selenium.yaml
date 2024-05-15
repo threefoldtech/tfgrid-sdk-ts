@@ -1,7 +1,6 @@
-name: Dashboard Selenium Tests
+name: Playground Selenium Tests
 
 on:
-  push:
   workflow_dispatch:
   schedule:
     - cron: "0 6 * * *"
@@ -28,10 +27,8 @@ jobs:
         run: yarn lerna run build
       - name: Yarn Serve
         run: make run project=playground &
-      - name: Wait on localhost
-        uses: iFaxity/wait-on-action@v1
-        with:
-          resource: http://localhost:5173
+      - name: Wait for localhost
+        run: sleep 60
       - name: Run tests
         working-directory: ./packages/playground/tests/frontend_selenium
         env:
