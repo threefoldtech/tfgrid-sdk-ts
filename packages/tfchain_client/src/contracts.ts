@@ -360,7 +360,10 @@ class Contracts extends QueryContracts {
   @checkConnection
   async unlock(contractId: number) {
     const extrinsic = await this.client.api.tx.smartContractModule.billContractForBlock(contractId);
-    return this.client.patchExtrinsic<Contract>(extrinsic);
+    return this.client.patchExtrinsic(extrinsic, {
+      map: () => contractId,
+      resultEvents: ["ContractGracePeriodEnded"],
+    });
   }
 }
 
