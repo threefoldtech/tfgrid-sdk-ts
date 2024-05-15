@@ -158,39 +158,52 @@
                   background: computePackageColor(priceTask.data?.dedicatedPackage.package),
                 }"
               >
-                <p>
-                  Cost of reserving a <strong v-text="'Dedicated Node '" />
-                  <strong v-text="'Loading...'" v-if="priceTask.loading" />
-                  <strong v-else v-text="dedicatedPriceUSD + ' USD/month, ' + dedicatedPriceTFT + ' TFT/month.'" />
-                </p>
-                <section class="card" v-if="priceTask.data?.dedicatedPackage.package !== 'gold'">
-                  <p class="card-info">
-                    <b>Too expensive?</b> can upgrade to <b>Gold package</b> to get discount up to 60% when you fund
-                    your wallet with <b>{{ Math.ceil(114.473 * 18) }}</b> TFT
+                <input-tooltip
+                  justifyCenter
+                  alignCenter
+                  tooltip="Dedicated Node allow user to reserve an entire node then use it exclusively to deploy solutions."
+                >
+                  <p>
+                    Cost of reserving a
+                    <strong class="mr-1" v-text="'Dedicated Node'" />
+                    <strong v-text="'Loading...'" v-if="priceTask.loading" />
+                    <strong v-else v-text="dedicatedPriceUSD + ' USD/month, ' + dedicatedPriceTFT + ' TFT/month'" />
                   </p>
-                </section>
+                </input-tooltip>
               </div>
+              <section class="card mt-5" v-if="priceTask.data?.dedicatedPackage.package !== 'gold'">
+                <p class="card-info pa-2">
+                  <b>Too expensive?</b> can upgrade to <b>Gold package</b> to get discount up to 60% when you fund your
+                  wallet with <b>{{ dedicatedUpgradePrice }}</b> TFT
+                </p>
+              </section>
             </VCol>
             <VCol cols="6">
               <div
-                class="rounded pa-4 h-100 discount"
+                class="rounded pa-4 discount"
                 :style="{
                   background: computePackageColor(priceTask.data?.sharedPackage.package),
                 }"
               >
-                <p>
-                  Cost of reservation on a
-                  <strong v-text="'Shared Node '" />
-                  <strong v-text="'Loading...'" v-if="priceTask.loading" />
-                  <strong v-else v-text="sharedPriceUSD + ' USD/month, ' + sharedPriceTFT + ' TFT/month.'" />
-                </p>
-                <section class="card" v-if="priceTask.data?.sharedPackage.package !== 'gold'">
-                  <p class="card-info">
-                    <b>Too expensive?</b> can upgrade to <b>Gold package</b> to get discount up to 60% when you fund
-                    your wallet with <b>{{ Math.ceil(228.947 * 18) }}</b> TFT
+                <input-tooltip
+                  justifyCenter
+                  alignCenter
+                  tooltip="Shared Nodes allow several users to host various workloads on a single node."
+                >
+                  <p>
+                    Cost of reservation on a
+                    <strong class="mr-1" v-text="'Shared Node'" />
+                    <strong v-text="'Loading...'" v-if="priceTask.loading" />
+                    <strong v-else v-text="sharedPriceUSD + ' USD/month, ' + sharedPriceTFT + ' TFT/month'" />
                   </p>
-                </section>
+                </input-tooltip>
               </div>
+              <section class="card mt-5 pa-2" v-if="priceTask.data?.sharedPackage.package !== 'gold'">
+                <p class="card-info">
+                  <b>Too expensive?</b> can upgrade to <b>Gold package</b> to get discount up to 60% when you fund your
+                  wallet with <b>{{ sharedUpgradePrice }}</b> TFT
+                </p>
+              </section>
             </VCol>
           </VRow>
 
@@ -240,7 +253,8 @@ export default {
       ipv4: false,
       useCurrentBalance: true,
     });
-
+    const dedicatedUpgradePrice = ref(Math.ceil(114.473 * 18));
+    const sharedUpgradePrice = ref(Math.ceil(228.947 * 18));
     const tftPriceTask = useAsync(() => calculator.tftPrice(), {
       init: true,
       default: 0,
@@ -320,26 +334,14 @@ export default {
       normalizeError,
       profileManager,
       manual,
+      dedicatedUpgradePrice,
+      sharedUpgradePrice,
     };
   },
 };
 </script>
 
 <style scoped>
-.discount {
-  display: flex;
-  flex-direction: column;
-  background: #f4f4f4;
-  border-radius: 8px;
-  padding: 15px 30px;
-  -webkit-mask-image: radial-gradient(circle at 10px, transparent 10px, red 10.5px),
-    radial-gradient(circle at 0px 0px, red 0px, transparent 0.5px);
-  -webkit-mask-position: -10px, -0px -0px;
-  -webkit-mask-size: 100% 23px, 100%;
-  -webkit-mask-composite: source-out, destination-over;
-  mask-composite: subtract, add;
-}
-
 .discount p {
   padding: 10px;
 }
@@ -348,6 +350,5 @@ export default {
   background: white;
   border: 1px solid #ccc;
   border-radius: 5px;
-  margin: 0 15px;
 }
 </style>
