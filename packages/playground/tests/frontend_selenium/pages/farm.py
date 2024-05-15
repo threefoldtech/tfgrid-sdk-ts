@@ -1,3 +1,4 @@
+from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
@@ -9,42 +10,44 @@ This module contains Farm page elements.
 
 class FarmPage:
 
-    farm=(By.XPATH, "//*[contains(text(), 'farms')]" )
+    logout_button = (By.XPATH, "//button[.//span[text()=' Logout ']]")
+    farm_section = (By.XPATH, "//span[text()='Farms']")
+    farm_page = (By.XPATH, "//span[text()='Your Farms']")
     twin_details = (By.XPATH, "//*[contains(text(), 'Twin Details')]")
-    create_button=(By.XPATH, "//*[contains(text(), 'Create farm')]")
-    farm_name_text_field=(By.XPATH,'/html/body/div[1]/div[4]/div/div/div[1]/form/div/div/div[1]/div/input')
-    create_farm_button=(By.XPATH, "/html/body/div[1]/div[4]/div/div/div[2]/button[1]")
-    search_bar=(By.XPATH ,'/html/body/div[1]/div[1]/div[2]/div/div[1]/div[3]/div/div[1]/div/input')
-    details_arrow=(By.XPATH,'//*[@id="app"]/div[1]/div[2]/div/div[1]/div[4]/div[1]/table/tbody/tr[1]/td[1]/button')
-    farm_Id_arrow=(By.XPATH ,'//*[@id="app"]/div[1]/div[2]/div/div[1]/div[4]/div[1]/table/thead/tr/th[2]')
-    farm_name_arrow=(By.XPATH ,'//*[@id="app"]/div[1]/div[2]/div/div[1]/div[4]/div[1]/table/thead/tr/th[3]/i')
-    farm_twin_linked_arrow=(By.XPATH ,'//*[@id="app"]/div[1]/div[2]/div/div[1]/div[4]/div[1]/table/thead/tr/th[4]/i')
-    certification_type_arrow=(By.XPATH ,'//*[@id="app"]/div[1]/div[2]/div/div[1]/div[4]/div[1]/table/thead/tr/th[5]/i')
-    pricing_policy_arrow=(By.XPATH ,'//*[@id="app"]/div[1]/div[2]/div/div[1]/div[4]/div[1]/table/thead/tr/th[6]/i')
-    add_v2_button=(By.XPATH ,'//*[@id="app"]/div[1]/div[2]/div/div[1]/div[4]/div[1]/table/tbody/tr[2]/td/div/div[5]/div[1]/div[2]/button')
-    submit_button=(By.XPATH,'//*[@id="app"]/div[5]/div/div/div[2]/button[2]')
-    view_bootstrap_button=(By.XPATH ,'//*[@id="app"]/div[1]/div[2]/div/div[1]/div[4]/div[1]/table/tbody/tr[2]/td/div/div[5]/div[1]/div[1]/a')
-    public_ip_list=(By.XPATH ,'//*[@id="app"]/div[1]/div[2]/div/div[1]/div[4]/div[1]/table/tbody/tr[2]/td/div/div[4]/div/div/div/button/div/i')
-    add_ip_button=(By.XPATH ,'//*[@id="app"]/div[1]/div[2]/div/div[1]/div[4]/div[1]/table/tbody/tr[2]/td/div/div[4]/div/div/div/div/div/div/header/div/div/button')
-    ip_text_field=(By.XPATH ,'/html/body/div[1]/div[5]/div/div/div[2]/form/div/div/div[1]/div/input')
-    add_stellar_address=(By.XPATH,'/html/body/div[1]/div[5]/div/div/div[1]/form/div/div/div[1]/div/input')
-    edit_stellar_address=(By.XPATH,'//*[@id="app"]/div[1]/div[2]/div/div[1]/div[4]/div[1]/table/tbody/tr[2]/td/div/div[3]/div[4]/div/div/div/div[2]/div/button')
-    gateway_text_field=(By.XPATH ,'/html/body/div[1]/div[5]/div/div/div[2]/div[2]/div/div[1]/div/input')
-    save_button=(By.XPATH ,'//*[@id="app"]/div[5]/div/div/div[3]/button[3]')
-    close_button=(By.XPATH ,'//*[@id="app"]/div[5]/div/div/div[3]/button[1]')
-    delete_button=(By.XPATH, "//div[contains(@class, 'v-card__actions')]//button[contains(@class, 'red--text')]")
-    zero=(By.XPATH,'//html/body/main/div[1]/div/h1')
+    create_button = (By.XPATH, "//button[.//span[text()='Create Farm']]")
+    farm_name_text_field = (By.XPATH, "//label[text()='Farm name']/following-sibling::input")
+    create_farm_button = (By.XPATH, "//button[.//span[text()='Create']]")
+    search_bar=(By.XPATH, "//label[text()='Search farm by ID or farm name']/following-sibling::input")
+    table = (By.XPATH, "//span[text()='Farm Name']/ancestor::table")
+    details_arrow = (By.XPATH, '//table/tbody/tr/td[5]/button')
+    farm_Id_arrow = (By.XPATH ,'//*[@id="app"]/div[1]/div[2]/div/div[1]/div[4]/div[1]/table/thead/tr/th[2]')
+    farm_name_arrow = (By.XPATH ,'//*[@id="app"]/div[1]/div[2]/div/div[1]/div[4]/div[1]/table/thead/tr/th[3]/i')
+    farm_twin_linked_arrow = (By.XPATH ,'//*[@id="app"]/div[1]/div[2]/div/div[1]/div[4]/div[1]/table/thead/tr/th[4]/i')
+    certification_type_arrow = (By.XPATH ,'//*[@id="app"]/div[1]/div[2]/div/div[1]/div[4]/div[1]/table/thead/tr/th[5]/i')
+    pricing_policy_arrow = (By.XPATH ,'//*[@id="app"]/div[1]/div[2]/div/div[1]/div[4]/div[1]/table/thead/tr/th[6]/i')
+    add_v2_button = (By.XPATH, "//button[.//span[text()=' Add/Edit Stellar Payout Address ']]")
+    submit_button = (By.XPATH, "//button[.//span[text()='Submit']]")
+    view_bootstrap_button = (By.XPATH, "//a[.//span[text()='Bootstrap Node Image']]")
+    add_ip_button = (By.XPATH, "//button[.//span[text()='Add IP']]")
+    ip_text_field = (By.XPATH, "//label[text()='IP']/following-sibling::input")
+    add_stellar_address = (By.XPATH, "//label[text()='Stellar Wallet Address']/following-sibling::input")
+    gateway_text_field = (By.XPATH, "//label[text()='Gateway']/following-sibling::input")
+    save_button = (By.XPATH, "//button[.//span[text()='Add']]")
+    close_button = (By.XPATH, "//button[.//span[text()='Close']]")
+    delete_button = (By.XPATH, "//button[.//span[text()=' Delete ']]")
+    confirm_button = (By.XPATH, "//button[.//span[text()='Confirm']]")
+    zero = (By.XPATH,'//html/body/main/div[1]/div/h1')
     table_farm_name=(By.XPATH, '//*[@id="app"]/div[1]/div[2]/div/div[1]/div[4]/div[1]/table/tbody/tr[1]/td[3]')
-    table = (By.XPATH,'//table/tbody/tr')
-    stellar_payout_address = (By.XPATH,'/html/body/div[1]/div[1]/div[2]/div/div[1]/div[4]/div[1]/table/tbody/tr[2]/td/div/div[3]/div[4]/div/div/div/div[1]/input')
-    ip_dropdown = (By.XPATH,'//*[@id="app"]/div[5]/div/div/div[2]/div[1]/div/div[1]/div[1]/div')
-    range_selection=(By.XPATH, "//*[contains(text(), 'Range')]")
-    from_ip_input = (By.XPATH, "/html/body/div[1]/div[5]/div/div/div[2]/form/div/div/div[1]/div/input") 
-    to_ip_input = (By.XPATH, "/html/body/div[1]/div[5]/div/div/div[2]/div[2]/div/div[1]/div/input") 
-    gateway_range_input = (By.XPATH, "/html/body/div[1]/div[5]/div/div/div[2]/div[3]/div/div[1]/div/input") 
+    stellar_payout_address = (By.XPATH, '//table/tbody/tr[2]/td/div[1]/div/div/div[3]/div/div/div[1]/div[2]/p')
+    dedicated = (By.XPATH, '//table/tbody/tr[2]/td/div[1]/div/div/div[3]/div/div/div[2]/div[2]/p')
+    pricing_policy = (By.XPATH, '//table/tbody/tr[2]/td/div[1]/div/div/div[3]/div/div/div[3]/div[2]/p')
+    ip_dropdown = (By.XPATH, "(//i[contains(@class, 'mdi-menu-down')])[3]")
+    range_selection = (By.XPATH, "//div[@class='v-list-item-title'][text()='Range']")
+    from_ip_input = (By.XPATH, "//label[text()='From IP']/following-sibling::input") 
+    to_ip_input = (By.XPATH, "//label[text()='To IP']/following-sibling::input")
     table_row = '//*[@id="app"]/div[1]/div[2]/div/div[1]/div[4]/div[1]/table/tbody/tr['
-    farm_public_ips = '//*[@id="app"]/div[1]/div[2]/div/div[1]/div[4]/div[1]/table/tbody/tr[2]/td/div/div[4]/div/div/div/div/div/div/div/table/tbody/tr'
-    node_expand_details = '//*[@id="app"]/div[1]/div[2]/div/div[1]/div[4]/div[1]/table/tbody/tr[2]/td/div/div['
+    farm_public_ips = '//table/tbody/tr[2]/td/div[2]/div/div[1]/div/div[2]/table/tbody/tr'
+    node_expand_details = '//table/tbody/tr[1]/td'
     rows_per_page = (By.XPATH, '//*[@id="app"]/div[1]/div[2]/div/div[1]/div[4]/div[2]/div[1]/div/div/div/div[1]/div[2]/div/i')
     all_rows_per_page = (By.XPATH, '/html/body/div[1]/div[3]/div/div[4]/div/div')   
     close_login_button = (By.XPATH, '/html/body/div[1]/div[3]/div/div/div[4]/button[2]')
@@ -54,10 +57,10 @@ class FarmPage:
         self.browser = browser
 
     def navigetor(self):
-        self.browser.find_element(*self.close_login_button).click()
-        WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.twin_details))
-        WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.farm))
-        self.browser.find_element(*self.farm).click()
+        WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.logout_button))
+        webdriver.ActionChains(self.browser).send_keys(Keys.ESCAPE).perform()
+        self.browser.find_element(*self.farm_section).click()
+        self.browser.find_element(*self.farm_page).click()
     
     def check_farm_counts(self):
         WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.table_farm_name))
@@ -213,11 +216,20 @@ class FarmPage:
 
     def setup_farmpayout_address(self, farm_name):
         self.search_functionality(farm_name)
-        self.wait_for(farm_name)
+        self.wait_for_farm_name(farm_name)
         WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.details_arrow))
         WebDriverWait(self.browser, 30).until(EC.element_to_be_clickable(self.details_arrow))
+        WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located((By.XPATH, "//span[contains(@class, 'v-btn__content')]/i[contains(@class, 'mdi-chevron-down')]")))
         self.browser.find_element(*self.details_arrow).click()
+        if(len(self.browser.find_elements(By.XPATH, "//span[contains(@class, 'v-btn__content')]/i[contains(@class, 'mdi-chevron-up')]")) == 0):
+            self.browser.find_element(*self.details_arrow).click()
+        self.browser.execute_script("window.scrollBy(0, 250);")
 
+    def reopen_details(self):
+        WebDriverWait(self.browser, 60).until(EC.visibility_of_element_located((By.XPATH, "//span[contains(@class, 'v-btn__content')]/i[contains(@class, 'mdi-chevron-down')]")))
+        self.browser.find_element(*self.details_arrow).click()
+        self.browser.execute_script("window.scrollBy(0, 150);")
+    
     def add_farmpayout_address(self, data):
         self.browser.find_element(*self.add_stellar_address).send_keys(Keys.CONTROL + "a")
         self.browser.find_element(*self.add_stellar_address).send_keys(Keys.DELETE)
@@ -225,16 +237,15 @@ class FarmPage:
         return self.browser.find_element(*self.submit_button)
 
     def farmpayout_address_value(self):
-        WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.edit_stellar_address))
-        return self.browser.find_element(*self.stellar_payout_address).get_attribute("value")
+        WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.stellar_payout_address))
+        return self.browser.find_element(*self.stellar_payout_address).text
     
-    def setup_gateway(self, data, farm_name):
-        self.search_functionality(farm_name)
-        self.browser.find_element(*self.details_arrow).click()
-        self.browser.find_element(*self.public_ip_list).click()
+    def setup_gateway(self, ip, gateway, farm_name, open_dialogue):
+        if (open_dialogue):
+            self.setup_farmpayout_address(farm_name)
         self.browser.find_element(*self.add_ip_button).click()
-        self.add_ip(data+'/16')
-        self.browser.find_element(*self.gateway_text_field).send_keys(data)
+        self.add_ip(ip)
+        self.add_gateway(gateway)
 
     def add_ip(self, data):
         self.browser.find_element(*self.ip_text_field).send_keys(Keys.CONTROL + "a")
@@ -243,11 +254,11 @@ class FarmPage:
         return self.browser.find_element(*self.save_button)
 
     def setup_ip(self, data, farm_name):
-        self.search_functionality(farm_name)
-        self.browser.find_element(*self.details_arrow).click()
-        self.browser.find_element(*self.public_ip_list).click()
+        self.browser.execute_script("window.scrollTo(0,0)")
+        self.setup_farmpayout_address(farm_name)
+        WebDriverWait(self.browser, 30).until(EC.element_to_be_clickable(self.add_ip_button))
         self.browser.find_element(*self.add_ip_button).click()
-        self.browser.find_element(*self.ip_text_field).send_keys(data)
+        self.add_ip(data)
 
     def add_gateway(self, data):
         self.browser.find_element(*self.gateway_text_field).send_keys(Keys.CONTROL + "a")
@@ -256,13 +267,11 @@ class FarmPage:
         return self.browser.find_element(*self.save_button)
 
     def change_to_range_ip(self, farm_name):
-        self.search_functionality(farm_name)
-        self.browser.find_element(*self.details_arrow).click()
-        self.browser.find_element(*self.public_ip_list).click()
+        self.setup_farmpayout_address(farm_name)
         self.browser.find_element(*self.add_ip_button).click()
-        WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located((By.XPATH, "//*[contains(text(), 'Single')]")))
         WebDriverWait(self.browser, 30).until(EC.element_to_be_clickable(self.ip_dropdown))
         self.browser.find_element(*self.ip_dropdown).click()
+        WebDriverWait(self.browser, 30).until(EC.element_to_be_clickable(self.range_selection))
         self.browser.find_element(*self.range_selection).click()
     
     def add_range_ips(self, from_ip, to_ip, range_gateway):
@@ -275,52 +284,58 @@ class FarmPage:
             self.browser.find_element(*self.to_ip_input).send_keys(Keys.DELETE)
             self.browser.find_element(*self.to_ip_input).send_keys(to_ip) 
         if(range_gateway):
-            self.browser.find_element(*self.gateway_range_input).send_keys(Keys.CONTROL + "a")
-            self.browser.find_element(*self.gateway_range_input).send_keys(Keys.DELETE)
-            self.browser.find_element(*self.gateway_range_input).send_keys(range_gateway)
+            self.browser.find_element(*self.gateway_text_field).send_keys(Keys.CONTROL + "a")
+            self.browser.find_element(*self.gateway_text_field).send_keys(Keys.DELETE)
+            self.browser.find_element(*self.gateway_text_field).send_keys(range_gateway)
         return self.browser.find_element(*self.save_button)
 
     def delete_ip(self, farm_name, ip, gateway):
-        self.search_functionality(farm_name)
-        self.browser.find_element(*self.details_arrow).click()
-        self.browser.find_element(*self.public_ip_list).click()
-        self.browser.find_element(*self.view_bootstrap_button).send_keys(Keys.PAGE_DOWN)
+        self.setup_farmpayout_address(farm_name)
         WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located((By.XPATH, self.farm_public_ips)))
         for i in range(len(self.browser.find_elements(By.XPATH, self.farm_public_ips))):
-            if(self.browser.find_element(By.XPATH,  f"{self.farm_public_ips}[{str(i+1)}]/td[1]").text == ip):
-                WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located((By.XPATH, "//*[contains(text(), '"+ ip +"')]")))
-                if(self.browser.find_element(By.XPATH,  f"{self.farm_public_ips}[{str(i+1)}]/td[2]").text == gateway):
-                    WebDriverWait(self.browser, 30).until(EC.presence_of_element_located((By.XPATH, "//*[contains(text(), '"+ gateway +"')]")))
-                    WebDriverWait(self.browser, 30).until(EC.element_to_be_clickable((By.XPATH,  f"{self.farm_public_ips}[{str(i+1)}]/td[4]/div/button")))
-                    self.browser.find_element(By.XPATH,  f"{self.farm_public_ips}[{str(i+1)}]/td[4]/div/button").click()
+            print(len(self.browser.find_elements(By.XPATH, self.farm_public_ips)))
+            print(f"{self.farm_public_ips}[{str(i+1)}]/td[1]")
+            if(self.browser.find_element(By.XPATH,  f"{self.farm_public_ips}[{str(i+1)}]/td[2]").text == ip):
+                if(self.browser.find_element(By.XPATH,  f"{self.farm_public_ips}[{str(i+1)}]/td[3]").text == gateway):
+                    WebDriverWait(self.browser, 30).until(EC.element_to_be_clickable((By.XPATH,  f"{self.farm_public_ips}[{str(i+1)}]/td[1]/div/div/div/input")))
+                    self.browser.find_element(By.XPATH,  f"{self.farm_public_ips}[{str(i+1)}]/td[1]/div/div/div/input").click()
                     WebDriverWait(self.browser, 30).until(EC.element_to_be_clickable(self.delete_button))
                     self.browser.find_element(*self.delete_button).click()
-          
-    def farm_detials(self, farm_name):
-        self.search_functionality(farm_name)
-        self.browser.find_element(*self.details_arrow).click()
-        self.browser.find_element(*self.public_ip_list).click()
+                    WebDriverWait(self.browser, 30).until(EC.element_to_be_clickable(self.confirm_button))
+                    self.browser.find_element(*self.confirm_button).click()
+
+    def get_ip(self, ip, gateway):
+        ip_len = 0
+        gateway_len = 0
+        if(ip):
+            ip_len = len(self.browser.find_elements(By.XPATH, "//td[contains(@class, 'v-data-table__td') and contains(@class, 'v-data-table-column--align-center') and text()='"+ ip +"']"))
+        if(gateway):
+            gateway_len = len(self.browser.find_elements(By.XPATH, "//td[contains(@class, 'v-data-table__td') and contains(@class, 'v-data-table-column--align-center') and text()='"+ gateway +"']"))
+        return ip_len, gateway_len
+    
+    def farm_detials(self):
         details = []
-        details.append(self.browser.find_element(By.XPATH,  f"{self.node_expand_details}1]/div[2]").text) # Farm ID
-        details.append(self.browser.find_element(By.XPATH,  f"{self.node_expand_details}1]/div[4]").text) # Farm Name
-        details.append(self.browser.find_element(By.XPATH,  f"{self.node_expand_details}2]/div[2]").text) # Linked Twin ID
-        details.append(self.browser.find_element(By.XPATH,  f"{self.node_expand_details}2]/div[4]").text) # Certification Type
-        details.append(self.browser.find_element(By.XPATH,  f"{self.node_expand_details}3]/div[2]").text) # Linked Pricing Policy ID
-        details.append(self.browser.find_element(*self.stellar_payout_address).get_attribute("value")) # Stellar Address
+        details.append(self.browser.find_element(By.XPATH,  f"{self.node_expand_details}[1]").text) # Farm ID
+        details.append(self.browser.find_element(By.XPATH,  f"{self.node_expand_details}[2]").text) # Farm Name
+        details.append(self.browser.find_element(By.XPATH,  f"{self.node_expand_details}[3]").text) # Linked Twin ID
+        details.append(self.browser.find_element(By.XPATH,  f"{self.node_expand_details}[4]").text) # Certification Type
+        details.append(self.browser.find_element(*self.stellar_payout_address).text) # Stellar Address
+        details.append(True if self.browser.find_element(*self.dedicated).text != "No" else False) # Dedicated
+        details.append(self.browser.find_element(*self.pricing_policy).text) # Pricing Policy
         for i in range(len(self.browser.find_elements(By.XPATH, self.farm_public_ips))):
-            details.append(self.browser.find_element(By.XPATH,  f"{self.farm_public_ips}[{str(i+1)}]/td[1]").text) # IP
-            details.append(self.browser.find_element(By.XPATH,  f"{self.farm_public_ips}[{str(i+1)}]/td[3]").text) # Deployed Contract ID
-            details.append(self.browser.find_element(By.XPATH,  f"{self.farm_public_ips}[{str(i+1)}]/td[2]").text) # Gateway
+            details.append(self.browser.find_element(By.XPATH,  f"{self.farm_public_ips}[{str(i+1)}]/td[2]").text) # IP
+            details.append(self.browser.find_element(By.XPATH,  f"{self.farm_public_ips}[{str(i+1)}]/td[4]").text) # Deployed Contract ID
+            details.append(self.browser.find_element(By.XPATH,  f"{self.farm_public_ips}[{str(i+1)}]/td[3]").text) # Gateway
         return details
 
     def verify_the_availability_of_zero_os_bootstrap(self):
-        self.browser.find_element(*self.details_arrow).click()
+        self.browser.execute_script("window.scrollTo(0,0)")
         self.browser.find_element(*self.view_bootstrap_button).click()
         WebDriverWait(self.browser, 30).until(EC.number_of_windows_to_be(2))
         self.browser.switch_to.window(self.browser.window_handles[1])
         return self.browser.current_url
         
-    def close_create(self):
+    def open_create(self):
         self.browser.find_element(*self.create_button).click()
 
     def close_ip(self):
@@ -328,6 +343,15 @@ class FarmPage:
         
     def close_detail(self):
         self.browser.find_element(*self.details_arrow).click()
+
+    def wait_for_farm_name(self, keyword):
+        td_elements = self.browser.find_elements(By.XPATH, "//table[1]//tbody//tr//td[2]")
+        td_texts = [td.text for td in td_elements]
+        return keyword in td_texts
+
+    def wait_for_button(self, button):
+        WebDriverWait(self.browser, 30).until(EC.element_to_be_clickable(button))
+        return button
 
     def wait_for(self, keyword):
         WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located((By.XPATH, "//*[contains(text(), '"+ keyword +"')]")))

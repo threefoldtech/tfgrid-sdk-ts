@@ -13,17 +13,25 @@
 
 ### First
 
-- In the root directory, run `yarn install` then `yarn lerna run build` then `make run project=playground`.
-- Change directory to frontend selenium through the command line using `cd packages/playground/tests/frontend_selenium/`.
-- Install the recommended version of the pip package listed above for a stable run, or you can just install Python 3 and use `pip install -r requirements.txt`.
-- If the port in serve changes from `5173` for any reason, you should change the variable `port` under `Base` section in [config.ini](../frontend_selenium/Config.ini) to the new value.
-- Add `Twin Mnemonic`, `Twin With A Node Mnemonic`, `Stellar Address`, and `Email` either in [config.ini](../frontend_selenium/Config.ini) under `Utils` or by exporting `TFCHAIN_MNEMONICS`, `TFCHAIN_NODE_MNEMONICS`, `STELLAR_ADDRESS`, and `EMAIL`.
-- Xvfb might also need to be installed using `sudo apt install xvfb`.
+- In the root directory, run `yarn install`, then `yarn lerna run build`, and finally `make run project=playground`.
+- Change directory to frontend selenium by running `cd packages/playground/tests/frontend_selenium/` in the command line.
+- Install the recommended version of the pip package listed above for a stable run, Or you can just install Python 3 and use the command `pip install -r requirements.txt`.
+- Add your configuration either in [config.ini](../frontend_selenium/Config.ini) or by exporting `TFCHAIN_MNEMONICS`, `TFCHAIN_NODE_MNEMONICS`, `STELLAR_ADDRESS`, and `EMAIL`.
+- Description of config under `Base` section:
+  - `port`: the port that the localhost is running on.
+  - `net`: the network that the tests will be run against.
+- Description of config under `Utils` section:
+  - `seed`: twin mnemonic that will be used for all the automated tests.
+  - `node_seed`: twin mnemonic for the node that will be used in node-related tests.
+  - `address`: a stellar address with a TFT trustline that will be used in TFT bridge-related tests.
+  - `email`: a valid email that will be used for all the automated tests.
+- If the port in serve changes from `5173` for any reason, you should update the `port` under the `Base` section in [config.ini](../frontend_selenium/Config.ini) to reflect the new value.
+- You'll also need to install `Xvfb`, Run `sudo apt install xvfb`.
 
 ### Second
 
-- You need to leave the server running and open a new terminal.
-- You can run selenium with pytest through the command line using `python3 -m pytest -v`.
+- You need to leave the localhost running and open a new terminal.
+- You can run selenium tests with pytest through the command line using `python3 -m pytest -v`.
 
 ### More options to run tests
 
