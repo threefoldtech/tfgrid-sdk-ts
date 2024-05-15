@@ -151,7 +151,7 @@ a {
 
 /* Update tables styles */
 .v-table {
-  border: thin solid rgba(var(--v-border-color), var(--v-border-opacity));
+  border: thin solid rgba(var(--v-border-color), var(--v-border-opacity)) !important;
 }
 
 table {
