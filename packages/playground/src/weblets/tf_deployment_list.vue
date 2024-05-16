@@ -217,6 +217,20 @@
           />
         </template>
 
+        <template #StaticWebsite-actions="{ item }">
+          <IconActionBtn
+            tooltip="Show Details"
+            icon="mdi-eye-outline"
+            @click="openDialog(tabs[activeTab].value, item)"
+          />
+          <IconActionBtn
+            tooltip="Visit"
+            icon="mdi-web"
+            color="anchor"
+            :href="'https://' + item.value.env.STATICWEBSITE_DOMAIN"
+          />
+        </template>
+
         <template #Algorand-actions="{ item }">
           <IconActionBtn
             tooltip="Show Details"
@@ -378,6 +392,7 @@ const tabs: Tab[] = [
   { title: "Umbrel", value: "Umbrel", imgPath: "images/icons/umbrel.png" },
   { title: "Freeflow", value: "Freeflow", imgPath: "images/icons/freeflow.png" },
   { title: "Wordpress", value: "Wordpress", imgPath: "images/icons/wordpress.png" },
+  { title: "Static Website", value: "StaticWebsite", imgPath: "images/icons/wordpress.png" },
 ];
 
 const layout = useLayout();
