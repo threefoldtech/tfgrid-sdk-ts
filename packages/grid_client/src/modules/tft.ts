@@ -1,4 +1,5 @@
 import { QueryClient } from "@threefold/tfchain_client";
+import Decimal from "decimal.js";
 
 import { calculator as Calculator } from "./calculator";
 
@@ -11,24 +12,24 @@ class TFT {
     this.calculator = new Calculator(new QueryClient(this.SUBSTRATE_URL));
   }
 
-  async tftPrice() {
+  async price() {
     return await this.calculator.tftPrice();
   }
 
   async fromUSD(usd: number) {
-    return (usd / (await this.tftPrice())).toFixed(2);
+    return new Decimal(usd / (await this.price())).toFixed(2);
   }
 
   async toUSD(tft: number) {
-    return (tft * (await this.tftPrice())).toFixed(2);
+    return new Decimal(tft * (await this.price())).toFixed(2);
   }
 
   toMonth(price: number) {
-    return (price * 24 * 30).toFixed(2);
+    return new Decimal(price * 24 * 30).toFixed(2);
   }
 
   toYear(price: number) {
-    return (+this.toMonth(price) * 12).toFixed(2);
+    return new Decimal(+this.toMonth(price) * 12).toFixed(2);
   }
 }
 
