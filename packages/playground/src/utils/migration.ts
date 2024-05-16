@@ -1,6 +1,5 @@
+import { BaseModule } from "@threefold/grid_client";
 import type { Contract, ExtrinsicResult } from "@threefold/tfchain_client";
-
-import { BaseModule } from "../../../grid_client/dist/es6/modules/base";
 
 /**
  * `_migrateOldFullVMs` is a function is implemented to list all old `FullVM` that listed in the old `Playground` with type `Fullvm`
@@ -8,6 +7,7 @@ import { BaseModule } from "../../../grid_client/dist/es6/modules/base";
  * @returns Applying the extrinsic in the chain with the batch request.
  */
 async function _migrateOldFullVMs(module: BaseModule) {
+  const moduleName = module.moduleName;
   module.moduleName = "Fullvm"; // Load old deployments that deployed with `Fullvm` type.
   const deploymentNames = await module._list();
   const contracts = await Promise.all(
@@ -38,6 +38,7 @@ async function _migrateOldFullVMs(module: BaseModule) {
     );
   };
 
+  module.moduleName = moduleName;
   if (deploymentNames.length) {
     const extrinsics = await loadUpdateExtrinsics().then(exts => exts.filter(Boolean) as ExtrinsicResult<Contract>[]);
     return module.tfClient.applyAllExtrinsics<Contract>(extrinsics);
@@ -45,13 +46,11 @@ async function _migrateOldFullVMs(module: BaseModule) {
 }
 
 export async function migrateModule(module: BaseModule) {
-  const moduleName = module.moduleName;
   // To list only `Full` and `Micro` VMs.
   if (module.moduleName === "machines") {
     await _migrateOldFullVMs(module);
   }
 
-  module.moduleName = moduleName;
   await module._list(); // force grid_client migration
   const path = module.getNewDeploymentPath();
   const keys = await module.backendStorage.list(path);
