@@ -59,8 +59,8 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="error" variant="text" @click="onDelete"> Remove </v-btn>
-        <v-btn color="error" variant="tonal" @click="deletingDialog = false"> Cancel </v-btn>
+        <v-btn color="error" variant="outlined" @click="onDelete"> Remove </v-btn>
+        <v-btn color="anchor" variant="outlined" @click="deletingDialog = false"> Cancel </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
