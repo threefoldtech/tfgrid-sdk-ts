@@ -247,14 +247,21 @@ async function loadDeployments() {
 }
 
 const filteredHeaders = computed(() => {
-  let headers = [
+  const headers = [
     { title: "PLACEHOLDER", key: "data-table-select" },
     { title: "Name", key: "name" },
-    { title: "Public IPv4", key: "ipv4", sortable: false },
-    { title: "Public IPv6", key: "ipv6", sortable: false },
-    { title: "Planetary Network IP", key: "planetary", sortable: false },
-    { title: "Mycelium Network IP", key: "mycelium", sortable: false },
-    { title: "WireGuard", key: "wireguard", sortable: false },
+    {
+      title: "Networks",
+      key: "networks",
+      sortable: false,
+      children: [
+        { title: "Public IPv4", key: "ipv4", sortable: false },
+        { title: "Public IPv6", key: "ipv6", sortable: false },
+        { title: "Planetary IP", key: "planetary", sortable: false },
+        { title: "Mycelium IP", key: "mycelium", sortable: false },
+        { title: "WireGuard", key: "wireguard", sortable: false },
+      ],
+    },
     { title: "Flist", key: "flist" },
     { title: "Cost", key: "billing" },
     { title: "Created At", key: "created" },
@@ -280,20 +287,22 @@ const filteredHeaders = computed(() => {
 
   const flistSolutions = [ProjectName.VM, ProjectName.Fullvm] as string[];
 
-  if (!IPV6Solutions.includes(props.projectName)) {
-    headers = headers.filter(h => h.key !== "ipv6");
-  }
+  if (headers[2].children) {
+    if (!IPV6Solutions.includes(props.projectName)) {
+      headers[2].children = headers[2].children.filter(h => h.key !== "ipv6");
+    }
 
-  if (!IPV4Solutions.includes(props.projectName)) {
-    headers = headers.filter(h => h.key !== "ipv4");
-  }
+    if (!IPV4Solutions.includes(props.projectName)) {
+      headers[2].children = headers[2].children.filter(h => h.key !== "ipv4");
+    }
 
-  if (!WireguardSolutions.includes(props.projectName)) {
-    headers = headers.filter(h => h.key !== "wireguard");
-  }
+    if (!WireguardSolutions.includes(props.projectName)) {
+      headers[2].children = headers[2].children.filter(h => h.key !== "wireguard");
+    }
 
-  if (!flistSolutions.includes(props.projectName)) {
-    headers = headers.filter(h => h.key !== "flist");
+    if (!flistSolutions.includes(props.projectName)) {
+      headers[2].children = headers[2].children.filter(h => h.key !== "flist");
+    }
   }
 
   return headers;

@@ -148,3 +148,32 @@ a {
   border-radius: 4px;
   border-left: 5px solid #1c81dd;
 }
+
+/* Update tables styles */
+.v-table {
+  border: thin solid rgba(var(--v-border-color), var(--v-border-opacity)) !important;
+}
+
+table {
+  thead {
+    tr {
+      th {
+        border-right: thin solid rgba(var(--v-border-color), var(--v-border-opacity));
+
+        &:not(.v-data-table__th--sorted) i {
+          opacity: 0.1 !important;
+        }
+      }
+
+      &:first-of-type th:last-of-type {
+        border-right: none;
+      }
+    }
+  }
+
+  tbody tr {
+    td:not(:last-of-type) {
+      border-right: thin solid rgba(var(--v-border-color), var(--v-border-opacity));
+    }
+  }
+}

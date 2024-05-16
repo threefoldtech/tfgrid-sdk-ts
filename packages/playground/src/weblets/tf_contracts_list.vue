@@ -195,13 +195,27 @@ const baseTableHeaders: VDataTableHeader = [
 // Define specific table headers for each contract type
 const nodeTableHeaders: VDataTableHeader = [
   ...baseTableHeaders,
-  { title: "Solution Type", key: "solutionType" },
-  { title: "Solution Name", key: "solutionName" },
+  {
+    title: "Solution",
+    key: "solution",
+    sortable: false,
+    children: [
+      { title: "Type", key: "solutionType" },
+      { title: "Name", key: "solutionName" },
+    ],
+  },
   { title: "Type", key: "deploymentType" },
   { title: "Expiration", key: "expiration" },
-  { title: "Node ID", key: "nodeId" },
   { title: "Farm ID", key: "farmId" },
-  { title: "Node Status", key: "nodeStatus", sortable: false },
+  {
+    title: "Node",
+    key: "node",
+    sortable: false,
+    children: [
+      { title: "ID", key: "nodeId" },
+      { title: "Status", key: "nodeStatus", sortable: false },
+    ],
+  },
   { title: "Details", key: "actions", sortable: false },
 ];
 
@@ -214,9 +228,16 @@ const nameTableHeaders: VDataTableHeader = [
 
 const RentTableHeaders: VDataTableHeader = [
   ...baseTableHeaders,
-  { title: "Node ID", key: "nodeId" },
   { title: "Farm ID", key: "farmId" },
-  { title: "Node Status", key: "nodeStatus", sortable: false },
+  {
+    title: "Node",
+    key: "node",
+    sortable: false,
+    children: [
+      { title: "ID", key: "nodeId" },
+      { title: "Status", key: "nodeStatus", sortable: false },
+    ],
+  },
   { title: "Details", key: "actions", sortable: false },
 ];
 

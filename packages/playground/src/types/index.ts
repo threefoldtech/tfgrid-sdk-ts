@@ -87,7 +87,13 @@ export interface Flist {
   entryPoint: string;
 }
 
-export type VDataTableHeader = { title: string; key: string; sortable?: boolean; [key: string]: any }[];
+export type VDataTableHeader = {
+  title: string;
+  key: string;
+  sortable?: boolean;
+  children?: VDataTableHeader;
+  [key: string]: any;
+}[];
 
 export enum ProjectName {
   Kubernetes = "Kubernetes",
