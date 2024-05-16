@@ -410,7 +410,7 @@
               <div class="table">
                 <nodes-table
                   v-model="nodes"
-                  height="675px"
+                  max-height="730px"
                   :size="size"
                   @update:size="
                     size = $event;
@@ -524,6 +524,7 @@ export default {
     const route = useRoute();
 
     async function loadNodes(retCount = false) {
+      _nodes.value = [];
       loading.value = true;
       if (retCount) page.value = 1;
       try {

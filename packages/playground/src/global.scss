@@ -155,9 +155,16 @@ a {
 }
 
 table {
+  --v-table-header-height: 45px;
+
   thead {
     tr {
       th {
+        span {
+          font-weight: bold;
+          text-wrap: nowrap;
+        }
+
         border-right: thin solid rgba(var(--v-border-color), var(--v-border-opacity));
 
         &:not(.v-data-table__th--sorted) i {

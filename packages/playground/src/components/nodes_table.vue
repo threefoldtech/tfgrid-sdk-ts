@@ -3,9 +3,9 @@
     <v-row>
       <v-col>
         <v-data-table-server
-          :height="height || '750px'"
+          :style="{ maxHeight: maxHeight || '750px' }"
           :loading="loading"
-          loading-text="Loading nodes..."
+          loading-text="Loading Nodes..."
           :items="modelValue"
           :items-length="count"
           :items-per-page="$props.size"
@@ -18,18 +18,18 @@
           :page="$props.page"
           @update:page="$emit('update:page', $event)"
           @update:items-per-page="$emit('update:size', $event)"
-          class="elevation-1 v-data-table-header"
+          class="nodes-table"
           :disable-sort="true"
-          :hover="true"
         >
-          <tbody class="mx-4 my-4">
-            <tr v-for="(node, index) in modelValue" v-bind:key="node.id" @click="openSheet($event, node)">
-              <TfNodeDetailsCard :key="node.rentedByTwinId" v-model:node="$props.modelValue[index]" />
-            </tr>
-            <p v-if="modelValue && modelValue.length === 0 && !loading" class="mx-4 mt-10 text-center">
-              No data available
-            </p>
-          </tbody>
+          <template #headers> </template>
+
+          <template #item="{ index }">
+            <TfNodeDetailsCard
+              class="mb-4"
+              v-model:node="$props.modelValue[index]"
+              @click="$emit('open-dialog', modelValue[index])"
+            />
+          </template>
         </v-data-table-server>
       </v-col>
     </v-row>
@@ -67,20 +67,15 @@ export default {
       required: true,
       type: Boolean,
     },
-    height: String,
+    maxHeight: String,
   },
   components: {
     TfNodeDetailsCard,
   },
-  setup(_, { emit }) {
-    const openSheet = (_e: any, node: any) => {
-      emit("open-dialog", node);
-    };
-
+  setup() {
     return {
       getNodeStatusColor,
       getNodeTypeColor,
-      openSheet,
       capitalize,
     };
   },
@@ -88,26 +83,11 @@ export default {
 </script>
 
 <style>
-.v-data-table-header th,
-.v-data-table-header td {
-  white-space: nowrap;
-  font-size: 14px;
-}
-.v-data-table__thead {
-  line-height: 60px;
-}
-</style>
-<style scoped>
-.v-data-table tbody tr {
-  position: relative;
-}
-.v-data-table tbody tr::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 100%;
-  height: 0.5rem;
-  background-color: rgb(var(--v-theme-background));
+.nodes-table {
+  background: rgb(var(--v-theme-background));
+
+  .v-data-table-footer {
+    background: rgb(var(--v-theme-surface));
+  }
 }
 </style>
