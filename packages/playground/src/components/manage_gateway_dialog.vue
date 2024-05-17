@@ -188,8 +188,8 @@
     <v-dialog v-model="requestDelete" max-width="600px">
       <v-card>
         <v-card-title> Are you sure you want to delete the following gateways? </v-card-title>
-        <v-card-text class="d-flex">
-          <v-chip color="error" label variant="tonal" class="mr-1 mb-1" v-for="gw in gatewaysToDelete" :key="gw.name">
+        <v-card-text class="d-flex flex-wrap">
+          <v-chip color="primary" label variant="tonal" class="mr-1 mb-1" v-for="gw in gatewaysToDelete" :key="gw.name">
             {{ gw.name }}
           </v-chip>
         </v-card-text>
