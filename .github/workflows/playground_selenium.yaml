@@ -1,7 +1,6 @@
 name: Playground Selenium Tests
 
 on:
-  push:
   workflow_dispatch:
   schedule:
     - cron: "0 6 * * *"
