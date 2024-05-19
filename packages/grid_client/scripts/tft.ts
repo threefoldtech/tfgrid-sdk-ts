@@ -16,10 +16,10 @@ async function main() {
   const usd = await tft.toUSD({ tft: 10 });
   console.log(usd);
 
-  const tftsInMonth = tft.toMonth({ tft: 10 });
+  const tftsInMonth = await tft.toMonth({ tft: 1 });
   console.log(tftsInMonth);
 
-  const tftsInYear = tft.toYear({ tft: 20 });
+  const tftsInYear = await tft.toYear({ tft: 20 });
   console.log(tftsInYear);
 
   grid.disconnect();
