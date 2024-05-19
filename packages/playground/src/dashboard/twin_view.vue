@@ -266,6 +266,7 @@ async function saveEmail() {
   try {
     const balance: Balance = await loadBalance(grid!);
     if (balance.free < 1) {
+      editEmail.value = false;
       createCustomToast(
         "Invalid Transaction: Inability to pay some fees, e.g. account balance too low",
         ToastType.danger,
