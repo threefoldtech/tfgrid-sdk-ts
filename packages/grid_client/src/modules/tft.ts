@@ -1,7 +1,16 @@
 import { QueryClient } from "@threefold/tfchain_client";
 import Decimal from "decimal.js";
 
+import { expose, validateInput } from "../helpers";
 import { calculator as Calculator } from "./calculator";
+import { TFTModel, USDModel } from "./models";
+
+enum substrateURL {
+  DEV = "wss://tfchain.dev.grid.tf/ws",
+  QA = "wss://tfchain.qa.grid.tf/ws",
+  TEST = "wss://tfchain.test.grid.tf/ws",
+  MAIN = "wss://tfchain.grid.tf/ws",
+}
 
 class TFT {
   public SUBSTRATE_URL: string;
@@ -16,21 +25,29 @@ class TFT {
     return await this.calculator.tftPrice();
   }
 
-  async fromUSD(usd: number) {
-    return new Decimal(usd / (await this.price())).toFixed(2);
+  @expose
+  @validateInput
+  async fromUSD(options: USDModel) {
+    return new Decimal(options.usd / (await this.price())).toFixed(2);
   }
 
-  async toUSD(tft: number) {
-    return new Decimal(tft * (await this.price())).toFixed(2);
+  @expose
+  @validateInput
+  async toUSD(options: TFTModel) {
+    return new Decimal(options.tft * (await this.price())).toFixed(2);
+  }
+  @expose
+  @validateInput
+  toMonth(options: TFTModel) {
+    return new Decimal(options.tft * 24 * 30).toFixed(2);
   }
 
-  toMonth(price: number) {
-    return new Decimal(price * 24 * 30).toFixed(2);
-  }
-
-  toYear(price: number) {
-    return new Decimal(+this.toMonth(price) * 12).toFixed(2);
+  @expose
+  @validateInput
+  toYear(options: TFTModel) {
+    const months = +this.toMonth(options);
+    return new Decimal(months * 12).toFixed(2);
   }
 }
 
-export { TFT };
+export { TFT, substrateURL };

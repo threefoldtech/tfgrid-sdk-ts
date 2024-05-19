@@ -832,6 +832,14 @@ class GetActiveContractsModel {
   @Expose() @IsInt() @IsNotEmpty() @Min(1) nodeId: number;
 }
 
+class USDModel {
+  @Expose() @IsNumber() @IsNotEmpty() @Min(0) usd: number;
+}
+
+class TFTModel {
+  @Expose() @IsNumber() @IsNotEmpty() @Min(0) tft: number;
+}
+
 interface GPUCardInfo {
   id: string;
   contract: number;
@@ -977,4 +985,6 @@ export {
   NodeCPUTest,
   NodeIPValidation,
   NodeIPerf,
+  USDModel,
+  TFTModel,
 };
