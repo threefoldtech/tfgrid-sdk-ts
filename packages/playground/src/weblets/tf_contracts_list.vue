@@ -142,6 +142,7 @@ async function onMount() {
       await loadContracts({ page: page.value, itemsPerPage: size.value, contractType: ContractType.Rent });
       // getting nodeStatus
       allContracts.value = [...nodeContracts.value, ...nameContracts.value, ...rentContracts.value];
+      nodeInfo.value = await getNodeInfo(nodeIDs.value);
 
       // load all contracts for total cost
       const { data: dataContracts } = await gridProxyClient.contracts.list({
