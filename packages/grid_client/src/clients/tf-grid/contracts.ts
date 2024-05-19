@@ -336,12 +336,10 @@ class TFContracts extends Contracts {
   }
 
   async batchUnlockContracts(ids: number[]) {
-    console.log({ ids });
     const billableContractsIDs: number[] = [];
     for (const id of ids) {
       if ((await this.contractLock({ id })).amountLocked > 0) billableContractsIDs.push(id);
     }
-    console.log(billableContractsIDs);
     const extrinsics: ExtrinsicResult<number>[] = [];
     for (const id of billableContractsIDs) {
       extrinsics.push(await this.unlock(id));
