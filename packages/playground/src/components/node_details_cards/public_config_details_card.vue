@@ -40,7 +40,13 @@ export default {
 
     const getNodeTwinDetailsCard = (): NodeDetailsCard[] => {
       return [
-        { name: "IPv4", value: props.node.publicConfig.ipv4 },
+        {
+          name: "IPv4",
+          value: props.node.publicConfig.ipv4,
+          icon: "mdi-content-copy",
+          callback: copy,
+          hint: "Copy the IPv4 to the clipboard.",
+        },
         {
           name: "IPv6",
           value: props.node.publicConfig.ipv6,
@@ -48,9 +54,27 @@ export default {
           callback: copy,
           hint: "Copy the IPv6 to the clipboard.",
         },
-        { name: "GW4", value: props.node.publicConfig.gw4 },
-        { name: "GW6", value: props.node.publicConfig.gw6 },
-        { name: "Domain", value: props.node.publicConfig.domain },
+        {
+          name: "GW4",
+          value: props.node.publicConfig.gw4,
+          icon: "mdi-content-copy",
+          callback: copy,
+          hint: "Copy the GW4 to the clipboard.",
+        },
+        {
+          name: "GW6",
+          value: props.node.publicConfig.gw6,
+          icon: "mdi-content-copy",
+          callback: copy,
+          hint: "Copy the GW6 to the clipboard.",
+        },
+        {
+          name: "Domain",
+          value: props.node.publicConfig.domain,
+          icon: "mdi-content-copy",
+          callback: copy,
+          hint: "Copy the Domain to the clipboard.",
+        },
       ];
     };
 
