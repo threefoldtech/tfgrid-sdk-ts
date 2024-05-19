@@ -1,9 +1,11 @@
 import { ContractStates, type GridClient } from "@threefold/grid_client";
 import { NodeStatus } from "@threefold/gridproxy_client";
+import { ContractType as type } from "@threefold/gridproxy_client";
 import type { Ref } from "vue";
 
 import { gridProxyClient } from "@/clients";
 import { solutionType, type VDataTableHeader } from "@/types";
+import toHumanDate from "@/utils/date";
 
 import { normalizeBalance } from "./helpers";
 
@@ -11,9 +13,9 @@ export async function getUserContracts(grid: GridClient) {
   const res: any = await grid!.contracts.listMyContracts();
 
   const promises = [
-    ...res.nameContracts.map((c: any) => normalizeContract(grid!, c, ContractType.NAME)),
-    ...res.nodeContracts.map((c: any) => normalizeContract(grid!, c, ContractType.NODE)),
-    ...res.rentContracts.map((c: any) => normalizeContract(grid!, c, ContractType.RENT)),
+    ...res.nameContracts.map((c: any) => normalizeContract(grid!, c, ContractType.Name)),
+    ...res.nodeContracts.map((c: any) => normalizeContract(grid!, c, ContractType.Node)),
+    ...res.rentContracts.map((c: any) => normalizeContract(grid!, c, ContractType.Rent)),
   ];
 
   return Promise.allSettled(promises).then(results =>
@@ -29,19 +31,18 @@ function parseProjectName(projectName: string) {
   return projectName;
 }
 
-async function normalizeContract(
+export async function normalizeContract(
   grid: GridClient,
   c: { [key: string]: any },
   type: ContractType,
 ): Promise<NormalizedContract> {
-  const id = +c.contractID;
+  const id = +c.contract_id;
 
   let data: { [key: string]: string };
   try {
-    data = JSON.parse(c.deploymentData);
-    data.projectName = parseProjectName(data.projectName);
+    data = JSON.parse(c.details.deployment_data);
   } catch {
-    data = { name: c.name };
+    data = { name: c.details.name };
   }
 
   let expiration = "-";
@@ -58,18 +59,21 @@ async function normalizeContract(
   }
 
   return {
-    contractId: id,
-    twinID: c.twinID,
+    contract_id: id,
+    twin_id: c.twin_id,
     type,
     deploymentType: data.type,
     state: c.state,
-    createdAt: new Date(+c.createdAt * 1000).toLocaleString(),
-    nodeId: c.nodeID || "-",
-    solutionProviderID: c.solutionProviderID,
+    created_at: c.created_at,
+    details: {
+      nodeId: c.details.nodeId || "-",
+      deployment_data: c.details.deployment_data ? JSON.parse(c.details.deployment_data) : undefined,
+      farm_id: c.details.farm_id || "-",
+    },
     solutionName: data.name || "-",
-    solutionType: data.projectName || data.type || "-",
+    solutionType: data.type || "-",
     expiration,
-    consumption,
+    consumption: consumption,
   };
 }
 
@@ -112,26 +116,32 @@ export async function getNodeInfo(nodeIDs: (number | undefined)[]) {
   return resultsArray.reduce((acc, obj) => Object.assign(acc, obj), {});
 }
 
+export interface ContractDetails {
+  nodeId: number;
+  deployment_data?: string;
+  deployment_hash?: string;
+  number_of_public_ips?: number;
+  farm_id: number;
+}
+
 export interface NormalizedContract {
-  contractId: number;
-  type: "name" | "node" | "rent";
-  deploymentType?: string;
+  contract_id: number;
+  twin_id: number;
   state: ContractStates;
-  createdAt: string;
-  nodeId?: number;
-  farmId?: number;
-  solutionName?: string;
+  created_at: number;
+  type: "name" | "node" | "rent";
+  details: ContractDetails;
+  consumption?: number;
   solutionType?: string;
+  solutionName?: string;
+  deploymentType?: string;
   expiration?: string;
-  consumption: number;
-  solutionProviderID: number;
-  twinID: number;
 }
 
 export enum ContractType {
-  NODE = "node",
-  RENT = "rent",
-  NAME = "name",
+  Node = "node",
+  Rent = "rent",
+  Name = "name",
 }
 
 export type ContractsTableType = {
@@ -142,4 +152,6 @@ export type ContractsTableType = {
   grid: GridClient;
   contracts: Ref<NormalizedContract[]>;
   loading: Ref<boolean>;
+  count: Ref<number>;
+  page: Ref<number>;
 };

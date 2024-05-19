@@ -1,22 +1,64 @@
 <template>
   <weblet-layout ref="layout" @mount="() => {}">
-    <list-table
+    <v-data-table-server
       v-if="$props.tableHeaders"
       :headers="$props.tableHeaders"
-      :items="contracts"
       :loading="$props.loading.value"
-      :deleting="deleting"
+      loading-text="Loading nodes..."
       v-model="selectedContracts"
-      :no-data-text="capitalize(`No ${props.contractsType} contracts found on your account.`)"
+      :deleting="deleting"
       v-bind:onClick:row="loading || deleting ? undefined : onClickRow"
+      :no-data-text="capitalize(`No ${props.contractsType} contracts found on your account.`)"
+      :items-per-page-options="[
+        { value: 5, title: '5' },
+        { value: 10, title: '10' },
+        { value: 15, title: '15' },
+        { value: 50, title: '50' },
+      ]"
+      class="elevation-1 v-data-table-header"
+      density="compact"
+      :items-length="$props.count.value"
+      :items-per-page="$props.size"
+      :page="$props.page"
+      :items="contracts"
+      @update:options="updateOptions"
+      return-object
+      show-select
     >
+      <template #[`item.nodeId`]="{ item }">
+        <span v-if="['node', 'rent'].includes(item.type)">{{ item.details.nodeId }}</span>
+      </template>
+
+      <template #[`item.created_at`]="{ item }">
+        {{ toHumanDate(item.created_at) }}
+      </template>
+
+      <template #[`item.consumption`]="{ item }">
+        <p v-if="item?.consumption !== 0 && item?.consumption !== undefined">
+          {{ item.consumption.toFixed(3) }} TFT/hour
+        </p>
+        <p v-else>No Data Available</p>
+      </template>
+
+      <template #[`item.farm_id`]="{ item }">
+        <span v-if="['node', 'rent'].includes(item.type)">
+          {{ item.details.farm_id ? item.details.farm_id : "-" }}
+        </span>
+      </template>
+
+      <template #[`item.solutionType`]="{ item }">
+        <span v-if="item.type === 'node'">
+          {{ item.solutionType }}
+        </span>
+      </template>
+
       <template #[`item.nodeStatus`]="{ item }">
         <v-chip
-          v-if="$props.nodeStatus && item.nodeId !== '-' && !$props.loading.value"
-          :color="getNodeStateColor($props.nodeStatus[item.nodeId])"
+          v-if="$props.nodeStatus && !$props.loading.value"
+          :color="getNodeStateColor($props.nodeStatus[item.details.nodeId])"
           class="text-capitalize"
         >
-          {{ $props.nodeStatus[item.nodeId] }}
+          {{ $props.nodeStatus[item.details.nodeId] }}
         </v-chip>
         <p v-else>-</p>
       </template>
@@ -38,29 +80,24 @@
         </v-chip>
       </template>
 
-      <template #[`item.consumption`]="{ item }">
-        <p v-if="item.consumption !== 0">{{ item.consumption.toFixed(3) }} TFT/hour</p>
-        <p v-else>No Data Available</p>
-      </template>
-
       <template #[`item.actions`]="{ item }">
-        <v-tooltip :text="failedContractId == item.contractId ? 'Retry' : 'Show Details'">
+        <v-tooltip :text="failedContractId == item.contract_id ? 'Retry' : 'Show Details'">
           <template #activator="{ props }">
             <v-btn
-              :color="failedContractId == item.contractId ? 'error' : ''"
+              :color="failedContractId == item.contract_id ? 'error' : ''"
               variant="tonal"
               @click="showDetails(item)"
-              :disabled="(loadingShowDetails && loadingContractId !== item.contractId) || deleting"
-              :loading="loadingContractId == item.contractId"
+              :disabled="(loadingShowDetails && loadingContractId !== item.contract_id) || deleting"
+              :loading="loadingContractId == item.contract_id"
               v-bind="props"
             >
-              <v-icon class="pt-1" v-if="failedContractId == item.contractId">mdi-refresh</v-icon>
+              <v-icon class="pt-1" v-if="failedContractId == item.contract_id">mdi-refresh</v-icon>
               <v-icon v-else>mdi-eye-outline</v-icon>
             </v-btn>
           </template>
         </v-tooltip>
       </template>
-    </list-table>
+    </v-data-table-server>
 
     <template #footer-actions>
       <v-btn
@@ -130,8 +167,8 @@
 
       <v-alert class="mx-4" type="warning" variant="tonal">Deleting contracts may take a while to complete.</v-alert>
       <v-card-text>
-        <v-chip class="ma-1" color="primary" label v-for="c in selectedContracts" :key="c.contractId">
-          {{ c.contractId }}
+        <v-chip class="ma-1" color="primary" label v-for="c in selectedContracts" :key="c.contract_id">
+          {{ c.contract_id }}
         </v-chip>
       </v-card-text>
       <v-card-actions>
@@ -154,9 +191,8 @@ import { capitalize, computed, defineComponent, type PropType, type Ref, ref } f
 import type { VDataTableHeader } from "@/types";
 import { ContractType, getNodeStateColor, getStateColor, type NormalizedContract } from "@/utils/contracts";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
+import toHumanDate from "@/utils/date";
 import { downloadAsJson, normalizeError } from "@/utils/helpers";
-
-import ListTable from "../../components/list_table.vue";
 
 const props = defineProps({
   contracts: {
@@ -183,6 +219,18 @@ const props = defineProps({
     type: Object as PropType<ContractType>,
     required: true,
   },
+  size: {
+    required: true,
+    type: Number,
+  },
+  page: {
+    required: true,
+    type: Number,
+  },
+  count: {
+    required: true,
+    type: Object as PropType<Ref<number>>,
+  },
 });
 
 const getAmountLocked = (): number => {
@@ -191,8 +239,10 @@ const getAmountLocked = (): number => {
 };
 
 const isNodeInRentContracts = computed(() => {
-  if (props.contractsType == ContractType.RENT) {
-    const nodeIds = contracts.value.map(contract => contract.nodeId).filter(nodeId => nodeId !== undefined) as number[];
+  if (props.contractsType == ContractType.Rent) {
+    const nodeIds = contracts.value
+      .map(contract => contract.details.nodeId)
+      .filter(nodeId => nodeId !== undefined) as number[];
     if (contractLocked.value && contractLocked.value.amountLocked === 0) {
       return nodeIds.includes(selectedItem.value.nodeId);
     }
@@ -200,8 +250,11 @@ const isNodeInRentContracts = computed(() => {
   return false;
 });
 
-const emits = defineEmits(["update:deleted-contracts"]);
+const emits = defineEmits(["update:deleted-contracts", "update:options"]);
 
+function updateOptions(options: any) {
+  emits("update:options", { ...options, contractType: props.contractsType });
+}
 const layout = ref();
 const contractLocked = ref<ContractLock>();
 const deleting = ref<boolean>(false);
@@ -219,12 +272,12 @@ const selectedItem = ref();
 // Function to show details of a contract
 async function showDetails(value: any) {
   failedContractId.value = undefined;
-  if (value.type === ContractType.NAME || value.type === ContractType.RENT) {
+  if (value.type === ContractType.Name || value.type === ContractType.Rent) {
     return layout.value.openDialog(value, false, true);
   }
 
   loadingShowDetails.value = true;
-  const contractId: number = value.contractId;
+  const contractId: number = value.contract_id;
   loadingContractId.value = contractId;
 
   try {
@@ -245,14 +298,14 @@ async function contractLockDetails(item: any) {
   loadingShowDetails.value = true;
   selectedItem.value = item;
   await props.grid?.contracts
-    .contractLock({ id: item.contractId })
+    .contractLock({ id: item.contract_id })
     .then((data: ContractLock) => {
       contractLocked.value = data;
     })
     .catch((err: any) => {
       layout.value.setStatus(
         "failed",
-        normalizeError(err, `Failed to fetch the contract ${item.contractId} lock details.`),
+        normalizeError(err, `Failed to fetch the contract ${item.contract_id} lock details.`),
       );
       contractStateDialog.value = false;
     });
@@ -276,7 +329,7 @@ async function onDelete() {
 
   try {
     await props.grid?.contracts.batchCancelContracts({
-      ids: selectedContracts.value.map(c => c.contractId),
+      ids: selectedContracts.value.map(c => c.contract_id),
     });
     contracts.value = contracts.value.filter(c => !selectedContracts.value.includes(c));
     emits("update:deleted-contracts", contracts.value);

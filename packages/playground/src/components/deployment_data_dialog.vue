@@ -199,7 +199,7 @@ function getValue(key: string) {
 async function getGrafanaUrl() {
   isLoading.value = true;
   if (grid) {
-    if (contract.value.type !== ContractType.NAME) {
+    if (contract.value.type !== ContractType.Name) {
       const nodeId = await grid.capacity.getNodeIdFromContractId({
         contractId: contract.value.contractId || contract.value.contract_id,
       });
