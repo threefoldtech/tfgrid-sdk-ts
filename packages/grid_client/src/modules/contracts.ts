@@ -310,7 +310,7 @@ class Contracts {
    */
   @expose
   @validateInput
-  async unlockContract(ids: number[]): Promise<number[]> {
+  async unlockContracts(ids: number[]): Promise<number[]> {
     return await this.client.contracts.batchUnlockContracts(ids);
   }
   /**
