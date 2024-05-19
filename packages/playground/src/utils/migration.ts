@@ -28,11 +28,9 @@ async function _migrateOldFullVMs(module: BaseModule) {
         }
 
         oldData.type = "vm";
-        oldData.type = "vm";
-        oldData.projectName = `Fullvm`;
-
         contract.parsedDeploymentData = oldData;
         contract.deploymentData = JSON.stringify(oldData);
+        contract.updatedAt = Date.now().toString();
 
         BaseModule.newContracts.push(contract);
 
