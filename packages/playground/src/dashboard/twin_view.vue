@@ -189,8 +189,8 @@ import { useGrid, useProfileManager } from "../stores";
 import type { FarmInterface } from "../types";
 import { createCustomToast, ToastType } from "../utils/custom_toast";
 import { getFarms } from "../utils/get_farms";
-import { getGrid, storeEmail } from "../utils/grid";
-
+import type { Balance } from "../utils/grid";
+import { loadBalance, storeEmail } from "../utils/grid";
 const profileManager = useProfileManager();
 
 const editingTwin = ref(false);
@@ -264,13 +264,21 @@ function redirectToDao() {
 
 async function saveEmail() {
   try {
-    loading.value = true;
-    savingEmail.value = true;
-    profileManager.updateEmail(email.value);
-    await storeEmail(grid!, email.value);
-    editEmail.value = false;
-    loading.value = false;
-    savingEmail.value = false;
+    const balance: Balance = await loadBalance(grid!);
+    if (balance.free < 1) {
+      createCustomToast(
+        "Invalid Transaction: Inability to pay some fees, e.g. account balance too low",
+        ToastType.danger,
+      );
+    } else {
+      loading.value = true;
+      savingEmail.value = true;
+      profileManager.updateEmail(email.value);
+      await storeEmail(grid!, email.value);
+      editEmail.value = false;
+      loading.value = false;
+      savingEmail.value = false;
+    }
   } catch (e) {
     console.log(e);
   }
