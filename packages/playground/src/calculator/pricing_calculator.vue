@@ -253,8 +253,8 @@ export default {
       ipv4: false,
       useCurrentBalance: true,
     });
-    const dedicatedUpgradePrice = ref(Math.ceil(114.473 * 18));
-    const sharedUpgradePrice = ref(Math.ceil(228.947 * 18));
+    const dedicatedUpgradePrice = Math.ceil(114.473 * 18);
+    const sharedUpgradePrice = Math.ceil(228.947 * 18);
     const tftPriceTask = useAsync(() => calculator.tftPrice(), {
       init: true,
       default: 0,
