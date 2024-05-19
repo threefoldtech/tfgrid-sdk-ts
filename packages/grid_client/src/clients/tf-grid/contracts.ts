@@ -336,12 +336,19 @@ class TFContracts extends Contracts {
   }
 
   async batchUnlockContracts(ids: number[]) {
-    const extrinsics: ExtrinsicResult<number>[] = [];
+    console.log({ ids });
+    const billableContractsIDs: number[] = [];
     for (const id of ids) {
+      if ((await this.contractLock({ id })).amountLocked > 0) billableContractsIDs.push(id);
+    }
+    console.log(billableContractsIDs);
+    const extrinsics: ExtrinsicResult<number>[] = [];
+    for (const id of billableContractsIDs) {
       extrinsics.push(await this.unlock(id));
     }
     return this.client.applyAllExtrinsics(extrinsics);
   }
+
   async unlockMyContracts(graphqlURL: string) {
     const contracts = await this.listMyContracts({
       stateList: [ContractStates.GracePeriod],
@@ -350,14 +357,9 @@ class TFContracts extends Contracts {
     const ids: number[] = [...contracts.nameContracts, ...contracts.nodeContracts, ...contracts.rentContracts].map(
       contract => parseInt(contract.contractID),
     );
-
-    const billableContractsIDs: number[] = [];
-    for (const id of ids) {
-      if ((await this.getConsumption({ id, graphqlURL })) > 0) billableContractsIDs.push(id);
-    }
-
-    return await this.batchUnlockContracts(billableContractsIDs);
+    return await this.batchUnlockContracts(ids);
   }
+
   async getDedicatedNodeExtraFee(options: GetDedicatedNodePriceOptions): Promise<number> {
     // converting fees from milli to usd before getting
     const fee = new Decimal(await super.getDedicatedNodeExtraFee(options));
