@@ -262,7 +262,7 @@ function onDeletedContracts(_contracts: NormalizedContract[]) {
 const baseTableHeaders: VDataTableHeader = [
   { title: "PLACEHOLDER", key: "data-table-select" },
   { title: "ID", key: "contract_id" },
-  { title: "State", key: "state" },
+  { title: "State", key: "state", sortable: false },
   { title: "Billing Rate", key: "consumption" },
   { title: "Created At", key: "created_at" },
 ];
@@ -275,11 +275,11 @@ const nodeTableHeaders: VDataTableHeader = [
     key: "solution",
     sortable: false,
     children: [
-      { title: "Type", key: "solutionType" },
-      { title: "Name", key: "solutionName" },
+      { title: "Type", key: "solutionType", sortable: false },
+      { title: "Name", key: "solutionName", sortable: false },
     ],
   },
-  { title: "Type", key: "deploymentType" },
+  { title: "Type", key: "deploymentType", sortable: false },
   { title: "Expiration", key: "expiration" },
   { title: "Farm ID", key: "farm_id" },
   {
