@@ -28,10 +28,17 @@ async function _migrateOldFullVMs(module: BaseModule) {
         }
 
         oldData.type = "vm";
+        oldData.type = "vm";
+        oldData.projectName = `Fullvm`;
+
+        contract.parsedDeploymentData = oldData;
+        contract.deploymentData = JSON.stringify(oldData);
+
         BaseModule.newContracts.push(contract);
+
         return module.tfClient.contracts.updateNode({
           id: +contract.contractID,
-          data: JSON.stringify(oldData),
+          data: contract.deploymentData,
           hash: contract.deploymentHash,
         });
       }),
