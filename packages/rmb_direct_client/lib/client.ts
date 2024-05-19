@@ -315,6 +315,8 @@ class Client {
         }
       }
 
+      clientEnvelope.relays = this.twin.relay.split("_");
+
       if (this.signer) {
         clientEnvelope.signature = clientEnvelope.signEnvelope();
       }

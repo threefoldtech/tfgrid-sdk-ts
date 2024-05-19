@@ -40,6 +40,7 @@ class ClientEnvelope extends Envelope {
       plain: envelope.plain.length != 0 ? envelope.plain : undefined,
       cipher: envelope.cipher.length != 0 ? envelope.cipher : undefined,
       federation: envelope.federation || undefined,
+      relays: envelope.relays || undefined,
     });
 
     this.chainUrl = chainUrl;
@@ -153,6 +154,12 @@ class ClientEnvelope extends Envelope {
     } else if (this.cipher.length > 0) {
       const cipher = Buffer.from(this.cipher).toString("hex");
       hash.update(cryptoJs.enc.Hex.parse(cipher));
+    }
+
+    if (this.relays) {
+      for (const r of this.relays) {
+        hash.update(r);
+      }
     }
 
     const hashFinal = Buffer.from(hash.finalize().toString(), "hex");
