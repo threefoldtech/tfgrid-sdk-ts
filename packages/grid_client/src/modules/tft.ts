@@ -7,6 +7,7 @@ import { CurrencyModel, HourlyTFTModel } from "./models";
 
 class TFTUSDConversionService {
   private client: TFClient;
+  private decimals = 2;
 
   constructor(public config: GridClientConfig) {
     this.client = config.tfclient;
@@ -19,18 +20,18 @@ class TFTUSDConversionService {
   @expose
   @validateInput
   async convertUSDtoTFT(options: CurrencyModel): Promise<string> {
-    return new Decimal(options.amount / (await this.price())).toFixed(2);
+    return new Decimal(options.amount / (await this.price())).toFixed(this.decimals);
   }
 
   @expose
   @validateInput
   async convertTFTtoUSD(options: CurrencyModel): Promise<string> {
-    return new Decimal(options.amount * (await this.price())).toFixed(2);
+    return new Decimal(options.amount * (await this.price())).toFixed(this.decimals);
   }
   @expose
   @validateInput
   monthlyTFT(options: HourlyTFTModel): string {
-    return new Decimal(options.amount * 24 * 30).toFixed(2);
+    return new Decimal(options.amount * 24 * 30).toFixed(this.decimals);
   }
 
   @expose
@@ -38,7 +39,7 @@ class TFTUSDConversionService {
   yearlyTFT(options: HourlyTFTModel): string {
     const months = this.monthlyTFT(options);
 
-    return new Decimal(+months * 12).toFixed(2);
+    return new Decimal(+months * 12).toFixed(this.decimals);
   }
 }
 
