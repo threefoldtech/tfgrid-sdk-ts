@@ -189,8 +189,7 @@ import { useGrid, useProfileManager } from "../stores";
 import type { FarmInterface } from "../types";
 import { createCustomToast, ToastType } from "../utils/custom_toast";
 import { getFarms } from "../utils/get_farms";
-import type { Balance } from "../utils/grid";
-import { loadBalance, storeEmail } from "../utils/grid";
+import { type Balance, loadBalance, storeEmail } from "../utils/grid";
 const profileManager = useProfileManager();
 
 const editingTwin = ref(false);
@@ -268,7 +267,7 @@ async function saveEmail() {
     if (balance.free < 1) {
       editEmail.value = false;
       createCustomToast(
-        "Invalid Transaction: Inability to pay some fees, e.g. account balance too low",
+        "Transaction Error: Unable to Process Payment - Insufficient Account Balance.",
         ToastType.danger,
       );
     } else {
