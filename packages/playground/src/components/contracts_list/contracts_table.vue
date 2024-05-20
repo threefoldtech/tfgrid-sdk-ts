@@ -4,7 +4,7 @@
       v-if="$props.tableHeaders"
       :headers="$props.tableHeaders"
       :loading="$props.loading.value"
-      loading-text="Loading nodes..."
+      loading-text="Loading contracts..."
       v-model="selectedContracts"
       :deleting="deleting"
       v-bind:onClick:row="loading || deleting ? undefined : onClickRow"
