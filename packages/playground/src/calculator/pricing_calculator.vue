@@ -154,7 +154,9 @@
             <VCol cols="6">
               <div
                 class="rounded pa-4 h-100 d-flex justify-center align-center"
-                :style="{ background: computePackageColor(priceTask.data?.dedicatedPackage.package) }"
+                :style="{
+                  background: computePackageColor(priceTask.data?.dedicatedPackage.package),
+                }"
               >
                 <p>
                   Cost of reserving a <strong v-text="'Dedicated Node'" /> of the same specifications<br />
@@ -167,10 +169,13 @@
             <VCol cols="6">
               <div
                 class="rounded pa-4 h-100 d-flex justify-center align-center"
-                :style="{ background: computePackageColor(priceTask.data?.sharedPackage.package) }"
+                :style="{
+                  background: computePackageColor(priceTask.data?.sharedPackage.package),
+                }"
               >
                 <p>
-                  Cost of reservation on a <strong v-text="'Shared Node'" /><br />
+                  Cost of reservation on a
+                  <strong v-text="'Shared Node'" /><br />
                   <strong v-text="'Loading...'" v-if="priceTask.loading" />
                   <strong v-else v-text="sharedPriceUSD + ' USD/month, ' + sharedPriceTFT + ' TFT/month'" />. Shared
                   Nodes allow several users to host various workloads on a single node
@@ -227,7 +232,10 @@ export default {
       useCurrentBalance: true,
     });
 
-    const tftPriceTask = useAsync(() => calculator.tftPrice(), { init: true, default: 0 });
+    const tftPriceTask = useAsync(() => calculator.tftPrice(), {
+      init: true,
+      default: 0,
+    });
     const priceTask = useAsync(
       () => {
         return calculator.calculate({
@@ -307,3 +315,12 @@ export default {
   },
 };
 </script>
+<style>
+.v-theme--light .v-btn--disabled,
+.v-theme--light .v-field--disabled {
+  opacity: 0.5 !important;
+  pointer-events: none !important;
+  background-color: #f0f0f0 !important;
+  color: #999999 !important;
+}
+</style>
