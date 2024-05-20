@@ -315,12 +315,3 @@ export default {
   },
 };
 </script>
-<style>
-.v-theme--light .v-btn--disabled,
-.v-theme--light .v-field--disabled {
-  opacity: 0.5 !important;
-  pointer-events: none !important;
-  background-color: #f0f0f0 !important;
-  color: #999999 !important;
-}
-</style>
