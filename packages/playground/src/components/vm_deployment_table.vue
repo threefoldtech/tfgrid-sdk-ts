@@ -281,6 +281,11 @@ const filteredHeaders = computed(() => {
     ProjectName.Nextcloud,
     ProjectName.Funkwhale,
     ProjectName.Casperlabs,
+    ProjectName.Mattermost,
+    ProjectName.Discourse,
+    ProjectName.Taiga,
+    ProjectName.StaticWebsite,
+    ProjectName.Wordpress,
   ] as string[];
 
   const WireguardSolutions = [ProjectName.VM, ProjectName.Fullvm, ProjectName.Umbrel] as string[];
