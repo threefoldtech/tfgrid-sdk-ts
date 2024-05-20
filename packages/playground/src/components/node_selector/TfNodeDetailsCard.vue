@@ -198,7 +198,9 @@
           </template>
 
           <template v-slot:activator="{ isActive, props }" v-else>
-            <span v-bind="props" v-on="isActive" class="font-weight-bold">{{ price_usd }} USD/Month</span>
+            <span v-bind="props" v-on="isActive" class="font-weight-bold"
+              ><v-icon class="mr-2" color="warning">mdi-sale-outline</v-icon>{{ price_usd }} USD/Month</span
+            >
           </template>
           <span>
             Discounts:
