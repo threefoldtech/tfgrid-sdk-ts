@@ -216,7 +216,7 @@ async function deploy() {
     await deployGatewayName(grid, selectionDetails.value.domain, {
       subdomain,
       ip: vm[0].interfaces[0].ip,
-      port: 80,
+      port: 88,
       network: vm[0].interfaces[0].network,
     });
 
