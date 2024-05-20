@@ -1,3 +1,4 @@
+import { ValidationError } from "@threefold/types";
 import Decimal from "decimal.js";
 
 import { type GridClient, tft as TFT } from "../../src";
@@ -34,7 +35,10 @@ describe("Testing TFT module", () => {
   });
 
   test("convertTFTtoUSD function to throw if passed a negative value.", async () => {
-    await expect(async () => await grid.tft.convertTFTtoUSD({ amount: -1 })).rejects.toThrow();
+    const result = async () => await grid.tft.convertTFTtoUSD({ amount: -1 });
+
+    await expect(result).rejects.toThrow();
+    await expect(result).rejects.toBeInstanceOf(ValidationError);
   });
 
   test("convertUSDtoTFT function returns a valid value.", async () => {
@@ -46,7 +50,10 @@ describe("Testing TFT module", () => {
   });
 
   test("convertUSDtoTFT function to throw if passed a negative value.", async () => {
-    await expect(async () => await grid.tft.convertUSDtoTFT({ amount: -1 })).rejects.toThrow();
+    const result = async () => await grid.tft.convertUSDtoTFT({ amount: -1 });
+
+    await expect(result).rejects.toThrow();
+    await expect(result).rejects.toBeInstanceOf(ValidationError);
   });
 
   test("monthlyTFT function returns a valid value.", async () => {
@@ -58,7 +65,10 @@ describe("Testing TFT module", () => {
   });
 
   test("monthlyTFT function throws if passed anything other than a positive value.", async () => {
-    await expect(async () => await grid.tft.monthlyTFT({ amount: -1 })).rejects.toThrow();
+    const result = async () => await grid.tft.monthlyTFT({ amount: -1 });
+
+    await expect(result).rejects.toThrow();
+    await expect(result).rejects.toBeInstanceOf(ValidationError);
   });
 
   test("yearlyTFT function returns a valid value.", async () => {
@@ -70,6 +80,9 @@ describe("Testing TFT module", () => {
   });
 
   test("yearlyTFT function throws if passed anything other than a positive value.", async () => {
-    await expect(async () => grid.tft.yearlyTFT({ amount: -1 })).rejects.toThrow();
+    const result = async () => grid.tft.yearlyTFT({ amount: -1 });
+
+    await expect(result).rejects.toThrow();
+    await expect(result).rejects.toBeInstanceOf(ValidationError);
   });
 });
