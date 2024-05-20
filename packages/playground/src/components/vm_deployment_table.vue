@@ -275,8 +275,6 @@ const filteredHeaders = computed(() => {
     ProjectName.VM,
     ProjectName.Fullvm,
     ProjectName.Presearch,
-    ProjectName.Algorand,
-    ProjectName.Subsquid,
     ProjectName.Umbrel,
     ProjectName.Nextcloud,
     ProjectName.Funkwhale,
