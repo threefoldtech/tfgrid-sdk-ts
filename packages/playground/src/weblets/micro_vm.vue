@@ -173,10 +173,8 @@
       </template>
     </d-tabs>
 
-    <template #footer-actions>
-      <v-btn color="secondary" variant="outlined" :disabled="tabs?.invalid || network?.error" @click="deploy"
-        >Deploy</v-btn
-      >
+    <template #footer-actions="{ validateBeforeDeploy }">
+      <v-btn color="secondary" variant="outlined" @click="validateBeforeDeploy(deploy)" text="Deploy" />
     </template>
   </weblet-layout>
 </template>

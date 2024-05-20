@@ -88,7 +88,7 @@
       <v-divider class="mt-5" />
       <v-card-actions>
         <v-spacer />
-        <slot name="footer-actions" v-if="!status" />
+        <slot name="footer-actions" :validateBeforeDeploy="validateBeforeDeploy" v-if="!status" />
         <v-btn v-else color="secondary" variant="outlined" :loading="status === 'deploy'" @click="reset"> Back </v-btn>
       </v-card-actions>
     </template>
@@ -192,6 +192,52 @@ provideService({
   },
 });
 
+function validateBeforeDeploy(fn: () => void) {
+  const forms = __forms;
+
+  let errorInput: [number, any] | null = null;
+
+  out: for (let i = 0; i < forms.length; i++) {
+    const form = forms[i];
+    const inputs = form.inputs as unknown as InputValidatorService[];
+
+    for (const input of inputs) {
+      const status = input.status;
+      if (status === ValidatorStatus.Invalid) {
+        errorInput = [i, input.$el];
+        break out;
+      }
+
+      const valid = status === ValidatorStatus.Valid || (status === ValidatorStatus.Init && form.validOnInit);
+
+      if ((!status || !valid) && !errorInput) {
+        errorInput = [i, input.$el];
+      }
+    }
+  }
+
+  if (errorInput) {
+    const [tab, input] = errorInput;
+
+    if (!input || !__setTab) {
+      return;
+    }
+
+    __setTab(tab);
+
+    // Timeout so the ui gets render before scroll
+    setTimeout(() => {
+      const _input = input.querySelector("textarea") || input.querySelector("input") || input;
+      document.addEventListener("scrollend", () => _input.focus(), { once: true });
+      _input.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 250);
+
+    return;
+  }
+
+  return fn();
+}
+
 defineExpose({
   async validateBalance(grid: GridClient, min = 2) {
     message.value = "Checking your balance...";
@@ -209,50 +255,6 @@ defineExpose({
   setStatus(s: WebletStatus, m?: string) {
     if (s !== "deploy" && !m) {
       throw new Error("Message need to be passed while settingStatus.");
-    }
-
-    const forms = __forms;
-
-    if (s === "deploy" && forms.length > 0) {
-      let errorInput: [number, any] | null = null;
-
-      out: for (let i = 0; i < forms.length; i++) {
-        const form = forms[i];
-        const inputs = form.inputs as unknown as InputValidatorService[];
-
-        for (const input of inputs) {
-          const status = input.status;
-          if (status === ValidatorStatus.Invalid) {
-            errorInput = [i, input.$el];
-            break out;
-          }
-
-          const valid = status === ValidatorStatus.Valid || (status === ValidatorStatus.Init && form.validOnInit);
-
-          if ((!status || !valid) && !errorInput) {
-            errorInput = [i, input.$el];
-          }
-        }
-      }
-
-      if (errorInput) {
-        const [tab, input] = errorInput;
-
-        if (!input || !__setTab) {
-          return;
-        }
-
-        __setTab(tab);
-
-        // Timeout so the ui gets render before scroll
-        setTimeout(() => {
-          const _input = input.querySelector("textarea") || input.querySelector("input") || input;
-          document.addEventListener("scrollend", () => _input.focus(), { once: true });
-          _input.scrollIntoView({ behavior: "smooth", block: "center" });
-        }, 250);
-
-        return;
-      }
     }
 
     message.value = m ? m : "Preparing to deploy...";
