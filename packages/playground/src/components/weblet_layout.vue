@@ -177,6 +177,21 @@ const alertType = computed(() => {
 const dialogData = ref();
 const environments = ref();
 const onlyJson = ref();
+
+let __forms: FormValidatorService[] = [];
+let __setTab: (tab: number) => void = () => void 0;
+
+provideService({
+  set(forms, setTab) {
+    __forms = forms as any;
+    __setTab = setTab;
+  },
+  clear() {
+    __forms = [];
+    __setTab = () => void 0;
+  },
+});
+
 defineExpose({
   async validateBalance(grid: GridClient, min = 2) {
     message.value = "Checking your balance...";
@@ -194,6 +209,50 @@ defineExpose({
   setStatus(s: WebletStatus, m?: string) {
     if (s !== "deploy" && !m) {
       throw new Error("Message need to be passed while settingStatus.");
+    }
+
+    const forms = __forms;
+
+    if (s === "deploy" && forms.length > 0) {
+      let errorInput: [number, any] | null = null;
+
+      out: for (let i = 0; i < forms.length; i++) {
+        const form = forms[i];
+        const inputs = form.inputs as unknown as InputValidatorService[];
+
+        for (const input of inputs) {
+          const status = input.status;
+          if (status === ValidatorStatus.Invalid) {
+            errorInput = [i, input.$el];
+            break out;
+          }
+
+          const valid = status === ValidatorStatus.Valid || (status === ValidatorStatus.Init && form.validOnInit);
+
+          if ((!status || !valid) && !errorInput) {
+            errorInput = [i, input.$el];
+          }
+        }
+      }
+
+      if (errorInput) {
+        const [tab, input] = errorInput;
+
+        if (!input || !__setTab) {
+          return;
+        }
+
+        __setTab(tab);
+
+        // Timeout so the ui gets render before scroll
+        setTimeout(() => {
+          const _input = input.querySelector("textarea") || input.querySelector("input") || input;
+          document.addEventListener("scrollend", () => _input.focus(), { once: true });
+          _input.scrollIntoView({ behavior: "smooth", block: "center" });
+        }, 250);
+
+        return;
+      }
     }
 
     message.value = m ? m : "Preparing to deploy...";
@@ -319,7 +378,11 @@ async function loadCost(profile: { mnemonic: string }) {
 
 <script lang="ts">
 import type { ComputedRef, PropType, Ref } from "vue";
+import { inject, provide } from "vue";
 import type { VCard } from "vuetify/components/VCard";
+
+import { type FormValidatorService, ValidatorStatus } from "@/hooks/form_validator";
+import type { InputValidatorService } from "@/hooks/input_validator";
 
 import type { Balance } from "../utils/grid";
 import DeploymentDataDialog from "./deployment_data_dialog.vue";
@@ -342,6 +405,21 @@ export interface WebletLayout {
 
 export function useLayout() {
   return ref() as Ref<WebletLayout>;
+}
+
+const KEY = "weblet:layout";
+
+export interface WebletLayoutService {
+  set(forms: FormValidatorService[], activeTab: (tab: number) => void): void;
+  clear(): void;
+}
+
+function provideService(service: WebletLayoutService) {
+  provide(KEY, service);
+}
+
+export function useWebletLayoutServie() {
+  return inject(KEY) as WebletLayoutService;
 }
 
 export default {

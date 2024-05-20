@@ -16,26 +16,28 @@
         </InputTooltip>
       </v-radio-group>
 
-      <template v-if="wayToSelect === 'automated'">
-        <TfSelectLocation v-model="location" title="Choose a Location" :status="NodeStatus.Up" />
-        <TfSelectFarm :valid-filters="validFilters" :filters="filters" :location="location" v-model="farm" />
-        <TfAutoNodeSelector
+      <div ref="input">
+        <template v-if="wayToSelect === 'automated'">
+          <TfSelectLocation v-model="location" title="Choose a Location" :status="NodeStatus.Up" />
+          <TfSelectFarm :valid-filters="validFilters" :filters="filters" :location="location" v-model="farm" />
+          <TfAutoNodeSelector
+            :valid-filters="validFilters"
+            :filters="filters"
+            :location="location"
+            :farm="farm"
+            v-model="node"
+            v-model:status="nodeStatus"
+          />
+        </template>
+
+        <TfManualNodeSelector
           :valid-filters="validFilters"
           :filters="filters"
-          :location="location"
-          :farm="farm"
           v-model="node"
           v-model:status="nodeStatus"
+          v-else
         />
-      </template>
-
-      <TfManualNodeSelector
-        :valid-filters="validFilters"
-        :filters="filters"
-        v-model="node"
-        v-model:status="nodeStatus"
-        v-else
-      />
+      </div>
 
       <VExpandTransition>
         <TfSelectGpu
@@ -108,6 +110,7 @@ export default {
     "update:status": (value: ValidatorStatus) => true || value,
   },
   setup(props, ctx) {
+    const input = ref<HTMLElement>();
     const filtersValidator = computed(() => createSelectionDetailsFiltersValidator(props.filtersValidators));
     const validFilters = computed(() => filtersValidator.value.safeParse(props.filters).success);
 
@@ -147,6 +150,7 @@ export default {
       reset: noop,
       status: ValidatorStatus.Init,
       error: null,
+      $el: input,
     };
 
     onMounted(() => form?.register(uid.toString(), fakeService));
@@ -186,6 +190,7 @@ export default {
     watch(
       status,
       status => {
+        fakeService.status = status;
         form?.updateStatus(uid.toString(), status);
         bindStatus(status);
       },
@@ -202,6 +207,7 @@ export default {
     }
 
     return {
+      input,
       validFilters,
       ValidatorStatus,
       wayToSelect,
