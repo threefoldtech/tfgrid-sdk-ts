@@ -550,7 +550,7 @@ export default {
             freeIps: +filters.value.publicIPs || undefined,
             dedicated: filters.value.dedicated || undefined,
             sortBy: SortBy.FreeCRU,
-            sortOrder: SortOrder.Desc,
+            sortOrder: SortOrder.Asc,
             numGpu: +filters.value.numGpu || undefined,
             rentable: filters.value.rentable && profileManager.profile ? filters.value.rentable : undefined,
             availableFor: filters.value.rentable && profileManager.profile ? profileManager.profile.twinId : undefined,
