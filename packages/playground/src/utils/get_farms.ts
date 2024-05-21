@@ -87,6 +87,9 @@ export async function getFarmTwinByTwinId(queries: Partial<TwinsQuery> = {}): Pr
   try {
     const twins = await gridProxyClient.twins.list(queries);
 
+    if (twins.count == null) {
+      return { twinId: queries.twinId } as Twin;
+    }
     return twins.data[0] as Twin;
   } catch (error) {
     console.error("An error occurred while requesting twins:", error);

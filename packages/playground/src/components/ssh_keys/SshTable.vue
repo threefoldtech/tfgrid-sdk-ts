@@ -1,17 +1,16 @@
 <template>
-  <v-card class="pt-6 pl-6 pr-6 mb-4">
-    <div class="head">
-      <h3 class="text-light text-subtitle-1">
-        <v-icon>mdi-key-chain</v-icon>
-        SSH Keys
-      </h3>
-    </div>
+  <v-card>
+    <v-card-title>
+      <v-icon icon="mdi-key-chain" />
+      SSH Keys
+    </v-card-title>
 
-    <div class="table mt-3">
+    <v-divider />
+
+    <v-card-text>
       <v-data-table
         show-select
         :no-data-text="capitalize(`No keys found.`)"
-        class="pa-5"
         v-model="selectedKeys"
         :loading="loading"
         :headers="headers"
@@ -20,7 +19,7 @@
         @click:row="(_: any, { item }: any) => $emit('view', item)"
       >
         <template #loading>
-          <div class="w-100 text-center" v-if="loading && loadingMessage">
+          <div class="text-center" v-if="loading && loadingMessage">
             <small>{{ loadingMessage }}</small>
           </div>
         </template>
@@ -92,9 +91,12 @@
 
         <template #bottom></template>
       </v-data-table>
-    </div>
+    </v-card-text>
 
-    <div class="bottom mt-3 d-flex justify-end">
+    <v-divider />
+
+    <v-card-actions>
+      <v-spacer />
       <v-tooltip location="bottom" text="Export all selected keys.">
         <template #activator="{ props }">
           <v-btn
@@ -127,7 +129,7 @@
           </v-btn>
         </template>
       </v-tooltip>
-    </div>
+    </v-card-actions>
   </v-card>
 </template>
 
@@ -220,22 +222,7 @@ export default defineComponent({
 </script>
 
 <style>
-.head {
-  border-bottom: 1px solid #8d848d;
-  padding-bottom: 15px;
-}
-
-.bottom {
-  width: 100%;
-  border-top: 1px solid #8d848d;
-  padding: 15px;
-}
 .activation {
   cursor: pointer;
-}
-.v-data-table-rows-loading td {
-  padding: 0 !important;
-  margin: 0 !important;
-  height: 25px !important;
 }
 </style>

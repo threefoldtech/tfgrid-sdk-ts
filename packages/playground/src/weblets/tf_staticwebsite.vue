@@ -5,13 +5,13 @@
     :memory="solution?.memory"
     :disk="solution?.disk"
     :ipv4="ipv4"
-    :certified="certified"
     :dedicated="dedicated"
     :SelectedNode="selectionDetails?.node"
     :valid-filters="selectionDetails?.validFilters"
-    title-image="images/icons/peertube.png"
+    title-image="images/icons/static_website.png"
   >
-    <template #title>Deploy a Peertube Instance</template>
+    <template #title>Deploy a Static Website Instance </template>
+
     <form-validator v-model="valid">
       <input-validator
         :value="name"
@@ -31,41 +31,44 @@
       </input-validator>
 
       <input-validator
-        :value="email"
+        :value="gitUrl"
         :rules="[
-          validators.required('Email is required.'),
-          validators.isEmail('Please provide a valid email address.'),
+          validators.required('Git https URL is required.'),
+          validators.isURL('Git URL must be a valid  https URL.', {
+            protocols: ['https'],
+            require_protocol: true,
+          }),
         ]"
+        :async-rules="[isGithubRepoExist]"
         #="{ props }"
       >
-        <input-tooltip tooltip="Peertube admin email.">
-          <v-text-field label="Admin Email" v-model="email" v-bind="props" />
+        <input-tooltip tooltip="Git https url to serve.">
+          <v-text-field label="Git URL" v-model="gitUrl" v-bind="props" />
         </input-tooltip>
       </input-validator>
 
-      <password-input-wrapper #="{ props }">
-        <input-validator
-          :value="password"
-          :rules="[
-            validators.required('Password is required.'),
-            validators.minLength('Password must be at least 6 characters.', 6),
-            validators.maxLength('Password cannot exceed 15 characters.', 15),
-            validators.pattern('Password should not contain whitespaces.', {
-              pattern: /^[^\s]+$/,
-            }),
-          ]"
-          #="{ props: validatorProps }"
-        >
-          <input-tooltip tooltip="Peertube admin password.">
-            <v-text-field label="Admin Password" v-model="password" v-bind="{ ...props, ...validatorProps }" />
-          </input-tooltip>
-        </input-validator>
-      </password-input-wrapper>
+      <input-tooltip tooltip="Git Branch name to serve (optional).">
+        <v-text-field label="Git Branch" v-model="gitBranch" />
+      </input-tooltip>
+      <input-tooltip
+        tooltip="HTML directory to be served. Please ensure correct casing, as this field is case-sensitive. If the directory is the root of the repository, it should not be added."
+      >
+        <v-text-field label="HTML Directory" v-model="root" />
+      </input-tooltip>
 
-      <SelectSolutionFlavor v-model="solution" />
-      <Networks v-model:mycelium="mycelium" />
+      <SelectSolutionFlavor
+        v-model="solution"
+        :small="{ cpu: 1, memory: 2, disk: 50 }"
+        :medium="{ cpu: 2, memory: 4, disk: 100 }"
+      />
 
-      <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
+      <Networks ref="network" v-model:ipv4="ipv4" v-model:mycelium="mycelium" />
+
+      <input-tooltip
+        inline
+        tooltip="Click to know more about dedicated machines."
+        href="https://www.manual.grid.tf/documentation/dashboard/deploy/dedicated_machines.html"
+      >
         <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
       </input-tooltip>
 
@@ -86,7 +89,6 @@
         require-domain
         v-model="selectionDetails"
       />
-
       <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
     </form-validator>
 
@@ -100,46 +102,52 @@
 import type { GridClient } from "@threefold/grid_client";
 import { computed, type Ref, ref } from "vue";
 
-import { manual } from "@/utils/manual";
-
 import { useLayout } from "../components/weblet_layout.vue";
-import { useGrid, useProfileManager } from "../stores";
+import { useProfileManager } from "../stores";
 import type { Flist, solutionFlavor as SolutionFlavor } from "../types";
 import { ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
 import { deployGatewayName, getSubdomain, rollbackDeployment } from "../utils/gateway";
-import { generateName, generatePassword } from "../utils/strings";
+import { getGrid } from "../utils/grid";
+import { normalizeError } from "../utils/helpers";
+import { generateName } from "../utils/strings";
 
 const layout = useLayout();
 const valid = ref(false);
 const profileManager = useProfileManager();
-const name = ref(generateName({ prefix: "pt" }));
-const email = ref(profileManager.profile?.email || "");
-const password = ref(generatePassword());
+const name = ref(generateName({ prefix: "sw" }));
+const gitUrl = ref("");
+const gitBranch = ref("");
+const root = ref("");
+const domain = ref();
+
+const ipv4 = ref(false);
+const mycelium = ref(false);
 const solution = ref() as Ref<SolutionFlavor>;
 const flist: Flist = {
-  value: "https://hub.grid.tf/tf-official-apps/peertube-v3.1.1.flist",
+  // Should be upgraded to an oficial Flist
+  value: "https://hub.grid.tf/mayarosamaa.3bot/mayarosama-caddy2-v1.flist",
   entryPoint: "/sbin/zinit init",
 };
 const dedicated = ref(false);
 const certified = ref(false);
-const ipv4 = ref(false);
 const rootFilesystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solution.value?.memory ?? 0));
 const selectionDetails = ref<SelectionDetails>();
-const mycelium = ref(false);
 const selectedSSHKeys = ref("");
-const gridStore = useGrid();
-const grid = gridStore.client as GridClient;
+function updateSSHkeyEnv(selectedKeys: string) {
+  selectedSSHKeys.value = selectedKeys;
+}
 
 function finalize(deployment: any) {
   layout.value.reloadDeploymentsList();
-  layout.value.setStatus("success", "Successfully deployed a peertube instance.");
-  layout.value.openDialog(deployment, deploymentListEnvironments.peertube);
+  layout.value.setStatus("success", "Successfully deployed a Static Website instance.");
+  layout.value.openDialog(deployment, deploymentListEnvironments.static_website);
 }
+
 async function deploy() {
   layout.value.setStatus("deploy");
 
-  const projectName = ProjectName.Peertube.toLowerCase() + "/" + name.value;
+  const projectName = ProjectName.StaticWebsite.toLowerCase() + "/" + name.value;
 
   const subdomain = getSubdomain({
     deploymentName: name.value,
@@ -147,15 +155,22 @@ async function deploy() {
     twinId: profileManager.profile!.twinId,
   });
 
-  const domain = selectionDetails.value?.domain?.enabledCustomDomain
-    ? selectionDetails.value.domain.customDomain
-    : subdomain + "." + selectionDetails.value?.domain?.selectedDomain?.publicConfig.domain;
+  if (
+    selectionDetails.value?.domain?.customDomain ||
+    selectionDetails.value?.domain?.selectedDomain?.publicConfig.domain
+  ) {
+    domain.value = selectionDetails.value?.domain?.enabledCustomDomain
+      ? selectionDetails.value.domain.customDomain
+      : subdomain + "." + selectionDetails.value?.domain?.selectedDomain?.publicConfig.domain;
+  }
 
+  let grid: GridClient | null;
   let vm: any;
 
   try {
     layout.value?.validateSSH();
-    updateGrid(grid, { projectName });
+    grid = await getGrid(profileManager.profile!, projectName);
+
     await layout.value.validateBalance(grid!);
 
     vm = await deployVM(grid!, {
@@ -172,19 +187,20 @@ async function deploy() {
           disks: [
             {
               size: solution.value.disk,
-              mountPoint: "/data",
+              mountPoint: "/var/lib/docker",
             },
           ],
           flist: flist.value,
           entryPoint: flist.entryPoint,
           publicIpv4: ipv4.value,
-          planetary: true,
           mycelium: mycelium.value,
           envs: [
             { key: "SSH_KEY", value: selectedSSHKeys.value },
-            { key: "PEERTUBE_ADMIN_EMAIL", value: email.value },
-            { key: "PT_INITIAL_ROOT_PASSWORD", value: password.value },
-            { key: "PEERTUBE_WEBSERVER_HOSTNAME", value: domain },
+            { key: "GITHUB_URL", value: gitUrl.value },
+            { key: "GITHUB_BRANCH", value: gitBranch.value },
+            { key: "HTML_DIR", value: root.value ? "website/" + root.value : "website" },
+            { key: "USER_DOMAIN", value: selectionDetails.value?.domain?.enabledCustomDomain ? domain.value : "" },
+            { key: "STATICWEBSITE_DOMAIN", value: domain.value },
           ],
           nodeId: selectionDetails.value!.node!.nodeId,
           rentedBy: dedicated.value ? grid!.twinId : undefined,
@@ -194,36 +210,47 @@ async function deploy() {
       ],
     });
   } catch (e) {
-    return layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a peertube instance."));
+    return layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Static Website instance."));
   }
+  if (domain.value) {
+    if (!selectionDetails.value?.domain?.enableSelectedDomain) {
+      vm[0].customDomain = selectionDetails.value?.domain?.customDomain;
+      return;
+    }
 
-  if (!selectionDetails.value?.domain?.enableSelectedDomain) {
-    vm[0].customDomain = selectionDetails.value?.domain?.customDomain;
-    finalize(vm);
-    return;
+    try {
+      layout.value.setStatus("deploy", "Preparing to deploy gateway...");
+
+      await deployGatewayName(grid, selectionDetails.value.domain, {
+        subdomain,
+        ip: vm[0].interfaces[0].ip,
+        port: 9000,
+        network: vm[0].interfaces[0].network,
+      });
+      finalize(vm);
+    } catch (e) {
+      layout.value.setStatus("deploy", "Rollbacking back due to fail to deploy gateway...");
+
+      await rollbackDeployment(grid!, name.value);
+      layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Static Website instance."));
+    }
   }
-
-  try {
-    layout.value.setStatus("deploy", "Preparing to deploy gateway...");
-
-    await deployGatewayName(grid, selectionDetails.value.domain, {
-      subdomain,
-      ip: vm[0].interfaces[0].ip,
-      port: 9000,
-      network: vm[0].interfaces[0].network,
-    });
-
-    finalize(vm);
-  } catch (e) {
-    layout.value.setStatus("deploy", "Rollbacking back due to fail to deploy gateway...");
-
-    await rollbackDeployment(grid!, name.value);
-    layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a peertube instance."));
-  }
+  finalize(vm);
 }
 
-function updateSSHkeyEnv(selectedKeys: string) {
-  selectedSSHKeys.value = selectedKeys;
+async function isGithubRepoExist(gitUrl: string) {
+  if (gitUrl.includes("github.com")) {
+    try {
+      gitUrl = gitUrl.replace("https://github.com", "");
+      gitUrl = gitUrl.replace("/", "");
+      gitUrl = gitUrl.replace(".git", "");
+
+      const res = await fetch("https://api.github.com/repos/" + gitUrl);
+      if (res.status !== 200) throw new Error();
+    } catch (error) {
+      return { message: `Github repository doesn't exist.`, isExist: false };
+    }
+  }
 }
 </script>
 
@@ -233,12 +260,10 @@ import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";
 import type { SelectionDetails } from "../types/nodeSelector";
-import { updateGrid } from "../utils/grid";
-import { normalizeError } from "../utils/helpers";
 import rootFs from "../utils/root_fs";
 
 export default {
-  name: "TfPeertube",
+  name: "TfStaticWebsite",
   components: { SelectSolutionFlavor, Networks, ManageSshDeployemnt },
 };
 </script>
