@@ -58,7 +58,7 @@ import { generateName } from "../utils/strings";
 import SelectSolutionFlavor from "./select_solution_flavor.vue";
 
 export function createWorker(name: string = generateName({ prefix: "wr" })): CaproverWorker {
-  return { name, mycelium: false };
+  return { name, mycelium: true };
 }
 
 export default {
