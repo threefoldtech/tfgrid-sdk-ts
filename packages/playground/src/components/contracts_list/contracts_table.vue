@@ -186,7 +186,7 @@
                   variant="outlined"
                   color="warning"
                   class="mr-2 px-3"
-                  @click="unlockContract([selectedItem.contractId])"
+                  @click="unlockContract([selectedItem.contract_id])"
                   :loading="unlockContractLoading"
                 >
                   Unlock Contract
@@ -452,7 +452,7 @@ async function contractLockDetails(item: any) {
   selectedItem.value = item;
   loadingShowDetails.value = true;
   await profileManagerController.reloadBalance();
-  await getLockDetails(item.contractId);
+  await getLockDetails(item.contract_id);
   await props.grid?.contracts
     .contractLock({ id: item.contract_id })
     .then((data: ContractLock) => {
