@@ -3,10 +3,13 @@
     <v-tooltip :text="tooltip || 'None!'" :location="location" :width="width ? width : ''">
       <template #activator="{ props }">
         {{ getPropsRef(props) }}
-        <div class="d-flex" :class="{ 'w-100': !inline, 'align-center': alignCenter }">
+        <div class="d-flex" :class="{ 'w-100': !inline, 'align-center': alignCenter, 'justify-center': justifyCenter }">
           <slot></slot>
           <span
-            :style="{ cursor: 'help', marginTop: $props.alignCenter ? '' : '17.5px' }"
+            :style="{
+              cursor: 'help',
+              marginTop: $props.alignCenter ? '' : '17.5px',
+            }"
             class="ml-3"
             @mouseenter="propsRef?.onMouseenter"
             @mouseleave="propsRef?.onMouseleave"
@@ -56,6 +59,10 @@ export default {
       required: false,
     },
     disabled: Boolean,
+    justifyCenter: {
+      type: Boolean,
+      required: false,
+    },
   },
   setup() {
     const appendIcon = "mdi-information";
