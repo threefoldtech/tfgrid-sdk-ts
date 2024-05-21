@@ -9,6 +9,6 @@ export default {
 
 .light-bg {
   color: #333333 !important;
-  background-color: #f5f5f5 !important;
+  background-color: #f6f6f6 !important;
 }
 </style>

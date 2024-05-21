@@ -105,8 +105,8 @@
             :loading="loading"
             v-bind="props"
             prepend-icon="mdi-export"
-            color="primary"
-            variant="tonal"
+            color="anchor"
+            variant="outlined"
             @click="() => $emit('export', selectedKeys)"
           >
             Export
@@ -120,7 +120,7 @@
             :disabled="loading || selectedKeys.length === 0 || deleting"
             :loading="deleting"
             v-bind="props"
-            variant="tonal"
+            variant="outlined"
             prepend-icon="mdi-trash-can-outline"
             color="error"
             @click="deleteSelected"

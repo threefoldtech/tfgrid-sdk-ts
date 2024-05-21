@@ -480,12 +480,16 @@ export default {
   cursor: pointer;
 }
 .v-theme--light .v-btn--disabled,
+.v-theme--dark .v-btn--disabled,
 .v-theme--light .v-field--disabled {
   opacity: 0.5 !important;
   pointer-events: none !important;
-  background-color: #f0f0f0 !important;
 }
 .v-theme--light .v-field--disabled {
-  color: #999999 !important;
+  background-color: #f0f0f0 !important;
+}
+.v-theme--light .v-btn--disabled,
+.v-theme--dark .v-btn--disabled {
+  color: #7b7b7b !important;
 }
 </style>
