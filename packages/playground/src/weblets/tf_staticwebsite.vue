@@ -122,7 +122,7 @@ const root = ref("");
 const domain = ref();
 
 const ipv4 = ref(false);
-const mycelium = ref(false);
+const mycelium = ref(true);
 const solution = ref() as Ref<SolutionFlavor>;
 const flist: Flist = {
   // Should be upgraded to an oficial Flist

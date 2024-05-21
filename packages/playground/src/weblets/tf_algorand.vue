@@ -199,7 +199,7 @@ const flist: Flist = {
 };
 const name = ref(generateName({ prefix: "al" }));
 const ipv4 = ref(false);
-const mycelium = ref(false);
+const mycelium = ref(true);
 const cpu = ref() as Ref<number>;
 const memory = ref() as Ref<number>;
 const storage = ref() as Ref<number>;

@@ -126,7 +126,7 @@ const certified = ref(false);
 const ipv4 = ref(false);
 const rootFilesystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solution.value?.memory ?? 0));
 const selectionDetails = ref<SelectionDetails>();
-const mycelium = ref(false);
+const mycelium = ref(true);
 const selectedSSHKeys = ref("");
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
