@@ -34,11 +34,11 @@ async function getDeployment(client, vms, gw) {
 }
 
 async function cancel(client, vms, gw) {
-  const resvm = await client.machines.delete(vms);
-  const resgw = await client.gateway.delete_name(gw);
+  const resultVM = await client.machines.delete(vms);
+  const resultGateway = await client.gateway.delete_name(gw);
   log("================= Canceling the deployment =================");
-  log(resvm);
-  log(resgw);
+  log(resultVM);
+  log(resultGateway);
   log("================= Canceling the deployment =================");
 }
 
@@ -61,6 +61,8 @@ async function main() {
     availableFor: grid3.twinId,
   };
   const gatewayNode = (await grid3.capacity.filterNodes(gatewayQueryOptions))[0];
+  const nodes = await grid3.capacity.filterNodes(vmQueryOptions);
+  const vmNode = await pingNodes(grid3, nodes);
 
   const vms: MachinesModel = {
     name,
@@ -71,7 +73,7 @@ async function main() {
     machines: [
       {
         name: "mattermost",
-        node_id: +(await pingNodes(grid3, await grid3.capacity.filterNodes(vmQueryOptions))),
+        node_id: vmNode,
         disks: [
           {
             name: "wedDisk",
@@ -92,9 +94,11 @@ async function main() {
           SSH_KEY: config.ssh_key,
           MATTERMOST_DOMAIN: subdomain + "." + gatewayNode.publicConfig.domain,
           SITE_URL: "https://" + subdomain + "." + gatewayNode.publicConfig.domain,
-          DJANGO_SUPERUSER_EMAIL: "admin123@matter.most", // edit me
-          DB_PASSWORD: "admin123", // edit me
-          // Optional
+          // These email and password will be used as admin credentials, so please update them with your own.
+          DJANGO_SUPERUSER_EMAIL: "admin123@matter.most",
+          DB_PASSWORD: "admin123",
+          /* The SMTP server is optional, if you would like to enable the access of the SMTP server, you need to send these values.
+           These credentials will be used as admin credentials, so please configure them with your own. */
           // SMTPUsername: "username",
           // SMTPPassword: "password",
           // SMTPServer: "hostname",
