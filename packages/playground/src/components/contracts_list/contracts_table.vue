@@ -291,12 +291,12 @@ import type { ContractLock } from "@threefold/tfchain_client";
 import { DeploymentKeyDeletionError, TFChainErrors } from "@threefold/types";
 import { capitalize, computed, defineComponent, type PropType, type Ref, ref, watch } from "vue";
 
+import { useProfileManagerController } from "@/components/profile_manager_controller.vue";
 import type { VDataTableHeader } from "@/types";
 import { ContractType, getNodeStateColor, getStateColor, type NormalizedContract } from "@/utils/contracts";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
 import toHumanDate from "@/utils/date";
 import { downloadAsJson, normalizeError } from "@/utils/helpers";
-import { useProfileManagerController } from "@/components/profile_manager_controller.vue";
 
 const props = defineProps({
   contracts: {
@@ -347,7 +347,9 @@ const getAmountLocked = computed(() => {
 
 const isNodeInRentContracts = computed(() => {
   if (props.contractsType == ContractType.Node && selectedItem.value) {
-    const nodeIds = contracts.value.map(contract => contract.details.nodeId).filter(nodeId => nodeId !== undefined) as number[];
+    const nodeIds = contracts.value
+      .map(contract => contract.details.nodeId)
+      .filter(nodeId => nodeId !== undefined) as number[];
     if (contractLocked.value && contractLocked.value.amountLocked === 0) {
       return nodeIds.includes(selectedItem.value.nodeId);
     }
@@ -450,7 +452,7 @@ async function contractLockDetails(item: any) {
   selectedItem.value = item;
   loadingShowDetails.value = true;
   await profileManagerController.reloadBalance();
-  await getLockDetails(item.contractId)
+  await getLockDetails(item.contractId);
   await props.grid?.contracts
     .contractLock({ id: item.contract_id })
     .then((data: ContractLock) => {

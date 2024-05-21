@@ -162,6 +162,7 @@ import type { GridClient, LockContracts } from "@threefold/grid_client";
 import { ContractState, NodeStatus } from "@threefold/gridproxy_client";
 import { Decimal } from "decimal.js";
 import { computed, defineComponent, onMounted, type Ref, ref } from "vue";
+
 import ContractsTable from "@/components/contracts_list/contracts_table.vue";
 import { useProfileManagerController } from "@/components/profile_manager_controller.vue";
 import { useProfileManager } from "@/stores/profile_manager";
