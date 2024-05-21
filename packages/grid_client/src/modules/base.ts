@@ -95,6 +95,7 @@ class BaseModule {
       BaseModule.newContracts.push({
         contractID: String(contract.contractId),
         createdAt: Date.now().toString(),
+        updatedAt: Date.now().toString(),
         deploymentData: contract.contractType.nodeContract.deploymentData,
         deploymentHash: contract.contractType.nodeContract.deploymentHash,
         gridVersion: "4",
@@ -179,15 +180,29 @@ class BaseModule {
     if (fetch || !this.contracts) {
       let contracts = await this.tfClient.contracts.listMyNodeContracts({
         graphqlURL: this.config.graphqlURL,
-        type: modulesNames[this.moduleName],
+        type: modulesNames[this.moduleName] ?? this.moduleName,
         projectName: this.projectName,
       });
+
       const alreadyFetchedContracts: GqlNodeContract[] = [];
+
       for (const contract of BaseModule.newContracts) {
-        if (contract.parsedDeploymentData?.projectName !== this.projectName) continue;
+        if (!contract.parsedDeploymentData?.projectName.includes(this.projectName)) continue;
         if (contract.parsedDeploymentData.type !== modulesNames[this.moduleName]) continue;
-        const c = contracts.filter(c => +c.contractID === +contract.contractID);
-        if (c.length > 0) {
+
+        const filteredContract = contracts.filter(c => c.contractID === contract.contractID);
+
+        const now = new Date();
+        const contractUpdatedAt = new Date(+contract.updatedAt);
+        const beforeOneMin = now.getTime() - contractUpdatedAt.getTime() < 1000 * 60;
+
+        if (filteredContract.length > 0) {
+          if (beforeOneMin) {
+            const idx = contracts.indexOf(filteredContract[0]);
+            contracts[idx] = contract;
+            continue;
+          }
+
           alreadyFetchedContracts.push(contract);
           continue;
         }

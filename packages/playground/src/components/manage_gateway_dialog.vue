@@ -111,7 +111,7 @@
           </list-table>
         </div>
 
-        <div v-show="gatewayTab === 1">
+        <div v-if="gatewayTab === 1">
           <form-validator v-model="valid">
             <input-tooltip tooltip="Selecting custom domain sets subdomain as gateway name.">
               <input-validator
@@ -124,7 +124,7 @@
                   validators.minLength('Subdomain must be at least 4 characters.', 4),
                   subdomain => validators.maxLength('Subdomain cannot exceed 30 characters.', 30)(subdomain),
                 ]"
-                :async-rules="[validateSubdomain]"
+                :async-rules="gatewayTab === 1 ? [validateSubdomain] : []"
                 #="{ props }"
               >
                 <v-text-field label="Subdomain" v-model.trim="subdomain" v-bind="props" />
