@@ -8,7 +8,7 @@ async function pingNodes(client, nodes) {
       await client.zos.pingNode({ nodeId: node.nodeId });
       return node.nodeId;
     } catch (error) {
-      console.log("node " + node.nodeId + " is not responding, trying different node.");
+      throw new Error("node " + node.nodeId + " is not responding, trying different node.");
     }
   }
   throw new Error("No avaiable nodes");
