@@ -98,6 +98,7 @@
                         :disabled="!isValid || savingEmail"
                       >
                       </v-btn>
+                      <v-btn icon="mdi-close" class="mt-2" variant="text" @click="cancelEditing"> </v-btn>
                     </v-form>
                   </v-list-item>
                 </v-col>
@@ -259,6 +260,11 @@ onMounted(async () => {
 
 function redirectToDao() {
   router.push({ path: "/tf-chain/dao" });
+}
+
+function cancelEditing() {
+  email.value = "";
+  editEmail.value = false;
 }
 
 async function saveEmail() {
