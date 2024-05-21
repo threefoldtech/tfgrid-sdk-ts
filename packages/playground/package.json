@@ -1,6 +1,6 @@
 {
   "name": "@threefold/playground",
-  "version": "2.4.1",
+  "version": "2.4.2",
   "private": true,
   "scripts": {
     "dev": "vite",
@@ -12,10 +12,10 @@
   },
   "dependencies": {
     "@mdi/font": "^7.2.96",
-    "@threefold/graphql_client": "^2.4.1",
-    "@threefold/grid_client": "^2.4.1",
-    "@threefold/gridproxy_client": "^2.4.1",
-    "@threefold/types": "^2.4.1",
+    "@threefold/graphql_client": "^2.4.2",
+    "@threefold/grid_client": "^2.4.2",
+    "@threefold/gridproxy_client": "^2.4.2",
+    "@threefold/types": "^2.4.2",
     "@types/ip": "^1.1.3",
     "@types/md5": "^2.3.5",
     "await-lock": "^2.2.2",
