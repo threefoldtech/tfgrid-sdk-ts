@@ -14,34 +14,35 @@ async function pingNodes(client, nodes) {
   throw new Error("No avaiable nodes");
 }
 
-async function deploy(client, vms) {
-  const res = await client.machines.deploy(vms);
+async function deploy(client, vms, subdomain, gatewayNode) {
+  const resultVM = await client.machines.deploy(vms);
   log("================= Deploying VM =================");
-  log(res);
+  log(resultVM);
   log("================= Deploying VM =================");
-}
 
-async function deployGW(client, gw) {
-  const res = await client.gateway.deploy_name(gw);
+  const vmPlanetary = (await client.machines.getObj(vms.name))[0].planetary;
+  //Name Gateway Model
+  const gw: GatewayNameModel = {
+    name: subdomain,
+    node_id: gatewayNode.nodeId,
+    tls_passthrough: false,
+    backends: ["http://[" + vmPlanetary + "]:8000"],
+  };
+
+  const resultGateway = await client.gateway.deploy_name(gw);
   log("================= Deploying name gateway =================");
-  log(res);
+  log(resultGateway);
   log("================= Deploying name gateway =================");
 }
 
-async function getDeployment(client, vms) {
-  const res = await client.machines.getObj(vms);
+async function getDeployment(client, vms, gw) {
+  const resultVM = await client.machines.getObj(vms.name);
+  const resultGateway = await client.gateway.getObj(gw);
   log("================= Getting deployment information =================");
-  log(res);
+  log(resultVM);
+  log(resultGateway);
+  log("https://" + resultGateway[0].domain);
   log("================= Getting deployment information =================");
-  return res;
-}
-
-async function getDeploymentGW(client, gw) {
-  const res = await client.gateway.getObj(gw);
-  log("================= Getting deployment information =================");
-  log(res);
-  log("================= Getting deployment information =================");
-  return res;
 }
 
 async function cancel(client, vms, gw) {
@@ -118,28 +119,10 @@ async function main() {
   };
 
   //Deploy VMs
-  await deploy(grid3, vms);
+  await deploy(grid3, vms, subdomain, gatewayNode);
 
   //Get the deployment
-  const result = await getDeployment(grid3, name);
-
-  //Name Gateway Model
-  const gw: GatewayNameModel = {
-    name: subdomain,
-    node_id: gatewayNode.nodeId,
-    tls_passthrough: false,
-    backends: ["http://[" + result[0].planetary + "]:8000"],
-  };
-
-  //Deploy gateway
-  await deployGW(grid3, gw);
-
-  //Get the deployment
-  const gatewayResult = await getDeploymentGW(grid3, gw.name);
-
-  //Get the site link
-  const domain = "https://" + gatewayResult[0].domain;
-  log(domain);
+  await getDeployment(grid3, vms, subdomain);
 
   //Uncomment the line below to cancel the deployment
   // await cancel(grid3, { name }, { name: subdomain });
