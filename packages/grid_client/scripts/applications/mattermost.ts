@@ -1,18 +1,6 @@
 import { FilterOptions, GatewayNameModel, MachinesModel } from "../../src";
 import { config, getClient } from "../client_loader";
-import { log } from "../utils";
-
-async function pingNodes(client, nodes) {
-  for (const node of nodes) {
-    try {
-      await client.zos.pingNode({ nodeId: node.nodeId });
-      return node.nodeId;
-    } catch (error) {
-      throw new Error("node " + node.nodeId + " is not responding, trying different node.");
-    }
-  }
-  throw new Error("No avaiable nodes");
-}
+import { log, pingNodes } from "../utils";
 
 async function deploy(client, vms, subdomain, gatewayNode) {
   const resultVM = await client.machines.deploy(vms);
