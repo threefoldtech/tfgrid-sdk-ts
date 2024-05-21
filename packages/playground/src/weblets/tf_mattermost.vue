@@ -109,7 +109,7 @@ const ipv4 = ref(false);
 const smtp = ref(createSMTPServer());
 const rootFilesystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solution.value?.memory ?? 0));
 const selectionDetails = ref<SelectionDetails>();
-const mycelium = ref(false);
+const mycelium = ref(true);
 const selectedSSHKeys = ref("");
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
@@ -202,7 +202,7 @@ async function deploy() {
     await deployGatewayName(grid, selectionDetails.value.domain, {
       subdomain,
       ip: vm[0].interfaces[0].ip,
-      port: 80,
+      port: 8000,
       network: vm[0].interfaces[0].network,
     });
 

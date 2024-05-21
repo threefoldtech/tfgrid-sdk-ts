@@ -41,6 +41,7 @@ export async function normalizeContract(
   let data: { [key: string]: string };
   try {
     data = JSON.parse(c.details.deployment_data);
+    data.projectName = parseProjectName(data.projectName);
   } catch {
     data = { name: c.details.name };
   }
@@ -71,7 +72,7 @@ export async function normalizeContract(
       farm_id: c.details.farm_id || "-",
     },
     solutionName: data.name || "-",
-    solutionType: data.type || "-",
+    solutionType: data.projectName || data.type || "-",
     expiration,
     consumption: consumption,
   };

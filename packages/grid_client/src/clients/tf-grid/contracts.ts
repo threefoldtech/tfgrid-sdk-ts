@@ -37,6 +37,7 @@ export interface GqlBaseContract {
   twinID: string;
   state: string;
   createdAt: string;
+  updatedAt: string;
   solutionProviderID: string;
 }
 

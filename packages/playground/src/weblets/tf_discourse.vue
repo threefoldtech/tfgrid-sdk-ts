@@ -122,7 +122,7 @@ const name = ref(generateName({ prefix: "dc" }));
 const email = ref(profileManager.profile?.email || "");
 const solution = ref() as Ref<SolutionFlavor>;
 const ipv4 = ref(false);
-const mycelium = ref(false);
+const mycelium = ref(true);
 const smtp = ref(createSMTPServer());
 const dedicated = ref(false);
 const certified = ref(false);
@@ -216,7 +216,7 @@ async function deploy() {
     await deployGatewayName(grid, selectionDetails.value.domain, {
       subdomain,
       ip: vm[0].interfaces[0].ip,
-      port: 80,
+      port: 88,
       network: vm[0].interfaces[0].network,
     });
 
