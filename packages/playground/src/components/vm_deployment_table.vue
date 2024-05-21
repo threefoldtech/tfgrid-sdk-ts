@@ -1,5 +1,8 @@
 <template>
   <div>
+    <v-alert v-if="errorMessage" type="error" variant="tonal">
+      {{ errorMessage }}
+    </v-alert>
     <v-alert v-if="!loading && count && items.length < count" type="warning" variant="tonal">
       Failed to load <strong>{{ count - items.length }}</strong> deployment{{ count - items.length > 1 ? "s" : "" }}.
 
@@ -177,6 +180,7 @@ const count = ref<number>();
 const items = ref<any[]>([]);
 const showDialog = ref(false);
 const showEncryption = ref(false);
+const errorMessage = ref<string>("");
 const showAllDeployments = ref(false);
 const failedDeployments = ref<
   {
@@ -194,57 +198,70 @@ async function loadDeployments() {
   items.value = [];
   loading.value = true;
   const grid = await getGrid(profileManager.profile!, props.projectName);
-  const chunk1 = await loadVms(grid!);
-  if (chunk1.count > 0 && migrateGateways) {
-    await migrateModule(grid!.gateway);
-  }
-
-  const chunk2 = await loadVms(updateGrid(grid!, { projectName: props.projectName.toLowerCase() }));
-  if (chunk2.count > 0 && migrateGateways) {
-    await migrateModule(grid!.gateway);
-  }
-  let chunk3: LoadedDeployments<any[]> = { count: 0, items: [], failedDeployments: [] };
-  if (showAllDeployments.value) {
-    chunk3 =
-      props.projectName.toLowerCase() === ProjectName.VM.toLowerCase()
-        ? await loadVms(updateGrid(grid!, { projectName: "" }))
-        : { count: 0, items: [], failedDeployments: [] };
-
-    if (chunk3.count > 0 && migrateGateways) {
+  try {
+    const chunk1 = await loadVms(grid!);
+    if (chunk1.count > 0 && migrateGateways) {
       await migrateModule(grid!.gateway);
     }
 
-    chunk3.items = chunk3.items.map(markAsFromAnotherClient);
-  }
+    const chunk2 = await loadVms(updateGrid(grid!, { projectName: props.projectName.toLowerCase() }));
+    if (chunk2.count > 0 && migrateGateways) {
+      await migrateModule(grid!.gateway);
+    }
+    let chunk3: LoadedDeployments<any[]> = { count: 0, items: [], failedDeployments: [] };
+    if (showAllDeployments.value) {
+      chunk3 =
+        props.projectName.toLowerCase() === ProjectName.VM.toLowerCase()
+          ? await loadVms(updateGrid(grid!, { projectName: "" }))
+          : { count: 0, items: [], failedDeployments: [] };
 
-  const vms = mergeLoadedDeployments(chunk1, chunk2, chunk3 as any);
-  failedDeployments.value = vms.failedDeployments;
-
-  count.value = vms.count;
-  items.value = vms.items
-    .map((vm: any) => {
-      if (props.projectName.toLowerCase() === ProjectName.Caprover.toLowerCase()) {
-        const [leader, ...workers] = vm;
-        leader.workers = workers;
-        return leader;
+      if (chunk3.count > 0 && migrateGateways) {
+        await migrateModule(grid!.gateway);
       }
 
-      return vm;
-    })
-    .flat();
+      chunk3.items = chunk3.items.map(markAsFromAnotherClient);
+    }
+
+    const vms = mergeLoadedDeployments(chunk1, chunk2, chunk3 as any);
+    failedDeployments.value = vms.failedDeployments;
+
+    count.value = vms.count;
+    items.value = vms.items
+      .map((vm: any) => {
+        if (props.projectName.toLowerCase() === ProjectName.Caprover.toLowerCase()) {
+          const [leader, ...workers] = vm;
+          leader.workers = workers;
+          return leader;
+        }
+
+        return vm;
+      })
+      .flat();
+  } catch (err) {
+    errorMessage.value = `Failed to load Deployments: ${err}`;
+  } finally {
+    loading.value = false;
+  }
 
   loading.value = false;
 }
 
 const filteredHeaders = computed(() => {
-  let headers = [
+  const headers = [
     { title: "PLACEHOLDER", key: "data-table-select" },
     { title: "Name", key: "name" },
-    { title: "Public IPv4", key: "ipv4", sortable: false },
-    { title: "Public IPv6", key: "ipv6", sortable: false },
-    { title: "Planetary Network IP", key: "planetary", sortable: false },
-    { title: "Mycelium Network IP", key: "mycelium", sortable: false },
-    { title: "WireGuard", key: "wireguard", sortable: false },
+    {
+      title: "Networks",
+      key: "networks",
+      sortable: false,
+      children: [
+        { title: "Public IPv4", key: "ipv4", sortable: false },
+        { title: "Public IPv6", key: "ipv6", sortable: false },
+        { title: "Planetary IP", key: "planetary", sortable: false },
+        { title: "Mycelium IP", key: "mycelium", sortable: false },
+        { title: "WireGuard", key: "wireguard", sortable: false },
+      ],
+    },
     { title: "Flist", key: "flist" },
     { title: "Cost", key: "billing" },
     { title: "Created At", key: "created" },
@@ -258,32 +275,37 @@ const filteredHeaders = computed(() => {
     ProjectName.VM,
     ProjectName.Fullvm,
     ProjectName.Presearch,
-    ProjectName.Algorand,
-    ProjectName.Subsquid,
     ProjectName.Umbrel,
     ProjectName.Nextcloud,
     ProjectName.Funkwhale,
     ProjectName.Casperlabs,
+    ProjectName.Mattermost,
+    ProjectName.Discourse,
+    ProjectName.Taiga,
+    ProjectName.StaticWebsite,
+    ProjectName.Wordpress,
   ] as string[];
 
   const WireguardSolutions = [ProjectName.VM, ProjectName.Fullvm, ProjectName.Umbrel] as string[];
 
   const flistSolutions = [ProjectName.VM, ProjectName.Fullvm] as string[];
 
-  if (!IPV6Solutions.includes(props.projectName)) {
-    headers = headers.filter(h => h.key !== "ipv6");
-  }
+  if (headers[2].children) {
+    if (!IPV6Solutions.includes(props.projectName)) {
+      headers[2].children = headers[2].children.filter(h => h.key !== "ipv6");
+    }
 
-  if (!IPV4Solutions.includes(props.projectName)) {
-    headers = headers.filter(h => h.key !== "ipv4");
-  }
+    if (!IPV4Solutions.includes(props.projectName)) {
+      headers[2].children = headers[2].children.filter(h => h.key !== "ipv4");
+    }
 
-  if (!WireguardSolutions.includes(props.projectName)) {
-    headers = headers.filter(h => h.key !== "wireguard");
-  }
+    if (!WireguardSolutions.includes(props.projectName)) {
+      headers[2].children = headers[2].children.filter(h => h.key !== "wireguard");
+    }
 
-  if (!flistSolutions.includes(props.projectName)) {
-    headers = headers.filter(h => h.key !== "flist");
+    if (!flistSolutions.includes(props.projectName)) {
+      headers[2].children = headers[2].children.filter(h => h.key !== "flist");
+    }
   }
 
   return headers;

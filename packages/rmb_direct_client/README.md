@@ -55,8 +55,4 @@ yarn workspace @threefold/rmb_direct_client start
 - Git
 - Yarn
 
-## Contributors
-
-Contributions, issues, and feature requests are welcome!
-
-Feel free to check the [issues page](https://github.com/threefoldtech/tfgrid-sdk-ts/issues).
+To update the RMB Messages to a newer version refer to [DEVELOPER.README.md](DEVELOPERS.README.md) file.

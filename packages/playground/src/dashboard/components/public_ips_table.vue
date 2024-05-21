@@ -1,20 +1,10 @@
 <template>
   <div>
-    <v-data-table
-      :loading="loadingIps"
-      loading-text="Loading farm IPs..."
+    <ListTable
       :headers="headers"
       :items="copyPublicIps"
-      :items-length="publicIps.length"
-      :items-per-page="size"
-      :page="page"
-      @update:items-per-page="size => updateIPPageSize(size)"
-      @update:page="page => updateIPPage(page)"
-      class="elevation-1 v-data-table-header"
-      :disable-sort="true"
-      hide-default-header
-      hover
-      show-select
+      :loading="loading"
+      :deleting="isRemoving"
       v-model="selectedItems"
     >
       <template v-slot:top>
@@ -35,7 +25,7 @@
       <template #bottom>
         <div class="d-flex align-end justify-end">
           <v-btn
-            class="ma-5"
+            class="ma-3"
             color="error"
             variant="outlined"
             prepend-icon="mdi-delete"
@@ -46,7 +36,7 @@
           </v-btn>
         </div>
       </template>
-    </v-data-table>
+    </ListTable>
     <v-dialog v-model="showDialogue" max-width="600">
       <v-card>
         <v-toolbar color="primary" class="custom-toolbar">
@@ -64,7 +54,8 @@
           <v-btn @click="showDialogue = false" variant="outlined" color="anchor">Close</v-btn>
           <v-btn
             variant="outlined"
-            :text="isRemoving ? 'Deleting..' : 'Confirm'"
+            text="Confirm"
+            :loading="isRemoving"
             color="error"
             :disabled="isRemoving"
             @click="removeFarmIps"
@@ -80,13 +71,14 @@ import type { RemoveFarmIPModel } from "@threefold/grid_client";
 import type { PublicIp } from "@threefold/tfchain_client";
 import { onMounted, ref, watch } from "vue";
 
+import ListTable from "@/components/list_table.vue";
 import { useGrid } from "@/stores";
 import { IPType } from "@/utils/types";
 
 import { createCustomToast, ToastType } from "../../utils/custom_toast";
-
 export default {
   name: "PublicIPsTable",
+  components: { ListTable },
   props: {
     farmId: {
       type: Number,

@@ -16,6 +16,7 @@ import type {
   SelectionDetailsFilters,
   SelectionDetailsFiltersValidators,
 } from "../types/nodeSelector";
+import { createCustomToast, ToastType } from "./custom_toast";
 import { normalizeError } from "./helpers";
 
 export interface GetLocationsConfig {
@@ -219,9 +220,14 @@ export async function validateRentContract(
 
   try {
     if (node.rentContractId !== 0) {
-      const contractInfo = await gridStore.grid.contracts.get({ id: node.rentContractId });
+      const contractInfo = await gridStore.grid.contracts.get({
+        id: node.rentContractId,
+      });
       if (contractInfo.state.gracePeriod) {
-        throw `You can't deploy on node ${node.nodeId}, its rent contract is in grace period.`;
+        createCustomToast(
+          `You can't deploy on node ${node.nodeId}, its rent contract is in grace period.`,
+          ToastType.danger,
+        );
       }
     }
 

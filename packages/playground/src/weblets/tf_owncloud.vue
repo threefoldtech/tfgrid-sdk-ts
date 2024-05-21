@@ -121,7 +121,7 @@
 
 <script lang="ts" setup>
 import type { GridClient } from "@threefold/grid_client";
-import { computed, type Ref, ref } from "vue";
+import { computed, type Ref, ref, watch } from "vue";
 
 import { manual } from "@/utils/manual";
 
@@ -264,6 +264,22 @@ async function deploy() {
 function updateSSHkeyEnv(selectedKeys: string) {
   selectedSSHKeys.value = selectedKeys;
 }
+watch(
+  () => smtp.value.enabled,
+  newValue => {
+    if (newValue) {
+      ipv4.value = true;
+    }
+  },
+);
+watch(
+  () => ipv4.value,
+  newValue => {
+    if (!newValue && smtp.value.enabled) {
+      smtp.value.enabled = false;
+    }
+  },
+);
 </script>
 
 <script lang="ts">
