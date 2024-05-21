@@ -272,6 +272,7 @@ async function saveEmail() {
     const balance: Balance = await loadBalance(grid!);
     if (balance.free < 1) {
       editEmail.value = false;
+      email.value = "";
       createCustomToast(
         "Transaction Error: Unable to Process Payment - Insufficient Account Balance.",
         ToastType.danger,
