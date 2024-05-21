@@ -199,7 +199,8 @@
 
           <template v-slot:activator="{ isActive, props }" v-else>
             <span v-bind="props" v-on="isActive" class="font-weight-bold"
-              ><v-icon class="mr-2" color="warning">mdi-sale-outline</v-icon>{{ price_usd }} USD/Month</span
+              ><v-icon class="scale_beat mr-2" color="warning">mdi-brightness-percent</v-icon
+              >{{ price_usd }} USD/Month</span
             >
           </template>
           <span>
@@ -497,5 +498,18 @@ export default {
   background-color: rgb(var(--v-speed-chip));
   padding: 5px 12px;
   border-radius: 9999px;
+}
+
+.scale_beat {
+  animation: crescendo 0.5s alternate infinite ease-in;
+}
+
+@keyframes crescendo {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.2);
+  }
 }
 </style>
