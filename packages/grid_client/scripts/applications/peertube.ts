@@ -63,6 +63,7 @@ async function main() {
   const gatewayNode = (await grid3.capacity.filterNodes(gatewayQueryOptions))[0];
   const nodes = await grid3.capacity.filterNodes(vmQueryOptions);
   const vmNode = await pingNodes(grid3, nodes);
+  const domain = subdomain + "." + gatewayNode.publicConfig.domain;
 
   const vms: MachinesModel = {
     name,
@@ -92,7 +93,7 @@ async function main() {
         entrypoint: "/sbin/zinit init",
         env: {
           SSH_KEY: config.ssh_key,
-          PEERTUBE_WEBSERVER_HOSTNAME: subdomain + "." + gatewayNode.publicConfig.domain,
+          PEERTUBE_WEBSERVER_HOSTNAME: domain,
           // These email, and password will be used to log in to your instance, so please update them with your own.
           PEERTUBE_ADMIN_EMAIL: "admin123@peer.tube",
           PT_INITIAL_ROOT_PASSWORD: "admin123",

@@ -63,6 +63,7 @@ async function main() {
   const gatewayNode = (await grid3.capacity.filterNodes(gatewayQueryOptions))[0];
   const nodes = await grid3.capacity.filterNodes(vmQueryOptions);
   const vmNode = await pingNodes(grid3, nodes);
+  const domain = subdomain + "." + gatewayNode.publicConfig.domain;
 
   const vms: MachinesModel = {
     name,
@@ -92,8 +93,8 @@ async function main() {
         entrypoint: "/sbin/zinit init",
         env: {
           SSH_KEY: config.ssh_key,
-          MATTERMOST_DOMAIN: subdomain + "." + gatewayNode.publicConfig.domain,
-          SITE_URL: "https://" + subdomain + "." + gatewayNode.publicConfig.domain,
+          MATTERMOST_DOMAIN: domain,
+          SITE_URL: "https://" + domain,
           // These email and password will be used as admin credentials, so please update them with your own.
           DJANGO_SUPERUSER_EMAIL: "admin123@matter.most",
           DB_PASSWORD: "admin123",

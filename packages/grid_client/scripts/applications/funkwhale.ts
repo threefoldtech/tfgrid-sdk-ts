@@ -63,6 +63,7 @@ async function main() {
   const gatewayNode = (await grid3.capacity.filterNodes(gatewayQueryOptions))[0];
   const nodes = await grid3.capacity.filterNodes(vmQueryOptions);
   const vmNode = await pingNodes(grid3, nodes);
+  const domain = subdomain + "." + gatewayNode.publicConfig.domain;
 
   const vms: MachinesModel = {
     name,
@@ -92,7 +93,7 @@ async function main() {
         entrypoint: "/init.sh",
         env: {
           SSH_KEY: config.ssh_key,
-          FUNKWHALE_HOSTNAME: subdomain + "." + gatewayNode.publicConfig.domain,
+          FUNKWHALE_HOSTNAME: domain,
           // These email, username, and password will be used to log in to your instance, so please update them with your own.
           DJANGO_SUPERUSER_EMAIL: "admin123@funk.whale",
           DJANGO_SUPERUSER_USERNAME: "admin123",

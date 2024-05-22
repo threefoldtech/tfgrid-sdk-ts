@@ -63,6 +63,7 @@ async function main() {
   const gatewayNode = (await grid3.capacity.filterNodes(gatewayQueryOptions))[0];
   const nodes = await grid3.capacity.filterNodes(vmQueryOptions);
   const vmNode = await pingNodes(grid3, nodes);
+  const domain = subdomain + "." + gatewayNode.publicConfig.domain;
 
   const vms: MachinesModel = {
     name,
@@ -92,7 +93,7 @@ async function main() {
         entrypoint: "/sbin/zinit init",
         env: {
           SSH_KEY: config.ssh_key,
-          CASPERLABS_HOSTNAME: subdomain + "." + gatewayNode.publicConfig.domain,
+          CASPERLABS_HOSTNAME: domain,
         },
       },
     ],
