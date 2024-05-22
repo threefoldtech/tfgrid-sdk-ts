@@ -46,7 +46,7 @@ async function main() {
   const name = "newfunkwhale";
   const grid3 = await getClient(`funkwhale/${name}`);
   const subdomain = "fw" + grid3.twinId + name;
-  const instanceCapacity = { cru: 1, mru: 2, sru: 15 }; // Update the instance capacity values according to your requirements.
+  const instanceCapacity = { cru: 1, mru: 2, sru: 50 }; // Update the instance capacity values according to your requirements.
 
   //VMNode Selection
   const vmQueryOptions: FilterOptions = {

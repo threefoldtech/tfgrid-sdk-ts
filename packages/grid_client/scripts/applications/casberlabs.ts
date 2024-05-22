@@ -46,7 +46,7 @@ async function main() {
   const name = "newcasperlabs";
   const grid3 = await getClient(`casperlabs/${name}`);
   const subdomain = "cl" + grid3.twinId + name;
-  const instanceCapacity = { cru: 1, mru: 2, sru: 15 }; // Update the instance capacity values according to your requirements.
+  const instanceCapacity = { cru: 2, mru: 4, sru: 100 }; // Update the instance capacity values according to your requirements.
 
   //VMNode Selection
   const vmQueryOptions: FilterOptions = {
