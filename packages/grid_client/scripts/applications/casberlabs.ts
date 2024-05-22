@@ -46,12 +46,13 @@ async function main() {
   const name = "newcasperlabs";
   const grid3 = await getClient(`casperlabs/${name}`);
   const subdomain = "cl" + grid3.twinId + name;
+  const instanceCapacity = { cru: 1, mru: 2, sru: 15 }; // Update the instance capacity values according to your requirements.
 
   //VMNode Selection
   const vmQueryOptions: FilterOptions = {
-    cru: 2,
-    mru: 4,
-    sru: 100,
+    cru: instanceCapacity.cru,
+    mru: instanceCapacity.mru,
+    sru: instanceCapacity.sru,
     availableFor: grid3.twinId,
     farmId: 1,
   };
@@ -78,7 +79,7 @@ async function main() {
         disks: [
           {
             name: "wedDisk",
-            size: 100,
+            size: instanceCapacity.sru,
             mountpoint: "/data",
           },
         ],
@@ -86,8 +87,8 @@ async function main() {
         public_ip: false,
         public_ip6: false,
         mycelium: false,
-        cpu: 2,
-        memory: 1024 * 4,
+        cpu: instanceCapacity.cru,
+        memory: 1024 * instanceCapacity.mru,
         rootfs_size: 0,
         flist: "https://hub.grid.tf/tf-official-apps/casperlabs-latest.flist",
         entrypoint: "/sbin/zinit init",

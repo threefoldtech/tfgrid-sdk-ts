@@ -46,12 +46,13 @@ async function main() {
   const name = "newfunkwhale";
   const grid3 = await getClient(`funkwhale/${name}`);
   const subdomain = "fw" + grid3.twinId + name;
+  const instanceCapacity = { cru: 1, mru: 2, sru: 15 }; // Update the instance capacity values according to your requirements.
 
   //VMNode Selection
   const vmQueryOptions: FilterOptions = {
-    cru: 1,
-    mru: 2,
-    sru: 50,
+    cru: instanceCapacity.cru,
+    mru: instanceCapacity.mru,
+    sru: instanceCapacity.sru,
     availableFor: grid3.twinId,
     farmId: 1,
   };
@@ -78,7 +79,7 @@ async function main() {
         disks: [
           {
             name: "wedDisk",
-            size: 50,
+            size: instanceCapacity.sru,
             mountpoint: "/data",
           },
         ],
@@ -86,8 +87,8 @@ async function main() {
         public_ip: false,
         public_ip6: false,
         mycelium: false,
-        cpu: 1,
-        memory: 1024 * 2,
+        cpu: instanceCapacity.cru,
+        memory: 1024 * instanceCapacity.mru,
         rootfs_size: 0,
         flist: "https://hub.grid.tf/tf-official-apps/funkwhale-dec21.flist",
         entrypoint: "/init.sh",
