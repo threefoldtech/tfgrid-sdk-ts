@@ -5,14 +5,14 @@ import { expose, validateInput } from "../helpers";
 import { CurrencyModel } from "./models";
 
 class TFTUSDConversionService {
-  private decimals = 2;
   private tfclient: TFClient;
-  TFTPrice: number;
+  private rate: number;
 
-  constructor(public config: GridClientConfig) {
+  constructor(public config: GridClientConfig, public decimals = 2) {
+    this.decimals = decimals;
     this.tfclient = config.tfclient;
     this.tfclient.tftPrice.get().then(res => {
-      this.TFTPrice = res;
+      this.rate = res;
     });
   }
 
@@ -25,14 +25,14 @@ class TFTUSDConversionService {
   @expose
   @validateInput
   convertUSDtoTFT(options: CurrencyModel) {
-    const amount = options.amount / this.TFTPrice;
+    const amount = options.amount / this.rate;
     return this.normalizeCurrency({ amount });
   }
 
   @expose
   @validateInput
   convertTFTtoUSD(options: CurrencyModel) {
-    const amount = options.amount * this.TFTPrice;
+    const amount = options.amount * this.rate;
     return this.normalizeCurrency({ amount });
   }
 
@@ -60,23 +60,22 @@ class TFTUSDConversionService {
   @expose
   @validateInput
   dailyUSD(options: CurrencyModel): string {
-    const dailyTFTs = +this.dailyTFT(options);
-    return this.convertTFTtoUSD({ amount: dailyTFTs });
+    const hours = options.amount * 24;
+    return this.normalizeCurrency({ amount: hours });
   }
 
   @expose
   @validateInput
   monthlyUSD(options: CurrencyModel): string {
-    const monthlyTFTs = +this.dailyTFT(options) * 30;
-    return this.convertTFTtoUSD({ amount: monthlyTFTs });
+    const months = +this.dailyUSD(options) * 30;
+    return this.normalizeCurrency({ amount: months });
   }
 
   @expose
   @validateInput
   yearlyUSD(options: CurrencyModel): string {
-    const yearlyTFT = +this.monthlyTFT(options) * 12;
-
-    return this.convertTFTtoUSD({ amount: yearlyTFT });
+    const years = +this.monthlyUSD(options) * 12;
+    return this.normalizeCurrency({ amount: years });
   }
 }
 
