@@ -17,7 +17,7 @@ export default {
   emits: { "update:modelValue": (value: boolean) => value },
   setup(props, { emit, expose }) {
     const statusMap = ref(new Map<string, ValidatorStatus>());
-    const serviceMap = new Map<string, InputValidatorService>();
+    const serviceMap = ref(new Map<string, InputValidatorService>());
 
     const valid = computed(() =>
       [...statusMap.value.values()].every(status => {
@@ -32,15 +32,15 @@ export default {
     const form: FormValidatorService = {
       register(uid, service) {
         statusMap.value.set(uid, ValidatorStatus.Init);
-        serviceMap.set(uid, service);
+        serviceMap.value.set(uid, service);
       },
       unregister(uid) {
         statusMap.value.delete(uid);
-        serviceMap.delete(uid);
+        serviceMap.value.delete(uid);
       },
 
       async validate() {
-        const valids = await Promise.all([...serviceMap.values()].map(({ validate }) => validate()));
+        const valids = await Promise.all([...serviceMap.value.values()].map(({ validate }) => validate()));
         return valids.every(valid => valid);
       },
 
@@ -51,14 +51,16 @@ export default {
       },
 
       reset() {
-        [...serviceMap.values()].map(({ reset }) => reset());
+        [...serviceMap.value.values()].map(({ reset }) => reset());
       },
 
-      get: uid => serviceMap.get(uid),
+      get: uid => serviceMap.value.get(uid),
 
       valid,
       invalid: computed(() => [...statusMap.value.values()].some(status => status === ValidatorStatus.Invalid)),
       pending: computed(() => [...statusMap.value.values()].some(status => status === ValidatorStatus.Pending)),
+      validOnInit: props.validOnInit,
+      inputs: computed(() => [...serviceMap.value.values()] as any),
     };
 
     provideForm(form);

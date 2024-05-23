@@ -76,8 +76,8 @@
       <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
     </form-validator>
 
-    <template #footer-actions>
-      <v-btn color="secondary" variant="outlined" @click="deploy()" :disabled="!valid"> Deploy </v-btn>
+    <template #footer-actions="{ validateBeforeDeploy }">
+      <v-btn color="secondary" variant="outlined" @click="validateBeforeDeploy(deploy)" text="Deploy" />
     </template>
   </weblet-layout>
 </template>

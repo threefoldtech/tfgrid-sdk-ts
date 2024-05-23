@@ -45,6 +45,8 @@ import { computed, ref, watch } from "vue";
 
 import { useFormRef } from "@/hooks/form_validator";
 
+import { useWebletLayoutServie } from "./weblet_layout.vue";
+
 export interface Tab {
   title: string;
   value: string;
@@ -65,12 +67,17 @@ const emits = defineEmits<{
   (event: "tab:change", value: number): void;
 }>();
 
+const webletLayoutServie = useWebletLayoutServie();
 const forms = useFormRef(true);
 
 const activeTab = ref<number>(props.modelValue ?? 0);
 watch(activeTab, t => {
   emits("update:modelValue", t);
   emits("tab:change", t);
+});
+
+webletLayoutServie.set(forms.value, (tab: number) => {
+  activeTab.value = tab;
 });
 
 const valid = computed(() => forms.value.reduce((r, f) => r && (f.valid as unknown as boolean), true));
