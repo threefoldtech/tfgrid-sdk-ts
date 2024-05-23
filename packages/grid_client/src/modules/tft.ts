@@ -1,20 +1,11 @@
 import Decimal from "decimal.js";
 
-import { GridClientConfig, TFClient } from "..";
 import { expose, validateInput } from "../helpers";
 import { CurrencyModel } from "./models";
 
 class TFTUSDConversionService {
-  private tfclient: TFClient;
-  private rate: number;
-
-  constructor(public config: GridClientConfig, public decimals = 2) {
-    this.decimals = decimals;
-    this.tfclient = config.tfclient;
-    this.tfclient.tftPrice.get().then(res => {
-      this.rate = res;
-    });
-  }
+  // TFT rate: 1 tft = x USD
+  constructor(public rate: number, private decimals = 2) {}
 
   @expose
   @validateInput

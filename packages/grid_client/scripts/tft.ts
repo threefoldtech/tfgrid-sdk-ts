@@ -59,7 +59,7 @@ async function yearlyUSD(client, hourlyUSD) {
 }
 async function main() {
   const grid = await getClient();
-
+  grid.currency.rate = await grid.tfclient.tftPrice.get();
   const amount: CurrencyModel = {
     amount: 1,
   };

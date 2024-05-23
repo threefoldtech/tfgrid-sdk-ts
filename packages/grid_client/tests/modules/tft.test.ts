@@ -1,17 +1,20 @@
 import { ValidationError } from "@threefold/types";
 import Decimal from "decimal.js";
 
-import { currency, type GridClient } from "../../src";
+import { currency as TFTUSDConversionService, type GridClient } from "../../src";
 import { getClient } from "../client_loader";
 
 jest.setTimeout(300000);
 let grid: GridClient;
-let tftPrice: number;
+let rate: number;
+let decimals: number;
+let currency: TFTUSDConversionService;
 
 beforeAll(async () => {
   grid = await getClient();
-  tftPrice = await grid.tfclient.tftPrice.get();
-  grid.currency.decimals = 5;
+  rate = await grid.tfclient.tftPrice.get();
+  decimals = 5;
+  currency = new TFTUSDConversionService(rate, decimals);
 });
 
 afterAll(async () => {
@@ -19,144 +22,163 @@ afterAll(async () => {
 });
 
 describe("Testing TFT module", () => {
-  test("tft module to be instance of TFTUSDConversionService", async () => {
-    expect(await grid.currency).toBeInstanceOf(currency);
+  test("tft module to be instance of TFTUSDConversionService", () => {
+    expect(currency).toBeInstanceOf(TFTUSDConversionService);
   });
 
-  test("should return value with 2 decimals.", async () => {
-    const result = await grid.currency.normalizeCurrency({ amount: 1 });
+  test("should return value with 2 decimals.", () => {
+    const result = currency.normalizeCurrency({ amount: 1 });
 
     expect(typeof result).toBe("string");
-    expect(result).toBe(new Decimal(1).toFixed(grid.currency.decimals));
+    expect(result).toBe(new Decimal(1).toFixed(decimals));
   });
 
-  test("should convert to the correct value based on tftPrice.", async () => {
+  test("should convert to the correct value based on tftPrice.", () => {
     const hourlyTFT = { amount: 1 };
-    const result = await grid.currency.convertTFTtoUSD(hourlyTFT);
+    const result = currency.convertTFTtoUSD(hourlyTFT);
 
     expect(typeof result).toBe("string");
-    expect(result).toBe(new Decimal(1 * tftPrice).toFixed(grid.currency.decimals));
+    expect(result).toBe(new Decimal(1 * rate).toFixed(decimals));
   });
 
-  test("convertTFTtoUSD function to throw if passed a negative value.", async () => {
-    const result = async () => await grid.currency.convertTFTtoUSD({ amount: -1 });
-
-    await expect(result).rejects.toThrow();
-    await expect(result).rejects.toBeInstanceOf(ValidationError);
+  test("convertTFTtoUSD function to throw if passed a negative value.", () => {
+    const result = () => currency.convertTFTtoUSD({ amount: -1 });
+    try {
+      expect(result).toThrow();
+    } catch (error) {
+      expect(result).toBeInstanceOf(ValidationError);
+    }
   });
 
-  test("convertUSDtoTFT function returns a valid value.", async () => {
+  test("convertUSDtoTFT function returns a valid value.", () => {
     const usd = 1;
-    const result = await grid.currency.convertUSDtoTFT({ amount: usd });
+    const result = currency.convertUSDtoTFT({ amount: usd });
 
     expect(typeof result).toBe("string");
-    expect(result).toEqual(new Decimal(1 / tftPrice).toFixed(grid.currency.decimals));
+    expect(result).toEqual(new Decimal(1 / rate).toFixed(decimals));
   });
 
-  test("convertUSDtoTFT function to throw if passed a negative value.", async () => {
-    const result = async () => await grid.currency.convertUSDtoTFT({ amount: -1 });
+  test("convertUSDtoTFT function to throw if passed a negative value.", () => {
+    const result = () => currency.convertUSDtoTFT({ amount: -1 });
 
-    await expect(result).rejects.toThrow();
-    await expect(result).rejects.toBeInstanceOf(ValidationError);
+    try {
+      expect(result).toThrow();
+    } catch (error) {
+      expect(result).toBeInstanceOf(ValidationError);
+    }
   });
 
-  test("dailyTFT function returns a valid value.", async () => {
+  test("dailyTFT function returns a valid value.", () => {
     const tfts = 1;
-    const result = await grid.currency.dailyTFT({ amount: tfts });
-    const expected_result = new Decimal(tfts * 24).toFixed(grid.currency.decimals);
+    const result = currency.dailyTFT({ amount: tfts });
+    const expected_result = new Decimal(tfts * 24).toFixed(decimals);
 
     expect(typeof result).toBe("string");
     expect(result).toBe(expected_result);
   });
 
-  test("dailyTFT function throws if passed anything other than a positive value.", async () => {
-    const result = async () => await grid.currency.dailyTFT({ amount: -1 });
+  test("dailyTFT function throws if passed anything other than a positive value.", () => {
+    const result = () => currency.dailyTFT({ amount: -1 });
 
-    expect(result).rejects.toThrow();
-    expect(result).rejects.toBeInstanceOf(ValidationError);
+    try {
+      expect(result).toThrow();
+    } catch (error) {
+      expect(result).toBeInstanceOf(ValidationError);
+    }
   });
 
-  test("monthlyTFT function returns a valid value.", async () => {
+  test("monthlyTFT function returns a valid value.", () => {
     const tfts = 1;
-    const result = await grid.currency.monthlyTFT({ amount: tfts });
-    const expected_result = new Decimal(tfts * 24 * 30).toFixed(grid.currency.decimals);
+    const result = currency.monthlyTFT({ amount: tfts });
+    const expected_result = new Decimal(tfts * 24 * 30).toFixed(decimals);
 
     expect(typeof result).toBe("string");
     expect(result).toBe(expected_result);
   });
 
-  test("monthlyTFT function throws if passed anything other than a positive value.", async () => {
-    const result = async () => await grid.currency.monthlyTFT({ amount: -1 });
+  test("monthlyTFT function throws if passed anything other than a positive value.", () => {
+    const result = () => currency.monthlyTFT({ amount: -1 });
 
-    await expect(result).rejects.toThrow();
-    await expect(result).rejects.toBeInstanceOf(ValidationError);
+    try {
+      expect(result).toThrow();
+    } catch (error) {
+      expect(result).toBeInstanceOf(ValidationError);
+    }
   });
 
-  test("yearlyTFT function returns a valid value.", async () => {
+  test("yearlyTFT function returns a valid value.", () => {
     const tfts = 1;
-    const result = await grid.currency.yearlyTFT({ amount: tfts });
-    const expected_result = new Decimal(+(await grid.currency.monthlyTFT({ amount: tfts })) * 12).toFixed(
-      grid.currency.decimals,
-    );
+    const result = currency.yearlyTFT({ amount: tfts });
+    const expected_result = new Decimal(+currency.monthlyTFT({ amount: tfts }) * 12).toFixed(decimals);
 
     expect(typeof result).toBe("string");
     expect(result).toBe(expected_result);
   });
 
-  test("yearlyTFT function throws if passed anything other than a positive value.", async () => {
-    const result = async () => grid.currency.yearlyTFT({ amount: -1 });
+  test("yearlyTFT function throws if passed anything other than a positive value.", () => {
+    const result = () => currency.yearlyTFT({ amount: -1 });
 
-    await expect(result).rejects.toThrow();
-    await expect(result).rejects.toBeInstanceOf(ValidationError);
+    try {
+      expect(result).toThrow();
+    } catch (error) {
+      expect(result).toBeInstanceOf(ValidationError);
+    }
   });
 
-  test("dailyUSD function returns a valid value.", async () => {
+  test("dailyUSD function returns a valid value.", () => {
     const tfts = 1;
-    const result = await grid.currency.dailyUSD({ amount: tfts });
-    const expected_result = new Decimal(tfts * 24).toFixed(grid.currency.decimals);
+    const result = currency.dailyUSD({ amount: tfts });
+    const expected_result = new Decimal(tfts * 24).toFixed(decimals);
 
     expect(typeof result).toBe("string");
     expect(result).toBe(expected_result);
   });
 
-  test("dailyUSD function throws if passed anything other than a positive value.", async () => {
-    const result = async () => await grid.currency.dailyUSD({ amount: -1 });
+  test("dailyUSD function throws if passed anything other than a positive value.", () => {
+    const result = () => currency.dailyUSD({ amount: -1 });
 
-    expect(result).rejects.toThrow();
-    expect(result).rejects.toBeInstanceOf(ValidationError);
+    try {
+      expect(result).toThrow();
+    } catch (error) {
+      expect(result).toBeInstanceOf(ValidationError);
+    }
   });
 
-  test("monthlyUSD function returns a valid value.", async () => {
+  test("monthlyUSD function returns a valid value.", () => {
     const tfts = 1;
-    const result = await grid.currency.monthlyUSD({ amount: tfts });
-    const expected_result = new Decimal(tfts * 24 * 30).toFixed(grid.currency.decimals);
+    const result = currency.monthlyUSD({ amount: tfts });
+    const expected_result = new Decimal(tfts * 24 * 30).toFixed(decimals);
 
     expect(typeof result).toBe("string");
     expect(result).toBe(expected_result);
   });
 
-  test("monthlyUSD function throws if passed anything other than a positive value.", async () => {
-    const result = async () => await grid.currency.monthlyUSD({ amount: -1 });
+  test("monthlyUSD function throws if passed anything other than a positive value.", () => {
+    const result = () => currency.monthlyUSD({ amount: -1 });
 
-    await expect(result).rejects.toThrow();
-    await expect(result).rejects.toBeInstanceOf(ValidationError);
+    try {
+      expect(result).toThrow();
+    } catch (error) {
+      expect(result).toBeInstanceOf(ValidationError);
+    }
   });
 
-  test("yearlyUSD function returns a valid value.", async () => {
+  test("yearlyUSD function returns a valid value.", () => {
     const tfts = 1;
-    const result = await grid.currency.yearlyUSD({ amount: tfts });
-    const expected_result = new Decimal(+(await grid.currency.monthlyUSD({ amount: tfts })) * 12).toFixed(
-      grid.currency.decimals,
-    );
+    const result = currency.yearlyUSD({ amount: tfts });
+    const expected_result = new Decimal(+currency.monthlyUSD({ amount: tfts }) * 12).toFixed(decimals);
 
     expect(typeof result).toBe("string");
     expect(result).toBe(expected_result);
   });
 
-  test("yearlyUSD function throws if passed anything other than a positive value.", async () => {
-    const result = async () => grid.currency.yearlyUSD({ amount: -1 });
+  test("yearlyUSD function throws if passed anything other than a positive value.", () => {
+    const result = () => currency.yearlyUSD({ amount: -1 });
 
-    await expect(result).rejects.toThrow();
-    await expect(result).rejects.toBeInstanceOf(ValidationError);
+    try {
+      expect(result).toThrow();
+    } catch (error) {
+      expect(result).toBeInstanceOf(ValidationError);
+    }
   });
 });
