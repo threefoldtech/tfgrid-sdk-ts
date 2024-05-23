@@ -833,11 +833,7 @@ class GetActiveContractsModel {
 }
 
 class CurrencyModel {
-  @Expose() @IsNumber() @IsNotEmpty() @Min(0) amount: number;
-}
-
-class HourlyTFTModel {
-  @Expose() @IsNumber() @IsNotEmpty() @Min(0) amount: number;
+  @Expose() @IsNumber() @IsNotEmpty() @Min(0) amount: number; // hourly amount
 }
 
 interface GPUCardInfo {
@@ -986,5 +982,4 @@ export {
   NodeIPValidation,
   NodeIPerf,
   CurrencyModel,
-  HourlyTFTModel,
 };

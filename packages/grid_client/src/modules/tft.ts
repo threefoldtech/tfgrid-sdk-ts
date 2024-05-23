@@ -1,46 +1,83 @@
 import Decimal from "decimal.js";
 
-import { TFClient } from "..";
-import { GridClientConfig } from "../config";
+import { GridClientConfig, TFClient } from "..";
 import { expose, validateInput } from "../helpers";
-import { CurrencyModel, HourlyTFTModel } from "./models";
+import { CurrencyModel } from "./models";
 
 class TFTUSDConversionService {
-  private client: TFClient;
   private decimals = 2;
+  private tfclient: TFClient;
+  TFTPrice: number;
 
   constructor(public config: GridClientConfig) {
-    this.client = config.tfclient;
-  }
-
-  async price() {
-    return await this.client.tftPrice.get();
-  }
-
-  @expose
-  @validateInput
-  async convertUSDtoTFT(options: CurrencyModel): Promise<string> {
-    return new Decimal(options.amount / (await this.price())).toFixed(this.decimals);
+    this.tfclient = config.tfclient;
+    this.tfclient.tftPrice.get().then(res => {
+      this.TFTPrice = res;
+    });
   }
 
   @expose
   @validateInput
-  async convertTFTtoUSD(options: CurrencyModel): Promise<string> {
-    return new Decimal(options.amount * (await this.price())).toFixed(this.decimals);
-  }
-  @expose
-  @validateInput
-  monthlyTFT(options: HourlyTFTModel): string {
-    return new Decimal(options.amount * 24 * 30).toFixed(this.decimals);
+  normalizeCurrency(options: CurrencyModel) {
+    return new Decimal(options.amount).toFixed(this.decimals);
   }
 
   @expose
   @validateInput
-  yearlyTFT(options: HourlyTFTModel): string {
-    const months = this.monthlyTFT(options);
+  convertUSDtoTFT(options: CurrencyModel) {
+    const amount = options.amount / this.TFTPrice;
+    return this.normalizeCurrency({ amount });
+  }
 
-    return new Decimal(+months * 12).toFixed(this.decimals);
+  @expose
+  @validateInput
+  convertTFTtoUSD(options: CurrencyModel) {
+    const amount = options.amount * this.TFTPrice;
+    return this.normalizeCurrency({ amount });
+  }
+
+  @expose
+  @validateInput
+  dailyTFT(options: CurrencyModel): string {
+    const hours = options.amount * 24;
+    return this.normalizeCurrency({ amount: hours });
+  }
+
+  @expose
+  @validateInput
+  monthlyTFT(options: CurrencyModel): string {
+    const months = +this.dailyTFT(options) * 30;
+    return this.normalizeCurrency({ amount: months });
+  }
+
+  @expose
+  @validateInput
+  yearlyTFT(options: CurrencyModel): string {
+    const years = +this.monthlyTFT(options) * 12;
+    return this.normalizeCurrency({ amount: years });
+  }
+
+  @expose
+  @validateInput
+  dailyUSD(options: CurrencyModel): string {
+    const dailyTFTs = +this.dailyTFT(options);
+    return this.convertTFTtoUSD({ amount: dailyTFTs });
+  }
+
+  @expose
+  @validateInput
+  monthlyUSD(options: CurrencyModel): string {
+    const monthlyTFTs = +this.dailyTFT(options) * 30;
+    return this.convertTFTtoUSD({ amount: monthlyTFTs });
+  }
+
+  @expose
+  @validateInput
+  yearlyUSD(options: CurrencyModel): string {
+    const yearlyTFT = +this.monthlyTFT(options) * 12;
+
+    return this.convertTFTtoUSD({ amount: yearlyTFT });
   }
 }
 
-export { TFTUSDConversionService as tft };
+export { TFTUSDConversionService as currency };

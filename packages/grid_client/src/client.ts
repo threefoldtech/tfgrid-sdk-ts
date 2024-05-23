@@ -13,7 +13,7 @@ import { isExposed } from "./helpers/expose";
 import { formatErrorMessage, generateString } from "./helpers/utils";
 import * as modules from "./modules/index";
 import { appPath } from "./storage/backend";
-import { BackendStorage, BackendStorageType } from "./storage/backend";
+import { BackendStorageType } from "./storage/backend";
 import { KeypairType } from "./zos/deployment";
 
 class GridClient {
@@ -41,7 +41,7 @@ class GridClient {
   stellar: modules.stellar;
   blockchain: modules.blockchain;
   calculator: modules.calculator;
-  tft: modules.tft;
+  currency: modules.currency;
   utility: modules.utility;
   farmerbot: modules.farmerbot;
   farms: modules.farms;
