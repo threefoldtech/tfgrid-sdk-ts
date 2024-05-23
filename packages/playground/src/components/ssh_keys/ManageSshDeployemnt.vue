@@ -1,6 +1,6 @@
 <template>
   <div ref="inputElement">
-    <v-card class="my-6" variant="tonal">
+    <v-card class="my-6" variant="outlined">
       <v-card-title>
         <v-icon>mdi-key-chain</v-icon>
         Manage SSH keys
@@ -20,8 +20,8 @@
       <v-card-actions>
         <VSpacer />
         <v-btn
-          color="primary"
-          variant="flat"
+          color="secondary"
+          variant="outlined"
           @click="openManageDialog = true"
           class="mr-2 my-1"
           :disabled="sshKeysManagement.list() && sshKeysManagement.list().length === 0"
@@ -80,7 +80,13 @@
 
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn class="mt-2 mb-2 mr-2" variant="outlined" color="white" text="Close" @click="openManageDialog = false" />
+        <v-btn
+          class="mt-2 mb-2 mr-2"
+          variant="outlined"
+          color="anchor"
+          text="Close"
+          @click="openManageDialog = false"
+        />
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -217,8 +223,20 @@ export default defineComponent({
 });
 </script>
 
-<style>
+<style scoped>
 .cursor-pointer {
   cursor: pointer;
+}
+
+.v-card-title,
+.v-card-text {
+  padding: 10px;
+}
+
+.v-theme--light .v-card--variant-outlined {
+  border-color: #b9b9b9;
+}
+.v-theme--dark .v-card--variant-outlined {
+  border-color: #5d5d5d;
 }
 </style>
