@@ -18,20 +18,20 @@ class TFTUSDConversionService {
 
   @expose
   @validateInput
-  normalizeCurrency(options: CurrencyModel) {
+  normalizeCurrency(options: CurrencyModel): string {
     return new Decimal(options.amount).toFixed(this.decimals);
   }
 
   @expose
   @validateInput
-  convertUSDtoTFT(options: CurrencyModel) {
+  convertUSDtoTFT(options: CurrencyModel): string {
     const amount = options.amount / this.rate;
     return this.normalizeCurrency({ amount });
   }
 
   @expose
   @validateInput
-  convertTFTtoUSD(options: CurrencyModel) {
+  convertTFTtoUSD(options: CurrencyModel): string {
     const amount = options.amount * this.rate;
     return this.normalizeCurrency({ amount });
   }
