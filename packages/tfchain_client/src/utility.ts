@@ -12,10 +12,18 @@ class Utility {
   @checkConnection
   async batch<T>(extrinsics: ExtrinsicResult<T>[]): Promise<T[]> {
     extrinsics = extrinsics.filter(Boolean);
+    const batchSize = 400;
     if (extrinsics.length > 0) {
-      const { resultSections, resultEvents } = this.extractResultSectionsAndEvents(extrinsics);
-      const batchExtrinsic = await this.client.api.tx.utility.batch(extrinsics);
-      return this.client.applyExtrinsic<T[]>(batchExtrinsic, resultSections, resultEvents);
+      const result: T[][] = [];
+      for (let i = 0; i < extrinsics.length; i += batchSize) {
+        const batch = extrinsics.slice(i, i + batchSize);
+        const { resultSections, resultEvents } = this.extractResultSectionsAndEvents(batch);
+        const batchExtrinsic = await this.client.api.tx.utility.batch(batch);
+        const res = await this.client.applyExtrinsic<T[]>(batchExtrinsic, resultSections, resultEvents);
+        result.push(res);
+      }
+
+      return result.flat();
     }
     return [];
   }
@@ -23,10 +31,18 @@ class Utility {
   @checkConnection
   async batchAll<T>(extrinsics: ExtrinsicResult<T>[]): Promise<T[]> {
     extrinsics = extrinsics.filter(Boolean);
+    const batchSize = 400;
     if (extrinsics.length > 0) {
-      const { resultSections, resultEvents } = this.extractResultSectionsAndEvents(extrinsics);
-      const batchAllExtrinsic = await this.client.api.tx.utility.batchAll(extrinsics);
-      return this.client.applyExtrinsic<T[]>(batchAllExtrinsic, resultSections, resultEvents);
+      const result: T[][] = [];
+      for (let i = 0; i < extrinsics.length; i += batchSize) {
+        const batch = extrinsics.slice(i, i + batchSize);
+        const { resultSections, resultEvents } = this.extractResultSectionsAndEvents(batch);
+        const batchAllExtrinsic = await this.client.api.tx.utility.batchAll(batch);
+        const res = await this.client.applyExtrinsic<T[]>(batchAllExtrinsic, resultSections, resultEvents);
+        result.push(res);
+      }
+
+      return result.flat();
     }
     return [];
   }
