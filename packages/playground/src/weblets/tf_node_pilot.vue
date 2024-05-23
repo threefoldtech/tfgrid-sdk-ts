@@ -1,9 +1,9 @@
 <template>
   <weblet-layout
     ref="layout"
-    :cpu="cpu"
-    :memory="memory"
-    :disk="32"
+    :cpu="solution?.cpu"
+    :memory="solution?.memory"
+    :disk="solution?.disk"
     :dedicated="dedicated"
     ipv4
     :SelectedNode="selectionDetails?.node"
@@ -29,35 +29,12 @@
         </input-tooltip>
       </input-validator>
 
-      <input-validator
-        :value="cpu"
-        :rules="[
-          validators.required('CPU is required.'),
-          validators.isInt('CPU must be a valid integer.'),
-          validators.min('CPU min is 8 cores.', 8),
-          validators.max('CPU max is 32 cores.', 32),
-        ]"
-        #="{ props }"
-      >
-        <input-tooltip tooltip="The number of virtual cores allocated to your instance.">
-          <v-text-field label="CPU (vCores)" type="number" v-model.number="cpu" v-bind="props" />
-        </input-tooltip>
-      </input-validator>
-
-      <input-validator
-        :value="memory"
-        :rules="[
-          validators.required('Memory is required.'),
-          validators.isInt('Memory must be a valid integer.'),
-          validators.min('Minimum allowed memory is 8192 MB.', 8192),
-          validators.max('Maximum allowed memory is 256 GB.', 256 * 1024),
-        ]"
-        #="{ props }"
-      >
-        <input-tooltip tooltip="The amount of RAM (Random Access Memory) allocated to your instance.">
-          <v-text-field label="Memory (MB)" type="number" v-model.number="memory" v-bind="props" />
-        </input-tooltip>
-      </input-validator>
+      <SelectSolutionFlavor
+        :small="{ cpu: 4, memory: 8, disk: 500 }"
+        :medium="{ cpu: 8, memory: 16, disk: 1000 }"
+        :large="{ cpu: 8, memory: 32, disk: 2000 }"
+        v-model="solution"
+      />
 
       <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
         <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
@@ -68,17 +45,13 @@
       </input-tooltip>
 
       <TfSelectionDetails
-        :filters-validators="{
-          cpu: { min: 8 },
-          memory: { min: 8192 },
-        }"
         :filters="{
           ipv4: true,
           certified,
           dedicated,
-          cpu,
-          ssdDisks: [15, 15],
-          memory,
+          cpu: solution?.cpu,
+          memory: solution?.memory,
+          solutionDisk: solution?.disk,
           rootFilesystemSize,
         }"
         v-model="selectionDetails"
@@ -87,14 +60,14 @@
       <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
     </form-validator>
 
-    <template #footer-actions>
-      <v-btn color="secondary" variant="outlined" @click="deploy" :disabled="!valid"> Deploy </v-btn>
+    <template #footer-actions="{ validateBeforeDeploy }">
+      <v-btn color="secondary" variant="outlined" @click="validateBeforeDeploy(deploy)" text="Deploy" />
     </template>
   </weblet-layout>
 </template>
 
 <script lang="ts" setup>
-import { ref } from "vue";
+import { type Ref, ref } from "vue";
 
 import { manual } from "@/utils/manual";
 
@@ -106,8 +79,7 @@ import { generateName } from "../utils/strings";
 const layout = useLayout();
 const valid = ref(false);
 const name = ref(generateName({ prefix: "np" }));
-const cpu = ref(8);
-const memory = ref(8192);
+const solution = ref() as Ref<SolutionFlavor>;
 const flist: Flist = {
   value: "https://hub.grid.tf/tf-official-vms/node-pilot-zdbfs.flist",
   entryPoint: "/",
@@ -136,8 +108,8 @@ async function deploy() {
       machines: [
         {
           name: name.value,
-          cpu: cpu.value,
-          memory: memory.value,
+          cpu: solution.value.cpu,
+          memory: solution.value.memory,
           flist: flist.value,
           entryPoint: flist.entryPoint,
           publicIpv4: true,
@@ -147,12 +119,8 @@ async function deploy() {
           rootFilesystemSize,
           disks: [
             {
-              size: 15,
-              mountPoint: "/mnt/" + generateName(),
-            },
-            {
-              size: 15,
-              mountPoint: "/mnt/" + generateName(),
+              size: solution.value.disk,
+              mountPoint: "/",
             },
           ],
           nodeId: selectionDetails.value!.node!.nodeId,
@@ -178,14 +146,16 @@ function updateSSHkeyEnv(selectedKeys: string) {
 <script lang="ts">
 import type { GridClient } from "@threefold/grid_client";
 
+import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";
+import type { solutionFlavor as SolutionFlavor } from "../types";
 import type { SelectionDetails } from "../types/nodeSelector";
 import { updateGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
 
 export default {
   name: "NodePilot",
-  components: { ManageSshDeployemnt },
+  components: { ManageSshDeployemnt, SelectSolutionFlavor },
 };
 </script>

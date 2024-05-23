@@ -193,12 +193,17 @@
         <v-tooltip bottom color="primary" close-delay="100" :disabled="!(node && node.dedicated)">
           <template v-slot:activator="{ isActive, props }" v-if="num_gpu!">
             <span v-bind="props" v-on="isActive" class="font-weight-bold"
+              ><v-icon class="scale_beat mr-2" color="warning">mdi-brightness-percent</v-icon
               >{{ (price_usd! / 24 / 30).toFixed(2) }} USD/Hour</span
             >
           </template>
 
           <template v-slot:activator="{ isActive, props }" v-else>
-            <span v-bind="props" v-on="isActive" class="font-weight-bold">{{ price_usd }} USD/Month</span>
+            <span v-bind="props" v-on="isActive" class="font-weight-bold"
+              ><v-icon class="scale_beat mr-2" color="warning" :disabled="!(node && node.dedicated)"
+                >mdi-brightness-percent</v-icon
+              >{{ price_usd }} USD/Month</span
+            >
           </template>
           <span>
             Discounts:
@@ -495,5 +500,22 @@ export default {
   background-color: rgb(var(--v-speed-chip));
   padding: 5px 12px;
   border-radius: 9999px;
+}
+
+.scale_beat {
+  animation: crescendo 0.5s alternate infinite ease-in;
+}
+
+@keyframes crescendo {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.2);
+  }
+}
+
+.v-icon--disabled {
+  opacity: 0 !important;
 }
 </style>

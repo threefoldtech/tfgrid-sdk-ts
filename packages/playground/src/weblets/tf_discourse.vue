@@ -91,8 +91,9 @@
         </SmtpServer>
       </template>
     </d-tabs>
-    <template #footer-actions>
-      <v-btn color="secondary" variant="outlined" @click="deploy()" :disabled="tabs?.invalid"> Deploy </v-btn>
+
+    <template #footer-actions="{ validateBeforeDeploy }">
+      <v-btn color="secondary" variant="outlined" @click="validateBeforeDeploy(deploy)" text="Deploy" />
     </template>
   </weblet-layout>
 </template>
@@ -122,7 +123,7 @@ const name = ref(generateName({ prefix: "dc" }));
 const email = ref(profileManager.profile?.email || "");
 const solution = ref() as Ref<SolutionFlavor>;
 const ipv4 = ref(false);
-const mycelium = ref(false);
+const mycelium = ref(true);
 const smtp = ref(createSMTPServer());
 const dedicated = ref(false);
 const certified = ref(false);

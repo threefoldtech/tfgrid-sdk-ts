@@ -1,4 +1,6 @@
 import {
+  Contract,
+  ContractLock,
   ContractLockOptions,
   Contracts,
   ExtrinsicResult,
@@ -98,6 +100,14 @@ export interface GetConsumptionOptions {
 
 export interface CancelMyContractOptions {
   graphqlURL: string;
+}
+
+export type LockDetails = { [key: number]: ContractLock };
+export interface LockContracts {
+  nameContracts: LockDetails;
+  nodeContracts: LockDetails;
+  rentContracts: LockDetails;
+  totalAmountLocked: number;
 }
 
 class TFContracts extends Contracts {
@@ -324,6 +334,29 @@ class TFContracts extends Contracts {
     }
     await this.client.applyAllExtrinsics(extrinsics);
     return ids;
+  }
+
+  async batchUnlockContracts(ids: number[]) {
+    const billableContractsIDs: number[] = [];
+    for (const id of ids) {
+      if ((await this.contractLock({ id })).amountLocked > 0) billableContractsIDs.push(id);
+    }
+    const extrinsics: ExtrinsicResult<number>[] = [];
+    for (const id of billableContractsIDs) {
+      extrinsics.push(await this.unlock(id));
+    }
+    return this.client.applyAllExtrinsics(extrinsics);
+  }
+
+  async unlockMyContracts(graphqlURL: string) {
+    const contracts = await this.listMyContracts({
+      stateList: [ContractStates.GracePeriod],
+      graphqlURL,
+    });
+    const ids: number[] = [...contracts.nameContracts, ...contracts.nodeContracts, ...contracts.rentContracts].map(
+      contract => parseInt(contract.contractID),
+    );
+    return await this.batchUnlockContracts(ids);
   }
 
   async getDedicatedNodeExtraFee(options: GetDedicatedNodePriceOptions): Promise<number> {
