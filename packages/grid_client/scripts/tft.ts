@@ -1,77 +1,83 @@
 import { CurrencyModel } from "../src";
+import { currency as TFTUSDConversionService } from "../src";
 import { getClient } from "./client_loader";
 import { log } from "./utils";
 
-async function convertTFTtoUSD(client, amount) {
-  const res = await client.currency.convertTFTtoUSD(amount);
+let currency: TFTUSDConversionService;
+
+function convertTFTtoUSD(amount) {
+  const res = currency.convertTFTtoUSD(amount);
   log("================= Convert TFT =================");
   log(res);
   log("================= Convert TFT =================");
 }
 
-async function convertUSDtoTFT(client, amount) {
-  const res = await client.currency.convertUSDtoTFT(amount);
+function convertUSDtoTFT(amount) {
+  const res = currency.convertUSDtoTFT(amount);
   log("================= Convert USD =================");
   log(res);
   log("================= Convert USD =================");
 }
 
-async function dailyTFT(client, hourlyTFT) {
-  const res = await client.currency.dailyTFT(hourlyTFT);
+function dailyTFT(hourlyTFT) {
+  const res = currency.dailyTFT(hourlyTFT);
   log("================= Daily TFT =================");
   log(res);
   log("================= Daily TFT =================");
 }
 
-async function monthlyTFT(client, hourlyTFT) {
-  const res = await client.currency.monthlyTFT(hourlyTFT);
+function monthlyTFT(hourlyTFT) {
+  const res = currency.monthlyTFT(hourlyTFT);
   log("================= Monthly TFT =================");
   log(res);
   log("================= Monthly TFT =================");
 }
 
-async function yearlyTFT(client, hourlyTFT) {
-  const res = await client.currency.yearlyTFT(hourlyTFT);
+function yearlyTFT(hourlyTFT) {
+  const res = currency.yearlyTFT(hourlyTFT);
   log("================= Yearly TFT =================");
   log(res);
   log("================= Yearly TFT =================");
 }
 
-async function dailyUSD(client, hourlyUSD) {
-  const res = await client.currency.dailyUSD(hourlyUSD);
+function dailyUSD(hourlyUSD) {
+  const res = currency.dailyUSD(hourlyUSD);
   log("================= Daily USD =================");
   log(res);
   log("================= Daily USD =================");
 }
 
-async function monthlyUSD(client, hourlyUSD) {
-  const res = await client.currency.monthlyUSD(hourlyUSD);
+function monthlyUSD(hourlyUSD) {
+  const res = currency.monthlyUSD(hourlyUSD);
   log("================= Monthly USD =================");
   log(res);
   log("================= Monthly USD =================");
 }
 
-async function yearlyUSD(client, hourlyUSD) {
-  const res = await client.currency.yearlyUSD(hourlyUSD);
+function yearlyUSD(hourlyUSD) {
+  const res = currency.yearlyUSD(hourlyUSD);
   log("================= Yearly USD =================");
   log(res);
   log("================= Yearly USD =================");
 }
 async function main() {
   const grid = await getClient();
-  grid.currency.rate = await grid.tfclient.tftPrice.get();
+  const rate = await grid.tfclient.tftPrice.get();
+  const decimals = 3;
+  currency = new TFTUSDConversionService(rate, decimals);
+
   const amount: CurrencyModel = {
     amount: 1,
   };
 
-  await convertTFTtoUSD(grid, amount);
-  await convertUSDtoTFT(grid, amount);
-  await dailyTFT(grid, amount);
-  await monthlyTFT(grid, amount);
-  await yearlyTFT(grid, amount);
-  await dailyUSD(grid, amount);
-  await monthlyUSD(grid, amount);
-  await yearlyUSD(grid, amount);
+  convertTFTtoUSD(amount);
+  convertUSDtoTFT(amount);
+  dailyTFT(amount);
+  monthlyTFT(amount);
+  yearlyTFT(amount);
+  dailyUSD(amount);
+  monthlyUSD(amount);
+  yearlyUSD(amount);
 
   await grid.disconnect();
 }

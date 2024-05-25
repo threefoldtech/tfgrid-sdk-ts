@@ -4,8 +4,12 @@ import { expose, validateInput } from "../helpers";
 import { CurrencyModel } from "./models";
 
 class TFTUSDConversionService {
-  // TFT rate: 1 tft = x USD
-  constructor(public rate: number, private decimals = 2) {}
+  // TFT rate: 1 TFT = x USD
+  constructor(protected rate: number, private decimals = 2) {}
+
+  get _rate() {
+    return this.rate;
+  }
 
   @expose
   @validateInput
