@@ -4,11 +4,11 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-"""
-This module contains Transfer page elements.
-"""
-
 class TransferPage:
+
+    """
+    This module contains TF Token Transfer page elements.
+    """
 
     logout_button = (By.XPATH, "//button[.//span[text()=' Logout ']]")
     tfchain_button = (By.XPATH, "//span[text()='TFChain']")

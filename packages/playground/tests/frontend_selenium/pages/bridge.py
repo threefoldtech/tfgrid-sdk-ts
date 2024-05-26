@@ -5,11 +5,11 @@ from selenium.webdriver.common.alert import Alert
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-"""
-This module contains Bridge page elements.
-"""
-
 class BridgePage:
+
+    """
+    This module contains TF Token Bridge page elements.
+    """
 
     logout_button = (By.XPATH, "//button[.//span[text()=' Logout ']]")
     tfchain_button = (By.XPATH, "//span[text()='TFChain']")

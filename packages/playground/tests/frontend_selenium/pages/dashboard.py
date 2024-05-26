@@ -7,11 +7,11 @@ from selenium.webdriver.support import expected_conditions as EC
 from utils.base import Base
 import time
 
-"""
-This module contains Dashboard homepage elements.
-"""
-
 class DashboardPage:
+
+    """
+    This module contains Dashboard Homepage and Profile Manager elements.
+    """
 
     profile_load_label = (By.XPATH, "//*[contains(text(), 'TFChain Wallet')]")
     threefold_load_label = (By.XPATH, "//*[contains(text(), 'A Co-Owned Global Sovereign Internet')]")
