@@ -323,7 +323,6 @@ class TFContracts extends Contracts {
       extrinsics.push(await this.cancel({ id }));
     }
     await this.client.applyAllExtrinsics(extrinsics);
-
     return ids;
   }
 

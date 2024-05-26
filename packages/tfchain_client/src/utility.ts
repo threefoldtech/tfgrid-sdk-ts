@@ -2,6 +2,7 @@ import { Client } from "./client";
 import { ExtrinsicResult } from "./types";
 import { checkConnection } from "./utils";
 
+const batchSize = 400;
 class Utility {
   client: Client;
 
@@ -12,18 +13,17 @@ class Utility {
   @checkConnection
   async batch<T>(extrinsics: ExtrinsicResult<T>[]): Promise<T[]> {
     extrinsics = extrinsics.filter(Boolean);
-    const batchSize = 400;
     if (extrinsics.length > 0) {
-      const result: T[][] = [];
+      const result: T[] = [];
       for (let i = 0; i < extrinsics.length; i += batchSize) {
         const batch = extrinsics.slice(i, i + batchSize);
         const { resultSections, resultEvents } = this.extractResultSectionsAndEvents(batch);
         const batchExtrinsic = await this.client.api.tx.utility.batch(batch);
         const res = await this.client.applyExtrinsic<T[]>(batchExtrinsic, resultSections, resultEvents);
-        result.push(res);
+        result.concat(res);
       }
 
-      return result.flat();
+      return result;
     }
     return [];
   }
@@ -33,16 +33,16 @@ class Utility {
     extrinsics = extrinsics.filter(Boolean);
     const batchSize = 400;
     if (extrinsics.length > 0) {
-      const result: T[][] = [];
+      const result: T[] = [];
       for (let i = 0; i < extrinsics.length; i += batchSize) {
         const batch = extrinsics.slice(i, i + batchSize);
         const { resultSections, resultEvents } = this.extractResultSectionsAndEvents(batch);
         const batchAllExtrinsic = await this.client.api.tx.utility.batchAll(batch);
         const res = await this.client.applyExtrinsic<T[]>(batchAllExtrinsic, resultSections, resultEvents);
-        result.push(res);
+        result.concat(res);
       }
 
-      return result.flat();
+      return result;
     }
     return [];
   }
