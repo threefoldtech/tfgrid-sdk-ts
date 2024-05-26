@@ -111,7 +111,7 @@
           </list-table>
         </div>
 
-        <div v-show="gatewayTab === 1">
+        <div v-if="gatewayTab === 1">
           <form-validator v-model="valid">
             <input-tooltip tooltip="Selecting custom domain sets subdomain as gateway name.">
               <input-validator
@@ -124,7 +124,7 @@
                   validators.minLength('Subdomain must be at least 4 characters.', 4),
                   subdomain => validators.maxLength('Subdomain cannot exceed 30 characters.', 30)(subdomain),
                 ]"
-                :async-rules="[validateSubdomain]"
+                :async-rules="gatewayTab === 1 ? [validateSubdomain] : []"
                 #="{ props }"
               >
                 <v-text-field label="Subdomain" v-model.trim="subdomain" v-bind="props" />
@@ -188,8 +188,8 @@
     <v-dialog v-model="requestDelete" max-width="600px">
       <v-card>
         <v-card-title> Are you sure you want to delete the following gateways? </v-card-title>
-        <v-card-text class="d-flex">
-          <v-chip color="error" label variant="tonal" class="mr-1 mb-1" v-for="gw in gatewaysToDelete" :key="gw.name">
+        <v-card-text class="d-flex flex-wrap">
+          <v-chip color="primary" label variant="tonal" class="mr-1 mb-1" v-for="gw in gatewaysToDelete" :key="gw.name">
             {{ gw.name }}
           </v-chip>
         </v-card-text>

@@ -1,33 +1,36 @@
 <template>
-  <v-card class="my-6" variant="tonal">
-    <v-card-title>
-      <v-icon>mdi-key-chain</v-icon>
-      Manage SSH keys
-    </v-card-title>
-    <v-card-text>
-      SSH grants secure remote access to your deployed machine for seamless management and execution of commands.
-      <v-alert v-if="selectedKeys.length === 0" type="warning" class="mt-2">
-        Attention: It appears that no SSH keys have been selected. In order to access your deployment, you must send at
-        least one SSH key. You can manage your SSH keys from the
-        <router-link :to="DashboardRoutes.Deploy.SSHKey">SSH keys management page</router-link> and add more as needed.
-      </v-alert>
-    </v-card-text>
-
-    <VDivider />
-
-    <v-card-actions>
-      <VSpacer />
-      <v-btn
-        color="primary"
-        variant="flat"
-        @click="openManageDialog = true"
-        class="mr-2 my-1"
-        :disabled="sshKeysManagement.list() && sshKeysManagement.list().length === 0"
-      >
+  <div ref="inputElement">
+    <v-card class="my-6" variant="outlined">
+      <v-card-title>
+        <v-icon>mdi-key-chain</v-icon>
         Manage SSH keys
-      </v-btn>
-    </v-card-actions>
-  </v-card>
+      </v-card-title>
+      <v-card-text>
+        SSH grants secure remote access to your deployed machine for seamless management and execution of commands.
+        <v-alert v-if="selectedKeys.length === 0" type="warning" class="mt-2">
+          Attention: It appears that no SSH keys have been selected. In order to access your deployment, you must send
+          at least one SSH key. You can manage your SSH keys from the
+          <router-link :to="DashboardRoutes.Deploy.SSHKey">SSH keys management page</router-link> and add more as
+          needed.
+        </v-alert>
+      </v-card-text>
+
+      <VDivider />
+
+      <v-card-actions>
+        <VSpacer />
+        <v-btn
+          color="secondary"
+          variant="outlined"
+          @click="openManageDialog = true"
+          class="mr-2 my-1"
+          :disabled="sshKeysManagement.list() && sshKeysManagement.list().length === 0"
+        >
+          Manage SSH keys
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </div>
 
   <v-dialog v-model="openManageDialog" max-width="850">
     <v-card>
@@ -77,7 +80,13 @@
 
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn class="mt-2 mb-2 mr-2" variant="outlined" color="white" text="Close" @click="openManageDialog = false" />
+        <v-btn
+          class="mt-2 mb-2 mr-2"
+          variant="outlined"
+          color="anchor"
+          text="Close"
+          @click="openManageDialog = false"
+        />
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -113,6 +122,7 @@ export default defineComponent({
   },
 
   setup(_, { emit }) {
+    const inputElement = ref<HTMLElement>();
     const defaultKeyData = { createdAt: "", id: 0, publicKey: "", name: "", isActive: false };
     const openManageDialog = ref<boolean>(false);
     const selectedKey = ref<SSHKeyData>(defaultKeyData);
@@ -174,6 +184,7 @@ export default defineComponent({
       reset: noop,
       status: ValidatorStatus.Init,
       error: null,
+      $el: inputElement,
     };
 
     onMounted(() => form?.register(`${uid}`, fakeService));
@@ -182,12 +193,15 @@ export default defineComponent({
     watch(
       () => selectedKeys.value.length,
       num => {
-        form?.updateStatus(`${uid}`, num === 0 ? ValidatorStatus.Invalid : ValidatorStatus.Valid);
+        const status = num === 0 ? ValidatorStatus.Init : ValidatorStatus.Valid;
+        fakeService.status = status;
+        form?.updateStatus(`${uid}`, status);
       },
       { immediate: true },
     );
 
     return {
+      inputElement,
       openManageDialog,
       selectedKeys,
       selectedKey,
@@ -209,8 +223,20 @@ export default defineComponent({
 });
 </script>
 
-<style>
+<style scoped>
 .cursor-pointer {
   cursor: pointer;
+}
+
+.v-card-title,
+.v-card-text {
+  padding: 10px;
+}
+
+.v-theme--light .v-card--variant-outlined {
+  border-color: #b9b9b9;
+}
+.v-theme--dark .v-card--variant-outlined {
+  border-color: #5d5d5d;
 }
 </style>

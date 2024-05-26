@@ -172,8 +172,8 @@
 
       <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
     </form-validator>
-    <template #footer-actions>
-      <v-btn color="secondary" variant="outlined" @click="deploy" :disabled="!valid"> Deploy </v-btn>
+    <template #footer-actions="{ validateBeforeDeploy }">
+      <v-btn color="secondary" variant="outlined" @click="validateBeforeDeploy(deploy)" text="Deploy" />
     </template>
   </weblet-layout>
 </template>
@@ -199,7 +199,7 @@ const flist: Flist = {
 };
 const name = ref(generateName({ prefix: "al" }));
 const ipv4 = ref(false);
-const mycelium = ref(false);
+const mycelium = ref(true);
 const cpu = ref() as Ref<number>;
 const memory = ref() as Ref<number>;
 const storage = ref() as Ref<number>;

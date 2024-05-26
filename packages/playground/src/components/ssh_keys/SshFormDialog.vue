@@ -175,16 +175,15 @@ function createNewSSHKey() {
     id: keyId,
     publicKey: sshKey.value,
     createdAt: sshKeysManagement.formatDate(now),
-    name: "",
+    name: keyName.value,
     isActive: true,
   };
 
   createdKey.value.publicKey = sshKey.value;
   const parts = createdKey.value.publicKey.split(" ");
 
-  if (parts.length === 3) {
+  if (parts.length === 3 && keyName.value === "") {
     const importedKeyName = parts[parts.length - 1];
-
     if (importedKeyName.length < 30 && sshKeysManagement.availableName(importedKeyName)) {
       keyName.value = parts[parts.length - 1];
     }
