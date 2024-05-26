@@ -329,6 +329,9 @@ class Nodes {
     if (nodes.length) {
       nodes = nodes.filter(n => !(options.nodeExclude && options.nodeExclude?.includes(n.nodeId)));
     }
+    console.log("nodessss", nodes);
+    console.log("query", query);
+
     return nodes;
   }
   async filterFarms(options: FilterOptions = {}, url = ""): Promise<FarmInfo[]> {
@@ -390,8 +393,7 @@ class Nodes {
       free_hru: Math.ceil(this._g2b(options.hru)) || "",
       free_ips: options.publicIPs ? 1 : "",
       ipv4: options.accessNodeV4,
-      ipv6: options.accessNodeV6,
-      has_ipv6: options.hasIPv6,
+      ipv6: options.hasIPv6,
       certification_type: options.certified ? "Certified" : "",
       farm_ids: options.farmId ? [options.farmId] : options.farmIds,
       farm_name: options.farmName,
