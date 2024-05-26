@@ -22,5 +22,5 @@ export * from "./farmerbot";
 export * from "./farms";
 export * from "./networks";
 export * from "./bridge";
-export * from "./tft";
+export * from "./currency";
 export * from "./base";
