@@ -5,7 +5,7 @@ import { CurrencyModel } from "./models";
 
 class TFTUSDConversionService {
   // TFT rate: 1 TFT = x USD
-  constructor(protected _rate: number, private decimals = 2) {}
+  constructor(private _rate: number, private decimals = 2) {}
 
   get rate() {
     return this._rate;
