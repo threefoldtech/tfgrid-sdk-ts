@@ -329,9 +329,6 @@ class Nodes {
     if (nodes.length) {
       nodes = nodes.filter(n => !(options.nodeExclude && options.nodeExclude?.includes(n.nodeId)));
     }
-    console.log("nodessss", nodes);
-    console.log("query", query);
-
     return nodes;
   }
   async filterFarms(options: FilterOptions = {}, url = ""): Promise<FarmInfo[]> {
