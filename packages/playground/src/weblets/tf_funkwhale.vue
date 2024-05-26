@@ -116,8 +116,8 @@
       <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
     </form-validator>
 
-    <template #footer-actions>
-      <v-btn color="secondary" variant="outlined" @click="deploy()" :disabled="!valid"> Deploy </v-btn>
+    <template #footer-actions="{ validateBeforeDeploy }">
+      <v-btn color="secondary" variant="outlined" @click="validateBeforeDeploy(deploy)" text="Deploy" />
     </template>
   </weblet-layout>
 </template>
@@ -153,7 +153,7 @@ const flist: Flist = {
 const dedicated = ref(false);
 const certified = ref(false);
 const ipv4 = ref(false);
-const mycelium = ref(false);
+const mycelium = ref(true);
 const selectionDetails = ref<SelectionDetails>();
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;

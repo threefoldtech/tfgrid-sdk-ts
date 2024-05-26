@@ -76,8 +76,8 @@
       <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
     </form-validator>
 
-    <template #footer-actions>
-      <v-btn color="secondary" variant="outlined" @click="deploy()" :disabled="!valid"> Deploy </v-btn>
+    <template #footer-actions="{ validateBeforeDeploy }">
+      <v-btn color="secondary" variant="outlined" @click="validateBeforeDeploy(deploy)" text="Deploy" />
     </template>
   </weblet-layout>
 </template>
@@ -103,7 +103,7 @@ const profileManager = useProfileManager();
 const name = ref(generateName({ prefix: "ss" }));
 const endpoint = ref("");
 const ipv4 = ref(false);
-const mycelium = ref(false);
+const mycelium = ref(true);
 const solution = ref() as Ref<SolutionFlavor>;
 const flist: Flist = {
   value: "https://hub.grid.tf/tf-official-apps/subsquid-latest.flist",

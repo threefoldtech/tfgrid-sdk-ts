@@ -173,10 +173,8 @@
       </template>
     </d-tabs>
 
-    <template #footer-actions>
-      <v-btn color="secondary" variant="outlined" :disabled="tabs?.invalid || network?.error" @click="deploy"
-        >Deploy</v-btn
-      >
+    <template #footer-actions="{ validateBeforeDeploy }">
+      <v-btn color="secondary" variant="outlined" @click="validateBeforeDeploy(deploy)" text="Deploy" />
     </template>
   </weblet-layout>
 </template>
@@ -240,7 +238,7 @@ const flist = ref<Flist>();
 const ipv4 = ref(false);
 const ipv6 = ref(false);
 const planetary = ref(true);
-const mycelium = ref(false);
+const mycelium = ref(true);
 const wireguard = ref(false);
 const envs = ref<Env[]>([]);
 const disks = ref<Disk[]>([]);

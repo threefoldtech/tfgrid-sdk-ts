@@ -348,6 +348,23 @@ class Contracts extends QueryContracts {
     );
     return this.client.patchExtrinsic<ServiceContract>(extrinsic);
   }
+  /**
+   * unlocks a smart contract by triggering the billing of a contract on this block.
+   *
+   *
+   * @param {number} contractId - Contract id to be unlocked.
+   * @returns {Promise<ExtrinsicResult<number>>} A promise that resolves to a `ExtrinsicResult<number>`
+   * @note This call doesn't guarantee that the contract will be resumed, it just triggers the billing of it, if the accounts has enough funds the contract will be resumed
+   *
+   */
+  @checkConnection
+  async unlock(contractId: number) {
+    const extrinsic = await this.client.api.tx.smartContractModule.billContractForBlock(contractId);
+    return this.client.patchExtrinsic(extrinsic, {
+      map: () => contractId,
+      resultEvents: ["ContractGracePeriodEnded"],
+    });
+  }
 }
 
 export {

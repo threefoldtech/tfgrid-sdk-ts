@@ -98,10 +98,8 @@
       </template>
     </d-tabs>
 
-    <template #footer-actions>
-      <v-btn color="secondary" variant="outlined" :disabled="tabs?.invalid || network?.error" @click="deploy">
-        Deploy
-      </v-btn>
+    <template #footer-actions="{ validateBeforeDeploy }">
+      <v-btn color="secondary" variant="outlined" @click="validateBeforeDeploy(deploy)" text="Deploy" />
     </template>
   </weblet-layout>
 </template>
@@ -140,7 +138,7 @@ const flist: Flist = {
 const dedicated = ref(false);
 const certified = ref(false);
 const selectionDetails = ref<SelectionDetails>();
-const mycelium = ref(false);
+const mycelium = ref(true);
 const selectedSSHKeys = ref("");
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;

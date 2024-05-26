@@ -122,7 +122,7 @@ export function createWorker(name: string = generateName({ prefix: "wr" })): K8S
     ipv4: false,
     ipv6: false,
     planetary: true,
-    mycelium: false,
+    mycelium: true,
     rootFsSize: 2,
     dedicated: false,
     certified: false,
