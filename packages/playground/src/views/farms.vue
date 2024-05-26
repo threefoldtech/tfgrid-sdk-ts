@@ -219,8 +219,6 @@ const headers: VDataTableHeader = [
       { title: "Used Public IPs", key: "usedPublicIp", sortable: false },
     ],
   },
-  // { title: "Total IPs", key: "totalPublicIp", sortable: false },
-  // { title: "Available IPs", key: "freePublicIp", sortable: false },
   {
     title: "Certification Type",
     key: "certificationType",
