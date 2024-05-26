@@ -67,6 +67,10 @@
         Uptime:
         <span class="font-weight-bold" v-text="toReadableDate(node.uptime)" />
       </span>
+      <span class="ml-2" v-if="node">
+        Last Deployment Time:
+        <span class="font-weight-bold" v-text="lastDeploymentTime === 0 ? 'N/A' : toReadableDate(lastDeploymentTime)" />
+      </span>
     </template>
 
     <template #append>
@@ -243,6 +247,7 @@ import { CertificationType, type GridNode } from "@threefold/gridproxy_client";
 import { computed, onMounted, ref, watch } from "vue";
 import { capitalize } from "vue";
 
+import { gridProxyClient } from "@/clients";
 import ReserveBtn from "@/dashboard/components/reserve_action_btn.vue";
 import { getCountryCode } from "@/utils/get_nodes";
 import { manual } from "@/utils/manual";
@@ -273,6 +278,7 @@ export default {
     const node = ref(props.node);
     const stakingDiscount = ref<number>();
     const loadingStakingDiscount = ref<boolean>(false);
+    const lastDeploymentTime = ref<number>(0);
     const rentedByUser = computed(() => {
       return props.node?.rentedByTwinId === profileManager.profile?.twinId;
     });
@@ -288,6 +294,10 @@ export default {
           : `https://www.worldatlas.com/r/w425/img/flag/${countryCode.toLowerCase()}-flag.png`;
 
       return imageUrl;
+    });
+
+    onMounted(async () => {
+      await getLastDeploymentTime();
     });
 
     async function refreshStakingDiscount() {
@@ -452,6 +462,14 @@ export default {
       }
     }
 
+    async function getLastDeploymentTime() {
+      if (props.node?.id) {
+        const obj = await gridProxyClient.nodes.statsById(props.node.nodeId);
+        lastDeploymentTime.value = obj.users.last_deployment_timestamp;
+      }
+      lastDeploymentTime.value = 0;
+    }
+
     return {
       cruText,
       mruText,
@@ -478,6 +496,7 @@ export default {
       formatSpeed,
       onReserveChange,
       getNodeStatusColor,
+      lastDeploymentTime,
     };
   },
 };
