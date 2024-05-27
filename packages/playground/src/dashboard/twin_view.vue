@@ -98,6 +98,7 @@
                         :disabled="!isValid || savingEmail"
                       >
                       </v-btn>
+                      <v-btn icon="mdi-close" class="mt-2" variant="text" @click="editEmail = false"> </v-btn>
                     </v-form>
                   </v-list-item>
                 </v-col>
@@ -189,8 +190,7 @@ import { useGrid, useProfileManager } from "../stores";
 import type { FarmInterface } from "../types";
 import { createCustomToast, ToastType } from "../utils/custom_toast";
 import { getFarms } from "../utils/get_farms";
-import { getGrid, storeEmail } from "../utils/grid";
-
+import { type Balance, loadBalance, storeEmail } from "../utils/grid";
 const profileManager = useProfileManager();
 
 const editingTwin = ref(false);
@@ -202,7 +202,7 @@ const numberOfProposalsToVoteOn = ref(0);
 const userFarms = ref<FarmInterface[]>();
 const activeProposalsUserHasVotedOn = ref(0);
 const bridge = (window as any).env.BRIDGE_TFT_ADDRESS;
-const email = ref("");
+const email = ref(profileManager.profile?.email || "");
 const loading = ref<boolean>(false);
 const editEmail = ref<boolean>(false);
 const isValid = ref<boolean>(false);
@@ -264,13 +264,22 @@ function redirectToDao() {
 
 async function saveEmail() {
   try {
-    loading.value = true;
-    savingEmail.value = true;
-    profileManager.updateEmail(email.value);
-    await storeEmail(grid!, email.value);
-    editEmail.value = false;
-    loading.value = false;
-    savingEmail.value = false;
+    const balance: Balance = await loadBalance(grid!);
+    if (balance.free < 1) {
+      editEmail.value = false;
+      createCustomToast(
+        "Transaction Error: Unable to Process Payment - Insufficient Account Balance.",
+        ToastType.danger,
+      );
+    } else {
+      loading.value = true;
+      savingEmail.value = true;
+      profileManager.updateEmail(email.value);
+      await storeEmail(grid!, email.value);
+      editEmail.value = false;
+      loading.value = false;
+      savingEmail.value = false;
+    }
   } catch (e) {
     console.log(e);
   }

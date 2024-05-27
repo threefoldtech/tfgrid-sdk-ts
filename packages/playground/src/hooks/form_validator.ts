@@ -19,6 +19,8 @@ export interface FormValidatorService {
   valid: ComputedRef<boolean>;
   invalid: ComputedRef<boolean>;
   pending: ComputedRef<boolean>;
+  validOnInit: boolean;
+  inputs: ComputedRef<InputValidatorService[]>;
 }
 
 export const formValidatorKey = Symbol("form:validator");

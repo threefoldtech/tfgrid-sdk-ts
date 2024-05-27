@@ -37,7 +37,12 @@
                   />
                 </div>
                 <div style="margin-top: 5rem">
-                  <p :style="{ paddingBottom: '3rem', color: '#7de3c8' }">Waiting for receiving TFTs{{ dots }}</p>
+                  <p
+                    :class="theme.name.value === AppThemeSelection.light ? 'text-primary' : 'text-info'"
+                    :style="{ paddingBottom: '3rem' }"
+                  >
+                    Waiting for receiving TFTs{{ dots }}
+                  </p>
                 </div>
               </v-col>
               <v-divider class="mx-4" vertical></v-divider>
@@ -78,7 +83,9 @@
 <script setup lang="ts">
 import { Decimal } from "decimal.js";
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
+import { useTheme } from "vuetify";
 
+import { AppThemeSelection } from "@/utils/app_theme";
 import { manual } from "@/utils/manual";
 
 import { useProfileManagerController } from "../components/profile_manager_controller.vue";
@@ -96,6 +103,7 @@ const interval = ref<number | null>(null);
 const ProfileManagerController = useProfileManagerController();
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
+const theme = useTheme();
 
 const apps = [
   {

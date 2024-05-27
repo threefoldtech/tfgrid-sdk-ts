@@ -832,6 +832,10 @@ class GetActiveContractsModel {
   @Expose() @IsInt() @IsNotEmpty() @Min(1) nodeId: number;
 }
 
+class CurrencyModel {
+  @Expose() @IsNumber() @IsNotEmpty() @Min(0) amount: number; // hourly amount
+}
+
 interface GPUCardInfo {
   id: string;
   contract: number;
@@ -977,4 +981,5 @@ export {
   NodeCPUTest,
   NodeIPValidation,
   NodeIPerf,
+  CurrencyModel,
 };

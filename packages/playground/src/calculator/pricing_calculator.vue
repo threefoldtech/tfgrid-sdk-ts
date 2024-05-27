@@ -153,7 +153,7 @@
           <VRow class="text-center text-body-1 text-black" v-else-if="valid">
             <VCol cols="6">
               <div
-                class="rounded pa-4 discount"
+                class="rounded pa-4 discount border"
                 :style="{
                   background: computePackageColor(priceTask.data?.dedicatedPackage.package),
                 }"
@@ -180,7 +180,7 @@
             </VCol>
             <VCol cols="6">
               <div
-                class="rounded pa-4 discount"
+                class="rounded pa-4 discount border"
                 :style="{
                   background: computePackageColor(priceTask.data?.sharedPackage.package),
                 }"
