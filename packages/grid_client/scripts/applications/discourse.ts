@@ -118,7 +118,7 @@ async function main() {
       },
     ],
     metadata: "",
-    description: "test deploying DisCourse via ts grid3 client",
+    description: "test deploying Discourse via ts grid3 client",
   };
 
   //Deploy VMs

@@ -101,7 +101,7 @@ async function main() {
       },
     ],
     metadata: "",
-    description: "test deploying Taiga via ts grid3 client",
+    description: "test deploying Subsquid via ts grid3 client",
   };
 
   //Deploy VMs

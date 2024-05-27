@@ -26,7 +26,7 @@ async function cancel(client, vms) {
 async function main() {
   const name = "newalgorand";
   const grid3 = await getClient(`algorand/${name}`);
-  const instanceCapacity = { cru: 2, mru: 4, sru: 50 }; // Update the instance capacity values according to your requirements.
+  const instanceCapacity = { cru: 2, mru: 4, sru: 100 }; // Update the instance capacity values according to your requirements.
 
   //VMNode Selection
   const vmQueryOptions: FilterOptions = {
@@ -81,7 +81,7 @@ async function main() {
       },
     ],
     metadata: "",
-    description: "test deploying Presearch via ts grid3 client",
+    description: "test deploying Algorand via ts grid3 client",
   };
 
   //Deploy VMs
