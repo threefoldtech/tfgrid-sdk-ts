@@ -67,6 +67,7 @@
 <script lang="ts">
 import { ref } from "vue";
 
+import { getAllFarmsNames } from "@/utils/get_farms";
 import { notifyDelaying } from "@/utils/notifications";
 
 import { useGrid } from "../../stores";
@@ -108,7 +109,9 @@ export default {
       if (!name.split("").every((c: string) => /[a-zA-Z0-9\-_]/.test(c))) {
         return { message: "Farm name can only contain alphabetic letters, numbers, '-' or '_'" };
       }
-      const names = await props.userFarms.getFarmsNames();
+
+      // const names = await props.userFarms.getFarmsNames();
+      const names = await getAllFarmsNames();
       if (names.includes(props.name.toLocaleLowerCase())) {
         return { message: "Farm name already exists!" };
       }

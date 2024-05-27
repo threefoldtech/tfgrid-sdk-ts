@@ -52,6 +52,11 @@ export async function getFarms(
     region: filters.region as string,
   }));
 }
+export async function getAllFarmsNames() {
+  const farms = await gridProxyClient.farms.listAll();
+  const names = farms.map((farm: { name: any }) => farm.name);
+  return names;
+}
 
 export async function getBlockedFarmSet(exclusiveFor: string): Promise<Set<number>> {
   const { totalCount } = await gqlClient.nodeContractsConnection(
