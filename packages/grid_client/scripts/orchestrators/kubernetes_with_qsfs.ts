@@ -1,6 +1,6 @@
-import { FilterOptions, K8SModel, QSFSZDBSModel } from "../src";
-import { config, getClient } from "./client_loader";
-import { log } from "./utils";
+import { FilterOptions, K8SModel, QSFSZDBSModel } from "../../src";
+import { config, getClient } from "../client_loader";
+import { log } from "../utils";
 
 async function deployQsfs(client, qsfs) {
   const res = await client.qsfs_zdbs.deploy(qsfs);

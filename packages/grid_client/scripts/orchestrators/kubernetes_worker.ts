@@ -1,6 +1,6 @@
-import { AddWorkerModel, FilterOptions } from "../src";
-import { getClient } from "./client_loader";
-import { log } from "./utils";
+import { AddWorkerModel, FilterOptions } from "../../src";
+import { getClient } from "../client_loader";
+import { log } from "../utils";
 
 // Please run kubernetes script first before running this one to create the cluster.
 
