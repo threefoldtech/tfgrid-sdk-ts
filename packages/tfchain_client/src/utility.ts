@@ -31,7 +31,6 @@ class Utility {
   @checkConnection
   async batchAll<T>(extrinsics: ExtrinsicResult<T>[]): Promise<T[]> {
     extrinsics = extrinsics.filter(Boolean);
-    const batchSize = 400;
     if (extrinsics.length > 0) {
       const result: T[] = [];
       for (let i = 0; i < extrinsics.length; i += batchSize) {
