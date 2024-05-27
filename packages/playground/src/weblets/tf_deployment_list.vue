@@ -227,7 +227,7 @@
             tooltip="Visit"
             icon="mdi-web"
             color="anchor"
-            :href="'https://' + item.value.env.STATICWEBSITE_DOMAIN"
+            :href="'https://' + item.env.STATICWEBSITE_DOMAIN"
           />
         </template>
 
