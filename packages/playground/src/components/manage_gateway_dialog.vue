@@ -4,7 +4,6 @@
       model-value
       @update:model-value="$emit('close')"
       scrollable
-      width="70%"
       :persistent="deleting || layout?.status === 'deploy'"
     >
       <weblet-layout

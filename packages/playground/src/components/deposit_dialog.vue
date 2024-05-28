@@ -1,11 +1,6 @@
 <template>
   <v-container>
-    <v-dialog
-      transition="dialog-bottom-transition"
-      max-width="1000"
-      v-model="depositDialog"
-      @update:model-value="closeDialog"
-    >
+    <v-dialog transition="dialog-bottom-transition" v-model="depositDialog" @update:model-value="closeDialog">
       <v-card>
         <VCardTitle class="bg-primary">Deposit TFT</VCardTitle>
         <v-card-text>

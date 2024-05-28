@@ -215,7 +215,7 @@
     </v-card>
   </v-dialog>
 
-  <v-dialog width="500" v-model="unlockDialog">
+  <v-dialog width="800" v-model="unlockDialog">
     <v-card>
       <v-card-title class="bg-primary">
         Unlock the following Contract<span v-if="selectedContracts.length > 1">s</span>

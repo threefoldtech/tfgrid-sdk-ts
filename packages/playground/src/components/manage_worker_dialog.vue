@@ -2,7 +2,6 @@
   <v-dialog
     model-value
     scrollable
-    width="70%"
     :persistent="layout?.status === 'deploy' || deleting"
     @update:model-value="$emit('close')"
   >

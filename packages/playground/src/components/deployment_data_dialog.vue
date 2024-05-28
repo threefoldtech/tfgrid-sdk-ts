@@ -1,6 +1,6 @@
 <template>
   <v-row justify="center">
-    <v-dialog model-value @update:model-value="$emit('close')" scrollable width="70%">
+    <v-dialog model-value @update:model-value="$emit('close')" scrollable>
       <v-card>
         <v-card-title class="d-flex flex-column" v-if="!onlyJson">
           <div class="d-flex justify-center">

@@ -31,7 +31,7 @@
     </v-card>
   </div>
 
-  <v-dialog v-model="openManageDialog" max-width="850">
+  <v-dialog v-model="openManageDialog" max-width="800">
     <v-card>
       <v-toolbar color="primary" class="custom-toolbar">
         <p class="mb-5">

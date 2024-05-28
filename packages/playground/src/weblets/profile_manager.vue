@@ -200,7 +200,7 @@
                 </template>
               </VTooltip>
 
-              <v-dialog v-model="openAcceptTerms" fullscreen>
+              <v-dialog v-model="openAcceptTerms" fullscreen width="100%">
                 <v-card v-if="!termsLoading">
                   <v-card-text class="pa-15" v-html="acceptTermsContent"></v-card-text>
                   <div class="terms-footer">

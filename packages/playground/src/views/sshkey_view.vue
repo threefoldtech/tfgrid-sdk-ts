@@ -46,6 +46,7 @@
 
       <v-btn
         class="mr-2"
+        variant="elevated"
         :disabled="loading || deleting || generatingSSH || savingKey || activating"
         @click="openDialog(SSHCreationMethod.Generate)"
         prepend-icon="mdi-key-plus"

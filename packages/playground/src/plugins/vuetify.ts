@@ -35,6 +35,9 @@ const defaults = {
     color: "primary",
     size: "small",
   },
+  VDialog: {
+    width: "70%",
+  },
 };
 
 const vuetify = createVuetify({

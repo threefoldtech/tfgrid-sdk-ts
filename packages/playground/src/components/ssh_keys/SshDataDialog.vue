@@ -3,7 +3,7 @@
     @click:outside="() => $emit('close')"
     @keydown.esc="() => $emit('close')"
     v-model="$props.open"
-    max-width="750"
+    max-width="800"
   >
     <template v-slot:default>
       <v-card>

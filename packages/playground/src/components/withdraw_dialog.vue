@@ -2,7 +2,7 @@
   <v-container>
     <v-dialog
       transition="dialog-bottom-transition"
-      max-width="1000"
+      max-width="50%"
       v-model="withdrawDialog"
       @update:model-value="closeDialog"
     >
