@@ -218,6 +218,18 @@ const nodeIDs = computed(() => {
   return [...new Set(allContracts.value.map(contract => contract.details.nodeId) || [])];
 });
 
+function updateLoadingTableValue(updateAllTables: boolean, loading = true, contractType?: ContractType) {
+  if (updateAllTables) {
+    isLoadingNode.value = loading;
+    isLoadingName.value = loading;
+    isLoadingRent.value = loading;
+    return;
+  } else if (contractType == ContractType.Name) isLoadingName.value = loading;
+  else if (contractType == ContractType.Node) isLoadingNode.value = loading;
+  else if (contractType == ContractType.Rent) isLoadingRent.value = loading;
+  return;
+}
+
 onMounted(onMount);
 
 async function onMount() {
@@ -272,20 +284,11 @@ async function onMount() {
       {},
     );
   }
-  isLoadingNode.value = false;
-  isLoadingName.value = false;
-  isLoadingRent.value = false;
+  updateLoadingTableValue(true, false);
 }
 
 async function loadContracts(options: { page: number; itemsPerPage: number; contractType: ContractType }) {
-  if (options.contractType == ContractType.Node) {
-    isLoadingNode.value = true;
-  } else if (options.contractType == ContractType.Name) {
-    isLoadingName.value = true;
-  } else {
-    isLoadingRent.value = true;
-  }
-
+  updateLoadingTableValue(false, true, options.contractType);
   try {
     const { count, data: dataContracts } = await gridProxyClient.contracts.list({
       twinId: profileManager.profile!.twinId,
@@ -322,9 +325,7 @@ async function loadContracts(options: { page: number; itemsPerPage: number; cont
     loadingErrorMessage.value = error.message;
     createCustomToast(`Error while listing contracts due: ${error.message}`, ToastType.danger, {});
   } finally {
-    isLoadingNode.value = false;
-    isLoadingName.value = false;
-    isLoadingRent.value = false;
+    updateLoadingTableValue(false, false, options.contractType);
   }
 }
 
