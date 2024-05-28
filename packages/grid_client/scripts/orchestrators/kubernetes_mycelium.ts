@@ -1,6 +1,6 @@
-import { FilterOptions, K8SModel } from "../src";
-import { config, getClient } from "./client_loader";
-import { log } from "./utils";
+import { FilterOptions, K8SModel } from "../../src";
+import { config, getClient } from "../client_loader";
+import { log } from "../utils";
 
 async function deploy(client, k8s) {
   const res = await client.k8s.deploy(k8s);

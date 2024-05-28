@@ -43,8 +43,8 @@
 
       <v-card-text>
         <v-alert type="info" class="mb-5">
-          The keys you've chosen will be forwarded to your deployment. To make changes, simply tap on the key you wish
-          to cancel or add.
+          The keys selected here will be forwarded to your deployment. To change keys, simply toggle on the keys you
+          wish to select/deselect.
         </v-alert>
 
         <v-row>
