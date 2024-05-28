@@ -274,6 +274,14 @@
           />
         </template>
 
+        <template #TFRobot-actions="{ item }">
+          <IconActionBtn
+            tooltip="Show Details"
+            icon="mdi-eye-outline"
+            @click="openDialog(tabs[activeTab].value, item)"
+          />
+        </template>
+
         <template #Wordpress-actions="{ item }">
           <IconActionBtn
             tooltip="Show Details"
@@ -393,6 +401,7 @@ const tabs: Tab[] = [
   { title: "Freeflow", value: "Freeflow", imgPath: "images/icons/freeflow.png" },
   { title: "Wordpress", value: "Wordpress", imgPath: "images/icons/wordpress.png" },
   { title: "Static Website", value: "StaticWebsite", imgPath: "images/icons/wordpress.png" },
+  { title: "TFRobot", value: "TFRobot", imgPath: "images/icons/tfrobot.png" },
 ];
 
 const layout = useLayout();

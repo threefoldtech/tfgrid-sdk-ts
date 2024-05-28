@@ -67,6 +67,7 @@ enum ApplicationRoutes {
   Wordpress = "/deploy/applications/wordpress/",
   Umbrel = "/deploy/applications/umbrel/",
   Freeflow = "/deploy/applications/freeflow/",
+  TFRobot = "/deploy/applications/tfrobot/",
 }
 
 const DashboardRoutes = {

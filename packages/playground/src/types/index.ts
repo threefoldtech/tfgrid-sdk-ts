@@ -121,6 +121,7 @@ export enum ProjectName {
   Umbrel = "Umbrel",
   FreeFlow = "Freeflow",
   StaticWebsite = "StaticWebsite",
+  TFRobot = "TFRobot",
 }
 
 export enum SolutionCode {
@@ -147,6 +148,7 @@ export enum SolutionCode {
   umbrel = "um",
   wordpress = "wp",
   staticwebsite = "sw",
+  tfrobot = "tfr",
 }
 
 export const solutionType: { [key: string]: string } = {
@@ -170,6 +172,7 @@ export const solutionType: { [key: string]: string } = {
   vm: "Micro Virtual Machine",
   wordpress: "Wordpress",
   staticwebsite: "Static Website",
+  tfrobot: "TFRobot",
 };
 
 export interface solutionFlavor {
