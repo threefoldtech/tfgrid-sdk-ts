@@ -209,13 +209,11 @@
                       @click="openAcceptTerms = termsLoading = false"
                       v-show="!termsLoading"
                       :color="theme.name.value === AppThemeSelection.light ? 'black' : 'white'"
-                      variant="outlined"
                       :text="capitalize('go back')"
                     />
                     <v-btn
                       @click="shouldActivateAccount ? activateAccount() : createNewAccount()"
                       v-show="!termsLoading"
-                      color="primary"
                       :text="capitalize('accept terms and conditions')"
                     />
                   </div>

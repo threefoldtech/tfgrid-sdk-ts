@@ -104,7 +104,6 @@
             <v-btn
               @click="isNodeHasConfig"
               color="error"
-              variant="outlined"
               :disabled="isRemoving || Object.values(config).every(value => value == '')"
             >
               Remove Config
@@ -117,13 +116,11 @@
                   showDialogue = false;
                   reset();
                 "
-                variant="outlined"
                 color="anchor"
                 >Close</v-btn
               >
               <v-btn
                 color="secondary"
-                variant="outlined"
                 @click="AddConfig"
                 :loading="isSaving"
                 :disabled="isSaving || !valid || (valid && !isConfigChanged)"
@@ -147,11 +144,10 @@
 
           <v-card-actions class="justify-end px-5 pb-5 pt-0">
             <!-- Cancel and Remove Buttons -->
-            <v-btn text="Cancel" color="anchor" variant="outlined" @click="showClearDialogue = false"></v-btn>
+            <v-btn text="Cancel" color="anchor" @click="showClearDialogue = false"></v-btn>
             <v-btn
               text="Remove"
               color="error"
-              variant="outlined"
               :loading="isRemoving"
               :disabled="isRemoving"
               @click="removeConfig()"

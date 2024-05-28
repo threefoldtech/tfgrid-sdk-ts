@@ -7,7 +7,9 @@
             :src="baseUrl + titleImage"
             alt="title image"
             v-if="titleImage"
-            :style="{ filter: `brightness(${$vuetify.theme.global.name === 'light' ? 0.2 : 1})` }"
+            :style="{
+              filter: `brightness(${$vuetify.theme.global.name === 'light' ? 0.2 : 1})`,
+            }"
           />
           <slot name="title" />
         </v-card-title>
@@ -71,10 +73,10 @@
         <div v-else>
           Based on the cloud resources you have selected (CPU: {{ cpu }} Cores, RAM: {{ memory }} MB, SSD:
           {{ disk }} GB{{ ipv4 ? ", Public IP: Enabled" : "" }}) your deployment costs
-          <span class="font-weight-black">{{ costLoading ? "Calculating..." : normalizeBalance(tft) }}</span> TFTs or
-          approximately
-          <span class="font-weight-black">{{ costLoading ? "Calculating..." : normalizeBalance(usd) }}</span> USD per
-          month.
+          <span class="font-weight-black">{{ costLoading ? "Calculating..." : normalizeBalance(tft) }}</span>
+          TFTs or approximately
+          <span class="font-weight-black">{{ costLoading ? "Calculating..." : normalizeBalance(usd) }}</span>
+          USD per month.
 
           <div v-if="SelectedNode?.certificationType === 'Certified'">
             You selected a certified node. Please note that this deployment costs more TFT.
@@ -89,7 +91,7 @@
       <v-card-actions>
         <v-spacer />
         <slot name="footer-actions" :validateBeforeDeploy="validateBeforeDeploy" v-if="!status" />
-        <v-btn v-else color="secondary" variant="outlined" :loading="status === 'deploy'" @click="reset"> Back </v-btn>
+        <v-btn v-else color="secondary" :loading="status === 'deploy'" @click="reset"> Back </v-btn>
       </v-card-actions>
     </template>
   </v-card>

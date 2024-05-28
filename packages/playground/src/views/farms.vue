@@ -109,8 +109,8 @@
       <v-container>
         <v-toolbar :height="35">
           <div class="ml-auto">
-            <v-btn icon dark @click="() => (dialog = false)">
-              <v-icon>mdi-close</v-icon>
+            <v-btn icon @click="() => (dialog = false)">
+              <v-icon color="anchor">mdi-close</v-icon>
             </v-btn>
           </div>
         </v-toolbar>

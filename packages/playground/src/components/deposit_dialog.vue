@@ -71,8 +71,8 @@
             </v-row>
           </v-container>
           <v-card-actions class="justify-end">
-            <v-btn variant="outlined" color="anchor" class="mr-2 px-3" @click="closeDialog"> Close </v-btn>
-            <v-btn variant="outlined" color="secondary" :href="manual.tft_bridges" target="_blank" text="Learn more?" />
+            <v-btn color="anchor" class="mr-2 px-3" @click="closeDialog"> Close </v-btn>
+            <v-btn color="secondary" :href="manual.tft_bridges" target="_blank" text="Learn more?" />
           </v-card-actions>
         </v-card-text>
       </v-card>

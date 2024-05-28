@@ -72,7 +72,7 @@
 
       <v-card-actions>
         <v-spacer />
-        <v-btn color="anchor" variant="outlined" @click="deployedDialog = false">Close</v-btn>
+        <v-btn color="anchor" @click="deployedDialog = false">Close</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

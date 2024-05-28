@@ -21,7 +21,6 @@
         <VSpacer />
         <v-btn
           color="secondary"
-          variant="outlined"
           @click="openManageDialog = true"
           class="mr-2 my-1"
           :disabled="sshKeysManagement.list() && sshKeysManagement.list().length === 0"
@@ -80,13 +79,7 @@
 
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn
-          class="mt-2 mb-2 mr-2"
-          variant="outlined"
-          color="anchor"
-          text="Close"
-          @click="openManageDialog = false"
-        />
+        <v-btn class="mt-2 mb-2 mr-2" color="anchor" text="Close" @click="openManageDialog = false" />
       </v-card-actions>
     </v-card>
   </v-dialog>

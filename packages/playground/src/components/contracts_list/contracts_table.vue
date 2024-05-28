@@ -113,13 +113,11 @@
         v-if="Object.keys(props.lockedContracts).length > 0"
         :disabled="!selectedLockedContracts"
         color="warning"
-        variant="outlined"
         @click="openUnlockDialog"
         >Unlock</v-btn
       >
 
       <v-btn
-        variant="outlined"
         color="anchor"
         prepend-icon="mdi-export-variant"
         :disabled="isExporting || !contracts || contracts.length === 0 || loadingDelete || deleting"
@@ -129,7 +127,6 @@
       </v-btn>
 
       <v-btn
-        variant="outlined"
         color="error"
         :disabled="!selectedContracts.length || loadingDelete || deleting"
         prepend-icon="mdi-trash-can-outline"
@@ -167,9 +164,7 @@
 
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn variant="outlined" color="anchor" class="mr-2 px-3" @click="contractStateDialog = false">
-            Close
-          </v-btn>
+          <v-btn color="anchor" class="mr-2 px-3" @click="contractStateDialog = false"> Close </v-btn>
           <v-tooltip
             :text="
               freeBalance < getAmountLocked
@@ -183,7 +178,6 @@
                 <v-btn
                   v-if="!isNodeInRentContracts"
                   :disabled="freeBalance < getAmountLocked"
-                  variant="outlined"
                   color="warning"
                   class="mr-2 px-3"
                   @click="unlockContract([selectedItem.contract_id])"
@@ -215,8 +209,8 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="anchor" variant="outlined" @click="deletingDialog = false"> Cancel </v-btn>
-        <v-btn color="error" variant="outlined" @click="onDelete"> Delete </v-btn>
+        <v-btn color="anchor" @click="deletingDialog = false"> Cancel </v-btn>
+        <v-btn color="error" @click="onDelete"> Delete </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -251,7 +245,7 @@
         </v-chip>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="anchor" variant="outlined" @click="unlockDialog = false"> Cancel </v-btn>
+          <v-btn color="anchor" @click="unlockDialog = false"> Cancel </v-btn>
           <v-tooltip
             :text="
               freeBalance < selectedLockedAmount
@@ -265,7 +259,6 @@
                 <v-btn
                   :disabled="selectedLockedAmount > freeBalance"
                   color="warning"
-                  variant="outlined"
                   class="ml-2"
                   :loading="unlockContractLoading"
                   @click="

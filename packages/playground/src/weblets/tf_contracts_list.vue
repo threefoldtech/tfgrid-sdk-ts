@@ -12,7 +12,6 @@
       <v-btn
         v-if="lockedContracts?.totalAmountLocked && !isLoading"
         class="mr-2"
-        variant="outlined"
         color="warning"
         @click="openUnlockDialog"
         :loading="unlockContractLoading"
@@ -22,7 +21,6 @@
       <v-btn
         prepend-icon="mdi-refresh"
         color="info"
-        variant="outlined"
         @click="
           contractsTable.forEach(t => t.reset());
           onMount();
@@ -38,7 +36,9 @@
   <v-card variant="tonal" :loading="totalCost === undefined" class="mb-3 bg-blue-primary-lighten-3">
     <template #title>
       <v-row>
-        <v-col class="d-flex justify-start"> <p class="text-subtitle-1">Total cost of contracts</p> </v-col>
+        <v-col class="d-flex justify-start">
+          <p class="text-subtitle-1">Total cost of contracts</p>
+        </v-col>
       </v-row>
     </template>
     <template #text>
@@ -88,7 +88,8 @@
             <div v-else>
               You need to fund your account with
               <span class="font-weight-black">
-                {{ Math.ceil(lockedContracts?.totalAmountLocked - freeBalance) }} TFTs
+                {{ Math.ceil(lockedContracts?.totalAmountLocked - freeBalance) }}
+                TFTs
               </span>
               to resume your contracts
             </div>
@@ -97,7 +98,7 @@
 
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn variant="outlined" color="anchor" class="mr-2 px-3" @click="unlockDialog = false"> Close </v-btn>
+          <v-btn color="anchor" class="mr-2 px-3" @click="unlockDialog = false"> Close </v-btn>
           <v-tooltip
             :text="
               freeBalance < lockedContracts?.totalAmountLocked
@@ -110,7 +111,6 @@
               <div v-bind="props">
                 <v-btn
                   :disabled="freeBalance < lockedContracts.totalAmountLocked || loadingLockDetails"
-                  variant="outlined"
                   color="warning"
                   @click="unlockAllContracts"
                   :loading="unlockContractLoading"

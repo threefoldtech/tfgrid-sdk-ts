@@ -326,7 +326,6 @@
     <template #footer-actions>
       <v-btn
         color="error"
-        variant="outlined"
         :disabled="selectedItems.length === 0 || deleting"
         prepend-icon="mdi-delete"
         @click="deletingDialog = true"
@@ -348,10 +347,8 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer />
-        <v-btn color="anchar" variant="outlined" @click="deletingDialog = false">Cancel</v-btn>
-        <v-btn color="error" variant="outlined" @click="onDelete(tabs[activeTab].value.toLowerCase() === 'kubernetes')">
-          Delete
-        </v-btn>
+        <v-btn color="anchar" @click="deletingDialog = false">Cancel</v-btn>
+        <v-btn color="error" @click="onDelete(tabs[activeTab].value.toLowerCase() === 'kubernetes')"> Delete </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

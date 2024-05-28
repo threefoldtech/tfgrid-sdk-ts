@@ -5,8 +5,8 @@
         <v-card-title class="d-flex flex-column" v-if="!onlyJson">
           <div class="d-flex justify-center">
             <v-btn-toggle divided v-model="showType" mandatory>
-              <v-btn variant="outlined"> details </v-btn>
-              <v-btn variant="outlined"> JSON</v-btn>
+              <v-btn> details </v-btn>
+              <v-btn> JSON</v-btn>
             </v-btn-toggle>
           </div>
 
@@ -113,8 +113,8 @@
         </v-card-text>
         <v-card-actions class="my-1">
           <v-spacer />
-          <v-btn color="anchor" variant="outlined" @click="$emit('close')">Close</v-btn>
-          <v-btn color="secondary" variant="outlined" @click="copy">Copy</v-btn>
+          <v-btn color="anchor" @click="$emit('close')">Close</v-btn>
+          <v-btn color="secondary" @click="copy">Copy</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>

@@ -170,17 +170,16 @@
         </div>
 
         <template #footer-actions>
-          <v-btn color="anchor" variant="outlined" @click="$emit('close')">Close</v-btn>
+          <v-btn color="anchor" @click="$emit('close')">Close</v-btn>
           <v-btn
             color="error"
-            variant="outlined"
             :disabled="gatewaysToDelete.length === 0 || deleting || loadingGateways"
             v-if="gatewayTab === 0"
             @click="requestDelete = true"
           >
             Delete
           </v-btn>
-          <v-btn color="secondary" variant="outlined" @click="deployGateway" :disabled="!valid" v-else> Add </v-btn>
+          <v-btn color="secondary" @click="deployGateway" :disabled="!valid" v-else> Add </v-btn>
         </template>
       </weblet-layout>
     </v-dialog>
@@ -199,7 +198,6 @@
         <v-card-actions class="d-flex justify-end">
           <v-btn
             color="error"
-            variant="outlined"
             size="small"
             :disabled="loadingGateways || deleting"
             @click="

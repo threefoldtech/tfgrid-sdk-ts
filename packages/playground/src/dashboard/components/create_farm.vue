@@ -2,7 +2,6 @@
   <v-container>
     <v-row class="text-center flex justify-center">
       <v-btn
-        variant="outlined"
         color="secondary"
         class="text-subtitle-1 px-6 mr-2"
         v-bind:href="'https://bootstrap.grid.tf/'"
@@ -10,7 +9,7 @@
         >Bootstrap Node Image</v-btn
       >
 
-      <v-btn class="bg-primary text-subtitle-1 px-6" @click="showDialogue = true" :disabled="isCreating"
+      <v-btn variant="elevated" class="text-subtitle-1 px-6" @click="showDialogue = true" :disabled="isCreating"
         >Create Farm</v-btn
       >
     </v-row>
@@ -48,15 +47,8 @@
             </form-validator>
           </div>
           <v-card-actions class="justify-end px-5 pb-5 pt-0">
-            <v-btn variant="outlined" color="anchor" @click="showDialogue = false">Close</v-btn>
-            <v-btn
-              color="primary"
-              variant="outlined"
-              @click="createFarm"
-              :loading="isCreating"
-              :disabled="!valid || isCreating"
-              >Create</v-btn
-            >
+            <v-btn color="anchor" @click="showDialogue = false">Close</v-btn>
+            <v-btn @click="createFarm" :loading="isCreating" :disabled="!valid || isCreating">Create</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -106,7 +98,9 @@ export default {
     }
     async function validateFarmName(name: string) {
       if (!name.split("").every((c: string) => /[a-zA-Z0-9\-_]/.test(c))) {
-        return { message: "Farm name can only contain alphabetic letters, numbers, '-' or '_'" };
+        return {
+          message: "Farm name can only contain alphabetic letters, numbers, '-' or '_'",
+        };
       }
       const names = await props.userFarms.getFarmsNames();
       if (names.includes(props.name.toLocaleLowerCase())) {

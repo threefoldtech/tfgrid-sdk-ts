@@ -15,10 +15,18 @@ const defaults = {
     color: "primary",
   },
   VBtn: {
+    variant: "outlined",
+    color: "primary",
     VProgressCircular: {
       size: undefined,
       width: undefined,
       color: undefined,
+    },
+  },
+  VCardActions: {
+    VBtn: {
+      variant: "outlined",
+      color: "primary",
     },
   },
 };

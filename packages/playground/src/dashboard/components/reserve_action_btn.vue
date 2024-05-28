@@ -11,8 +11,8 @@
         <v-divider />
         <v-card-text>This will free up the node for others on the chain</v-card-text>
         <v-card-actions class="justify-end">
-          <v-btn variant="outlined" color="anchor" @click="openUnreserveDialog = false">Close</v-btn>
-          <v-btn variant="outlined" color="error" @click="unReserveNode" :loading="loadingUnreserveNode">Confirm</v-btn>
+          <v-btn color="anchor" @click="openUnreserveDialog = false">Close</v-btn>
+          <v-btn color="error" @click="unReserveNode" :loading="loadingUnreserveNode">Confirm</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>

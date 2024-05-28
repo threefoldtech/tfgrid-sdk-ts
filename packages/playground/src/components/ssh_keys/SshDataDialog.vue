@@ -53,8 +53,8 @@
         <v-card-actions class="mb-3 custom-actions">
           <v-spacer></v-spacer>
           <div class="mt-2">
-            <v-btn color="white" variant="outlined" text="Close" @click="$emit('close')"></v-btn>
-            <v-btn color="primary" variant="outlined" text="Save" @click="updateKey" :loading="loading"></v-btn>
+            <v-btn color="white" text="Close" @click="$emit('close')"></v-btn>
+            <v-btn text="Save" @click="updateKey" :loading="loading"></v-btn>
           </div>
         </v-card-actions>
       </v-card>

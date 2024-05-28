@@ -11,8 +11,8 @@
 
       <template #header-actions>
         <v-btn-toggle divided v-model="showType" mandatory :disabled="layout?.status || deleting" class="mt-2">
-          <v-btn variant="outlined" :disabled="workers.length === 0"> List </v-btn>
-          <v-btn variant="outlined"> Deploy </v-btn>
+          <v-btn :disabled="workers.length === 0"> List </v-btn>
+          <v-btn> Deploy </v-btn>
         </v-btn-toggle>
       </template>
 
@@ -25,10 +25,9 @@
       </form-validator>
 
       <template #footer-actions>
-        <v-btn color="anchor" variant="outlined" v-if="!deleting" @click="$emit('close')"> Close </v-btn>
+        <v-btn color="anchor" v-if="!deleting" @click="$emit('close')"> Close </v-btn>
         <v-btn
           color="error"
-          variant="outlined"
           prepend-icon="mdi-delete"
           :disabled="selectedWorkers.length === 0 || deleting"
           v-if="showType === 0"
@@ -36,13 +35,7 @@
         >
           Delete
         </v-btn>
-        <v-btn
-          color="secondary"
-          variant="outlined"
-          :disabled="!valid"
-          @click="$emit('deploy', layout)"
-          v-if="showType === 1"
-        >
+        <v-btn color="secondary" :disabled="!valid" @click="$emit('deploy', layout)" v-if="showType === 1">
           Deploy
         </v-btn>
       </template>
@@ -59,8 +52,8 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="anchor" variant="outlined" @click="deletingDialog = false"> Cancel </v-btn>
-        <v-btn color="error" variant="outlined" @click="onDelete"> Remove </v-btn>
+        <v-btn color="anchor" @click="deletingDialog = false"> Cancel </v-btn>
+        <v-btn color="error" @click="onDelete"> Remove </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -69,7 +62,11 @@
 <script lang="ts" setup>
 import { ref } from "vue";
 
-const props = defineProps<{ workers: any[]; selectedWorkers: any[]; deleting: boolean }>();
+const props = defineProps<{
+  workers: any[];
+  selectedWorkers: any[];
+  deleting: boolean;
+}>();
 const emits = defineEmits<{
   (event: "close"): void;
   (event: "delete", cb: (workers: any[]) => void): void;

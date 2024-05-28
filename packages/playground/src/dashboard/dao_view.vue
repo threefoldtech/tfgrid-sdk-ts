@@ -46,9 +46,7 @@
               <v-card-title class="pa-0 mb-5 font-weight-bold" v-if="proposal.action">
                 {{ proposal.action }}
               </v-card-title>
-              <v-btn variant="outlined" color="secondary" v-bind:href="proposal.link" v-bind:target="'blank'">
-                Go to Proposal
-              </v-btn>
+              <v-btn color="secondary" v-bind:href="proposal.link" v-bind:target="'blank'"> Go to Proposal </v-btn>
             </div>
             <v-divider class="mt-1 mb-5 text-red-700" />
 
@@ -236,15 +234,8 @@
             </form-validator>
           </v-card-text>
           <v-card-actions class="justify-end">
-            <v-btn @click="openVDialog = false" variant="outlined" color="anchor">Close</v-btn>
-            <v-btn
-              @click="castVote"
-              :loading="loadingVote"
-              variant="outlined"
-              color="secondary"
-              :disabled="!isValidFarm"
-              >Vote</v-btn
-            >
+            <v-btn @click="openVDialog = false" color="anchor">Close</v-btn>
+            <v-btn @click="castVote" :loading="loadingVote" color="secondary" :disabled="!isValidFarm">Vote</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -292,7 +283,7 @@
 
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn @click="openInfoModal = false" class="my-1" color="anchor" variant="outlined"> Close </v-btn>
+            <v-btn @click="openInfoModal = false" class="my-1" color="anchor"> Close </v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>

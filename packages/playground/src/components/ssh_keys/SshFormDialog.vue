@@ -68,14 +68,13 @@
           <v-card-actions class="custom-actions">
             <v-spacer></v-spacer>
             <div class="mt-3">
-              <v-btn color="white" variant="outlined" text="Close" @click="$emit('close')"></v-btn>
+              <v-btn color="white" text="Close" @click="$emit('close')"></v-btn>
 
               <v-btn
                 v-if="$props.dialogType === SSHCreationMethod.Generate"
                 @click="generateSSHKey"
                 :loading="generating"
                 :disabled="!isValidForm || generating || !!generatedSshKey"
-                variant="outlined"
                 color="secondary"
               >
                 Generate and Save

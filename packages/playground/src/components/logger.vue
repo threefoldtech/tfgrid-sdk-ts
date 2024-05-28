@@ -82,8 +82,8 @@
       <VCardText v-text="'This will delete all of your logs. Be careful this operation is irreversible!'" />
       <v-card-actions>
         <v-spacer />
-        <v-btn variant="outlined" @click="clearDialog = false" text="Cancel" />
-        <v-btn variant="outlined" color="error" @click="clearLogs.run()" text="clear" />
+        <v-btn color="anchor" @click="clearDialog = false" text="Cancel" />
+        <v-btn color="error" @click="clearLogs.run()" text="clear" />
       </v-card-actions>
     </v-card>
   </v-dialog>

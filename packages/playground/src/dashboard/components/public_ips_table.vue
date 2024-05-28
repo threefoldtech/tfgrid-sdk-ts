@@ -27,7 +27,6 @@
           <v-btn
             class="ma-3"
             color="error"
-            variant="outlined"
             prepend-icon="mdi-delete"
             :disabled="selectedItems.length === 0 || isRemoving"
             @click="showDialogue = true"
@@ -51,9 +50,8 @@
           </v-chip>
         </v-card-text>
         <v-card-actions class="justify-end px-5 pb-5 pt-0">
-          <v-btn @click="showDialogue = false" variant="outlined" color="anchor">Close</v-btn>
+          <v-btn @click="showDialogue = false" color="anchor">Close</v-btn>
           <v-btn
-            variant="outlined"
             text="Confirm"
             :loading="isRemoving"
             color="error"

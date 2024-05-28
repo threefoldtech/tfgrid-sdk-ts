@@ -52,11 +52,10 @@
           </FormValidator>
         </v-card-text>
         <v-card-actions class="justify-end pb-4 px-6">
-          <v-btn variant="outlined" color="anchor" class="px-3" @click="closeDialog"> Close </v-btn>
+          <v-btn color="anchor" class="px-3" @click="closeDialog"> Close </v-btn>
           <v-btn
             class="px-3"
             color="secondary"
-            variant="outlined"
             @click="withdrawTFT(target, amount)"
             :disabled="!valid || validatingAddress"
             :loading="loadingWithdraw"

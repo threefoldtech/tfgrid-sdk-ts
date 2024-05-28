@@ -51,10 +51,9 @@
             </form-validator>
           </div>
           <v-card-actions class="justify-end px-5 pb-5 pt-0">
-            <v-btn @click="showDialogue = false" variant="outlined" color="anchor">Close</v-btn>
+            <v-btn @click="showDialogue = false" color="anchor">Close</v-btn>
             <v-btn
               color="secondary"
-              variant="outlined"
               @click="setExtraFee()"
               :loading="isSetting"
               :disabled="!valid || isSetting || isDisabled"

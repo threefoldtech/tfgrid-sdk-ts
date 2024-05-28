@@ -34,7 +34,9 @@
         :value="endpoint"
         :rules="[
           validators.required('Endpoint is required.'),
-          validators.isURL('Please provide a valid endpoint.', { protocols: ['wss'] }),
+          validators.isURL('Please provide a valid endpoint.', {
+            protocols: ['wss'],
+          }),
         ]"
         #="{ props }"
       >
@@ -77,7 +79,7 @@
     </form-validator>
 
     <template #footer-actions="{ validateBeforeDeploy }">
-      <v-btn color="secondary" variant="outlined" @click="validateBeforeDeploy(deploy)" text="Deploy" />
+      <v-btn color="secondary" @click="validateBeforeDeploy(deploy)" text="Deploy" />
     </template>
   </weblet-layout>
 </template>

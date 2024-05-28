@@ -128,7 +128,9 @@
               </TfSwapPrice>
             </div>
           </v-spacer>
-          <v-btn class="capitalize" :style="{ pointerEvents: 'none' }" variant="text"> {{ network }}net </v-btn>
+          <v-btn class="capitalize" color="anchor" :style="{ pointerEvents: 'none' }" variant="text">
+            {{ network }}net
+          </v-btn>
           <v-divider vertical class="mx-2" />
           <AppTheme />
           <v-divider vertical class="mx-2" />

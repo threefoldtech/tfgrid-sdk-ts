@@ -1,5 +1,5 @@
 <template>
-  <v-btn class="bg-primary text-subtitle-1 px-6 ml-2 mr-3" @click="showDialogue = true" :loading="loading"
+  <v-btn variant="elevated" class="text-subtitle-1 px-6 ml-2 mr-3" @click="showDialogue = true" :loading="loading"
     >Add IP</v-btn
   >
   <v-container>
@@ -82,13 +82,10 @@
           </v-dialog>
 
           <v-card-actions class="justify-end pa-5">
-            <v-btn @click="showDialogue = false" variant="outlined" color="anchor">Close</v-btn>
+            <v-btn @click="showDialogue = false" color="anchor">Close</v-btn>
 
-            <v-btn variant="outlined" @click="showRange" :disabled="!valid || type === IPType.single || !toPublicIP"
-              >Show IPs Range</v-btn
-            >
+            <v-btn @click="showRange" :disabled="!valid || type === IPType.single || !toPublicIP">Show IPs Range</v-btn>
             <v-btn
-              variant="outlined"
               color="secondary"
               @click="addFarmIp($props.farmId, gateway)"
               @update:modelValue="$emit('update:isAdded', $event)"
