@@ -67,7 +67,6 @@
 <script lang="ts">
 import { ref } from "vue";
 
-import { getAllFarmsNames } from "@/utils/get_farms";
 import { notifyDelaying } from "@/utils/notifications";
 
 import { gridProxyClient } from "../../clients";
