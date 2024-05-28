@@ -203,7 +203,7 @@
 
       <v-alert class="mx-4" type="warning" variant="tonal">Deleting contracts may take a while to complete.</v-alert>
       <v-card-text>
-        <v-chip class="ma-1" color="primary" label v-for="c in selectedContracts" :key="c.contract_id">
+        <v-chip class="ma-1" label v-for="c in selectedContracts" :key="c.contract_id">
           {{ c.contract_id }}
         </v-chip>
       </v-card-text>
@@ -236,11 +236,11 @@
           </div>
           <div v-else-if="selectedLockedAmount > 0">
             You need to fund your account with
-            <span class="font-weight-bold">{{ Math.ceil(selectedLockedAmount - freeBalance) }} TFTs</span> to resume
-            your contracts
+            <span class="font-weight-bold">{{ Math.ceil(selectedLockedAmount - freeBalance) }} TFTs</span>
+            to resume your contracts
           </div>
         </v-alert>
-        <v-chip class="ma-1" color="primary" label v-for="c in selectedContracts" :key="c.contract_id">
+        <v-chip class="ma-1" label v-for="c in selectedContracts" :key="c.contract_id">
           {{ c.contract_id }}
         </v-chip>
         <v-card-actions>

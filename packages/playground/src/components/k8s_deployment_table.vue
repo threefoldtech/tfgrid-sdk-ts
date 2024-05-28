@@ -120,9 +120,7 @@
       </template>
 
       <template #[`item.actions`]="{ item }">
-        <v-chip color="error" variant="tonal" v-if="deleting && ($props.modelValue || []).includes(item.value)">
-          Deleting...
-        </v-chip>
+        <v-chip color="error" v-if="deleting && ($props.modelValue || []).includes(item.value)"> Deleting... </v-chip>
         <v-btn-group variant="tonal" v-else>
           <slot name="actions" :item="item"></slot>
         </v-btn-group>

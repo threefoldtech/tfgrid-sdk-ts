@@ -38,14 +38,14 @@
 
           <v-tooltip text="Key status">
             <template #activator="{ props }">
-              <v-chip v-bind="props" color="primary" v-if="selectedKey.isActive">Active</v-chip>
-              <v-chip v-bind="props" color="grey-lighten-1" v-else>Inactive</v-chip>
+              <v-chip v-bind="props" v-if="selectedKey.isActive">Active</v-chip>
+              <v-chip v-bind="props" color="anchor" v-else>Inactive</v-chip>
             </template>
           </v-tooltip>
 
           <v-tooltip text="Created at">
             <template #activator="{ props }">
-              <v-chip v-bind="props" class="ml-2" color="primary">{{ selectedKey.createdAt }}</v-chip>
+              <v-chip v-bind="props" class="ml-2">{{ selectedKey.createdAt }}</v-chip>
             </template>
           </v-tooltip>
         </v-card-text>

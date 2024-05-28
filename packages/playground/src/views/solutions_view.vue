@@ -19,14 +19,7 @@
                 />
                 <v-card-title class="d-inline-block">
                   {{ card.title }}
-                  <v-chip
-                    v-for="tag in card.tags"
-                    :key="tag"
-                    class="ml-2 pulse-animation"
-                    color="#1AA18F"
-                    small
-                    text-color="white"
-                  >
+                  <v-chip v-for="tag in card.tags" :key="tag" class="ml-2 pulse-animation">
                     {{ tag }}
                   </v-chip>
                 </v-card-title>

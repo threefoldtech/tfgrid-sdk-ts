@@ -116,9 +116,7 @@
         {{ toHumanDate(item.created) }}
       </template>
       <template #[`item.actions`]="{ item }">
-        <v-chip color="error" variant="tonal" v-if="deleting && ($props.modelValue || []).includes(item)">
-          Deleting...
-        </v-chip>
+        <v-chip color="error" v-if="deleting && ($props.modelValue || []).includes(item)"> Deleting... </v-chip>
         <v-btn-group variant="tonal" v-else>
           <slot :name="projectName + '-actions'" :item="item" :update="updateItem"></slot>
         </v-btn-group>

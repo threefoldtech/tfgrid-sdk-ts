@@ -27,7 +27,13 @@ const defaults = {
     VBtn: {
       variant: "outlined",
       color: "primary",
+      size: "small",
     },
+  },
+  VChip: {
+    variant: "tonal",
+    color: "primary",
+    size: "small",
   },
 };
 

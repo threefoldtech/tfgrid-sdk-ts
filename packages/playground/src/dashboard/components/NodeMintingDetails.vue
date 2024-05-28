@@ -28,7 +28,7 @@
                 <v-row>
                   <v-list class="custom-list" density="compact">
                     <h3 class="mb-1 font-weight-medium">
-                      Minting Details<v-chip class="ma-2 me-auto" small :color="getChipColor(receipt.type)"
+                      Minting Details<v-chip class="ma-2 me-auto" :color="getChipColor(receipt.type)"
                         >{{ receipt.type }}
                       </v-chip>
                     </h3>

@@ -341,7 +341,7 @@
         <strong>Delete the following deployments?</strong>
       </v-card-title>
       <v-card-text>
-        <v-chip class="ma-1" color="primary" v-for="item in selectedItems" :key="item.deploymentName">
+        <v-chip class="ma-1" v-for="item in selectedItems" :key="item.deploymentName">
           {{ item.deploymentName }}
         </v-chip>
       </v-card-text>

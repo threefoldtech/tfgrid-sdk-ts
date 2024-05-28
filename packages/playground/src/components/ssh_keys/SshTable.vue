@@ -26,7 +26,7 @@
         <template #[`item.createdAt`]="{ item }">
           <v-tooltip location="bottom" :text="`The date when this SSH key was created.`">
             <template #activator="{ props }">
-              <v-chip color="primary" v-bind="props">
+              <v-chip v-bind="props">
                 {{ item.createdAt }}
               </v-chip>
             </template>

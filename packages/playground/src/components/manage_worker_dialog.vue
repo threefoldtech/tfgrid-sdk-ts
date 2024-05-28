@@ -46,7 +46,7 @@
     <v-card>
       <v-card-title class="text-h5"> Are you sure you want to delete the following workers? </v-card-title>
       <v-card-text>
-        <v-chip class="ma-1" color="primary" label v-for="w in selectedWorkers" :key="w.name">
+        <v-chip class="ma-1" label v-for="w in selectedWorkers" :key="w.name">
           {{ w.name }}
         </v-chip>
       </v-card-text>
