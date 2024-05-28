@@ -80,10 +80,6 @@ export default {
       type: String,
       required: true,
     },
-    userFarms: {
-      type: Object,
-      required: true,
-    },
   },
   setup(props) {
     const showDialogue = ref(false);
@@ -97,7 +93,6 @@ export default {
         createCustomToast("Farm created successfully.", ToastType.success);
         notifyDelaying();
         showDialogue.value = false;
-        await props.userFarms.reloadFarms();
       } catch (error) {
         console.log(error);
         createCustomToast("Failed to create farm.", ToastType.danger);
@@ -110,7 +105,6 @@ export default {
         return { message: "Farm name can only contain alphabetic letters, numbers, '-' or '_'" };
       }
 
-      // const names = await props.userFarms.getFarmsNames();
       const farmsWithSameName = await gridProxyClient.farms.listAll({ name: name.toLocaleLowerCase() });
       if (farmsWithSameName.length > 0) {
         return { message: "Farm name already exists!" };
