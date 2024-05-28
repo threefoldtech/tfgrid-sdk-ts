@@ -70,6 +70,7 @@ import { ref } from "vue";
 import { getAllFarmsNames } from "@/utils/get_farms";
 import { notifyDelaying } from "@/utils/notifications";
 
+import { gridProxyClient } from "../../clients";
 import { useGrid } from "../../stores";
 import { createCustomToast, ToastType } from "../../utils/custom_toast";
 
@@ -111,8 +112,8 @@ export default {
       }
 
       // const names = await props.userFarms.getFarmsNames();
-      const names = await getAllFarmsNames();
-      if (names.includes(props.name.toLocaleLowerCase())) {
+      const farmsWithSameName = await gridProxyClient.farms.listAll({ name: name.toLocaleLowerCase() });
+      if (farmsWithSameName.length > 0) {
         return { message: "Farm name already exists!" };
       }
     }
