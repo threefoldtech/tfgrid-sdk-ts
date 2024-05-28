@@ -251,7 +251,7 @@ async function deploy() {
           name: name.value,
           cpu: solution.value.cpu,
           memory: solution.value.memory,
-          flist: "https://hub.grid.tf/petep.3bot/tfrobot.flist",
+          flist: "https://hub.grid.tf/tf-official-apps/tfrobot.flist",
           entryPoint: "/sbin/zinit init",
           disks: disks.value,
           envs: envs.value,
