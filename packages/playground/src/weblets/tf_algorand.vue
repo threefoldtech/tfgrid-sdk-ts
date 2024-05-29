@@ -118,7 +118,6 @@ import { generateName } from "../utils/strings";
 const layout = useLayout();
 const valid = ref(false);
 const lastRoundInput = ref();
-const profileManager = useProfileManager();
 const flist: Flist = {
   value: "https://hub.grid.tf/tf-official-apps/algorand-latest.flist",
   entryPoint: "/sbin/zinit init",
