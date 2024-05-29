@@ -1,5 +1,5 @@
 <template>
-  <section>
+  <section class="mt-4">
     <template v-if="!disableNodeSelection">
       <h3 class="bg-primary pa-2 text-h6 rounded">Node Selection</h3>
       <p class="text-h6 mb-4 mt-2 ml-2">Choose a way to select Node</p>

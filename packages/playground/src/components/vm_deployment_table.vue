@@ -247,7 +247,7 @@ async function loadDeployments() {
 }
 
 const filteredHeaders = computed(() => {
-  const headers = [
+  let headers = [
     { title: "PLACEHOLDER", key: "data-table-select" },
     { title: "Name", key: "name" },
     {
@@ -269,7 +269,7 @@ const filteredHeaders = computed(() => {
     { title: "Actions", key: "actions", sortable: false },
   ];
 
-  const IPV6Solutions = [ProjectName.VM, ProjectName.Fullvm] as string[];
+  const IPV6Solutions = [ProjectName.VM, ProjectName.Fullvm, ProjectName.TFRobot] as string[];
 
   const IPV4Solutions = [
     ProjectName.VM,
@@ -284,9 +284,10 @@ const filteredHeaders = computed(() => {
     ProjectName.Taiga,
     ProjectName.StaticWebsite,
     ProjectName.Wordpress,
+    ProjectName.TFRobot,
   ] as string[];
 
-  const WireguardSolutions = [ProjectName.VM, ProjectName.Fullvm, ProjectName.Umbrel] as string[];
+  const WireguardSolutions = [ProjectName.VM, ProjectName.Fullvm, ProjectName.Umbrel, ProjectName.TFRobot] as string[];
 
   const flistSolutions = [ProjectName.VM, ProjectName.Fullvm] as string[];
 
@@ -302,10 +303,9 @@ const filteredHeaders = computed(() => {
     if (!WireguardSolutions.includes(props.projectName)) {
       headers[2].children = headers[2].children.filter(h => h.key !== "wireguard");
     }
-
-    if (!flistSolutions.includes(props.projectName)) {
-      headers[2].children = headers[2].children.filter(h => h.key !== "flist");
-    }
+  }
+  if (!flistSolutions.includes(props.projectName)) {
+    headers = headers.filter(h => h.key !== "flist");
   }
 
   return headers;

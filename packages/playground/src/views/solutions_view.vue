@@ -59,6 +59,13 @@ export default {
   setup() {
     const cards: Card[] = [
       {
+        title: "TFRobot",
+        excerpt:
+          "TFRobot is a command line interface tool that offers simultaneous mass deployment of groups of VMs on the ThreeFold Grid, with support of multiple retries for failed deployments, and customizable configurations.",
+        icon: "tfrobot.png",
+        route: DashboardRoutes.Applications.TFRobot,
+      },
+      {
         title: "Peertube",
         excerpt: "Peertube aspires to be a decentralized and free/libre alternative to video broadcasting services.",
         icon: "peertube.png",
@@ -100,13 +107,6 @@ export default {
         icon: "static_website.png",
         route: DashboardRoutes.Applications.StaticWebsite,
       },
-      // {
-      //   title: "Owncloud",
-      //   excerpt:
-      //     "ownCloud develops and provides open-source software for content collaboration, allowing teams to easily share and work on files seamlessly regardless of device or location.",
-      //   icon: "owncloud.png",
-      //   route: DashboardRoutes.Applications.Owncloud,
-      // },
       {
         title: "Nextcloud",
         excerpt:
@@ -157,13 +157,6 @@ export default {
         icon: "umbrel.png",
         route: DashboardRoutes.Applications.Umbrel,
       },
-      //       {
-      //         title: "Freeflow",
-      //         excerpt: `Freeflow is a convenient ecosystem on top of a resilient internet grid. We bring you a new internet with a set of
-      // productivity tools so you can enhance collaboration within your country, your company, your community.`,
-      //         icon: "freeflow.png",
-      //         route: DashboardRoutes.Applications.Freeflow,
-      //       },
       {
         title: "Wordpress",
         excerpt:
