@@ -46,7 +46,10 @@ export const hruRules = _applyRules([
   min("Minimum allowed hdd storage size is 0 GB.", 0),
 ]);
 
-export const balanceRules = _applyRules([min("Balance should be a positive integer and more than 1 TFT.", 1)]);
+export const balanceRules = _applyRules([
+  isInt("Balance must be a valid integer."),
+  min("Balance should be a positive integer and more than 1 TFT.", 1),
+]);
 
 export function normalizePrice(price: number) {
   return parseInt(String(price * 1000)) / 1000;
