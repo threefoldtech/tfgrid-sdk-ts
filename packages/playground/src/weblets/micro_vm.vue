@@ -198,7 +198,7 @@ const tabs = ref();
 const images = [
   {
     name: "Ubuntu-23.10",
-    flist: "https://hub.grid.tf/petep.3bot/ubuntu23.10_mycelium.flist",
+    flist: "https://hub.grid.tf/tf-official-vms/ubuntu-23.10-mycelium.flist",
     entryPoint: "/sbin/zinit init",
   },
   {
@@ -208,7 +208,7 @@ const images = [
   },
   {
     name: "Arch",
-    flist: "https://hub.grid.tf/petep.3bot/arch_mycelium.flist",
+    flist: "https://hub.grid.tf/tf-official-vms/arch-mycelium.flist",
     entryPoint: "/sbin/zinit init",
   },
   {
