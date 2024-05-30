@@ -170,7 +170,7 @@ export default defineComponent({
   setup(props, { emit }) {
     const selectedKeys = ref<number[]>([]); // IDs
     const theme = useTheme();
-    const itemsPerPage = ref(5);
+    const itemsPerPage = ref(10);
     const headers: VDataTableHeader = [
       {
         title: "ID",
