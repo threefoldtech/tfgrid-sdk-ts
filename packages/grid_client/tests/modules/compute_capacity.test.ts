@@ -46,6 +46,12 @@ describe("Compute Capacity module", () => {
     expect(result).toThrow();
   });
 
+  test("cpu & memory empty values.", () => {
+    const result = () => computeCapacity.challenge();
+
+    expect(result).toThrow();
+  });
+
   test("An error should be thrown if cpu & memory negative values.", () => {
     const negative_cpu = -1;
     const negative_mem = -1;
