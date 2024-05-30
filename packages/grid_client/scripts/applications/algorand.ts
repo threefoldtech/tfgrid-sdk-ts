@@ -16,13 +16,6 @@ async function getDeployment(client, vms) {
   log("================= Getting deployment information =================");
 }
 
-async function cancel(client, vms) {
-  const resultVM = await client.machines.delete(vms);
-  log("================= Canceling the deployment =================");
-  log(resultVM);
-  log("================= Canceling the deployment =================");
-}
-
 async function main() {
   const name = "newalgorand";
   const grid3 = await getClient(`algorand/${name}`);
@@ -69,14 +62,8 @@ async function main() {
           SSH_KEY: config.ssh_key,
           // Select a network to work against.
           NETWORK: "mainnet",
-          // Defualt, Relay, Participant, Indexer
+          // Default, Relay, Indexer
           NODE_TYPE: "default",
-          // Account mnemonic is the private key of your Algorand wallet and it consists of 24 words, and these 3 options are only enabled on Participant.
-          //ACCOUNT_MNEMONICS: "",
-          // First Validation Block.
-          //FIRST_ROUND: "24000000",
-          // Last Validation Block
-          //LAST_ROUND: "26000000",
         },
       },
     ],

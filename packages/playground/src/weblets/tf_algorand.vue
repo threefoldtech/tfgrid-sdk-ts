@@ -110,8 +110,8 @@ import { computed, type Ref, ref, watch } from "vue";
 import { manual } from "@/utils/manual";
 
 import { useLayout } from "../components/weblet_layout.vue";
-import { useGrid, useProfileManager } from "../stores";
-import { type Flist, ProjectName, type Validators } from "../types";
+import { useGrid } from "../stores";
+import { type Flist, ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
 import { generateName } from "../utils/strings";
 
