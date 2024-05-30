@@ -13,7 +13,7 @@ let deploymentName: string;
 beforeAll(async () => {
   gridClient = await getClient();
   deploymentName = generateString(15);
-  gridClient.clientOptions.projectName = `casperlabs/${deploymentName}`;
+  gridClient.clientOptions.projectName = `funkwhale/${deploymentName}`;
   gridClient._connect();
   return gridClient;
 });
@@ -21,24 +21,24 @@ beforeAll(async () => {
 //Private IP Regex
 const ipRegex = /(^127\.)|(^10\.)|(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1]\.)|(^192\.168\.)/;
 
-test("TC2683 - Applications: Deploy Casperlabs", async () => {
+test("TC2685 - Applications: Deploy Funkwhale", async () => {
   /**********************************************
      Test Suite: Grid3_Client_TS (Automated)
-     Test Cases: TC2683 - Applications: Deploy Casperlabs
+     Test Cases: TC2685 - Applications: Deploy Funkwhale
      Scenario:
-        - Generate Test Data/casperlabs Config/Gateway Config.
-        - Select a Node To Deploy the casperlabs on.
+        - Generate Test Data/funkwhale Config/Gateway Config.
+        - Select a Node To Deploy the funkwhale on.
         - Select a Gateway Node To Deploy the gateway on.
-        - Deploy the casperlabs solution.
+        - Deploy the funkwhale solution.
         - Assert that the generated data matches
           the deployment details.
-        - Pass the IP of the Created casperlabs to the Gateway
+        - Pass the IP of the Created funkwhale to the Gateway
           Config.
         - Deploy the Gateway.
         - Assert that the generated data matches
           the deployment details.
         - Assert that the Gateway points at the IP
-          of the created casperlabs.
+          of the created funkwhale.
         - Assert that the returned domain is working
           and returns correct data.
     **********************************************/
@@ -59,8 +59,8 @@ test("TC2683 - Applications: Deploy Casperlabs", async () => {
   const ipRangeClassB = "172." + generateInt(16, 31) + ".0.0/16";
   const ipRangeClassC = "192.168.0.0/16";
   const ipRange = randomChoice([ipRangeClassA, ipRangeClassB, ipRangeClassC]);
-  const metadata = "{'deploymentType': 'casperlabs'}";
-  const description = "test deploying Casperlabs via ts grid3 client";
+  const metadata = "{'deploymentType': 'funkwhale'}";
+  const description = "test deploying Funkwhale via ts grid3 client";
 
   //GatewayNode Selection
   const gatewayNodes = await gridClient.capacity.filterNodes({
@@ -126,14 +126,17 @@ test("TC2683 - Applications: Deploy Casperlabs", async () => {
             mountpoint: mountPoint,
           },
         ],
-        flist: "https://hub.grid.tf/tf-official-apps/casperlabs-latest.flist",
-        entrypoint: "/sbin/zinit init",
+        flist: "https://hub.grid.tf/tf-official-apps/funkwhale-dec21.flist",
+        entrypoint: "/init.sh",
         public_ip: publicIp,
         planetary: true,
         mycelium: false,
         env: {
           SSH_KEY: config.ssh_key,
-          CASPERLABS_HOSTNAME: domain,
+          FUNKWHALE_HOSTNAME: domain,
+          DJANGO_SUPERUSER_EMAIL: "admin123@funk.whale",
+          DJANGO_SUPERUSER_USERNAME: "admin123",
+          DJANGO_SUPERUSER_PASSWORD: "admin123",
         },
       },
     ],
@@ -235,7 +238,7 @@ test("TC2683 - Applications: Deploy Casperlabs", async () => {
       log(res.data);
       expect(res.status).toBe(200);
       expect(res.statusText).toBe("OK");
-      expect(res.data).toContain("Your Casper node is now running succesfully on the ThreeFold Grid.");
+      expect(res.data).toContain("Funkwhale");
     });
   } else {
     throw new Error("Gateway is unreachable after multiple retries");

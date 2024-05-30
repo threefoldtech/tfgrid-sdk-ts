@@ -13,7 +13,7 @@ let deploymentName: string;
 beforeAll(async () => {
   gridClient = await getClient();
   deploymentName = generateString(15);
-  gridClient.clientOptions.projectName = `casperlabs/${deploymentName}`;
+  gridClient.clientOptions.projectName = `peertube/${deploymentName}`;
   gridClient._connect();
   return gridClient;
 });
@@ -21,24 +21,24 @@ beforeAll(async () => {
 //Private IP Regex
 const ipRegex = /(^127\.)|(^10\.)|(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1]\.)|(^192\.168\.)/;
 
-test("TC2683 - Applications: Deploy Casperlabs", async () => {
+test("TC2684 - Applications: Deploy Peertube", async () => {
   /**********************************************
      Test Suite: Grid3_Client_TS (Automated)
-     Test Cases: TC2683 - Applications: Deploy Casperlabs
+     Test Cases: TC2684 - Applications: Deploy Peertube
      Scenario:
-        - Generate Test Data/casperlabs Config/Gateway Config.
-        - Select a Node To Deploy the casperlabs on.
+        - Generate Test Data/peertube Config/Gateway Config.
+        - Select a Node To Deploy the peertube on.
         - Select a Gateway Node To Deploy the gateway on.
-        - Deploy the casperlabs solution.
+        - Deploy the peertube solution.
         - Assert that the generated data matches
           the deployment details.
-        - Pass the IP of the Created casperlabs to the Gateway
+        - Pass the IP of the Created peertube to the Gateway
           Config.
         - Deploy the Gateway.
         - Assert that the generated data matches
           the deployment details.
         - Assert that the Gateway points at the IP
-          of the created casperlabs.
+          of the created peertube.
         - Assert that the returned domain is working
           and returns correct data.
     **********************************************/
@@ -59,8 +59,8 @@ test("TC2683 - Applications: Deploy Casperlabs", async () => {
   const ipRangeClassB = "172." + generateInt(16, 31) + ".0.0/16";
   const ipRangeClassC = "192.168.0.0/16";
   const ipRange = randomChoice([ipRangeClassA, ipRangeClassB, ipRangeClassC]);
-  const metadata = "{'deploymentType': 'casperlabs'}";
-  const description = "test deploying Casperlabs via ts grid3 client";
+  const metadata = "{'deploymentType': 'peertube'}";
+  const description = "test deploying Peertube via ts grid3 client";
 
   //GatewayNode Selection
   const gatewayNodes = await gridClient.capacity.filterNodes({
@@ -126,14 +126,16 @@ test("TC2683 - Applications: Deploy Casperlabs", async () => {
             mountpoint: mountPoint,
           },
         ],
-        flist: "https://hub.grid.tf/tf-official-apps/casperlabs-latest.flist",
+        flist: "https://hub.grid.tf/tf-official-apps/peertube-v3.1.1.flist",
         entrypoint: "/sbin/zinit init",
         public_ip: publicIp,
         planetary: true,
         mycelium: false,
         env: {
           SSH_KEY: config.ssh_key,
-          CASPERLABS_HOSTNAME: domain,
+          PEERTUBE_WEBSERVER_HOSTNAME: domain,
+          PEERTUBE_ADMIN_EMAIL: "admin123@peer.tube",
+          PT_INITIAL_ROOT_PASSWORD: "admin123",
         },
       },
     ],
@@ -177,7 +179,7 @@ test("TC2683 - Applications: Deploy Casperlabs", async () => {
   expect(result[0].mounts[0]["mountPoint"]).toBe(mountPoint);
   expect(result[0].mounts[0]["state"]).toBe("ok");
 
-  const backends = ["http://[" + result[0].planetary + "]:80"];
+  const backends = ["http://[" + result[0].planetary + "]:9000"];
   log(backends);
 
   //Name Gateway Model
@@ -210,10 +212,16 @@ test("TC2683 - Applications: Deploy Casperlabs", async () => {
 
   const site = "https://" + gatewayResult[0].domain;
   let reachable = false;
+  const header =
+    "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7";
 
   for (let i = 0; i < 300; i++) {
     axios
-      .get(site)
+      .get(site, {
+        headers: {
+          Accept: header,
+        },
+      })
       .then(() => {
         log("gateway is reachable");
         reachable = true;
@@ -229,13 +237,15 @@ test("TC2683 - Applications: Deploy Casperlabs", async () => {
   }
 
   if (reachable) {
-    axios.get(site).then(res => {
+    axios.get(site, { headers: { Accept: header } }).then(res => {
       log(res.status);
       log(res.statusText);
       log(res.data);
       expect(res.status).toBe(200);
       expect(res.statusText).toBe("OK");
-      expect(res.data).toContain("Your Casper node is now running succesfully on the ThreeFold Grid.");
+      expect(res.data).toContain(
+        "PeerTube, an ActivityPub-federated video streaming platform using P2P directly in your web browser.",
+      );
     });
   } else {
     throw new Error("Gateway is unreachable after multiple retries");
