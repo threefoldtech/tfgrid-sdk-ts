@@ -66,7 +66,7 @@ jobs:
         id: kubernetes
         continue-on-error: true
         run: |
-          yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/kubernetes.ts
+          yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/orchestrators/kubernetes.ts
       - name: Run test vm with qsfs
         id: vmqsfs
         continue-on-error: true
@@ -76,7 +76,7 @@ jobs:
         id: kubernetesqsfs
         continue-on-error: true
         run: |
-          yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/kubernetes_with_qsfs.ts
+          yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/orchestrators/kubernetes_with_qsfs.ts
       - name: Run test kvstore
         id: kvstore
         continue-on-error: true
