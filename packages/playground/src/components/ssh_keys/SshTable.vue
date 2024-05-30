@@ -15,6 +15,13 @@
         :loading="loading"
         :headers="headers"
         :items="sshKeys"
+        :items-per-page="itemsPerPage"
+        :items-per-page-options="[
+          { value: 5, title: '5' },
+          { value: 10, title: '10' },
+          { value: 15, title: '15' },
+          { value: 50, title: '50' },
+        ]"
         loading-text="Loading..."
         @click:row="(_: any, { item }: any) => $emit('view', item)"
       >
@@ -88,8 +95,6 @@
             </template>
           </v-tooltip>
         </template>
-
-        <template #bottom></template>
       </v-data-table>
     </v-card-text>
 
@@ -165,7 +170,7 @@ export default defineComponent({
   setup(props, { emit }) {
     const selectedKeys = ref<number[]>([]); // IDs
     const theme = useTheme();
-
+    const itemsPerPage = ref(5);
     const headers: VDataTableHeader = [
       {
         title: "ID",
@@ -210,6 +215,7 @@ export default defineComponent({
     return {
       headers,
       selectedKeys,
+      itemsPerPage,
       theme,
       AppThemeSelection,
       capitalize,
