@@ -196,19 +196,6 @@ async function deploy() {
   }
 }
 
-function customAccountValidation(value: string) {
-  if (value.split(" ").length !== 25) {
-    return { message: "Mnemonic must have 25 words separated by spaces." };
-  }
-}
-
-function customLastRoundValidation(validators: Validators) {
-  return (value: string) => {
-    const min = firstRound.value;
-    return validators.min(`Last round must be greater than ${min}`, min + 1)(value);
-  };
-}
-
 function updateSSHkeyEnv(selectedKeys: string) {
   selectedSSHKeys.value = selectedKeys;
 }
