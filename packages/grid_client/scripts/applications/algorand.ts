@@ -16,6 +16,13 @@ async function getDeployment(client, vms) {
   log("================= Getting deployment information =================");
 }
 
+async function cancel(client, vms) {
+  const resultVM = await client.machines.delete(vms);
+  log("================= Canceling the deployment =================");
+  log(resultVM);
+  log("================= Canceling the deployment =================");
+}
+
 async function main() {
   const name = "newalgorand";
   const grid3 = await getClient(`algorand/${name}`);
