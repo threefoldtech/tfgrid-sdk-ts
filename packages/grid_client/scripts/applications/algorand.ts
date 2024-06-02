@@ -69,14 +69,8 @@ async function main() {
           SSH_KEY: config.ssh_key,
           // Select a network to work against.
           NETWORK: "mainnet",
-          // Defualt, Relay, Participant, Indexer
+          // Default, Relay, Indexer
           NODE_TYPE: "default",
-          // Account mnemonic is the private key of your Algorand wallet and it consists of 24 words, and these 3 options are only enabled on Participant.
-          //ACCOUNT_MNEMONICS: "",
-          // First Validation Block.
-          //FIRST_ROUND: "24000000",
-          // Last Validation Block
-          //LAST_ROUND: "26000000",
         },
       },
     ],
