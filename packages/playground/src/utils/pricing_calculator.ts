@@ -42,7 +42,7 @@ export const hruRules = _applyRules([
 
 export const balanceRules = _applyRules([
   isNumeric("Balance must be a valid number."),
-  min("Balance should be a positive integer and more than 1 TFT.", 1),
+  min("Minimum allowed balance is 0.", 0),
 ]);
 
 export function normalizePrice(price: number) {
