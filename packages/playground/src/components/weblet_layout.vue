@@ -239,7 +239,6 @@ function validateBeforeDeploy(fn: () => void) {
         return;
       }
 
-      console.log({ errorInput });
       document.addEventListener("scrollend", () => _input.focus(), { once: true });
       _input.scrollIntoView({ behavior: "smooth", block: "center" });
     }, 250);
