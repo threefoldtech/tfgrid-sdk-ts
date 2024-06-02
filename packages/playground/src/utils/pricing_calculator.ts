@@ -1,7 +1,8 @@
-import { isInt, max, min, required } from "./validators";
+import { isInt, isNumeric, max, min, required } from "./validators";
 
 function _applyRules(rules: Array<(value: string) => { message: string } | void>): (value: string) => true | string {
   return (value: string) => {
+    value = value?.toString();
     for (const rule of rules) {
       const res = rule(value);
       if (res && res.message) {
@@ -47,7 +48,7 @@ export const hruRules = _applyRules([
 ]);
 
 export const balanceRules = _applyRules([
-  isInt("Balance must be a valid integer."),
+  isNumeric("Balance must be a valid number."),
   min("Balance should be a positive integer and more than 1 TFT.", 1),
 ]);
 
