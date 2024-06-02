@@ -69,6 +69,7 @@ import { ref } from "vue";
 
 import { notifyDelaying } from "@/utils/notifications";
 
+import { gridProxyClient } from "../../clients";
 import { useGrid } from "../../stores";
 import { createCustomToast, ToastType } from "../../utils/custom_toast";
 
@@ -77,10 +78,6 @@ export default {
   props: {
     name: {
       type: String,
-      required: true,
-    },
-    userFarms: {
-      type: Object,
       required: true,
     },
   },
@@ -96,7 +93,6 @@ export default {
         createCustomToast("Farm created successfully.", ToastType.success);
         notifyDelaying();
         showDialogue.value = false;
-        await props.userFarms.reloadFarms();
       } catch (error) {
         console.log(error);
         createCustomToast("Failed to create farm.", ToastType.danger);
@@ -108,8 +104,9 @@ export default {
       if (!name.split("").every((c: string) => /[a-zA-Z0-9\-_]/.test(c))) {
         return { message: "Farm name can only contain alphabetic letters, numbers, '-' or '_'" };
       }
-      const names = await props.userFarms.getFarmsNames();
-      if (names.includes(props.name.toLocaleLowerCase())) {
+
+      const farmsWithSameName = await gridProxyClient.farms.listAll({ name: name.toLocaleLowerCase() });
+      if (farmsWithSameName.length > 0) {
         return { message: "Farm name already exists!" };
       }
     }

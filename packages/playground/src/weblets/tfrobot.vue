@@ -9,9 +9,9 @@
     :dedicated="dedicated"
     :SelectedNode="selectionDetails?.node"
     :valid-filters="selectionDetails?.validFilters"
-    title-image="images/icons/vm.png"
+    title-image="images/icons/tfrobot.png"
   >
-    <template #title>Deploy a Micro Virtual Machine </template>
+    <template #title>Deploy a TFRobot Machine </template>
 
     <d-tabs
       :tabs="[
@@ -39,7 +39,6 @@
           </input-tooltip>
         </input-validator>
 
-        <SelectVmImage :images="images" v-model="flist" />
         <SelectSolutionFlavor
           :small="{ cpu: 1, memory: 2, disk: 25 }"
           :medium="{ cpu: 2, memory: 4, disk: 50 }"
@@ -120,7 +119,7 @@
         <ExpandableLayout
           v-model="disks"
           @add="addDisk"
-          title="Add additional disk space to your micro virtual machine"
+          title="Add additional disk space to your TFRobot machine"
           #="{ index }"
         >
           <p class="text-h6 mb-4">Disk #{{ index + 1 }}</p>
@@ -188,53 +187,14 @@ import Network from "../components/networks.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useGrid } from "../stores";
-import { type Flist, ProjectName } from "../types";
+import { ProjectName } from "../types";
 import { deployVM, type Disk, type Env } from "../utils/deploy_vm";
 import { generateName } from "../utils/strings";
 
 const layout = useLayout();
 const tabs = ref();
 
-const images = [
-  {
-    name: "Ubuntu-23.10",
-    flist: "https://hub.grid.tf/tf-official-vms/ubuntu-23.10-mycelium.flist",
-    entryPoint: "/sbin/zinit init",
-  },
-  {
-    name: "Ubuntu-22.04",
-    flist: "https://hub.grid.tf/tf-official-apps/threefoldtech-ubuntu-22.04.flist",
-    entryPoint: "/sbin/zinit init",
-  },
-  {
-    name: "Arch",
-    flist: "https://hub.grid.tf/tf-official-vms/arch-mycelium.flist",
-    entryPoint: "/sbin/zinit init",
-  },
-  {
-    name: "Debian-12",
-    flist: "https://hub.grid.tf/tf-official-apps/threefoldtech-debian-12.flist",
-    entryPoint: "/sbin/zinit init",
-  },
-  {
-    name: "Alpine-3",
-    flist: "https://hub.grid.tf/tf-official-apps/threefoldtech-alpine-3.flist",
-    entryPoint: "/entrypoint.sh",
-  },
-  {
-    name: "CentOS-8",
-    flist: "https://hub.grid.tf/tf-official-apps/threefoldtech-centos-8.flist",
-    entryPoint: "/entrypoint.sh",
-  },
-  {
-    name: "Nixos",
-    flist: "https://hub.grid.tf/tf-official-vms/nixos-micro-latest.flist",
-    entryPoint: "/entrypoint.sh",
-  },
-];
-
-const name = ref(generateName({ prefix: "vm" }));
-const flist = ref<Flist>();
+const name = ref(generateName({ prefix: "tfr" }));
 const ipv4 = ref(false);
 const ipv6 = ref(false);
 const planetary = ref(true);
@@ -274,7 +234,7 @@ function addDisk() {
 async function deploy() {
   layout.value.setStatus("deploy");
 
-  const projectName = ProjectName.VM.toLowerCase() + "/" + name.value;
+  const projectName = ProjectName.TFRobot.toLowerCase() + "/" + name.value;
 
   try {
     updateGrid(grid, { projectName });
@@ -291,8 +251,8 @@ async function deploy() {
           name: name.value,
           cpu: solution.value.cpu,
           memory: solution.value.memory,
-          flist: flist.value!.value,
-          entryPoint: flist.value!.entryPoint,
+          flist: "https://hub.grid.tf/tf-official-apps/tfrobot.flist",
+          entryPoint: "/sbin/zinit init",
           disks: disks.value,
           envs: envs.value,
           planetary: planetary.value,
@@ -308,10 +268,10 @@ async function deploy() {
     });
 
     layout.value.reloadDeploymentsList();
-    layout.value.setStatus("success", "Successfully deployed a micro virtual machine.");
-    layout.value.openDialog(vm, deploymentListEnvironments.vm);
+    layout.value.setStatus("success", "Successfully deployed a TFRobot machine.");
+    layout.value.openDialog(vm, deploymentListEnvironments.tfrobot);
   } catch (e) {
-    layout.value.setStatus("failed", normalizeError(e, "Failed to deploy micro virtual machine instance."));
+    layout.value.setStatus("failed", normalizeError(e, "Failed to deploy TFRobot machine instance."));
   }
 }
 
@@ -326,7 +286,6 @@ watch(selectedSSHKeys, layoutMount, { deep: true });
 import type { GridClient } from "@threefold/grid_client";
 
 import ExpandableLayout from "../components/expandable_layout.vue";
-import SelectVmImage from "../components/select_vm_image.vue";
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";
 import type { solutionFlavor as SolutionFlavor } from "../types";
@@ -337,9 +296,8 @@ import { normalizeError } from "../utils/helpers";
 const solution = ref() as Ref<SolutionFlavor>;
 
 export default {
-  name: "MicroVm",
+  name: "TFRobot",
   components: {
-    SelectVmImage,
     SelectSolutionFlavor,
     ExpandableLayout,
   },

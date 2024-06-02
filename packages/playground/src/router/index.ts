@@ -387,6 +387,28 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
     //     },
     //   },
     // },
+    {
+      path: DashboardRoutes.Applications.TFRobot,
+      component: () => import("../views/tfrobot_view.vue"),
+      meta: {
+        title: "TFRobot",
+        info: { page: "info/tfrobot.md" },
+        navbarConfig: {
+          back: true,
+          path: [
+            { title: "Deploy" },
+            {
+              title: "Applications",
+              disabled: false,
+              to: DashboardRoutes.Deploy.Applications,
+            },
+            {
+              title: "TFRobot",
+            },
+          ],
+        },
+      },
+    },
   ];
 }
 
