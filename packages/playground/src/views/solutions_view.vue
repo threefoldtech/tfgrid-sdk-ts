@@ -57,7 +57,7 @@ interface Card {
 export default {
   name: "SolutionsView",
   setup() {
-    const cards: Card[] = [
+    let cards: Card[] = [
       {
         title: "TFRobot",
         excerpt:
@@ -165,6 +165,7 @@ export default {
         route: DashboardRoutes.Applications.Wordpress,
       },
     ];
+    cards = cards.sort((a, b) => a.title.localeCompare(b.title));
 
     const baseURL = import.meta.env.BASE_URL;
     const searchItem = ref("");
