@@ -1,5 +1,3 @@
-# This workflow will install needed dependencies and run main grid tests.
-
 name: Grid Client Nightly
 
 on:
@@ -42,7 +40,7 @@ jobs:
           node-version: 18
           cache: "yarn"
 
-      - name: Install deps
+      - name: Install dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y git libtool tmux redis net-tools
@@ -123,6 +121,7 @@ jobs:
           echo Delete all contracts: ${{ steps.deleteall.outcome }}
 
       - name: Check test script status
+        id: check-status
         if: |
           steps.dynamicsinglevm.outcome != 'success' ||
           steps.multiplevm.outcome != 'success' ||
@@ -133,3 +132,26 @@ jobs:
           steps.zdb.outcome != 'success' ||
           steps.deleteall.outcome != 'success' 
         run: exit 1
+
+      - name: Set up GitHub CLI
+        uses: actions/setup-gh@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install jq
+        run: sudo apt-get install -y jq
+
+      - name: Check for existing issues
+        if: failure()
+        id: check-issues
+        run: |
+          existing_issue=$(gh issue list --state open --label bug --json title | jq -r '.[] | select(.title == "Test Failure Detected")')
+          echo "existing_issue=${existing_issue}" >> $GITHUB_ENV
+
+      - name: Create GitHub Issue on Failure
+        if: failure() && env.existing_issue == ''
+        uses: peter-evans/create-issue-from-file@v4
+        with:
+          title: "Test Failure Detected"
+          content-file: ./.github/ISSUE_TEMPLATE/nightly_report.yml
+          labels: bug
