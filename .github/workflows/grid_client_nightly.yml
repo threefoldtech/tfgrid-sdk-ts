@@ -1,3 +1,5 @@
+# This workflow will install needed dependencies and run main grid tests.
+
 name: Grid Client Nightly
 
 on:
@@ -40,7 +42,7 @@ jobs:
           node-version: 18
           cache: "yarn"
 
-      - name: Install dependencies
+      - name: Install deps
         run: |
           sudo apt-get update
           sudo apt-get install -y git libtool tmux redis net-tools
