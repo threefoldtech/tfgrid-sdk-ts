@@ -32,11 +32,12 @@
 
             <v-alert width="95%" class="mb-4" type="info">
               {{ $props.dialogType === SSHCreationMethod.Generate ? "Generating" : "Importing" }}
-              a new SSH key will cost you up to {{ sshKeysManagement.updateCost }} TFT
+              a new SSH key will cost you up to
+              {{ sshKeysManagement.updateCost }} TFT
             </v-alert>
 
             <div v-if="$props.dialogType === SSHCreationMethod.Generate" class="create">
-              <v-alert width="95%" type="info" class="mt-4">
+              <v-alert width="95%" type="info" class="my-4">
                 We will not keep your private key information. Be sure to save the private key downloaded after
                 creation.
               </v-alert>
@@ -63,32 +64,29 @@
                 </CopyInputWrapper>
               </input-tooltip>
             </div>
+            <v-divider />
           </v-card-text>
 
-          <v-card-actions class="custom-actions">
-            <v-spacer></v-spacer>
-            <div class="mt-3">
-              <v-btn color="white" text="Close" @click="$emit('close')"></v-btn>
+          <v-card-actions class="justify-end mb-1 mr-2">
+            <v-btn color="anchor" text="Close" @click="$emit('close')"></v-btn>
 
-              <v-btn
-                v-if="$props.dialogType === SSHCreationMethod.Generate"
-                @click="generateSSHKey"
-                :loading="generating"
-                :disabled="!isValidForm || generating || !!generatedSshKey"
-                color="secondary"
-              >
-                Generate and Save
-              </v-btn>
-              <v-btn
-                v-if="$props.dialogType === SSHCreationMethod.Import"
-                :loading="$props.savingKey"
-                :disabled="!isValidForm"
-                color="secondary"
-                variant="outlined"
-                text="Save"
-                @click="createNewSSHKey"
-              ></v-btn>
-            </div>
+            <v-btn
+              v-if="$props.dialogType === SSHCreationMethod.Generate"
+              @click="generateSSHKey"
+              :loading="generating"
+              :disabled="!isValidForm || generating || !!generatedSshKey"
+              color="secondary"
+            >
+              Generate and Save
+            </v-btn>
+            <v-btn
+              v-if="$props.dialogType === SSHCreationMethod.Import"
+              :loading="$props.savingKey"
+              :disabled="!isValidForm"
+              color="secondary"
+              text="Save"
+              @click="createNewSSHKey"
+            ></v-btn>
           </v-card-actions>
         </v-card>
       </v-form>

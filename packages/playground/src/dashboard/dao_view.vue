@@ -233,7 +233,7 @@
               </input-validator>
             </form-validator>
           </v-card-text>
-          <v-card-actions class="justify-end">
+          <v-card-actions class="justify-end mb-1 mr-2">
             <v-btn @click="openVDialog = false" color="anchor">Close</v-btn>
             <v-btn @click="castVote" :loading="loadingVote" color="secondary" :disabled="!isValidFarm">Vote</v-btn>
           </v-card-actions>
@@ -283,7 +283,7 @@
 
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn @click="openInfoModal = false" class="my-1" color="anchor"> Close </v-btn>
+            <v-btn @click="openInfoModal = false" color="anchor"> Close </v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>

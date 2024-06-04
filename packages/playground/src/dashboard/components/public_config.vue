@@ -18,10 +18,10 @@
     <template v-if="showDialogue">
       <v-dialog v-model="showDialogue" max-width="600" @click:outside="reset">
         <v-card>
-          <v-toolbar color="primary" dark class="custom-toolbar">
-            <p class="mb-5">Add a public config to your node with ID: {{ $props.nodeId }}</p>
-          </v-toolbar>
-          <div class="pt-6 px-6">
+          <v-card-title class="bg-primary">
+            Add a public config to your node with ID: {{ $props.nodeId }}
+          </v-card-title>
+          <v-card-text>
             <form-validator v-model="valid" ref="formRef">
               <!-- IPv4 -->
               <input-validator
@@ -98,9 +98,17 @@
                 </input-tooltip>
               </input-validator>
             </form-validator>
-          </div>
-          <v-card-actions class="justify-space-between px-5 pb-5 pt-0">
+          </v-card-text>
+          <v-card-actions class="justify-end my-1 mr-2">
             <!-- Remove and Generate Config Buttons -->
+            <v-btn
+              @click="
+                showDialogue = false;
+                reset();
+              "
+              color="anchor"
+              >Close</v-btn
+            >
             <v-btn
               @click="isNodeHasConfig"
               color="error"
@@ -108,26 +116,14 @@
             >
               Remove Config
             </v-btn>
-
-            <!-- Close and Save Buttons -->
-            <div>
-              <v-btn
-                @click="
-                  showDialogue = false;
-                  reset();
-                "
-                color="anchor"
-                >Close</v-btn
-              >
-              <v-btn
-                color="secondary"
-                @click="AddConfig"
-                :loading="isSaving"
-                :disabled="isSaving || !valid || (valid && !isConfigChanged)"
-              >
-                Save
-              </v-btn>
-            </div>
+            <v-btn
+              color="secondary"
+              @click="AddConfig"
+              :loading="isSaving"
+              :disabled="isSaving || !valid || (valid && !isConfigChanged)"
+            >
+              Save
+            </v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -137,12 +133,10 @@
     <template v-if="showClearDialogue">
       <v-dialog v-model="showClearDialogue" width="650">
         <v-card>
-          <v-toolbar color="primary" dark class="custom-toolbar">
-            <p class="mb-5">Remove Public Config</p>
-          </v-toolbar>
-          <v-card-text class="mb-3">Are you sure you want to remove this node's public config? </v-card-text>
+          <v-card-title class="bg-primary"> Remove Public Config </v-card-title>
+          <v-card-text>Are you sure you want to remove this node's public config? </v-card-text>
 
-          <v-card-actions class="justify-end px-5 pb-5 pt-0">
+          <v-card-actions class="justify-end my-1 mr-2">
             <!-- Cancel and Remove Buttons -->
             <v-btn text="Cancel" color="anchor" @click="showClearDialogue = false"></v-btn>
             <v-btn
@@ -164,7 +158,6 @@ import type { PublicConfig } from "@threefold/grid_client";
 import { isEqual } from "lodash";
 import { onMounted, ref, watch } from "vue";
 
-import type { RuleReturn } from "@/components/input_validator.vue";
 import { useFormRef } from "@/hooks/form_validator";
 import { useGrid } from "@/stores";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
@@ -317,10 +310,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.custom-toolbar {
-  height: 2.5rem !important;
-  padding-left: 10px;
-}
-</style>

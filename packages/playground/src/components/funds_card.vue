@@ -1,21 +1,12 @@
 <template>
   <v-tooltip location="bottom" close-delay="1000" color="primary">
     <template #activator="{ props }">
-      <v-btn
-        id="tftBtn"
-        variant="elevated"
-        @click="addTFT"
-        class="px-lg-6 px-md-2 px-sm-0 mx-sm-0"
-        :loading="loadingAddTFT"
-        v-bind="props"
-      >
-        GET TFT
-      </v-btn>
+      <v-btn id="tftBtn" variant="elevated" @click="addTFT" :loading="loadingAddTFT" v-bind="props"> GET TFT </v-btn>
     </template>
     <div>
       Get TFT on Stellar using BTC or Credit card, then you can bridge it to your tfchain account using the Bridge in
       the dashboard section.
-      <v-btn icon color="anchor" small @click.stop :href="manual.buy_sell_tft" target="_blank"
+      <v-btn icon small @click.stop :href="manual.buy_sell_tft" target="_blank"
         ><v-icon>mdi-information-outline</v-icon></v-btn
       >
     </div>
@@ -69,7 +60,7 @@ export default {
 <style>
 #tftBtn {
   display: inline-block;
-  min-width: 10px !important;
+  font-weight: bold;
 }
 
 :root {

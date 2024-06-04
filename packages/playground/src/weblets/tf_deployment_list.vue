@@ -344,9 +344,9 @@
         <v-chip class="ma-1" v-for="item in selectedItems" :key="item.deploymentName">
           {{ item.deploymentName }}
         </v-chip>
+        <v-divider />
       </v-card-text>
-      <v-card-actions>
-        <v-spacer />
+      <v-card-actions class="justify-end my-1 mr-2">
         <v-btn color="anchar" @click="deletingDialog = false">Cancel</v-btn>
         <v-btn color="error" @click="onDelete(tabs[activeTab].value.toLowerCase() === 'kubernetes')"> Delete </v-btn>
       </v-card-actions>

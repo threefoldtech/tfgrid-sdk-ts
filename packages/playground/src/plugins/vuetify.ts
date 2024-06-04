@@ -17,6 +17,9 @@ const defaults = {
   VBtn: {
     variant: "outlined",
     color: "primary",
+    VIcon: {
+      variant: "tonal",
+    },
     VProgressCircular: {
       size: undefined,
       width: undefined,
@@ -27,7 +30,6 @@ const defaults = {
     VBtn: {
       variant: "outlined",
       color: "primary",
-      size: "small",
     },
   },
   VChip: {

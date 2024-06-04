@@ -18,14 +18,12 @@
     <span v-if="showDialogue">
       <v-dialog v-model="showDialogue" max-width="600">
         <v-card>
-          <v-toolbar color="primary" dark class="custom-toolbar">
-            <p class="mb-5">Set Additional Fees</p>
-          </v-toolbar>
+          <v-card-title class="bg-primary"> Set Additional Fees </v-card-title>
           <v-card-text>
             Additional fees will be added to your node {{ $props.nodeId }} (for the special hardware you’re providing
             e.g. GPUs) while renting.
           </v-card-text>
-          <div class="pt-6 px-6">
+          <v-card-text>
             <form-validator v-model="valid">
               <input-validator
                 :value="fee"
@@ -49,8 +47,9 @@
                 </input-tooltip>
               </input-validator>
             </form-validator>
-          </div>
-          <v-card-actions class="justify-end px-5 pb-5 pt-0">
+            <v-divider></v-divider>
+          </v-card-text>
+          <v-card-actions class="justify-end my-1 mr-2">
             <v-btn @click="showDialogue = false" color="anchor">Close</v-btn>
             <v-btn
               color="secondary"

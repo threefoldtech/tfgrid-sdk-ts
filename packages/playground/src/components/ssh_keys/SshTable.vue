@@ -93,15 +93,13 @@
       </v-data-table>
     </v-card-text>
 
-    <v-divider />
+    <!-- <v-divider /> -->
 
-    <v-card-actions>
-      <v-spacer />
+    <v-card-actions class="justify-end my-1 mr-2">
       <v-tooltip location="bottom" text="Export all selected keys.">
         <template #activator="{ props }">
           <v-btn
             :disabled="loading || selectedKeys.length === 0 || $props.sshKeys.length === 0 || deleting"
-            class="mr-2"
             :loading="loading"
             v-bind="props"
             prepend-icon="mdi-export"

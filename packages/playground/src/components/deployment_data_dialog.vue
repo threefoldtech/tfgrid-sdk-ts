@@ -111,8 +111,7 @@
           </pre>
           </template>
         </v-card-text>
-        <v-card-actions class="my-1">
-          <v-spacer />
+        <v-card-actions class="justify-end my-1 mr-2">
           <v-btn color="anchor" @click="$emit('close')">Close</v-btn>
           <v-btn color="secondary" @click="copy">Copy</v-btn>
         </v-card-actions>

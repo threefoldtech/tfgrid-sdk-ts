@@ -49,7 +49,7 @@
               </template>
             </li>
           </v-card-text>
-          <v-card-actions class="justify-end">
+          <v-card-actions class="justify-end my-1 mr-2">
             <v-btn @click="showDialog = false" color="anchor">Close</v-btn>
           </v-card-actions>
         </v-card>

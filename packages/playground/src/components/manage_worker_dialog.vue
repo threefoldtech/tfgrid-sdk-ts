@@ -50,7 +50,6 @@
         </v-chip>
       </v-card-text>
       <v-card-actions>
-        <v-spacer></v-spacer>
         <v-btn color="anchor" @click="deletingDialog = false"> Cancel </v-btn>
         <v-btn color="error" @click="onDelete"> Remove </v-btn>
       </v-card-actions>

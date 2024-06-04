@@ -6,10 +6,8 @@
     <v-container v-if="showDialogue">
       <v-dialog v-model="showDialogue" max-width="600">
         <v-card>
-          <v-toolbar color="primary" class="custom-toolbar">
-            <p class="mb-5">Add Public IP to Farm</p>
-          </v-toolbar>
-          <div class="pa-6">
+          <v-card-title class="bg-primary">Add Public IP to Farm</v-card-title>
+          <v-card-text>
             <form-validator ref="formValidator" v-model="valid">
               <v-select
                 :items="items"
@@ -72,7 +70,8 @@
                 </input-tooltip>
               </input-validator>
             </form-validator>
-          </div>
+            <v-divider />
+          </v-card-text>
           <v-dialog v-model="showIPs" max-width="500">
             <v-card>
               <v-card-title class="text-h5">IPs range</v-card-title>
@@ -81,7 +80,7 @@
             </v-card>
           </v-dialog>
 
-          <v-card-actions class="justify-end pa-5">
+          <v-card-actions class="justify-end mb-1 mr-2">
             <v-btn @click="showDialogue = false" color="anchor">Close</v-btn>
 
             <v-btn @click="showRange" :disabled="!valid || type === IPType.single || !toPublicIP">Show IPs Range</v-btn>
@@ -324,10 +323,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.custom-toolbar {
-  height: 2.5rem !important;
-  padding-left: 10px;
-}
-</style>

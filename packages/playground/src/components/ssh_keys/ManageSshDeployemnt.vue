@@ -10,19 +10,16 @@
         <v-alert v-if="selectedKeys.length === 0" type="warning" class="mt-2">
           Attention: It appears that no SSH keys have been selected. In order to access your deployment, you must send
           at least one SSH key. You can manage your SSH keys from the
-          <router-link :to="DashboardRoutes.Deploy.SSHKey">SSH keys management page</router-link> and add more as
-          needed.
+          <router-link :to="DashboardRoutes.Deploy.SSHKey">SSH keys management page</router-link>
+          and add more as needed.
         </v-alert>
+        <VDivider class="mt-3" />
       </v-card-text>
 
-      <VDivider />
-
-      <v-card-actions>
-        <VSpacer />
+      <v-card-actions class="justify-end mb-1 mr-2">
         <v-btn
           color="secondary"
           @click="openManageDialog = true"
-          class="mr-2 my-1"
           :disabled="sshKeysManagement.list() && sshKeysManagement.list().length === 0"
         >
           Manage SSH keys
@@ -33,12 +30,10 @@
 
   <v-dialog v-model="openManageDialog" max-width="800">
     <v-card>
-      <v-toolbar color="primary" class="custom-toolbar">
-        <p class="mb-5">
-          <v-icon>mdi-cog-sync</v-icon>
-          Manage SSH keys
-        </p>
-      </v-toolbar>
+      <v-card-title class="bg-primary">
+        <v-icon>mdi-cog-sync</v-icon>
+        Manage SSH keys
+      </v-card-title>
 
       <v-card-text>
         <v-alert type="info" class="mb-5">
@@ -46,40 +41,38 @@
           to cancel or add.
         </v-alert>
 
-        <v-row>
-          <v-tooltip
-            v-for="_key of sshKeysManagement.list()"
-            :key="_key.id"
-            :text="isKeySelected(_key) ? 'Selected' : 'Not selected'"
-            location="bottom"
-          >
-            <template #activator="{ props }">
-              <v-chip
-                class="pa-5 ml-5 mt-5"
-                :variant="isKeySelected(_key) ? 'flat' : 'outlined'"
-                :color="
-                  isKeySelected(_key) ? 'primary' : theme.name.value === AppThemeSelection.light ? 'primary' : 'white'
-                "
-                v-bind="props"
-                @click="selectKey(_key)"
-              >
-                <div class="d-flex justify-center">
-                  <v-icon>mdi-key-variant</v-icon>
-                </div>
-                <div class="d-flex justify-center">
-                  <p class="ml-2">
-                    {{ capitalize(_key.name) }}
-                  </p>
-                </div>
-              </v-chip>
-            </template>
-          </v-tooltip>
-        </v-row>
+        <v-tooltip
+          v-for="_key of sshKeysManagement.list()"
+          :key="_key.id"
+          :text="isKeySelected(_key) ? 'Selected' : 'Not selected'"
+          location="bottom"
+        >
+          <template #activator="{ props }">
+            <v-chip
+              class="pa-5 ml-5 mt-5"
+              :variant="isKeySelected(_key) ? 'flat' : 'outlined'"
+              :color="
+                isKeySelected(_key) ? 'primary' : theme.name.value === AppThemeSelection.light ? 'primary' : 'white'
+              "
+              v-bind="props"
+              @click="selectKey(_key)"
+            >
+              <div class="d-flex justify-center">
+                <v-icon>mdi-key-variant</v-icon>
+              </div>
+              <div class="d-flex justify-center">
+                <p class="ml-2">
+                  {{ capitalize(_key.name) }}
+                </p>
+              </div>
+            </v-chip>
+          </template>
+        </v-tooltip>
+        <v-divider class="mt-3" />
       </v-card-text>
 
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn class="mt-2 mb-2 mr-2" color="anchor" text="Close" @click="openManageDialog = false" />
+      <v-card-actions class="justify-end mb-1 mr-2">
+        <v-btn color="anchor" text="Close" @click="openManageDialog = false" />
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -116,7 +109,13 @@ export default defineComponent({
 
   setup(_, { emit }) {
     const inputElement = ref<HTMLElement>();
-    const defaultKeyData = { createdAt: "", id: 0, publicKey: "", name: "", isActive: false };
+    const defaultKeyData = {
+      createdAt: "",
+      id: 0,
+      publicKey: "",
+      name: "",
+      isActive: false,
+    };
     const openManageDialog = ref<boolean>(false);
     const selectedKey = ref<SSHKeyData>(defaultKeyData);
     const selectedKeys = ref<SSHKeyData[]>([]);

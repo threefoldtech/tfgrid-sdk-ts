@@ -87,9 +87,8 @@
           Learn more about the pricing and how to unlock discounts.
         </a>
       </v-alert>
-      <v-divider class="mt-5" />
-      <v-card-actions>
-        <v-spacer />
+      <v-divider class="mt-3" />
+      <v-card-actions class="justify-end my-1 mr-2">
         <slot name="footer-actions" :validateBeforeDeploy="validateBeforeDeploy" v-if="!status" />
         <v-btn v-else color="secondary" :loading="status === 'deploy'" @click="reset"> Back </v-btn>
       </v-card-actions>

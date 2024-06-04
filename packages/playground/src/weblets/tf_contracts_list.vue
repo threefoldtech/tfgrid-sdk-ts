@@ -76,52 +76,52 @@
         </v-tooltip>
       </v-card-title>
       <v-card-text>
-        <v-row v-if="loadingLockDetails" class="d-flex flex-column justify-center align-center py-4">
-          <v-progress-circular indeterminate />
-          <div class="text-subtitle-2 pt-2">Loading contracts lock details</div>
-        </v-row>
-        <v-row class="d-flex" v-else>
-          <v-alert class="ma-4" type="warning" variant="tonal">
-            <div v-if="lockedContracts?.totalAmountLocked < freeBalance" class="font-weigh-black">
-              You have enough balance to unlock your contracts!
-            </div>
-            <div v-else>
-              You need to fund your account with
-              <span class="font-weight-black">
-                {{ Math.ceil(lockedContracts?.totalAmountLocked - freeBalance) }}
-                TFTs
-              </span>
-              to resume your contracts
-            </div>
-          </v-alert>
-        </v-row>
-
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="anchor" class="mr-2 px-3" @click="unlockDialog = false"> Close </v-btn>
-          <v-tooltip
-            :text="
-              freeBalance < lockedContracts?.totalAmountLocked
-                ? `You don't have enough balance to unlock your contracts`
-                : `Get your contracts ready again`
-            "
-            location="top center"
-          >
-            <template #activator="{ props }">
-              <div v-bind="props">
-                <v-btn
-                  :disabled="freeBalance < lockedContracts.totalAmountLocked || loadingLockDetails"
-                  color="warning"
-                  @click="unlockAllContracts"
-                  :loading="unlockContractLoading"
-                >
-                  Unlock contracts
-                </v-btn>
+        <v-container>
+          <v-row v-if="loadingLockDetails" class="d-flex flex-column justify-center align-center py-4">
+            <v-progress-circular indeterminate />
+            <div class="text-subtitle-2 pt-2">Loading contracts lock details</div>
+          </v-row>
+          <v-row class="d-flex" v-else>
+            <v-alert class="ma-4" type="warning" variant="tonal">
+              <div v-if="lockedContracts?.totalAmountLocked < freeBalance" class="font-weigh-black">
+                You have enough balance to unlock your contracts!
               </div>
-            </template>
-          </v-tooltip>
-        </v-card-actions>
+              <div v-else>
+                You need to fund your account with
+                <span class="font-weight-black">
+                  {{ Math.ceil(lockedContracts?.totalAmountLocked - freeBalance) }}
+                  TFTs
+                </span>
+                to resume your contracts
+              </div>
+            </v-alert>
+          </v-row>
+        </v-container>
       </v-card-text>
+      <v-card-actions class="justify-end my-1 mr-2">
+        <v-btn color="anchor" @click="unlockDialog = false"> Close </v-btn>
+        <v-tooltip
+          :text="
+            freeBalance < lockedContracts?.totalAmountLocked
+              ? `You don't have enough balance to unlock your contracts`
+              : `Get your contracts ready again`
+          "
+          location="top center"
+        >
+          <template #activator="{ props }">
+            <div v-bind="props">
+              <v-btn
+                :disabled="freeBalance < lockedContracts.totalAmountLocked || loadingLockDetails"
+                color="warning"
+                @click="unlockAllContracts"
+                :loading="unlockContractLoading"
+              >
+                Unlock contracts
+              </v-btn>
+            </div>
+          </template>
+        </v-tooltip>
+      </v-card-actions>
     </v-card>
   </v-dialog>
   <!-- Contracts Tables -->

@@ -320,7 +320,6 @@
                 class="ml-2"
                 type="submit"
                 color="secondary"
-                variant="outlined"
                 :loading="activating"
                 :disabled="
                   !isValidForm ||
@@ -393,14 +392,7 @@
       </template>
       <!-- <v-divider horizontal></v-divider> -->
       <div class="d-flex justify-end mt-4 mb-2">
-        <VBtn
-          v-if="profileManager.profile"
-          color="anchor"
-          variant="outlined"
-          @click="$emit('update:modelValue', false)"
-        >
-          Close
-        </VBtn>
+        <VBtn v-if="profileManager.profile" color="anchor" @click="$emit('update:modelValue', false)"> Close </VBtn>
         <VBtn
           class="ml-2"
           color="error"

@@ -50,8 +50,7 @@
                 </input-tooltip>
               </input-validator>
             </form-validator>
-            <v-card-actions>
-              <v-spacer></v-spacer>
+            <v-card-actions class="justify-end mb-1 mr-2">
               <v-btn @click="clearInput" color="anchor" :disabled="loadingTwinIDTransfer">Clear</v-btn>
               <v-btn
                 color="secondary"

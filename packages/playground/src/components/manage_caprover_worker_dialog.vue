@@ -66,9 +66,8 @@
           </li>
           <li>Click <strong>Join cluster</strong> button.</li>
         </ol>
+        <v-divider />
       </v-card-text>
-
-      <v-divider />
 
       <v-card-actions>
         <v-spacer />

@@ -7,7 +7,7 @@
           <div class="text-h2 pa-10">
             <v-text-field v-model="relay" outlined label="Relay" :error-messages="errorMsg"></v-text-field>
           </div>
-          <v-card-actions class="justify-end pa-5">
+          <v-card-actions class="justify-end mb-1 mr-2">
             <v-btn @click="editingTwin = false" color="anchor">Close</v-btn>
             <v-btn @click="UpdateRelay">Save</v-btn>
           </v-card-actions>
@@ -19,9 +19,9 @@
       <v-card>
         <v-toolbar color="primary" dark class="custom-toolbar bold-text">Vote Reminder</v-toolbar>
         <v-card-text>There are {{ numberOfProposalsToVoteOn }} active proposals you can vote on now</v-card-text>
-        <v-card-actions class="justify-end pa-5">
-          <v-btn @click="redirectToDao" variant="elevated" class="mr-2 text-subtitle-2">Vote</v-btn>
-          <v-btn @click="openVotePopup = false" color="anchor" class="mr-2 text-subtitle-2">Close</v-btn>
+        <v-card-actions class="justify-end mb-1 mr-2">
+          <v-btn @click="redirectToDao" variant="elevated">Vote</v-btn>
+          <v-btn @click="openVotePopup = false" color="anchor">Close</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -171,7 +171,7 @@
             </div>
           </v-col>
         </v-row>
-        <v-card-actions v-if="updateRelay" class="justify-end mx-4 mb-4">
+        <v-card-actions v-if="updateRelay" class="justify-end mb-1 mr-2">
           <v-btn variant="elevated" class="custom-button" @click="editTwin">Edit</v-btn>
         </v-card-actions>
       </v-card>

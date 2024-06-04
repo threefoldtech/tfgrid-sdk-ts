@@ -163,7 +163,6 @@
         >
 
         <v-card-actions>
-          <v-spacer></v-spacer>
           <v-btn color="anchor" class="mr-2 px-3" @click="contractStateDialog = false"> Close </v-btn>
           <v-tooltip
             :text="
@@ -195,7 +194,7 @@
 
   <v-dialog width="800" v-model="deletingDialog">
     <v-card>
-      <v-card-title class="text-h5 mt-2"> Delete the following contracts? </v-card-title>
+      <v-card-title class="bg-primary"> Delete the following contracts? </v-card-title>
       <v-alert class="ma-4" type="warning" variant="tonal"
         >It is advisable to remove the contract from its solution page, especially when multiple contracts may be linked
         to the same instance.</v-alert
@@ -206,9 +205,9 @@
         <v-chip class="ma-1" label v-for="c in selectedContracts" :key="c.contract_id">
           {{ c.contract_id }}
         </v-chip>
+        <v-divider class="mt-3" />
       </v-card-text>
-      <v-card-actions>
-        <v-spacer></v-spacer>
+      <v-card-actions class="justify-end mb-1 mr-2">
         <v-btn color="anchor" @click="deletingDialog = false"> Cancel </v-btn>
         <v-btn color="error" @click="onDelete"> Delete </v-btn>
       </v-card-actions>
@@ -244,7 +243,6 @@
           {{ c.contract_id }}
         </v-chip>
         <v-card-actions>
-          <v-spacer></v-spacer>
           <v-btn color="anchor" @click="unlockDialog = false"> Cancel </v-btn>
           <v-tooltip
             :text="
