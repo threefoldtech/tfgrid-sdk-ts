@@ -126,7 +126,7 @@ const mycelium = ref(true);
 const solution = ref() as Ref<SolutionFlavor>;
 const flist: Flist = {
   // Should be upgraded to an oficial Flist
-  value: "https://hub.grid.tf/mayarosamaa.3bot/mayarosama-caddy2-v1.flist",
+  value: "https://hub.grid.tf/tf-official-apps/staticwebsite-latest.flist",
   entryPoint: "/sbin/zinit init",
 };
 const dedicated = ref(false);
