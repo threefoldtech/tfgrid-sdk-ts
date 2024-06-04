@@ -190,7 +190,7 @@ async function deploy() {
               value: publicRestoreKey.value,
             },
           ],
-          rootFilesystemSize: rootFilesystemSize,
+          rootFilesystemSize,
           nodeId: selectionDetails.value!.node!.nodeId,
           rentedBy: dedicated.value ? grid!.twinId : undefined,
           certified: certified.value,

@@ -80,7 +80,7 @@
             You selected a certified node. Please note that this deployment costs more TFT.
           </div>
         </div>
-
+        <div>Please Note that the Bandwidth affects the total cost.</div>
         <a :href="manual.pricing" target="_blank" class="app-link">
           Learn more about the pricing and how to unlock discounts.
         </a>
