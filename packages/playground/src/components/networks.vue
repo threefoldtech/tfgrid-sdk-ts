@@ -137,7 +137,7 @@ export default {
       props.ipv6 === null &&
       props.planetary === null &&
       props.wireguard === null &&
-      props.mycelium
+      props.mycelium === null
     ) {
       throw new Error("You must provide at least one network  option");
     }
