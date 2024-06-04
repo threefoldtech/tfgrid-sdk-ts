@@ -60,7 +60,7 @@ async function main() {
   };
 
   const qsfsQueryOptions: FilterOptions = {
-    hru: 6,
+    hru: 10,
     availableFor: grid3.twinId,
     farmId: 1,
   };
