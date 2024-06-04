@@ -123,7 +123,7 @@ import { manual } from "@/utils/manual";
 
 import Network from "../components/networks.vue";
 import { useLayout } from "../components/weblet_layout.vue";
-import { useGrid, useProfileManager } from "../stores";
+import { useGrid } from "../stores";
 import type { Flist, solutionFlavor as SolutionFlavor } from "../types";
 import { ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
@@ -133,7 +133,6 @@ import { generateName, generatePassword } from "../utils/strings";
 
 const layout = useLayout();
 const valid = ref(false);
-const profileManager = useProfileManager();
 const name = ref(generateName({ prefix: "um" }));
 const username = ref("admin");
 const password = ref(generatePassword());
