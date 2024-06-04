@@ -218,6 +218,29 @@ const nodeIDs = computed(() => {
   return [...new Set(allContracts.value.map(contract => contract.details.nodeId) || [])];
 });
 
+type ContractsLoadingOptions = { updateAllTables: boolean; loading: boolean; contractType?: ContractType };
+
+function updateLoadingTableValue(options: ContractsLoadingOptions) {
+  if (options.updateAllTables) {
+    isLoadingNode.value = options.loading;
+    isLoadingName.value = options.loading;
+    isLoadingRent.value = options.loading;
+    return;
+  }
+
+  switch (options.contractType) {
+    case ContractType.Name:
+      isLoadingName.value = options.loading;
+      break;
+    case ContractType.Node:
+      isLoadingNode.value = options.loading;
+      break;
+    case ContractType.Rent:
+      isLoadingRent.value = options.loading;
+  }
+  return;
+}
+
 onMounted(onMount);
 
 async function onMount() {
@@ -272,20 +295,15 @@ async function onMount() {
       {},
     );
   }
-  isLoadingNode.value = false;
-  isLoadingName.value = false;
-  isLoadingRent.value = false;
+  updateLoadingTableValue({ updateAllTables: true, loading: false });
 }
 
 async function loadContracts(options: { page: number; itemsPerPage: number; contractType: ContractType }) {
-  if (options.contractType == ContractType.Node) {
-    isLoadingNode.value = true;
-  } else if (options.contractType == ContractType.Name) {
-    isLoadingName.value = true;
-  } else {
-    isLoadingRent.value = true;
-  }
-
+  updateLoadingTableValue({
+    updateAllTables: false,
+    loading: true,
+    contractType: options.contractType,
+  });
   try {
     const { count, data: dataContracts } = await gridProxyClient.contracts.list({
       twinId: profileManager.profile!.twinId,
@@ -322,9 +340,11 @@ async function loadContracts(options: { page: number; itemsPerPage: number; cont
     loadingErrorMessage.value = error.message;
     createCustomToast(`Error while listing contracts due: ${error.message}`, ToastType.danger, {});
   } finally {
-    isLoadingNode.value = false;
-    isLoadingName.value = false;
-    isLoadingRent.value = false;
+    updateLoadingTableValue({
+      updateAllTables: false,
+      loading: false,
+      contractType: options.contractType,
+    });
   }
 }
 
