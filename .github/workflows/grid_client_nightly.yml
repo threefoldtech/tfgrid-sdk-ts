@@ -144,7 +144,7 @@ jobs:
         if: failure()
         id: check-issues
         run: |
-          existing_issue=$(gh issue list --state open --label bug --json title | jq -r '.[] | select(.title == "${{ github.workflow }} failed during ${{ github.event_name }}")')
+          existing_issue=$(gh issue list --state open --json title | jq -r '.[] | select(.title == "${{ github.workflow }} failed during ${{ github.event_name }}")')
           echo "existing_issue=${existing_issue}" >> $GITHUB_ENV
 
       - name: Create GitHub Issue on Failure
@@ -153,7 +153,7 @@ jobs:
         with:
           token: ${{ github.token }}
           title: |
-            ${{ github.workflow }} failed during ${{ github.event_name }}
+            ${{ github.workflow }} failed during ${{ github.event_name }} on network ${{ env.NETWORK }}
           body: |
             ## Failure Report:
             
@@ -163,7 +163,6 @@ jobs:
             - Author: @${{ github.triggering_actor }}
             - Branch: `${{ github.ref }}`
             - Commit: ${{ github.sha }}
-            - Workflow Path: `${{ github.workflow_ref }}`
             - Network: `${{ env.NETWORK }}`
   
 
