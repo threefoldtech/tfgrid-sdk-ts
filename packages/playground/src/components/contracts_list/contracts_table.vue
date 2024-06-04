@@ -3,7 +3,7 @@
     <v-data-table-server
       v-if="$props.tableHeaders"
       :headers="$props.tableHeaders"
-      :loading="$props.loading.value"
+      :loading="$props.loading.value || deleting"
       loading-text="Loading contracts..."
       v-model="selectedContracts"
       :deleting="deleting"
@@ -122,7 +122,7 @@
         variant="outlined"
         color="anchor"
         prepend-icon="mdi-export-variant"
-        :disabled="isExporting || !contracts || contracts.length === 0 || loadingDelete || deleting"
+        :disabled="isExporting || !contracts || contracts.length === 0 || deleting"
         @click="exportData"
       >
         Export
@@ -131,7 +131,8 @@
       <v-btn
         variant="outlined"
         color="error"
-        :disabled="!selectedContracts.length || loadingDelete || deleting"
+        :disabled="!selectedContracts.length || deleting"
+        :loading="deleting"
         prepend-icon="mdi-trash-can-outline"
         @click="deletingDialog = true"
       >
@@ -366,7 +367,6 @@ const layout = ref();
 const contractLocked = ref<ContractLock>();
 const deleting = ref<boolean>(false);
 const loadingShowDetails = ref<boolean>(false);
-const loadingDelete = ref<boolean>(false);
 const contractStateDialog = ref<boolean>(false);
 const isExporting = ref<boolean>(false);
 const deletingDialog = ref<boolean>(false);
