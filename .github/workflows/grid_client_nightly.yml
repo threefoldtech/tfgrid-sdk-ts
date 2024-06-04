@@ -154,6 +154,6 @@ jobs:
             > through `dacbd/create-issue-action@main` action
             > **DO NOT** close this issue until resolved.
           labels: type_bug , grid_client       
-          content-filepath: ./.github/ISSUE_TEMPLATE/nightly_report.yml 
+          # content-filepath: ./.github/ISSUE_TEMPLATE/nightly_report.yml 
           
 
