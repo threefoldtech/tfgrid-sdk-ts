@@ -51,6 +51,22 @@ jobs:
         run: |
           yarn
           lerna run build --no-private
+
+      - name: Run test dynamic single vm
+        id: dynamicsinglevm
+        continue-on-error: true
+        run: |
+          yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/dynamic_single_vm.ts
+      - name: Run test multiple vms
+        id: multiplevm
+        continue-on-error: true
+        run: |
+          yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/multiple_vms.ts
+      - name: Run test kubernetes
+        id: kubernetes
+        continue-on-error: true
+        run: |
+          yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/orchestrators/kubernetes_leader.ts
       - name: Run test vm with qsfs
         id: vmqsfs
         continue-on-error: true
@@ -60,7 +76,7 @@ jobs:
         id: kubernetesqsfs
         continue-on-error: true
         run: |
-          yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/kubernetes_with_qsfs.ts
+          yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/orchestrators/kubernetes_with_qsfs.ts
       - name: Run test kvstore
         id: kvstore
         continue-on-error: true
@@ -97,6 +113,9 @@ jobs:
 
       - name: Test Results
         run: |
+          echo Dynamic Single Vm: ${{ steps.dynamicsinglevm.outcome }}
+          echo Multiple Vm: ${{ steps.multiplevm.outcome }}
+          echo Kubernetes: ${{ steps.kubernetes.outcome }}
           echo Vmq Qsfs: ${{ steps.vmqsfs.outcome }}
           echo Kubernetes Qsfs: ${{ steps.kubernetesqsfs.outcome }}
           echo Kvstore: ${{ steps.kvstore.outcome }}
@@ -104,8 +123,10 @@ jobs:
           echo Delete all contracts: ${{ steps.deleteall.outcome }}
 
       - name: Check test script status
-        id: check-status
         if: |
+          steps.dynamicsinglevm.outcome != 'success' ||
+          steps.multiplevm.outcome != 'success' ||
+          steps.kubernetes.outcome != 'success' ||
           steps.vmqsfs.outcome != 'success' ||
           steps.kubernetesqsfs.outcome != 'success' ||
           steps.kvstore.outcome != 'success' ||
@@ -123,7 +144,7 @@ jobs:
         if: failure()
         id: check-issues
         run: |
-          existing_issue=$(gh issue list --state open --label bug --json title | jq -r '.[] | select(.title == "Test Failure Detected")')
+          existing_issue=$(gh issue list --state open --label bug --json title | jq -r '.[] | select(.title == "${{ github.workflow }} failed during ${{ github.event_name }}")')
           echo "existing_issue=${existing_issue}" >> $GITHUB_ENV
 
       - name: Create GitHub Issue on Failure
@@ -132,7 +153,7 @@ jobs:
         with:
           token: ${{ github.token }}
           title: |
-            [${{ github.workflow }}] failed during [${{ github.event_name }} at ${{ github.event.date }}] 
+            ${{ github.workflow }} failed during ${{ github.event_name }}
           body: |
             ## Failure Report:
             
@@ -143,16 +164,16 @@ jobs:
             - Branch: `${{ github.ref }}`
             - Commit: ${{ github.sha }}
             - Workflow Path: `${{ github.workflow_ref }}`
-    
-            - [ ] **Task**: Review failed run, fix the issue(s), and re-run until successful.
+            - Network: `${{ env.NETWORK }}`
+  
 
+            Dynamic Single Vm: ${{ steps.dynamicsinglevm.outcome }}
+            Multiple Vm: ${{ steps.multiplevm.outcome }}
+            Kubernetes: ${{ steps.kubernetes.outcome }}
             Vmq Qsfs: ${{ steps.vmqsfs.outcome }}
-            echo Kubernetes Qsfs: ${{ steps.kubernetesqsfs.outcome }}
-            echo Kvstore: ${{ steps.kvstore.outcome }}
-            echo Zdb: ${{ steps.zdb.outcome }}
-            echo Delete all contracts: ${{ steps.deleteall.outcome }}
-            > This issue was created automatically by GitHub, 
-            > through `dacbd/create-issue-action@main` action
-            > **DO NOT** close this issue until resolved.
+            Kubernetes Qsfs: ${{ steps.kubernetesqsfs.outcome }}
+            Kvstore: ${{ steps.kvstore.outcome }}
+            Zdb: ${{ steps.zdb.outcome }}
+            Delete all contracts: ${{ steps.deleteall.outcome }}
           labels: type_bug , grid_client                 
 
