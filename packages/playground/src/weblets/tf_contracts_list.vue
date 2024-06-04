@@ -161,7 +161,7 @@
 import type { GridClient, LockContracts } from "@threefold/grid_client";
 import { ContractState, NodeStatus } from "@threefold/gridproxy_client";
 import { Decimal } from "decimal.js";
-import { computed, defineComponent, onMounted, type Ref, ref } from "vue";
+import { computed, defineComponent, type Ref, ref } from "vue";
 
 import ContractsTable from "@/components/contracts_list/contracts_table.vue";
 import { useProfileManagerController } from "@/components/profile_manager_controller.vue";
@@ -240,8 +240,6 @@ function updateLoadingTableValue(options: ContractsLoadingOptions) {
   }
   return;
 }
-
-onMounted(onMount);
 
 async function onMount() {
   contracts.value = nameContracts.value = nodeContracts.value = rentContracts.value = [];
@@ -324,6 +322,8 @@ async function loadContracts(options: { page: number; itemsPerPage: number; cont
       }
     }
 
+    contracts.value.push(...normalizedContracts);
+    totalCost.value = getTotalCost(contracts.value);
     if (options.contractType == ContractType.Node) {
       nodeContracts.value = normalizedContracts;
       nodesCount.value = count ?? 0;
