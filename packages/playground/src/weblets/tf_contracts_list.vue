@@ -218,15 +218,26 @@ const nodeIDs = computed(() => {
   return [...new Set(allContracts.value.map(contract => contract.details.nodeId) || [])];
 });
 
-function updateLoadingTableValue(updateAllTables: boolean, loading = true, contractType?: ContractType) {
-  if (updateAllTables) {
-    isLoadingNode.value = loading;
-    isLoadingName.value = loading;
-    isLoadingRent.value = loading;
+type ContractsLoadingOptions = { updateAllTables: boolean; loading: boolean; contractType?: ContractType };
+
+function updateLoadingTableValue(options: ContractsLoadingOptions) {
+  if (options.updateAllTables) {
+    isLoadingNode.value = options.loading;
+    isLoadingName.value = options.loading;
+    isLoadingRent.value = options.loading;
     return;
-  } else if (contractType == ContractType.Name) isLoadingName.value = loading;
-  else if (contractType == ContractType.Node) isLoadingNode.value = loading;
-  else if (contractType == ContractType.Rent) isLoadingRent.value = loading;
+  }
+
+  switch (options.contractType) {
+    case ContractType.Name:
+      isLoadingName.value = options.loading;
+      break;
+    case ContractType.Node:
+      isLoadingNode.value = options.loading;
+      break;
+    case ContractType.Rent:
+      isLoadingRent.value = options.loading;
+  }
   return;
 }
 
@@ -284,11 +295,15 @@ async function onMount() {
       {},
     );
   }
-  updateLoadingTableValue(true, false);
+  updateLoadingTableValue({ updateAllTables: true, loading: false });
 }
 
 async function loadContracts(options: { page: number; itemsPerPage: number; contractType: ContractType }) {
-  updateLoadingTableValue(false, true, options.contractType);
+  updateLoadingTableValue({
+    updateAllTables: false,
+    loading: true,
+    contractType: options.contractType,
+  });
   try {
     const { count, data: dataContracts } = await gridProxyClient.contracts.list({
       twinId: profileManager.profile!.twinId,
@@ -325,7 +340,11 @@ async function loadContracts(options: { page: number; itemsPerPage: number; cont
     loadingErrorMessage.value = error.message;
     createCustomToast(`Error while listing contracts due: ${error.message}`, ToastType.danger, {});
   } finally {
-    updateLoadingTableValue(false, false, options.contractType);
+    updateLoadingTableValue({
+      updateAllTables: false,
+      loading: false,
+      contractType: options.contractType,
+    });
   }
 }
 
