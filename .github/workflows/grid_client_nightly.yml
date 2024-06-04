@@ -112,14 +112,9 @@ jobs:
           steps.zdb.outcome != 'success' ||
           steps.deleteall.outcome != 'success' 
         run: exit 1
-
+    
       - name: Set up GitHub CLI
         uses: wusatosi/setup-gh@v1.1
-      # with:
-        # Repository setting for Github CLI
-        # repository: # optional, default is ${{ github.repository }}
-        # # Authentication token setting for Github CLI
-        # token: # optional, default is ${{ github.token }}
 
       - name: Install jq
         run: sudo apt-get install -y jq
@@ -133,9 +128,32 @@ jobs:
 
       - name: Create GitHub Issue on Failure
         if: failure() && env.existing_issue == ''
-        uses: peter-evans/create-issue-from-file@v5.0.0
+        uses: dacbd/create-issue-action@main
         with:
-          title: "Test Failure Detected"
-          content-filepath: ./.github/ISSUE_TEMPLATE/nightly_report.yml
-          labels: bug
+          title: |
+            [${{ github.workflow }}] failed during [${{ github.event_name }} at ${{ github.event.date }}] 
+          body: |
+            ## Failure Report:
+            
+            > [!IMPORTANT]
+            > Details on failed run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+    
+            - Author: @${{ github.triggering_actor }}
+            - Branch: `${{ github.ref }}`
+            - Commit: ${{ github.sha }}
+            - Workflow Path: `${{ github.workflow_ref }}`
+    
+            - [ ] **Task**: Review failed run, fix the issue(s), and re-run until successful.
+
+            Vmq Qsfs: ${{ steps.vmqsfs.outcome }}
+            echo Kubernetes Qsfs: ${{ steps.kubernetesqsfs.outcome }}
+            echo Kvstore: ${{ steps.kvstore.outcome }}
+            echo Zdb: ${{ steps.zdb.outcome }}
+            echo Delete all contracts: ${{ steps.deleteall.outcome }}
+            > This issue was created automatically by GitHub, 
+            > through `dacbd/create-issue-action@main` action
+            > **DO NOT** close this issue until resolved.
+          labels: type_bug , grid_client       
+          content-filepath: ./.github/ISSUE_TEMPLATE/nightly_report.yml 
+          
 
