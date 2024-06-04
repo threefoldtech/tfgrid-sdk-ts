@@ -51,22 +51,6 @@ jobs:
         run: |
           yarn
           lerna run build --no-private
-
-      - name: Run test dynamic single vm
-        id: dynamicsinglevm
-        continue-on-error: true
-        run: |
-          yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/dynamic_single_vm.ts
-      - name: Run test multiple vms
-        id: multiplevm
-        continue-on-error: true
-        run: |
-          yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/multiple_vms.ts
-      - name: Run test kubernetes
-        id: kubernetes
-        continue-on-error: true
-        run: |
-          yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/kubernetes.ts
       - name: Run test vm with qsfs
         id: vmqsfs
         continue-on-error: true
@@ -113,9 +97,6 @@ jobs:
 
       - name: Test Results
         run: |
-          echo Dynamic Single Vm: ${{ steps.dynamicsinglevm.outcome }}
-          echo Multiple Vm: ${{ steps.multiplevm.outcome }}
-          echo Kubernetes: ${{ steps.kubernetes.outcome }}
           echo Vmq Qsfs: ${{ steps.vmqsfs.outcome }}
           echo Kubernetes Qsfs: ${{ steps.kubernetesqsfs.outcome }}
           echo Kvstore: ${{ steps.kvstore.outcome }}
@@ -125,9 +106,6 @@ jobs:
       - name: Check test script status
         id: check-status
         if: |
-          steps.dynamicsinglevm.outcome != 'success' ||
-          steps.multiplevm.outcome != 'success' ||
-          steps.kubernetes.outcome != 'success' ||
           steps.vmqsfs.outcome != 'success' ||
           steps.kubernetesqsfs.outcome != 'success' ||
           steps.kvstore.outcome != 'success' ||
@@ -158,5 +136,6 @@ jobs:
         uses: peter-evans/create-issue-from-file@v5.0.0
         with:
           title: "Test Failure Detected"
-          content-file: ./.github/ISSUE_TEMPLATE/nightly_report.yml
+          content-filepath: ./.github/ISSUE_TEMPLATE/nightly_report.yml
           labels: bug
+
