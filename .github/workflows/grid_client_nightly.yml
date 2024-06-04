@@ -130,6 +130,7 @@ jobs:
         if: failure() && env.existing_issue == ''
         uses: dacbd/create-issue-action@main
         with:
+          token: ${{ github.token }}
           title: |
             [${{ github.workflow }}] failed during [${{ github.event_name }} at ${{ github.event.date }}] 
           body: |
@@ -153,7 +154,5 @@ jobs:
             > This issue was created automatically by GitHub, 
             > through `dacbd/create-issue-action@main` action
             > **DO NOT** close this issue until resolved.
-          labels: type_bug , grid_client       
-          # content-filepath: ./.github/ISSUE_TEMPLATE/nightly_report.yml 
-          
+          labels: type_bug , grid_client                 
 
