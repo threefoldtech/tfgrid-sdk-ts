@@ -136,9 +136,12 @@ jobs:
         run: exit 1
 
       - name: Set up GitHub CLI
-        uses: actions/setup-gh@v1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+        uses: wusatosi/setup-gh@v1.1
+      # with:
+        # Repository setting for Github CLI
+        # repository: # optional, default is ${{ github.repository }}
+        # # Authentication token setting for Github CLI
+        # token: # optional, default is ${{ github.token }}
 
       - name: Install jq
         run: sudo apt-get install -y jq
@@ -152,7 +155,7 @@ jobs:
 
       - name: Create GitHub Issue on Failure
         if: failure() && env.existing_issue == ''
-        uses: peter-evans/create-issue-from-file@v4
+        uses: peter-evans/create-issue-from-file@v5.0.0
         with:
           title: "Test Failure Detected"
           content-file: ./.github/ISSUE_TEMPLATE/nightly_report.yml
