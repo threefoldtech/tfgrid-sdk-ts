@@ -276,10 +276,9 @@ async function onMount() {
           console.error("Error normalizing contract:", error);
         }
       }
+
       contracts.value = normalizedContracts;
-      totalCost.value = getTotalCost(contracts.value);
-      const TFTInUSD = await queryClient.tftPrice.get();
-      totalCostUSD.value = totalCost.value * (TFTInUSD / 1000);
+      await _getTotalCost();
     } else {
       loadingErrorMessage.value = "Failed to initialize an instance of grid type.";
       createCustomToast("Failed to initialize an instance of grid type.", ToastType.danger, {});
@@ -323,7 +322,8 @@ async function loadContracts(options: { page: number; itemsPerPage: number; cont
     }
 
     contracts.value.push(...normalizedContracts);
-    totalCost.value = getTotalCost(contracts.value);
+    await _getTotalCost();
+
     if (options.contractType == ContractType.Node) {
       nodeContracts.value = normalizedContracts;
       nodesCount.value = count ?? 0;
@@ -346,6 +346,12 @@ async function loadContracts(options: { page: number; itemsPerPage: number; cont
       contractType: options.contractType,
     });
   }
+}
+
+async function _getTotalCost() {
+  totalCost.value = getTotalCost(contracts.value);
+  const TFTInUSD = await queryClient.tftPrice.get();
+  totalCostUSD.value = totalCost.value * (TFTInUSD / 1000);
 }
 
 async function openUnlockDialog() {
