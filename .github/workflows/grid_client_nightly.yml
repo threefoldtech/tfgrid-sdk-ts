@@ -140,15 +140,7 @@ jobs:
       - name: Install jq
         run: sudo apt-get install -y jq
 
-      - name: Check for existing issues
-        if: failure()
-        id: check-issues
-        run: |
-          existing_issue=$(gh issue list --state open --json title | jq -r '.[] | select(.title == "${{ github.workflow }} failed during ${{ github.event_name }}")')
-          echo "existing_issue=${existing_issue}" >> $GITHUB_ENV
-
       - name: Create GitHub Issue on Failure
-        if: failure() && env.existing_issue == ''
         uses: dacbd/create-issue-action@main
         with:
           token: ${{ github.token }}
