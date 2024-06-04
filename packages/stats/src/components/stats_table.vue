@@ -95,6 +95,7 @@ const Istats = computed((): IStatistics[] => {
       { data: formattedStats.value.twins, title: "Twins", icon: "mdi-brain" },
       { data: formattedStats.value.publicIps, title: "Public IPs", icon: "mdi-access-point" },
       { data: formattedStats.value.contracts, title: "Contracts", icon: "mdi-file-document-edit-outline" },
+      { data: formattedStats.value.workloads_number, title: "Number of workloads", icon: "mdi-state-machine" },
     ];
   }
 });
