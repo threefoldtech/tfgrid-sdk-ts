@@ -5,6 +5,7 @@ import type { NetworkStats } from "@/types";
 function mergeAllStatsData(stats: Stats[]): Stats {
   const res = stats[0];
   for (let i = 1; i < stats.length; i++) {
+    const workloads = isNaN(stats[i].workloads_number) ? 0 : stats[i].workloads_number;
     res.accessNodes += stats[i].accessNodes;
     res.dedicatedNodes += stats[i].dedicatedNodes;
     res.contracts += stats[i].contracts;
@@ -20,6 +21,7 @@ function mergeAllStatsData(stats: Stats[]): Stats {
     res.twins += stats[i].twins;
     res.nodesDistribution = mergeNodeDistribution([res.nodesDistribution, stats[i].nodesDistribution]);
     res.countries = Object.keys(res.nodesDistribution).length;
+    res.workloads_number += workloads;
   }
 
   return res;
@@ -28,6 +30,7 @@ function mergeAllStatsData(stats: Stats[]): Stats {
 function mergeStatsData(stats: Stats[]): Stats {
   const res = stats[0];
   for (let i = 1; i < stats.length; i++) {
+    const workloads = isNaN(stats[i].workloads_number) ? 0 : stats[i].workloads_number;
     res.accessNodes += stats[i].accessNodes;
     res.dedicatedNodes += stats[i].dedicatedNodes;
     res.gateways += stats[i].gateways;
@@ -39,6 +42,7 @@ function mergeStatsData(stats: Stats[]): Stats {
     res.gpus += stats[i].gpus;
     res.nodesDistribution = mergeNodeDistribution([res.nodesDistribution, stats[i].nodesDistribution]);
     res.countries = Object.keys(res.nodesDistribution).length;
+    res.workloads_number += workloads;
   }
   return res;
 }
@@ -86,6 +90,7 @@ export function formatData(network: string[] = ["main"], totalStat: NetworkStats
     contracts: 0,
     nodesDistribution: {},
     dedicatedNodes: 0,
+    workloads_number: 0,
   };
   for (let i = 0; i < network.length; i++) {
     const currentStats = totalStat[network[i]];
