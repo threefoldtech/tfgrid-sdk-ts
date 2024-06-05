@@ -5,6 +5,12 @@ export enum NodeStatus {
   Up = "up",
   Down = "down",
   Standby = "standby",
+}
+
+export enum UnifiedNodeStatus {
+  Up = "up",
+  Down = "down",
+  Standby = "standby",
   UpStandby = "up,standby",
 }
 
