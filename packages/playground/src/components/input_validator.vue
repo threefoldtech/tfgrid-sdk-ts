@@ -1,5 +1,5 @@
 <template>
-  <div ref="inputElement" class="input-validator">
+  <div ref="inputElement" class="input-validator w-100">
     <slot
       :props="{
         onBlur,
