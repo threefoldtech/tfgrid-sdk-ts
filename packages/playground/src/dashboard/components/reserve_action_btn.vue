@@ -21,6 +21,7 @@
       v-if="node.rentedByTwinId === 0"
       :disabled="disableButton || hasInsufficientBalance"
       @click.stop="reserveNode"
+      color="primary"
     >
       Reserve
     </v-btn>
