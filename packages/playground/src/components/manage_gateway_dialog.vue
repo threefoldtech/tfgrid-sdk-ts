@@ -132,7 +132,7 @@
             </input-tooltip>
 
             <div :style="{ marginTop: '-10px' }">
-              <TfSelectionDetails disable-node-selection require-domain v-model="selectionDetails" />
+              <TfSelectionDetails disable-node-selection require-domain use-fqdn v-model="selectionDetails" />
             </div>
 
             <input-validator

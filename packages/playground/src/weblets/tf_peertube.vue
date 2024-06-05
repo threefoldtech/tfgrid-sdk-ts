@@ -12,7 +12,7 @@
     title-image="images/icons/peertube.png"
   >
     <template #title>Deploy a Peertube Instance</template>
-    <form-validator v-model="valid">
+    <d-tabs :tabs="[{ title: 'Config', value: 'config' }]">
       <input-validator
         :value="name"
         :rules="[
@@ -88,7 +88,7 @@
       />
 
       <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
-    </form-validator>
+    </d-tabs>
 
     <template #footer-actions="{ validateBeforeDeploy }">
       <v-btn color="secondary" variant="outlined" @click="validateBeforeDeploy(deploy)" text="Deploy" />
@@ -111,7 +111,6 @@ import { deployGatewayName, getSubdomain, rollbackDeployment } from "../utils/ga
 import { generateName, generatePassword } from "../utils/strings";
 
 const layout = useLayout();
-const valid = ref(false);
 const profileManager = useProfileManager();
 const name = ref(generateName({ prefix: "pt" }));
 const email = ref(profileManager.profile?.email || "");

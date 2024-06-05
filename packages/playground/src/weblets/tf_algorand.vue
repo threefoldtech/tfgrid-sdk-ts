@@ -11,7 +11,7 @@
     title-image="images/icons/algorand.png"
   >
     <template #title>Deploy a Algorand Instance </template>
-    <form-validator v-model="valid">
+    <d-tabs :tabs="[{ title: 'Config', value: 'config' }]">
       <input-validator
         :value="name"
         :rules="[
@@ -97,7 +97,7 @@
       />
 
       <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
-    </form-validator>
+    </d-tabs>
     <template #footer-actions="{ validateBeforeDeploy }">
       <v-btn color="secondary" variant="outlined" @click="validateBeforeDeploy(deploy)" text="Deploy" />
     </template>
@@ -116,7 +116,6 @@ import { deployVM } from "../utils/deploy_vm";
 import { generateName } from "../utils/strings";
 
 const layout = useLayout();
-const valid = ref(false);
 const lastRoundInput = ref();
 const flist: Flist = {
   value: "https://hub.grid.tf/tf-official-apps/algorand-latest.flist",

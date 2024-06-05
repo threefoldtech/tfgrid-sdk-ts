@@ -202,7 +202,7 @@ function validateBeforeDeploy(fn: () => void) {
     const inputs = form.inputs as unknown as InputValidatorService[];
 
     for (const input of inputs) {
-      const status = input.status;
+      const status = typeof input.status === "string" ? input.status : (input.status as any)?.value;
       if (status === ValidatorStatus.Invalid) {
         errorInput = [i, input.$el];
         break out;
@@ -217,7 +217,14 @@ function validateBeforeDeploy(fn: () => void) {
   }
 
   if (errorInput) {
-    const [tab, input] = errorInput;
+    const [tab, __input] = errorInput;
+
+    const input =
+      __input && typeof __input === "object" && "value" in __input && __input.value instanceof HTMLElement
+        ? __input.value
+        : __input instanceof HTMLElement
+        ? __input
+        : null;
 
     if (!input || !__setTab) {
       return;
@@ -227,7 +234,11 @@ function validateBeforeDeploy(fn: () => void) {
 
     // Timeout so the ui gets render before scroll
     setTimeout(() => {
-      const _input = input.querySelector("textarea") || input.querySelector("input") || input;
+      const _input = input.querySelector("textarea") || input.querySelector("input") || null;
+      if (!(_input instanceof HTMLElement)) {
+        return;
+      }
+
       document.addEventListener("scrollend", () => _input.focus(), { once: true });
       _input.scrollIntoView({ behavior: "smooth", block: "center" });
     }, 250);

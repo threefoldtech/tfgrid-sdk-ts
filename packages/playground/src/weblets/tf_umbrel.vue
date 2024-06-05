@@ -12,7 +12,7 @@
   >
     <template #title>Deploy an Umbrel Instance </template>
 
-    <form-validator v-model="valid">
+    <d-tabs :tabs="[{ title: 'Config', value: 'config' }]">
       <input-validator
         :value="name"
         :rules="[
@@ -108,7 +108,7 @@
       />
 
       <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
-    </form-validator>
+    </d-tabs>
 
     <template #footer-actions="{ validateBeforeDeploy }">
       <v-btn color="secondary" variant="outlined" @click="validateBeforeDeploy(deploy)" text="Deploy" />
@@ -132,7 +132,6 @@ import rootFs from "../utils/root_fs";
 import { generateName, generatePassword } from "../utils/strings";
 
 const layout = useLayout();
-const valid = ref(false);
 const name = ref(generateName({ prefix: "um" }));
 const username = ref("admin");
 const password = ref(generatePassword());

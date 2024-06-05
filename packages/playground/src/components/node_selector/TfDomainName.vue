@@ -120,6 +120,7 @@ export default {
     farm: Object as PropType<FarmInfo>,
     hideTitle: Boolean,
     status: String as PropType<ValidatorStatus>,
+    useFqdn: Boolean,
   },
   emits: {
     "update:model-value": (domain?: DomainInfo) => true || domain,
@@ -175,7 +176,7 @@ export default {
     });
 
     const disableSelectedDomain = computed(() => enableCustomDomain.value && props.filters.ipv4 === true);
-    const useFQDN = computed(() => enableCustomDomain.value && props.filters.ipv4 === false);
+    const useFQDN = computed(() => enableCustomDomain.value && (props.useFqdn || props.filters.ipv4 === false));
 
     const domain = computed<DomainInfo>(() => {
       return {

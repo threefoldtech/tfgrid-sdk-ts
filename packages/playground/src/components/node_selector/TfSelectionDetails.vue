@@ -57,6 +57,7 @@
         :hide-title="$props.disableNodeSelection"
         v-model="domain"
         v-model:status="domainStatus"
+        :use-fqdn="$props.useFqdn"
         v-if="requireDomain"
       />
     </VExpandTransition>
@@ -104,6 +105,7 @@ export default {
     requireDomain: Boolean,
     disableNodeSelection: { type: Boolean, default: () => false },
     status: String as PropType<ValidatorStatus>,
+    useFqdn: Boolean,
   },
   emits: {
     "update:model-value": (value: SelectionDetails) => true || value,
