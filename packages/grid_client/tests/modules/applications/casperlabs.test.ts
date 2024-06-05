@@ -5,14 +5,12 @@ import { FilterOptions, GatewayNameModel, generateString, GridClient, MachinesMo
 import { config, getClient } from "../../client_loader";
 import { bytesToGB, generateInt, getOnlineNode, log, splitIP } from "../../utils";
 
-jest.setTimeout(1500000);
-
 let gridClient: GridClient;
 let deploymentName: string;
 
 beforeAll(async () => {
   gridClient = await getClient();
-  deploymentName = generateString(15);
+  deploymentName = "cl" + generateString(15);
   gridClient.clientOptions.projectName = `casperlabs/${deploymentName}`;
   gridClient._connect();
   return gridClient;
@@ -46,10 +44,10 @@ test("TC2683 - Applications: Deploy Casperlabs", async () => {
   //Test Data
   const name = "gw" + generateString(10).toLowerCase();
   const tlsPassthrough = false;
-  let cpu = generateInt(1, 4);
-  let memory = generateInt(1, 6);
-  let rootfsSize = generateInt(0, 2);
-  let diskSize = generateInt(10, 50);
+  const cpu = 2;
+  const memory = 4;
+  const rootfsSize = 0;
+  const diskSize = 100;
   const networkName = generateString(15);
   const vmName = generateString(15);
   const diskName = generateString(15);
@@ -72,35 +70,13 @@ test("TC2683 - Applications: Deploy Casperlabs", async () => {
   const GatewayNode = gatewayNodes[generateInt(0, gatewayNodes.length - 1)];
 
   //Node Selection
-  let nodes;
-  try {
-    nodes = await gridClient.capacity.filterNodes({
-      cru: cpu,
-      mru: memory,
-      sru: rootfsSize + diskSize,
-      farmId: 1,
-      availableFor: await gridClient.twins.get_my_twin_id(),
-    } as FilterOptions);
-  } catch (error) {
-    //Log the resources that were not found.
-    log("A Node was not found with the generated resources." + error);
-    log("Regenerating test data with lower resources....");
-
-    //Generate lower resources.
-    cpu = generateInt(1, cpu);
-    memory = generateInt(1, memory);
-    rootfsSize = generateInt(0, rootfsSize);
-    diskSize = generateInt(5, diskSize);
-
-    //Search for another node with lower resources.
-    nodes = await gridClient.capacity.filterNodes({
-      cru: cpu,
-      mru: memory,
-      sru: rootfsSize + diskSize,
-      farmId: 1,
-      availableFor: await gridClient.twins.get_my_twin_id(),
-    } as FilterOptions);
-  }
+  const nodes = await gridClient.capacity.filterNodes({
+    cru: cpu,
+    mru: memory,
+    sru: rootfsSize + diskSize,
+    farmId: 1,
+    availableFor: await gridClient.twins.get_my_twin_id(),
+  } as FilterOptions);
   const nodeId = await getOnlineNode(nodes);
   if (nodeId == -1) throw new Error("no nodes available to complete this test");
   const domain = name + "." + GatewayNode.publicConfig.domain;
@@ -211,7 +187,10 @@ test("TC2683 - Applications: Deploy Casperlabs", async () => {
   const site = "https://" + gatewayResult[0].domain;
   let reachable = false;
 
-  for (let i = 0; i < 300; i++) {
+  for (let i = 0; i < 180; i++) {
+    const wait = await setTimeout(5000, "Waiting for gateway to be ready");
+    log(wait);
+
     axios
       .get(site)
       .then(() => {
@@ -224,8 +203,6 @@ test("TC2683 - Applications: Deploy Casperlabs", async () => {
     if (reachable) {
       break;
     }
-    const wait = await setTimeout(5000, "Waiting for gateway to be ready");
-    log(wait);
   }
 
   if (reachable) {
