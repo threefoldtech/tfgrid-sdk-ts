@@ -5,6 +5,7 @@ export enum NodeStatus {
   Up = "up",
   Down = "down",
   Standby = "standby",
+  UpStandby = "up,standby",
 }
 
 export interface GatewaysQuery {

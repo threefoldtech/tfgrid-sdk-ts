@@ -46,6 +46,7 @@
                 { title: 'Up', value: NodeStatus.Up },
                 { title: 'Down', value: NodeStatus.Down },
                 { title: 'Standby', value: NodeStatus.Standby },
+                { title: 'Up & Standby', value: NodeStatus.UpStandby },
               ]"
               label="Select Nodes Status"
               item-title="title"
@@ -528,6 +529,7 @@ export default {
       loading.value = true;
       if (retCount) page.value = 1;
       try {
+        console.log("filters.value.status", filters.value.status);
         const { count, data } = await requestNodes(
           {
             page: page.value,

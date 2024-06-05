@@ -129,7 +129,7 @@ const NODES_VALIDATOR: BuilderValidator<NodesQuery> = {
   freeGpu: assertNatural,
   freeIps: assertNatural,
   status(value) {
-    assertIn(value, [NodeStatus.Up, NodeStatus.Down, NodeStatus.Standby]);
+    assertIn(value, [NodeStatus.Up, NodeStatus.Down, NodeStatus.Standby, NodeStatus.UpStandby]);
   },
   city: assertString,
   country: assertString,
