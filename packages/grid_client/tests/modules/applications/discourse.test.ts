@@ -1,5 +1,7 @@
 import axios from "axios";
+import { Buffer } from "buffer";
 import { setTimeout } from "timers/promises";
+import TweetNACL from "tweetnacl";
 
 import { FilterOptions, GatewayNameModel, generateString, GridClient, MachinesModel, randomChoice } from "../../../src";
 import { config, getClient } from "../../client_loader";
@@ -17,6 +19,11 @@ beforeAll(async () => {
   gridClient._connect();
   return gridClient;
 });
+
+function generatePubKey(): string {
+  const keypair = TweetNACL.box.keyPair();
+  return Buffer.from(keypair.publicKey).toString("base64");
+}
 
 //Private IP Regex
 const ipRegex = /(^127\.)|(^10\.)|(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1]\.)|(^192\.168\.)/;
@@ -112,7 +119,7 @@ test("TC2690 - Applications: Deploy Discourse", async () => {
         env: {
           SSH_KEY: config.ssh_key,
           DISCOURSE_HOSTNAME: domain,
-          THREEBOT_PRIVATE_KEY: "GQM1ddPW9e8/wA/lWGOgI68I/3qJOcyfCJBTCKwG6xE=",
+          THREEBOT_PRIVATE_KEY: generatePubKey(),
           DISCOURSE_DEVELOPER_EMAILS: "admin123@dis.course",
           DISCOURSE_SMTP_ADDRESS: "smtp.gmail.com",
           DISCOURSE_SMTP_PORT: "587",
@@ -222,7 +229,7 @@ test("TC2690 - Applications: Deploy Discourse", async () => {
       log(res.data);
       expect(res.status).toBe(200);
       expect(res.statusText).toBe("OK");
-      expect(res.data).toContain("Funkwhale");
+      expect(res.data).toContain("Congratulations, you installed Discourse!");
     });
   } else {
     throw new Error("Gateway is unreachable after multiple retries");

@@ -27,13 +27,18 @@ export SSH_KEY=""
 ## Run
 
 ```bash
-npm run test
+npm run test --runInBand
 ```
 
 or
 
 ```bash
-yarn test
+yarn test --runInBand
 ```
 
-> **Note:** `--coverage` can be added to the running command to generate test coverage.
+> **Note:** `--coverage`: can be added to the running command to generate test coverage.
+> `--runInBand`: Run tests serially.
+> `--ci`: Indicate CI environment.
+> `--coverage`: Collect and report coverage.
+> `--colors`: Force colorful output.
+> `--forceExit`: Force the process to exit after tests complete.
