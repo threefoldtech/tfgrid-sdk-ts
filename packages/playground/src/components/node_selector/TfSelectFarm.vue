@@ -149,7 +149,7 @@ export default {
 
     const reloadFarms = () => farmsTask.value.run(gridStore, filters.value, props.filters.exclusiveFor);
 
-    useWatchDeep(filters, farmsTask.value.reset);
+    useWatchDeep(filters, farmsTask.value.reset, { ignoreFields: ["page"] });
     useWatchDeep(
       filters,
       async filters => {
