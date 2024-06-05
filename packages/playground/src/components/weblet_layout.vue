@@ -235,7 +235,7 @@ function validateBeforeDeploy(fn: () => void) {
 
     // Timeout so the ui gets render before scroll
     setTimeout(() => {
-      const _input = input.querySelector("textarea") || input.querySelector("input") || null;
+      const _input = input.querySelector("textarea") || input.querySelector("input") || input;
       if (!(_input instanceof HTMLElement)) {
         return;
       }
