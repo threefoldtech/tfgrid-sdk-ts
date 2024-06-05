@@ -11,9 +11,11 @@ import TfSelectCountry from "./components/node_selector/select_location_internal
 import TfSelectRegion from "./components/node_selector/select_location_internals/TfSelectRegion.vue";
 import TfSelectionDetails from "./components/node_selector/TfSelectionDetails.vue";
 import PasswordInputWrapper from "./components/password_input_wrapper.vue";
+import TfErrorFormater from "./components/tf_error_formater.vue";
 import ViewLayout from "./components/view_layout.vue";
 import WebletLayout from "./components/weblet_layout.vue";
 import * as validators from "./utils/validators";
+
 const GLOBAL_COMPONENTS: { [key: string]: Component } = {
   PasswordInputWrapper,
   WebletLayout,
@@ -27,6 +29,7 @@ const GLOBAL_COMPONENTS: { [key: string]: Component } = {
   TfSelectionDetails,
   TfSelectRegion,
   TfSelectCountry,
+  TfErrorFormater,
 };
 
 export function defineGlobals(app: App<Element>): void {
