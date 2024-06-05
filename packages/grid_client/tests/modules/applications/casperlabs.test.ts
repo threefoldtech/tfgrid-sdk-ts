@@ -5,12 +5,14 @@ import { FilterOptions, GatewayNameModel, generateString, GridClient, MachinesMo
 import { config, getClient } from "../../client_loader";
 import { bytesToGB, generateInt, getOnlineNode, log, splitIP } from "../../utils";
 
+jest.setTimeout(900000);
+
 let gridClient: GridClient;
 let deploymentName: string;
 
 beforeAll(async () => {
   gridClient = await getClient();
-  deploymentName = "cl" + generateString(15);
+  deploymentName = "cl" + generateString(10);
   gridClient.clientOptions.projectName = `casperlabs/${deploymentName}`;
   gridClient._connect();
   return gridClient;

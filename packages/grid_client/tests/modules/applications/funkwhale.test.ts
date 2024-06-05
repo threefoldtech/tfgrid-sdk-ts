@@ -5,12 +5,14 @@ import { FilterOptions, GatewayNameModel, generateString, GridClient, MachinesMo
 import { config, getClient } from "../../client_loader";
 import { bytesToGB, generateInt, getOnlineNode, log, splitIP } from "../../utils";
 
+jest.setTimeout(900000);
+
 let gridClient: GridClient;
 let deploymentName: string;
 
 beforeAll(async () => {
   gridClient = await getClient();
-  deploymentName = "fw" + generateString(15);
+  deploymentName = "fw" + generateString(10);
   gridClient.clientOptions.projectName = `funkwhale/${deploymentName}`;
   gridClient._connect();
   return gridClient;

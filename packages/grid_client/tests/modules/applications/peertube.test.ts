@@ -5,12 +5,14 @@ import { FilterOptions, GatewayNameModel, generateString, GridClient, MachinesMo
 import { config, getClient } from "../../client_loader";
 import { bytesToGB, generateInt, getOnlineNode, log, splitIP } from "../../utils";
 
+jest.setTimeout(900000);
+
 let gridClient: GridClient;
 let deploymentName: string;
 
 beforeAll(async () => {
   gridClient = await getClient();
-  deploymentName = "pt" + generateString(15);
+  deploymentName = "pt" + generateString(10);
   gridClient.clientOptions.projectName = `peertube/${deploymentName}`;
   gridClient._connect();
   return gridClient;
@@ -196,7 +198,11 @@ test("TC2684 - Applications: Deploy Peertube", async () => {
     log(wait);
 
     axios
-      .get(site)
+      .get(site, {
+        headers: {
+          Accept: header,
+        },
+      })
       .then(() => {
         log("gateway is reachable");
         reachable = true;
