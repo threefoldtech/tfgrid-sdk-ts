@@ -1,12 +1,6 @@
 <template>
   <div>
-    <ListTable
-      :headers="headers"
-      :items="copyPublicIps"
-      :loading="loading"
-      :deleting="isRemoving"
-      v-model="selectedItems"
-    >
+    <ListTable :headers="headers" :items="publicIps" :loading="loading" :deleting="isRemoving" v-model="selectedItems">
       <template v-slot:top>
         <v-alert>
           <h4 class="text-center font-weight-medium">Public IPs</h4>
@@ -104,7 +98,6 @@ export default {
       },
     ] as any;
     const publicIps = ref<PublicIp[]>([]);
-    const copyPublicIps = ref<PublicIp[]>([]);
     const loading = ref(false);
     const loadingIps = ref(false);
     const showDialogue = ref(false);
@@ -113,8 +106,6 @@ export default {
     const toPublicIP = ref();
     const gateway = ref();
     const isRemoving = ref(false);
-    const size = ref(5);
-    const page = ref(1);
     const selectedItems = ref<any[]>([]);
     const items = ref<RemoveFarmIPModel[]>([]);
 
@@ -122,27 +113,11 @@ export default {
       await getFarmByID(props.farmId);
     });
 
-    function updateIPPageSize(pageSize: number) {
-      loadingIps.value = true;
-      size.value = pageSize;
-      copyPublicIps.value = publicIps.value.slice(0, size.value) as unknown as PublicIp[];
-      loadingIps.value = false;
-    }
-    function updateIPPage(pageNumber: number) {
-      page.value = pageNumber;
-      loadingIps.value = true;
-      const startIndex = (pageNumber - 1) * size.value;
-      const endIndex = startIndex + size.value;
-      copyPublicIps.value = publicIps.value.slice(startIndex, endIndex) as unknown as PublicIp[];
-      loadingIps.value = false;
-    }
-
     async function getFarmByID(id: number) {
       loadingIps.value = true;
       try {
         const farm = await gridStore.grid.farms.getFarmByID({ id });
         publicIps.value = farm.publicIps as unknown as PublicIp[];
-        copyPublicIps.value = publicIps.value.slice(0, size.value);
       } catch (error) {
         createCustomToast(`Failed to get public IPs! ${error}`, ToastType.danger);
       }
@@ -187,11 +162,6 @@ export default {
       showDialogue,
       isRemoving,
       removeFarmIps,
-      page,
-      size,
-      updateIPPageSize,
-      updateIPPage,
-      copyPublicIps,
       selectedItems,
       loadingIps,
     };
