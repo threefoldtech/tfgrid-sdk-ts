@@ -529,7 +529,6 @@ export default {
       loading.value = true;
       if (retCount) page.value = 1;
       try {
-        console.log("filters.value.status", filters.value.status);
         const { count, data } = await requestNodes(
           {
             page: page.value,
