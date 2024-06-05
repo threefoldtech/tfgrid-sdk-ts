@@ -8,7 +8,7 @@
       v-model="selectedItems"
     >
       <template v-slot:top>
-        <v-alert class="pa-5" style="height: 20px">
+        <v-alert>
           <h4 class="text-center font-weight-medium">Public IPs</h4>
         </v-alert>
       </template>
@@ -27,7 +27,6 @@
           <v-btn
             class="ma-3"
             color="error"
-            variant="outlined"
             prepend-icon="mdi-delete"
             :disabled="selectedItems.length === 0 || isRemoving"
             @click="showDialogue = true"
@@ -39,21 +38,18 @@
     </ListTable>
     <v-dialog v-model="showDialogue" max-width="600">
       <v-card>
-        <v-toolbar color="primary" class="custom-toolbar">
-          <p class="mb-5">Delete IPs</p>
-        </v-toolbar>
         <v-card-title class="text-subtitle-1">
           <strong>Delete the following IPs?</strong>
         </v-card-title>
         <v-card-text>
-          <v-chip class="ma-1" color="primary" v-for="item in selectedItems" :key="item">
+          <v-chip class="mb-5" v-for="item in selectedItems" :key="item">
             {{ item.ip }}
           </v-chip>
+          <v-divider />
         </v-card-text>
-        <v-card-actions class="justify-end px-5 pb-5 pt-0">
-          <v-btn @click="showDialogue = false" variant="outlined" color="anchor">Close</v-btn>
+        <v-card-actions class="justify-end mb-1 mr-2">
+          <v-btn @click="showDialogue = false" color="anchor">Close</v-btn>
           <v-btn
-            variant="outlined"
             text="Confirm"
             :loading="isRemoving"
             color="error"
@@ -202,9 +198,3 @@ export default {
   },
 };
 </script>
-<style scoped>
-.custom-toolbar {
-  height: 2.5rem !important;
-  padding-left: 10px;
-}
-</style>

@@ -2,12 +2,12 @@
   <v-container>
     <v-dialog
       transition="dialog-bottom-transition"
-      max-width="1000"
+      max-width="50%"
       v-model="withdrawDialog"
       @update:model-value="closeDialog"
     >
       <v-card>
-        <v-toolbar color="primary" dark class="bold-text justify-center"> Withdraw TFT </v-toolbar>
+        <v-card-title class="bg-primary"> Withdraw TFT </v-card-title>
         <v-card-text>
           Interact with the bridge in order to withdraw your TFT to
           {{ selectedName?.charAt(0).toUpperCase() + selectedName!.slice(1) }} (withdraw fee is: {{ withdrawFee }} TFT)
@@ -50,13 +50,12 @@
               </v-text-field>
             </InputValidator>
           </FormValidator>
+          <v-divider />
         </v-card-text>
-        <v-card-actions class="justify-end pb-4 px-6">
-          <v-btn variant="outlined" color="anchor" class="px-3" @click="closeDialog"> Close </v-btn>
+        <v-card-actions class="justify-end mb-1 mr-2">
+          <v-btn color="anchor" @click="closeDialog"> Close </v-btn>
           <v-btn
-            class="px-3"
             color="secondary"
-            variant="outlined"
             @click="withdrawTFT(target, amount)"
             :disabled="!valid || validatingAddress"
             :loading="loadingWithdraw"

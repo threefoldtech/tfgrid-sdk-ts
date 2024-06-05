@@ -42,8 +42,8 @@
               </template>
             </v-list>
           </v-card-text>
-          <v-card-actions class="justify-end">
-            <v-btn @click="showDialog = false" variant="outlined" color="anchor">Close</v-btn>
+          <v-card-actions class="justify-end my-1 mr-2">
+            <v-btn @click="showDialog = false" color="anchor">Close</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -116,9 +116,7 @@
         {{ toHumanDate(item.created) }}
       </template>
       <template #[`item.actions`]="{ item }">
-        <v-chip color="error" variant="tonal" v-if="deleting && ($props.modelValue || []).includes(item)">
-          Deleting...
-        </v-chip>
+        <v-chip color="error" v-if="deleting && ($props.modelValue || []).includes(item)"> Deleting... </v-chip>
         <v-btn-group variant="tonal" v-else>
           <slot :name="projectName + '-actions'" :item="item" :update="updateItem"></slot>
         </v-btn-group>

@@ -93,7 +93,7 @@
     </d-tabs>
 
     <template #footer-actions="{ validateBeforeDeploy }">
-      <v-btn color="secondary" variant="outlined" @click="validateBeforeDeploy(deploy)" text="Deploy" />
+      <v-btn color="secondary" @click="validateBeforeDeploy(deploy)" text="Deploy" />
     </template>
   </weblet-layout>
 </template>
@@ -267,6 +267,11 @@ import { updateGrid } from "../utils/grid";
 
 export default {
   name: "TfDiscourse",
-  components: { SmtpServer, SelectSolutionFlavor, Networks, ManageSshDeployemnt },
+  components: {
+    SmtpServer,
+    SelectSolutionFlavor,
+    Networks,
+    ManageSshDeployemnt,
+  },
 };
 </script>

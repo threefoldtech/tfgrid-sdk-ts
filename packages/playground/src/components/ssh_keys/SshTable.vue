@@ -33,7 +33,7 @@
         <template #[`item.createdAt`]="{ item }">
           <v-tooltip location="bottom" :text="`The date when this SSH key was created.`">
             <template #activator="{ props }">
-              <v-chip color="primary" v-bind="props">
+              <v-chip v-bind="props">
                 {{ item.createdAt }}
               </v-chip>
             </template>
@@ -98,20 +98,17 @@
       </v-data-table>
     </v-card-text>
 
-    <v-divider />
+    <!-- <v-divider /> -->
 
-    <v-card-actions>
-      <v-spacer />
+    <v-card-actions class="justify-end my-1 mr-2">
       <v-tooltip location="bottom" text="Export all selected keys.">
         <template #activator="{ props }">
           <v-btn
             :disabled="loading || selectedKeys.length === 0 || $props.sshKeys.length === 0 || deleting"
-            class="mr-2"
             :loading="loading"
             v-bind="props"
             prepend-icon="mdi-export"
             color="anchor"
-            variant="outlined"
             @click="() => $emit('export', selectedKeys)"
           >
             Export
@@ -125,7 +122,6 @@
             :disabled="loading || selectedKeys.length === 0 || deleting"
             :loading="deleting"
             v-bind="props"
-            variant="outlined"
             prepend-icon="mdi-trash-can-outline"
             color="error"
             @click="deleteSelected"

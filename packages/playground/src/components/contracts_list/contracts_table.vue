@@ -113,13 +113,11 @@
         v-if="Object.keys(props.lockedContracts).length > 0"
         :disabled="!selectedLockedContracts"
         color="warning"
-        variant="outlined"
         @click="openUnlockDialog"
         >Unlock</v-btn
       >
 
       <v-btn
-        variant="outlined"
         color="anchor"
         prepend-icon="mdi-export-variant"
         :disabled="isExporting || !contracts || contracts.length === 0 || deleting"
@@ -129,7 +127,6 @@
       </v-btn>
 
       <v-btn
-        variant="outlined"
         color="error"
         :disabled="!selectedContracts.length || deleting"
         :loading="deleting"
@@ -167,10 +164,7 @@
         >
 
         <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn variant="outlined" color="anchor" class="mr-2 px-3" @click="contractStateDialog = false">
-            Close
-          </v-btn>
+          <v-btn color="anchor" class="mr-2 px-3" @click="contractStateDialog = false"> Close </v-btn>
           <v-tooltip
             :text="
               freeBalance < getAmountLocked
@@ -184,7 +178,6 @@
                 <v-btn
                   v-if="!isNodeInRentContracts"
                   :disabled="freeBalance < getAmountLocked"
-                  variant="outlined"
                   color="warning"
                   class="mr-2 px-3"
                   @click="unlockContract([selectedItem.contract_id])"
@@ -202,7 +195,7 @@
 
   <v-dialog width="800" v-model="deletingDialog">
     <v-card>
-      <v-card-title class="text-h5 mt-2"> Delete the following contracts? </v-card-title>
+      <v-card-title class="bg-primary"> Delete the following contracts? </v-card-title>
       <v-alert class="ma-4" type="warning" variant="tonal"
         >It is advisable to remove the contract from its solution page, especially when multiple contracts may be linked
         to the same instance.</v-alert
@@ -210,19 +203,19 @@
 
       <v-alert class="mx-4" type="warning" variant="tonal">Deleting contracts may take a while to complete.</v-alert>
       <v-card-text>
-        <v-chip class="ma-1" color="primary" label v-for="c in selectedContracts" :key="c.contract_id">
+        <v-chip class="ma-1" label v-for="c in selectedContracts" :key="c.contract_id">
           {{ c.contract_id }}
         </v-chip>
+        <v-divider class="mt-3" />
       </v-card-text>
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn color="anchor" variant="outlined" @click="deletingDialog = false"> Cancel </v-btn>
-        <v-btn color="error" variant="outlined" @click="onDelete"> Delete </v-btn>
+      <v-card-actions class="justify-end mb-1 mr-2">
+        <v-btn color="anchor" @click="deletingDialog = false"> Cancel </v-btn>
+        <v-btn color="error" @click="onDelete"> Delete </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
 
-  <v-dialog width="500" v-model="unlockDialog">
+  <v-dialog width="800" v-model="unlockDialog">
     <v-card>
       <v-card-title class="bg-primary">
         Unlock the following Contract<span v-if="selectedContracts.length > 1">s</span>
@@ -243,16 +236,15 @@
           </div>
           <div v-else-if="selectedLockedAmount > 0">
             You need to fund your account with
-            <span class="font-weight-bold">{{ Math.ceil(selectedLockedAmount - freeBalance) }} TFTs</span> to resume
-            your contracts
+            <span class="font-weight-bold">{{ Math.ceil(selectedLockedAmount - freeBalance) }} TFTs</span>
+            to resume your contracts
           </div>
         </v-alert>
-        <v-chip class="ma-1" color="primary" label v-for="c in selectedContracts" :key="c.contract_id">
+        <v-chip class="ma-1" label v-for="c in selectedContracts" :key="c.contract_id">
           {{ c.contract_id }}
         </v-chip>
         <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="anchor" variant="outlined" @click="unlockDialog = false"> Cancel </v-btn>
+          <v-btn color="anchor" @click="unlockDialog = false"> Cancel </v-btn>
           <v-tooltip
             :text="
               freeBalance < selectedLockedAmount
@@ -266,7 +258,6 @@
                 <v-btn
                   :disabled="selectedLockedAmount > freeBalance"
                   color="warning"
-                  variant="outlined"
                   class="ml-2"
                   :loading="unlockContractLoading"
                   @click="

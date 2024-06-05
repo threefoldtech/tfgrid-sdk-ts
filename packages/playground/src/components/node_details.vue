@@ -5,12 +5,11 @@
     @click:outside="() => $emit('close-dialog', false)"
     transition="dialog-bottom-transition"
     hide-overlay
-    class="w-75 mx-auto"
   >
     <v-toolbar color="primary">
       <div class="d-flex justify-center">
         <v-btn icon dark @click="() => $emit('close-dialog', false)">
-          <v-icon>mdi-close</v-icon>
+          <v-icon color="anchor">mdi-close</v-icon>
         </v-btn>
       </div>
     </v-toolbar>
@@ -29,8 +28,8 @@
           <p class="mt-4 mb-4 font-weight-bold text-error">
             {{ errorMessage }}
           </p>
-          <v-btn class="mr-4" @click="requestNode" color="primary" text="Try Again" />
-          <v-btn @click="(val:boolean) => closeDialog(val)" color="error" variant="outlined" text="Cancel" />
+          <v-btn class="mr-4" @click="requestNode" text="Try Again" />
+          <v-btn @click="(val:boolean) => closeDialog(val)" color="error" text="Cancel" />
         </div>
       </v-card>
     </template>

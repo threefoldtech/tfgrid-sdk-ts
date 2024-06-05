@@ -4,7 +4,6 @@
       model-value
       @update:model-value="$emit('close')"
       scrollable
-      width="70%"
       :persistent="deleting || layout?.status === 'deploy'"
     >
       <weblet-layout
@@ -170,17 +169,16 @@
         </div>
 
         <template #footer-actions>
-          <v-btn color="anchor" variant="outlined" @click="$emit('close')">Close</v-btn>
+          <v-btn color="anchor" @click="$emit('close')">Close</v-btn>
           <v-btn
             color="error"
-            variant="outlined"
             :disabled="gatewaysToDelete.length === 0 || deleting || loadingGateways"
             v-if="gatewayTab === 0"
             @click="requestDelete = true"
           >
             Delete
           </v-btn>
-          <v-btn color="secondary" variant="outlined" @click="deployGateway" :disabled="!valid" v-else> Add </v-btn>
+          <v-btn color="secondary" @click="deployGateway" :disabled="!valid" v-else> Add </v-btn>
         </template>
       </weblet-layout>
     </v-dialog>
@@ -189,18 +187,16 @@
       <v-card>
         <v-card-title> Are you sure you want to delete the following gateways? </v-card-title>
         <v-card-text class="d-flex flex-wrap">
-          <v-chip color="primary" label variant="tonal" class="mr-1 mb-1" v-for="gw in gatewaysToDelete" :key="gw.name">
+          <v-chip label class="mr-1 mb-5" v-for="gw in gatewaysToDelete" :key="gw.name">
             {{ gw.name }}
           </v-chip>
+          <v-divider />
         </v-card-text>
 
-        <v-divider />
-
-        <v-card-actions class="d-flex justify-end">
+        <v-card-actions class="justify-end mb-1 mr-2">
+          <v-btn color="anchor" @click="requestDelete = false">Cancel</v-btn>
           <v-btn
             color="error"
-            variant="outlined"
-            size="small"
             :disabled="loadingGateways || deleting"
             @click="
               () => {
@@ -210,7 +206,6 @@
             "
             >Delete</v-btn
           >
-          <v-btn color="secondary" variant="tonal" size="small" @click="requestDelete = false">Cancel</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>

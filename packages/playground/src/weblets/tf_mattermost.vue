@@ -74,7 +74,7 @@
     </d-tabs>
 
     <template #footer-actions="{ validateBeforeDeploy }">
-      <v-btn color="secondary" variant="outlined" @click="validateBeforeDeploy(deploy)" text="Deploy" />
+      <v-btn color="secondary" @click="validateBeforeDeploy(deploy)" text="Deploy" />
     </template>
   </weblet-layout>
 </template>
@@ -250,6 +250,11 @@ import rootFs from "../utils/root_fs";
 
 export default {
   name: "TfMattermost",
-  components: { SmtpServer, SelectSolutionFlavor, Networks, ManageSshDeployemnt },
+  components: {
+    SmtpServer,
+    SelectSolutionFlavor,
+    Networks,
+    ManageSshDeployemnt,
+  },
 };
 </script>

@@ -21,13 +21,13 @@
               href="https://github.com/threefoldtech/tfgrid-sdk-ts"
               target="_blank"
               :style="{ color: 'rgb(var(--v-footer-color-link)) !important' }"
-              ><v-btn class="" icon="mdi-github" variant="text"></v-btn
+              ><v-btn color="anchor" icon="mdi-github" variant="text"></v-btn
             ></a>
             <a
               href="mailto:info@threefold.io"
               target="_blank"
               :style="{ color: 'rgb(var(--v-footer-color)) !important' }"
-              ><v-btn class="" icon="mdi-email-outline" variant="text"></v-btn
+              ><v-btn color="anchor" icon="mdi-email-outline" variant="text"></v-btn
             ></a>
           </div>
         </v-col>

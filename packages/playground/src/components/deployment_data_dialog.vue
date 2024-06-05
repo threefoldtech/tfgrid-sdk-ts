@@ -1,12 +1,12 @@
 <template>
   <v-row justify="center">
-    <v-dialog model-value @update:model-value="$emit('close')" scrollable width="70%">
+    <v-dialog model-value @update:model-value="$emit('close')" scrollable>
       <v-card>
         <v-card-title class="d-flex flex-column" v-if="!onlyJson">
           <div class="d-flex justify-center">
             <v-btn-toggle divided v-model="showType" mandatory>
-              <v-btn variant="outlined"> details </v-btn>
-              <v-btn variant="outlined"> JSON</v-btn>
+              <v-btn> details </v-btn>
+              <v-btn> JSON</v-btn>
             </v-btn-toggle>
           </div>
 
@@ -111,10 +111,9 @@
           </pre>
           </template>
         </v-card-text>
-        <v-card-actions class="my-1">
-          <v-spacer />
-          <v-btn color="anchor" variant="outlined" @click="$emit('close')">Close</v-btn>
-          <v-btn color="secondary" variant="outlined" @click="copy">Copy</v-btn>
+        <v-card-actions class="justify-end my-1 mr-2">
+          <v-btn color="anchor" @click="$emit('close')">Close</v-btn>
+          <v-btn color="secondary" @click="copy">Copy</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
