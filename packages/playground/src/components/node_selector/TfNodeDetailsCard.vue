@@ -1,6 +1,6 @@
 <template>
   <VCard
-    class="tf-node-card rounded-0 w-100 pb-3"
+    class="tf-node-card rounded-0 w-100 pb-3 text-left"
     :class="{ 'selected-node': status !== 'Init' }"
     :color="
       status === 'Valid'
