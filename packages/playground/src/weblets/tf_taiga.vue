@@ -90,7 +90,7 @@
           :small="{ cpu: 2, memory: 4, disk: 100 }"
           :medium="{ cpu: 4, memory: 8, disk: 150 }"
         />
-        <Networks v-model:mycelium="mycelium" v-model:ipv4="ipv4" />
+        <Networks v-model:mycelium="mycelium" v-model:ipv4="ipv4" v-model:planetary="planetary" />
 
         <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
           <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
@@ -161,6 +161,7 @@ const dedicated = ref(false);
 const certified = ref(false);
 const ipv4 = ref(false);
 const mycelium = ref(true);
+const planetary = ref(true);
 const smtp = ref(createSMTPServer());
 const rootFilesystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solution.value?.memory ?? 0));
 const selectionDetails = ref<SelectionDetails>();
@@ -218,7 +219,7 @@ async function deploy() {
           entryPoint: flist.entryPoint,
           rootFilesystemSize: rootFilesystemSize.value,
           publicIpv4: ipv4.value,
-          planetary: true,
+          planetary: planetary.value,
           mycelium: mycelium.value,
           envs: [
             { key: "SSH_KEY", value: selectedSSHKeys.value },

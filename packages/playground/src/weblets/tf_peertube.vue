@@ -63,7 +63,7 @@
       </password-input-wrapper>
 
       <SelectSolutionFlavor v-model="solution" />
-      <Networks v-model:mycelium="mycelium" />
+      <Networks v-model:mycelium="mycelium" v-model:planetary="planetary" />
 
       <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
         <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
@@ -126,6 +126,7 @@ const ipv4 = ref(false);
 const rootFilesystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solution.value?.memory ?? 0));
 const selectionDetails = ref<SelectionDetails>();
 const mycelium = ref(true);
+const planetary = ref(true);
 const selectedSSHKeys = ref("");
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
@@ -177,7 +178,7 @@ async function deploy() {
           flist: flist.value,
           entryPoint: flist.entryPoint,
           publicIpv4: ipv4.value,
-          planetary: true,
+          planetary: planetary.value,
           mycelium: mycelium.value,
           envs: [
             { key: "SSH_KEY", value: selectedSSHKeys.value },
