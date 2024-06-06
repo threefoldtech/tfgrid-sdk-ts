@@ -5,9 +5,6 @@
       <a class="app-link" @click="$emit('openProfile')">Wallet</a>
       to view {{ pageTitle }}
     </v-alert>
-    <v-alert variant="tonal" type="error">
-      <tf-error-formater :error="error" />
-    </v-alert>
     <v-container class="custom-container">
       <h4 class="text-center text-h4 mt-4">A Co-Owned Global Sovereign Internet</h4>
       <v-container class="d-flex justify-center">
@@ -92,7 +89,6 @@ export default {
     const route = useRoute();
     const pageTitle = computed(() => route.meta.title);
     const statsStore = useStatsStore();
-
     return {
       theme,
       pageTitle,
@@ -100,7 +96,6 @@ export default {
       stats: computed(() => statsStore.stats),
       statsUrl: window.env.STATS_URL || "https://stats.grid.tf",
       baseUrl,
-      error: `InsufficientBalanceError: Failed to apply {"args":{"calls":[{"args":{"key":"metadata","value":"daqvxpIHCOgggUklNZ6oPNqYz5b0d9mLoZwwC4YKU24HiRWXUnUzHmMEM97KKWthsxsU/keo/TQr6er3TFs5CgaCN4dVip/kon8ssALK2mR9cYnNtJMg3G0YTvb1lVN6LGQsVdix00AiiHMq1ni4I3Sbw6wzj0j+zOjRQVVEQxY9/EcuJ2UJzkyYpZkWNeCrOKTpzxtW7hSNbY/21nP44iVs6+HgduqoeXNZh5HfVgNgV21Ar5fEA/1sCwl7fRKOyV2VSWUdUwtkdG1BAM+2rNTXImqJB3KVMO6wb84cMIwi726mlVLd4Yk7avbN8W2qyXc="},"method":"set","section":"tfkvStore"}, {"args":{"key":"metadata","value":"daqvxpIHCOgggUklNZ6oPNqYz5b0d9mLoZwwC4YKU24HiRWXUnUzHmMEM97KKWthsxsU/keo/TQr6er3TFs5CgaCN4dVip/kon8ssALK2mR9cYnNtJMg3G0YTvb1lVN6LGQsVdix00AiiHMq1ni4I3Sbw6wzj0j+zOjRQVVEQxY9/EcuJ2UJzkyYpZkWNeCrOKTpzxtW7hSNbY/21nP44iVs6+HgduqoeXNZh5HfVgNgV21Ar5fEA/1sCwl7fRKOyV2VSWUdUwtkdG1BAM+2rNTXImqJB3KVMO6wb84cMIwi726mlVLd4Yk7avbN8W2qyXc="},"method":"set","section":"tfkvStore"}]},"method":"batchAll","section":"utility"} due to error: RpcError: 1010: Invalid Transaction: Inability to pay some fees , e.g. account balance too low`,
     };
   },
 };
