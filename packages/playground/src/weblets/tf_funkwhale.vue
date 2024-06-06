@@ -89,7 +89,7 @@
         :small="{ cpu: 1, memory: 2, disk: 50 }"
         :medium="{ cpu: 2, memory: 4, disk: 100 }"
       />
-      <Networks v-model:ipv4="ipv4" v-model:mycelium="mycelium" />
+      <Networks v-model:ipv4="ipv4" v-model:planetary="planetary" v-model:mycelium="mycelium" />
 
       <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
         <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
@@ -153,6 +153,7 @@ const dedicated = ref(false);
 const certified = ref(false);
 const ipv4 = ref(false);
 const mycelium = ref(true);
+const planetary = ref(false);
 const selectionDetails = ref<SelectionDetails>();
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
@@ -207,6 +208,7 @@ async function deploy() {
           entryPoint: flist.entryPoint,
           publicIpv4: ipv4.value,
           mycelium: mycelium.value,
+          planetary: planetary.value,
           envs: [
             { key: "SSH_KEY", value: selectedSSHKeys.value },
             { key: "FUNKWHALE_HOSTNAME", value: domain },
