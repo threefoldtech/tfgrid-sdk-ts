@@ -133,12 +133,6 @@ jobs:
           steps.zdb.outcome != 'success' ||
           steps.deleteall.outcome != 'success' 
         run: exit 1
-    
-      - name: Set up GitHub CLI
-        uses: wusatosi/setup-gh@v1.1
-
-      - name: Install jq
-        run: sudo apt-get install -y jq
 
       - name: Create GitHub Issue on Failure
         uses: dacbd/create-issue-action@main
