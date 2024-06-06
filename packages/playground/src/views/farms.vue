@@ -1,5 +1,6 @@
 <template>
   <view-layout>
+    <v-alert type="info" variant="tonal" class="mb-6"> Click on the row to view farm details. </v-alert>
     <TfFiltersLayout>
       <template #filters>
         <TfFiltersContainer @apply="loadFarms(true)" class="mb-4" :loading="loading">

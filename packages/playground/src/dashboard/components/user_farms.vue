@@ -10,6 +10,9 @@
     <v-alert type="warning" variant="tonal" v-if="farmsCount == 0" class="my-8">
       Can't see any of your farms? Try changing your key type in your TFChain Wallet above.
     </v-alert>
+    <v-alert type="info" variant="tonal" v-if="farmsCount > 0" class="my-8">
+      Click on the row to view farm details.
+    </v-alert>
     <v-data-table-server
       :loading="loading"
       :items-length="farmsCount"
