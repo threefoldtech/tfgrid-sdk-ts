@@ -37,8 +37,12 @@
 
       <v-card-text>
         <v-alert type="info" class="mb-5">
-          The keys selected here will be forwarded to your deployment. To change keys, simply toggle on the keys you
-          wish to select/deselect.
+          <!--
+            TODO: Return the message back when return the multiple keys feature.
+            The keys selected here will be forwarded to your deployment. To change keys, simply toggle on the keys you
+            wish to select/deselect.
+          -->
+          To change the key that you want to use over the deployment, simply click on it.
         </v-alert>
 
         <v-tooltip
