@@ -30,7 +30,7 @@ async function main() {
   const masterQueryOptions: FilterOptions = {
     cru: 2,
     mru: 2, // GB
-    sru: 2,
+    sru: 6,
     availableFor: grid3.twinId,
     farmId: 1,
   };
@@ -38,7 +38,7 @@ async function main() {
   const workerQueryOptions: FilterOptions = {
     cru: 1,
     mru: 1, // GB
-    sru: 1,
+    sru: 3,
     availableFor: grid3.twinId,
     farmId: 1,
   };
