@@ -1,13 +1,14 @@
 import { ContractStates, type GridClient } from "@threefold/grid_client";
 import { NodeStatus } from "@threefold/gridproxy_client";
-import { ContractType as type } from "@threefold/gridproxy_client";
 import type { Ref } from "vue";
 
 import { gridProxyClient } from "@/clients";
 import { solutionType, type VDataTableHeader } from "@/types";
-import toHumanDate from "@/utils/date";
 
 import { normalizeBalance } from "./helpers";
+
+// Cache to store results of `getNodeInfo` requests
+const NODE_INFO_CACHE: { [key: number]: { status: NodeStatus; farmId: number } } = {};
 
 export async function getUserContracts(grid: GridClient) {
   const res: any = await grid!.contracts.listMyContracts();
@@ -105,16 +106,33 @@ export function formatConsumption(value: number): string {
   return normalizeBalance(value) + " TFT/hour";
 }
 
-export async function getNodeInfo(nodeIDs: (number | undefined)[]) {
-  const resultPromises = nodeIDs.map(async nodeId => {
+export async function getNodeInfo(nodeIDs: number[], requestedNodes: number[]) {
+  // Ensure we have unique node IDs
+  const uniqueNodeIDs = Array.from(new Set(nodeIDs));
+  const uniqueRequestedNodes = new Set(requestedNodes);
+
+  const nodeIDsToRequest = uniqueNodeIDs.filter(
+    nodeId => !uniqueRequestedNodes.has(nodeId) && !NODE_INFO_CACHE[nodeId],
+  );
+
+  const resultPromises = nodeIDsToRequest.map(async nodeId => {
     if (typeof nodeId !== "number") return {};
     const nodeInfo = await gridProxyClient.nodes.byId(nodeId);
-    return { [nodeId]: { status: nodeInfo.status, farmId: nodeInfo.farmId } };
+    // Store result in cache
+    NODE_INFO_CACHE[nodeId] = { status: nodeInfo.status, farmId: nodeInfo.farmId };
+    return { [nodeId]: NODE_INFO_CACHE[nodeId] };
   });
 
   const resultsArray = await Promise.all(resultPromises);
+  const results = resultsArray.reduce((acc, obj) => Object.assign(acc, obj), {});
 
-  return resultsArray.reduce((acc, obj) => Object.assign(acc, obj), {});
+  for (const nodeId of uniqueNodeIDs) {
+    if (NODE_INFO_CACHE[nodeId]) {
+      results[nodeId] = NODE_INFO_CACHE[nodeId];
+    }
+  }
+
+  return results;
 }
 
 export interface ContractDetails {
@@ -155,4 +173,5 @@ export type ContractsTableType = {
   loading: Ref<boolean>;
   count: Ref<number>;
   page: Ref<number>;
+  size: Ref<number>;
 };
