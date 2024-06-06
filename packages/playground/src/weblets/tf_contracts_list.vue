@@ -174,7 +174,7 @@
 
 <script lang="ts" setup>
 import type { GridClient, LockContracts } from "@threefold/grid_client";
-import { Contract, ContractState, NodeStatus } from "@threefold/gridproxy_client";
+import { type Contract, ContractState, NodeStatus } from "@threefold/gridproxy_client";
 import { Decimal } from "decimal.js";
 import { computed, defineComponent, onMounted, type Ref, ref } from "vue";
 
