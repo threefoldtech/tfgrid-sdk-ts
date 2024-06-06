@@ -48,7 +48,7 @@ test("TC2683 - Applications: Deploy Casperlabs", async () => {
   const tlsPassthrough = false;
   const cpu = 2;
   const memory = 4;
-  const rootfsSize = 0;
+  const rootfsSize = 2;
   const diskSize = 100;
   const networkName = generateString(15);
   const vmName = generateString(15);
@@ -150,6 +150,7 @@ test("TC2683 - Applications: Deploy Casperlabs", async () => {
   expect(result[0].planetary).toBeDefined();
   expect(result[0].publicIP).toBeNull();
   expect(result[0].description).toBe(description);
+  expect(result[0].rootfs_size).toBe(bytesToGB(rootfsSize));
   expect(result[0].mounts[0]["name"]).toBe(diskName);
   expect(result[0].mounts[0]["size"]).toBe(bytesToGB(diskSize));
   expect(result[0].mounts[0]["mountPoint"]).toBe(mountPoint);

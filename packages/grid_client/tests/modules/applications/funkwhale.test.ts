@@ -48,7 +48,7 @@ test("TC2685 - Applications: Deploy Funkwhale", async () => {
   const tlsPassthrough = false;
   const cpu = 1;
   const memory = 2;
-  const rootfsSize = 0;
+  const rootfsSize = 2;
   const diskSize = 50;
   const networkName = generateString(15);
   const vmName = generateString(15);
@@ -153,6 +153,7 @@ test("TC2685 - Applications: Deploy Funkwhale", async () => {
   expect(result[0].planetary).toBeDefined();
   expect(result[0].publicIP).toBeNull();
   expect(result[0].description).toBe(description);
+  expect(result[0].rootfs_size).toBe(bytesToGB(rootfsSize));
   expect(result[0].mounts[0]["name"]).toBe(diskName);
   expect(result[0].mounts[0]["size"]).toBe(bytesToGB(diskSize));
   expect(result[0].mounts[0]["mountPoint"]).toBe(mountPoint);
