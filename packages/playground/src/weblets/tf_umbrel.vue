@@ -12,7 +12,7 @@
   >
     <template #title>Deploy an Umbrel Instance </template>
 
-    <form-validator v-model="valid">
+    <d-tabs :tabs="[{ title: 'Config', value: 'config' }]">
       <input-validator
         :value="name"
         :rules="[
@@ -108,10 +108,10 @@
       />
 
       <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
-    </form-validator>
+    </d-tabs>
 
-    <template #footer-actions>
-      <v-btn color="secondary" variant="outlined" @click="deploy" :disabled="!valid"> Deploy </v-btn>
+    <template #footer-actions="{ validateBeforeDeploy }">
+      <v-btn color="secondary" @click="validateBeforeDeploy(deploy)" text="Deploy" />
     </template>
   </weblet-layout>
 </template>
@@ -123,18 +123,15 @@ import { manual } from "@/utils/manual";
 
 import Network from "../components/networks.vue";
 import { useLayout } from "../components/weblet_layout.vue";
-import { useProfileManager } from "../stores";
+import { useGrid } from "../stores";
 import type { Flist, solutionFlavor as SolutionFlavor } from "../types";
 import { ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
-import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
 import rootFs from "../utils/root_fs";
 import { generateName, generatePassword } from "../utils/strings";
 
 const layout = useLayout();
-const valid = ref(false);
-const profileManager = useProfileManager();
 const name = ref(generateName({ prefix: "um" }));
 const username = ref("admin");
 const password = ref(generatePassword());
@@ -151,8 +148,10 @@ const dedicated = ref(false);
 const certified = ref(false);
 const rootFilesystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solution.value?.memory ?? 0));
 const selectionDetails = ref<SelectionDetails>();
-const mycelium = ref(false);
+const mycelium = ref(true);
 const selectedSSHKeys = ref("");
+const gridStore = useGrid();
+const grid = gridStore.client as GridClient;
 
 async function deploy() {
   layout.value.setStatus("deploy");
@@ -161,7 +160,7 @@ async function deploy() {
 
   try {
     layout.value?.validateSSH();
-    const grid = await getGrid(profileManager.profile!, projectName);
+    updateGrid(grid, { projectName });
 
     await layout.value.validateBalance(grid!);
 
@@ -218,6 +217,10 @@ function updateSSHkeyEnv(selectedKeys: string) {
 </script>
 
 <script lang="ts">
+import type { GridClient } from "@threefold/grid_client";
+
+import { updateGrid } from "@/utils/grid";
+
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";

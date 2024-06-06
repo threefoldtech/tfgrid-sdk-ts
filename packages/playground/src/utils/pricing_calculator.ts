@@ -1,7 +1,8 @@
-import { isInt, max, min, required } from "./validators";
+import { isInt, isNumeric, max, min, required } from "./validators";
 
 function _applyRules(rules: Array<(value: string) => { message: string } | void>): (value: string) => true | string {
   return (value: string) => {
+    value = value?.toString();
     for (const rule of rules) {
       const res = rule(value);
       if (res && res.message) {
@@ -17,6 +18,13 @@ export const cruRules = _applyRules([
   isInt("CPU must be a valid integer."),
   min("Minimum allowed cpu cores is 1", 1),
   max("Maximum allowed cpu cores is 256.", 256),
+]);
+
+export const nuRules = _applyRules([
+  required("Bandwidth is required."),
+  isInt("Bandwidth must be a valid integer."),
+  min("Minimum allowed bandwidth is 0.", 0),
+  max("Maximum allowed bandwidth is 1000000.", 1000000),
 ]);
 
 export const mruRules = _applyRules([
@@ -39,7 +47,10 @@ export const hruRules = _applyRules([
   min("Minimum allowed hdd storage size is 0 GB.", 0),
 ]);
 
-export const balanceRules = _applyRules([min("Balance should be a positive integer and more than 1 TFT.", 1)]);
+export const balanceRules = _applyRules([
+  isNumeric("Balance must be a valid number."),
+  min("Minimum allowed balance is 0.", 0),
+]);
 
 export function normalizePrice(price: number) {
   return parseInt(String(price * 1000)) / 1000;

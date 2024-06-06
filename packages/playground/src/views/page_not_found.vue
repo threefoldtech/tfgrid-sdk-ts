@@ -3,9 +3,7 @@
   <p class="text1">Oops! The page you were looking for doesn't exist.</p>
   <p class="text2">You may have mistyped address or the page may have been moved.</p>
   <div style="text-align: center">
-    <v-btn color="primary" variant="text" @click="$router.push({ name: 'landing' })">
-      Take me back to the Home page.</v-btn
-    >
+    <v-btn variant="text" @click="$router.push({ name: 'landing' })"> Take me back to the Home page.</v-btn>
   </div>
 </template>
 

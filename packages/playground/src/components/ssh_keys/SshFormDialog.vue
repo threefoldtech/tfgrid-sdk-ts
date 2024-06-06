@@ -3,7 +3,7 @@
     @click:outside="() => $emit('close')"
     @keydown.esc="() => $emit('close')"
     v-model="$props.open"
-    max-width="750"
+    max-width="800"
   >
     <template v-slot:default>
       <v-form v-model="isValidForm">
@@ -32,11 +32,12 @@
 
             <v-alert width="95%" class="mb-4" type="info">
               {{ $props.dialogType === SSHCreationMethod.Generate ? "Generating" : "Importing" }}
-              a new SSH key will cost you up to {{ sshKeysManagement.updateCost }} TFT
+              a new SSH key will cost you up to
+              {{ sshKeysManagement.updateCost }} TFT
             </v-alert>
 
             <div v-if="$props.dialogType === SSHCreationMethod.Generate" class="create">
-              <v-alert width="95%" type="info" class="mt-4">
+              <v-alert width="95%" type="info" class="my-4">
                 We will not keep your private key information. Be sure to save the private key downloaded after
                 creation.
               </v-alert>
@@ -63,33 +64,29 @@
                 </CopyInputWrapper>
               </input-tooltip>
             </div>
+            <v-divider />
           </v-card-text>
 
-          <v-card-actions class="custom-actions">
-            <v-spacer></v-spacer>
-            <div class="mt-3">
-              <v-btn color="white" variant="outlined" text="Close" @click="$emit('close')"></v-btn>
+          <v-card-actions class="justify-end mb-1 mr-2">
+            <v-btn color="anchor" text="Close" @click="$emit('close')"></v-btn>
 
-              <v-btn
-                v-if="$props.dialogType === SSHCreationMethod.Generate"
-                @click="generateSSHKey"
-                :loading="generating"
-                :disabled="!isValidForm || generating || !!generatedSshKey"
-                variant="outlined"
-                color="secondary"
-              >
-                Generate and Save
-              </v-btn>
-              <v-btn
-                v-if="$props.dialogType === SSHCreationMethod.Import"
-                :loading="$props.savingKey"
-                :disabled="!isValidForm"
-                color="secondary"
-                variant="outlined"
-                text="Save"
-                @click="createNewSSHKey"
-              ></v-btn>
-            </div>
+            <v-btn
+              v-if="$props.dialogType === SSHCreationMethod.Generate"
+              @click="generateSSHKey"
+              :loading="generating"
+              :disabled="!isValidForm || generating || !!generatedSshKey"
+              color="secondary"
+            >
+              Generate and Save
+            </v-btn>
+            <v-btn
+              v-if="$props.dialogType === SSHCreationMethod.Import"
+              :loading="$props.savingKey"
+              :disabled="!isValidForm"
+              color="secondary"
+              text="Save"
+              @click="createNewSSHKey"
+            ></v-btn>
           </v-card-actions>
         </v-card>
       </v-form>
@@ -98,12 +95,14 @@
 </template>
 
 <script lang="ts" setup>
+import type { GridClient } from "@threefold/grid_client";
 import { defineComponent, type PropType, ref, watch } from "vue";
 import { onMounted } from "vue";
 
+import { useGrid } from "@/stores";
 import { type Profile, useProfileManager } from "@/stores/profile_manager";
 import { SSHCreationMethod, type SSHKeyData } from "@/types";
-import { type Balance, getGrid, loadBalance } from "@/utils/grid";
+import { type Balance, loadBalance } from "@/utils/grid";
 import SSHKeysManagement from "@/utils/ssh";
 
 const props = defineProps({
@@ -136,6 +135,8 @@ const props = defineProps({
 const emits = defineEmits(["close", "save", "generate"]);
 
 const profileManager = useProfileManager();
+const gridStore = useGrid();
+const grid = gridStore.client as unknown as GridClient;
 const sshKeysManagement = new SSHKeysManagement();
 const isValidForm = ref<boolean>(false);
 
@@ -171,16 +172,15 @@ function createNewSSHKey() {
     id: keyId,
     publicKey: sshKey.value,
     createdAt: sshKeysManagement.formatDate(now),
-    name: "",
+    name: keyName.value,
     isActive: true,
   };
 
   createdKey.value.publicKey = sshKey.value;
   const parts = createdKey.value.publicKey.split(" ");
 
-  if (parts.length === 3) {
+  if (parts.length === 3 && keyName.value === "") {
     const importedKeyName = parts[parts.length - 1];
-
     if (importedKeyName.length < 30 && sshKeysManagement.availableName(importedKeyName)) {
       keyName.value = parts[parts.length - 1];
     }
@@ -218,7 +218,6 @@ async function __loadBalance(profile?: Profile, tries = 1) {
 
   try {
     loadingBalance.value = true;
-    const grid = await getGrid(profile);
     balance.value = await loadBalance(grid!);
     loadingBalance.value = false;
   } catch {

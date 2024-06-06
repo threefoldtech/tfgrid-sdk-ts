@@ -4,7 +4,7 @@
     @mount="layoutMount"
     :cpu="solution?.cpu"
     :memory="solution?.memory"
-    :disk="disks.reduce((total, disk) => total + disk.size, rootFilesystemSize)"
+    :disk="disks.reduce((total, disk) => total + disk.size, solution?.disk ?? 0)"
     :ipv4="ipv4"
     :dedicated="dedicated"
     :SelectedNode="selectionDetails?.node"
@@ -72,9 +72,8 @@
             dedicated,
             cpu: solution?.cpu,
             ssdDisks: disks.map(disk => disk.size),
-            solutionDisk: solution?.disk,
             memory: solution?.memory,
-            rootFilesystemSize,
+            rootFilesystemSize: solution?.disk,
           }"
           v-model="selectionDetails"
         />
@@ -173,36 +172,42 @@
       </template>
     </d-tabs>
 
-    <template #footer-actions>
-      <v-btn color="secondary" variant="outlined" :disabled="tabs?.invalid || network?.error" @click="deploy"
-        >Deploy</v-btn
-      >
+    <template #footer-actions="{ validateBeforeDeploy }">
+      <v-btn color="secondary" @click="validateBeforeDeploy(deploy)" text="Deploy" />
     </template>
   </weblet-layout>
 </template>
 
 <script lang="ts" setup>
-import { computed, type Ref, ref, watch } from "vue";
+import { type Ref, ref, watch } from "vue";
 
 import { manual } from "@/utils/manual";
 
 import Network from "../components/networks.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import { useLayout } from "../components/weblet_layout.vue";
-import { useProfileManager } from "../stores";
+import { useGrid } from "../stores";
 import { type Flist, ProjectName } from "../types";
 import { deployVM, type Disk, type Env } from "../utils/deploy_vm";
-import { getGrid } from "../utils/grid";
 import { generateName } from "../utils/strings";
 
 const layout = useLayout();
 const tabs = ref();
-const profileManager = useProfileManager();
 
 const images = [
   {
+    name: "Ubuntu-23.10",
+    flist: "https://hub.grid.tf/tf-official-vms/ubuntu-23.10-mycelium.flist",
+    entryPoint: "/sbin/zinit init",
+  },
+  {
     name: "Ubuntu-22.04",
     flist: "https://hub.grid.tf/tf-official-apps/threefoldtech-ubuntu-22.04.flist",
+    entryPoint: "/sbin/zinit init",
+  },
+  {
+    name: "Arch",
+    flist: "https://hub.grid.tf/tf-official-vms/arch-mycelium.flist",
     entryPoint: "/sbin/zinit init",
   },
   {
@@ -232,16 +237,17 @@ const flist = ref<Flist>();
 const ipv4 = ref(false);
 const ipv6 = ref(false);
 const planetary = ref(true);
-const mycelium = ref(false);
+const mycelium = ref(true);
 const wireguard = ref(false);
 const envs = ref<Env[]>([]);
 const disks = ref<Disk[]>([]);
 const network = ref();
 const dedicated = ref(false);
 const certified = ref(false);
-const rootFilesystemSize = computed(() => solution.value?.disk);
 const selectionDetails = ref<SelectionDetails>();
 const selectedSSHKeys = ref("");
+const gridStore = useGrid();
+const grid = gridStore.client as GridClient;
 
 function layoutMount() {
   if (envs.value.length > 0) {
@@ -269,7 +275,7 @@ async function deploy() {
   const projectName = ProjectName.VM.toLowerCase() + "/" + name.value;
 
   try {
-    const grid = await getGrid(profileManager.profile!, projectName);
+    updateGrid(grid, { projectName });
 
     await layout.value.validateBalance(grid!);
 
@@ -291,7 +297,7 @@ async function deploy() {
           mycelium: mycelium.value,
           publicIpv4: ipv4.value,
           publicIpv6: ipv6.value,
-          rootFilesystemSize: rootFilesystemSize.value,
+          rootFilesystemSize: solution.value?.disk,
           nodeId: selectionDetails.value?.node?.nodeId,
           rentedBy: dedicated.value ? grid!.twinId : undefined,
           certified: certified.value,
@@ -315,12 +321,15 @@ watch(selectedSSHKeys, layoutMount, { deep: true });
 </script>
 
 <script lang="ts">
+import type { GridClient } from "@threefold/grid_client";
+
 import ExpandableLayout from "../components/expandable_layout.vue";
 import SelectVmImage from "../components/select_vm_image.vue";
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";
 import type { solutionFlavor as SolutionFlavor } from "../types";
 import type { SelectionDetails } from "../types/nodeSelector";
+import { updateGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
 
 const solution = ref() as Ref<SolutionFlavor>;

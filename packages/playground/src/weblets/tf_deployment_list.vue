@@ -26,13 +26,9 @@
             @click="openDialog(tabs[activeTab].value, item)"
           />
 
-          <IconActionBtn icon="mdi-cog" tooltip="Manage Domains" @click="dialog = item.value.deploymentName" />
+          <IconActionBtn icon="mdi-cog" tooltip="Manage Domains" @click="dialog = item.deploymentName" />
 
-          <ManageGatewayDialog
-            v-if="dialog === item.value.deploymentName"
-            :vm="item.value"
-            @close="dialog = undefined"
-          />
+          <ManageGatewayDialog v-if="dialog === item.deploymentName" :vm="item" @close="dialog = undefined" />
         </template>
 
         <template #VM-actions="{ item }">
@@ -45,18 +41,14 @@
           <IconActionBtn
             icon="mdi-cog"
             tooltip="Manage Domains"
-            :disabled="item.value.fromAnotherClient"
-            @click="dialog = item.value.deploymentName"
+            :disabled="item.fromAnotherClient"
+            @click="dialog = item.deploymentName"
           />
 
-          <ManageGatewayDialog
-            v-if="dialog === item.value.deploymentName"
-            :vm="item.value"
-            @close="dialog = undefined"
-          />
+          <ManageGatewayDialog v-if="dialog === item.deploymentName" :vm="item" @close="dialog = undefined" />
         </template>
 
-        <template #CapRover-actions="{ item }">
+        <template #CapRover-actions="{ item, update }">
           <IconActionBtn
             tooltip="Show Details"
             icon="mdi-eye-outline"
@@ -66,17 +58,17 @@
             tooltip="Admin Panel"
             color="anchor"
             icon="mdi-view-dashboard"
-            :href="'http://captain.' + item.value.env.CAPROVER_ROOT_DOMAIN"
+            :href="'http://captain.' + item.env.CAPROVER_ROOT_DOMAIN"
           />
-          <IconActionBtn icon="mdi-cog" tooltip="Manage Workers" @click="dialog = item.value.deploymentName" />
+          <IconActionBtn icon="mdi-cog" tooltip="Manage Workers" @click="dialog = item.deploymentName" />
 
           <ManageCaproverWorkerDialog
-            v-if="dialog === item.value.deploymentName"
-            :master="item.value"
-            :data="item.value.workers || []"
-            :project-name="item.value.projectName"
+            v-if="dialog === item.deploymentName"
+            :master="item"
+            :data="item.workers || []"
+            :project-name="item.projectName"
             @close="dialog = undefined"
-            @update:caprover="item.value = $event"
+            @update:caprover="update($event)"
           />
         </template>
 
@@ -90,7 +82,7 @@
             tooltip="Visit"
             icon="mdi-web"
             color="anchor"
-            :href="'https://' + item.value.env.PEERTUBE_WEBSERVER_HOSTNAME"
+            :href="'https://' + item.env.PEERTUBE_WEBSERVER_HOSTNAME"
           />
         </template>
 
@@ -104,7 +96,7 @@
             tooltip="Visit"
             icon="mdi-web"
             color="anchor"
-            :href="'https://' + item.value.env.FUNKWHALE_HOSTNAME"
+            :href="'https://' + item.env.FUNKWHALE_HOSTNAME"
           />
         </template>
 
@@ -118,14 +110,9 @@
             tooltip="Admin Panel"
             color="anchor"
             icon="mdi-view-dashboard"
-            :href="'http://' + item.value.env.DOMAIN_NAME + '/admin/'"
+            :href="'http://' + item.env.DOMAIN_NAME + '/admin/'"
           />
-          <IconActionBtn
-            tooltip="Visit"
-            icon="mdi-web"
-            color="anchor"
-            :href="'https://' + item.value.env.DOMAIN_NAME"
-          />
+          <IconActionBtn tooltip="Visit" icon="mdi-web" color="anchor" :href="'https://' + item.env.DOMAIN_NAME" />
         </template>
 
         <template #Presearch-actions="{ item }">
@@ -142,7 +129,7 @@
             icon="mdi-eye-outline"
             @click="openDialog(tabs[activeTab].value, item)"
           />
-          <IconActionBtn tooltip="Visit" color="anchor" icon="mdi-web" :href="item.value.env.SITE_URL" />
+          <IconActionBtn tooltip="Visit" color="anchor" icon="mdi-web" :href="item.env.SITE_URL" />
         </template>
 
         <template #Discourse-actions="{ item }">
@@ -155,7 +142,7 @@
             tooltip="Visit"
             icon="mdi-web"
             color="anchor"
-            :href="'https://' + item.value.env.DISCOURSE_HOSTNAME"
+            :href="'https://' + item.env.DISCOURSE_HOSTNAME"
           />
         </template>
 
@@ -169,7 +156,7 @@
             tooltip="Visit"
             icon="mdi-web"
             color="anchor"
-            :href="'https://' + item.value.env.DIGITALTWIN_APPID"
+            :href="'https://' + item.env.DIGITALTWIN_APPID"
           />
         </template>
 
@@ -183,7 +170,7 @@
             tooltip="Visit"
             icon="mdi-web"
             color="anchor"
-            :href="'https://' + item.value.env.CASPERLABS_HOSTNAME"
+            :href="'https://' + item.env.CASPERLABS_HOSTNAME"
           />
         </template>
 
@@ -193,12 +180,7 @@
             icon="mdi-eye-outline"
             @click="openDialog(tabs[activeTab].value, item)"
           />
-          <IconActionBtn
-            tooltip="Visit"
-            icon="mdi-web"
-            color="anchor"
-            :href="'https://' + item.value.env.OWNCLOUD_DOMAIN"
-          />
+          <IconActionBtn tooltip="Visit" icon="mdi-web" color="anchor" :href="'https://' + item.env.OWNCLOUD_DOMAIN" />
         </template>
 
         <template #Nextcloud-actions="{ item }">
@@ -211,13 +193,13 @@
             tooltip="Open Nextcloud"
             color="anchor"
             icon="mdi-web"
-            :href="'https://' + item.value.env.NEXTCLOUD_DOMAIN"
+            :href="'https://' + item.env.NEXTCLOUD_DOMAIN"
           />
           <IconActionBtn
             tooltip="Nextcloud Setup"
             color="anchor"
             icon="mdi-view-dashboard"
-            :href="'https://' + item.value.env.NEXTCLOUD_AIO_LINK"
+            :href="'https://' + item.env.NEXTCLOUD_AIO_LINK"
           />
         </template>
 
@@ -231,7 +213,21 @@
             tooltip="Visit"
             icon="mdi-web"
             color="anchor"
-            :href="'https://' + item.value.env.SUBSQUID_WEBSERVER_HOSTNAME + '/graphql'"
+            :href="'https://' + item.env.SUBSQUID_WEBSERVER_HOSTNAME + '/graphql'"
+          />
+        </template>
+
+        <template #StaticWebsite-actions="{ item }">
+          <IconActionBtn
+            tooltip="Show Details"
+            icon="mdi-eye-outline"
+            @click="openDialog(tabs[activeTab].value, item)"
+          />
+          <IconActionBtn
+            tooltip="Visit"
+            icon="mdi-web"
+            color="anchor"
+            :href="'https://' + item.env.STATICWEBSITE_DOMAIN"
           />
         </template>
 
@@ -253,10 +249,7 @@
             tooltip="Visit"
             icon="mdi-web"
             color="anchor"
-            :href="
-              'http://' +
-              (item.value.publicIP?.ip ? item.value.publicIP.ip.slice(0, -3) : '[' + item.value.planetary + ']')
-            "
+            :href="'http://' + (item.publicIP?.ip ? item.publicIP.ip.slice(0, -3) : '[' + item.planetary + ']')"
           />
         </template>
 
@@ -272,12 +265,20 @@
             icon="mdi-view-dashboard"
             :href="
               'http://' +
-              (item.value.publicIP?.ip
-                ? item.value.publicIP.ip.slice(0, -3)
-                : item.value.planetary
-                ? '[' + item.value.planetary + ']'
-                : item.value.interfaces[0].ip)
+              (item.publicIP?.ip
+                ? item.publicIP.ip.slice(0, -3)
+                : item.planetary
+                ? '[' + item.planetary + ']'
+                : item.interfaces[0].ip)
             "
+          />
+        </template>
+
+        <template #TFRobot-actions="{ item }">
+          <IconActionBtn
+            tooltip="Show Details"
+            icon="mdi-eye-outline"
+            @click="openDialog(tabs[activeTab].value, item)"
           />
         </template>
 
@@ -287,12 +288,12 @@
             icon="mdi-eye-outline"
             @click="openDialog(tabs[activeTab].value, item)"
           />
-          <IconActionBtn tooltip="Visit" color="anchor" icon="mdi-web" :href="'https://' + item.value.env.WP_URL" />
+          <IconActionBtn tooltip="Visit" color="anchor" icon="mdi-web" :href="'https://' + item.env.WP_URL" />
           <IconActionBtn
             tooltip="Admin Panel"
             color="anchor"
             icon="mdi-view-dashboard"
-            :href="'https://' + item.value.env.WP_URL + '/wp-admin'"
+            :href="'https://' + item.env.WP_URL + '/wp-admin'"
           />
         </template>
       </VmDeploymentTable>
@@ -314,16 +315,16 @@
 
             <IconActionBtn
               icon="mdi-cog"
-              :disabled="item.value.fromAnotherClient"
+              :disabled="item.fromAnotherClient"
               tooltip="Manage Workers"
-              @click="dialog = item.value.deploymentName"
+              @click="dialog = item.deploymentName"
             />
 
             <ManageK8SWorkerDialog
-              v-if="dialog === item.value.deploymentName"
-              :data="item.value"
+              v-if="dialog === item.deploymentName"
+              :data="item"
               @close="dialog = undefined"
-              @update:k8s="item.value.workers = $event.workers"
+              @update:k8s="item.workers = $event.workers"
             />
           </template>
         </K8sDeploymentTable>
@@ -333,7 +334,6 @@
     <template #footer-actions>
       <v-btn
         color="error"
-        variant="outlined"
         :disabled="selectedItems.length === 0 || deleting"
         prepend-icon="mdi-delete"
         @click="deletingDialog = true"
@@ -349,16 +349,14 @@
         <strong>Delete the following deployments?</strong>
       </v-card-title>
       <v-card-text>
-        <v-chip class="ma-1" color="primary" v-for="item in selectedItems" :key="item.deploymentName">
+        <v-chip class="ma-1" v-for="item in selectedItems" :key="item.deploymentName">
           {{ item.deploymentName }}
         </v-chip>
+        <v-divider />
       </v-card-text>
-      <v-card-actions>
-        <v-spacer />
-        <v-btn color="anchar" variant="outlined" @click="deletingDialog = false">Cancel</v-btn>
-        <v-btn color="error" variant="outlined" @click="onDelete(tabs[activeTab].value.toLowerCase() === 'kubernetes')">
-          Delete
-        </v-btn>
+      <v-card-actions class="justify-end my-1 mr-2">
+        <v-btn color="anchar" @click="deletingDialog = false">Cancel</v-btn>
+        <v-btn color="error" @click="onDelete(tabs[activeTab].value.toLowerCase() === 'kubernetes')"> Delete </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -370,9 +368,9 @@ import { getCurrentInstance, onUnmounted, type Ref, ref, watch } from "vue";
 import type { Tab } from "../components/dynamic_tabs.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { deploymentListEnvironments } from "../constants/deployment_list";
-import { useProfileManager } from "../stores";
+import { useGrid } from "../stores";
 import { deleteDeployment } from "../utils/delete_deployment";
-import { getGrid, updateGrid } from "../utils/grid";
+import { updateGrid } from "../utils/grid";
 
 const props = defineProps<{
   projectName?: ProjectName;
@@ -399,9 +397,9 @@ const tabs: Tab[] = [
   { title: "Umbrel", value: "Umbrel", imgPath: "images/icons/umbrel.png" },
   { title: "Freeflow", value: "Freeflow", imgPath: "images/icons/freeflow.png" },
   { title: "Wordpress", value: "Wordpress", imgPath: "images/icons/wordpress.png" },
+  { title: "Static Website", value: "StaticWebsite", imgPath: "images/icons/wordpress.png" },
+  { title: "TFRobot", value: "TFRobot", imgPath: "images/icons/tfrobot.png" },
 ];
-
-const profileManager = useProfileManager();
 
 const layout = useLayout();
 const dialog = ref<string>();
@@ -409,6 +407,8 @@ const selectedItems = ref<any[]>([]);
 const deleting = ref(false);
 const deletingDialog = ref(false);
 const table = ref() as Ref<{ loadDeployments(): void }>;
+const gridStore = useGrid();
+const grid = gridStore.client as GridClient;
 
 const _idx = tabs.findIndex(t => t.value === props.projectName);
 const activeTab = ref(!props.projectName ? 0 : _idx) as Ref<number>;
@@ -418,7 +418,6 @@ async function onDelete(k8s = false) {
   deletingDialog.value = false;
   deleting.value = true;
   try {
-    const grid = await getGrid(profileManager.profile!);
     for (const item of selectedItems.value) {
       try {
         await deleteDeployment(updateGrid(grid!, { projectName: item.projectName }), {
@@ -442,13 +441,13 @@ async function onDelete(k8s = false) {
 }
 
 const VMS: string[] = [ProjectName.Fullvm, ProjectName.VM, ProjectName.NodePilot];
-function openDialog(project: string, item?: { value: any }): void {
+function openDialog(project: string, item?: any): void {
   const key: keyof typeof deploymentListEnvironments = VMS.includes(project)
     ? "vm"
     : project === ProjectName.Kubernetes
     ? "k8s"
     : (project.toLowerCase() as any);
-  layout.value.openDialog(item?.value, deploymentListEnvironments[key]);
+  layout.value.openDialog(item, deploymentListEnvironments[key]);
 }
 
 function clickOpenDialog(_: MouseEvent, { item }: any) {
@@ -467,6 +466,8 @@ onUnmounted(() => deploymentListManager?.unregister(uid));
 </script>
 
 <script lang="ts">
+import type { GridClient } from "@threefold/grid_client";
+
 import { useDeploymentListManager } from "../components/deployment_list_manager.vue";
 import IconActionBtn from "../components/icon_action_btn.vue";
 import K8sDeploymentTable from "../components/k8s_deployment_table.vue";

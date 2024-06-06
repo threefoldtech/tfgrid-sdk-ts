@@ -1,6 +1,6 @@
 import { assertBoolean, assertId, assertIn, assertInt, assertNatural, assertPattern, assertString } from "../utils";
 import { AbstractBuilder, BuilderMapper, BuilderMethods, BuilderValidator } from "./abstract_builder";
-import { ID_PATTERN, NodeStatus } from "./gateways";
+import { ID_PATTERN, UnifiedNodeStatus } from "./gateways";
 
 export enum SortBy {
   NodeId = "node_id",
@@ -25,6 +25,7 @@ export enum SortBy {
   NumGPU = "num_gpu",
   ExtraFee = "extra_fee",
   Status = "status",
+  FreeCRU = "free_cru",
 }
 
 export enum SortOrder {
@@ -46,7 +47,7 @@ export interface NodesQuery {
   totalSru: number;
   totalHru: number;
   freeIps: number;
-  status: NodeStatus;
+  status: UnifiedNodeStatus;
   city: string;
   country: string;
   region: string;
@@ -72,6 +73,7 @@ export interface NodesQuery {
   healthy: boolean;
   sortBy: SortBy;
   sortOrder: SortOrder;
+  numGpu: number;
 }
 
 const NODES_MAPPER: BuilderMapper<NodesQuery> = {
@@ -114,6 +116,7 @@ const NODES_MAPPER: BuilderMapper<NodesQuery> = {
   healthy: "healthy",
   sortBy: "sort_by",
   sortOrder: "sort_order",
+  numGpu: "num_gpu",
 };
 
 const NODES_VALIDATOR: BuilderValidator<NodesQuery> = {
@@ -126,7 +129,12 @@ const NODES_VALIDATOR: BuilderValidator<NodesQuery> = {
   freeGpu: assertNatural,
   freeIps: assertNatural,
   status(value) {
-    assertIn(value, [NodeStatus.Up, NodeStatus.Down, NodeStatus.Standby]);
+    assertIn(value, [
+      UnifiedNodeStatus.Up,
+      UnifiedNodeStatus.Down,
+      UnifiedNodeStatus.Standby,
+      UnifiedNodeStatus.UpStandby,
+    ]);
   },
   city: assertString,
   country: assertString,
@@ -165,6 +173,7 @@ const NODES_VALIDATOR: BuilderValidator<NodesQuery> = {
   healthy: assertBoolean,
   sortBy: assertString,
   sortOrder: assertString,
+  numGpu: assertInt,
 };
 
 export class NodesBuilder extends AbstractBuilder<NodesQuery> {

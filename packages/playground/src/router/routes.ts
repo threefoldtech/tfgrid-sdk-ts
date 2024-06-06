@@ -52,6 +52,7 @@ enum OtherRoutes {
 enum ApplicationRoutes {
   BaseRoute = "/deploy/applications/",
   Peertube = "/deploy/applications/peertube/",
+  StaticWebsite = "/deploy/applications/static_website/",
   Funkwhale = "/deploy/applications/funkwhale/",
   Mattermost = "/deploy/applications/mattermost/",
   Discourse = "/deploy/applications/discourse/",
@@ -66,6 +67,7 @@ enum ApplicationRoutes {
   Wordpress = "/deploy/applications/wordpress/",
   Umbrel = "/deploy/applications/umbrel/",
   Freeflow = "/deploy/applications/freeflow/",
+  TFRobot = "/deploy/applications/tfrobot/",
 }
 
 const DashboardRoutes = {

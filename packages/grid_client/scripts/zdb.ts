@@ -28,8 +28,8 @@ async function main() {
   const grid3 = await getClient(`zdb/${name}`);
 
   const zdbQueryOptions: FilterOptions = {
-    sru: 1,
-    hru: 1,
+    sru: 3,
+    hru: 3,
     availableFor: grid3.twinId,
     farmId: 1,
   };

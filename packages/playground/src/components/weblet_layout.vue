@@ -7,7 +7,9 @@
             :src="baseUrl + titleImage"
             alt="title image"
             v-if="titleImage"
-            :style="{ filter: `brightness(${$vuetify.theme.global.name === 'light' ? 0.2 : 1})` }"
+            :style="{
+              filter: `brightness(${$vuetify.theme.global.name === 'light' ? 0.2 : 1})`,
+            }"
           />
           <slot name="title" />
         </v-card-title>
@@ -71,25 +73,24 @@
         <div v-else>
           Based on the cloud resources you have selected (CPU: {{ cpu }} Cores, RAM: {{ memory }} MB, SSD:
           {{ disk }} GB{{ ipv4 ? ", Public IP: Enabled" : "" }}) your deployment costs
-          <span class="font-weight-black">{{ costLoading ? "Calculating..." : normalizeBalance(tft) }}</span> TFTs or
-          approximately
-          <span class="font-weight-black">{{ costLoading ? "Calculating..." : normalizeBalance(usd) }}</span> USD per
-          month.
+          <span class="font-weight-black">{{ costLoading ? "Calculating..." : normalizeBalance(tft) }}</span>
+          TFTs or approximately
+          <span class="font-weight-black">{{ costLoading ? "Calculating..." : normalizeBalance(usd) }}</span>
+          USD per month.
 
           <div v-if="SelectedNode?.certificationType === 'Certified'">
             You selected a certified node. Please note that this deployment costs more TFT.
           </div>
         </div>
-
+        <div>Please Note that the Bandwidth affects the total cost.</div>
         <a :href="manual.pricing" target="_blank" class="app-link">
           Learn more about the pricing and how to unlock discounts.
         </a>
       </v-alert>
-      <v-divider class="mt-5" />
-      <v-card-actions>
-        <v-spacer />
-        <slot name="footer-actions" v-if="!status" />
-        <v-btn v-else color="secondary" variant="outlined" :loading="status === 'deploy'" @click="reset"> Back </v-btn>
+      <v-divider class="mt-3" />
+      <v-card-actions class="justify-end my-1 mr-2">
+        <slot name="footer-actions" :validateBeforeDeploy="validateBeforeDeploy" v-if="!status" />
+        <v-btn v-else color="secondary" :loading="status === 'deploy'" @click="reset"> Back </v-btn>
       </v-card-actions>
     </template>
   </v-card>
@@ -110,8 +111,8 @@ import { computed, ref, watch } from "vue";
 
 import { manual } from "@/utils/manual";
 
-import { useProfileManager } from "../stores";
-import { getGrid, loadBalance } from "../utils/grid";
+import { useGrid, useProfileManager } from "../stores";
+import { loadBalance, updateGrid } from "../utils/grid";
 import { normalizeBalance } from "../utils/helpers";
 
 const props = defineProps({
@@ -155,6 +156,9 @@ const profileManager = useProfileManager();
 const webletLayoutContainer = ref<VCard>();
 const status = ref<WebletStatus>();
 const message = ref<string>();
+const gridStore = useGrid();
+const grid = gridStore.client as GridClient;
+
 function onLogMessage(msg: string) {
   if (typeof msg === "string") {
     message.value = msg;
@@ -174,6 +178,78 @@ const alertType = computed(() => {
 const dialogData = ref();
 const environments = ref();
 const onlyJson = ref();
+
+let __forms: FormValidatorService[] = [];
+let __setTab: (tab: number) => void = () => void 0;
+
+provideService({
+  set(forms, setTab) {
+    __forms = forms as any;
+    __setTab = setTab;
+  },
+  clear() {
+    __forms = [];
+    __setTab = () => void 0;
+  },
+});
+
+function validateBeforeDeploy(fn: () => void) {
+  const forms = __forms;
+
+  let errorInput: [number, any] | null = null;
+
+  out: for (let i = 0; i < forms.length; i++) {
+    const form = forms[i];
+    const inputs = form.inputs as unknown as InputValidatorService[];
+
+    for (const input of inputs) {
+      const status = typeof input.status === "string" ? input.status : (input.status as any)?.value;
+      if (status === ValidatorStatus.Invalid) {
+        errorInput = [i, input.$el];
+        break out;
+      }
+
+      const valid = status === ValidatorStatus.Valid || (status === ValidatorStatus.Init && form.validOnInit);
+
+      if ((!status || !valid) && !errorInput) {
+        errorInput = [i, input.$el];
+      }
+    }
+  }
+
+  if (errorInput) {
+    const [tab, __input] = errorInput;
+
+    const input =
+      __input && typeof __input === "object" && "value" in __input && __input.value instanceof HTMLElement
+        ? __input.value
+        : __input instanceof HTMLElement
+        ? __input
+        : null;
+
+    if (!input || !__setTab) {
+      return;
+    }
+
+    __setTab(tab);
+
+    // Timeout so the ui gets render before scroll
+    setTimeout(() => {
+      const _input = input.querySelector("textarea") || input.querySelector("input") || input;
+      if (!(_input instanceof HTMLElement)) {
+        return;
+      }
+
+      document.addEventListener("scrollend", () => _input.focus(), { once: true });
+      _input.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 250);
+
+    return;
+  }
+
+  return fn();
+}
+
 defineExpose({
   async validateBalance(grid: GridClient, min = 2) {
     message.value = "Checking your balance...";
@@ -298,7 +374,7 @@ async function loadCost(profile: { mnemonic: string }) {
   }
 
   costLoading.value = true;
-  const grid = await getGrid(profile);
+  updateGrid(grid, { projectName: "" });
   const { sharedPrice, dedicatedPrice } = await grid!.calculator.calculateWithMyBalance({
     cru: typeof props.cpu === "number" ? props.cpu : 0,
     sru: typeof props.disk === "number" ? props.disk : 0,
@@ -316,7 +392,11 @@ async function loadCost(profile: { mnemonic: string }) {
 
 <script lang="ts">
 import type { ComputedRef, PropType, Ref } from "vue";
+import { inject, provide } from "vue";
 import type { VCard } from "vuetify/components/VCard";
+
+import { type FormValidatorService, ValidatorStatus } from "@/hooks/form_validator";
+import type { InputValidatorService } from "@/hooks/input_validator";
 
 import type { Balance } from "../utils/grid";
 import DeploymentDataDialog from "./deployment_data_dialog.vue";
@@ -339,6 +419,21 @@ export interface WebletLayout {
 
 export function useLayout() {
   return ref() as Ref<WebletLayout>;
+}
+
+const KEY = "weblet:layout";
+
+export interface WebletLayoutService {
+  set(forms: FormValidatorService[], activeTab: (tab: number) => void): void;
+  clear(): void;
+}
+
+function provideService(service: WebletLayoutService) {
+  provide(KEY, service);
+}
+
+export function useWebletLayoutServie() {
+  return inject(KEY) as WebletLayoutService;
 }
 
 export default {

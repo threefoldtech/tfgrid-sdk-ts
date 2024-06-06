@@ -10,19 +10,18 @@
         </v-card-title>
         <v-divider />
         <v-card-text>This will free up the node for others on the chain</v-card-text>
-        <v-card-actions class="justify-end">
-          <v-btn variant="outlined" color="anchor" @click="openUnreserveDialog = false">Close</v-btn>
-          <v-btn variant="outlined" color="error" @click="unReserveNode" :loading="loadingUnreserveNode">Confirm</v-btn>
+        <v-card-actions class="justify-end mb-1 mr-2">
+          <v-btn color="anchor" @click="openUnreserveDialog = false">Close</v-btn>
+          <v-btn color="error" @click="unReserveNode" :loading="loadingUnreserveNode">Confirm</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
     <v-btn
-      size="small"
       :loading="loadingReserveNode"
       v-if="node.rentedByTwinId === 0"
       :disabled="disableButton || hasInsufficientBalance"
-      color="primary"
       @click.stop="reserveNode"
+      color="primary"
     >
       Reserve
     </v-btn>
@@ -47,16 +46,18 @@
 </template>
 
 <script lang="ts">
+import type { GridClient } from "@threefold/grid_client";
 import type { GridNode } from "@threefold/gridproxy_client";
 import { InsufficientBalanceError } from "@threefold/types";
 import { computed, type PropType, ref, watch } from "vue";
 
 import { useProfileManager } from "@/stores";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
-import { getGrid } from "@/utils/grid";
 import { notifyDelaying } from "@/utils/notifications";
 
 import { useProfileManagerController } from "../../components/profile_manager_controller.vue";
+import { useGrid } from "../../stores";
+import { updateGrid } from "../../utils/grid";
 
 export default {
   name: "ReserveBtn",
@@ -80,6 +81,8 @@ export default {
     const hasInsufficientBalance = ref(false);
     const balance = profileManagerController.balance;
     const freeBalance = computed(() => balance.value?.free ?? 0);
+    const gridStore = useGrid();
+    const grid = gridStore.client as GridClient;
 
     watch(
       freeBalance,
@@ -100,7 +103,7 @@ export default {
     async function unReserveNode() {
       loadingUnreserveNode.value = true;
       try {
-        const grid = await getGrid(profile.value!);
+        updateGrid(grid, { projectName: "" });
         createCustomToast(`Verify contracts for node ${props.node.nodeId}`, ToastType.info);
 
         const result = (await grid?.contracts.getActiveContracts({ nodeId: +props.node.nodeId })) as any;
@@ -139,7 +142,6 @@ export default {
       try {
         if (profile.value) {
           loadingReserveNode.value = true;
-          const grid = await getGrid(profile.value);
           createCustomToast("Transaction Submitted", ToastType.info);
           await grid?.nodes.reserve({ nodeId: +props.node.nodeId });
           createCustomToast(`Transaction succeeded node ${props.node.nodeId} Reserved`, ToastType.success);

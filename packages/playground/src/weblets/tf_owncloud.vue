@@ -113,25 +113,24 @@
       </template>
     </d-tabs>
 
-    <template #footer-actions>
-      <v-btn color="secondary" variant="outlined" @click="deploy()" :disabled="tabs?.invalid"> Deploy </v-btn>
+    <template #footer-actions="{ validateBeforeDeploy }">
+      <v-btn color="secondary" @click="validateBeforeDeploy(deploy)" text="Deploy" />
     </template>
   </weblet-layout>
 </template>
 
 <script lang="ts" setup>
 import type { GridClient } from "@threefold/grid_client";
-import { computed, type Ref, ref } from "vue";
+import { computed, type Ref, ref, watch } from "vue";
 
 import { manual } from "@/utils/manual";
 
 import { useLayout } from "../components/weblet_layout.vue";
-import { useProfileManager } from "../stores";
+import { useGrid, useProfileManager } from "../stores";
 import type { Flist, solutionFlavor as SolutionFlavor } from "../types";
 import { ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
 import { deployGatewayName, getSubdomain, rollbackDeployment } from "../utils/gateway";
-import { getGrid } from "../utils/grid";
 import { generateName, generatePassword } from "../utils/strings";
 
 const selectionDetails = ref<SelectionDetails>();
@@ -151,10 +150,12 @@ const flist: Flist = {
 const dedicated = ref(false);
 const certified = ref(false);
 const ipv4 = ref(false);
-const mycelium = ref(false);
+const mycelium = ref(true);
 const smtp = ref(createSMTPServer());
 const rootFilesystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solution.value?.memory ?? 0));
 const selectedSSHKeys = ref("");
+const gridStore = useGrid();
+const grid = gridStore.client as GridClient;
 
 function finalize(deployment: any) {
   layout.value.reloadDeploymentsList();
@@ -176,13 +177,11 @@ async function deploy() {
     ? selectionDetails.value.domain.customDomain
     : subdomain + "." + selectionDetails.value?.domain?.selectedDomain?.publicConfig.domain;
 
-  let grid: GridClient | null;
   let vm: any;
 
   try {
     layout.value?.validateSSH();
-    grid = await getGrid(profileManager.profile!, projectName);
-
+    updateGrid(grid, { projectName });
     await layout.value.validateBalance(grid!);
 
     vm = await deployVM(grid!, {
@@ -265,6 +264,22 @@ async function deploy() {
 function updateSSHkeyEnv(selectedKeys: string) {
   selectedSSHKeys.value = selectedKeys;
 }
+watch(
+  () => smtp.value.enabled,
+  newValue => {
+    if (newValue) {
+      ipv4.value = true;
+    }
+  },
+);
+watch(
+  () => ipv4.value,
+  newValue => {
+    if (!newValue && smtp.value.enabled) {
+      smtp.value.enabled = false;
+    }
+  },
+);
 </script>
 
 <script lang="ts">
@@ -274,6 +289,7 @@ import SmtpServer, { createSMTPServer } from "../components/smtp_server.vue";
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";
 import type { SelectionDetails } from "../types/nodeSelector";
+import { updateGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
 import rootFs from "../utils/root_fs";
 

@@ -77,7 +77,21 @@
                 </InputTooltip>
               </VCol>
 
-              <VCol cols="12">
+              <VCol cols="6">
+                <InputTooltip tooltip="To input network bandwidth, The public IPv4 should be enabled.">
+                  <VTextField
+                    label="Bandwidth"
+                    suffix="GB"
+                    min="0"
+                    max="1000000"
+                    :disabled="!resources.ipv4"
+                    :rules="[nuRules]"
+                    v-model="resources.nu"
+                  />
+                </InputTooltip>
+              </VCol>
+
+              <VCol cols="6">
                 <InputTooltip tooltip="The amount of TFT to calculate discount.">
                   <VTextField
                     label="Balance"
@@ -139,29 +153,57 @@
           <VRow class="text-center text-body-1 text-black" v-else-if="valid">
             <VCol cols="6">
               <div
-                class="rounded pa-4 h-100 d-flex justify-center align-center"
-                :style="{ background: computePackageColor(priceTask.data?.dedicatedPackage.package) }"
+                class="rounded pa-4 discount border"
+                :style="{
+                  background: computePackageColor(priceTask.data?.dedicatedPackage.package),
+                }"
               >
-                <p>
-                  Cost of reserving a <strong v-text="'Dedicated Node'" /> of the same specifications<br />
-                  <strong v-text="'Loading...'" v-if="priceTask.loading" />
-                  <strong v-else v-text="dedicatedPriceUSD + ' USD/month, ' + dedicatedPriceTFT + ' TFT/month'" />. A
-                  user can reserve an entire node then use it exclusively to deploy solutions
-                </p>
+                <input-tooltip
+                  justifyCenter
+                  alignCenter
+                  tooltip="Dedicated Node allow user to reserve an entire node then use it exclusively to deploy solutions."
+                >
+                  <p>
+                    Cost of reserving a
+                    <strong class="mr-1" v-text="'Dedicated Node'" />
+                    <strong v-text="'Loading...'" v-if="priceTask.loading" />
+                    <strong v-else v-text="dedicatedPriceUSD + ' USD/month, ' + dedicatedPriceTFT + ' TFT/month'" />
+                  </p>
+                </input-tooltip>
               </div>
+              <section class="card mt-5" v-if="priceTask.data?.dedicatedPackage.package !== 'gold'">
+                <p class="card-info pa-2">
+                  <b>Too expensive?</b> can upgrade to <b>Gold package</b> to get discount up to 60% when you fund your
+                  wallet with <b>{{ dedicatedUpgradePrice }}</b> TFT
+                </p>
+              </section>
             </VCol>
             <VCol cols="6">
               <div
-                class="rounded pa-4 h-100 d-flex justify-center align-center"
-                :style="{ background: computePackageColor(priceTask.data?.sharedPackage.package) }"
+                class="rounded pa-4 discount border"
+                :style="{
+                  background: computePackageColor(priceTask.data?.sharedPackage.package),
+                }"
               >
-                <p>
-                  Cost of reservation on a <strong v-text="'Shared Node'" /><br />
-                  <strong v-text="'Loading...'" v-if="priceTask.loading" />
-                  <strong v-else v-text="sharedPriceUSD + ' USD/month, ' + sharedPriceTFT + ' TFT/month'" />. Shared
-                  Nodes allow several users to host various workloads on a single node
-                </p>
+                <input-tooltip
+                  justifyCenter
+                  alignCenter
+                  tooltip="Shared Nodes allow several users to host various workloads on a single node."
+                >
+                  <p>
+                    Cost of reservation on a
+                    <strong class="mr-1" v-text="'Shared Node'" />
+                    <strong v-text="'Loading...'" v-if="priceTask.loading" />
+                    <strong v-else v-text="sharedPriceUSD + ' USD/month, ' + sharedPriceTFT + ' TFT/month'" />
+                  </p>
+                </input-tooltip>
               </div>
+              <section class="card mt-5 pa-2" v-if="priceTask.data?.sharedPackage.package !== 'gold'">
+                <p class="card-info">
+                  <b>Too expensive?</b> can upgrade to <b>Gold package</b> to get discount up to 60% when you fund your
+                  wallet with <b>{{ sharedUpgradePrice }}</b> TFT
+                </p>
+              </section>
             </VCol>
           </VRow>
 
@@ -191,9 +233,8 @@ import { useProfileManagerController } from "../components/profile_manager_contr
 import { useAsync } from "../hooks";
 import { useProfileManager } from "../stores";
 import { normalizeError } from "../utils/helpers";
-import { balanceRules, cruRules, hruRules, mruRules, sruRules } from "../utils/pricing_calculator";
+import { balanceRules, cruRules, hruRules, mruRules, nuRules, sruRules } from "../utils/pricing_calculator";
 import { computePackageColor, normalizePrice } from "../utils/pricing_calculator";
-
 export default {
   name: "PricingCalculator",
   setup() {
@@ -206,13 +247,18 @@ export default {
       mru: "1",
       sru: "25",
       hru: "100",
+      nu: "0",
       balance: "1",
       certified: false,
       ipv4: false,
       useCurrentBalance: true,
     });
-
-    const tftPriceTask = useAsync(() => calculator.tftPrice(), { init: true, default: 0 });
+    const dedicatedUpgradePrice = Math.ceil(114.473 * 18);
+    const sharedUpgradePrice = Math.ceil(228.947 * 18);
+    const tftPriceTask = useAsync(() => calculator.tftPrice(), {
+      init: true,
+      default: 0,
+    });
     const priceTask = useAsync(
       () => {
         return calculator.calculate({
@@ -224,6 +270,7 @@ export default {
           certified: resources.value.certified,
           balance:
             userBalance.value && resources.value.useCurrentBalance ? userBalance.value.free : +resources.value.balance,
+          nu: +resources.value.nu,
         });
       },
       {
@@ -274,11 +321,11 @@ export default {
       mruRules,
       sruRules,
       hruRules,
+      nuRules,
       balanceRules,
       userBalance,
       resources,
       priceTask,
-
       dedicatedPriceUSD,
       dedicatedPriceTFT,
       sharedPriceUSD,
@@ -287,7 +334,21 @@ export default {
       normalizeError,
       profileManager,
       manual,
+      dedicatedUpgradePrice,
+      sharedUpgradePrice,
     };
   },
 };
 </script>
+
+<style scoped>
+.discount p {
+  padding: 10px 0;
+}
+
+.card {
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+</style>

@@ -16,12 +16,12 @@ import { DeploymentFactory } from "../primitives/deployment";
 import { Network } from "../primitives/network";
 import { Nodes } from "../primitives/nodes";
 import { BackendStorage, BackendStorageType } from "../storage/backend";
+import { Volume, Zmount } from "../zos";
 import { Deployment } from "../zos/deployment";
 import { PublicIPResult } from "../zos/public_ip";
 import { QuantumSafeFS, QuantumSafeFSResult } from "../zos/qsfs";
 import { Workload, WorkloadTypes } from "../zos/workload";
 import { Zmachine, ZmachineResult } from "../zos/zmachine";
-import { Zmount } from "../zos/zmount";
 import { ContractStates } from "./models";
 
 const modulesNames = {
@@ -95,6 +95,7 @@ class BaseModule {
       BaseModule.newContracts.push({
         contractID: String(contract.contractId),
         createdAt: Date.now().toString(),
+        updatedAt: Date.now().toString(),
         deploymentData: contract.contractType.nodeContract.deploymentData,
         deploymentHash: contract.contractType.nodeContract.deploymentHash,
         gridVersion: "4",
@@ -179,15 +180,29 @@ class BaseModule {
     if (fetch || !this.contracts) {
       let contracts = await this.tfClient.contracts.listMyNodeContracts({
         graphqlURL: this.config.graphqlURL,
-        type: modulesNames[this.moduleName],
+        type: modulesNames[this.moduleName] ?? this.moduleName,
         projectName: this.projectName,
       });
+
       const alreadyFetchedContracts: GqlNodeContract[] = [];
+
       for (const contract of BaseModule.newContracts) {
-        if (contract.parsedDeploymentData?.projectName !== this.projectName) continue;
+        if (!contract.parsedDeploymentData?.projectName.includes(this.projectName)) continue;
         if (contract.parsedDeploymentData.type !== modulesNames[this.moduleName]) continue;
-        const c = contracts.filter(c => +c.contractID === +contract.contractID);
-        if (c.length > 0) {
+
+        const filteredContract = contracts.filter(c => c.contractID === contract.contractID);
+
+        const now = new Date();
+        const contractUpdatedAt = new Date(+contract.updatedAt);
+        const beforeOneMin = now.getTime() - contractUpdatedAt.getTime() < 1000 * 60;
+
+        if (filteredContract.length > 0) {
+          if (beforeOneMin) {
+            const idx = contracts.indexOf(filteredContract[0]);
+            contracts[idx] = contract;
+            continue;
+          }
+
           alreadyFetchedContracts.push(contract);
           continue;
         }
@@ -335,13 +350,20 @@ class BaseModule {
     for (const deployment of deployments) {
       if (deployment.contract_id !== contractId) continue;
       for (const workload of deployment.workloads) {
-        if (workload.type === WorkloadTypes.zmount && workload.name === name) {
+        if (workload.name !== name) continue;
+        if (workload.type === WorkloadTypes.zmount) {
           return {
             size: (workload.data as Zmount).size,
             state: workload.result.state,
             message: workload.result.message,
           };
-        } else if (workload.type === WorkloadTypes.qsfs && workload.name === name) {
+        } else if (workload.type === WorkloadTypes.volume) {
+          return {
+            size: (workload.data as Volume).size,
+            state: workload.result.state,
+            message: workload.result.message,
+          };
+        } else if (workload.type === WorkloadTypes.qsfs) {
           const data = workload.data as QuantumSafeFS;
           const metadata = JSON.parse(workload.metadata);
           return {

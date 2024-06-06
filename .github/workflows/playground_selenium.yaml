@@ -1,0 +1,39 @@
+name: Playground Selenium Tests
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 6 * * *"
+
+jobs:
+  selenium-run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setting up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - name: Installing all necessary packages
+        run: pip install -r  packages/playground/tests/frontend_selenium/requirements.txt
+      - name: Node install
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - name: Yarn install
+        run: yarn install
+      - name: Lerna Build
+        run: yarn lerna run build
+      - name: Yarn Serve
+        run: make run project=playground &
+      - name: Wait for localhost
+        run: sleep 60
+      - name: Run tests
+        working-directory: ./packages/playground/tests/frontend_selenium
+        env:
+          TFCHAIN_MNEMONICS: ${{ secrets.TFCHAIN_MNEMONICS }}
+          TFCHAIN_NODE_MNEMONICS: ${{ secrets.TFCHAIN_NODE_MNEMONICS }}
+          STELLAR_ADDRESS: ${{ secrets.STELLAR_ADDRESS }}
+          EMAIL: ${{ secrets.EMAIL }}
+        run: python -m pytest -v

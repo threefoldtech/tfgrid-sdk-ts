@@ -1,6 +1,6 @@
 <template>
   <VCard
-    class="tf-node-card rounded-0 w-100 pb-3"
+    class="tf-node-card rounded-0 w-100 pb-3 text-left"
     :class="{ 'selected-node': status !== 'Init' }"
     :color="
       status === 'Valid'
@@ -67,6 +67,9 @@
         Uptime:
         <span class="font-weight-bold" v-text="toReadableDate(node.uptime)" />
       </span>
+      <span class="ml-2" v-if="node"
+        >Last Deployment Time: {{ lastDeploymentTime === 0 ? "N/A" : toHumanDate(lastDeploymentTime) }}
+      </span>
     </template>
 
     <template #append>
@@ -91,7 +94,7 @@
             <template #activator="{ props }">
               <VChip
                 v-bind="props"
-                :color="node?.status === 'up' ? 'success' : 'error'"
+                :color="getNodeStatusColor(node?.status)"
                 class="mr-2"
                 :text="capitalize(node.status)"
               />
@@ -191,27 +194,36 @@
       </VRow>
       <div class="mt-5 ml-auto text-right">
         <v-tooltip bottom color="primary" close-delay="100" :disabled="!(node && node.dedicated)">
-          <template v-slot:activator="{ isActive, props }" v-if="num_gpu!">
+          <template v-slot:activator="{ isActive, props }" v-if="node && node.dedicated">
             <span v-bind="props" v-on="isActive" class="font-weight-bold"
+              ><v-icon class="scale_beat mr-2" color="warning">mdi-brightness-percent</v-icon
               >{{ (price_usd! / 24 / 30).toFixed(2) }} USD/Hour</span
             >
           </template>
 
           <template v-slot:activator="{ isActive, props }" v-else>
-            <span v-bind="props" v-on="isActive" class="font-weight-bold">{{ price_usd }} USD/Month</span>
+            <span v-bind="props" v-on="isActive" class="font-weight-bold"
+              ><v-icon class="scale_beat mr-2" color="warning" :disabled="!(node && node.dedicated)"
+                >mdi-brightness-percent</v-icon
+              >{{ price_usd }} USD/Month</span
+            >
           </template>
           <span>
             Discounts:
             <v-spacer />
             <ul class="pl-2">
               <li>
-                {{ rentedByUser ? "You receive " : "You'll receive " }} a 50%
+                {{ rentedByUser ? "You receive " : "You'll receive " }} a
+                <strong class="mr-1">50%</strong>
                 <a target="_blank" :href="manual?.billing_pricing">discount</a>
                 {{ rentedByUser ? " as you reserve the" : " if you reserve the" }}
                 entire node
               </li>
               <li>
-                {{ rentedByUser ? "You receive" : "You'll receive" }} a {{ stakingDiscount }}% discount as per the
+                {{ rentedByUser ? "You receive" : "You'll receive" }} a
+                <VProgressCircular indeterminate size="10" width="1" color="info" v-if="loadingStakingDiscount" />
+                <strong v-else>{{ stakingDiscount }}%</strong>
+                discount as per the
                 <a target="_blank" :href="manual?.discount_levels"> staking discounts </a>
               </li>
             </ul>
@@ -229,19 +241,20 @@
   </VCard>
 </template>
 <script lang="ts">
-import type { NodeInfo, NodeResources } from "@threefold/grid_client";
+import type { GridClient, NodeInfo, NodeResources } from "@threefold/grid_client";
 import { CertificationType, type GridNode } from "@threefold/gridproxy_client";
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { capitalize } from "vue";
 
+import { gridProxyClient } from "@/clients";
 import ReserveBtn from "@/dashboard/components/reserve_action_btn.vue";
+import toHumanDate from "@/utils/date";
 import { getCountryCode } from "@/utils/get_nodes";
 import { manual } from "@/utils/manual";
 import toReadableDate from "@/utils/to_readable_data";
 
-import { useProfileManager } from "../../stores";
+import { useGrid, useProfileManager } from "../../stores";
 import formatResourceSize from "../../utils/format_resource_size";
-import { getGrid } from "../../utils/grid";
 import { toGigaBytes } from "../../utils/helpers";
 import ResourceDetails from "./node_details_internals/ResourceDetails.vue";
 
@@ -260,8 +273,12 @@ export default {
   },
   setup(props, ctx) {
     const profileManager = useProfileManager();
+    const gridStore = useGrid();
+    const grid = gridStore.client as unknown as GridClient;
     const node = ref(props.node);
     const stakingDiscount = ref<number>();
+    const loadingStakingDiscount = ref<boolean>(false);
+    const lastDeploymentTime = ref<number>(0);
     const rentedByUser = computed(() => {
       return props.node?.rentedByTwinId === profileManager.profile?.twinId;
     });
@@ -280,10 +297,25 @@ export default {
     });
 
     onMounted(async () => {
+      await getLastDeploymentTime();
+    });
+
+    async function refreshStakingDiscount() {
+      loadingStakingDiscount.value = true;
       if (props.node) {
         stakingDiscount.value = (await getStakingDiscount()) || 0;
       }
-    });
+      loadingStakingDiscount.value = false;
+    }
+
+    watch(
+      () => profileManager.profile,
+      async () => {
+        await refreshStakingDiscount();
+      },
+      { immediate: true, deep: true },
+    );
+
     // A guard to check node type
     function isGridNode(node: unknown): node is GridNode {
       return !!node && typeof node === "object" && "num_gpu" in node;
@@ -383,7 +415,6 @@ export default {
 
     async function getStakingDiscount() {
       try {
-        const grid = await getGrid(profileManager.profile!);
         const total_resources = props.node?.total_resources;
         const { cru, hru, mru, sru } = total_resources as NodeResources;
         const price = await grid?.calculator.calculateWithMyBalance({
@@ -421,13 +452,34 @@ export default {
       ctx.emit("update:node", n);
     }
 
+    function getNodeStatusColor(status: string): string {
+      if (status === "up") {
+        return "success";
+      } else if (status === "standby") {
+        return "warning";
+      } else {
+        return "error";
+      }
+    }
+
+    async function getLastDeploymentTime() {
+      if (props.node?.id) {
+        try {
+          const obj = await gridProxyClient.nodes.statsById(props.node.nodeId);
+          lastDeploymentTime.value = obj.users.last_deployment_timestamp;
+        } catch (error) {
+          console.log(`Error getting node object for node ID ${props.node.nodeId}: `, error);
+          lastDeploymentTime.value = 0;
+        }
+      }
+    }
+
     return {
       cruText,
       mruText,
       sruText,
       hruText,
       countryFlagSrc,
-      toReadableDate,
       dedicated,
       serialNumber,
       num_gpu,
@@ -438,12 +490,17 @@ export default {
       dmi,
       manual,
       rentedByUser,
+      loadingStakingDiscount,
       stakingDiscount,
+      toReadableDate,
+      toHumanDate,
       checkSerialNumber,
       capitalize,
       formatResourceSize,
       formatSpeed,
       onReserveChange,
+      getNodeStatusColor,
+      lastDeploymentTime,
     };
   },
 };
@@ -466,5 +523,22 @@ export default {
   background-color: rgb(var(--v-speed-chip));
   padding: 5px 12px;
   border-radius: 9999px;
+}
+
+.scale_beat {
+  animation: crescendo 0.5s alternate infinite ease-in;
+}
+
+@keyframes crescendo {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.2);
+  }
+}
+
+.v-icon--disabled {
+  opacity: 0 !important;
 }
 </style>

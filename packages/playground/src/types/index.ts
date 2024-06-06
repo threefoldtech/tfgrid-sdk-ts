@@ -1,6 +1,6 @@
 import { CertificationType, type GridNode, type NodeStats, NodeStatus } from "@threefold/gridproxy_client";
 import { capitalize } from "vue";
-import type { VDataTable } from "vuetify/lib/labs/components";
+import type { VDataTable } from "vuetify/components";
 
 import type { AsyncRule, SyncRule } from "@/components/input_validator.vue";
 
@@ -87,7 +87,13 @@ export interface Flist {
   entryPoint: string;
 }
 
-export type VDataTableHeader = VDataTable["headers"];
+export type VDataTableHeader = {
+  title: string;
+  key: string;
+  sortable?: boolean;
+  children?: VDataTableHeader;
+  [key: string]: any;
+}[];
 
 export enum ProjectName {
   Kubernetes = "Kubernetes",
@@ -114,6 +120,8 @@ export enum ProjectName {
   Qvm = "Qvm",
   Umbrel = "Umbrel",
   FreeFlow = "Freeflow",
+  StaticWebsite = "StaticWebsite",
+  TFRobot = "TFRobot",
 }
 
 export enum SolutionCode {
@@ -139,6 +147,8 @@ export enum SolutionCode {
   qvm = "qvm",
   umbrel = "um",
   wordpress = "wp",
+  staticwebsite = "sw",
+  tfrobot = "tfr",
 }
 
 export const solutionType: { [key: string]: string } = {
@@ -161,6 +171,8 @@ export const solutionType: { [key: string]: string } = {
   umbrel: "Umbrel",
   vm: "Micro Virtual Machine",
   wordpress: "Wordpress",
+  staticwebsite: "Static Website",
+  tfrobot: "TFRobot",
 };
 
 export interface solutionFlavor {
@@ -281,6 +293,7 @@ export const nodeStatsInitializer: NodeStats = {
   users: {
     deployments: 0,
     workloads: 0,
+    last_deployment_timestamp: 0,
   },
 };
 

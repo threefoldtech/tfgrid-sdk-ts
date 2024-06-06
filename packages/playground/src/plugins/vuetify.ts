@@ -4,23 +4,47 @@ import "vuetify/styles";
 import { createVuetify } from "vuetify";
 import * as components from "vuetify/components";
 import * as directives from "vuetify/directives";
-import { VDataTable, VDataTableServer } from "vuetify/labs/VDataTable";
-const vuetify = createVuetify({
-  defaults: {
-    VAlert: {
+
+const defaults = {
+  VAlert: {
+    variant: "tonal",
+  },
+  VProgressCircular: {
+    size: 50,
+    width: 7,
+    color: "primary",
+  },
+  VBtn: {
+    variant: "outlined",
+    color: "primary",
+    VIcon: {
       variant: "tonal",
     },
     VProgressCircular: {
-      size: 50,
-      width: 7,
+      size: undefined,
+      width: undefined,
+      color: undefined,
+    },
+  },
+  VCardActions: {
+    VBtn: {
+      variant: "outlined",
       color: "primary",
     },
   },
-  components: {
-    ...components,
-    VDataTable,
-    VDataTableServer,
+  VChip: {
+    variant: "tonal",
+    color: "primary",
+    size: "small",
   },
+  VDialog: {
+    width: "70%",
+  },
+};
+
+const vuetify = createVuetify({
+  defaults,
+  components,
   directives,
   theme: {
     defaultTheme: "dark",

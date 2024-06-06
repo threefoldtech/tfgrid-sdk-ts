@@ -1,9 +1,9 @@
 import { ValidationError } from "@threefold/types";
 import { plainToInstance } from "class-transformer";
-import { validate } from "class-validator";
+import { validateSync } from "class-validator";
 
-async function validateObject(obj) {
-  const errors = await validate(obj);
+function validateObject(obj) {
+  const errors = validateSync(obj);
   // errors is an array of validation errors
   if (errors.length > 0) {
     console.log("Validation failed. errors:", errors);
@@ -13,13 +13,13 @@ async function validateObject(obj) {
 // used as decorator
 function validateInput(target, propertyKey: string, descriptor: PropertyDescriptor) {
   const method = descriptor.value;
-  descriptor.value = async function (...args) {
+  descriptor.value = function (...args) {
     const types = Reflect.getMetadata("design:paramtypes", target, propertyKey);
     for (let i = 0; i < args.length; i++) {
       const input = plainToInstance(types[i], args[i], { excludeExtraneousValues: true });
-      await validateObject(input);
+      validateObject(input);
     }
-    return await method.apply(this, args);
+    return method.apply(this, args);
   };
 }
 

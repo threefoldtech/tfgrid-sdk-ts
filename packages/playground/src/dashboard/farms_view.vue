@@ -5,7 +5,7 @@
       <v-card-title class="pa-0">Farms</v-card-title>
     </v-card>
 
-    <CreateFarm v-model:name="name" class="mt-4" :userFarms="userFarms" />
+    <CreateFarm v-model:name="name" class="mt-4" />
     <UserFarms ref="userFarms" />
     <UserNodes />
   </div>
@@ -27,10 +27,9 @@ export default {
   },
   setup() {
     const name = ref<string>("");
-    const userFarms = ref();
+
     return {
       name,
-      userFarms,
     };
   },
 };

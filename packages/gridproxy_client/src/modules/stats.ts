@@ -15,6 +15,7 @@ export interface Stats {
   gateways: number;
   twins: number;
   contracts: number;
+  workloads_number: number;
   nodesDistribution: { [key: string]: number };
   dedicatedNodes: number;
 }

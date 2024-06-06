@@ -1,16 +1,14 @@
 <template>
-  <v-btn class="bg-primary text-subtitle-1 px-6 ml-2 mr-3" @click="showDialogue = true" :loading="loading"
+  <v-btn variant="elevated" class="text-subtitle-1 px-6 ml-2 mr-3" @click="showDialogue = true" :loading="loading"
     >Add IP</v-btn
   >
   <v-container>
     <v-container v-if="showDialogue">
       <v-dialog v-model="showDialogue" max-width="600">
         <v-card>
-          <v-toolbar color="primary" class="custom-toolbar">
-            <p class="mb-5">Add Public IP to Farm</p>
-          </v-toolbar>
-          <div class="pa-6">
-            <form-validator v-model="valid">
+          <v-card-title class="bg-primary">Add Public IP to Farm</v-card-title>
+          <v-card-text>
+            <form-validator ref="formValidator" v-model="valid">
               <v-select
                 :items="items"
                 label="Choose how to enter IP"
@@ -72,7 +70,8 @@
                 </input-tooltip>
               </input-validator>
             </form-validator>
-          </div>
+            <v-divider />
+          </v-card-text>
           <v-dialog v-model="showIPs" max-width="500">
             <v-card>
               <v-card-title class="text-h5">IPs range</v-card-title>
@@ -81,14 +80,11 @@
             </v-card>
           </v-dialog>
 
-          <v-card-actions class="justify-end pa-5">
-            <v-btn @click="showDialogue = false" variant="outlined" color="anchor">Close</v-btn>
+          <v-card-actions class="justify-end mb-1 mr-2">
+            <v-btn @click="showDialogue = false" color="anchor">Close</v-btn>
 
-            <v-btn variant="outlined" @click="showRange" :disabled="!valid || type === IPType.single || !toPublicIP"
-              >Show IPs Range</v-btn
-            >
+            <v-btn @click="showRange" :disabled="!valid || type === IPType.single || !toPublicIP">Show IPs Range</v-btn>
             <v-btn
-              variant="outlined"
               color="secondary"
               @click="addFarmIp($props.farmId, gateway)"
               @update:modelValue="$emit('update:isAdded', $event)"
@@ -105,7 +101,6 @@
 
 <script lang="ts">
 import { TFChainErrors } from "@threefold/types";
-import { contains } from "cidr-tools";
 import { getIPRange } from "get-ip-range";
 import { default as PrivateIp } from "private-ip";
 import { ref, watch } from "vue";
@@ -123,32 +118,31 @@ export default {
     },
   },
   setup(_, context) {
-    const showDialogue = ref(false);
     const gridStore = useGrid();
-    const valid = ref(false);
     const IPs = ref<string[]>();
     const items = ref<string[]>([IPType.single, IPType.range]);
-    const type = ref("Single");
-    const publicIP = ref("");
+    const type = ref(IPType.single);
+
+    const showDialogue = ref(false);
+    const valid = ref(false);
     const loading = ref(false);
     const isAdded = ref(false);
     const isAdding = ref(false);
-    const inRange = ref<boolean>();
     const showIPs = ref(false);
+
+    const publicIP = ref("");
     const toPublicIP = ref("");
     const gateway = ref("");
 
+    const formValidator = ref();
+
     watch(
-      [() => publicIP.value, () => gateway.value],
-      ([newPublicIP, newGateway], [_, _2]) => {
-        try {
-          inRange.value = contains(newPublicIP, newGateway);
-        } catch (e) {
-          inRange.value = false;
-        }
-        gatewayCheck();
+      [publicIP, toPublicIP, gateway],
+      async () => {
+        if (publicIP.value.length || toPublicIP.value.length || gateway.value.length)
+          await formValidator.value.validate();
       },
-      { immediate: true },
+      { deep: true },
     );
 
     function ipcheck() {
@@ -159,6 +153,14 @@ export default {
       }
       return undefined;
     }
+
+    watch(
+      type,
+      () => {
+        publicIP.value = toPublicIP.value = gateway.value = "";
+      },
+      { deep: true },
+    );
 
     function toIpCheck() {
       if (toPublicIP.value.split("/")[1] !== publicIP.value.split("/")[1]) {
@@ -202,16 +204,30 @@ export default {
     }
 
     function gatewayCheck() {
-      if (!inRange.value) {
-        return {
-          message: "Gateway IP not in the provided IP range.",
-        };
-      }
-      if (publicIP?.value.split("/")[0] === gateway.value || toPublicIP?.value.split("/")[0] === gateway.value) {
+      const firstIP = publicIP?.value.split("/")[0];
+      const lastIP = toPublicIP?.value.split("/")[0];
+
+      if (firstIP === gateway.value || lastIP === gateway.value) {
         return {
           message: "IPs cannot be the same.",
         };
       }
+
+      if (type.value !== IPType.single) {
+        try {
+          const range = getIPRange(firstIP, lastIP);
+          if (range.includes(gateway.value)) {
+            return {
+              message: "The gateway IP shouldn't be in the IPs range.",
+            };
+          }
+        } catch (error: any) {
+          return {
+            message: error.message,
+          };
+        }
+      }
+
       return undefined;
     }
 
@@ -289,27 +305,21 @@ export default {
       loading,
       isAdded,
       isAdding,
-      inRange,
       showIPs,
       IPType,
+      formValidator,
+      type,
+      publicIP,
+      toPublicIP,
+      gateway,
+
       showRange,
       addIPs,
       addFarmIp,
       ipcheck,
       toIpCheck,
       gatewayCheck,
-      type,
-      publicIP,
-      toPublicIP,
-      gateway,
     };
   },
 };
 </script>
-
-<style scoped>
-.custom-toolbar {
-  height: 2.5rem !important;
-  padding-left: 10px;
-}
-</style>

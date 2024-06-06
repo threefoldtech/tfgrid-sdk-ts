@@ -38,7 +38,9 @@
                   validators.required('Transfer amount is required '),
                   validators.isNumeric('Amount should be a number.'),
                   validators.min('Amount must be greater than 0.001', 0.001),
-                  validators.isDecimal('Amount can have 3 decimals only.', { decimal_digits: '0,3' }),
+                  validators.isDecimal('Amount can have 3 decimals only.', {
+                    decimal_digits: '0,3',
+                  }),
                   validators.max('Insufficient funds.', freeBalance - 0.01),
                 ]"
                 #="{ props }"
@@ -48,14 +50,10 @@
                 </input-tooltip>
               </input-validator>
             </form-validator>
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn @click="clearInput" color="anchor" :disabled="loadingTwinIDTransfer" variant="outlined"
-                >Clear</v-btn
-              >
+            <v-card-actions class="justify-end mb-1 mr-2">
+              <v-btn @click="clearInput" color="anchor" :disabled="loadingTwinIDTransfer">Clear</v-btn>
               <v-btn
                 color="secondary"
-                variant="outlined"
                 :loading="loadingTwinIDTransfer"
                 :disabled="!isValidTwinIDTransfer"
                 @click="submitFormTwinID"
@@ -90,7 +88,9 @@
                   validators.required('Transfer amount is required '),
                   validators.isNumeric('Amount should be a number.'),
                   validators.min('Amount must be greater than 0.001', 0.001),
-                  validators.isDecimal('Amount can have 3 decimals only.', { decimal_digits: '0,3' }),
+                  validators.isDecimal('Amount can have 3 decimals only.', {
+                    decimal_digits: '0,3',
+                  }),
                   validators.max('Insufficient funds.', freeBalance - 0.01),
                 ]"
                 #="{ props }"
@@ -102,13 +102,10 @@
             </form-validator>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn @click="clearInput" color="anchor" :disabled="loadingAddressTransfer" variant="outlined"
-                >Clear</v-btn
-              >
+              <v-btn @click="clearInput" color="anchor" :disabled="loadingAddressTransfer">Clear</v-btn>
 
               <v-btn
                 color="secondary"
-                variant="outlined"
                 :loading="loadingAddressTransfer"
                 :disabled="!isValidAddressTransfer"
                 @click="submitFormAddress"
@@ -165,7 +162,9 @@ function isSameTwinID(value: string) {
 async function isValidTwinID(value: string) {
   try {
     if (gridStore) {
-      receptTwinFromTwinID.value = await gridStore.client.twins.get({ id: parseInt(value.trim()) });
+      receptTwinFromTwinID.value = await gridStore.client.twins.get({
+        id: parseInt(value.trim()),
+      });
       if (receptTwinFromTwinID.value == null) {
         return { message: "This twin id doesn't exist" };
       }
@@ -192,7 +191,9 @@ async function isValidAddress() {
       const twinId = await gridStore.client.twins.get_twin_id_by_account_id({
         public_key: recipientAddress.value.trim(),
       });
-      recepTwinFromAddress.value = await gridStore.client.twins.get({ id: twinId });
+      recepTwinFromAddress.value = await gridStore.client.twins.get({
+        id: twinId,
+      });
       if (recepTwinFromAddress.value == null) {
         return { message: "Twin ID doesn't exist" };
       }
@@ -211,7 +212,10 @@ function clearInput() {
 async function transfer(recipientTwin: Twin) {
   try {
     if (gridStore) {
-      await gridStore.client.balance.transfer({ address: recipientTwin.accountId, amount: transferAmount.value });
+      await gridStore.client.balance.transfer({
+        address: recipientTwin.accountId,
+        amount: transferAmount.value,
+      });
       clearInput();
       createCustomToast("Transaction Complete!", ToastType.success);
       profileManagerController.reloadBalance();
@@ -230,7 +234,9 @@ function createInvalidTransferToast(message: string) {
 }
 async function submitFormTwinID() {
   if (gridStore) {
-    const twinDetails = await gridStore.client.twins.get({ id: parseInt(recipientTwinId.value.trim()) });
+    const twinDetails = await gridStore.client.twins.get({
+      id: parseInt(recipientTwinId.value.trim()),
+    });
     if (twinDetails != null) {
       loadingTwinIDTransfer.value = true;
       await transfer(twinDetails);

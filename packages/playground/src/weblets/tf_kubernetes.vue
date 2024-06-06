@@ -75,8 +75,8 @@
       </template>
     </d-tabs>
 
-    <template #footer-actions>
-      <v-btn color="secondary" variant="outlined" @click="deploy" :disabled="tabs?.invalid"> Deploy </v-btn>
+    <template #footer-actions="{ validateBeforeDeploy }">
+      <v-btn color="secondary" @click="validateBeforeDeploy(deploy)" text="Deploy" />
     </template>
   </weblet-layout>
 </template>
@@ -86,21 +86,21 @@ import { ref } from "vue";
 
 import { createWorker } from "../components/k8s_worker.vue";
 import { useLayout } from "../components/weblet_layout.vue";
-import { useProfileManager } from "../stores";
+import { useGrid } from "../stores";
 import type { K8SWorker as K8sWorker } from "../types";
 import { ProjectName } from "../types";
 import { deployK8s } from "../utils/deploy_k8s";
-import { getGrid } from "../utils/grid";
 import { generateName, generatePassword } from "../utils/strings";
 
 const layout = useLayout();
 const tabs = ref();
-const profileManager = useProfileManager();
 const name = ref(generateName({ prefix: "k8s" }));
 const clusterToken = ref(generatePassword(10));
 const master = ref(createWorker(generateName({ prefix: "mr" })));
 const workers = ref<K8sWorker[]>([]);
 const selectedSSHKeys = ref("");
+const gridStore = useGrid();
+const grid = gridStore.client as GridClient;
 
 function addWorker() {
   workers.value.push(createWorker());
@@ -112,8 +112,7 @@ async function deploy() {
   try {
     layout.value?.validateSSH();
     const projectName = ProjectName.Kubernetes.toLowerCase() + "/" + name.value;
-    const grid = await getGrid(profileManager.profile!, projectName);
-
+    updateGrid(grid, { projectName });
     await layout.value.validateBalance(grid!);
 
     const k8s = await deployK8s(grid!, {
@@ -138,10 +137,13 @@ function updateSSHkeyEnv(selectedKeys: string) {
 </script>
 
 <script lang="ts">
+import type { GridClient } from "@threefold/grid_client";
+
 import ExpandableLayout from "../components/expandable_layout.vue";
 import K8SWorker from "../components/k8s_worker.vue";
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";
+import { updateGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
 
 export default {

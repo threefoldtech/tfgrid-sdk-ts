@@ -341,6 +341,29 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
         },
       },
     },
+
+    {
+      path: DashboardRoutes.Applications.StaticWebsite,
+      component: () => import("../views/staticwebsite_view.vue"),
+      meta: {
+        title: "Static Website",
+        info: { page: "info/static_website.md" },
+        navbarConfig: {
+          back: true,
+          path: [
+            { title: "Deploy" },
+            {
+              title: "Applications",
+              disabled: false,
+              to: DashboardRoutes.Deploy.Applications,
+            },
+            {
+              title: "Static Website",
+            },
+          ],
+        },
+      },
+    },
     // Commented for now and will be user later.
     // {
     //   path: DashboardRoutes.Applications.Freeflow,
@@ -364,6 +387,28 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
     //     },
     //   },
     // },
+    {
+      path: DashboardRoutes.Applications.TFRobot,
+      component: () => import("../views/tfrobot_view.vue"),
+      meta: {
+        title: "TFRobot",
+        info: { page: "info/tfrobot.md" },
+        navbarConfig: {
+          back: true,
+          path: [
+            { title: "Deploy" },
+            {
+              title: "Applications",
+              disabled: false,
+              to: DashboardRoutes.Deploy.Applications,
+            },
+            {
+              title: "TFRobot",
+            },
+          ],
+        },
+      },
+    },
   ];
 }
 

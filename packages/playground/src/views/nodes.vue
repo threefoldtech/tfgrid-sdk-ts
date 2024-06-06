@@ -1,7 +1,7 @@
 <template>
   <div class="hint">
     <v-alert class="mb-4" type="info" variant="tonal">
-      Node status is updated every 90 minutes. For a realtime status, click on the row.
+      Node status is updated every 90 minutes. For a realtime status, click on the node's card.
     </v-alert>
   </div>
 
@@ -13,39 +13,25 @@
             <v-switch
               color="primary"
               inset
-              label="Dedicated Nodes (Only)"
+              label="Dedicated Nodes"
               v-model="filters.dedicated"
               density="compact"
               hide-details
             />
           </TfFilter>
           <TfFilter query-route="gateway" v-model="filters.gateway">
-            <v-switch
-              color="primary"
-              inset
-              label="Gateways (Only)"
-              v-model="filters.gateway"
-              density="compact"
-              hide-details
-            />
+            <v-switch color="primary" inset label="Gateways" v-model="filters.gateway" density="compact" hide-details />
           </TfFilter>
 
           <TfFilter query-route="gpu" v-model="filters.gpu">
-            <v-switch
-              color="primary"
-              inset
-              label="GPU Node (Only)"
-              v-model="filters.gpu"
-              density="compact"
-              hide-details
-            />
+            <v-switch color="primary" inset label="GPU Node" v-model="filters.gpu" density="compact" hide-details />
           </TfFilter>
 
           <TfFilter query-route="rentable" v-model="filters.rentable" v-if="profileManager.profile">
             <v-switch
               color="primary"
               inset
-              label="Rentable (Only)"
+              label="Rentable"
               v-model="filters.rentable"
               density="compact"
               hide-details
@@ -57,9 +43,10 @@
               :model-value="filters.status || undefined"
               @update:model-value="filters.status = $event || ''"
               :items="[
-                { title: 'Up', value: NodeStatus.Up },
-                { title: 'Down', value: NodeStatus.Down },
-                { title: 'Standby', value: NodeStatus.Standby },
+                { title: 'Up', value: UnifiedNodeStatus.Up },
+                { title: 'Standby', value: UnifiedNodeStatus.Standby },
+                { title: 'Up & Standby', value: UnifiedNodeStatus.UpStandby },
+                { title: 'Down', value: UnifiedNodeStatus.Down },
               ]"
               label="Select Nodes Status"
               item-title="title"
@@ -140,6 +127,7 @@
               filters.country = $event?.country || '';
               filters.region = $event?.region || '';
             "
+            :only-with-nodes="false"
           >
             <template #region="{ props }">
               <TfFilter query-route="region" v-model="filters.region">
@@ -270,6 +258,28 @@
           </TfFilter>
 
           <TfFilter
+            query-route="num-gpu"
+            v-model="filters.numGpu"
+            :rules="[
+              validators.isNumeric('This field accepts numbers only.'),
+              validators.min('The number of gpus should be larger than zero.', 1),
+              validators.validateResourceMaxNumber('This value is out of range.'),
+            ]"
+          >
+            <template #input="{ props }">
+              <VTextField density="compact" label="Num GPU" variant="outlined" v-model="filters.numGpu" v-bind="props">
+                <template #append-inner>
+                  <VTooltip text="Filter by the number of gpus in the node.">
+                    <template #activator="{ props }">
+                      <VIcon icon="mdi-information-outline" v-bind="props" />
+                    </template>
+                  </VTooltip>
+                </template>
+              </VTextField>
+            </template>
+          </TfFilter>
+
+          <TfFilter
             query-route="min-ssd"
             v-model="filters.minSSD"
             :rules="[
@@ -383,6 +393,17 @@
         </TfFiltersContainer>
       </template>
 
+      <v-row>
+        <v-spacer />
+        <v-col :style="{ maxWidth: '350px' }">
+          <v-select hide-details label="Sort By" clearable :items="sortItems" v-model="sortItem" return-object>
+            <template #item="{ props, item }">
+              <v-list-item v-bind="props" :title="item.title" :prepend-icon="item.raw.icon" />
+            </template>
+          </v-select>
+        </v-col>
+      </v-row>
+
       <div class="nodes">
         <div class="nodes-inner">
           <v-row>
@@ -390,6 +411,7 @@
               <div class="table">
                 <nodes-table
                   v-model="nodes"
+                  max-height="730px"
                   :size="size"
                   @update:size="
                     size = $event;
@@ -422,15 +444,15 @@
 </template>
 
 <script lang="ts">
-import { type GridNode, NodeStatus, SortBy, SortOrder } from "@threefold/gridproxy_client";
-import { onMounted, ref } from "vue";
+import { type GridNode, SortBy, SortOrder, UnifiedNodeStatus } from "@threefold/gridproxy_client";
+import { sortBy } from "lodash";
+import { computed, onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 
 import NodeDetails from "@/components/node_details.vue";
 import NodesTable from "@/components/nodes_table.vue";
 import router from "@/router";
 import { useProfileManager } from "@/stores";
-import type { GridProxyRequestConfig } from "@/types";
 import { requestNodes } from "@/utils/get_nodes";
 import { convertToBytes } from "@/utils/get_nodes";
 
@@ -439,6 +461,19 @@ import TfFiltersContainer from "../components/filters/TfFiltersContainer.vue";
 import TfFiltersLayout from "../components/filters/TfFiltersLayout.vue";
 import TfSelectFarm from "../components/node_selector/TfSelectFarm.vue";
 import TfSelectLocation from "../components/node_selector/TfSelectLocation.vue";
+
+const sortItems = [
+  {
+    icon: "mdi-sort-ascending",
+    title: "USD Price: Low to High",
+    value: (nodes: GridNode[]) => sortBy(nodes, "price_usd"),
+  },
+  {
+    icon: "mdi-sort-descending",
+    title: "USD Price: High to Low",
+    value: (nodes: GridNode[]) => sortBy(nodes, "price_usd").reverse(),
+  },
+];
 
 export default {
   components: {
@@ -454,7 +489,6 @@ export default {
     const profileManager = useProfileManager();
     const size = ref(window.env.PAGE_SIZE);
     const page = ref(1);
-    const nodeId = ref<number>(0);
     const filters = ref({
       nodeId: "",
       farmId: "",
@@ -473,11 +507,16 @@ export default {
       gpu: false,
       publicIPs: "",
       dedicated: false,
+      numGpu: "",
       rentable: false,
     });
 
     const loading = ref<boolean>(true);
-    const nodes = ref<GridNode[]>([]);
+    const _nodes = ref<GridNode[]>([]);
+
+    const sortItem = ref<{ title: string; icon: string; value: (nodes: GridNode[]) => GridNode[] }>();
+    const nodes = computed(() => (sortItem.value?.value || ((x: GridNode[]) => x))(_nodes.value));
+
     const nodesCount = ref<number>(0);
     const selectedNodeId = ref<number>(0);
 
@@ -485,14 +524,8 @@ export default {
 
     const route = useRoute();
 
-    const nodeOptions: GridProxyRequestConfig = {
-      loadTwin: true,
-      loadFarm: true,
-      loadStats: true,
-      loadGpu: false,
-    };
-
     async function loadNodes(retCount = false) {
+      _nodes.value = [];
       loading.value = true;
       if (retCount) page.value = 1;
       try {
@@ -506,7 +539,7 @@ export default {
             farmName: filters.value.farmName || undefined,
             country: filters.value.country,
             region: filters.value.region,
-            status: (filters.value.status as NodeStatus) || undefined,
+            status: (filters.value.status as UnifiedNodeStatus) || undefined,
             freeHru: convertToBytes(filters.value.freeHDD),
             freeMru: convertToBytes(filters.value.freeRAM),
             freeSru: convertToBytes(filters.value.freeSSD),
@@ -520,13 +553,14 @@ export default {
             dedicated: filters.value.dedicated || undefined,
             sortBy: SortBy.Status,
             sortOrder: SortOrder.Asc,
+            numGpu: +filters.value.numGpu || undefined,
             rentable: filters.value.rentable && profileManager.profile ? filters.value.rentable : undefined,
             availableFor: filters.value.rentable && profileManager.profile ? profileManager.profile.twinId : undefined,
           },
           { loadFarm: true },
         );
 
-        nodes.value = data;
+        _nodes.value = data;
         if (retCount) nodesCount.value = count ?? 0;
       } catch (err) {
         console.log(err);
@@ -562,6 +596,8 @@ export default {
     return {
       profileManager,
       loading,
+      sortItems,
+      sortItem,
       nodesCount,
       nodes,
       selectedNodeId,
@@ -570,7 +606,7 @@ export default {
       requestNodes,
       isDialogOpened,
       filters,
-      NodeStatus,
+      UnifiedNodeStatus,
       size,
       page,
       loadNodes,

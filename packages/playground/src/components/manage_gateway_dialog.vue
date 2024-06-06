@@ -4,7 +4,6 @@
       model-value
       @update:model-value="$emit('close')"
       scrollable
-      width="70%"
       :persistent="deleting || layout?.status === 'deploy'"
     >
       <weblet-layout
@@ -90,36 +89,30 @@
             no-data-text="No domains attached to this virtual machine."
           >
             <template #[`item.name`]="{ item }">
-              {{
-                item.value.name.slice(
-                  item.value.name.startsWith(prefix)
-                    ? prefix.length
-                    : item.value.name.startsWith(oldPrefix)
-                    ? oldPrefix.length
-                    : 0,
-                )
-              }}
+              {{ item.name }}
             </template>
 
             <template #[`item.tls_passthrough`]="{ item }">
-              {{ item.value.tls_passthrough ? "Yes" : "No" }}
+              {{ item.tls_passthrough ? "Yes" : "No" }}
+            </template>
+
+            <template #[`item.backends`]="{ item }">
+              {{ (Array.isArray(item.backends) ? item.backends[0] : item.backends) ?? "-" }}
             </template>
 
             <template #[`item.status`]="{ item }">
-              {{ item.value.status.toUpperCase() }}
+              {{ item.status.toUpperCase() }}
             </template>
 
             <template #[`item.actions`]="{ item }">
-              <IconActionBtn tooltip="Visit" icon="mdi-web" color="anchor" :href="'https://' + item.value.domain" />
+              <IconActionBtn tooltip="Visit" icon="mdi-web" color="anchor" :href="'https://' + item.domain" />
             </template>
           </list-table>
         </div>
 
-        <div v-show="gatewayTab === 1">
+        <div v-if="gatewayTab === 1">
           <form-validator v-model="valid">
-            <input-tooltip
-              :tooltip="`Selecting custom domain sets subdomain as gateway name. Prefix(${prefix}) is solution name, twin ID, and deployment name.`"
-            >
+            <input-tooltip tooltip="Selecting custom domain sets subdomain as gateway name.">
               <input-validator
                 :value="subdomain"
                 :rules="[
@@ -128,20 +121,17 @@
                   validators.isAlphanumeric('Subdomain should consist of letters and numbers only.'),
                   subdomain => validators.isAlpha('Subdomain must start with alphabet char.')(subdomain[0]),
                   validators.minLength('Subdomain must be at least 4 characters.', 4),
-                  subdomain =>
-                    validators.maxLength(
-                      `Subdomain cannot exceed ${35 - prefix.length} characters.`,
-                      35 - prefix.length,
-                    )(subdomain),
+                  subdomain => validators.maxLength('Subdomain cannot exceed 30 characters.', 30)(subdomain),
                 ]"
+                :async-rules="gatewayTab === 1 ? [validateSubdomain] : []"
                 #="{ props }"
               >
-                <v-text-field label="Subdomain" :prefix="prefix" v-model.trim="subdomain" v-bind="props" />
+                <v-text-field label="Subdomain" v-model.trim="subdomain" v-bind="props" />
               </input-validator>
             </input-tooltip>
 
             <div :style="{ marginTop: '-10px' }">
-              <TfSelectionDetails disable-node-selection require-domain v-model="selectionDetails" />
+              <TfSelectionDetails disable-node-selection require-domain use-fqdn v-model="selectionDetails" />
             </div>
 
             <input-validator
@@ -179,17 +169,16 @@
         </div>
 
         <template #footer-actions>
-          <v-btn color="anchor" variant="outlined" @click="$emit('close')">Close</v-btn>
+          <v-btn color="anchor" @click="$emit('close')">Close</v-btn>
           <v-btn
             color="error"
-            variant="outlined"
             :disabled="gatewaysToDelete.length === 0 || deleting || loadingGateways"
             v-if="gatewayTab === 0"
             @click="requestDelete = true"
           >
             Delete
           </v-btn>
-          <v-btn color="secondary" variant="outlined" @click="deployGateway" :disabled="!valid" v-else> Add </v-btn>
+          <v-btn color="secondary" @click="deployGateway" :disabled="!valid" v-else> Add </v-btn>
         </template>
       </weblet-layout>
     </v-dialog>
@@ -197,19 +186,17 @@
     <v-dialog v-model="requestDelete" max-width="600px">
       <v-card>
         <v-card-title> Are you sure you want to delete the following gateways? </v-card-title>
-        <v-card-text class="d-flex">
-          <v-chip color="error" label variant="tonal" class="mr-1 mb-1" v-for="gw in gatewaysToDelete" :key="gw.name">
+        <v-card-text class="d-flex flex-wrap">
+          <v-chip label class="mr-1 mb-5" v-for="gw in gatewaysToDelete" :key="gw.name">
             {{ gw.name }}
           </v-chip>
+          <v-divider />
         </v-card-text>
 
-        <v-divider />
-
-        <v-card-actions class="d-flex justify-end">
+        <v-card-actions class="justify-end mb-1 mr-2">
+          <v-btn color="anchor" @click="requestDelete = false">Cancel</v-btn>
           <v-btn
             color="error"
-            variant="outlined"
-            size="small"
             :disabled="loadingGateways || deleting"
             @click="
               () => {
@@ -219,7 +206,6 @@
             "
             >Delete</v-btn
           >
-          <v-btn color="secondary" variant="tonal" size="small" @click="requestDelete = false">Cancel</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -227,15 +213,17 @@
 </template>
 
 <script lang="ts">
+import type { GridClient } from "@threefold/grid_client";
 import { onMounted, type PropType, ref } from "vue";
 
-import { useProfileManager } from "../stores";
+import { useGrid } from "../stores";
 import { ProjectName } from "../types";
 import type { SelectionDetails } from "../types/nodeSelector";
 import { deployGatewayName, type GridGateway, loadDeploymentGateways } from "../utils/gateway";
-import { getGrid } from "../utils/grid";
+import { updateGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
 import { generateName } from "../utils/strings";
+import { isAvailableName } from "../utils/validators";
 import IconActionBtn from "./icon_action_btn.vue";
 import ListTable from "./list_table.vue";
 import { useLayout } from "./weblet_layout.vue";
@@ -247,7 +235,6 @@ export default {
     vm: { type: Array as PropType<any>, required: true },
   },
   setup(props) {
-    const profileManager = useProfileManager();
     const layout = useLayout();
     const gatewayTab = ref(0);
 
@@ -261,14 +248,17 @@ export default {
 
     const ip = props.vm.interfaces[0].ip as string;
     const networkName = props.vm.interfaces[0].network as string;
+    const gridStore = useGrid();
+    const grid = gridStore.client as unknown as GridClient;
 
     onMounted(async () => {
-      const grid = await getGrid(profileManager.profile!);
+      updateGrid(grid, { projectName: "" });
+
       oldPrefix.value =
         (props.vm.projectName.toLowerCase().includes(ProjectName.Fullvm.toLowerCase()) ? "fvm" : "vm") +
         grid!.config.twinId;
       prefix.value = oldPrefix.value + props.vm.name;
-      subdomain.value = generateName({}, 35 - prefix.value.length > 7 ? 7 : 35 - prefix.value.length);
+      subdomain.value = generateName({ prefix: prefix.value }, 4);
       await loadGateways();
     });
 
@@ -281,7 +271,8 @@ export default {
         gateways.value = [];
         gatewaysToDelete.value = [];
         loadingGateways.value = true;
-        const grid = await getGrid(profileManager.profile!, props.vm.projectName);
+        updateGrid(grid, { projectName: props.vm.projectName });
+
         const { gateways: gws, failedToList } = await loadDeploymentGateways(grid!);
         gateways.value = gws;
         failedToListGws.value = failedToList;
@@ -297,7 +288,6 @@ export default {
 
       try {
         const [x, y] = ip.split(".");
-        const grid = await getGrid(profileManager.profile!, props.vm.projectName);
 
         const data = {
           name: networkName,
@@ -313,7 +303,7 @@ export default {
         }
 
         await deployGatewayName(grid, selectionDetails.value!.domain, {
-          subdomain: prefix.value + subdomain.value,
+          subdomain: subdomain.value,
           ip,
           port: port.value,
           network: networkName,
@@ -330,7 +320,6 @@ export default {
     const deleting = ref(false);
     async function deleteSelectedGateways() {
       deleting.value = true;
-      const grid = await getGrid(profileManager.profile!, props.vm.projectName);
       const deletedGateways = new Set<GridGateway>();
       for (const gw of gatewaysToDelete.value) {
         await grid!.gateway
@@ -346,9 +335,11 @@ export default {
       }
     }
 
-    return {
-      profileManager,
+    async function validateSubdomain() {
+      return await isAvailableName(grid!, subdomain.value);
+    }
 
+    return {
       oldPrefix,
       prefix,
       layout,
@@ -375,6 +366,7 @@ export default {
       gatewaysToDelete,
       deleting,
       deleteSelectedGateways,
+      validateSubdomain,
     };
   },
 };

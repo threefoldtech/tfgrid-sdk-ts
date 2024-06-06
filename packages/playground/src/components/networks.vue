@@ -7,11 +7,11 @@
           <v-chip v-if="error" variant="text">
             <v-icon color="warning" icon="mdi-alert-circle" />
           </v-chip>
-          <v-chip v-if="ipv4" variant="outlined" size="small" class="ml-2"> IPV4 </v-chip>
-          <v-chip v-if="ipv6" variant="outlined" size="small" class="ml-2"> IPV6 </v-chip>
-          <v-chip v-if="planetary" variant="outlined" size="small" class="ml-2"> Planetary </v-chip>
-          <v-chip v-if="mycelium" variant="outlined" size="small" class="ml-2"> Mycelium </v-chip>
-          <v-chip v-if="wireguard" variant="outlined" size="small" class="ml-2"> Wireguard </v-chip>
+          <v-chip v-if="ipv4" variant="outlined" class="ml-2"> IPV4 </v-chip>
+          <v-chip v-if="ipv6" variant="outlined" class="ml-2"> IPV6 </v-chip>
+          <v-chip v-if="planetary" variant="outlined" class="ml-2"> Planetary </v-chip>
+          <v-chip v-if="mycelium" variant="outlined" class="ml-2"> Mycelium </v-chip>
+          <v-chip v-if="wireguard" variant="outlined" class="ml-2"> Wireguard </v-chip>
         </template>
         <v-expansion-panel-text>
           <input-tooltip
@@ -25,7 +25,7 @@
               inset
               label="Public IPv4"
               :model-value="$props.ipv4"
-              @update:model-value="$emit('update:ipv4', $event)"
+              @update:model-value="$emit('update:ipv4', $event ?? undefined)"
             />
           </input-tooltip>
           <input-tooltip
@@ -39,7 +39,7 @@
               inset
               label="Public IPv6"
               :modelValue="$props.ipv6"
-              @update:modelValue="$emit('update:ipv6', $event)"
+              @update:modelValue="$emit('update:ipv6', $event ?? undefined)"
             />
           </input-tooltip>
           <input-tooltip
@@ -53,7 +53,7 @@
               inset
               label="Planetary Network"
               :modelValue="$props.planetary"
-              @update:modelValue="$emit('update:planetary', $event)"
+              @update:modelValue="$emit('update:planetary', $event ?? undefined)"
             />
           </input-tooltip>
           <input-tooltip
@@ -67,7 +67,7 @@
               inset
               label="mycelium"
               :modelValue="$props.mycelium"
-              @update:modelValue="$emit('update:mycelium', $event)"
+              @update:modelValue="$emit('update:mycelium', $event ?? undefined)"
             />
           </input-tooltip>
           <input-tooltip
@@ -81,7 +81,7 @@
               inset
               label="Add Wireguard Access"
               :modelValue="$props.wireguard"
-              @update:modelValue="$emit('update:wireguard', $event)"
+              @update:modelValue="$emit('update:wireguard', $event ?? undefined)"
             />
           </input-tooltip>
           <v-alert v-show="error" class="mb-2" type="warning" variant="tonal">
@@ -137,7 +137,7 @@ export default {
       props.ipv6 === null &&
       props.planetary === null &&
       props.wireguard === null &&
-      props.mycelium
+      props.mycelium === null
     ) {
       throw new Error("You must provide at least one network  option");
     }

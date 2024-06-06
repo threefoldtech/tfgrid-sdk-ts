@@ -39,7 +39,7 @@
             <p class="mt-4 mb-4 font-weight-bold text-error">
               {{ errorMessage }}
             </p>
-            <v-btn :loading="loading" class="mr-4" @click="RerequestNode" color="primary" text="Try Again" />
+            <v-btn :loading="loading" class="mr-4" @click="RerequestNode" text="Try Again" />
           </div>
         </v-card>
       </div>

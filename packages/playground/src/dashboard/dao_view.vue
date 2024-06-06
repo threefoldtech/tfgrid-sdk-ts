@@ -46,9 +46,7 @@
               <v-card-title class="pa-0 mb-5 font-weight-bold" v-if="proposal.action">
                 {{ proposal.action }}
               </v-card-title>
-              <v-btn variant="outlined" color="secondary" v-bind:href="proposal.link" v-bind:target="'blank'">
-                Go to Proposal
-              </v-btn>
+              <v-btn color="secondary" v-bind:href="proposal.link" v-bind:target="'blank'"> Go to Proposal </v-btn>
             </div>
             <v-divider class="mt-1 mb-5 text-red-700" />
 
@@ -235,16 +233,9 @@
               </input-validator>
             </form-validator>
           </v-card-text>
-          <v-card-actions class="justify-end">
-            <v-btn @click="openVDialog = false" variant="outlined" color="anchor">Close</v-btn>
-            <v-btn
-              @click="castVote"
-              :loading="loadingVote"
-              variant="outlined"
-              color="secondary"
-              :disabled="!isValidFarm"
-              >Vote</v-btn
-            >
+          <v-card-actions class="justify-end mb-1 mr-2">
+            <v-btn @click="openVDialog = false" color="anchor">Close</v-btn>
+            <v-btn @click="castVote" :loading="loadingVote" color="secondary" :disabled="!isValidFarm">Vote</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -292,7 +283,7 @@
 
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn @click="openInfoModal = false" class="my-1" color="anchor" variant="outlined"> Close </v-btn>
+            <v-btn @click="openInfoModal = false" color="anchor"> Close </v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -300,6 +291,7 @@
   </div>
 </template>
 <script lang="ts" setup>
+import type { GridClient } from "@threefold/grid_client";
 import type { Proposal, Proposals } from "@threefold/tfchain_client";
 import type moment from "moment";
 import { createToast } from "mosha-vue-toastify";
@@ -307,10 +299,10 @@ import { onMounted, ref } from "vue";
 
 import { manual } from "@/utils/manual";
 
-import { useProfileManager } from "../stores";
+import { useGrid, useProfileManager } from "../stores";
 import type { FarmInterface } from "../types";
 import { getFarms } from "../utils/get_farms";
-import { getGrid } from "../utils/grid";
+import { updateGrid } from "../utils/grid";
 
 const loadingProposals = ref(true);
 const activeTab = ref(0);
@@ -334,8 +326,11 @@ const tabs = [
   { title: "Executable", content: inactiveProposals },
 ];
 
+const gridStore = useGrid();
+const grid = gridStore.client as GridClient;
+
 onMounted(async () => {
-  const grid = await getGrid(profile.value);
+  updateGrid(grid, { projectName: "" });
 
   if (grid) {
     proposals.value = await grid?.dao.get();
@@ -364,7 +359,6 @@ function filteredProposals(proposals: Proposal[] | undefined) {
 }
 async function castVote() {
   loadingVote.value = true;
-  const grid = await getGrid(profile.value);
 
   if (grid) {
     try {

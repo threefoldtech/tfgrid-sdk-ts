@@ -17,7 +17,7 @@
         </template>
       </v-tooltip>
 
-      <v-dialog transition="dialog-bottom-transition" v-model="showDialog" max-width="500px">
+      <v-dialog transition="dialog-bottom-transition" v-model="showDialog">
         <v-card>
           <v-card-title style="color: #ffcc00; font-weight: bold">Failed Deployments</v-card-title>
           <v-divider color="#FFCC00" />
@@ -49,8 +49,8 @@
               </template>
             </li>
           </v-card-text>
-          <v-card-actions class="justify-end">
-            <v-btn @click="showDialog = false" variant="outlined" color="anchor">Close</v-btn>
+          <v-card-actions class="justify-end my-1 mr-2">
+            <v-btn @click="showDialog = false" color="anchor">Close</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -72,10 +72,17 @@
       :headers="[
         { title: 'PLACEHOLDER', key: 'data-table-select' },
         { title: 'Name', key: 'name' },
-        { title: 'Public IPv4', key: 'ipv4', sortable: false },
-        { title: 'Public IPv6', key: 'ipv6', sortable: false },
-        { title: 'Planetary Network IP', key: 'planetary', sortable: false },
-        { title: 'Mycelium Network IP', key: 'mycelium', sortable: false },
+        {
+          title: 'Networks',
+          key: 'networks',
+          sortable: false,
+          children: [
+            { title: 'Public IPv4', key: 'ipv4', sortable: false },
+            { title: 'Public IPv6', key: 'ipv6', sortable: false },
+            { title: 'Planetary IP', key: 'planetary', sortable: false },
+            { title: 'Mycelium IP', key: 'mycelium', sortable: false },
+          ],
+        },
         { title: 'Workers', key: 'workersLength' },
         { title: 'Billing Rate', key: 'billing' },
         { title: 'Created At', key: 'created' },
@@ -91,31 +98,29 @@
       :sort-by="sortBy"
     >
       <template #[`item.created`]="{ item }">
-        {{ toHumanDate(item.value.masters[0].created) }}
+        {{ toHumanDate(item.masters[0].created) }}
       </template>
 
       <template #[`item.mycelium`]="{ item }">
-        {{ item.value.masters[0].myceliumIP || "-" }}
+        {{ item.masters[0].myceliumIP || "-" }}
       </template>
 
       <template #[`item.status`]="{ item }">
-        <v-chip :color="getNodeHealthColor(item.value.masters[0].status as string).color">
-          <v-tooltip v-if="item.value.masters[0].status == NodeHealth.Error" activator="parent" location="top">{{
-            item.value.masters[0].message
+        <v-chip :color="getNodeHealthColor(item.masters[0].status as string).color">
+          <v-tooltip v-if="item.masters[0].status == NodeHealth.Error" activator="parent" location="top">{{
+            item.masters[0].message
           }}</v-tooltip>
-          <v-tooltip v-if="item.value.masters[0].status == NodeHealth.Paused" activator="parent" location="top"
+          <v-tooltip v-if="item.masters[0].status == NodeHealth.Paused" activator="parent" location="top"
             >The deployment contract is in grace period</v-tooltip
           >
           <span class="text-uppercase">
-            {{ getNodeHealthColor(item.value.masters[0].status as string).type }}
+            {{ getNodeHealthColor(item.masters[0].status as string).type }}
           </span>
         </v-chip>
       </template>
 
       <template #[`item.actions`]="{ item }">
-        <v-chip color="error" variant="tonal" v-if="deleting && ($props.modelValue || []).includes(item.value)">
-          Deleting...
-        </v-chip>
+        <v-chip color="error" v-if="deleting && ($props.modelValue || []).includes(item.value)"> Deleting... </v-chip>
         <v-btn-group variant="tonal" v-else>
           <slot name="actions" :item="item"></slot>
         </v-btn-group>

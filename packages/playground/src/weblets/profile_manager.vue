@@ -138,7 +138,6 @@
                       valid-message="Mnemonic or Hex Seed is valid."
                       #="{ props: validationProps }"
                       ref="mnemonicInput"
-                      :disable-validation="creatingAccount || activatingAccount || activating"
                     >
                       <v-row>
                         <v-col cols="12" md="9">
@@ -201,7 +200,7 @@
                 </template>
               </VTooltip>
 
-              <v-dialog v-model="openAcceptTerms" fullscreen>
+              <v-dialog v-model="openAcceptTerms" fullscreen width="100%">
                 <v-card v-if="!termsLoading">
                   <v-card-text class="pa-15" v-html="acceptTermsContent"></v-card-text>
                   <div class="terms-footer">
@@ -210,13 +209,11 @@
                       @click="openAcceptTerms = termsLoading = false"
                       v-show="!termsLoading"
                       :color="theme.name.value === AppThemeSelection.light ? 'black' : 'white'"
-                      variant="outlined"
                       :text="capitalize('go back')"
                     />
                     <v-btn
                       @click="shouldActivateAccount ? activateAccount() : createNewAccount()"
                       v-show="!termsLoading"
-                      color="primary"
                       :text="capitalize('accept terms and conditions')"
                     />
                   </div>
@@ -323,7 +320,6 @@
                 class="ml-2"
                 type="submit"
                 color="secondary"
-                variant="outlined"
                 :loading="activating"
                 :disabled="
                   !isValidForm ||
@@ -396,14 +392,7 @@
       </template>
       <!-- <v-divider horizontal></v-divider> -->
       <div class="d-flex justify-end mt-4 mb-2">
-        <VBtn
-          v-if="profileManager.profile"
-          color="anchor"
-          variant="outlined"
-          @click="$emit('update:modelValue', false)"
-        >
-          Close
-        </VBtn>
+        <VBtn v-if="profileManager.profile" color="anchor" @click="$emit('update:modelValue', false)"> Close </VBtn>
         <VBtn
           class="ml-2"
           color="error"
@@ -691,7 +680,9 @@ async function activate(mnemonic: string, keypairType: KeypairType) {
   try {
     const grid = await getGrid({ mnemonic, keypairType });
     const profile = await loadProfile(grid!);
-
+    if (email.value) {
+      profile.email = email.value;
+    }
     profileManager.set({ ...profile, mnemonic });
     emit("update:modelValue", false);
     // Migrate the ssh-key
@@ -720,6 +711,7 @@ async function createNewAccount() {
   openAcceptTerms.value = false;
   termsLoading.value = false;
   enableReload.value = false;
+  mnemonicInput.value.reset();
   clearError();
   creatingAccount.value = true;
   try {

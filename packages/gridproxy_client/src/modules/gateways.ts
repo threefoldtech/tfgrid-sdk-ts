@@ -37,6 +37,7 @@ export interface NodeStats {
   users: {
     deployments: number;
     workloads: number;
+    last_deployment_timestamp: number;
   };
 }
 

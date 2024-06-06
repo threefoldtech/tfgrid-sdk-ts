@@ -313,7 +313,11 @@ class Client {
         } else {
           clientEnvelope.plain = new Uint8Array(Buffer.from(requestData));
         }
+      } else {
+        clientEnvelope.plain = new Uint8Array();
       }
+
+      clientEnvelope.relays = this.twin.relay.split("_");
 
       if (this.signer) {
         clientEnvelope.signature = clientEnvelope.signEnvelope();

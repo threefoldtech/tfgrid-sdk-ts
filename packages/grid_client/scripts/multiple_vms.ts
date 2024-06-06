@@ -30,7 +30,7 @@ async function main() {
   const vmQueryOptions: FilterOptions = {
     cru: 1,
     mru: 1, // GB
-    sru: 1,
+    sru: 14,
     availableFor: grid3.twinId,
     farmId: 1,
   };

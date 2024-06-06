@@ -128,7 +128,9 @@
               </TfSwapPrice>
             </div>
           </v-spacer>
-          <v-btn class="capitalize" :style="{ pointerEvents: 'none' }" variant="text"> {{ network }}net </v-btn>
+          <v-btn class="capitalize" color="anchor" :style="{ pointerEvents: 'none' }" variant="text">
+            {{ network }}net
+          </v-btn>
           <v-divider vertical class="mx-2" />
           <AppTheme />
           <v-divider vertical class="mx-2" />
@@ -148,14 +150,18 @@
           height="50"
         >
           <v-row>
-            <v-breadcrumbs class="ma-3" :items="navbarConfig.path" active-color="secondary">
+            <v-breadcrumbs class="ma-3" :items="navbarConfig.path">
               <template v-slot:divider>
                 <v-icon icon="mdi-chevron-right"></v-icon>
               </template>
               <template v-slot:item="{ item }">
-                <router-link :to="item.to" :class="{ 'clickable-item': !item.disabled }">
+                <component
+                  :is="item.to ? 'router-link' : 'span'"
+                  :to="item.to"
+                  :class="{ 'text-secondary text-decoration-none': !!item.to }"
+                >
                   {{ item.title }}
-                </router-link>
+                </component>
               </template>
             </v-breadcrumbs>
           </v-row>
@@ -474,5 +480,18 @@ export default {
 <style>
 .clickable-logo:hover {
   cursor: pointer;
+}
+.v-theme--light .v-btn--disabled,
+.v-theme--dark .v-btn--disabled,
+.v-theme--light .v-field--disabled {
+  opacity: 0.5 !important;
+  pointer-events: none !important;
+}
+.v-theme--light .v-field--disabled {
+  background-color: #f0f0f0 !important;
+}
+.v-theme--light .v-btn--disabled,
+.v-theme--dark .v-btn--disabled {
+  color: #7b7b7b !important;
 }
 </style>

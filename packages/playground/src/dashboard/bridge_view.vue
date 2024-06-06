@@ -11,10 +11,10 @@
         </v-col>
       </v-row>
       <v-row class="pa-4 px-8">
-        <v-btn variant="outlined" color="secondary" @click="navigation">Learn How?</v-btn>
+        <v-btn color="secondary" @click="navigation">Learn How?</v-btn>
         <div class="ml-auto">
-          <v-btn variant="outlined" color="secondary" class="mr-2" @click="openWithdrawDialog = true">Withdraw</v-btn>
-          <v-btn color="primary" class="mr-2" @click="openDepositDialog = true">Deposit</v-btn>
+          <v-btn color="secondary" class="mr-2" @click="openWithdrawDialog = true">Withdraw</v-btn>
+          <v-btn variant="elevated" class="mr-2" @click="openDepositDialog = true">Deposit</v-btn>
         </div>
       </v-row>
     </v-card>
@@ -46,8 +46,8 @@
 <script lang="ts" setup>
 import { onMounted, ref } from "vue";
 
-import { useProfileManager } from "../stores";
-import { getGrid, loadBalance } from "../utils/grid";
+import { useGrid, useProfileManager } from "../stores";
+import { loadBalance } from "../utils/grid";
 
 const profileManager = useProfileManager();
 const items = ref([{ id: 1, name: "stellar" }]);
@@ -60,13 +60,14 @@ const freeBalance = ref(0);
 const depositWallet = ref("");
 const qrCodeText = ref("");
 const depositFee = ref(0);
+const gridStore = useGrid();
+const grid = gridStore.client as GridClient;
 
 onMounted(async () => {
   selectedName.value = items.value.filter(item => item.id === selectedItem.value.id)[0].name;
   depositWallet.value = window.env.BRIDGE_TFT_ADDRESS;
   qrCodeText.value = `TFT:${depositWallet.value}?message=twin_${profileManager.profile?.twinId}&sender=me`;
   try {
-    const grid = await getGrid(profileManager.profile!);
     if (grid) {
       const WithdrawFee = await grid.bridge.getWithdrawFee();
       withdrawFee.value = WithdrawFee;
@@ -88,6 +89,8 @@ function navigation() {
 </script>
 
 <script lang="ts">
+import type { GridClient } from "@threefold/grid_client";
+
 import DepositDialog from "@/components/deposit_dialog.vue";
 import WithdrawDialog from "@/components/withdraw_dialog.vue";
 import { manual } from "@/utils/manual";

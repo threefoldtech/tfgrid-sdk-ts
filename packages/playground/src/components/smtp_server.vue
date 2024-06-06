@@ -5,6 +5,9 @@
       <p v-else>Configure your SMTP Server.</p>
     </v-alert>
 
+    <v-alert variant="tonal" type="warning" class="mt-3">
+      SMTP functionality requires IPv4. Enabling SMTP will automatically activate IPv4.
+    </v-alert>
     <input-tooltip
       v-if="!persistent"
       inline
@@ -31,6 +34,7 @@
             v-model="$props.modelValue.username"
             v-bind="props"
             autofocus
+            class="mt-3"
           />
         </input-tooltip>
       </input-validator>
@@ -139,13 +143,16 @@ defineProps<{
 </script>
 
 <script lang="ts">
+import { useProfileManager } from "../stores";
 import type { SMTPServer } from "../types";
 import { generatePassword } from "../utils/strings";
+
+const profileManager = useProfileManager();
 
 export function createSMTPServer(options: Partial<SMTPServer> = {}): SMTPServer {
   return {
     enabled: options.enabled || false,
-    username: options.username || "",
+    username: profileManager.profile?.email || options.username || "",
     email: options.email || "",
     hostname: options.hostname || "smtp.gmail.com",
     port: options.port || 587,

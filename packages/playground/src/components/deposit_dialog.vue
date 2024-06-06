@@ -1,11 +1,6 @@
 <template>
   <v-container>
-    <v-dialog
-      transition="dialog-bottom-transition"
-      max-width="1000"
-      v-model="depositDialog"
-      @update:model-value="closeDialog"
-    >
+    <v-dialog transition="dialog-bottom-transition" v-model="depositDialog" @update:model-value="closeDialog">
       <v-card>
         <VCardTitle class="bg-primary">Deposit TFT</VCardTitle>
         <v-card-text>
@@ -37,7 +32,12 @@
                   />
                 </div>
                 <div style="margin-top: 5rem">
-                  <p :style="{ paddingBottom: '3rem', color: '#7de3c8' }">Waiting for receiving TFTs{{ dots }}</p>
+                  <p
+                    :class="theme.name.value === AppThemeSelection.light ? 'text-primary' : 'text-info'"
+                    :style="{ paddingBottom: '3rem' }"
+                  >
+                    Waiting for receiving TFTs{{ dots }}
+                  </p>
                 </div>
               </v-col>
               <v-divider class="mx-4" vertical></v-divider>
@@ -62,14 +62,14 @@
                   </div>
                 </div>
               </v-col>
-              <v-divider horizontal></v-divider>
             </v-row>
           </v-container>
-          <v-card-actions class="justify-end">
-            <v-btn variant="outlined" color="anchor" class="mr-2 px-3" @click="closeDialog"> Close </v-btn>
-            <v-btn variant="outlined" color="secondary" :href="manual.tft_bridges" target="_blank" text="Learn more?" />
-          </v-card-actions>
+          <v-divider />
         </v-card-text>
+        <v-card-actions class="justify-end my-1 mr-2">
+          <v-btn color="anchor" @click="closeDialog"> Close </v-btn>
+          <v-btn color="secondary" :href="manual.tft_bridges" target="_blank" text="Learn more?" />
+        </v-card-actions>
       </v-card>
     </v-dialog>
   </v-container>
@@ -78,14 +78,15 @@
 <script setup lang="ts">
 import { Decimal } from "decimal.js";
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
+import { useTheme } from "vuetify";
 
+import { AppThemeSelection } from "@/utils/app_theme";
 import { manual } from "@/utils/manual";
 
 import { useProfileManagerController } from "../components/profile_manager_controller.vue";
 import QrcodeGenerator from "../components/qrcode_generator.vue";
-import { useProfileManager } from "../stores";
+import { useGrid, useProfileManager } from "../stores";
 import { createCustomToast, ToastType } from "../utils/custom_toast";
-import { getGrid } from "../utils/grid";
 import CopyReadonlyInput from "./copy_readonly_input.vue";
 const depositDialog = ref(false);
 const emits = defineEmits(["close"]);
@@ -95,6 +96,9 @@ const loading = ref(false);
 const dots = ref(".");
 const interval = ref<number | null>(null);
 const ProfileManagerController = useProfileManagerController();
+const gridStore = useGrid();
+const grid = gridStore.client as GridClient;
+const theme = useTheme();
 
 const apps = [
   {
@@ -141,7 +145,7 @@ onMounted(async () => {
   interval.value = window.setInterval(loadingDots, 500);
   try {
     loading.value = true;
-    const grid = await getGrid(profileManager.profile!);
+    updateGrid(grid, { projectName: "" });
     const address = profileManager.profile?.address as string;
     const receivedDeposit = await grid!.bridge.listenToMintCompleted({
       address: address,
@@ -171,7 +175,10 @@ onBeforeUnmount(() => {
 });
 </script>
 <script lang="ts">
+import type { GridClient } from "@threefold/grid_client";
 import { defineComponent } from "vue";
+
+import { updateGrid } from "../utils/grid";
 
 export default defineComponent({
   name: "DepositDialog",

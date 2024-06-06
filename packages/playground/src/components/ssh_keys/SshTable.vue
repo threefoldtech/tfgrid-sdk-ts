@@ -1,34 +1,40 @@
 <template>
-  <v-card class="pt-6 pl-6 pr-6 mb-4">
-    <div class="head">
-      <h3 class="text-light text-subtitle-1">
-        <v-icon>mdi-key-chain</v-icon>
-        SSH Keys
-      </h3>
-    </div>
+  <v-card>
+    <v-card-title>
+      <v-icon icon="mdi-key-chain" />
+      SSH Keys
+    </v-card-title>
 
-    <div class="table mt-3">
+    <v-divider />
+
+    <v-card-text>
       <v-data-table
         show-select
         :no-data-text="capitalize(`No keys found.`)"
-        class="pa-5"
         v-model="selectedKeys"
         :loading="loading"
         :headers="headers"
         :items="sshKeys"
+        :items-per-page="itemsPerPage"
+        :items-per-page-options="[
+          { value: 5, title: '5' },
+          { value: 10, title: '10' },
+          { value: 15, title: '15' },
+          { value: 50, title: '50' },
+        ]"
         loading-text="Loading..."
-        @click:row="(_: any, { item }: any) => $emit('view', item.raw)"
+        @click:row="(_: any, { item }: any) => $emit('view', item)"
       >
         <template #loading>
-          <div class="w-100 text-center" v-if="loading && loadingMessage">
+          <div class="text-center" v-if="loading && loadingMessage">
             <small>{{ loadingMessage }}</small>
           </div>
         </template>
         <template #[`item.createdAt`]="{ item }">
           <v-tooltip location="bottom" :text="`The date when this SSH key was created.`">
             <template #activator="{ props }">
-              <v-chip color="primary" v-bind="props">
-                {{ item.raw.createdAt }}
+              <v-chip v-bind="props">
+                {{ item.createdAt }}
               </v-chip>
             </template>
           </v-tooltip>
@@ -41,7 +47,7 @@
           >
             <template #activator="{ props }">
               <p v-bind="props">
-                {{ item.raw.name || "-" }}
+                {{ item.name || "-" }}
               </p>
             </template>
           </v-tooltip>
@@ -54,7 +60,7 @@
           >
             <template #activator="{ props }">
               <p v-bind="props">
-                {{ item.raw.fingerPrint || "-" }}
+                {{ item.fingerPrint || "-" }}
               </p>
             </template>
           </v-tooltip>
@@ -64,14 +70,14 @@
           <v-tooltip
             location="bottom"
             :text="
-              item.raw.isActive
-                ? `The '${item.raw.name}' key is currently activated and will be utilized in deployments.`
-                : `Click to activate the '${item.raw.name}' for use in deployments.`
+              item.isActive
+                ? `The '${item.name}' key is currently activated and will be utilized in deployments.`
+                : `Click to activate the '${item.name}' for use in deployments.`
             "
           >
             <template #activator="{ props }">
               <v-progress-circular
-                v-if="item.raw.activating"
+                v-if="item.activating"
                 :size="20"
                 :width="2"
                 color="info"
@@ -82,29 +88,27 @@
                 class="d-inline"
                 v-bind="props"
                 color="secondary"
-                @click.stop="toggleKeyActivation(item.raw)"
-                :model-value="item.raw.isActive"
+                @click.stop="toggleKeyActivation(item)"
+                :model-value="item.isActive"
                 :disabled="deleting"
               />
             </template>
           </v-tooltip>
         </template>
-
-        <template #bottom></template>
       </v-data-table>
-    </div>
+    </v-card-text>
 
-    <div class="bottom mt-3 d-flex justify-end">
+    <!-- <v-divider /> -->
+
+    <v-card-actions class="justify-end my-1 mr-2">
       <v-tooltip location="bottom" text="Export all selected keys.">
         <template #activator="{ props }">
           <v-btn
             :disabled="loading || selectedKeys.length === 0 || $props.sshKeys.length === 0 || deleting"
-            class="mr-2"
             :loading="loading"
             v-bind="props"
             prepend-icon="mdi-export"
-            color="primary"
-            variant="tonal"
+            color="anchor"
             @click="() => $emit('export', selectedKeys)"
           >
             Export
@@ -118,7 +122,6 @@
             :disabled="loading || selectedKeys.length === 0 || deleting"
             :loading="deleting"
             v-bind="props"
-            variant="tonal"
             prepend-icon="mdi-trash-can-outline"
             color="error"
             @click="deleteSelected"
@@ -127,7 +130,7 @@
           </v-btn>
         </template>
       </v-tooltip>
-    </div>
+    </v-card-actions>
   </v-card>
 </template>
 
@@ -163,7 +166,7 @@ export default defineComponent({
   setup(props, { emit }) {
     const selectedKeys = ref<number[]>([]); // IDs
     const theme = useTheme();
-
+    const itemsPerPage = ref(10);
     const headers: VDataTableHeader = [
       {
         title: "ID",
@@ -211,6 +214,7 @@ export default defineComponent({
     return {
       headers,
       selectedKeys,
+      itemsPerPage,
       theme,
       AppThemeSelection,
       capitalize,
@@ -223,22 +227,7 @@ export default defineComponent({
 </script>
 
 <style>
-.head {
-  border-bottom: 1px solid #8d848d;
-  padding-bottom: 15px;
-}
-
-.bottom {
-  width: 100%;
-  border-top: 1px solid #8d848d;
-  padding: 15px;
-}
 .activation {
   cursor: pointer;
-}
-.v-data-table-rows-loading td {
-  padding: 0 !important;
-  margin: 0 !important;
-  height: 25px !important;
 }
 </style>

@@ -13,7 +13,7 @@
   >
     <template #title>Deploy a Freeflow Instance </template>
 
-    <form-validator v-model="valid">
+    <d-tabs :tabs="[{ title: 'Config', value: 'config' }]">
       <input-validator
         :value="threebotName"
         :rules="[
@@ -72,10 +72,10 @@
       />
 
       <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
-    </form-validator>
+    </d-tabs>
 
-    <template #footer-actions>
-      <v-btn color="primary" variant="tonal" @click="deploy()" :disabled="!valid"> Deploy </v-btn>
+    <template #footer-actions="{ validateBeforeDeploy }">
+      <v-btn color="secondary" @click="validateBeforeDeploy(deploy)" text="Deploy" />
     </template>
   </weblet-layout>
 </template>
@@ -87,17 +87,14 @@ import { computed, onMounted, type Ref, ref } from "vue";
 import { manual } from "@/utils/manual";
 
 import { useLayout } from "../components/weblet_layout.vue";
-import { useProfileManager } from "../stores";
+import { useGrid } from "../stores";
 import type { Flist, solutionFlavor as SolutionFlavor } from "../types";
 import { ProjectName } from "../types";
 import { deployVM, type Disk } from "../utils/deploy_vm";
 import { deployGatewayName, rollbackDeployment } from "../utils/gateway";
-import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
 
 const layout = useLayout();
-const valid = ref(false);
-const profileManager = useProfileManager();
 
 const threebotName = ref<string>("");
 const solution = ref() as Ref<SolutionFlavor>;
@@ -109,6 +106,8 @@ const ipv4 = ref(false);
 const rootFilesystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solution.value?.memory ?? 0));
 const selectionDetails = ref<SelectionDetails>();
 const selectedSSHKeys = ref("");
+const gridStore = useGrid();
+const grid = gridStore.client as GridClient;
 
 onMounted(() => {
   disks.value.push({
@@ -138,12 +137,11 @@ async function deploy() {
     ? selectionDetails.value!.domain!.customDomain
     : threebotName.value + "." + selectionDetails.value!.domain!.selectedDomain!.publicConfig.domain;
 
-  let grid: GridClient | null;
   let vm: any;
 
   try {
     layout.value?.validateSSH();
-    grid = await getGrid(profileManager.profile!, projectName);
+    updateGrid(grid, { projectName });
 
     await layout.value.validateBalance(grid!);
 
@@ -215,6 +213,7 @@ import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";
 import type { SelectionDetails } from "../types/nodeSelector";
+import { updateGrid } from "../utils/grid";
 import rootFs from "../utils/root_fs";
 
 export default {

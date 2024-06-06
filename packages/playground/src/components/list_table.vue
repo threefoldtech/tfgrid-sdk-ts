@@ -12,7 +12,7 @@
     hide-no-data
     :return-object="returnObject"
   >
-    <template #[`column.data-table-select`]>
+    <template #[`header.data-table-select`]>
       <div class="d-flex align-center justify-space-between">
         <span>#</span>
         <div class="d-flex">
@@ -26,14 +26,14 @@
       </div>
     </template>
 
-    <template #[`item.data-table-select`]="{ item, toggleSelect, index }">
+    <template #[`item.data-table-select`]="{ item, index }">
       <div class="d-flex align-center justify-space-between">
         <span>{{ index + 1 }}</span>
         <div class="d-flex" @click.stop>
           <v-progress-circular
-            v-if="deleting && selectedItems.includes(item?.value)"
+            v-if="deleting && selectedItems.includes(item)"
             class="ml-3"
-            color="red"
+            color="error"
             :width="2"
             :size="20"
             indeterminate
@@ -42,7 +42,7 @@
             v-else
             color="primary"
             :disabled="deleting || loading"
-            :model-value="selectedItems.includes(item.value)"
+            :model-value="selectedItems.includes(item)"
             @update:model-value="toggleSelect(item)"
           />
         </div>
@@ -50,12 +50,12 @@
     </template>
 
     <!-- Forward slots to the host component -->
-    <template v-for="(_, slot) of $slots" v-slot:[slot]="scope">
+    <template v-for="slot in (Object.keys($slots) as any[])" v-slot:[slot]="scope">
       <slot :name="slot" v-bind="scope" />
     </template>
 
     <template #bottom>
-      <v-row class="mt-5" v-if="loading && items.length === 0">
+      <v-row class="my-5" v-if="loading && items.length === 0">
         <v-spacer />
         <div class="d-flex my-6 align-center justify-center">
           <v-progress-circular indeterminate :width="3" :size="30" />
@@ -64,7 +64,7 @@
       </v-row>
       <template v-else-if="!loading && items.length === 0 && (noDataText || $slots['no-data-text'])">
         <VContainer>
-          <VRow justify="center" align="center" class="mt-5">
+          <VRow justify="center" align="center" class="my-5">
             <slot name="no-data-text" v-if="$slots['no-data-text']" />
             <p v-else v-text="noDataText" />
           </VRow>
@@ -113,7 +113,15 @@ export default {
       },
     );
 
-    return { selectedItems, onUpdateSelection };
+    function toggleSelect(item: any) {
+      if (selectedItems.value.includes(item)) {
+        selectedItems.value = selectedItems.value.filter(i => i !== item);
+      } else {
+        selectedItems.value = [...selectedItems.value, item];
+      }
+    }
+
+    return { selectedItems, onUpdateSelection, toggleSelect };
   },
 };
 </script>

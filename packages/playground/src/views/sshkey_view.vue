@@ -17,7 +17,6 @@
   <v-card class="mb-3 pa-3" color="transparent">
     <v-col class="d-flex justify-end">
       <v-btn
-        variant="outlined"
         class="mr-2"
         @click="() => openDialog(SSHCreationMethod.Import)"
         prepend-icon="mdi-key-plus"
@@ -29,7 +28,6 @@
 
       <v-btn
         @click="exportAllKeys"
-        variant="outlined"
         class="mr-2"
         prepend-icon="mdi-export"
         color="secondary"
@@ -50,10 +48,10 @@
 
       <v-btn
         class="mr-2"
+        variant="elevated"
         :disabled="loading || deleting || generatingSSH || savingKey || activating"
         @click="openDialog(SSHCreationMethod.Generate)"
         prepend-icon="mdi-key-plus"
-        color="primary"
       >
         Generate
       </v-btn>
@@ -99,7 +97,13 @@
   />
 
   <!-- View -->
-  <ssh-data-dialog :open="isViewKey" :selected-key="selectedKey" @close="isViewKey = false" />
+  <ssh-data-dialog
+    :open="isViewKey"
+    :all-keys="allKeys"
+    :selected-key="selectedKey"
+    @close="isViewKey = false"
+    @update="updateKeys"
+  />
 </template>
 
 <script lang="ts" setup>
@@ -276,6 +280,19 @@ const addKey = async (key: SSHKeyData) => {
   savingKey.value = false;
   loading.value = false;
   closeDialog();
+};
+
+const updateKeys = async (updatedKey: SSHKeyData) => {
+  const index = allKeys.value.findIndex(key => key.id === updatedKey.id);
+  allKeys.value[index] = { ...updatedKey };
+  try {
+    await sshKeysManagement.update(allKeys.value);
+    createCustomToast("SSH Key updated successfully.", ToastType.success);
+  } catch (error) {
+    createCustomToast("Failed to update the SSH Key.", ToastType.danger);
+  } finally {
+    isViewKey.value = false;
+  }
 };
 
 const generateSSHKeys = async (key: SSHKeyData) => {
