@@ -18,12 +18,13 @@
       class="elevation-1 v-data-table-header"
       density="compact"
       :items-length="$props.count.value"
-      :items-per-page="$props.size"
-      :page="$props.page"
-      :items="contracts"
-      @update:options="updateOptions"
+      :items-per-page="$props.size.value"
+      :page="$props.page.value"
+      :items="contracts.value"
       return-object
       show-select
+      @update:page="updatePage"
+      @update:items-per-page="updateSize"
     >
       <template #[`item.nodeId`]="{ item }">
         <span v-if="['node', 'rent'].includes(item.type)">{{ item.details.nodeId }}</span>
@@ -120,7 +121,7 @@
       <v-btn
         color="anchor"
         prepend-icon="mdi-export-variant"
-        :disabled="isExporting || !contracts || contracts.length === 0 || deleting"
+        :disabled="isExporting || !contracts || contracts.value.length === 0 || loading.value"
         @click="exportData"
       >
         Export
@@ -140,8 +141,10 @@
 
   <v-dialog width="800" v-model="contractStateDialog">
     <v-card>
-      <v-card-title class="text-h5 mt-2"> Contract lock Details</v-card-title>
-      <v-card-text>
+      <v-toolbar color="primary" class="custom-toolbar">
+        <p class="mb-5">Contract lock Details</p>
+      </v-toolbar>
+      <v-card-text class="mt-4">
         <v-row class="d-flex justify-center">
           Amount Locked:
           {{ getAmountLocked }}
@@ -321,11 +324,11 @@ const props = defineProps({
   },
   size: {
     required: true,
-    type: Number,
+    type: Object as PropType<Ref<number>>,
   },
   page: {
     required: true,
-    type: Number,
+    type: Object as PropType<Ref<number>>,
   },
   count: {
     required: true,
@@ -339,7 +342,7 @@ const getAmountLocked = computed(() => {
 
 const isNodeInRentContracts = computed(() => {
   if (props.contractsType == ContractType.Node && selectedItem.value) {
-    const nodeIds = contracts.value
+    const nodeIds = props.contracts.value
       .map(contract => contract.details.nodeId)
       .filter(nodeId => nodeId !== undefined) as number[];
     if (contractLocked.value && contractLocked.value.amountLocked === 0) {
@@ -349,11 +352,16 @@ const isNodeInRentContracts = computed(() => {
   return false;
 });
 
-const emits = defineEmits(["update:deleted-contracts", "update:unlock-contracts", "update:options"]);
+const emits = defineEmits(["update:deleted-contracts", "update:unlock-contracts", "update:page", "update:size"]);
 
-function updateOptions(options: any) {
-  emits("update:options", { ...options, contractType: props.contractsType });
+function updatePage(page: number) {
+  emits("update:page", page);
 }
+
+function updateSize(size: number) {
+  emits("update:size", size);
+}
+
 const layout = ref();
 const contractLocked = ref<ContractLock>();
 const deleting = ref<boolean>(false);
@@ -364,7 +372,6 @@ const deletingDialog = ref<boolean>(false);
 const failedContractId = ref<number>();
 const loadingContractId = ref<number>();
 const selectedContracts = ref<NormalizedContract[]>([]);
-const contracts = ref<Ref<NormalizedContract[]>>(props.contracts);
 const selectedItem = ref();
 const profileManagerController = useProfileManagerController();
 const balance = profileManagerController.balance;
@@ -465,7 +472,7 @@ async function contractLockDetails(item: any) {
 // Function to export contract data as JSON
 function exportData() {
   isExporting.value = true;
-  downloadAsJson(contracts.value, `${props.contractsType}_contracts`);
+  downloadAsJson(props.contracts, `${props.contractsType}_contracts`);
   isExporting.value = false;
 }
 
@@ -481,12 +488,11 @@ async function onDelete() {
     await props.grid?.contracts.batchCancelContracts({
       ids: selectedContracts.value.map(c => c.contract_id),
     });
-    contracts.value = contracts.value.filter(c => !selectedContracts.value.includes(c));
-    emits("update:deleted-contracts", contracts.value);
+    const contracts = props.contracts.value.filter(c => !selectedContracts.value.includes(c));
+    emits("update:deleted-contracts", contracts);
     selectedContracts.value = [];
   } catch (e) {
     if (e instanceof DeploymentKeyDeletionError) {
-      contracts.value = contracts.value.filter(c => !selectedContracts.value.includes(c));
       selectedContracts.value = [];
       createCustomToast("Failed to delete some keys, You don't have enough tokens", ToastType.danger);
     } else if (e instanceof TFChainErrors.smartContractModule.NodeHasActiveContracts) {
