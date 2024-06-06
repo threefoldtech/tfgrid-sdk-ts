@@ -44,7 +44,7 @@
         <v-card-actions class="justify-end mb-1 mr-2">
           <v-btn @click="showDialogue = false" color="anchor">Close</v-btn>
           <v-btn
-            text="Confirm"
+            text="Delete"
             :loading="isRemoving"
             color="error"
             :disabled="isRemoving"
