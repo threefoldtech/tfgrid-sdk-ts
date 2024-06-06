@@ -107,7 +107,7 @@
 <script lang="ts" setup>
 import { events, type GridClient, type NodeInfo } from "@threefold/grid_client";
 import debounce from "lodash/debounce.js";
-import { computed, ref, watch } from "vue";
+import { computed, nextTick, ref, watch } from "vue";
 
 import { manual } from "@/utils/manual";
 
@@ -240,8 +240,38 @@ function validateBeforeDeploy(fn: () => void) {
         return;
       }
 
-      document.addEventListener("scrollend", () => _input.focus(), { once: true });
+      document.addEventListener("scrollend", _improveUx, { once: true });
       _input.scrollIntoView({ behavior: "smooth", block: "center" });
+
+      async function _improveUx() {
+        if (!(_input instanceof HTMLElement)) return;
+
+        if (_input instanceof HTMLInputElement || _input instanceof HTMLTextAreaElement) {
+          _input.focus();
+          _input.blur();
+          _input.focus();
+          // return;
+        }
+
+        if (input instanceof HTMLElement) {
+          input.style.border = "thin solid rgba(var(--v-theme-error), 1)";
+          input.style.padding = "16px";
+
+          setTimeout(() => {
+            input.style.border = null as unknown as any;
+            input.style.padding = null as unknown as any;
+          }, 5000);
+          // input.addEventListener(
+          //   "blur",
+          //   () => {
+          //     console.log("blured");
+
+          //     input.style.background = null as unknown as any;
+          //   },
+          //   { once: true },
+          // );
+        }
+      }
     }, 250);
 
     return;
