@@ -68,7 +68,7 @@ test("TC2683 - Applications: Deploy Casperlabs", async () => {
     farmId: 1,
     availableFor: await gridClient.twins.get_my_twin_id(),
   } as FilterOptions);
-  if (gatewayNodes.length == 0) throw new Error("no nodes available to complete this test");
+  if (gatewayNodes.length == 0) throw new Error("no gateway nodes available to complete this test");
   const GatewayNode = gatewayNodes[generateInt(0, gatewayNodes.length - 1)];
 
   //Node Selection
@@ -193,10 +193,16 @@ test("TC2683 - Applications: Deploy Casperlabs", async () => {
     const wait = await setTimeout(5000, "Waiting for gateway to be ready");
     log(wait);
 
-    axios
+    await axios
       .get(site)
-      .then(() => {
+      .then(res => {
         log("gateway is reachable");
+        log(res.status);
+        log(res.statusText);
+        log(res.data);
+        expect(res.status).toBe(200);
+        expect(res.statusText).toBe("OK");
+        expect(res.data).toContain("Your Casper node is now running succesfully on the ThreeFold Grid.");
         reachable = true;
       })
       .catch(() => {
@@ -204,20 +210,9 @@ test("TC2683 - Applications: Deploy Casperlabs", async () => {
       });
     if (reachable) {
       break;
+    } else if (i == 180) {
+      throw new Error("Gateway is unreachable after multiple retries");
     }
-  }
-
-  if (reachable) {
-    axios.get(site).then(res => {
-      log(res.status);
-      log(res.statusText);
-      log(res.data);
-      expect(res.status).toBe(200);
-      expect(res.statusText).toBe("OK");
-      expect(res.data).toContain("Your Casper node is now running succesfully on the ThreeFold Grid.");
-    });
-  } else {
-    throw new Error("Gateway is unreachable after multiple retries");
   }
 });
 
