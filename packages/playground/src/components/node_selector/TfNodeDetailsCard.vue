@@ -205,10 +205,7 @@
             <span v-bind="props" v-on="isActive" class="font-weight-bold"
               ><v-icon class="scale_beat mr-2" color="warning" :disabled="!(node && node.dedicated)"
                 >mdi-brightness-percent</v-icon
-              >{{
-                price_usd > 1000000 ? `${price_usd / 1000000}M` : price_usd > 1000 ? `${price_usd / 1000}K` : price_usd
-              }}
-              USD/Hour</span
+              >{{ (price_usd / 24 / 30).toFixed(2) }} USD/Hour</span
             >
           </template>
           <span>
