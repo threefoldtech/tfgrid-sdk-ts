@@ -44,9 +44,9 @@
               @update:model-value="filters.status = $event || ''"
               :items="[
                 { title: 'Up', value: UnifiedNodeStatus.Up },
-                { title: 'Down', value: UnifiedNodeStatus.Down },
                 { title: 'Standby', value: UnifiedNodeStatus.Standby },
                 { title: 'Up & Standby', value: UnifiedNodeStatus.UpStandby },
+                { title: 'Down', value: UnifiedNodeStatus.Down },
               ]"
               label="Select Nodes Status"
               item-title="title"
