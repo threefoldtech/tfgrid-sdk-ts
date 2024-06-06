@@ -86,10 +86,6 @@ export default {
     const props = toRef(_props);
     const parsedError = computed(() => parseError(props.value.error));
 
-    console.log(props.value.error);
-
-    console.log(parsedError.value);
-
     return { parsedError };
   },
 };
