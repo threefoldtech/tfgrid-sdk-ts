@@ -41,7 +41,7 @@
         <p v-else>No Data Available</p>
       </template>
 
-      <template #[`item.farm_id`]="{ item }">
+      <template #[`item.farmId`]="{ item }">
         <span v-if="['node', 'rent'].includes(item.type)">
           {{ item.details.farm_id ? item.details.farm_id : "-" }}
         </span>
