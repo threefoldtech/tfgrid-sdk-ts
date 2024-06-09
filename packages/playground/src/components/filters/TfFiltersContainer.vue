@@ -68,7 +68,7 @@
     >
       <div>
         <VExpandTransition mode="in-out">
-          <VForm :disabled="loading" v-show="!collapsible || filterOpened">
+          <VForm :disabled="loading" v-show="!collapsible || filterOpened" @keyup.enter="apply">
             <FormValidator valid-on-init v-model="valid">
               <VContainer fluid>
                 <VRow no-gutters>
