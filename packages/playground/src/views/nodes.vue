@@ -55,7 +55,22 @@
               clearable
               @click:clear="filters.status = ''"
               density="compact"
+              hide-details
             />
+          </TfFilter>
+
+          <TfFilter query-route="cru" v-model="filters.cru">
+            <template #input="{ props }">
+              {{ filters.cru }}
+              <tf-range-slider
+                label="CPU (vCores)"
+                :min="1"
+                :max="32"
+                color="primary"
+                v-model="filters.cru"
+                v-bind="props"
+              />
+            </template>
           </TfFilter>
 
           <TfFilter
@@ -509,6 +524,7 @@ export default {
       dedicated: false,
       numGpu: "",
       rentable: false,
+      cru: "1,32",
     });
 
     const loading = ref<boolean>(true);
