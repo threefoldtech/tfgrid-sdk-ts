@@ -122,6 +122,7 @@ export enum ProjectName {
   FreeFlow = "Freeflow",
   StaticWebsite = "StaticWebsite",
   TFRobot = "TFRobot",
+  Gitea = "Gitea",
 }
 
 export enum SolutionCode {
@@ -149,6 +150,7 @@ export enum SolutionCode {
   wordpress = "wp",
   staticwebsite = "sw",
   tfrobot = "tfr",
+  gitea = "gt",
 }
 
 export const solutionType: { [key: string]: string } = {
@@ -173,6 +175,7 @@ export const solutionType: { [key: string]: string } = {
   wordpress: "Wordpress",
   staticwebsite: "Static Website",
   tfrobot: "TFRobot",
+  Gitea: "Gitea",
 };
 
 export interface solutionFlavor {

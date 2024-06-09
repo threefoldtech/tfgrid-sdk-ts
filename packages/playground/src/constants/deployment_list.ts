@@ -166,4 +166,8 @@ export const deploymentListEnvironments = {
   tfrobot: {
     SSH_KEY: _ssh,
   },
+
+  gitea: {
+    SSH_KEY: _ssh,
+  },
 };

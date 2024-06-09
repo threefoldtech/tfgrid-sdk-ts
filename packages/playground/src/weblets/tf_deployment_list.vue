@@ -282,6 +282,14 @@
           />
         </template>
 
+        <template #Gitea-actions="{ item }">
+          <IconActionBtn
+            tooltip="Show Details"
+            icon="mdi-eye-outline"
+            @click="openDialog(tabs[activeTab].value, item)"
+          />
+        </template>
+
         <template #Wordpress-actions="{ item }">
           <IconActionBtn
             tooltip="Show Details"
