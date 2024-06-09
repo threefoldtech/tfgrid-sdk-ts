@@ -1,14 +1,8 @@
 <template>
   <div>
-    <ListTable
-      :headers="headers"
-      :items="copyPublicIps"
-      :loading="loading"
-      :deleting="isRemoving"
-      v-model="selectedItems"
-    >
+    <ListTable :headers="headers" :items="publicIps" :loading="loading" :deleting="isRemoving" v-model="selectedItems">
       <template v-slot:top>
-        <v-alert class="pa-5" style="height: 20px">
+        <v-alert>
           <h4 class="text-center font-weight-medium">Public IPs</h4>
         </v-alert>
       </template>
@@ -27,7 +21,6 @@
           <v-btn
             class="ma-3"
             color="error"
-            variant="outlined"
             prepend-icon="mdi-delete"
             :disabled="selectedItems.length === 0 || isRemoving"
             @click="showDialogue = true"
@@ -39,21 +32,18 @@
     </ListTable>
     <v-dialog v-model="showDialogue" max-width="600">
       <v-card>
-        <v-toolbar color="primary" class="custom-toolbar">
-          <p class="mb-5">Delete IPs</p>
-        </v-toolbar>
         <v-card-title class="text-subtitle-1">
           <strong>Delete the following IPs?</strong>
         </v-card-title>
         <v-card-text>
-          <v-chip class="ma-1" color="primary" v-for="item in selectedItems" :key="item">
+          <v-chip class="mb-5" v-for="item in selectedItems" :key="item">
             {{ item.ip }}
           </v-chip>
+          <v-divider />
         </v-card-text>
-        <v-card-actions class="justify-end px-5 pb-5 pt-0">
-          <v-btn @click="showDialogue = false" variant="outlined" color="anchor">Close</v-btn>
+        <v-card-actions class="justify-end mb-1 mr-2">
+          <v-btn @click="showDialogue = false" color="anchor">Close</v-btn>
           <v-btn
-            variant="outlined"
             text="Confirm"
             :loading="isRemoving"
             color="error"
@@ -108,7 +98,6 @@ export default {
       },
     ] as any;
     const publicIps = ref<PublicIp[]>([]);
-    const copyPublicIps = ref<PublicIp[]>([]);
     const loading = ref(false);
     const loadingIps = ref(false);
     const showDialogue = ref(false);
@@ -117,8 +106,6 @@ export default {
     const toPublicIP = ref();
     const gateway = ref();
     const isRemoving = ref(false);
-    const size = ref(5);
-    const page = ref(1);
     const selectedItems = ref<any[]>([]);
     const items = ref<RemoveFarmIPModel[]>([]);
 
@@ -126,27 +113,11 @@ export default {
       await getFarmByID(props.farmId);
     });
 
-    function updateIPPageSize(pageSize: number) {
-      loadingIps.value = true;
-      size.value = pageSize;
-      copyPublicIps.value = publicIps.value.slice(0, size.value) as unknown as PublicIp[];
-      loadingIps.value = false;
-    }
-    function updateIPPage(pageNumber: number) {
-      page.value = pageNumber;
-      loadingIps.value = true;
-      const startIndex = (pageNumber - 1) * size.value;
-      const endIndex = startIndex + size.value;
-      copyPublicIps.value = publicIps.value.slice(startIndex, endIndex) as unknown as PublicIp[];
-      loadingIps.value = false;
-    }
-
     async function getFarmByID(id: number) {
       loadingIps.value = true;
       try {
         const farm = await gridStore.grid.farms.getFarmByID({ id });
         publicIps.value = farm.publicIps as unknown as PublicIp[];
-        copyPublicIps.value = publicIps.value.slice(0, size.value);
       } catch (error) {
         createCustomToast(`Failed to get public IPs! ${error}`, ToastType.danger);
       }
@@ -191,20 +162,9 @@ export default {
       showDialogue,
       isRemoving,
       removeFarmIps,
-      page,
-      size,
-      updateIPPageSize,
-      updateIPPage,
-      copyPublicIps,
       selectedItems,
       loadingIps,
     };
   },
 };
 </script>
-<style scoped>
-.custom-toolbar {
-  height: 2.5rem !important;
-  padding-left: 10px;
-}
-</style>

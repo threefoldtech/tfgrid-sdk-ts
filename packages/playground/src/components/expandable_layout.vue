@@ -5,14 +5,7 @@
       <v-spacer />
       <v-tooltip text="Add">
         <template #activator="{ props }">
-          <v-btn
-            icon="mdi-plus"
-            variant="outlined"
-            color="secondary"
-            @click="$emit('add')"
-            v-bind="props"
-            :disabled="disabled"
-          />
+          <v-btn icon="mdi-plus" color="secondary" @click="$emit('add')" v-bind="props" :disabled="disabled" />
         </template>
       </v-tooltip>
     </div>

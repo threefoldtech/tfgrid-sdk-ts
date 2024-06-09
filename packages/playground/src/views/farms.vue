@@ -77,10 +77,11 @@
       </template>
 
       <v-data-table-server
-        height="750px"
+        :style="{ maxHeight: '798px' }"
         fixed-header
         :loading="loading"
         :headers="headers"
+        loading-text="Loading Farms..."
         :items="farms"
         :items-length="totalFarms"
         :items-per-page-options="[
@@ -101,7 +102,9 @@
         :disable-sort="true"
         @click:row="openSheet"
       >
-        <template #loading />
+        <template #[`item.usedPublicIp`]="{ item }">
+          {{ item.publicIps.filter(p => p.contract_id !== 0).length }}
+        </template>
       </v-data-table-server>
     </TfFiltersLayout>
 
@@ -109,8 +112,8 @@
       <v-container>
         <v-toolbar :height="35">
           <div class="ml-auto">
-            <v-btn icon dark @click="() => (dialog = false)">
-              <v-icon>mdi-close</v-icon>
+            <v-btn icon @click="() => (dialog = false)">
+              <v-icon color="anchor">mdi-close</v-icon>
             </v-btn>
           </div>
         </v-toolbar>
@@ -161,6 +164,7 @@ const totalFarms = ref(0);
 
 async function loadFarms(retCount = false) {
   loading.value = true;
+  farms.value = [];
   if (retCount) page.value = 1;
   try {
     const { count, data } = await getAllFarms({
@@ -210,8 +214,9 @@ const headers: VDataTableHeader = [
     key: "publicIps",
     sortable: false,
     children: [
-      { title: "Total", key: "totalPublicIp", sortable: false },
-      { title: "Available", key: "freePublicIp", sortable: false },
+      { title: "Total Public IPs", key: "totalPublicIp", sortable: false },
+      { title: "Available Public IPs", key: "freePublicIp", sortable: false },
+      { title: "Used Public IPs", key: "usedPublicIp", sortable: false },
     ],
   },
   {

@@ -11,7 +11,7 @@
     title-image="images/icons/vm.png"
   >
     <template #title>Deploy a Node Pilot</template>
-    <form-validator v-model="valid">
+    <d-tabs :tabs="[{ title: 'Config', value: 'config' }]">
       <input-validator
         :value="name"
         :rules="[
@@ -58,10 +58,10 @@
       />
 
       <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
-    </form-validator>
+    </d-tabs>
 
     <template #footer-actions="{ validateBeforeDeploy }">
-      <v-btn color="secondary" variant="outlined" @click="validateBeforeDeploy(deploy)" text="Deploy" />
+      <v-btn color="secondary" @click="validateBeforeDeploy(deploy)" text="Deploy" />
     </template>
   </weblet-layout>
 </template>
@@ -77,7 +77,6 @@ import { type Flist, ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
 import { generateName } from "../utils/strings";
 const layout = useLayout();
-const valid = ref(false);
 const name = ref(generateName({ prefix: "np" }));
 const solution = ref() as Ref<SolutionFlavor>;
 const flist: Flist = {

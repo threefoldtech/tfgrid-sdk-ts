@@ -13,7 +13,7 @@
   >
     <template #title>Deploy a Freeflow Instance </template>
 
-    <form-validator v-model="valid">
+    <d-tabs :tabs="[{ title: 'Config', value: 'config' }]">
       <input-validator
         :value="threebotName"
         :rules="[
@@ -72,10 +72,10 @@
       />
 
       <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
-    </form-validator>
+    </d-tabs>
 
     <template #footer-actions="{ validateBeforeDeploy }">
-      <v-btn color="secondary" variant="outlined" @click="validateBeforeDeploy(deploy)" text="Deploy" />
+      <v-btn color="secondary" @click="validateBeforeDeploy(deploy)" text="Deploy" />
     </template>
   </weblet-layout>
 </template>
@@ -95,7 +95,6 @@ import { deployGatewayName, rollbackDeployment } from "../utils/gateway";
 import { normalizeError } from "../utils/helpers";
 
 const layout = useLayout();
-const valid = ref(false);
 
 const threebotName = ref<string>("");
 const solution = ref() as Ref<SolutionFlavor>;

@@ -136,6 +136,7 @@ const fetchData = async () => {
         { data: stats!.twins, title: "Twins", icon: "mdi-brain" },
         { data: stats!.publicIps, title: "Public IPs", icon: "mdi-access-point" },
         { data: stats!.contracts, title: "Contracts", icon: "mdi-file-document-edit-outline" },
+        { data: stats!.workloads_number, title: "Number of workloads", icon: "mdi-state-machine" },
       ];
 
       loading.value = false;

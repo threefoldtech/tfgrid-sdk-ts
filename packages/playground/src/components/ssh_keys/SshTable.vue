@@ -15,6 +15,13 @@
         :loading="loading"
         :headers="headers"
         :items="sshKeys"
+        :items-per-page="itemsPerPage"
+        :items-per-page-options="[
+          { value: 5, title: '5' },
+          { value: 10, title: '10' },
+          { value: 15, title: '15' },
+          { value: 50, title: '50' },
+        ]"
         loading-text="Loading..."
         @click:row="(_: any, { item }: any) => $emit('view', item)"
       >
@@ -26,7 +33,7 @@
         <template #[`item.createdAt`]="{ item }">
           <v-tooltip location="bottom" :text="`The date when this SSH key was created.`">
             <template #activator="{ props }">
-              <v-chip color="primary" v-bind="props">
+              <v-chip v-bind="props">
                 {{ item.createdAt }}
               </v-chip>
             </template>
@@ -88,25 +95,20 @@
             </template>
           </v-tooltip>
         </template>
-
-        <template #bottom></template>
       </v-data-table>
     </v-card-text>
 
-    <v-divider />
+    <!-- <v-divider /> -->
 
-    <v-card-actions>
-      <v-spacer />
+    <v-card-actions class="justify-end my-1 mr-2">
       <v-tooltip location="bottom" text="Export all selected keys.">
         <template #activator="{ props }">
           <v-btn
             :disabled="loading || selectedKeys.length === 0 || $props.sshKeys.length === 0 || deleting"
-            class="mr-2"
             :loading="loading"
             v-bind="props"
             prepend-icon="mdi-export"
             color="anchor"
-            variant="outlined"
             @click="() => $emit('export', selectedKeys)"
           >
             Export
@@ -120,7 +122,6 @@
             :disabled="loading || selectedKeys.length === 0 || deleting"
             :loading="deleting"
             v-bind="props"
-            variant="outlined"
             prepend-icon="mdi-trash-can-outline"
             color="error"
             @click="deleteSelected"
@@ -165,7 +166,7 @@ export default defineComponent({
   setup(props, { emit }) {
     const selectedKeys = ref<number[]>([]); // IDs
     const theme = useTheme();
-
+    const itemsPerPage = ref(10);
     const headers: VDataTableHeader = [
       {
         title: "ID",
@@ -183,11 +184,14 @@ export default defineComponent({
         title: "Key Fingerprint",
         key: "fingerPrint",
       },
-      {
-        title: "Active",
-        key: "activation",
-        sortable: false,
-      },
+
+      // TODO: Update the below `Column` to make the user activate/deactivate more than one key.
+      // after fixing this issue: https://github.com/threefoldtech/tf-images/issues/231
+      // {
+      //   title: "Active",
+      //   key: "activation",
+      //   sortable: false,
+      // },
     ];
 
     const deleteSelected = () => {
@@ -210,6 +214,7 @@ export default defineComponent({
     return {
       headers,
       selectedKeys,
+      itemsPerPage,
       theme,
       AppThemeSelection,
       capitalize,

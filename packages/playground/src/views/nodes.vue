@@ -47,9 +47,10 @@
               :model-value="filters.status || undefined"
               @update:model-value="filters.status = $event || ''"
               :items="[
-                { title: 'Up', value: NodeStatus.Up },
-                { title: 'Down', value: NodeStatus.Down },
-                { title: 'Standby', value: NodeStatus.Standby },
+                { title: 'Up', value: UnifiedNodeStatus.Up },
+                { title: 'Standby', value: UnifiedNodeStatus.Standby },
+                { title: 'Up & Standby', value: UnifiedNodeStatus.UpStandby },
+                { title: 'Down', value: UnifiedNodeStatus.Down },
               ]"
               label="Select Nodes Status"
               item-title="title"
@@ -414,7 +415,7 @@
               <div class="table">
                 <nodes-table
                   v-model="nodes"
-                  height="675px"
+                  max-height="730px"
                   :size="size"
                   @update:size="
                     size = $event;
@@ -447,7 +448,7 @@
 </template>
 
 <script lang="ts">
-import { type GridNode, NodeStatus, SortBy, SortOrder } from "@threefold/gridproxy_client";
+import { type GridNode, SortBy, SortOrder, UnifiedNodeStatus } from "@threefold/gridproxy_client";
 import { sortBy } from "lodash";
 import { computed, onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
@@ -529,6 +530,7 @@ export default {
     const route = useRoute();
 
     async function loadNodes(retCount = false) {
+      _nodes.value = [];
       loading.value = true;
       if (retCount) page.value = 1;
       try {
@@ -542,7 +544,7 @@ export default {
             farmName: filters.value.farmName || undefined,
             country: filters.value.country,
             region: filters.value.region,
-            status: (filters.value.status as NodeStatus) || undefined,
+            status: (filters.value.status as UnifiedNodeStatus) || undefined,
             freeHru: convertToBytes(filters.value.freeHDD),
             freeMru: convertToBytes(filters.value.freeRAM),
             freeSru: convertToBytes(filters.value.freeSSD),
@@ -554,8 +556,8 @@ export default {
             domain: filters.value.gateway || undefined,
             freeIps: +filters.value.publicIPs || undefined,
             dedicated: filters.value.dedicated || undefined,
-            sortBy: SortBy.FreeCRU,
-            sortOrder: SortOrder.Desc,
+            sortBy: SortBy.Status,
+            sortOrder: SortOrder.Asc,
             numGpu: +filters.value.numGpu || undefined,
             rentable: filters.value.rentable && profileManager.profile ? filters.value.rentable : undefined,
             availableFor: filters.value.rentable && profileManager.profile ? profileManager.profile.twinId : undefined,
@@ -610,7 +612,7 @@ export default {
       requestNodes,
       isDialogOpened,
       filters,
-      NodeStatus,
+      UnifiedNodeStatus,
       size,
       page,
       loadNodes,

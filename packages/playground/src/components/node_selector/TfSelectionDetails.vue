@@ -1,5 +1,5 @@
 <template>
-  <section>
+  <section class="mt-4">
     <template v-if="!disableNodeSelection">
       <h3 class="bg-primary pa-2 text-h6 rounded">Node Selection</h3>
       <p class="text-h6 mb-4 mt-2 ml-2">Choose a way to select Node</p>
@@ -57,6 +57,7 @@
         :hide-title="$props.disableNodeSelection"
         v-model="domain"
         v-model:status="domainStatus"
+        :use-fqdn="$props.useFqdn"
         v-if="requireDomain"
       />
     </VExpandTransition>
@@ -104,6 +105,7 @@ export default {
     requireDomain: Boolean,
     disableNodeSelection: { type: Boolean, default: () => false },
     status: String as PropType<ValidatorStatus>,
+    useFqdn: Boolean,
   },
   emits: {
     "update:model-value": (value: SelectionDetails) => true || value,

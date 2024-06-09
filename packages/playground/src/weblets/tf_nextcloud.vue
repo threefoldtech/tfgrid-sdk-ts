@@ -12,7 +12,7 @@
   >
     <template #title>Deploy a Nextcloud All-in-One Instance </template>
 
-    <form-validator v-model="valid">
+    <d-tabs :tabs="[{ title: 'Config', value: 'config' }]">
       <input-validator
         :value="name"
         :rules="[
@@ -61,10 +61,10 @@
       />
 
       <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
-    </form-validator>
+    </d-tabs>
 
     <template #footer-actions="{ validateBeforeDeploy }">
-      <v-btn color="secondary" variant="outlined" @click="validateBeforeDeploy(deploy)" text="Deploy" />
+      <v-btn color="secondary" @click="validateBeforeDeploy(deploy)" text="Deploy" />
     </template>
   </weblet-layout>
 </template>
@@ -85,7 +85,6 @@ import { normalizeError } from "../utils/helpers";
 import { generateName } from "../utils/strings";
 
 const layout = useLayout();
-const valid = ref(false);
 const profileManager = useProfileManager();
 
 const name = ref(generateName({ prefix: "nc" }));

@@ -10,20 +10,16 @@
         <v-alert v-if="selectedKeys.length === 0" type="warning" class="mt-2">
           Attention: It appears that no SSH keys have been selected. In order to access your deployment, you must send
           at least one SSH key. You can manage your SSH keys from the
-          <router-link :to="DashboardRoutes.Deploy.SSHKey">SSH keys management page</router-link> and add more as
-          needed.
+          <router-link :to="DashboardRoutes.Deploy.SSHKey">SSH keys management page</router-link>
+          and add more as needed.
         </v-alert>
+        <VDivider class="mt-3" />
       </v-card-text>
 
-      <VDivider />
-
-      <v-card-actions>
-        <VSpacer />
+      <v-card-actions class="justify-end mb-1 mr-2">
         <v-btn
           color="secondary"
-          variant="outlined"
           @click="openManageDialog = true"
-          class="mr-2 my-1"
           :disabled="sshKeysManagement.list() && sshKeysManagement.list().length === 0"
         >
           Manage SSH keys
@@ -32,61 +28,55 @@
     </v-card>
   </div>
 
-  <v-dialog v-model="openManageDialog" max-width="850">
+  <v-dialog v-model="openManageDialog" max-width="800">
     <v-card>
-      <v-toolbar color="primary" class="custom-toolbar">
-        <p class="mb-5">
-          <v-icon>mdi-cog-sync</v-icon>
-          Manage SSH keys
-        </p>
-      </v-toolbar>
+      <v-card-title class="bg-primary">
+        <v-icon>mdi-cog-sync</v-icon>
+        Manage SSH keys
+      </v-card-title>
 
       <v-card-text>
         <v-alert type="info" class="mb-5">
-          The keys you've chosen will be forwarded to your deployment. To make changes, simply tap on the key you wish
-          to cancel or add.
+          <!--
+            TODO: Return the message back when return the multiple keys feature.
+            The keys selected here will be forwarded to your deployment. To change keys, simply toggle on the keys you
+            wish to select/deselect.
+          -->
+          To change the key that you want to use over the deployment, simply click on it.
         </v-alert>
 
-        <v-row>
-          <v-tooltip
-            v-for="_key of sshKeysManagement.list()"
-            :key="_key.id"
-            :text="isKeySelected(_key) ? 'Selected' : 'Not selected'"
-            location="bottom"
-          >
-            <template #activator="{ props }">
-              <v-chip
-                class="pa-5 ml-5 mt-5"
-                :variant="isKeySelected(_key) ? 'flat' : 'outlined'"
-                :color="
-                  isKeySelected(_key) ? 'primary' : theme.name.value === AppThemeSelection.light ? 'primary' : 'white'
-                "
-                v-bind="props"
-                @click="selectKey(_key)"
-              >
-                <div class="d-flex justify-center">
-                  <v-icon>mdi-key-variant</v-icon>
-                </div>
-                <div class="d-flex justify-center">
-                  <p class="ml-2">
-                    {{ capitalize(_key.name) }}
-                  </p>
-                </div>
-              </v-chip>
-            </template>
-          </v-tooltip>
-        </v-row>
+        <v-tooltip
+          v-for="_key of sshKeysManagement.list()"
+          :key="_key.id"
+          :text="isKeySelected(_key) ? 'Selected' : 'Not selected'"
+          location="bottom"
+        >
+          <template #activator="{ props }">
+            <v-chip
+              class="pa-5 ml-5 mt-5"
+              :variant="isKeySelected(_key) ? 'flat' : 'outlined'"
+              :color="
+                isKeySelected(_key) ? 'primary' : theme.name.value === AppThemeSelection.light ? 'primary' : 'white'
+              "
+              v-bind="props"
+              @click="selectKey(_key)"
+            >
+              <div class="d-flex justify-center">
+                <v-icon>mdi-key-variant</v-icon>
+              </div>
+              <div class="d-flex justify-center">
+                <p class="ml-2">
+                  {{ capitalize(_key.name) }}
+                </p>
+              </div>
+            </v-chip>
+          </template>
+        </v-tooltip>
+        <v-divider class="mt-3" />
       </v-card-text>
 
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn
-          class="mt-2 mb-2 mr-2"
-          variant="outlined"
-          color="anchor"
-          text="Close"
-          @click="openManageDialog = false"
-        />
+      <v-card-actions class="justify-end mb-1 mr-2">
+        <v-btn color="anchor" text="Close" @click="openManageDialog = false" />
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -123,7 +113,13 @@ export default defineComponent({
 
   setup(_, { emit }) {
     const inputElement = ref<HTMLElement>();
-    const defaultKeyData = { createdAt: "", id: 0, publicKey: "", name: "", isActive: false };
+    const defaultKeyData = {
+      createdAt: "",
+      id: 0,
+      publicKey: "",
+      name: "",
+      isActive: false,
+    };
     const openManageDialog = ref<boolean>(false);
     const selectedKey = ref<SSHKeyData>(defaultKeyData);
     const selectedKeys = ref<SSHKeyData[]>([]);
@@ -136,6 +132,9 @@ export default defineComponent({
 
     onMounted(() => {
       selectedKeys.value = sshKeysManagement.list().filter(_key => _key.isActive === true);
+      // TODO: Remove the below `selectedKeys.value = [selectedKeys.value[0]];` to make the user select more than one key
+      // after fixing this issue: https://github.com/threefoldtech/tf-images/issues/231
+      selectedKeys.value = [selectedKeys.value[0]];
       handleKeys();
       emit("selectedKeys", selectedKeysString.value);
     });
@@ -145,14 +144,17 @@ export default defineComponent({
     };
 
     function selectKey(key: SSHKeyData) {
-      if (isKeySelected(key)) {
-        const index = selectedKeys.value.findIndex(selectedKey => selectedKey.id === key.id);
-        if (index !== -1) {
-          selectedKeys.value.splice(index, 1);
-        }
-      } else {
-        selectedKeys.value.push(key);
-      }
+      // TODO: Update the below `selectedKeys.value = [key];` to make the user select more than one key
+      // after fixing this issue: https://github.com/threefoldtech/tf-images/issues/231
+      selectedKeys.value = [key];
+      // if (isKeySelected(key)) {
+      //   const index = selectedKeys.value.findIndex(selectedKey => selectedKey.id === key.id);
+      //   if (index !== -1) {
+      //     selectedKeys.value.splice(index, 1);
+      //   }
+      // } else {
+      //   selectedKeys.value.push(key);
+      // }
 
       handleKeys();
       emit("selectedKeys", selectedKeysString.value);

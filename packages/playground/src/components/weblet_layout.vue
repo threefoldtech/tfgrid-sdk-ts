@@ -7,7 +7,9 @@
             :src="baseUrl + titleImage"
             alt="title image"
             v-if="titleImage"
-            :style="{ filter: `brightness(${$vuetify.theme.global.name === 'light' ? 0.2 : 1})` }"
+            :style="{
+              filter: `brightness(${$vuetify.theme.global.name === 'light' ? 0.2 : 1})`,
+            }"
           />
           <slot name="title" />
         </v-card-title>
@@ -71,25 +73,24 @@
         <div v-else>
           Based on the cloud resources you have selected (CPU: {{ cpu }} Cores, RAM: {{ memory }} MB, SSD:
           {{ disk }} GB{{ ipv4 ? ", Public IP: Enabled" : "" }}) your deployment costs
-          <span class="font-weight-black">{{ costLoading ? "Calculating..." : normalizeBalance(tft) }}</span> TFTs or
-          approximately
-          <span class="font-weight-black">{{ costLoading ? "Calculating..." : normalizeBalance(usd) }}</span> USD per
-          month.
+          <span class="font-weight-black">{{ costLoading ? "Calculating..." : normalizeBalance(tft) }}</span>
+          TFTs or approximately
+          <span class="font-weight-black">{{ costLoading ? "Calculating..." : normalizeBalance(usd) }}</span>
+          USD per month.
 
           <div v-if="SelectedNode?.certificationType === 'Certified'">
             You selected a certified node. Please note that this deployment costs more TFT.
           </div>
         </div>
-
+        <div>Please Note that the Bandwidth affects the total cost.</div>
         <a :href="manual.pricing" target="_blank" class="app-link">
           Learn more about the pricing and how to unlock discounts.
         </a>
       </v-alert>
-      <v-divider class="mt-5" />
-      <v-card-actions>
-        <v-spacer />
+      <v-divider class="mt-3" />
+      <v-card-actions class="justify-end my-1 mr-2">
         <slot name="footer-actions" :validateBeforeDeploy="validateBeforeDeploy" v-if="!status" />
-        <v-btn v-else color="secondary" variant="outlined" :loading="status === 'deploy'" @click="reset"> Back </v-btn>
+        <v-btn v-else color="secondary" :loading="status === 'deploy'" @click="reset"> Back </v-btn>
       </v-card-actions>
     </template>
   </v-card>
@@ -202,7 +203,7 @@ function validateBeforeDeploy(fn: () => void) {
     const inputs = form.inputs as unknown as InputValidatorService[];
 
     for (const input of inputs) {
-      const status = input.status;
+      const status = typeof input.status === "string" ? input.status : (input.status as any)?.value;
       if (status === ValidatorStatus.Invalid) {
         errorInput = [i, input.$el];
         break out;
@@ -217,7 +218,14 @@ function validateBeforeDeploy(fn: () => void) {
   }
 
   if (errorInput) {
-    const [tab, input] = errorInput;
+    const [tab, __input] = errorInput;
+
+    const input =
+      __input && typeof __input === "object" && "value" in __input && __input.value instanceof HTMLElement
+        ? __input.value
+        : __input instanceof HTMLElement
+        ? __input
+        : null;
 
     if (!input || !__setTab) {
       return;
@@ -228,6 +236,10 @@ function validateBeforeDeploy(fn: () => void) {
     // Timeout so the ui gets render before scroll
     setTimeout(() => {
       const _input = input.querySelector("textarea") || input.querySelector("input") || input;
+      if (!(_input instanceof HTMLElement)) {
+        return;
+      }
+
       document.addEventListener("scrollend", () => _input.focus(), { once: true });
       _input.scrollIntoView({ behavior: "smooth", block: "center" });
     }, 250);

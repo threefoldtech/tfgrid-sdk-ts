@@ -1,11 +1,6 @@
 <template>
   <v-container>
-    <v-dialog
-      transition="dialog-bottom-transition"
-      max-width="1000"
-      v-model="depositDialog"
-      @update:model-value="closeDialog"
-    >
+    <v-dialog transition="dialog-bottom-transition" v-model="depositDialog" @update:model-value="closeDialog">
       <v-card>
         <VCardTitle class="bg-primary">Deposit TFT</VCardTitle>
         <v-card-text>
@@ -67,14 +62,14 @@
                   </div>
                 </div>
               </v-col>
-              <v-divider horizontal></v-divider>
             </v-row>
           </v-container>
-          <v-card-actions class="justify-end">
-            <v-btn variant="outlined" color="anchor" class="mr-2 px-3" @click="closeDialog"> Close </v-btn>
-            <v-btn variant="outlined" color="secondary" :href="manual.tft_bridges" target="_blank" text="Learn more?" />
-          </v-card-actions>
+          <v-divider />
         </v-card-text>
+        <v-card-actions class="justify-end my-1 mr-2">
+          <v-btn color="anchor" @click="closeDialog"> Close </v-btn>
+          <v-btn color="secondary" :href="manual.tft_bridges" target="_blank" text="Learn more?" />
+        </v-card-actions>
       </v-card>
     </v-dialog>
   </v-container>

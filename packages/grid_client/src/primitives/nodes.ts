@@ -1,3 +1,4 @@
+import { SortBy, SortOrder } from "@threefold/gridproxy_client";
 import { Client as RMBClient } from "@threefold/rmb_direct_client";
 import { QueryClient } from "@threefold/tfchain_client";
 import {
@@ -135,13 +136,22 @@ class Nodes {
     let nodes: NodeInfo[] = [];
     let page = 1;
     do {
-      nodes = await this.filterNodes({ accessNodeV4: true, accessNodeV6: true, availableFor, page });
+      nodes = await this.filterNodes({
+        accessNodeV4: true,
+        accessNodeV6: true,
+        availableFor,
+        page,
+      });
       for (const node of nodes) {
         const ipv4 = node.publicConfig.ipv4;
         const ipv6 = node.publicConfig.ipv6;
         const domain = node.publicConfig.domain;
         if (PrivateIp(ipv4.split("/")[0]) === false) {
-          accessNodes[+node.nodeId] = { ipv4: ipv4, ipv6: ipv6, domain: domain };
+          accessNodes[+node.nodeId] = {
+            ipv4: ipv4,
+            ipv6: ipv6,
+            domain: domain,
+          };
         }
       }
       page++;
@@ -279,7 +289,13 @@ class Nodes {
         .request([node_twin_id], "zos.statistics.get", "")
         .then(res => {
           const node: RMBNodeCapacity = res;
-          const ret: NodeResources = { cru: 0, mru: 0, hru: 0, sru: 0, ipv4u: 0 };
+          const ret: NodeResources = {
+            cru: 0,
+            mru: 0,
+            hru: 0,
+            sru: 0,
+            ipv4u: 0,
+          };
 
           ret.cru = +node.total.cru;
           ret.mru = +node.total.mru - +node.used.mru;
@@ -409,6 +425,8 @@ class Nodes {
       ret_count: options.ret_count,
       region: options.region,
       healthy: options.healthy,
+      sort_by: SortBy.FreeCRU,
+      sort_order: SortOrder.Desc,
     };
 
     if (options.gateway) {

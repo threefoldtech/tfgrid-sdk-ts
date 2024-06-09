@@ -1,18 +1,19 @@
-import { FilterOptions, MachinesModel } from "../src";
-import { config, getClient } from "./client_loader";
-import { log } from "./utils";
+import { FilterOptions, MachinesModel } from "../../src";
+import { config, getClient } from "../client_loader";
+import { log } from "../utils";
 
 async function deploy(client, vms) {
   const res = await client.machines.deploy(vms);
-  log("================= Deploying Worker =================");
+  log("================= Deploying Caprover cluster =================");
   log(res);
-  log("================= Deploying Worker =================");
+  log("================= Deploying Caprover cluster =================");
 }
 
 async function getDeployment(client, vms) {
   const res = await client.machines.getObj(vms);
   log("================= Getting deployment information =================");
   log(res);
+  log(`You can access Caprover via the browser using: http://captain.${res[0].env.CAPROVER_ROOT_DOMAIN}`);
   log("================= Getting deployment information =================");
 }
 
@@ -42,12 +43,12 @@ async function main() {
     },
     machines: [
       {
-        name: "capworker1",
-        node_id: +(await grid3.capacity.filterNodes(vmQueryOptions))[1].nodeId,
+        name: "testvm",
+        node_id: +(await grid3.capacity.filterNodes(vmQueryOptions))[0].nodeId,
         disks: [
           {
             name: "wedDisk",
-            size: 10,
+            size: 8,
             mountpoint: "/var/lib/docker",
           },
         ],
@@ -61,19 +62,19 @@ async function main() {
         flist: "https://hub.grid.tf/tf-official-apps/tf-caprover-latest.flist",
         entrypoint: "/sbin/zinit init",
         env: {
-          // These env. vars needed to be changed based on the leader node.
           PUBLIC_KEY: config.ssh_key,
-          SWM_NODE_MODE: "worker",
-          LEADER_PUBLIC_IP: "185.206.122.157",
+          SWM_NODE_MODE: "leader",
+          CAPROVER_ROOT_DOMAIN: "rafy.grid.tf", // update me
+          DEFAULT_PASSWORD: "captain42",
           CAPTAIN_IMAGE_VERSION: "latest",
         },
       },
     ],
     metadata: "",
-    description: "caprover worker machine/node",
+    description: "caprover leader machine/node",
   };
 
-  //Deploy Caprover worker
+  //Deploy Caprover cluster
   await deploy(grid3, vms);
 
   //Get the deployment

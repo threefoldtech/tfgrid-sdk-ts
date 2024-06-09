@@ -2,6 +2,7 @@ import { Client } from "./client";
 import { ExtrinsicResult } from "./types";
 import { checkConnection } from "./utils";
 
+const BATCH_SIZE = 400;
 class Utility {
   client: Client;
 
@@ -13,9 +14,16 @@ class Utility {
   async batch<T>(extrinsics: ExtrinsicResult<T>[]): Promise<T[]> {
     extrinsics = extrinsics.filter(Boolean);
     if (extrinsics.length > 0) {
-      const { resultSections, resultEvents } = this.extractResultSectionsAndEvents(extrinsics);
-      const batchExtrinsic = await this.client.api.tx.utility.batch(extrinsics);
-      return this.client.applyExtrinsic<T[]>(batchExtrinsic, resultSections, resultEvents);
+      let result: T[] = [];
+      for (let i = 0; i < extrinsics.length; i += BATCH_SIZE) {
+        const batch = extrinsics.slice(i, i + BATCH_SIZE);
+        const { resultSections, resultEvents } = this.extractResultSectionsAndEvents(batch);
+        const batchExtrinsic = await this.client.api.tx.utility.batch(batch);
+        const res = await this.client.applyExtrinsic<T[]>(batchExtrinsic, resultSections, resultEvents);
+        result = result.concat(res);
+      }
+
+      return result;
     }
     return [];
   }
@@ -24,9 +32,16 @@ class Utility {
   async batchAll<T>(extrinsics: ExtrinsicResult<T>[]): Promise<T[]> {
     extrinsics = extrinsics.filter(Boolean);
     if (extrinsics.length > 0) {
-      const { resultSections, resultEvents } = this.extractResultSectionsAndEvents(extrinsics);
-      const batchAllExtrinsic = await this.client.api.tx.utility.batchAll(extrinsics);
-      return this.client.applyExtrinsic<T[]>(batchAllExtrinsic, resultSections, resultEvents);
+      let result: T[] = [];
+      for (let i = 0; i < extrinsics.length; i += BATCH_SIZE) {
+        const batch = extrinsics.slice(i, i + BATCH_SIZE);
+        const { resultSections, resultEvents } = this.extractResultSectionsAndEvents(batch);
+        const batchAllExtrinsic = await this.client.api.tx.utility.batchAll(batch);
+        const res = await this.client.applyExtrinsic<T[]>(batchAllExtrinsic, resultSections, resultEvents);
+        result = result.concat(res);
+      }
+
+      return result;
     }
     return [];
   }

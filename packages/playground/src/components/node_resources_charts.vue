@@ -21,9 +21,7 @@
       <div class="d-flex my-6 align-center justify-center">
         <v-progress-circular v-if="loading" indeterminate class="mt-10 mb-10" />
       </div>
-      <v-btn rounded="md" variant="flat" color="primary" class="mt-10" @click="getNodeHealthUrl">
-        Check Node Health
-      </v-btn>
+      <v-btn rounded="md" variant="flat" class="mt-10" @click="getNodeHealthUrl"> Check Node Health </v-btn>
     </v-row>
     <v-row justify="center" class="w-50 mt-10" style="margin: 0 auto">
       <v-alert variant="tonal" type="warning" v-if="hintMessage">{{ hintMessage }}</v-alert>

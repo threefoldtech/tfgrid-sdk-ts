@@ -99,7 +99,7 @@
     </d-tabs>
 
     <template #footer-actions="{ validateBeforeDeploy }">
-      <v-btn color="secondary" variant="outlined" @click="validateBeforeDeploy(deploy)" text="Deploy" />
+      <v-btn color="secondary" @click="validateBeforeDeploy(deploy)" text="Deploy" />
     </template>
   </weblet-layout>
 </template>
@@ -190,7 +190,7 @@ async function deploy() {
               value: publicRestoreKey.value,
             },
           ],
-          rootFilesystemSize: rootFilesystemSize,
+          rootFilesystemSize,
           nodeId: selectionDetails.value!.node!.nodeId,
           rentedBy: dedicated.value ? grid!.twinId : undefined,
           certified: certified.value,

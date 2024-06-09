@@ -9,7 +9,7 @@
             class="mx-1 order-1"
             @click="priceTask.error ? priceTask.run() : toggleSwap()"
             :loading="priceTask.loading"
-            :color="priceTask.error ? 'error' : undefined"
+            :color="priceTask.error ? 'error' : 'anchor'"
             v-bind="props"
           />
         </template>

@@ -3,7 +3,7 @@
     @click:outside="() => $emit('close')"
     @keydown.esc="() => $emit('close')"
     v-model="$props.open"
-    max-width="750"
+    max-width="800"
   >
     <template v-slot:default>
       <v-card>
@@ -38,24 +38,22 @@
 
           <v-tooltip text="Key status">
             <template #activator="{ props }">
-              <v-chip v-bind="props" color="primary" v-if="selectedKey.isActive">Active</v-chip>
-              <v-chip v-bind="props" color="grey-lighten-1" v-else>Inactive</v-chip>
+              <v-chip v-bind="props" v-if="selectedKey.isActive">Active</v-chip>
+              <v-chip v-bind="props" color="anchor" v-else>Inactive</v-chip>
             </template>
           </v-tooltip>
 
           <v-tooltip text="Created at">
             <template #activator="{ props }">
-              <v-chip v-bind="props" class="ml-2" color="primary">{{ selectedKey.createdAt }}</v-chip>
+              <v-chip v-bind="props" class="ma-2">{{ selectedKey.createdAt }}</v-chip>
             </template>
           </v-tooltip>
+          <v-divider />
         </v-card-text>
 
-        <v-card-actions class="mb-3 custom-actions">
-          <v-spacer></v-spacer>
-          <div class="mt-2">
-            <v-btn color="white" variant="outlined" text="Close" @click="$emit('close')"></v-btn>
-            <v-btn color="primary" variant="outlined" text="Save" @click="updateKey" :loading="loading"></v-btn>
-          </div>
+        <v-card-actions class="justify-end mb-1 mr-2">
+          <v-btn color="anchor" text="Close" @click="$emit('close')"></v-btn>
+          <v-btn text="Save" @click="updateKey" :loading="loading"></v-btn>
         </v-card-actions>
       </v-card>
     </template>
@@ -150,13 +148,5 @@ export default defineComponent({
 }
 .ssh-key .v-field__input {
   height: 230px !important;
-}
-.custom-actions {
-  border-top: 1px solid rgb(101 99 99);
-  display: flex;
-  justify-content: center;
-  margin-right: 15px;
-  margin-left: 15px;
-  margin-top: 15px;
 }
 </style>

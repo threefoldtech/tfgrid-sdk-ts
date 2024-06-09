@@ -18,9 +18,7 @@
                 />
                 <v-card-title class="d-inline-block">
                   {{ card.title }}
-                  <v-chip v-if="card.flare" class="ml-2 pulse-animation" color="#1AA18F" small text-color="white">
-                    Community
-                  </v-chip>
+                  <v-chip v-if="card.flare" class="ml-2 pulse-animation"> Community </v-chip>
                 </v-card-title>
                 <v-card-text class="mt-2"> {{ card.excerpt }} </v-card-text>
               </v-card>

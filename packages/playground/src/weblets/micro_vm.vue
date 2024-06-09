@@ -4,7 +4,7 @@
     @mount="layoutMount"
     :cpu="solution?.cpu"
     :memory="solution?.memory"
-    :disk="disks.reduce((total, disk) => total + disk.size, rootFilesystemSize)"
+    :disk="disks.reduce((total, disk) => total + disk.size, solution?.disk ?? 0)"
     :ipv4="ipv4"
     :dedicated="dedicated"
     :SelectedNode="selectionDetails?.node"
@@ -72,9 +72,8 @@
             dedicated,
             cpu: solution?.cpu,
             ssdDisks: disks.map(disk => disk.size),
-            solutionDisk: solution?.disk,
             memory: solution?.memory,
-            rootFilesystemSize,
+            rootFilesystemSize: solution?.disk,
           }"
           v-model="selectionDetails"
         />
@@ -174,13 +173,13 @@
     </d-tabs>
 
     <template #footer-actions="{ validateBeforeDeploy }">
-      <v-btn color="secondary" variant="outlined" @click="validateBeforeDeploy(deploy)" text="Deploy" />
+      <v-btn color="secondary" @click="validateBeforeDeploy(deploy)" text="Deploy" />
     </template>
   </weblet-layout>
 </template>
 
 <script lang="ts" setup>
-import { computed, type Ref, ref, watch } from "vue";
+import { type Ref, ref, watch } from "vue";
 
 import { manual } from "@/utils/manual";
 
@@ -198,7 +197,7 @@ const tabs = ref();
 const images = [
   {
     name: "Ubuntu-23.10",
-    flist: "https://hub.grid.tf/petep.3bot/ubuntu23.10_mycelium.flist",
+    flist: "https://hub.grid.tf/tf-official-vms/ubuntu-23.10-mycelium.flist",
     entryPoint: "/sbin/zinit init",
   },
   {
@@ -208,7 +207,7 @@ const images = [
   },
   {
     name: "Arch",
-    flist: "https://hub.grid.tf/petep.3bot/arch_mycelium.flist",
+    flist: "https://hub.grid.tf/tf-official-vms/arch-mycelium.flist",
     entryPoint: "/sbin/zinit init",
   },
   {
@@ -245,7 +244,6 @@ const disks = ref<Disk[]>([]);
 const network = ref();
 const dedicated = ref(false);
 const certified = ref(false);
-const rootFilesystemSize = computed(() => solution.value?.disk);
 const selectionDetails = ref<SelectionDetails>();
 const selectedSSHKeys = ref("");
 const gridStore = useGrid();
@@ -299,7 +297,7 @@ async function deploy() {
           mycelium: mycelium.value,
           publicIpv4: ipv4.value,
           publicIpv6: ipv6.value,
-          rootFilesystemSize: rootFilesystemSize.value,
+          rootFilesystemSize: solution.value?.disk,
           nodeId: selectionDetails.value?.node?.nodeId,
           rentedBy: dedicated.value ? grid!.twinId : undefined,
           certified: certified.value,

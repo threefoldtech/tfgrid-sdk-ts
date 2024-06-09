@@ -7,9 +7,9 @@
           <div class="text-h2 pa-10">
             <v-text-field v-model="relay" outlined label="Relay" :error-messages="errorMsg"></v-text-field>
           </div>
-          <v-card-actions class="justify-end pa-5">
-            <v-btn @click="editingTwin = false" class="grey lighten-2 black--text">Close</v-btn>
-            <v-btn @click="UpdateRelay" class="primary white--text">Save</v-btn>
+          <v-card-actions class="justify-end mb-1 mr-2">
+            <v-btn @click="editingTwin = false" color="anchor">Close</v-btn>
+            <v-btn @click="UpdateRelay">Save</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -19,11 +19,9 @@
       <v-card>
         <v-toolbar color="primary" dark class="custom-toolbar bold-text">Vote Reminder</v-toolbar>
         <v-card-text>There are {{ numberOfProposalsToVoteOn }} active proposals you can vote on now</v-card-text>
-        <v-card-actions class="justify-end pa-5">
-          <v-btn @click="redirectToDao" variant="elevated" color="primary" class="mr-2 text-subtitle-2">Vote</v-btn>
-          <v-btn @click="openVotePopup = false" variant="outlined" color="anchor" class="mr-2 text-subtitle-2"
-            >Close</v-btn
-          >
+        <v-card-actions class="justify-end mb-1 mr-2">
+          <v-btn @click="redirectToDao" variant="elevated">Vote</v-btn>
+          <v-btn @click="openVotePopup = false" color="anchor">Close</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -94,11 +92,13 @@
                         type="submit"
                         icon="mdi-content-save-all"
                         class="mt-2"
+                        color="anchor"
                         variant="text"
                         :disabled="!isValid || savingEmail"
                       >
                       </v-btn>
-                      <v-btn icon="mdi-close" class="mt-2" variant="text" @click="editEmail = false"> </v-btn>
+                      <v-btn icon="mdi-close" class="mt-2" color="anchor" variant="text" @click="editEmail = false">
+                      </v-btn>
                     </v-form>
                   </v-list-item>
                 </v-col>
@@ -171,8 +171,8 @@
             </div>
           </v-col>
         </v-row>
-        <v-card-actions v-if="updateRelay" class="justify-end mx-4 mb-4">
-          <v-btn class="custom-button bg-primary" @click="editTwin">Edit</v-btn>
+        <v-card-actions v-if="updateRelay" class="justify-end mb-1 mr-2">
+          <v-btn variant="elevated" class="custom-button" @click="editTwin">Edit</v-btn>
         </v-card-actions>
       </v-card>
     </div>
@@ -351,11 +351,6 @@ export default {
   border-bottom: 0.1px solid #8a8a8a;
   margin-left: 10px;
   margin-right: 10px;
-}
-
-.custom-button {
-  font-size: 16px;
-  font-weight: bold;
 }
 
 .custom-toolbar {

@@ -12,10 +12,11 @@
     </div>
   </v-card>
 
+  <v-alert type="info"> Multiple keys support is coming up soon </v-alert>
+
   <v-card class="mb-3 pa-3" color="transparent">
     <v-col class="d-flex justify-end">
       <v-btn
-        variant="outlined"
         class="mr-2"
         @click="() => openDialog(SSHCreationMethod.Import)"
         prepend-icon="mdi-key-plus"
@@ -27,7 +28,6 @@
 
       <v-btn
         @click="exportAllKeys"
-        variant="outlined"
         class="mr-2"
         prepend-icon="mdi-export"
         color="secondary"
@@ -48,10 +48,10 @@
 
       <v-btn
         class="mr-2"
+        variant="elevated"
         :disabled="loading || deleting || generatingSSH || savingKey || activating"
         @click="openDialog(SSHCreationMethod.Generate)"
         prepend-icon="mdi-key-plus"
-        color="primary"
       >
         Generate
       </v-btn>

@@ -2,7 +2,6 @@
   <v-container>
     <v-row class="text-center flex justify-center">
       <v-btn
-        variant="outlined"
         color="secondary"
         class="text-subtitle-1 px-6 mr-2"
         v-bind:href="'https://bootstrap.grid.tf/'"
@@ -10,7 +9,7 @@
         >Bootstrap Node Image</v-btn
       >
 
-      <v-btn class="bg-primary text-subtitle-1 px-6" @click="showDialogue = true" :disabled="isCreating"
+      <v-btn variant="elevated" class="text-subtitle-1 px-6" @click="showDialogue = true" :disabled="isCreating"
         >Create Farm</v-btn
       >
     </v-row>
@@ -18,10 +17,8 @@
     <v-container v-if="showDialogue">
       <v-dialog v-model="showDialogue" max-width="600">
         <v-card>
-          <v-toolbar color="primary" dark class="custom-toolbar">
-            <p class="mb-5">Create Farm</p>
-          </v-toolbar>
-          <div class="pt-6 px-6">
+          <v-card-title class="bg-primary"> Create Farm </v-card-title>
+          <v-card-text>
             <form-validator v-model="valid">
               <input-validator
                 :value="$props.name"
@@ -46,17 +43,10 @@
                 ></v-text-field>
               </input-validator>
             </form-validator>
-          </div>
-          <v-card-actions class="justify-end px-5 pb-5 pt-0">
-            <v-btn variant="outlined" color="anchor" @click="showDialogue = false">Close</v-btn>
-            <v-btn
-              color="primary"
-              variant="outlined"
-              @click="createFarm"
-              :loading="isCreating"
-              :disabled="!valid || isCreating"
-              >Create</v-btn
-            >
+          </v-card-text>
+          <v-card-actions class="justify-end my-1 mr-2">
+            <v-btn color="anchor" @click="showDialogue = false">Close</v-btn>
+            <v-btn @click="createFarm" :loading="isCreating" :disabled="!valid || isCreating">Create</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -69,6 +59,7 @@ import { ref } from "vue";
 
 import { notifyDelaying } from "@/utils/notifications";
 
+import { gridProxyClient } from "../../clients";
 import { useGrid } from "../../stores";
 import { createCustomToast, ToastType } from "../../utils/custom_toast";
 
@@ -77,10 +68,6 @@ export default {
   props: {
     name: {
       type: String,
-      required: true,
-    },
-    userFarms: {
-      type: Object,
       required: true,
     },
   },
@@ -96,7 +83,6 @@ export default {
         createCustomToast("Farm created successfully.", ToastType.success);
         notifyDelaying();
         showDialogue.value = false;
-        await props.userFarms.reloadFarms();
       } catch (error) {
         console.log(error);
         createCustomToast("Failed to create farm.", ToastType.danger);
@@ -106,10 +92,13 @@ export default {
     }
     async function validateFarmName(name: string) {
       if (!name.split("").every((c: string) => /[a-zA-Z0-9\-_]/.test(c))) {
-        return { message: "Farm name can only contain alphabetic letters, numbers, '-' or '_'" };
+        return {
+          message: "Farm name can only contain alphabetic letters, numbers, '-' or '_'",
+        };
       }
-      const names = await props.userFarms.getFarmsNames();
-      if (names.includes(props.name.toLocaleLowerCase())) {
+
+      const farmsWithSameName = await gridProxyClient.farms.listAll({ name: name.toLocaleLowerCase() });
+      if (farmsWithSameName.length > 0) {
         return { message: "Farm name already exists!" };
       }
     }

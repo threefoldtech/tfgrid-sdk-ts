@@ -66,7 +66,7 @@ jobs:
         id: kubernetes
         continue-on-error: true
         run: |
-          yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/kubernetes.ts
+          yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/orchestrators/kubernetes_leader.ts
       - name: Run test vm with qsfs
         id: vmqsfs
         continue-on-error: true
@@ -76,7 +76,7 @@ jobs:
         id: kubernetesqsfs
         continue-on-error: true
         run: |
-          yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/kubernetes_with_qsfs.ts
+          yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/orchestrators/kubernetes_with_qsfs.ts
       - name: Run test kvstore
         id: kvstore
         continue-on-error: true
@@ -133,3 +133,32 @@ jobs:
           steps.zdb.outcome != 'success' ||
           steps.deleteall.outcome != 'success' 
         run: exit 1
+
+      - name: Create GitHub Issue on Failure
+        uses: dacbd/create-issue-action@main
+        with:
+          token: ${{ github.token }}
+          title: |
+            ${{ github.workflow }} failed during ${{ github.event_name }} on network ${{ env.NETWORK }}
+          body: |
+            ## Failure Report:
+            
+            > [!IMPORTANT]
+            > Details on failed run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+    
+            - Author: @${{ github.triggering_actor }}
+            - Branch: `${{ github.ref }}`
+            - Commit: ${{ github.sha }}
+            - Network: `${{ env.NETWORK }}`
+  
+
+            Dynamic Single Vm: ${{ steps.dynamicsinglevm.outcome }}
+            Multiple Vm: ${{ steps.multiplevm.outcome }}
+            Kubernetes: ${{ steps.kubernetes.outcome }}
+            Vmq Qsfs: ${{ steps.vmqsfs.outcome }}
+            Kubernetes Qsfs: ${{ steps.kubernetesqsfs.outcome }}
+            Kvstore: ${{ steps.kvstore.outcome }}
+            Zdb: ${{ steps.zdb.outcome }}
+            Delete all contracts: ${{ steps.deleteall.outcome }}
+          labels: type_bug , grid_client                 
+

@@ -162,4 +162,8 @@ export const deploymentListEnvironments = {
       transform: prefixUrl("https"),
     },
   },
+
+  tfrobot: {
+    SSH_KEY: _ssh,
+  },
 };

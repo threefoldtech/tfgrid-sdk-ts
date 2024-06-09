@@ -227,7 +227,7 @@
             tooltip="Visit"
             icon="mdi-web"
             color="anchor"
-            :href="'https://' + item.value.env.STATICWEBSITE_DOMAIN"
+            :href="'https://' + item.env.STATICWEBSITE_DOMAIN"
           />
         </template>
 
@@ -271,6 +271,14 @@
                 ? '[' + item.planetary + ']'
                 : item.interfaces[0].ip)
             "
+          />
+        </template>
+
+        <template #TFRobot-actions="{ item }">
+          <IconActionBtn
+            tooltip="Show Details"
+            icon="mdi-eye-outline"
+            @click="openDialog(tabs[activeTab].value, item)"
           />
         </template>
 
@@ -326,7 +334,6 @@
     <template #footer-actions>
       <v-btn
         color="error"
-        variant="outlined"
         :disabled="selectedItems.length === 0 || deleting"
         prepend-icon="mdi-delete"
         @click="deletingDialog = true"
@@ -342,16 +349,14 @@
         <strong>Delete the following deployments?</strong>
       </v-card-title>
       <v-card-text>
-        <v-chip class="ma-1" color="primary" v-for="item in selectedItems" :key="item.deploymentName">
+        <v-chip class="ma-1" v-for="item in selectedItems" :key="item.deploymentName">
           {{ item.deploymentName }}
         </v-chip>
+        <v-divider />
       </v-card-text>
-      <v-card-actions>
-        <v-spacer />
-        <v-btn color="anchar" variant="outlined" @click="deletingDialog = false">Cancel</v-btn>
-        <v-btn color="error" variant="outlined" @click="onDelete(tabs[activeTab].value.toLowerCase() === 'kubernetes')">
-          Delete
-        </v-btn>
+      <v-card-actions class="justify-end my-1 mr-2">
+        <v-btn color="anchar" @click="deletingDialog = false">Cancel</v-btn>
+        <v-btn color="error" @click="onDelete(tabs[activeTab].value.toLowerCase() === 'kubernetes')"> Delete </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -393,6 +398,7 @@ const tabs: Tab[] = [
   { title: "Freeflow", value: "Freeflow", imgPath: "images/icons/freeflow.png" },
   { title: "Wordpress", value: "Wordpress", imgPath: "images/icons/wordpress.png" },
   { title: "Static Website", value: "StaticWebsite", imgPath: "images/icons/wordpress.png" },
+  { title: "TFRobot", value: "TFRobot", imgPath: "images/icons/tfrobot.png" },
 ];
 
 const layout = useLayout();

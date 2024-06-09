@@ -7,11 +7,11 @@
           <v-chip v-if="error" variant="text">
             <v-icon color="warning" icon="mdi-alert-circle" />
           </v-chip>
-          <v-chip v-if="ipv4" variant="outlined" size="small" class="ml-2"> IPV4 </v-chip>
-          <v-chip v-if="ipv6" variant="outlined" size="small" class="ml-2"> IPV6 </v-chip>
-          <v-chip v-if="planetary" variant="outlined" size="small" class="ml-2"> Planetary </v-chip>
-          <v-chip v-if="mycelium" variant="outlined" size="small" class="ml-2"> Mycelium </v-chip>
-          <v-chip v-if="wireguard" variant="outlined" size="small" class="ml-2"> Wireguard </v-chip>
+          <v-chip v-if="ipv4" variant="outlined" class="ml-2"> IPV4 </v-chip>
+          <v-chip v-if="ipv6" variant="outlined" class="ml-2"> IPV6 </v-chip>
+          <v-chip v-if="planetary" variant="outlined" class="ml-2"> Planetary </v-chip>
+          <v-chip v-if="mycelium" variant="outlined" class="ml-2"> Mycelium </v-chip>
+          <v-chip v-if="wireguard" variant="outlined" class="ml-2"> Wireguard </v-chip>
         </template>
         <v-expansion-panel-text>
           <input-tooltip
@@ -137,7 +137,7 @@ export default {
       props.ipv6 === null &&
       props.planetary === null &&
       props.wireguard === null &&
-      props.mycelium
+      props.mycelium === null
     ) {
       throw new Error("You must provide at least one network  option");
     }

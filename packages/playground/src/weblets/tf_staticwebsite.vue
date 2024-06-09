@@ -12,7 +12,7 @@
   >
     <template #title>Deploy a Static Website Instance </template>
 
-    <form-validator v-model="valid">
+    <d-tabs :tabs="[{ title: 'Config', value: 'config' }]">
       <input-validator
         :value="name"
         :rules="[
@@ -90,10 +90,10 @@
         v-model="selectionDetails"
       />
       <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
-    </form-validator>
+    </d-tabs>
 
     <template #footer-actions="{ validateBeforeDeploy }">
-      <v-btn color="secondary" variant="outlined" @click="validateBeforeDeploy(deploy)" text="Deploy" />
+      <v-btn color="secondary" @click="validateBeforeDeploy(deploy)" text="Deploy" />
     </template>
   </weblet-layout>
 </template>
@@ -113,7 +113,6 @@ import { normalizeError } from "../utils/helpers";
 import { generateName } from "../utils/strings";
 
 const layout = useLayout();
-const valid = ref(false);
 const profileManager = useProfileManager();
 const name = ref(generateName({ prefix: "sw" }));
 const gitUrl = ref("");
@@ -126,7 +125,7 @@ const mycelium = ref(true);
 const solution = ref() as Ref<SolutionFlavor>;
 const flist: Flist = {
   // Should be upgraded to an oficial Flist
-  value: "https://hub.grid.tf/mayarosamaa.3bot/mayarosama-caddy2-v1.flist",
+  value: "https://hub.grid.tf/tf-official-apps/staticwebsite-latest.flist",
   entryPoint: "/sbin/zinit init",
 };
 const dedicated = ref(false);

@@ -1,6 +1,6 @@
 <template>
   <VCard
-    class="tf-node-card rounded-0 w-100 pb-3"
+    class="tf-node-card rounded-0 w-100 pb-3 text-left"
     :class="{ 'selected-node': status !== 'Init' }"
     :color="
       status === 'Valid'
@@ -66,6 +66,9 @@
       <span class="ml-2" v-if="node">
         Uptime:
         <span class="font-weight-bold" v-text="toReadableDate(node.uptime)" />
+      </span>
+      <span class="ml-2" v-if="node"
+        >Last Deployment Time: {{ lastDeploymentTime === 0 ? "N/A" : toHumanDate(lastDeploymentTime) }}
       </span>
     </template>
 
@@ -191,20 +194,14 @@
       </VRow>
       <div class="mt-5 ml-auto text-right">
         <v-tooltip bottom color="primary" close-delay="100" :disabled="!(node && node.dedicated)">
-          <template v-slot:activator="{ isActive, props }" v-if="num_gpu!">
+          <template v-slot:activator="{ isActive, props }">
             <span v-bind="props" v-on="isActive" class="font-weight-bold"
-              ><v-icon class="scale_beat mr-2" color="warning">mdi-brightness-percent</v-icon
+              ><v-icon class="scale_beat mr-2" color="warning" :disabled="!(node && node.dedicated)"
+                >mdi-brightness-percent</v-icon
               >{{ (price_usd! / 24 / 30).toFixed(2) }} USD/Hour</span
             >
           </template>
 
-          <template v-slot:activator="{ isActive, props }" v-else>
-            <span v-bind="props" v-on="isActive" class="font-weight-bold"
-              ><v-icon class="scale_beat mr-2" color="warning" :disabled="!(node && node.dedicated)"
-                >mdi-brightness-percent</v-icon
-              >{{ price_usd }} USD/Month</span
-            >
-          </template>
           <span>
             Discounts:
             <v-spacer />
@@ -243,7 +240,9 @@ import { CertificationType, type GridNode } from "@threefold/gridproxy_client";
 import { computed, onMounted, ref, watch } from "vue";
 import { capitalize } from "vue";
 
+import { gridProxyClient } from "@/clients";
 import ReserveBtn from "@/dashboard/components/reserve_action_btn.vue";
+import toHumanDate from "@/utils/date";
 import { getCountryCode } from "@/utils/get_nodes";
 import { manual } from "@/utils/manual";
 import toReadableDate from "@/utils/to_readable_data";
@@ -273,6 +272,7 @@ export default {
     const node = ref(props.node);
     const stakingDiscount = ref<number>();
     const loadingStakingDiscount = ref<boolean>(false);
+    const lastDeploymentTime = ref<number>(0);
     const rentedByUser = computed(() => {
       return props.node?.rentedByTwinId === profileManager.profile?.twinId;
     });
@@ -288,6 +288,10 @@ export default {
           : `https://www.worldatlas.com/r/w425/img/flag/${countryCode.toLowerCase()}-flag.png`;
 
       return imageUrl;
+    });
+
+    onMounted(async () => {
+      await getLastDeploymentTime();
     });
 
     async function refreshStakingDiscount() {
@@ -452,6 +456,18 @@ export default {
       }
     }
 
+    async function getLastDeploymentTime() {
+      if (props.node?.id) {
+        try {
+          const obj = await gridProxyClient.nodes.statsById(props.node.nodeId);
+          lastDeploymentTime.value = obj.users.last_deployment_timestamp;
+        } catch (error) {
+          console.log(`Error getting node object for node ID ${props.node.nodeId}: `, error);
+          lastDeploymentTime.value = 0;
+        }
+      }
+    }
+
     return {
       cruText,
       mruText,
@@ -470,14 +486,15 @@ export default {
       rentedByUser,
       loadingStakingDiscount,
       stakingDiscount,
-
       toReadableDate,
+      toHumanDate,
       checkSerialNumber,
       capitalize,
       formatResourceSize,
       formatSpeed,
       onReserveChange,
       getNodeStatusColor,
+      lastDeploymentTime,
     };
   },
 };
