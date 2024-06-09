@@ -74,6 +74,7 @@ export interface NodesQuery {
   sortBy: SortBy;
   sortOrder: SortOrder;
   numGpu: number;
+  hasIPv6: boolean;
 }
 
 const NODES_MAPPER: BuilderMapper<NodesQuery> = {
@@ -117,6 +118,7 @@ const NODES_MAPPER: BuilderMapper<NodesQuery> = {
   sortBy: "sort_by",
   sortOrder: "sort_order",
   numGpu: "num_gpu",
+  hasIPv6: "has_ipv6",
 };
 
 const NODES_VALIDATOR: BuilderValidator<NodesQuery> = {
@@ -174,6 +176,7 @@ const NODES_VALIDATOR: BuilderValidator<NodesQuery> = {
   sortBy: assertString,
   sortOrder: assertString,
   numGpu: assertInt,
+  hasIPv6: assertBoolean,
 };
 
 export class NodesBuilder extends AbstractBuilder<NodesQuery> {

@@ -37,8 +37,12 @@
 
       <v-card-text>
         <v-alert type="info" class="mb-5">
-          The keys selected here will be forwarded to your deployment. To change keys, simply toggle on the keys you
-          wish to select/deselect.
+          <!--
+            TODO: Return the message back when return the multiple keys feature.
+            The keys selected here will be forwarded to your deployment. To change keys, simply toggle on the keys you
+            wish to select/deselect.
+          -->
+          To change the key that you want to use over the deployment, simply click on it.
         </v-alert>
 
         <v-tooltip
@@ -128,6 +132,9 @@ export default defineComponent({
 
     onMounted(() => {
       selectedKeys.value = sshKeysManagement.list().filter(_key => _key.isActive === true);
+      // TODO: Remove the below `selectedKeys.value = [selectedKeys.value[0]];` to make the user select more than one key
+      // after fixing this issue: https://github.com/threefoldtech/tf-images/issues/231
+      selectedKeys.value = [selectedKeys.value[0]];
       handleKeys();
       emit("selectedKeys", selectedKeysString.value);
     });
@@ -137,14 +144,17 @@ export default defineComponent({
     };
 
     function selectKey(key: SSHKeyData) {
-      if (isKeySelected(key)) {
-        const index = selectedKeys.value.findIndex(selectedKey => selectedKey.id === key.id);
-        if (index !== -1) {
-          selectedKeys.value.splice(index, 1);
-        }
-      } else {
-        selectedKeys.value.push(key);
-      }
+      // TODO: Update the below `selectedKeys.value = [key];` to make the user select more than one key
+      // after fixing this issue: https://github.com/threefoldtech/tf-images/issues/231
+      selectedKeys.value = [key];
+      // if (isKeySelected(key)) {
+      //   const index = selectedKeys.value.findIndex(selectedKey => selectedKey.id === key.id);
+      //   if (index !== -1) {
+      //     selectedKeys.value.splice(index, 1);
+      //   }
+      // } else {
+      //   selectedKeys.value.push(key);
+      // }
 
       handleKeys();
       emit("selectedKeys", selectedKeysString.value);
