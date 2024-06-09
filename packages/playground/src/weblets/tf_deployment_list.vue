@@ -282,6 +282,14 @@
           />
         </template>
 
+        <template #Nostr-actions="{ item }">
+          <IconActionBtn
+            tooltip="Show Details"
+            icon="mdi-eye-outline"
+            @click="openDialog(tabs[activeTab].value, item)"
+          />
+        </template>
+
         <template #Wordpress-actions="{ item }">
           <IconActionBtn
             tooltip="Show Details"
@@ -399,6 +407,7 @@ const tabs: Tab[] = [
   { title: "Wordpress", value: "Wordpress", imgPath: "images/icons/wordpress.png" },
   { title: "Static Website", value: "StaticWebsite", imgPath: "images/icons/wordpress.png" },
   { title: "TFRobot", value: "TFRobot", imgPath: "images/icons/tfrobot.png" },
+  { title: "Nostr", value: "Nostr", imgPath: "images/icons/nostr.png" },
 ];
 
 const layout = useLayout();
