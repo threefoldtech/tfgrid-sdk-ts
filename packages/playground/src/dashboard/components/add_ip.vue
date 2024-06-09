@@ -101,6 +101,7 @@
 
 <script lang="ts">
 import { TFChainErrors } from "@threefold/types";
+import { contains } from "cidr-tools";
 import { getIPRange } from "get-ip-range";
 import { default as PrivateIp } from "private-ip";
 import { ref, watch } from "vue";
@@ -206,6 +207,12 @@ export default {
     function gatewayCheck() {
       const firstIP = publicIP?.value.split("/")[0];
       const lastIP = toPublicIP?.value.split("/")[0];
+
+      if (!contains(publicIP.value, gateway.value)) {
+        return {
+          message: "Gateway IP not in the provided IP range.",
+        };
+      }
 
       if (firstIP === gateway.value || lastIP === gateway.value) {
         return {
