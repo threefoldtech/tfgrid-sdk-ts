@@ -68,12 +68,8 @@
     >
       <div>
         <VExpandTransition mode="in-out">
-          <VForm
-            :disabled="loading"
-            v-show="!collapsible || filterOpened"
-            @keyup.enter="applyOnEnter"
-            @submit.prevent="apply"
-          >
+          <VForm :disabled="loading" v-show="!collapsible || filterOpened" @submit.prevent="apply">
+            <input type="submit" hidden :disabled="!valid || !changed" />
             <FormValidator valid-on-init v-model="valid">
               <VContainer fluid>
                 <VRow no-gutters>
@@ -175,10 +171,6 @@ export default {
       ctx.emit("apply");
     }
 
-    function applyOnEnter() {
-      if (changed.value && valid) apply();
-    }
-
     const collapsible = ref(false);
     const filterOpened = ref(true);
 
@@ -192,7 +184,7 @@ export default {
     onUnmounted(() => typeof breakpoint === "number" && window.removeEventListener("resize", onResize));
     typeof breakpoint === "number" && onResize();
 
-    return { empty, changed, clear, apply, applyOnEnter, valid, collapsible, filterOpened };
+    return { empty, changed, clear, apply, valid, collapsible, filterOpened };
   },
 };
 </script>
