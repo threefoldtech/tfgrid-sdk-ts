@@ -153,6 +153,7 @@ export default {
       status: ValidatorStatus.Init,
       error: null,
       $el: input,
+      highlightOnError: true,
     };
 
     onMounted(() => form?.register(uid.toString(), fakeService));
