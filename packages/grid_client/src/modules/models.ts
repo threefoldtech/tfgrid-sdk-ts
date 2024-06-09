@@ -593,6 +593,7 @@ class FilterOptions {
   @Expose() @IsOptional() @Min(0) sru?: number; // GB
   @Expose() @IsOptional() @Min(0) hru?: number; // GB
   @Expose() @IsOptional() @IsBoolean() publicIPs?: boolean;
+  @Expose() @IsOptional() @IsBoolean() hasIPv6?: boolean;
   @Expose() @IsOptional() @IsBoolean() accessNodeV4?: boolean;
   @Expose() @IsOptional() @IsBoolean() accessNodeV6?: boolean;
   @Expose() @IsOptional() @IsBoolean() gateway?: boolean;
@@ -629,6 +630,7 @@ class FarmFilterOptions {
   @Expose() @IsOptional() @Min(0) nodeSRU?: number; // GB
   @Expose() @IsOptional() @Min(0) nodeHRU?: number; // GB
   @Expose() @IsOptional() @IsBoolean() publicIp?: boolean;
+  @Expose() @IsOptional() @IsBoolean() nodeHasIPv6?: boolean;
   @Expose() @IsOptional() @IsBoolean() certificationType?: CertificationType;
   @Expose() @IsOptional() @IsString() farmName?: string;
   @Expose() @IsOptional() @IsString() country?: string;
