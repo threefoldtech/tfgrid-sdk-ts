@@ -22,6 +22,7 @@ export interface FarmsQuery {
   certificationType: CertificationType;
   dedicated: boolean;
   stellarAddress: string;
+  nodeHasIPv6: boolean;
 }
 
 const FARMS_MAPPER: BuilderMapper<FarmsQuery> = {
@@ -39,6 +40,7 @@ const FARMS_MAPPER: BuilderMapper<FarmsQuery> = {
   stellarAddress: "stellar_address",
   totalIps: "total_ips",
   twinId: "twin_id",
+  nodeHasIPv6: "node_has_ipv6",
 };
 
 const FARMS_VALIDATOR: BuilderValidator<FarmsQuery> = {
@@ -58,6 +60,7 @@ const FARMS_VALIDATOR: BuilderValidator<FarmsQuery> = {
   },
   dedicated: assertBoolean,
   stellarAddress: assertString,
+  nodeHasIPv6: assertBoolean,
 };
 
 export class FarmsBuilder extends AbstractBuilder<FarmsQuery> {

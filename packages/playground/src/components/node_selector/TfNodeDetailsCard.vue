@@ -194,20 +194,14 @@
       </VRow>
       <div class="mt-5 ml-auto text-right">
         <v-tooltip bottom color="primary" close-delay="100" :disabled="!(node && node.dedicated)">
-          <template v-slot:activator="{ isActive, props }" v-if="node && node.dedicated">
+          <template v-slot:activator="{ isActive, props }">
             <span v-bind="props" v-on="isActive" class="font-weight-bold"
-              ><v-icon class="scale_beat mr-2" color="warning">mdi-brightness-percent</v-icon
+              ><v-icon class="scale_beat mr-2" color="warning" :disabled="!(node && node.dedicated)"
+                >mdi-brightness-percent</v-icon
               >{{ (price_usd! / 24 / 30).toFixed(2) }} USD/Hour</span
             >
           </template>
 
-          <template v-slot:activator="{ isActive, props }" v-else>
-            <span v-bind="props" v-on="isActive" class="font-weight-bold"
-              ><v-icon class="scale_beat mr-2" color="warning" :disabled="!(node && node.dedicated)"
-                >mdi-brightness-percent</v-icon
-              >{{ price_usd }} USD/Month</span
-            >
-          </template>
           <span>
             Discounts:
             <v-spacer />
