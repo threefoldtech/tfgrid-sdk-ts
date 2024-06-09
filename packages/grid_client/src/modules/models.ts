@@ -630,6 +630,7 @@ class FarmFilterOptions {
   @Expose() @IsOptional() @Min(0) nodeSRU?: number; // GB
   @Expose() @IsOptional() @Min(0) nodeHRU?: number; // GB
   @Expose() @IsOptional() @IsBoolean() publicIp?: boolean;
+  @Expose() @IsOptional() @IsBoolean() nodeHasIPv6?: boolean;
   @Expose() @IsOptional() @IsBoolean() certificationType?: CertificationType;
   @Expose() @IsOptional() @IsString() farmName?: string;
   @Expose() @IsOptional() @IsString() country?: string;

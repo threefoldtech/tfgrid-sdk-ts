@@ -449,6 +449,7 @@ class Nodes {
       country: options.country,
       dedicated: options.dedicated,
       node_available_for: options.availableFor,
+      node_has_ipv6: options.nodeHasIPv6,
       node_status: "up",
       page: options.page,
       size: options.size,

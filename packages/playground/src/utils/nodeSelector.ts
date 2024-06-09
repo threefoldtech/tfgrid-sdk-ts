@@ -104,6 +104,7 @@ export function normalizeFarmFilters(
     publicIp: filters.ipv4 || undefined,
     nodeCertified: filters.certified || undefined,
     nodeHasGPU: filters.hasGPU || undefined,
+    nodeHasIPv6: filters.ipv6 || undefined,
   };
 }
 
