@@ -436,7 +436,7 @@ const nodeTableHeaders: VDataTableHeader = [
   },
   { title: "Type", key: "deploymentType", sortable: false },
   { title: "Expiration", key: "expiration" },
-  { title: "Farm ID", key: "farm_id" },
+  { title: "Farm ID", key: "farmId" },
   {
     title: "Node",
     key: "node",
