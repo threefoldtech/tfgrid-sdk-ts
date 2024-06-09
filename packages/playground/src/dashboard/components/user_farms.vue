@@ -226,6 +226,7 @@ export default {
           twinId,
           page: page.value,
           size: pageSize.value,
+          nameContains: search.value,
         });
 
         const filteredFarms = filter(data);
