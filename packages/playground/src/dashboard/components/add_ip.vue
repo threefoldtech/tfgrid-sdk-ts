@@ -207,8 +207,15 @@ export default {
     function gatewayCheck() {
       const firstIP = publicIP?.value.split("/")[0];
       const lastIP = toPublicIP?.value.split("/")[0];
+      let isRange = false;
 
-      if (!contains(publicIP.value, gateway.value)) {
+      try {
+        isRange = contains(publicIP.value, gateway.value);
+      } catch {
+        isRange = false;
+      }
+
+      if (!isRange) {
         return {
           message: "Gateway IP not in the provided IP range.",
         };
