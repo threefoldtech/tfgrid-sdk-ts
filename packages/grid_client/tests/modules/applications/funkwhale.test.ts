@@ -220,7 +220,7 @@ test("TC2685 - Applications: Deploy Funkwhale", async () => {
   }
 });
 
-afterEach(async () => {
+afterAll(async () => {
   const vmNames = await gridClient.machines.list();
   for (const name of vmNames) {
     const res = await gridClient.machines.delete({ name });
@@ -238,8 +238,6 @@ afterEach(async () => {
     expect(res.updated).toHaveLength(0);
     expect(res.deleted).toBeDefined();
   }
-});
 
-afterAll(async () => {
   return await gridClient.disconnect();
 }, 130000);
