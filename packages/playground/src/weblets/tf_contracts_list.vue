@@ -288,9 +288,6 @@ async function loadContracts(type?: ContractType) {
   loadingTablesMessage.value = undefined;
   nodeInfo.value = {};
   contracts.value = [];
-  nodeContracts.value = [];
-  rentContracts.value = [];
-  nameContracts.value = [];
   cachedNodeIDs.value = [];
 
   try {
@@ -314,7 +311,7 @@ async function loadContracts(type?: ContractType) {
       ]);
     }
 
-    contracts.value.push(...nodeContracts.value, ...nameContracts.value, ...rentContracts.value);
+    contracts.value = [...nodeContracts.value, ...nameContracts.value, ...rentContracts.value];
 
     // Update the total cost of the contracts.
     await getTotalCost();
