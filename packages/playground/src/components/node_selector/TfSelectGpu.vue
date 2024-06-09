@@ -59,19 +59,6 @@ export default {
     const input = ref<HTMLElement>();
     const cardsTask = useAsync(getNodeGpuCards, { default: [] });
 
-    useWatchDeep(
-      () => [props.validNode, props.node],
-      ([valid, node]) => {
-        bindModelValue();
-        if (valid && node) {
-          return cardsTask.value.run(gridStore, node as NodeInfo);
-        }
-        bindStatus();
-        cardsTask.value.initialized && cardsTask.value.reset();
-      },
-      { immediate: true, deep: true },
-    );
-
     onUnmounted(() => {
       bindModelValue();
       bindStatus();
@@ -98,6 +85,19 @@ export default {
       error: null,
       $el: input,
     };
+
+    useWatchDeep(
+      () => [props.validNode, props.node],
+      ([valid, node]) => {
+        bindModelValue();
+        if (valid && node) {
+          return cardsTask.value.run(gridStore, node as NodeInfo);
+        }
+        bindStatus();
+        cardsTask.value.initialized && cardsTask.value.reset();
+      },
+      { immediate: true, deep: true },
+    );
 
     onMounted(() => form?.register(uid.toString(), fakeService));
     onUnmounted(() => form?.unregister(uid.toString()));
