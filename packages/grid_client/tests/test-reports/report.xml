@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="jest tests" tests="6" failures="5" errors="0" time="61.886">
+  <testsuite name="compute_capacity.test.ts" errors="0" failures="5" skipped="0" timestamp="2024-06-10T08:33:01" time="61.825" tests="6">
+    <testcase classname="Compute Capacity module Compute Capacity instance is of type ComputeCapacity." name="Compute Capacity module Compute Capacity instance is of type ComputeCapacity." time="0.003">
+    </testcase>
+    <testcase classname="Compute Capacity module Min values for cpu &amp; memory." name="Compute Capacity module Min values for cpu &amp; memory." time="0.001">
+      <failure>Error: expect(received).toThrow()
+
+Received function did not throw
+    at Object.&lt;anonymous&gt; (/home/amira/cs/tfgrid-sdk-ts/packages/grid_client/tests/modules/compute_capacity.test.ts:22:20)
+    at Promise.then.completed (/home/amira/cs/tfgrid-sdk-ts/node_modules/@jest/core/node_modules/jest-circus/build/utils.js:293:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/home/amira/cs/tfgrid-sdk-ts/node_modules/@jest/core/node_modules/jest-circus/build/utils.js:226:10)
+    at _callCircusTest (/home/amira/cs/tfgrid-sdk-ts/node_modules/@jest/core/node_modules/jest-circus/build/run.js:297:40)
+    at _runTest (/home/amira/cs/tfgrid-sdk-ts/node_modules/@jest/core/node_modules/jest-circus/build/run.js:233:3)
+    at _runTestsForDescribeBlock (/home/amira/cs/tfgrid-sdk-ts/node_modules/@jest/core/node_modules/jest-circus/build/run.js:135:9)
+    at _runTestsForDescribeBlock (/home/amira/cs/tfgrid-sdk-ts/node_modules/@jest/core/node_modules/jest-circus/build/run.js:130:9)
+    at run (/home/amira/cs/tfgrid-sdk-ts/node_modules/@jest/core/node_modules/jest-circus/build/run.js:68:3)
+    at runAndTransformResultsToJestFormat (/home/amira/cs/tfgrid-sdk-ts/node_modules/@jest/core/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+    at jestAdapter (/home/amira/cs/tfgrid-sdk-ts/node_modules/@jest/core/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+    at runTestInternal (/home/amira/cs/tfgrid-sdk-ts/node_modules/jest-runner/build/runTest.js:367:16)
+    at runTest (/home/amira/cs/tfgrid-sdk-ts/node_modules/jest-runner/build/runTest.js:444:34)</failure>
+    </testcase>
+    <testcase classname="Compute Capacity module Max values for cpu &amp; memory." name="Compute Capacity module Max values for cpu &amp; memory." time="0">
+      <failure>Error: expect(received).toThrow()
+
+Received function did not throw
+    at Object.&lt;anonymous&gt; (/home/amira/cs/tfgrid-sdk-ts/packages/grid_client/tests/modules/compute_capacity.test.ts:34:20)
+    at Promise.then.completed (/home/amira/cs/tfgrid-sdk-ts/node_modules/@jest/core/node_modules/jest-circus/build/utils.js:293:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/home/amira/cs/tfgrid-sdk-ts/node_modules/@jest/core/node_modules/jest-circus/build/utils.js:226:10)
+    at _callCircusTest (/home/amira/cs/tfgrid-sdk-ts/node_modules/@jest/core/node_modules/jest-circus/build/run.js:297:40)
+    at _runTest (/home/amira/cs/tfgrid-sdk-ts/node_modules/@jest/core/node_modules/jest-circus/build/run.js:233:3)
+    at _runTestsForDescribeBlock (/home/amira/cs/tfgrid-sdk-ts/node_modules/@jest/core/node_modules/jest-circus/build/run.js:135:9)
+    at _runTestsForDescribeBlock (/home/amira/cs/tfgrid-sdk-ts/node_modules/@jest/core/node_modules/jest-circus/build/run.js:130:9)
+    at run (/home/amira/cs/tfgrid-sdk-ts/node_modules/@jest/core/node_modules/jest-circus/build/run.js:68:3)
+    at runAndTransformResultsToJestFormat (/home/amira/cs/tfgrid-sdk-ts/node_modules/@jest/core/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+    at jestAdapter (/home/amira/cs/tfgrid-sdk-ts/node_modules/@jest/core/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+    at runTestInternal (/home/amira/cs/tfgrid-sdk-ts/node_modules/jest-runner/build/runTest.js:367:16)
+    at runTest (/home/amira/cs/tfgrid-sdk-ts/node_modules/jest-runner/build/runTest.js:444:34)</failure>
+    </testcase>
+    <testcase classname="Compute Capacity module cpu &amp; memory doesn&apos;t accept decimal values." name="Compute Capacity module cpu &amp; memory doesn&apos;t accept decimal values." time="0.001">
+      <failure>Error: expect(received).toThrow()
+
+Received function did not throw
+    at Object.&lt;anonymous&gt; (/home/amira/cs/tfgrid-sdk-ts/packages/grid_client/tests/modules/compute_capacity.test.ts:46:20)
+    at Promise.then.completed (/home/amira/cs/tfgrid-sdk-ts/node_modules/@jest/core/node_modules/jest-circus/build/utils.js:293:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/home/amira/cs/tfgrid-sdk-ts/node_modules/@jest/core/node_modules/jest-circus/build/utils.js:226:10)
+    at _callCircusTest (/home/amira/cs/tfgrid-sdk-ts/node_modules/@jest/core/node_modules/jest-circus/build/run.js:297:40)
+    at _runTest (/home/amira/cs/tfgrid-sdk-ts/node_modules/@jest/core/node_modules/jest-circus/build/run.js:233:3)
+    at _runTestsForDescribeBlock (/home/amira/cs/tfgrid-sdk-ts/node_modules/@jest/core/node_modules/jest-circus/build/run.js:135:9)
+    at _runTestsForDescribeBlock (/home/amira/cs/tfgrid-sdk-ts/node_modules/@jest/core/node_modules/jest-circus/build/run.js:130:9)
+    at run (/home/amira/cs/tfgrid-sdk-ts/node_modules/@jest/core/node_modules/jest-circus/build/run.js:68:3)
+    at runAndTransformResultsToJestFormat (/home/amira/cs/tfgrid-sdk-ts/node_modules/@jest/core/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+    at jestAdapter (/home/amira/cs/tfgrid-sdk-ts/node_modules/@jest/core/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+    at runTestInternal (/home/amira/cs/tfgrid-sdk-ts/node_modules/jest-runner/build/runTest.js:367:16)
+    at runTest (/home/amira/cs/tfgrid-sdk-ts/node_modules/jest-runner/build/runTest.js:444:34)</failure>
+    </testcase>
+    <testcase classname="Compute Capacity module cpu &amp; memory empty values." name="Compute Capacity module cpu &amp; memory empty values." time="0.001">
+      <failure>Error: expect(received).toThrow()
+
+Received function did not throw
+    at Object.&lt;anonymous&gt; (/home/amira/cs/tfgrid-sdk-ts/packages/grid_client/tests/modules/compute_capacity.test.ts:52:20)
+    at Promise.then.completed (/home/amira/cs/tfgrid-sdk-ts/node_modules/@jest/core/node_modules/jest-circus/build/utils.js:293:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/home/amira/cs/tfgrid-sdk-ts/node_modules/@jest/core/node_modules/jest-circus/build/utils.js:226:10)
+    at _callCircusTest (/home/amira/cs/tfgrid-sdk-ts/node_modules/@jest/core/node_modules/jest-circus/build/run.js:297:40)
+    at _runTest (/home/amira/cs/tfgrid-sdk-ts/node_modules/@jest/core/node_modules/jest-circus/build/run.js:233:3)
+    at _runTestsForDescribeBlock (/home/amira/cs/tfgrid-sdk-ts/node_modules/@jest/core/node_modules/jest-circus/build/run.js:135:9)
+    at _runTestsForDescribeBlock (/home/amira/cs/tfgrid-sdk-ts/node_modules/@jest/core/node_modules/jest-circus/build/run.js:130:9)
+    at run (/home/amira/cs/tfgrid-sdk-ts/node_modules/@jest/core/node_modules/jest-circus/build/run.js:68:3)
+    at runAndTransformResultsToJestFormat (/home/amira/cs/tfgrid-sdk-ts/node_modules/@jest/core/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+    at jestAdapter (/home/amira/cs/tfgrid-sdk-ts/node_modules/@jest/core/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+    at runTestInternal (/home/amira/cs/tfgrid-sdk-ts/node_modules/jest-runner/build/runTest.js:367:16)
+    at runTest (/home/amira/cs/tfgrid-sdk-ts/node_modules/jest-runner/build/runTest.js:444:34)</failure>
+    </testcase>
+    <testcase classname="Compute Capacity module An error should be thrown if cpu &amp; memory negative values." name="Compute Capacity module An error should be thrown if cpu &amp; memory negative values." time="0.001">
+      <failure>Error: expect(received).toThrow()
+
+Received function did not throw
+    at Object.&lt;anonymous&gt; (/home/amira/cs/tfgrid-sdk-ts/packages/grid_client/tests/modules/compute_capacity.test.ts:64:20)
+    at Promise.then.completed (/home/amira/cs/tfgrid-sdk-ts/node_modules/@jest/core/node_modules/jest-circus/build/utils.js:293:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/home/amira/cs/tfgrid-sdk-ts/node_modules/@jest/core/node_modules/jest-circus/build/utils.js:226:10)
+    at _callCircusTest (/home/amira/cs/tfgrid-sdk-ts/node_modules/@jest/core/node_modules/jest-circus/build/run.js:297:40)
+    at _runTest (/home/amira/cs/tfgrid-sdk-ts/node_modules/@jest/core/node_modules/jest-circus/build/run.js:233:3)
+    at _runTestsForDescribeBlock (/home/amira/cs/tfgrid-sdk-ts/node_modules/@jest/core/node_modules/jest-circus/build/run.js:135:9)
+    at _runTestsForDescribeBlock (/home/amira/cs/tfgrid-sdk-ts/node_modules/@jest/core/node_modules/jest-circus/build/run.js:130:9)
+    at run (/home/amira/cs/tfgrid-sdk-ts/node_modules/@jest/core/node_modules/jest-circus/build/run.js:68:3)
+    at runAndTransformResultsToJestFormat (/home/amira/cs/tfgrid-sdk-ts/node_modules/@jest/core/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+    at jestAdapter (/home/amira/cs/tfgrid-sdk-ts/node_modules/@jest/core/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+    at runTestInternal (/home/amira/cs/tfgrid-sdk-ts/node_modules/jest-runner/build/runTest.js:367:16)
+    at runTest (/home/amira/cs/tfgrid-sdk-ts/node_modules/jest-runner/build/runTest.js:444:34)</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

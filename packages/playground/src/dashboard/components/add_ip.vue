@@ -266,17 +266,22 @@ export default {
       });
     }
 
+    async function checkIfIPExists(ip: string) {
+      const ipsInUse = await gqlClient.publicIps({ ip: true });
+      return ipsInUse.filter(entry => entry.ip == ip).length > 0;
+    }
+
     async function addFarmIp(farmId: number, gw: string) {
       try {
         isAdding.value = true;
-        const ipsInUse = await gqlClient.publicIps({ ip: true });
+
         if (type.value === IPType.range) {
           addIPs();
         }
         if (IPs.value && IPs.value.length > 1) {
           const extrinsics: any[] = [];
           for (const Ip in IPs.value) {
-            if (ipsInUse.filter(entry => entry.ip == Ip).length > 0) {
+            if (await checkIfIPExists(Ip)) {
               throw new TFChainErrors.tfgridModule.IpExists("IP exists");
             }
             extrinsics.push(
@@ -289,7 +294,7 @@ export default {
           }
           await gridStore.grid.utility.batchAll({ extrinsics });
         } else {
-          if (ipsInUse.filter(entry => entry.ip == publicIP.value).length > 0) {
+          if (await checkIfIPExists(publicIP.value)) {
             throw new TFChainErrors.tfgridModule.IpExists("IP exists");
           }
           await gridStore.grid.farms.addFarmIp({
