@@ -27,9 +27,11 @@
       <template v-else>
         <v-alert variant="tonal" type="info" v-show="!profileManager.profile"> Please connect your wallet </v-alert>
 
-        <v-alert variant="tonal" v-show="profileManager.profile && status" :type="alertType">
-          {{ message }}
-        </v-alert>
+        <div ref="msgAlert">
+          <v-alert variant="tonal" v-show="profileManager.profile && status" :type="alertType">
+            {{ message }}
+          </v-alert>
+        </div>
 
         <div v-show="profileManager.profile && !status">
           <slot v-if="profileManager.profile" />
@@ -158,6 +160,7 @@ const status = ref<WebletStatus>();
 const message = ref<string>();
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
+const msgAlert = ref<HTMLElement>();
 
 function onLogMessage(msg: string) {
   if (typeof msg === "string") {
@@ -196,7 +199,7 @@ provideService({
 function validateBeforeDeploy(fn: () => void) {
   const forms = __forms;
 
-  let errorInput: [number, any] | null = null;
+  let errorInput: [number, any, boolean] | null = null;
 
   out: for (let i = 0; i < forms.length; i++) {
     const form = forms[i];
@@ -205,20 +208,20 @@ function validateBeforeDeploy(fn: () => void) {
     for (const input of inputs) {
       const status = typeof input.status === "string" ? input.status : (input.status as any)?.value;
       if (status === ValidatorStatus.Invalid) {
-        errorInput = [i, input.$el];
+        errorInput = [i, input.$el, input.highlightOnError || false];
         break out;
       }
 
       const valid = status === ValidatorStatus.Valid || (status === ValidatorStatus.Init && form.validOnInit);
 
       if ((!status || !valid) && !errorInput) {
-        errorInput = [i, input.$el];
+        errorInput = [i, input.$el, input.highlightOnError || false];
       }
     }
   }
 
   if (errorInput) {
-    const [tab, __input] = errorInput;
+    const [tab, __input, highlightOnError] = errorInput;
 
     const input =
       __input && typeof __input === "object" && "value" in __input && __input.value instanceof HTMLElement
@@ -240,13 +243,32 @@ function validateBeforeDeploy(fn: () => void) {
         return;
       }
 
-      document.addEventListener("scrollend", () => _input.focus(), { once: true });
+      document.addEventListener("scrollend", _improveUx, { once: true });
       _input.scrollIntoView({ behavior: "smooth", block: "center" });
+
+      async function _improveUx() {
+        if (!(_input instanceof HTMLElement)) return;
+
+        if (_input instanceof HTMLInputElement || _input instanceof HTMLTextAreaElement) {
+          // use `requestAnimationFrame` to avoid browser possible lagging
+          requestAnimationFrame(() => _input.focus());
+          requestAnimationFrame(() => _input.blur());
+          requestAnimationFrame(() => _input.focus());
+        }
+
+        if (input instanceof HTMLElement && highlightOnError) {
+          input.classList.add("weblet-layout-error-transition");
+          requestAnimationFrame(() => {
+            input.classList.add("weblet-layout-error");
+          });
+        }
+      }
     }, 250);
 
     return;
   }
 
+  msgAlert.value?.scrollIntoView({ behavior: "smooth", block: "center" });
   return fn();
 }
 
@@ -448,5 +470,16 @@ export default {
 .title img {
   margin-right: 5px;
   max-height: 24px;
+}
+
+.weblet-layout-error-transition {
+  will-change: padding;
+  transition: padding 0.15s ease-in-out;
+}
+
+.weblet-layout-error {
+  border: thin solid rgba(var(--v-theme-error), 1) !important;
+  padding: 8px !important;
+  margin-bottom: 8px !important;
 }
 </style>
