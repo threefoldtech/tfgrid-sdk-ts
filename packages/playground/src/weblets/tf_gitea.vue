@@ -16,7 +16,7 @@
     <d-tabs
       :tabs="[
         { title: 'Config', value: 'config' },
-        { title: 'Environment Variables', value: 'env' },
+        { title: 'Mail Server', value: 'mail' },
       ]"
       ref="tabs"
     >
@@ -78,39 +78,10 @@
 
         <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
       </template>
-
-      <template #env>
-        <ExpandableLayout
-          v-model="envs"
-          @add="envs.push({ key: '', value: '' })"
-          #="{ index, isRequired }"
-          :required="[0]"
-        >
-          <input-validator
-            :value="envs[index].key"
-            :rules="[
-              validators.required('Key name is required.'),
-              key => validators.isAlpha('Key must start with alphabet char.')(key[0]),
-              validators.pattern('Invalid key format.', { pattern: /^[^0-9_\s][a-zA-Z0-9_]+$/ }),
-              validators.maxLength('Key max length is 128 chars.', 128),
-            ]"
-            #="{ props }"
-          >
-            <input-tooltip tooltip="Environment key.">
-              <v-text-field label="Name" v-model="envs[index].key" :disabled="isRequired" v-bind="props" />
-            </input-tooltip>
-          </input-validator>
-
-          <input-validator
-            :value="envs[index].value"
-            :rules="[validators.required('Value is required.')]"
-            #="{ props }"
-          >
-            <input-tooltip tooltip="Environment Value.">
-              <v-textarea label="Value" v-model="envs[index].value" no-resize :spellcheck="false" />
-            </input-tooltip>
-          </input-validator>
-        </ExpandableLayout>
+      <template #mail>
+        <SmtpServer v-model="smtp" :persistent="true" :tls="true">
+          Gitea needs SMTP service so please configure these settings properly.
+        </SmtpServer>
       </template>
     </d-tabs>
 
@@ -149,6 +120,7 @@ const certified = ref(false);
 const rootFilesystemSize = computed(() => solution.value?.disk);
 const selectionDetails = ref<SelectionDetails>();
 const selectedSSHKeys = ref("");
+const smtp = ref(createSMTPServer());
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
 
@@ -183,7 +155,7 @@ async function deploy() {
           name: name.value,
           cpu: solution.value.cpu,
           memory: solution.value.memory,
-          flist: "https://hub.grid.tf/tf-official-apps/Gitea.flist",
+          flist: "https://hub.grid.tf/petep.3bot/gitea_mycelium.flist",
           entryPoint: "/sbin/zinit init",
           disks: disks.value,
           envs: envs.value,
@@ -217,7 +189,7 @@ watch(selectedSSHKeys, layoutMount, { deep: true });
 <script lang="ts">
 import type { GridClient } from "@threefold/grid_client";
 
-import ExpandableLayout from "../components/expandable_layout.vue";
+import SmtpServer, { createSMTPServer } from "../components/smtp_server.vue";
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";
 import type { solutionFlavor as SolutionFlavor } from "../types";
@@ -231,7 +203,7 @@ export default {
   name: "Gitea",
   components: {
     SelectSolutionFlavor,
-    ExpandableLayout,
+    SmtpServer,
   },
 };
 </script>

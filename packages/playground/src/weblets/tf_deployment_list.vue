@@ -407,6 +407,7 @@ const tabs: Tab[] = [
   { title: "Wordpress", value: "Wordpress", imgPath: "images/icons/wordpress.png" },
   { title: "Static Website", value: "StaticWebsite", imgPath: "images/icons/wordpress.png" },
   { title: "TFRobot", value: "TFRobot", imgPath: "images/icons/tfrobot.png" },
+  { title: "Gitea", value: "Gitea", imgPath: "images/icons/vm.png" },
 ];
 
 const layout = useLayout();
