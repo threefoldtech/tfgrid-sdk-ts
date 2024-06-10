@@ -89,6 +89,7 @@
           { value: 5, title: '5' },
           { value: 10, title: '10' },
           { value: 15, title: '15' },
+          { value: 50, title: '50' },
         ]"
         :items-per-page="size"
         @update:items-per-page="
