@@ -41,6 +41,9 @@
           <TfFilter query-route="ipv6" v-model="filters.ipv6">
             <v-switch color="primary" inset label="IPv6" v-model="filters.ipv6" density="compact" hide-details />
           </TfFilter>
+          <TfFilter query-route="mine" v-model="filters.mine" v-if="profileManager.profile">
+            <v-switch color="primary" inset label="Mine" v-model="filters.mine" density="compact" hide-details />
+          </TfFilter>
 
           <TfFilter class="mt-4" query-route="node-status" v-model="filters.status">
             <v-select
@@ -521,6 +524,7 @@ export default {
       numGpu: "",
       rentable: false,
       ipv6: false,
+      mine: false,
     });
 
     const loading = ref<boolean>(true);
@@ -570,6 +574,7 @@ export default {
             rentable: filters.value.rentable && profileManager.profile ? filters.value.rentable : undefined,
             availableFor: filters.value.rentable && profileManager.profile ? profileManager.profile.twinId : undefined,
             hasIPv6: filters.value.ipv6,
+            rentedBy: filters.value.mine && profileManager.profile ? profileManager.profile.twinId : undefined,
           },
           { loadFarm: true },
         );
