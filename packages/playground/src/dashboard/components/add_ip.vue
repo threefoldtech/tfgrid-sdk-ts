@@ -267,7 +267,7 @@ export default {
     }
 
     async function checkIfIPExists(ip: string) {
-      const ipsInUse = await gqlClient.publicIps({ ip: true });
+      const ipsInUse = await gqlClient.publicIps({ ip: true, limit: 1000 });
       return ipsInUse.filter(entry => entry.ip == ip).length > 0;
     }
 
