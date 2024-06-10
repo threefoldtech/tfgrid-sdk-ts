@@ -269,7 +269,6 @@ export default {
     const profileManager = useProfileManager();
     const gridStore = useGrid();
     const grid = gridStore.client as unknown as GridClient;
-    const node = ref(props.node);
     const stakingDiscount = ref<number>();
     const loadingStakingDiscount = ref<boolean>(false);
     const lastDeploymentTime = ref<number>(0);
@@ -316,59 +315,59 @@ export default {
     }
 
     const dedicated = computed(() => {
-      if (isGridNode(node.value)) {
-        return node.value?.dedicated;
+      if (isGridNode(props.node)) {
+        return props.node?.dedicated;
       }
       return null;
     });
 
     const serialNumber = computed(() => {
-      if (isGridNode(node.value)) {
+      if (isGridNode(props.node)) {
         return null;
       }
-      return node.value?.serialNumber;
+      return props.node?.serialNumber;
     });
 
     const num_gpu = computed(() => {
-      if (isGridNode(node.value)) {
-        return node.value?.num_gpu;
+      if (isGridNode(props.node)) {
+        return props.node?.num_gpu;
       }
-      return node.value?.hasGPU;
+      return props.node?.hasGPU;
     });
 
     const rentable = computed(() => {
-      if (isGridNode(node.value)) {
-        return node.value?.rentable;
+      if (isGridNode(props.node)) {
+        return props.node?.rentable;
       }
       return null;
     });
 
     const rented = computed(() => {
-      if (isGridNode(node.value)) {
-        return node.value?.rented;
+      if (isGridNode(props.node)) {
+        return props.node?.rented;
       }
       return null;
     });
 
     const speed = computed(() => {
-      if (isGridNode(node.value)) {
-        return node.value?.speed;
+      if (isGridNode(props.node)) {
+        return props.node?.speed;
       }
       return null;
     });
 
     const price_usd = computed(() => {
-      if (isGridNode(node.value)) {
+      if (isGridNode(props.node)) {
         // convert extra fee from mili usd to usd
-        const extraFee = node.value?.extraFee / 1000;
-        return node.value?.price_usd + extraFee;
+        const extraFee = props.node?.extraFee / 1000;
+        return props.node?.price_usd + extraFee;
       }
       return null;
     });
 
     const dmi = computed(() => {
-      if (isGridNode(node.value)) {
-        return node.value?.dmi;
+      if (isGridNode(props.node)) {
+        return props.node?.dmi;
       }
       return null;
     });
@@ -427,11 +426,11 @@ export default {
     }
 
     function onReserveChange() {
-      if (!node.value) {
+      if (!props.node) {
         return;
       }
 
-      const n = { ...node.value } as NodeInfo | GridNode;
+      const n = { ...props.node } as NodeInfo | GridNode;
       const gotReserved = n.rentedByTwinId === 0;
 
       if (gotReserved) {
@@ -442,7 +441,6 @@ export default {
         n.rented = false;
       }
       n.rentable = !n.rented;
-
       ctx.emit("update:node", n);
     }
 
