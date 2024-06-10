@@ -432,8 +432,8 @@ async function onDelete(k8s = false) {
         console.log("Error while deleting deployment", e.message);
         continue;
       }
-      table.value?.loadDeployments();
     }
+    table.value?.loadDeployments();
   } catch (e) {
     createCustomToast((e as Error).message, ToastType.danger);
   } finally {
