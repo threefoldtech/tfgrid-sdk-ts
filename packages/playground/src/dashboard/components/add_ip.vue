@@ -106,10 +106,12 @@ import { getIPRange } from "get-ip-range";
 import { default as PrivateIp } from "private-ip";
 import { ref, watch } from "vue";
 
+import { gqlClient } from "@/clients";
 import { IPType } from "@/utils/types";
 
 import { useGrid } from "../../stores";
 import { createCustomToast, ToastType } from "../../utils/custom_toast";
+
 export default {
   name: "AddIP",
   props: {
@@ -163,7 +165,7 @@ export default {
       { deep: true },
     );
 
-    function toIpCheck() {
+    async function toIpCheck() {
       if (toPublicIP.value.split("/")[1] !== publicIP.value.split("/")[1]) {
         return {
           message: "Subnet is different.",
@@ -201,6 +203,7 @@ export default {
           message: "IP is not public.",
         };
       }
+
       return undefined;
     }
 
@@ -266,22 +269,29 @@ export default {
     async function addFarmIp(farmId: number, gw: string) {
       try {
         isAdding.value = true;
+        const ipsInUse = await gqlClient.publicIps({ ip: true });
         if (type.value === IPType.range) {
           addIPs();
         }
         if (IPs.value && IPs.value.length > 1) {
           const extrinsics: any[] = [];
-          for (const ip in IPs.value) {
+          for (const Ip in IPs.value) {
+            if (ipsInUse.filter(entry => entry.ip == Ip).length > 0) {
+              throw new TFChainErrors.tfgridModule.IpExists("IP exists");
+            }
             extrinsics.push(
               await gridStore.grid.tfchain.tfClient.farms.addFarmIp({
                 farmId,
-                ip: IPs.value[ip],
+                ip: IPs.value[Ip],
                 gw,
               }),
             );
           }
           await gridStore.grid.utility.batchAll({ extrinsics });
         } else {
+          if (ipsInUse.filter(entry => entry.ip == publicIP.value).length > 0) {
+            throw new TFChainErrors.tfgridModule.IpExists("IP exists");
+          }
           await gridStore.grid.farms.addFarmIp({
             farmId,
             ip: publicIP.value,
