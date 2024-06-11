@@ -318,6 +318,12 @@ const routes: AppRoute[] = [
         title: "Your Contracts",
         icon: "mdi-file-document-edit",
         route: DashboardRoutes.Deploy.YourContracts,
+        tooltip: "Explore and modify your deployed applications.",
+      },
+      {
+        title: "Your Deployments",
+        icon: "mdi-apps",
+        route: DashboardRoutes.Deploy.YourDeployments,
         tooltip: "Explore and modify your TFChain contracts.",
       },
       {
