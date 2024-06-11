@@ -165,7 +165,7 @@ export default {
       { deep: true },
     );
 
-    async function toIpCheck() {
+    function toIpCheck() {
       if (toPublicIP.value.split("/")[1] !== publicIP.value.split("/")[1]) {
         return {
           message: "Subnet is different.",
