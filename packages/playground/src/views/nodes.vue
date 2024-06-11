@@ -561,7 +561,7 @@ export default {
             numGpu: +filters.value.numGpu || undefined,
             rentable: filters.value.rentable && profileManager.profile ? filters.value.rentable : undefined,
             availableFor: filters.value.rentable && profileManager.profile ? profileManager.profile.twinId : undefined,
-            hasIPv6: filters.value.ipv6,
+            hasIPv6: filters.value.ipv6 ? filters.value.ipv6 : undefined,
           },
           { loadFarm: true },
         );
