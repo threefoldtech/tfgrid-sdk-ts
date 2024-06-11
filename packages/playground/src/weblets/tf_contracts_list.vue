@@ -422,12 +422,12 @@ async function onDeletedContracts(_contracts: NormalizedContract[]) {
     }
   }
   loadingTablesMessage.value =
-    "The contracts have been successfully deleted. Please note that all tables will be reloaded in 8 to 10 seconds.";
+    "The contracts have been successfully deleted. Please note that all tables will be reloaded in 30 seconds.";
   createCustomToast(loadingTablesMessage.value, ToastType.info);
   setTimeout(() => {
     loadContracts();
     loadingTablesMessage.value = undefined;
-  }, 9000);
+  }, 30000);
   await getTotalCost();
   contracts.value = [...rentContracts.value, ...nameContracts.value, ...nodeContracts.value];
   totalCost.value = undefined;
