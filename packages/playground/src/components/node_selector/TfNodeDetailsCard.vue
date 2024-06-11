@@ -455,7 +455,7 @@ export default {
     }
 
     async function getLastDeploymentTime() {
-      if (props.node?.id && props.node?.status !== "down") {
+      if (props.node?.id && props.node?.status == "up") {
         try {
           const obj = await gridProxyClient.nodes.statsById(props.node.nodeId);
           lastDeploymentTime.value = obj.users.last_deployment_timestamp;
