@@ -75,7 +75,11 @@ export async function rollbackDeployment(grid: GridClient, name: string) {
 }
 
 export type GridGateway = Awaited<ReturnType<GridClient["gateway"]["getObj"]>>[0];
-export async function loadDeploymentGateways(grid: GridClient) {
+interface LoadDeploymentGatewaysOptions {
+  filter?: (gateway: GridGateway) => boolean;
+}
+
+export async function loadDeploymentGateways(grid: GridClient, options?: LoadDeploymentGatewaysOptions) {
   const failedToList: string[] = [];
   const gws = await grid.gateway.list();
   const items = await Promise.all(
@@ -97,5 +101,13 @@ export async function loadDeploymentGateways(grid: GridClient) {
         .finally(() => timeout && clearTimeout(timeout));
     }),
   );
-  return { gateways: items.flat().filter(Boolean) as GridGateway[], failedToList };
+
+  const filter = options?.filter ?? (() => true);
+  return {
+    gateways: items
+      .flat()
+      .filter(Boolean)
+      .filter(filter as any) as GridGateway[],
+    failedToList,
+  };
 }

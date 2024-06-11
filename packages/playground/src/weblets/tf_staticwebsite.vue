@@ -62,7 +62,7 @@
         :medium="{ cpu: 2, memory: 4, disk: 100 }"
       />
 
-      <Networks ref="network" v-model:ipv4="ipv4" v-model:mycelium="mycelium" />
+      <Networks ref="network" v-model:ipv4="ipv4" v-model:mycelium="mycelium" v-model:planetary="planetary" />
 
       <input-tooltip
         inline
@@ -122,6 +122,7 @@ const domain = ref();
 
 const ipv4 = ref(false);
 const mycelium = ref(true);
+const planetary = ref(false);
 const solution = ref() as Ref<SolutionFlavor>;
 const flist: Flist = {
   // Should be upgraded to an oficial Flist
@@ -193,6 +194,7 @@ async function deploy() {
           entryPoint: flist.entryPoint,
           publicIpv4: ipv4.value,
           mycelium: mycelium.value,
+          planetary: planetary.value,
           envs: [
             { key: "SSH_KEY", value: selectedSSHKeys.value },
             { key: "GITHUB_URL", value: gitUrl.value },

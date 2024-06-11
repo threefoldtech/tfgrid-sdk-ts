@@ -1,5 +1,6 @@
 <template>
   <view-layout>
+    <v-alert type="info" variant="tonal" class="mb-6"> Click on the row to view farm details. </v-alert>
     <TfFiltersLayout>
       <template #filters>
         <TfFiltersContainer @apply="loadFarms(true)" class="mb-4" :loading="loading">
@@ -88,6 +89,7 @@
           { value: 5, title: '5' },
           { value: 10, title: '10' },
           { value: 15, title: '15' },
+          { value: 50, title: '50' },
         ]"
         :items-per-page="size"
         @update:items-per-page="

@@ -7,8 +7,10 @@ import { getSubdomain, loadDeploymentGateways } from "./gateway";
 import { updateGrid } from "./grid";
 
 export interface DeleteDeploymentOptions {
+  deploymentName?: string;
   name: string;
   projectName: ProjectName;
+  ip?: string;
   k8s?: boolean;
 }
 
@@ -25,7 +27,7 @@ export async function deleteDeployment(grid: GridClient, options: DeleteDeployme
 
   /* For fvm/vm */
   if (isVm(options.projectName)) {
-    await deleteVmGateways(grid);
+    await deleteVmGateways(grid, options.ip);
   }
 
   /* For solutions */
@@ -36,7 +38,15 @@ export async function deleteDeployment(grid: GridClient, options: DeleteDeployme
   /* End Delete gateway */
 
   /* Delete deployment */
-  return options.k8s ? grid.k8s.delete({ name: options.name }) : grid.machines.delete({ name: options.name });
+  if (options.k8s) {
+    return grid.k8s.delete({ name: options.name });
+  }
+
+  if (options.deploymentName) {
+    return grid.machines.delete_machine({ deployment_name: options.deploymentName, name: options.name });
+  }
+
+  return grid.machines.delete({ name: options.name });
 }
 
 export async function deleteDeploymentGateway(grid: GridClient, options: DeleteDeploymentOptions) {
@@ -93,8 +103,10 @@ function isVm(projectName: string) {
   return false;
 }
 
-async function deleteVmGateways(grid: GridClient) {
-  const { gateways } = await loadDeploymentGateways(grid);
+async function deleteVmGateways(grid: GridClient, ip?: string) {
+  const { gateways } = await loadDeploymentGateways(grid, {
+    filter: ip ? gw => gw.backends.some(bk => bk.includes(ip)) : undefined,
+  });
   for (const gateway of gateways) {
     try {
       if (gateway.type.includes("name")) {
