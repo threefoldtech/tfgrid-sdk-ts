@@ -10,7 +10,7 @@ on:
     branches: [development, development_2.6]
 
 jobs:
-  lint:
+  audit:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -23,9 +23,9 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
-          cache: "yarn"
+          cache: "npm"
 
-      - name: Install
-        run: yarn
+      - name: Install Dependencies
+        run: npm install
       - name: Audit Fix
         run: npm run audit-fix
