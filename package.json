@@ -26,7 +26,8 @@
     "prepare": "husky install",
     "lint": "eslint -c .eslintrc.json . --fix",
     "check-eslint": "eslint -c .eslintrc.json .",
-    "check-prettier": "prettier .prettierrc ."
+    "check-prettier": "prettier .prettierrc .",
+    "audit-fix": "npm audit fix"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,css,scss,svelte,vue}": "eslint -c .eslintrc.json --fix",
