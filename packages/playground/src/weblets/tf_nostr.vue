@@ -152,7 +152,7 @@ async function deploy() {
           name: name.value,
           cpu: solution.value.cpu,
           memory: solution.value.memory,
-          flist: "https://hub.grid.tf/petep.3bot/nostr_relay-mycelium.flist",
+          flist: "https://hub.grid.tf/tf-official-apps/nostr_relay-mycelium.flist",
           entryPoint: "/sbin/zinit init",
           disks: disks.value,
           envs: envs.value,

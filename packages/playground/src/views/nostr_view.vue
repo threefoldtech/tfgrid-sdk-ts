@@ -14,7 +14,7 @@ import TfDeploymentList from "../weblets/tf_deployment_list.vue";
 import Nostr from "../weblets/tf_nostr.vue";
 
 export default {
-  name: "TFRobotView",
+  name: "NostrView",
   components: {
     Nostr,
     TfDeploymentList,
