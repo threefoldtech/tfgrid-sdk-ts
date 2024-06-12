@@ -25,6 +25,7 @@
       show-select
       @update:page="updatePage"
       @update:items-per-page="updateSize"
+      @update:sort-by="updateSortBy"
     >
       <template #[`item.nodeId`]="{ item }">
         <span v-if="['node', 'rent'].includes(item.type)">{{ item.details.nodeId }}</span>
@@ -41,7 +42,7 @@
         <p v-else>No Data Available</p>
       </template>
 
-      <template #[`item.farmId`]="{ item }">
+      <template #[`item.farm_id`]="{ item }">
         <span v-if="['node', 'rent'].includes(item.type)">
           {{ item.details.farm_id ? item.details.farm_id : "-" }}
         </span>
@@ -352,7 +353,13 @@ const isNodeInRentContracts = computed(() => {
   return false;
 });
 
-const emits = defineEmits(["update:deleted-contracts", "update:unlock-contracts", "update:page", "update:size"]);
+const emits = defineEmits([
+  "update:deleted-contracts",
+  "update:unlock-contracts",
+  "update:page",
+  "update:size",
+  "update:sort",
+]);
 
 function updatePage(page: number) {
   emits("update:page", page);
@@ -360,6 +367,10 @@ function updatePage(page: number) {
 
 function updateSize(size: number) {
   emits("update:size", size);
+}
+
+function updateSortBy(sort: { key: string; order: "asc" | "desc" }[]) {
+  emits("update:sort", sort);
 }
 
 const layout = ref();

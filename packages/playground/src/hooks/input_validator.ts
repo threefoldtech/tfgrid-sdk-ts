@@ -9,6 +9,7 @@ export interface InputValidatorService {
   status: ValidatorStatus;
   error: string | null;
   $el?: Ref<HTMLElement | null | undefined> | null;
+  highlightOnError?: boolean;
 }
 
 export function useInputRef(isArray: true): Ref<InputValidatorService[]>;

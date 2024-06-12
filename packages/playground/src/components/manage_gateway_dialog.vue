@@ -273,7 +273,9 @@ export default {
         loadingGateways.value = true;
         updateGrid(grid, { projectName: props.vm.projectName });
 
-        const { gateways: gws, failedToList } = await loadDeploymentGateways(grid!);
+        const { gateways: gws, failedToList } = await loadDeploymentGateways(grid!, {
+          filter: gw => gw.backends.some(bk => bk.includes(ip)),
+        });
         gateways.value = gws;
         failedToListGws.value = failedToList;
       } catch (error) {

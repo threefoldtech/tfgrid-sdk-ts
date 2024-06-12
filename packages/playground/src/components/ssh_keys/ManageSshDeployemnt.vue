@@ -187,6 +187,7 @@ export default defineComponent({
       status: ValidatorStatus.Init,
       error: null,
       $el: inputElement,
+      highlightOnError: true,
     };
 
     onMounted(() => form?.register(`${uid}`, fakeService));
