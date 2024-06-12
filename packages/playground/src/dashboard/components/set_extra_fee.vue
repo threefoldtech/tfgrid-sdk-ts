@@ -66,6 +66,7 @@
 </template>
 
 <script lang="ts">
+import { TFChainErrors } from "@threefold/types";
 import { onMounted, ref, watch } from "vue";
 
 import { useGrid } from "../../stores";
@@ -119,8 +120,10 @@ export default {
         });
         createCustomToast("Additional fee is set successfully.", ToastType.success);
         await getExtraFee();
-      } catch (error) {
-        createCustomToast("Failed to set additional fees!", ToastType.danger);
+      } catch (e) {
+        let msg = "Failed to set additional fees.";
+        if (e instanceof TFChainErrors.smartContractModule.NodeHasActiveContracts) msg += " Node has acive contracts.";
+        createCustomToast(msg, ToastType.danger);
       } finally {
         isSetting.value = false;
         showDialogue.value = false;
