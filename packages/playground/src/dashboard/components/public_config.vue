@@ -105,6 +105,9 @@
                 </input-tooltip>
               </input-validator>
             </form-validator>
+            <v-alert type="error" v-if="errorMessage">
+              {{ errorMessage }}
+            </v-alert>
           </v-card-text>
           <v-card-actions class="justify-end my-1 mr-2">
             <!-- Remove and Generate Config Buttons -->
@@ -195,6 +198,7 @@ export default {
     const isConfigChanged = ref(false);
     const formRef = useFormRef();
     const grid = useGrid();
+    const errorMessage = ref<string | undefined>(undefined);
 
     const defualtNodeConfig = ref<PublicConfig>(publicConfigInitializer());
     const config = ref<PublicConfig>(publicConfigInitializer());
@@ -238,6 +242,7 @@ export default {
 
     async function AddConfig() {
       try {
+        errorMessage.value = undefined;
         isSaving.value = true;
         await grid.client.nodes.addNodePublicConfig({
           farmId: props.farmId,
@@ -259,8 +264,10 @@ export default {
         getPublicConfig();
         showDialogue.value = false;
       } catch (error) {
-        console.log(error);
-        createCustomToast(`Failed to save config. ${error}.`, ToastType.danger);
+        errorMessage.value =
+          "Failed to save the node public configuration. Please ensure that the configuration data you entered is valid.";
+        createCustomToast(errorMessage.value, ToastType.danger);
+        console.error(`Failed to save config due: ${error}.`, ToastType.danger);
       } finally {
         isSaving.value = false;
       }
@@ -305,11 +312,20 @@ export default {
 
     function isPrivateIP(type: "ipv4" | "ipv6") {
       const ip = type === "ipv4" ? config.value.ipv4 : config.value.ipv6;
-      if (PrivateIp(ip.split("/")[0])) {
+      const [address, prefixLength] = ip.split("/");
+
+      if (prefixLength && +prefixLength === 0) {
         return {
-          message: "IP is not public",
+          message: "The prefix length should be greater than 0.",
         };
       }
+
+      if (PrivateIp(address)) {
+        return {
+          message: "Private IP addresses are not allowed.",
+        };
+      }
+
       return undefined;
     }
 
@@ -343,6 +359,8 @@ export default {
       config,
       isConfigChanged,
       formRef,
+      errorMessage,
+
       AddConfig,
       removeConfig,
       isNodeHasConfig,
