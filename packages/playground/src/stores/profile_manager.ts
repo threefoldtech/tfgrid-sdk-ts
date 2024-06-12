@@ -52,6 +52,7 @@ const useProfileManager = defineStore("profile-manager", {
     },
     clear() {
       this.profile = null;
+      useGrid().set(null);
     },
   },
 });

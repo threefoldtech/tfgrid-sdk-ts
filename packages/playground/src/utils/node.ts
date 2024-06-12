@@ -85,25 +85,25 @@ export async function getNodeAvailability(nodeId: number) {
   const fakeDataPoint = { timestamp: currentPeriodStartTimestamp, uptime: 0 };
   uptimeEvents.unshift(fakeDataPoint);
 
-  let downtime = 0;
+  let time = 0;
   for (let i = 0; i < uptimeEvents.length - 1; i++) {
-    // if uptime decreases with time, then node was down in that time period, so add time period to node downtime
+    // if uptime decreases with time, then node was down in that time period, so add time period to node time
     if (
       uptimeEvents[i].uptime > uptimeEvents[i + 1].uptime ||
       uptimeEvents[i + 1].uptime < uptimeEvents[i + 1].timestamp - uptimeEvents[i].timestamp
     ) {
-      downtime += uptimeEvents[i + 1].timestamp - uptimeEvents[i].timestamp - uptimeEvents[i + 1].uptime;
+      time += uptimeEvents[i + 1].timestamp - uptimeEvents[i].timestamp - uptimeEvents[i + 1].uptime;
     }
   }
 
   const elapsedSinceLastUptimeEvent = secondsSinceEpoch - uptimeEvents[uptimeEvents.length - 1].timestamp;
   if (elapsedSinceLastUptimeEvent >= UPTIME_EVENTS_INTERVAL) {
-    downtime += elapsedSinceLastUptimeEvent;
+    time += elapsedSinceLastUptimeEvent;
   }
   console.log(
-    `getNodeAvailability: Node ${nodeId} was down for ${downtime} seconds in the last ${secondsSinceCurrentPeriodStart} seconds.`,
+    `getNodeAvailability: Node ${nodeId} was down for ${time} seconds in the last ${secondsSinceCurrentPeriodStart} seconds.`,
   );
-  return { downtime: downtime, currentPeriod: secondsSinceCurrentPeriodStart };
+  return { downtime: time, currentPeriod: secondsSinceCurrentPeriodStart };
 }
 
 export async function getFarmUptimePercentage(farm: NodeInterface[]) {

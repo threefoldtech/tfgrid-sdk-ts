@@ -104,6 +104,7 @@ export function normalizeFarmFilters(
     publicIp: filters.ipv4 || undefined,
     nodeCertified: filters.certified || undefined,
     nodeHasGPU: filters.hasGPU || undefined,
+    nodeHasIPv6: filters.ipv6 || undefined,
   };
 }
 
@@ -195,6 +196,7 @@ export function normalizeNodeFilters(
         (filters.solutionDisk ?? 0) + (filters.rootFilesystemSize ?? 0),
       ) || undefined,
     publicIPs: filters.ipv4 || undefined,
+    hasIPv6: filters.ipv6 || undefined,
     hasGPU: filters.hasGPU || undefined,
     rentedBy: filters.dedicated ? options.twinId : undefined,
     certified: filters.certified || undefined,

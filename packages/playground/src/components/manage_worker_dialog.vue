@@ -49,7 +49,7 @@
           {{ w.name }}
         </v-chip>
       </v-card-text>
-      <v-card-actions>
+      <v-card-actions class="justify-end mb-1 mr-2">
         <v-btn color="anchor" @click="deletingDialog = false"> Cancel </v-btn>
         <v-btn color="error" @click="onDelete"> Remove </v-btn>
       </v-card-actions>
