@@ -1,6 +1,4 @@
-# This workflow will do a clean install of node dependencies, cache/restore them, build the source code and run tests across different versions of node
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
-
+# This workflow will do a clean install of node dependencies, cache/restore them & audit the source code.
 name: Full Clients Audit
 
 on:
@@ -15,7 +13,6 @@ jobs:
     strategy:
       matrix:
         node-version: [18.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
       - uses: actions/checkout@v2
@@ -28,4 +25,4 @@ jobs:
       - name: Install Dependencies
         run: npm install
       - name: Audit Fix
-        run: npm run audit-fix
+        run: npm audit fix
