@@ -7,7 +7,7 @@ on:
     branches: [development, development_2.6]
 
 jobs:
-  linkChecker:
+  check-links-and-create-issue:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -15,11 +15,19 @@ jobs:
       - name: Link Checker
         id: lychee
         uses: lycheeverse/lychee-action@v1
+        with:
+          args: --output lychee/out.md
+        continue-on-error: true
 
-      - name: Create Issue From File
-        if: env.lychee_exit_code != 0
+      - name: Set Exit Code
+        run: echo "::set-output name=lychee_exit_code::${{ steps.lychee.outcome }}"
+        id: set-exit-code
+
+      - name: Create Issue
+        if: steps.set-exit-code.outputs.lychee_exit_code != 'success'
         uses: peter-evans/create-issue-from-file@v4
         with:
-          title: Link Checker Report
+          title: "${{ github.workflow }}: some links are broken"
+          token: ${{ github.token }}
           content-filepath: ./lychee/out.md
-          labels: report, automated issue
+          labels: link_checker
