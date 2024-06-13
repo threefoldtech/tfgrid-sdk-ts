@@ -9,7 +9,7 @@ on:
     branches: [development, development_2.6]
 
 jobs:
-  build:
+  audit-and-open-issue:
     runs-on: ubuntu-latest
     steps:
           - uses: actions/checkout@v2
