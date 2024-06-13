@@ -17,7 +17,7 @@ jobs:
             uses: pragatheeswarans/yarn-audit-action@v1.0.0
             with:
               token: ${{ github.token }}
-              label: 'type_bug'
+              label: 'audit'
               title: ${{ github.workflow }} failed during ${{ github.event }}
               description: 'High severity issues are identified in the repo.'
               paths: |
