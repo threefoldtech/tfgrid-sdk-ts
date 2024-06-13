@@ -52,6 +52,13 @@ export default {
   setup() {
     let cards: Card[] = [
       {
+        title: "Nostr",
+        excerpt:
+          "Nostr is a simple, open protocol that enables global, decentralized, and censorship-resistant social media.",
+        icon: "nostr.png",
+        route: DashboardRoutes.Applications.Nostr,
+      },
+      {
         title: "TFRobot",
         excerpt:
           "TFRobot is a command line interface tool that offers simultaneous mass deployment of groups of VMs on the ThreeFold Grid, with support of multiple retries for failed deployments, and customizable configurations.",

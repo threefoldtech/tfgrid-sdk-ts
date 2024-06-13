@@ -166,4 +166,7 @@ export const deploymentListEnvironments = {
   tfrobot: {
     SSH_KEY: _ssh,
   },
+  nostr: {
+    SSH_KEY: _ssh,
+  },
 };
