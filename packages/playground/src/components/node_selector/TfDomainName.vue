@@ -52,7 +52,7 @@
               <template #append-item v-if="pagination.page !== -1">
                 <VContainer>
                   <VBtn
-                    @click="loadDomains()"
+                    @click="loadDomains"
                     block
                     color="secondary"
                     variant="tonal"
@@ -65,7 +65,7 @@
               </template>
               <template v-slot:append>
                 <v-slide-x-reverse-transition mode="out-in">
-                  <v-icon icon="mdi-reload" @click="reloadDomains()"></v-icon>
+                  <v-icon icon="mdi-reload" @click="reloadDomains"></v-icon>
                 </v-slide-x-reverse-transition>
               </template>
             </VAutocomplete>
