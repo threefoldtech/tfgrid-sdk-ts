@@ -1,0 +1,22 @@
+name: Link Checker
+
+on:
+  push:
+    branches: [development, development_2.6]
+  pull_request:
+    branches: [development, development_2.6]
+
+jobs:
+  check-links:
+    runs-on: ubuntu-latest
+    name: Check for broken links
+    steps:
+      - name: Check for broken links
+        id: link-report
+        uses: elliotforbes/broken-link-checker@1.0.2
+        with:
+          url: |
+            https://dashboard.dev.grid.tf
+            https://dashboard.qa.grid.tf
+            https://dashboard.test.grid.tf
+            https://dashboard.grid.tf
