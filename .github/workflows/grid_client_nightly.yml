@@ -30,7 +30,7 @@ jobs:
       - uses: actions/checkout@v4
         if: ${{ env.NETWORK == 'test' }}
         with:
-          ref: refs/tags/v2.4.3
+          ref: refs/tags/v2.5.0-rc2
       - uses: actions/checkout@v4
         if: ${{ env.NETWORK == 'main' }}
         with:
