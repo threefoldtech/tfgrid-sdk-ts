@@ -16,7 +16,7 @@
           >
           (storage, compute, and network) provided by farmers. A decentralized sovereign alternative to today’s
           centralized Internet model.
-          <a href="https://threefold.io/" target="_blank" class="app-link">Find More!</a>
+          <a href="nenenene" target="_blank" class="app-link">Find More!</a>
         </p>
       </v-container>
 

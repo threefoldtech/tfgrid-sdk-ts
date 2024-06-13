@@ -27,7 +27,7 @@ jobs:
         if: steps.set-exit-code.outputs.lychee_exit_code != 'success'
         uses: peter-evans/create-issue-from-file@v4
         with:
-          title: "${{ github.workflow }}: some links are broken"
+          title: "${{ github.workflow }}: Some links are broken"
           token: ${{ github.token }}
-          content-filepath: ./lychee/out.md
+          content-filepath: lychee/out.md
           labels: link_checker
