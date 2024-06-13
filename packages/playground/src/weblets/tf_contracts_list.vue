@@ -310,7 +310,7 @@ async function loadContracts(type?: ContractType) {
         loadContractsByType(ContractType.Rent, rentContracts),
       ]);
     }
-
+    await getContractsLockDetails();
     contracts.value = [...nodeContracts.value, ...nameContracts.value, ...rentContracts.value];
 
     // Update the total cost of the contracts.
