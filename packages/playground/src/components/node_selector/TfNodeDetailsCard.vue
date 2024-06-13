@@ -52,7 +52,7 @@
           </VChip>
         </template>
       </VTooltip>
-      <VTooltip text="Node Country" v-if="node && node.location.country" location="left">
+      <VTooltip text="Node Country" v-if="node && node.location.country.trim().length > 0" location="left">
         <template #activator="{ props }">
           <VChip class="ml-2" size="x-small" v-bind="props">
             <span class="font-weight-bold" v-text="node?.location.country" />
