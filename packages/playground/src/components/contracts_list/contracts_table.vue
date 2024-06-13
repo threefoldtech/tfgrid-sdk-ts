@@ -342,11 +342,11 @@ const getAmountLocked = computed(() => {
 
 const isNodeInRentContracts = computed(() => {
   if (props.contractsType == ContractType.Node && selectedItem.value) {
-    const nodeIds = props.contracts.value
-      .map(contract => contract.details.nodeId)
-      .filter(nodeId => nodeId !== undefined) as number[];
+    const nodeIds = new Set(
+      props.contracts.value.map(contract => contract.details.nodeId).filter(nodeId => nodeId !== undefined) as number[],
+    );
     if (contractLocked.value && contractLocked.value.amountLocked === 0) {
-      return nodeIds.includes(selectedItem.value.details.nodeId);
+      return nodeIds.has(selectedItem.value.details.nodeId);
     }
   }
   return false;
