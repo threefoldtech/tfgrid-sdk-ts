@@ -134,7 +134,12 @@ jobs:
           steps.deleteall.outcome != 'success' 
         run: exit 1
 
+      - name: Get the day of the week
+        id: dayofweek
+        run: echo "DAY_OF_WEEK=$(date +%u)" >> $GITHUB_ENV
+
       - name: Create GitHub Issue on Failure
+        if: needs.teststatus.result == 'failure' && env.DAY_OF_WEEK != '5' && env.DAY_OF_WEEK != '6'
         uses: dacbd/create-issue-action@main
         with:
           token: ${{ github.token }}
@@ -151,7 +156,6 @@ jobs:
             - Commit: ${{ github.sha }}
             - Network: `${{ env.NETWORK }}`
   
-
             Dynamic Single Vm: ${{ steps.dynamicsinglevm.outcome }}
             Multiple Vm: ${{ steps.multiplevm.outcome }}
             Kubernetes: ${{ steps.kubernetes.outcome }}
@@ -160,5 +164,4 @@ jobs:
             Kvstore: ${{ steps.kvstore.outcome }}
             Zdb: ${{ steps.zdb.outcome }}
             Delete all contracts: ${{ steps.deleteall.outcome }}
-          labels: type_bug , grid_client                 
-
+          labels: type_bug, grid_client
