@@ -346,7 +346,7 @@ const isNodeInRentContracts = computed(() => {
       .map(contract => contract.details.nodeId)
       .filter(nodeId => nodeId !== undefined) as number[];
     if (contractLocked.value && contractLocked.value.amountLocked === 0) {
-      return nodeIds.includes(selectedItem.value.nodeId);
+      return nodeIds.includes(selectedItem.value.details.nodeId);
     }
   }
   return false;
