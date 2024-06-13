@@ -18,7 +18,7 @@ jobs:
             with:
               token: ${{ github.token }}
               label: 'audit'
-              title: ${{ github.workflow }} failed during ${{ github.event }}
+              title: "${{ github.workflow }}: Critical Security Vulnerability Identified"
               description: 'High severity issues are identified in the repo.'
               paths: |
                 .
