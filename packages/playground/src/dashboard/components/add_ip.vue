@@ -158,7 +158,7 @@ export default {
 
       if (await IpExistsCheck()) {
         return {
-          message: "IP exists",
+          message: "IP exists.",
         };
       }
 
