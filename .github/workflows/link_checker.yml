@@ -1,10 +1,8 @@
 name: Link Checker
 
 on:
-  push:
-    branches: [development, development_2.6]
-  pull_request:
-    branches: [development, development_2.6]
+  schedule:
+    - cron: '0 8 * * *'
 
 jobs:
   check-links:
