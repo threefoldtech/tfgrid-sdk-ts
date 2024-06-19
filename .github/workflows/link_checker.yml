@@ -7,7 +7,7 @@ on:
     branches: [development, development_2.6]
 
 jobs:
-  check-links-and-create-issue:
+  check-links:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -17,21 +17,3 @@ jobs:
         uses: docker://ghcr.io/threefoldfoundation/website-link-checker:latest
         with:
           args: 'https://staging.dashboard.dev.grid.tf -e 404 501 503 504 -w all'
-        continue-on-error: true
-
-      - name: Write Output to File
-        run: echo "${{ steps.checker.outcome }}" > checker/out.md
-
-      - name: Set Exit Code
-        run: |
-          echo "checker_exit_code=${{ steps.checker.outcome }}" >> $GITHUB_ENV
-        id: set-exit-code
-
-      - name: Create Issue
-        if: env.checker_exit_code != 'success'
-        uses: peter-evans/create-issue-from-file@v4
-        with:
-          title: "${{ github.workflow }}: Some links are broken"
-          token: ${{ github.token }}
-          content-filepath: checker/out.md
-          labels: link_checker
