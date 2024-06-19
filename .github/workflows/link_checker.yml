@@ -13,24 +13,25 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Link Checker
-        id: lychee
-        uses: lycheeverse/lychee-action@v1
+        id: checker
+        uses: docker://ghcr.io/threefoldfoundation/website-link-checker:latest
         with:
-          args: --output-stdout
+          args: 'https://staging.dashboard.dev.grid.tf -e 404 501 503 504 -w all'
         continue-on-error: true
 
       - name: Write Output to File
-        run: echo "${{ steps.lychee.outputs.stdout }}" > lychee/out.md
+        run: echo "${{ steps.checker.outcome }}" > checker/out.md
 
       - name: Set Exit Code
-        run: echo "::set-output name=lychee_exit_code::${{ steps.lychee.outcome }}"
+        run: |
+          echo "checker_exit_code=${{ steps.checker.outcome }}" >> $GITHUB_ENV
         id: set-exit-code
 
       - name: Create Issue
-        if: steps.set-exit-code.outputs.lychee_exit_code != 'success'
+        if: env.checker_exit_code != 'success'
         uses: peter-evans/create-issue-from-file@v4
         with:
           title: "${{ github.workflow }}: Some links are broken"
           token: ${{ github.token }}
-          content-filepath: lychee/out.md
+          content-filepath: checker/out.md
           labels: link_checker
