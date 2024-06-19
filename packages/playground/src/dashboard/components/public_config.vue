@@ -26,7 +26,11 @@
               <!-- IPv4 -->
               <input-validator
                 :value="config.ipv4"
-                :rules="[validators.required('IPv4 is required.'), validators.isIPRange('IP is not valid.', 4)]"
+                :rules="[
+                  () => isPrivateIP('ipv4'),
+                  validators.required('IPv4 is required.'),
+                  validators.isIPRange('IPv4 is not valid.', 4),
+                ]"
                 #="{ props }"
               >
                 <input-tooltip tooltip="IPv4 address in CIDR format xx.xx.xx.xx/xx">
@@ -40,6 +44,7 @@
                 :rules="[
                   validators.required('Gateway is required.'),
                   validators.isIP('Gateway is not valid.', 4),
+                  () => IPGatewayCheck('ipv4'),
                   value =>
                     validators.ipNotEqualGateway(
                       config.ipv4,
@@ -58,6 +63,7 @@
               <input-validator
                 :value="config.ipv6"
                 :rules="[
+                  () => isPrivateIP('ipv6'),
                   value => (config.gw6 !== '' ? validators.required('IPv6 is required.')(value) : '') as RuleReturn,
                   value => validators.isIPRange('IP is not valid.', 6)(value),
                 ]"
@@ -74,6 +80,7 @@
                 :rules="[
                   value => (config.ipv6 !== '' ? validators.required('Gateway is required.')(value) : '') as RuleReturn,
                   value => validators.isIP('Gateway is not valid.', 6)(value),
+                  () => IPGatewayCheck('ipv6'),
                   value => validators.ipNotEqualGateway(
                     config.ipv6!,
                     config.gw6!,
@@ -155,7 +162,9 @@
 
 <script lang="ts">
 import type { PublicConfig } from "@threefold/grid_client";
+import { contains } from "cidr-tools";
 import { isEqual } from "lodash";
+import { default as PrivateIp } from "private-ip";
 import { onMounted, ref, watch } from "vue";
 
 import type { RuleReturn } from "@/components/input_validator.vue";
@@ -250,8 +259,11 @@ export default {
         getPublicConfig();
         showDialogue.value = false;
       } catch (error) {
-        console.log(error);
-        createCustomToast(`Failed to save config. ${error}.`, ToastType.danger);
+        createCustomToast(
+          "Failed to save the node public configuration. Please ensure that the configuration data you entered is valid.",
+          ToastType.danger,
+        );
+        console.error(`Failed to save config due: ${error}.`, ToastType.danger);
       } finally {
         isSaving.value = false;
       }
@@ -293,6 +305,46 @@ export default {
       config.value.gw6 = defualtNodeConfig.value.gw6;
       config.value.domain = defualtNodeConfig.value.domain;
     }
+
+    function isPrivateIP(type: "ipv4" | "ipv6") {
+      const ip = type === "ipv4" ? config.value.ipv4 : config.value.ipv6;
+      const [address, prefixLength] = ip.split("/");
+
+      if (prefixLength && +prefixLength === 0) {
+        return {
+          message: "The prefix length should be greater than 0.",
+        };
+      }
+
+      if (PrivateIp(address)) {
+        return {
+          message: "Private IP addresses are not allowed.",
+        };
+      }
+
+      return undefined;
+    }
+
+    const IPGatewayCheck = (type: "ipv4" | "ipv6") => {
+      let isRange = false;
+
+      try {
+        if (type === "ipv4") {
+          isRange = contains(config.value.ipv4, config.value.gw4);
+        } else {
+          isRange = contains(config.value.ipv6, config.value.gw6);
+        }
+      } catch {
+        isRange = false;
+      }
+
+      if (!isRange) {
+        return {
+          message: "Gateway IP is not in the provided IP range.",
+        };
+      }
+    };
+
     return {
       showDialogue,
       isAdding,
@@ -303,10 +355,13 @@ export default {
       config,
       isConfigChanged,
       formRef,
+
       AddConfig,
       removeConfig,
       isNodeHasConfig,
       reset,
+      isPrivateIP,
+      IPGatewayCheck,
     };
   },
 };
