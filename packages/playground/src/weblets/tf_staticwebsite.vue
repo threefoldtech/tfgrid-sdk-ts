@@ -62,7 +62,13 @@
         :medium="{ cpu: 2, memory: 4, disk: 100 }"
       />
 
-      <Networks ref="network" v-model:ipv4="ipv4" v-model:mycelium="mycelium" v-model:planetary="planetary" />
+      <Networks
+        ref="network"
+        v-model:ipv4="ipv4"
+        v-model:mycelium="mycelium"
+        v-model:planetary="planetary"
+        v-model:ipv6="ipv6"
+      />
 
       <input-tooltip
         inline
@@ -79,6 +85,7 @@
       <TfSelectionDetails
         :filters="{
           ipv4,
+          ipv6,
           certified,
           dedicated,
           cpu: solution?.cpu,
@@ -121,6 +128,7 @@ const root = ref("");
 const domain = ref();
 
 const ipv4 = ref(false);
+const ipv6 = ref(false);
 const mycelium = ref(true);
 const planetary = ref(false);
 const solution = ref() as Ref<SolutionFlavor>;
@@ -193,6 +201,7 @@ async function deploy() {
           flist: flist.value,
           entryPoint: flist.entryPoint,
           publicIpv4: ipv4.value,
+          publicIpv6: ipv6.value,
           mycelium: mycelium.value,
           planetary: planetary.value,
           envs: [
