@@ -9,9 +9,12 @@
   </v-alert>
 
   <!-- Contracts List Card -->
+  <v-card color="primary" class="d-flex justify-center items-center my-3 pa-3 text-center">
+    <v-icon size="30" class="pr-3">mdi-file-document-edit</v-icon>
+    <v-card-title class="pa-0">Contracts List</v-card-title>
+  </v-card>
   <v-card variant="text" class="mb-4">
     <section class="d-flex align-center">
-      <v-card-title class="font-weight-bold d-flex align-center title ma-0 pa-0"> Contracts List </v-card-title>
       <v-spacer />
       <v-btn
         v-if="lockedContracts?.totalAmountLocked && !isLoading"
