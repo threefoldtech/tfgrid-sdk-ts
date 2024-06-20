@@ -119,6 +119,7 @@
                 color="warning"
                 @click="unlockAllContracts"
                 :loading="unlockContractLoading"
+                class="ml-2"
               >
                 Unlock contracts
               </v-btn>
