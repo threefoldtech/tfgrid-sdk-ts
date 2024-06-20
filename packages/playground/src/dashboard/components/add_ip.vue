@@ -156,7 +156,7 @@ export default {
         };
       }
 
-      if (await IpExistsCheck(toPublicIP.value)) {
+      if (await IpExistsCheck(publicIP.value)) {
         return {
           message: "IP exists.",
         };
@@ -214,7 +214,7 @@ export default {
           message: "IP is not public.",
         };
       }
-      if (await IpExistsCheck(publicIP.value)) {
+      if (await IpExistsCheck(toPublicIP.value)) {
         return {
           message: "IP exists.",
         };
