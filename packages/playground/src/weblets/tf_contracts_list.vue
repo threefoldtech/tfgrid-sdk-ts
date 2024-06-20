@@ -119,6 +119,7 @@
                 color="warning"
                 @click="unlockAllContracts"
                 :loading="unlockContractLoading"
+                class="ml-2"
               >
                 Unlock contracts
               </v-btn>
@@ -336,7 +337,7 @@ async function loadContracts(type?: ContractType, options?: { sort: { key: strin
         loadContractsByType(ContractType.Rent, rentContracts, options),
       ]);
     }
-
+    await getContractsLockDetails();
     contracts.value = [...nodeContracts.value, ...nameContracts.value, ...rentContracts.value];
 
     // Update the total cost of the contracts.

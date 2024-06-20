@@ -167,7 +167,7 @@
           above.</v-alert
         >
 
-        <v-card-actions>
+        <v-card-actions class="justify-end mb-1 mr-2">
           <v-btn color="anchor" class="mr-2 px-3" @click="contractStateDialog = false"> Close </v-btn>
           <v-tooltip
             :text="
@@ -247,7 +247,7 @@
         <v-chip class="ma-1" label v-for="c in selectedContracts" :key="c.contract_id">
           {{ c.contract_id }}
         </v-chip>
-        <v-card-actions>
+        <v-card-actions class="justify-end mb-1 mr-2">
           <v-btn color="anchor" @click="unlockDialog = false"> Cancel </v-btn>
           <v-tooltip
             :text="
@@ -343,11 +343,11 @@ const getAmountLocked = computed(() => {
 
 const isNodeInRentContracts = computed(() => {
   if (props.contractsType == ContractType.Node && selectedItem.value) {
-    const nodeIds = props.contracts.value
-      .map(contract => contract.details.nodeId)
-      .filter(nodeId => nodeId !== undefined) as number[];
+    const nodeIds = new Set(
+      props.contracts.value.map(contract => contract.details.nodeId).filter(nodeId => nodeId !== undefined) as number[],
+    );
     if (contractLocked.value && contractLocked.value.amountLocked === 0) {
-      return nodeIds.includes(selectedItem.value.nodeId);
+      return nodeIds.has(selectedItem.value.details.nodeId);
     }
   }
   return false;
