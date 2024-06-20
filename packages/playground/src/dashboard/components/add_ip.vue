@@ -156,7 +156,7 @@ export default {
         };
       }
 
-      if (await IpExistsCheck()) {
+      if (await IpExistsCheck(toPublicIP.value)) {
         return {
           message: "IP exists.",
         };
@@ -172,8 +172,8 @@ export default {
       },
       { deep: true },
     );
-    async function IpExistsCheck() {
-      const ips = await gqlClient.publicIps({ ip: true }, { where: { ip_eq: publicIP.value } });
+    async function IpExistsCheck(pubIp: string) {
+      const ips = await gqlClient.publicIps({ ip: true }, { where: { ip_eq: pubIp } });
       return ips.length > 0;
     }
     async function toIpCheck() {
@@ -214,7 +214,7 @@ export default {
           message: "IP is not public.",
         };
       }
-      if (await IpExistsCheck()) {
+      if (await IpExistsCheck(publicIP.value)) {
         return {
           message: "IP exists.",
         };
