@@ -377,7 +377,7 @@ const profileManagerController = useProfileManagerController();
 const balance = profileManagerController.balance;
 const freeBalance = computed(() => balance.value?.free ?? 0 - (balance.value?.locked ?? 0));
 const unlockContractLoading = ref(false);
-const unlockDialog = ref(true);
+const unlockDialog = ref(false);
 const selectedLockedContracts = computed(() => {
   if (selectedContracts.value.length == 0) return false;
   for (const contract of selectedContracts.value) {
