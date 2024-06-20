@@ -166,7 +166,7 @@
           above.</v-alert
         >
 
-        <v-card-actions>
+        <v-card-actions class="justify-end mb-1 mr-2">
           <v-btn color="anchor" class="mr-2 px-3" @click="contractStateDialog = false"> Close </v-btn>
           <v-tooltip
             :text="
@@ -246,7 +246,7 @@
         <v-chip class="ma-1" label v-for="c in selectedContracts" :key="c.contract_id">
           {{ c.contract_id }}
         </v-chip>
-        <v-card-actions>
+        <v-card-actions class="justify-end mb-1 mr-2">
           <v-btn color="anchor" @click="unlockDialog = false"> Cancel </v-btn>
           <v-tooltip
             :text="
