@@ -68,11 +68,7 @@
               <v-col class="votes">
                 <v-container class="" :style="{}">
                   <v-row v-if="expired(proposal.end)" class="d-flex justify-space-between">
-                    <v-btn
-                      :style="{ backgroundColor: '#1AA18F' }"
-                      @click="openVoteDialog(proposal.hash, true)"
-                      :disabled="loadingVote"
-                      class="text-white"
+                    <v-btn @click="openVoteDialog(proposal.hash, true)" :disabled="loadingVote" variant="flat"
                       >Yes <v-divider class="mx-3" vertical />{{ proposal.ayes.length }}
                     </v-btn>
                     <div class="d-flex align-center text-center pr-2">
