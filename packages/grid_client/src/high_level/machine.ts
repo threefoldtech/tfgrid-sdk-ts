@@ -2,7 +2,7 @@ import { GridClientErrors, ValidationError } from "@threefold/types";
 import { Addr } from "netaddr";
 
 import { events } from "../helpers/events";
-import calculateRootFs from "../helpers/root_fs";
+import { calculateRootFileSystem } from "../helpers/root_fs";
 import { randomChoice, zeroPadding } from "../helpers/utils";
 import { validateHexSeed } from "../helpers/validator";
 import { DiskModel, MyceliumNetworkModel, QSFSDiskModel } from "../modules/models";
@@ -55,7 +55,7 @@ class VMHL extends HighLevelBase {
     gpus: string[] = [],
   ): Promise<[TwinDeployment[], string]> {
     if (!rootfs_size) {
-      rootfs_size = calculateRootFs({
+      rootfs_size = calculateRootFileSystem({
         CPUCores: cpu,
         RAMInMegaBytes: memory,
       });

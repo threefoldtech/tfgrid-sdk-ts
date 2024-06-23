@@ -128,7 +128,6 @@ import type { Flist, solutionFlavor as SolutionFlavor } from "../types";
 import { ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
 import { normalizeError } from "../utils/helpers";
-import rootFs from "../utils/root_fs";
 import { generateName, generatePassword } from "../utils/strings";
 
 const layout = useLayout();
@@ -146,7 +145,9 @@ const flist: Flist = {
 };
 const dedicated = ref(false);
 const certified = ref(false);
-const rootFilesystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solution.value?.memory ?? 0));
+const rootFilesystemSize = computed(() =>
+  calculateRootFileSystem({ CPUCores: solution.value?.cpu ?? 0, RAMInMegaBytes: solution.value?.memory ?? 0 }),
+);
 const selectionDetails = ref<SelectionDetails>();
 const mycelium = ref(true);
 const selectedSSHKeys = ref("");
@@ -217,7 +218,7 @@ function updateSSHkeyEnv(selectedKeys: string) {
 </script>
 
 <script lang="ts">
-import type { GridClient } from "@threefold/grid_client";
+import { calculateRootFileSystem, type GridClient } from "@threefold/grid_client";
 
 import { updateGrid } from "@/utils/grid";
 

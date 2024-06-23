@@ -123,7 +123,7 @@
 </template>
 
 <script lang="ts" setup>
-import type { GridClient } from "@threefold/grid_client";
+import { calculateRootFileSystem, type GridClient } from "@threefold/grid_client";
 import { computed, type Ref, ref } from "vue";
 
 import { manual } from "@/utils/manual";
@@ -144,7 +144,9 @@ const username = ref("admin");
 const email = ref(profileManager.profile?.email || "");
 const password = ref(generatePassword(12));
 const solution = ref() as Ref<SolutionFlavor>;
-const rootFilesystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solution.value?.memory ?? 0));
+const rootFilesystemSize = computed(() =>
+  calculateRootFileSystem({ CPUCores: solution.value?.cpu ?? 0, RAMInMegaBytes: solution.value?.memory ?? 0 }),
+);
 const flist: Flist = {
   value: "https://hub.grid.tf/tf-official-apps/funkwhale-dec21.flist",
   entryPoint: "/init.sh",
@@ -264,7 +266,6 @@ import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue"
 import { deploymentListEnvironments } from "../constants";
 import type { SelectionDetails } from "../types/nodeSelector";
 import { updateGrid } from "../utils/grid";
-import rootFs from "../utils/root_fs";
 
 export default {
   name: "TfFunkwhale",
