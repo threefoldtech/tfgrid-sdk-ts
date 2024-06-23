@@ -6,6 +6,8 @@ enum DeployRoutes {
   Orchestrators = "/deploy/orchestrators/",
   Applications = "/deploy/applications/",
   YourContracts = "/deploy/your-contracts/",
+  YourDeployments = "/deploy/your-deployments/",
+
   Images = "https://hub.grid.tf/",
   SSHKey = "/deploy/sshkey/",
 }
