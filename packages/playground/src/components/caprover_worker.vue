@@ -22,7 +22,7 @@
       :small="{ cpu: 1, memory: 2, disk: 50 }"
       :medium="{ cpu: 2, memory: 4, disk: 100 }"
     />
-    <Networks v-model:mycelium="$props.modelValue.mycelium" />
+    <Networks v-model:mycelium="$props.modelValue.mycelium" v-model:ipv6="$props.modelValue.ipv6" />
 
     <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
       <v-switch color="primary" inset label="Dedicated" v-model="$props.modelValue.dedicated" />
@@ -34,6 +34,7 @@
     <TfSelectionDetails
       :filters="{
         ipv4: true,
+        ipv6: $props.modelValue.ipv6,
         certified: $props.modelValue.certified,
         dedicated: $props.modelValue.dedicated,
         cpu: $props.modelValue.solution?.cpu,
@@ -58,7 +59,7 @@ import { generateName } from "../utils/strings";
 import SelectSolutionFlavor from "./select_solution_flavor.vue";
 
 export function createWorker(name: string = generateName({ prefix: "wr" })): CaproverWorker {
-  return { name, mycelium: true };
+  return { name, mycelium: true, ipv6: false };
 }
 
 export default {
