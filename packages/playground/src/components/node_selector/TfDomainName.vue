@@ -52,7 +52,7 @@
               <template #append-item v-if="pagination.page !== -1">
                 <VContainer>
                   <VBtn
-                    @click="reloadDomains()"
+                    @click="loadDomains"
                     block
                     color="secondary"
                     variant="tonal"
@@ -65,7 +65,7 @@
               </template>
               <template v-slot:append>
                 <v-slide-x-reverse-transition mode="out-in">
-                  <v-icon icon="mdi-reload" @click="reloadDomains()"></v-icon>
+                  <v-icon icon="mdi-reload" @click="reloadDomains"></v-icon>
                 </v-slide-x-reverse-transition>
               </template>
             </VAutocomplete>
@@ -149,26 +149,28 @@ export default {
       farmId: enableCustomDomain.value ? props.farm?.farmId : undefined,
       availableFor: gridStore.client.twinId,
     }));
-
-    const reloadDomains = () => domainsTask.value.run(gridStore, filters.value);
-
-    useWatchDeep(
-      filters,
-      async filters => {
-        await pageCountTask.value.run(gridStore, filters);
-        pagination.value.reset(pageCountTask.value.data as number);
-        await nextTick();
-        loadedDomains.value = [];
-        return reloadDomains();
-      },
-      {
-        immediate: true,
-        deep: true,
-        ignoreFields: ["page"],
-      },
-    );
-    const customDomain = ref("");
     const selectedDomain = ref<NodeInfo | null>(null);
+    const loadDomains = () => domainsTask.value.run(gridStore, filters.value);
+
+    const reloadDomains = async (_filters: FilterOptions = filters.value) => {
+      if (selectedDomain.value) {
+        selectedDomain.value = null;
+        bindModelValue();
+        bindStatus();
+      }
+      await pageCountTask.value.run(gridStore, _filters);
+      pagination.value.reset(pageCountTask.value.data as number);
+      await nextTick();
+      loadedDomains.value = [];
+      return loadDomains();
+    };
+
+    useWatchDeep(filters, reloadDomains, {
+      immediate: true,
+      deep: true,
+      ignoreFields: ["page"],
+    });
+    const customDomain = ref("");
 
     const domainNameValid = ref<boolean | null>(null);
     watch(domainNameValid, valid => {
@@ -235,6 +237,7 @@ export default {
       domainsTask,
       loadedDomains,
       selectedDomain,
+      loadDomains,
       reloadDomains,
 
       disableSelectedDomain,

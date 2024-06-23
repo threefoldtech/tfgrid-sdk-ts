@@ -35,6 +35,13 @@
         :large="{ cpu: 8, memory: 32, disk: 2000 }"
         v-model="solution"
       />
+      <Network
+        required
+        v-model:ipv4="ipv4"
+        v-model:ipv6="ipv6"
+        v-model:planetary="planetary"
+        v-model:mycelium="mycelium"
+      />
 
       <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
         <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
@@ -71,6 +78,7 @@ import { type Ref, ref } from "vue";
 
 import { manual } from "@/utils/manual";
 
+import Network from "../components/networks.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useGrid } from "../stores";
 import { type Flist, ProjectName } from "../types";
@@ -83,6 +91,10 @@ const flist: Flist = {
   value: "https://hub.grid.tf/tf-official-vms/node-pilot-zdbfs.flist",
   entryPoint: "/",
 };
+const ipv4 = ref(false);
+const ipv6 = ref(false);
+const planetary = ref(true);
+const mycelium = ref(true);
 const dedicated = ref(false);
 const certified = ref(false);
 const rootFilesystemSize = 2;
@@ -111,9 +123,10 @@ async function deploy() {
           memory: solution.value.memory,
           flist: flist.value,
           entryPoint: flist.entryPoint,
-          publicIpv4: true,
-          publicIpv6: true,
-          planetary: false,
+          publicIpv4: ipv4.value,
+          publicIpv6: ipv6.value,
+          planetary: planetary.value,
+          mycelium: mycelium.value,
           envs: [{ key: "SSH_KEY", value: selectedSSHKeys.value }],
           rootFilesystemSize,
           disks: [
