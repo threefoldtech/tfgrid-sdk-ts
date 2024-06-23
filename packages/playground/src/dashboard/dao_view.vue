@@ -1,5 +1,5 @@
 <template>
-  <div class="border px-4 pb-4 rounded position-relative mt-2">
+  <div class="border px-4 pb-4 rounded position-relative">
     <v-card color="primary" class="d-flex justify-center items-center mt-3 pa-3 text-center">
       <v-icon size="30" class="pr-3">mdi-note-check-outline</v-icon>
       <v-card-title class="pa-0">DAO</v-card-title>
