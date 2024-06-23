@@ -1,5 +1,5 @@
 <template>
-  <v-card color="primary" class="py-2 text-center">
+  <v-card color="primary" class="py-2 text-center flex-grow-1">
     <div class="font-weight-medium">
       <v-icon class="mr-2" size="small">{{ item.icon }} </v-icon>
       <span>

@@ -24,12 +24,18 @@
               </v-btn>
             </v-alert>
           </v-col>
-          <v-col cols="12" sm="6">
+          <v-col cols="12" md="8">
             <tf-map r="125" g="227" b="200" :nodes="nodesDistribution" />
           </v-col>
-          <v-col v-if="Istats.length !== 0">
+          <v-col v-if="Istats.length !== 0" cols="12" md="4">
             <v-row>
-              <v-col v-for="item of Istats" :key="item.title" cols="12" sm="6">
+              <v-col
+                v-for="(item, index) of Istats"
+                :key="item.title"
+                :cols="index === Istats.length - 1 ? 12 : 6"
+                :md="index === Istats.length - 1 ? 12 : 6"
+                class="d-flex flex-grow-1"
+              >
                 <StatisticsCard :item="item" />
               </v-col>
             </v-row>
