@@ -196,10 +196,16 @@ test("TC2689 - Applications: Deploy Mattermost", async () => {
     const wait = await setTimeout(5000, "Waiting for gateway to be ready");
     log(wait);
 
-    axios
+    await axios
       .get(site)
-      .then(() => {
+      .then(res => {
         log("gateway is reachable");
+        log(res.status);
+        log(res.statusText);
+        log(res.data);
+        expect(res.status).toBe(200);
+        expect(res.statusText).toBe("OK");
+        expect(res.data).toContain("Mattermost");
         reachable = true;
       })
       .catch(() => {
@@ -207,24 +213,13 @@ test("TC2689 - Applications: Deploy Mattermost", async () => {
       });
     if (reachable) {
       break;
+    } else if (i == 180) {
+      throw new Error("Gateway is unreachable after multiple retries");
     }
-  }
-
-  if (reachable) {
-    axios.get(site).then(res => {
-      log(res.status);
-      log(res.statusText);
-      log(res.data);
-      expect(res.status).toBe(200);
-      expect(res.statusText).toBe("OK");
-      expect(res.data).toContain("Mattermost");
-    });
-  } else {
-    throw new Error("Gateway is unreachable after multiple retries");
   }
 });
 
-afterEach(async () => {
+afterAll(async () => {
   const vmNames = await gridClient.machines.list();
   for (const name of vmNames) {
     const res = await gridClient.machines.delete({ name });
@@ -242,8 +237,6 @@ afterEach(async () => {
     expect(res.updated).toHaveLength(0);
     expect(res.deleted).toBeDefined();
   }
-});
 
-afterAll(async () => {
   return await gridClient.disconnect();
 }, 130000);

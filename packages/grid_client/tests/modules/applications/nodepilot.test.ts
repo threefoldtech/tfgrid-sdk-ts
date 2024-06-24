@@ -1,4 +1,5 @@
 import axios from "axios";
+import https from "https";
 import { setTimeout } from "timers/promises";
 
 import { FilterOptions, generateString, GridClient, MachinesModel, randomChoice } from "../../../src";
@@ -153,14 +154,26 @@ test("TC2701 - Applications: Deploy Nodepilot", async () => {
   let reachable = false;
   log(site);
 
+  const axiosInstance = axios.create({
+    httpsAgent: new https.Agent({
+      rejectUnauthorized: false,
+    }),
+  });
+
   for (let i = 0; i < 180; i++) {
     const wait = await setTimeout(5000, "Waiting for gateway to be ready");
     log(wait);
 
-    axios
+    await axiosInstance
       .get(site)
-      .then(() => {
+      .then(res => {
         log("gateway is reachable");
+        log(res.status);
+        log(res.statusText);
+        log(res.data);
+        expect(res.status).toBe(200);
+        expect(res.statusText).toBe("OK");
+        expect(res.data).toContain("Node Pilot");
         reachable = true;
       })
       .catch(() => {
@@ -168,24 +181,13 @@ test("TC2701 - Applications: Deploy Nodepilot", async () => {
       });
     if (reachable) {
       break;
+    } else if (i == 180) {
+      throw new Error("Gateway is unreachable after multiple retries");
     }
-  }
-
-  if (reachable) {
-    axios.get(site).then(res => {
-      log(res.status);
-      log(res.statusText);
-      log(res.data);
-      expect(res.status).toBe(200);
-      expect(res.statusText).toBe("OK");
-      expect(res.data).toContain("Node Pilot");
-    });
-  } else {
-    throw new Error("Gateway is unreachable after multiple retries");
   }
 });
 
-afterEach(async () => {
+afterAll(async () => {
   const vmNames = await gridClient.machines.list();
   for (const name of vmNames) {
     const res = await gridClient.machines.delete({ name });
@@ -203,8 +205,6 @@ afterEach(async () => {
     expect(res.updated).toHaveLength(0);
     expect(res.deleted).toBeDefined();
   }
-});
 
-afterAll(async () => {
   return await gridClient.disconnect();
 }, 130000);
