@@ -9,9 +9,12 @@
   </v-alert>
 
   <!-- Contracts List Card -->
-  <v-card variant="text" class="mb-4">
+  <v-card color="primary" class="d-flex justify-center items-center mb-4 pa-3 text-center">
+    <v-icon size="30" class="pr-3">mdi-file-document-edit</v-icon>
+    <v-card-title class="pa-0">Contracts List</v-card-title>
+  </v-card>
+  <v-card variant="text" class="my-3">
     <section class="d-flex align-center">
-      <v-card-title class="font-weight-bold d-flex align-center title ma-0 pa-0"> Contracts List </v-card-title>
       <v-spacer />
       <v-btn
         v-if="lockedContracts?.totalAmountLocked && !isLoading"
@@ -37,7 +40,7 @@
   </v-card>
 
   <!-- Total Cost Card -->
-  <v-card :loading="totalCost === undefined" variant="tonal" class="mb-3 mt-5 bg-blue-primary-lighten-3">
+  <v-card :loading="totalCost === undefined" variant="tonal" class="mb-3 bg-blue-primary-lighten-3">
     <template #title>
       <v-row>
         <v-col class="d-flex justify-start">
@@ -132,7 +135,7 @@
   <!-- Contracts Tables -->
   <v-expansion-panels v-model="panel" multiple>
     <v-expansion-panel class="mb-4" :elevation="3" v-for="(table, idx) of contractsTables" :key="idx">
-      <v-expansion-panel-title color="primary" style="height: 50px !important; min-height: 15px !important">
+      <v-expansion-panel-title color="primary" style="height: 40px !important; min-height: 15px !important">
         <v-icon size="24" class="pr-3">{{ table.icon }}</v-icon>
         <v-card-title class="pa-0 text-subtitle-1">
           <strong>{{ table.title }}</strong>
