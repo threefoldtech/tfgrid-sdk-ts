@@ -10,6 +10,7 @@ describe("Zmount module", () => {
     expect(zmount).toBeInstanceOf(Zmount);
   });
 
+  // The following tests are skipped as there's an issue w input validation. Should be returned once validation is fixed here: https://github.com/threefoldtech/tfgrid-sdk-ts/issues/2821
   test.skip("Min value for size.", () => {
     const size = 100 * 1025 ** 2;
 
