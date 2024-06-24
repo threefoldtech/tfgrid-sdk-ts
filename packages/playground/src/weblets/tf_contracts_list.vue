@@ -135,7 +135,7 @@
   <!-- Contracts Tables -->
   <v-expansion-panels v-model="panel" multiple>
     <v-expansion-panel class="mb-4" :elevation="3" v-for="(table, idx) of contractsTables" :key="idx">
-      <v-expansion-panel-title color="primary" style="height: 50px !important; min-height: 15px !important">
+      <v-expansion-panel-title color="primary" style="height: 40px !important; min-height: 15px !important">
         <v-icon size="24" class="pr-3">{{ table.icon }}</v-icon>
         <v-card-title class="pa-0 text-subtitle-1">
           <strong>{{ table.title }}</strong>
