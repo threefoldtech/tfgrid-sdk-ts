@@ -4,19 +4,6 @@
       <v-icon size="30" class="pr-3">mdi-key-plus</v-icon>
       <v-card-title class="pa-0">SSH keys</v-card-title>
     </v-card>
-    <!-- <v-card class="pa-6 mb-4">
-    <div>
-      <h3 class="text-light">
-        <v-icon> mdi-cog-sync </v-icon>
-        Manage SSH Keys
-      </h3>
-      <p class="mt-2">
-        Manage SSH keys easily, switch between them, and activate or deactivate keys as needed for accessing deployed
-        machines. Simplify key distribution and effectively manage access to nodes.
-      </p>
-    </div>
-  </v-card> -->
-
     <v-alert type="info"> Multiple keys support is coming up soon </v-alert>
 
     <v-card class="mt-3 mb-1" color="transparent">
