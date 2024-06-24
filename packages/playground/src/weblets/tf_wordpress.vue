@@ -124,7 +124,7 @@
 </template>
 
 <script lang="ts" setup>
-import type { GridClient } from "@threefold/grid_client";
+import { calculateRootFileSystem, type GridClient } from "@threefold/grid_client";
 import { computed, type Ref, ref } from "vue";
 
 import { updateGrid } from "@/utils/grid";
@@ -155,7 +155,9 @@ const certified = ref(false);
 const ipv4 = ref(false);
 const mycelium = ref(true);
 const planetary = ref(false);
-const rootFilesystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solution.value?.memory ?? 0));
+const rootFilesystemSize = computed(() =>
+  calculateRootFileSystem({ CPUCores: solution.value?.cpu ?? 0, RAMInMegaBytes: solution.value?.memory ?? 0 }),
+);
 const selectionDetails = ref<SelectionDetails>();
 const selectedSSHKeys = ref("");
 const gridStore = useGrid();
@@ -262,7 +264,6 @@ import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";
 import type { SelectionDetails } from "../types/nodeSelector";
-import rootFs from "../utils/root_fs";
 
 export default {
   name: "TFWordpress",
