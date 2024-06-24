@@ -65,12 +65,15 @@
       </template>
 
       <template #master>
-        <K8SWorker v-model="master" />
+        <K8SWorker v-model="master" :other-workers="workers" />
       </template>
 
       <template #workers>
         <ExpandableLayout v-model="workers" @add="addWorker" #="{ index }">
-          <K8SWorker v-model="workers[index]" />
+          <K8SWorker
+            v-model="workers[index]"
+            :other-workers="[workers, master].flat(1).filter((_, i) => i !== index)"
+          />
         </ExpandableLayout>
       </template>
     </d-tabs>
