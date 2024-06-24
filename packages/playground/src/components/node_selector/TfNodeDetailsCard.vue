@@ -203,9 +203,17 @@
           </template>
 
           <span>
-            Discounts:
             <v-spacer />
-            <ul class="pl-2">
+            <v-data-table
+              class="px-5 my-5 rounded-lg"
+              hover
+              :header="discountPackagesHeaders"
+              :items="discountPackagesItems"
+            >
+              <template #bottom></template>
+            </v-data-table>
+            <v-spacer />
+            <ul class="pl-2 py-5">
               <li>
                 {{ rentedByUser ? "You receive " : "You'll receive " }} a
                 <strong class="mr-1">50%</strong>
@@ -221,6 +229,7 @@
                 <a target="_blank" :href="manual?.discount_levels"> staking discounts </a>
               </li>
             </ul>
+            <v-divider />
           </span>
         </v-tooltip>
 
@@ -236,7 +245,7 @@
 </template>
 <script lang="ts">
 import type { GridClient, NodeInfo, NodeResources } from "@threefold/grid_client";
-import { CertificationType, type GridNode } from "@threefold/gridproxy_client";
+import { CertificationType, Discount, type GridNode } from "@threefold/gridproxy_client";
 import { computed, onMounted, ref, watch } from "vue";
 import { capitalize } from "vue";
 
@@ -465,8 +474,20 @@ export default {
         }
       }
     }
-
+    const discountPackagesHeaders = [
+      { title: "Packages", align: "center", key: "name", sortable: false },
+      { title: "Discount", align: "center", key: "discount", sortable: false },
+      { title: "TFT needed", align: "center", key: "tfts", sortable: false },
+    ];
+    const discountPackagesItems = [
+      { name: "Default", discount: -20, tfts: 200 },
+      { name: "Bronze", discount: -30, tfts: 200 },
+      { name: "Silver", discount: -40, tfts: 200 },
+      { name: "Gold", discount: -60, tfts: 1000 },
+    ];
     return {
+      discountPackagesHeaders,
+      discountPackagesItems,
       cruText,
       mruText,
       sruText,
