@@ -1,12 +1,12 @@
 <template>
   <v-row>
-    <v-col v-for="card in cards" :key="card.title" cols="12" sm="12" md="6" lg="6">
+    <v-col v-for="card in cards" :key="card.title" cols="12" sm="12" md="12" lg="6">
       <router-link :to="card.route">
         <v-hover>
           <template v-slot:default="{ isHovering, props }">
             <v-card
               class="pa-3 pt-6"
-              :height="isMobile && tallestCard > 220 ? 220 : 200"
+              :height="isMobile && tallestCard > 200 ? tallestCard + 15 : 200"
               v-bind="props"
               :class="isHovering ? 'card-opacity' : undefined"
             >
