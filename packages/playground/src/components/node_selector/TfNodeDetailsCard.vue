@@ -207,8 +207,9 @@
             <v-data-table
               class="px-5 my-5 rounded-lg"
               hover
-              :header="discountPackagesHeaders"
+              :headers="discountPackagesHeaders"
               :items="discountPackagesItems"
+              disable-sort="true"
             >
               <template #bottom></template>
             </v-data-table>
@@ -230,6 +231,9 @@
               </li>
             </ul>
             <v-divider />
+
+            <p>Price after discount \t</p>
+            <p>Price before discount \t 44</p>
           </span>
         </v-tooltip>
 
@@ -481,11 +485,13 @@ export default {
     ];
     const discountPackagesItems = [
       { name: "Default", discount: -20, tfts: 200 },
-      { name: "Bronze", discount: -30, tfts: 200 },
-      { name: "Silver", discount: -40, tfts: 200 },
+      { name: "Bronze", discount: -30, tfts: 400 },
+      { name: "Silver", discount: -40, tfts: 600 },
       { name: "Gold", discount: -60, tfts: 1000 },
     ];
+    const sortPackages = [{ key: "name" }];
     return {
+      sortPackages,
       discountPackagesHeaders,
       discountPackagesItems,
       cruText,
