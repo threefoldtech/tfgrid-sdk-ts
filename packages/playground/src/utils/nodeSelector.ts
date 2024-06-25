@@ -299,8 +299,6 @@ export function isNodeValid(node: NodeInfo, machines: SelectedMachine[], filters
     sru -= machine.disk * 1e9;
   }
 
-  console.log({ node, machinesWithSameNode, machines, requiredMru, requiredSru, mru, sru });
-
   return mru >= requiredMru && sru >= requiredSru;
 }
 

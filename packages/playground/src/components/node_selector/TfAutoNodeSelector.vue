@@ -344,6 +344,7 @@ export default {
 
         _setValidNode();
       },
+      { debounce: 1000 },
     );
 
     return {

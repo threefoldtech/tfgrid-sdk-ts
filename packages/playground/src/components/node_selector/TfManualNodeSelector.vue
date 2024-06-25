@@ -219,6 +219,7 @@ export default {
     useWatchDeep(
       () => props.selectedMachines.map(m => m.nodeId),
       () => nodeId.value && validationTask.value.run(nodeId.value),
+      { debounce: 1000 },
     );
 
     // revalidate if filters updated
