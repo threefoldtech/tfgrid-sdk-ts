@@ -73,6 +73,7 @@
         v-model:planetary="planetary"
         v-model:wireguard="wireguard"
         v-model:mycelium="mycelium"
+        v-model:ipv6="ipv6"
       />
 
       <SelectSolutionFlavor
@@ -96,6 +97,7 @@
         }"
         :filters="{
           ipv4,
+          ipv6,
           certified,
           dedicated,
           cpu: solution?.cpu,
@@ -135,6 +137,7 @@ const name = ref(generateName({ prefix: "um" }));
 const username = ref("admin");
 const password = ref(generatePassword());
 const ipv4 = ref(false);
+const ipv6 = ref(false);
 const planetary = ref(true);
 const wireguard = ref(false);
 const network = ref();
@@ -190,6 +193,7 @@ async function deploy() {
           planetary: planetary.value,
           mycelium: mycelium.value,
           publicIpv4: ipv4.value,
+          publicIpv6: ipv6.value,
           envs: [
             { key: "SSH_KEY", value: selectedSSHKeys.value },
             { key: "USERNAME", value: username.value },
