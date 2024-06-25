@@ -115,7 +115,6 @@ import { useGrid } from "../stores";
 import { type Flist, ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
 import { normalizeError } from "../utils/helpers";
-import rootFs from "../utils/root_fs";
 import { generateName } from "../utils/strings";
 
 const layout = useLayout();
@@ -126,7 +125,7 @@ const ipv4 = ref(false);
 const planetary = ref(true);
 const cpu = 1;
 const memory = 512;
-const rootFilesystemSize = rootFs(cpu, memory);
+const rootFilesystemSize = calculateRootFileSystem({ CPUCores: cpu, RAMInMegaBytes: memory });
 const dockerDiskSize = 10;
 const privateRestoreKey = ref("");
 const publicRestoreKey = ref("");
@@ -212,7 +211,7 @@ function updateSSHkeyEnv(selectedKeys: string) {
 </script>
 
 <script lang="ts">
-import type { GridClient } from "@threefold/grid_client";
+import { calculateRootFileSystem, type GridClient } from "@threefold/grid_client";
 
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";

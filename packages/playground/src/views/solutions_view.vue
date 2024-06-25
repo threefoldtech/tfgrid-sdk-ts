@@ -1,5 +1,9 @@
 <template>
   <view-layout>
+    <v-card color="primary" class="d-flex justify-center items-center mb-4 pa-3 text-center">
+      <v-icon size="30" class="pr-3">mdi-lightbulb-on-outline</v-icon>
+      <v-card-title class="pa-0">Applications</v-card-title>
+    </v-card>
     <v-text-field label="Search Applications" v-model="searchItem" class="mb-5" clearable></v-text-field>
     <ApplicationCards :cards="filteredCards" />
     <p v-if="filteredCards.length === 0" class="mx-3 mb-3">No solution was found with the provided search query.</p>

@@ -1,5 +1,9 @@
 <template>
   <view-layout>
+    <v-card color="primary" class="d-flex justify-center items-center mb-4 pa-3 text-center">
+      <v-icon size="30" class="pr-3">mdi-group</v-icon>
+      <v-card-title class="pa-0">Orchestrators</v-card-title>
+    </v-card>
     <ApplicationCards :cards="cards" />
   </view-layout>
 </template>
