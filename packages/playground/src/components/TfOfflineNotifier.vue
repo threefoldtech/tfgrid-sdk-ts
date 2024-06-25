@@ -1,5 +1,5 @@
 <template>
-  <VDialog scrollable persistent min-width="400px" max-width="700px" :model-value="offline || failed">
+  <VDialog scrollable persistent min-width="400px" max-width="700px" :model-value="offline || failed" attach="#modals">
     <VCard>
       <VCardTitle class="v-card-title font-weight-black text-center text-h5 bg-primary py-3" v-text="title" />
       <VCardText class="text-center">

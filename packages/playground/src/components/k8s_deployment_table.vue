@@ -17,7 +17,7 @@
         </template>
       </v-tooltip>
 
-      <v-dialog transition="dialog-bottom-transition" v-model="showDialog">
+      <v-dialog transition="dialog-bottom-transition" v-model="showDialog" attach="#modals">
         <v-card>
           <v-card-title style="color: #ffcc00; font-weight: bold">Failed Deployments</v-card-title>
           <v-divider color="#FFCC00" />

@@ -16,7 +16,7 @@
     </v-tooltip>
 
     <span v-if="showDialogue">
-      <v-dialog v-model="showDialogue" max-width="600">
+      <v-dialog v-model="showDialogue" max-width="600" attach="#modals">
         <v-card>
           <v-card-title class="bg-primary"> Set Additional Fees </v-card-title>
           <v-card-text>
