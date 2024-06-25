@@ -41,13 +41,13 @@ function Validate(options?: ValidationOptions): ClassDecorator {
   return (target: any): any => {
     const methods = _getMethods(target, _options);
     for (const method of methods) {
-      const fn = target.prototype[method].bind(target.prototype);
+      const fn = target.prototype[method];
       target.prototype[method] = function (...args: any[]): any {
         const errors = validateSync(this);
         if (errors.length) {
           throw errors;
         }
-        return fn(...args);
+        return fn.apply(this, args);
       };
     }
 
