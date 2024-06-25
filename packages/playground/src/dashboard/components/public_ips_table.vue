@@ -39,7 +39,7 @@
           <strong>Delete the following IPs?</strong>
         </v-card-title>
         <v-card-text>
-          <v-chip class="mb-5" v-for="item in selectedItems" :key="item">
+          <v-chip class="mb-5 mr-2" v-for="item in selectedItems" :key="item">
             {{ item.ip }}
           </v-chip>
           <v-divider />

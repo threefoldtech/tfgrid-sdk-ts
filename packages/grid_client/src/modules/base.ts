@@ -6,6 +6,7 @@ import { GqlNodeContract, RMB } from "../clients";
 import { TFClient } from "../clients/tf-grid/client";
 import { GridClientConfig } from "../config";
 import { formatErrorMessage } from "../helpers";
+import { type ZmachineData } from "../helpers/types";
 import { HighLevelBase } from "../high_level/base";
 import { KubernetesHL } from "../high_level/kubernetes";
 import { VMHL } from "../high_level/machine";
@@ -306,7 +307,7 @@ class BaseModule {
     return null;
   }
 
-  async _getZmachineData(deploymentName: string, deployments, workload: Workload): Promise<Record<string, unknown>> {
+  async _getZmachineData(deploymentName: string, deployments, workload: Workload): Promise<ZmachineData> {
     const data = workload.data as Zmachine;
     const resultData = workload.result.data as ZmachineResult;
     return {
