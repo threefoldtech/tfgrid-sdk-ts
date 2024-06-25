@@ -1,8 +1,8 @@
-import { NetworkAddNodeModel } from "../src";
+import { GridClient, NetworkAddNodeModel } from "../src";
 import { getClient } from "./client_loader";
 import { log } from "./utils";
 
-async function addNode(client, node) {
+async function addNode(client: GridClient, node: NetworkAddNodeModel) {
   const res = await client.networks.addNode(node);
   log("================= Adding node =================");
   log(res);
@@ -10,7 +10,7 @@ async function addNode(client, node) {
 }
 
 async function main() {
-  const grid3 = await getClient();
+  const grid3: GridClient = await getClient();
   const node: NetworkAddNodeModel = {
     name: "wedtest",
     ipRange: "10.249.0.0/16",

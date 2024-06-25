@@ -8,6 +8,18 @@ import { BaseModule } from "./base";
 import { NetworkAddNodeModel, NetworkGetModel, NetworkHasNodeModel } from "./models";
 import { checkBalance } from "./utils";
 
+interface INetworkModule {
+  addNode: {
+    contracts: {};
+  };
+}
+
+class NetworkModuleResult implements INetworkModule {
+  addNode: {
+    contracts: {};
+  };
+}
+
 class NetworkModule extends BaseModule {
   moduleName = "networks";
   network: NetworkHL;
@@ -20,7 +32,7 @@ class NetworkModule extends BaseModule {
   @expose
   @validateInput
   @checkBalance
-  async addNode(options: NetworkAddNodeModel) {
+  async addNode(options: NetworkAddNodeModel): Promise<{}> {
     const twinDeployments = await this.network.addNode(
       options.name,
       options.ipRange,
