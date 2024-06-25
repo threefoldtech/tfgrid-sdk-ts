@@ -19,11 +19,13 @@
         <slot name="list"></slot>
       </template>
 
-      <form-validator v-model="valid" v-else>
-        <slot name="deploy"></slot>
-      </form-validator>
+      <d-tabs v-else :tabs="[{ title: 'Config', value: 'config' }]">
+        <template #config>
+          <slot name="deploy"></slot>
+        </template>
+      </d-tabs>
 
-      <template #footer-actions>
+      <template #footer-actions="{ validateBeforeDeploy }">
         <v-btn color="anchor" v-if="!deleting" @click="$emit('close')"> Close </v-btn>
         <v-btn
           color="error"
@@ -34,7 +36,11 @@
         >
           Delete
         </v-btn>
-        <v-btn color="secondary" :disabled="!valid" @click="$emit('deploy', layout)" v-if="showType === 1">
+        <v-btn
+          color="secondary"
+          @click="validateBeforeDeploy(() => $emit('deploy', layout), false)"
+          v-if="showType === 1"
+        >
           Deploy
         </v-btn>
       </template>
@@ -74,7 +80,6 @@ const emits = defineEmits<{
 
 const layout = ref();
 const showType = ref(props.workers.length === 0 ? 1 : 0);
-const valid = ref(true);
 const deletingDialog = ref(false);
 
 function onDelete() {

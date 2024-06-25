@@ -196,7 +196,7 @@ provideService({
   },
 });
 
-function validateBeforeDeploy(fn: () => void) {
+function validateBeforeDeploy(fn: () => void, documentScrollend = true) {
   const forms = __forms;
 
   let errorInput: [number, any, boolean] | null = null;
@@ -243,7 +243,8 @@ function validateBeforeDeploy(fn: () => void) {
         return;
       }
 
-      document.addEventListener("scrollend", _improveUx, { once: true });
+      documentScrollend && document.addEventListener("scrollend", _improveUx, { once: true });
+      !documentScrollend && setTimeout(_improveUx, 500);
       _input.scrollIntoView({ behavior: "smooth", block: "center" });
 
       async function _improveUx() {

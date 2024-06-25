@@ -86,7 +86,12 @@
     <TfSelectionDetails
       :filters-validators="{
         memory: { min: 1024 },
-        rootFilesystemSize: { min: rootFs($props.modelValue.cpu ?? 0, $props.modelValue.memory ?? 0) },
+        rootFilesystemSize: {
+          min: calculateRootFileSystem({
+            CPUCores: $props.modelValue.cpu ?? 0,
+            RAMInMegaBytes: $props.modelValue.memory ?? 0,
+          }),
+        },
       }"
       :filters="{
         ipv4: $props.modelValue.ipv4,
@@ -103,13 +108,13 @@
 </template>
 
 <script lang="ts">
+import { calculateRootFileSystem } from "@threefold/grid_client";
 import type { PropType } from "vue";
 
 import { manual } from "@/utils/manual";
 
 import Networks from "../components/networks.vue";
 import type { K8SWorker } from "../types";
-import rootFs from "../utils/root_fs";
 import { generateName } from "../utils/strings";
 import RootFsSize from "./root_fs_size.vue";
 
@@ -140,7 +145,7 @@ export default {
     },
   },
   setup() {
-    return { rootFs, manual };
+    return { calculateRootFileSystem, manual };
   },
 };
 </script>

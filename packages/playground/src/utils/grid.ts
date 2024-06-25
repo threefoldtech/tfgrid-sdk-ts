@@ -1,5 +1,6 @@
 import { BackendStorageType, GridClient, KeypairType, NetworkEnv } from "@threefold/grid_client";
 import { InsufficientBalanceError } from "@threefold/types";
+import { markRaw } from "vue";
 
 import type { SSHKeyData } from "@/types";
 
@@ -10,18 +11,20 @@ export async function getGrid(
   projectName?: string,
 ) {
   if (!profile) return null;
-  const grid = new GridClient({
-    mnemonic: profile.mnemonic,
-    network,
-    backendStorageType: BackendStorageType.tfkvstore,
-    keypairType: profile.keypairType || KeypairType.sr25519,
-    projectName,
-    substrateURL: window.env.SUBSTRATE_URL,
-    proxyURL: window.env.GRIDPROXY_URL,
-    graphqlURL: window.env.GRAPHQL_URL,
-    activationURL: window.env.ACTIVATION_SERVICE_URL,
-    relayURL: window.env.RELAY_DOMAIN,
-  });
+  const grid = markRaw(
+    new GridClient({
+      mnemonic: profile.mnemonic,
+      network,
+      backendStorageType: BackendStorageType.tfkvstore,
+      keypairType: profile.keypairType || KeypairType.sr25519,
+      projectName,
+      substrateURL: window.env.SUBSTRATE_URL,
+      proxyURL: window.env.GRIDPROXY_URL,
+      graphqlURL: window.env.GRAPHQL_URL,
+      activationURL: window.env.ACTIVATION_SERVICE_URL,
+      relayURL: window.env.RELAY_DOMAIN,
+    }),
+  );
   try {
     await grid.connect();
   } catch (e) {

@@ -71,7 +71,7 @@
 </template>
 
 <script lang="ts" setup>
-import type { GridClient } from "@threefold/grid_client";
+import { calculateRootFileSystem, type GridClient } from "@threefold/grid_client";
 import { computed, type Ref, ref } from "vue";
 
 import { manual } from "@/utils/manual";
@@ -99,7 +99,9 @@ const certified = ref(false);
 const ipv4 = ref(false);
 const mycelium = ref(true);
 const planetary = ref(false);
-const rootFilesystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solution.value?.memory ?? 0));
+const rootFilesystemSize = computed(() =>
+  calculateRootFileSystem({ CPUCores: solution.value?.cpu ?? 0, RAMInMegaBytes: solution.value?.memory ?? 0 }),
+);
 const selectionDetails = ref<SelectionDetails>();
 const selectedSSHKeys = ref("");
 const gridStore = useGrid();
@@ -203,7 +205,6 @@ import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue"
 import { deploymentListEnvironments } from "../constants";
 import type { SelectionDetails } from "../types/nodeSelector";
 import { updateGrid } from "../utils/grid";
-import rootFs from "../utils/root_fs";
 
 export default {
   name: "TFCasperlabs",

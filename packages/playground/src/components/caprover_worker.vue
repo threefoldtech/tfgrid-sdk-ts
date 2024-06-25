@@ -47,13 +47,13 @@
 </template>
 
 <script lang="ts">
+import { calculateRootFileSystem } from "@threefold/grid_client";
 import { computed, type PropType } from "vue";
 
 import { manual } from "@/utils/manual";
 
 import Networks from "../components/networks.vue";
 import type { CaproverWorker } from "../types";
-import rootFs from "../utils/root_fs";
 import { generateName } from "../utils/strings";
 import SelectSolutionFlavor from "./select_solution_flavor.vue";
 
@@ -68,7 +68,10 @@ export default {
   setup(props) {
     const rootFilesystemSize = computed(() => {
       const { cpu = 0, memory = 0 } = props.modelValue.solution || {};
-      return rootFs(cpu, memory);
+      return calculateRootFileSystem({
+        CPUCores: cpu,
+        RAMInMegaBytes: memory,
+      });
     });
 
     return { rootFilesystemSize, manual };

@@ -1,5 +1,5 @@
 <template>
-  <div class="border px-4 pb-4 rounded position-relative mt-2">
+  <div class="border px-4 pb-4 rounded position-relative">
     <v-card color="primary" class="d-flex justify-center items-center mt-3 pa-3 text-center">
       <v-icon size="30" class="pr-3">mdi-note-check-outline</v-icon>
       <v-card-title class="pa-0">DAO</v-card-title>
@@ -68,11 +68,7 @@
               <v-col class="votes">
                 <v-container class="" :style="{}">
                   <v-row v-if="expired(proposal.end)" class="d-flex justify-space-between">
-                    <v-btn
-                      :style="{ backgroundColor: '#1AA18F' }"
-                      @click="openVoteDialog(proposal.hash, true)"
-                      :disabled="loadingVote"
-                      class="text-white"
+                    <v-btn @click="openVoteDialog(proposal.hash, true)" :disabled="loadingVote" variant="flat"
                       >Yes <v-divider class="mx-3" vertical />{{ proposal.ayes.length }}
                     </v-btn>
                     <div class="d-flex align-center text-center pr-2">

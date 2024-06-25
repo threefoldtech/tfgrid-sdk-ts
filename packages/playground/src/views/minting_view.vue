@@ -1,9 +1,10 @@
 <template>
   <view-layout>
-    <h2 class="mb-4 text-capitalize">Grid Minting Explorer</h2>
-    <v-alert variant="tonal" type="warning" class="mb-4 pa-2">
-      <p>All data subject to change</p>
-    </v-alert>
+    <v-card color="primary" class="d-flex justify-center items-center mb-4 pa-3 text-center">
+      <v-icon size="30" class="pr-3">mdi-file-document-edit</v-icon>
+      <v-card-title class="pa-0">TF Minting Reports</v-card-title>
+    </v-card>
+    <v-alert variant="tonal" type="warning" class="mb-4"> All data subject to change </v-alert>
     <v-form class="d-inline-flex w-100">
       <FormValidator v-model="isValidForm">
         <InputValidator

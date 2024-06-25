@@ -1,109 +1,102 @@
 <template>
-  <v-card class="pa-6 mb-4">
-    <div>
-      <h3 class="text-light">
-        <v-icon> mdi-cog-sync </v-icon>
-        Manage SSH Keys
-      </h3>
-      <p class="mt-2">
-        Manage SSH keys easily, switch between them, and activate or deactivate keys as needed for accessing deployed
-        machines. Simplify key distribution and effectively manage access to nodes.
-      </p>
-    </div>
-  </v-card>
+  <view-layout>
+    <v-card color="primary" class="d-flex justify-center items-center pa-3 mb-3 text-center">
+      <v-icon size="30" class="pr-3">mdi-key-plus</v-icon>
+      <v-card-title class="pa-0">SSH keys</v-card-title>
+    </v-card>
+    <v-alert type="info"> Multiple keys support is coming up soon </v-alert>
 
-  <v-alert type="info"> Multiple keys support is coming up soon </v-alert>
+    <v-card class="mt-3 mb-1" color="transparent">
+      <v-col class="px-0 d-flex justify-end">
+        <v-btn
+          class="mr-2"
+          @click="() => openDialog(SSHCreationMethod.Import)"
+          prepend-icon="mdi-key-plus"
+          color="secondary"
+          :disabled="loading || deleting || generatingSSH || savingKey || activating"
+        >
+          Import
+        </v-btn>
 
-  <v-card class="mb-3 pa-3" color="transparent">
-    <v-col class="d-flex justify-end">
-      <v-btn
-        class="mr-2"
-        @click="() => openDialog(SSHCreationMethod.Import)"
-        prepend-icon="mdi-key-plus"
-        color="secondary"
-        :disabled="loading || deleting || generatingSSH || savingKey || activating"
-      >
-        Import
-      </v-btn>
+        <v-btn
+          @click="exportAllKeys"
+          class="mr-2"
+          prepend-icon="mdi-export"
+          color="secondary"
+          :disabled="
+            !allKeys ||
+            allKeys.length === 0 ||
+            loading ||
+            deleting ||
+            generatingSSH ||
+            savingKey ||
+            isExporting ||
+            activating
+          "
+          :loading="isExporting"
+        >
+          Export all
+        </v-btn>
 
-      <v-btn
-        @click="exportAllKeys"
-        class="mr-2"
-        prepend-icon="mdi-export"
-        color="secondary"
-        :disabled="
-          !allKeys ||
-          allKeys.length === 0 ||
-          loading ||
-          deleting ||
-          generatingSSH ||
-          savingKey ||
-          isExporting ||
-          activating
-        "
-        :loading="isExporting"
-      >
-        Export all
-      </v-btn>
+        <v-btn
+          class=""
+          variant="elevated"
+          :disabled="loading || deleting || generatingSSH || savingKey || activating"
+          @click="openDialog(SSHCreationMethod.Generate)"
+          prepend-icon="mdi-key-plus"
+        >
+          Generate
+        </v-btn>
+      </v-col>
+    </v-card>
 
-      <v-btn
-        class="mr-2"
-        variant="elevated"
-        :disabled="loading || deleting || generatingSSH || savingKey || activating"
-        @click="openDialog(SSHCreationMethod.Generate)"
-        prepend-icon="mdi-key-plus"
-      >
-        Generate
-      </v-btn>
-    </v-col>
-  </v-card>
+    <ssh-table
+      @delete="deleteKey"
+      @view="viewSelectedKey"
+      @export="exportSelectedKeys"
+      @update:activation="updateActivation"
+      :ssh-keys="allKeys"
+      :loading="loading"
+      :loading-message="tableLoadingMessage"
+      :deleting="deleting"
+    />
 
-  <ssh-table
-    @delete="deleteKey"
-    @view="viewSelectedKey"
-    @export="exportSelectedKeys"
-    @update:activation="updateActivation"
-    :ssh-keys="allKeys"
-    :loading="loading"
-    :loading-message="tableLoadingMessage"
-    :deleting="deleting"
-  />
+    <!-- Dialogs -->
+    <!-- Generate -->
+    <ssh-form-dialog
+      v-if="dialogType === SSHCreationMethod.Generate"
+      :open="dialogType === SSHCreationMethod.Generate"
+      :all-keys="allKeys"
+      :dialog-type="dialogType"
+      :generating="generatingSSH"
+      :saving-key="savingKey"
+      @save="addKey($event)"
+      @close="closeDialog"
+      @generate="generateSSHKeys($event)"
+    />
 
-  <!-- Dialogs -->
-  <!-- Generate -->
-  <ssh-form-dialog
-    v-if="dialogType === SSHCreationMethod.Generate"
-    :open="dialogType === SSHCreationMethod.Generate"
-    :all-keys="allKeys"
-    :dialog-type="dialogType"
-    :generating="generatingSSH"
-    :saving-key="savingKey"
-    @save="addKey($event)"
-    @close="closeDialog"
-    @generate="generateSSHKeys($event)"
-  />
+    <!-- Import -->
+    <ssh-form-dialog
+      v-if="dialogType === SSHCreationMethod.Import"
+      :open="dialogType === SSHCreationMethod.Import"
+      :all-keys="allKeys"
+      :dialog-type="dialogType"
+      :generating="generatingSSH"
+      :saving-key="savingKey"
+      @save="addKey($event)"
+      @close="closeDialog"
+      @generate="generateSSHKeys($event)"
+    />
 
-  <!-- Import -->
-  <ssh-form-dialog
-    v-if="dialogType === SSHCreationMethod.Import"
-    :open="dialogType === SSHCreationMethod.Import"
-    :all-keys="allKeys"
-    :dialog-type="dialogType"
-    :generating="generatingSSH"
-    :saving-key="savingKey"
-    @save="addKey($event)"
-    @close="closeDialog"
-    @generate="generateSSHKeys($event)"
-  />
-
-  <!-- View -->
-  <ssh-data-dialog
-    :open="isViewKey"
-    :all-keys="allKeys"
-    :selected-key="selectedKey"
-    @close="isViewKey = false"
-    @update="updateKeys"
-  />
+    <!-- View -->
+    <ssh-data-dialog
+      :open="isViewKey"
+      :all-keys="allKeys"
+      :selected-key="selectedKey"
+      @close="isViewKey = false"
+      @update="updateKeys"
+    />
+  </view-layout>
 </template>
 
 <script lang="ts" setup>
