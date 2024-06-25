@@ -6,9 +6,10 @@ import type { jsPDF } from "jspdf";
 import moment from "moment";
 
 import { gqlClient } from "@/clients";
+import type { GridProxyRequestConfig } from "@/types";
 
+import { getNode } from "./get_nodes";
 import type { CloudUnits, Fixup, Minting } from "./mintings";
-
 export interface NodeInterface extends GridNode {
   extraFee: number;
   rentContractId: number;
@@ -62,12 +63,20 @@ export async function getNodeAvailability(nodeId: number) {
   const secondsSinceEpoch = Math.round(Date.now() / 1000);
   const secondsSinceCurrentPeriodStart = (secondsSinceEpoch - FIRST_PERIOD_START_TIMESTAMP) % STANDARD_PERIOD_DURATION;
   const currentPeriodStartTimestamp = secondsSinceEpoch - secondsSinceCurrentPeriodStart;
-
+  const nodeOptions: GridProxyRequestConfig = {
+    loadTwin: false,
+    loadFarm: false,
+    loadStats: false,
+    loadGpu: false,
+  };
   const res = await gqlClient.uptimeEvents(
     { timestamp: true, uptime: true },
     {
       orderBy: ["timestamp_ASC"],
-      where: { nodeID_eq: nodeId, timestamp_gt: currentPeriodStartTimestamp as unknown as bigint },
+      where: {
+        nodeID_eq: nodeId,
+        timestamp_gt: currentPeriodStartTimestamp as unknown as bigint,
+      },
     },
   );
 
@@ -79,7 +88,10 @@ export async function getNodeAvailability(nodeId: number) {
     console.log(
       `getNodeAvailability: Node ${nodeId} didn't send uptime events for the last ${secondsSinceCurrentPeriodStart} seconds.`,
     );
-    return { downtime: secondsSinceCurrentPeriodStart, currentPeriod: secondsSinceCurrentPeriodStart };
+    return {
+      downtime: secondsSinceCurrentPeriodStart,
+      currentPeriod: secondsSinceCurrentPeriodStart,
+    };
   }
 
   const fakeDataPoint = { timestamp: currentPeriodStartTimestamp, uptime: 0 };
@@ -100,8 +112,10 @@ export async function getNodeAvailability(nodeId: number) {
   if (elapsedSinceLastUptimeEvent >= UPTIME_EVENTS_INTERVAL) {
     time += elapsedSinceLastUptimeEvent;
   }
+
+  const { status }: GridNode = await getNode(nodeId, nodeOptions);
   console.log(
-    `getNodeAvailability: Node ${nodeId} was down for ${time} seconds in the last ${secondsSinceCurrentPeriodStart} seconds.`,
+    `getNodeAvailability: Node ${nodeId} was ${status} for ${time} seconds in the last ${secondsSinceCurrentPeriodStart} seconds.`,
   );
   return { downtime: time, currentPeriod: secondsSinceCurrentPeriodStart };
 }
