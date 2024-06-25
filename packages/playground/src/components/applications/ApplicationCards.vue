@@ -1,6 +1,6 @@
 <template>
   <v-row>
-    <v-col v-for="card in cards" :key="card.title" cols="12" sm="12" md="12" lg="6">
+    <v-col v-for="card in cards" :key="card.title" cols="12" sm="12" md="12" lg="6" xl="4">
       <router-link :to="card.route">
         <v-hover>
           <template v-slot:default="{ isHovering, props }">
@@ -25,7 +25,6 @@
                 <v-chip v-for="tag in card.tags" :key="tag" class="ml-2 pulse-animation">
                   {{ tag }}
                 </v-chip>
-                <v-chip v-if="card.flare" class="ml-2 pulse-animation"> Community </v-chip>
               </v-card-title>
               <v-card-text class="mt-2"> {{ card.excerpt }} </v-card-text>
             </v-card>

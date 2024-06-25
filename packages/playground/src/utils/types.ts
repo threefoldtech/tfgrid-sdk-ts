@@ -20,6 +20,5 @@ export interface ApplicationCard {
   excerpt: string;
   icon: string;
   route: string;
-  flare?: string;
   tags?: string[];
 }
