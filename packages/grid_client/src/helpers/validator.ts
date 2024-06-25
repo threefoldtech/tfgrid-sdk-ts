@@ -53,7 +53,7 @@ function Validate(options?: ValidationOptions): ClassDecorator {
 
     return class extends target {
       constructor(...args: any[]) {
-        super(args);
+        super(...args);
 
         const props = _getProps(this, _options);
         for (const prop of props) {
