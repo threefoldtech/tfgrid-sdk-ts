@@ -205,16 +205,17 @@
           <span>
             <v-spacer />
             <v-data-table
-              class="px-5 my-5 rounded-lg"
+              class="my-5 rounded-lg"
               hover
               :headers="discountPackagesHeaders"
               :items="discountPackagesItems"
               disable-sort="true"
+              density="compact"
             >
               <template #bottom></template>
             </v-data-table>
-            <v-spacer />
-            <ul class="pl-2 py-5">
+            <v-divider class="pt-3" />
+            <ul class="pl-5 py-5">
               <li>
                 {{ rentedByUser ? "You receive " : "You'll receive " }} a
                 <strong class="mr-1">50%</strong>
@@ -230,10 +231,21 @@
                 <a target="_blank" :href="manual?.discount_levels"> staking discounts </a>
               </li>
             </ul>
-            <v-divider />
-
-            <p>Price after discount \t</p>
-            <p>Price before discount \t 44</p>
+            <v-divider class="py-3" />
+            <v-table density="compact" class="mb-3" :hide-default="true">
+              <tbody>
+                <tr>
+                  <td>Price after discount</td>
+                  <td>{{ monthlyPriceAfterDiscount }}$/month</td>
+                  <td>{{ hourlyPriceAfterDiscount }}$/hr</td>
+                </tr>
+                <tr>
+                  <td>Price before discount</td>
+                  <td class="text-decoration-line-through">{{ price_usd?.toFixed(2) }} $/month</td>
+                  <td class="text-decoration-line-through">{{ (price_usd! / 24 / 30).toFixed(2) }} $/hr</td>
+                </tr>
+              </tbody>
+            </v-table>
           </span>
         </v-tooltip>
 
@@ -489,9 +501,28 @@ export default {
       { name: "Silver", discount: -40, tfts: 600 },
       { name: "Gold", discount: -60, tfts: 1000 },
     ];
-    const sortPackages = [{ key: "name" }];
+    const monthlyPriceAfterDiscount = computed(() => {
+      if (price_usd.value) {
+        if (stakingDiscount.value) {
+          return (price_usd.value - 0.5 * price_usd.value - stakingDiscount.value * price_usd.value).toFixed(2);
+        }
+        return (price_usd.value - 0.5 * price_usd.value).toFixed(2);
+      }
+      return null;
+    });
+    const hourlyPriceAfterDiscount = computed(() => {
+      if (price_usd.value) {
+        const hourlyPrice = price_usd.value / 24 / 30;
+        if (stakingDiscount.value) {
+          return (hourlyPrice - 0.5 * hourlyPrice - stakingDiscount.value * hourlyPrice).toFixed(2);
+        }
+        return (hourlyPrice - 0.5 * hourlyPrice).toFixed(2);
+      }
+      return null;
+    });
     return {
-      sortPackages,
+      hourlyPriceAfterDiscount,
+      monthlyPriceAfterDiscount,
       discountPackagesHeaders,
       discountPackagesItems,
       cruText,
