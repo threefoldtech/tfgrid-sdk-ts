@@ -193,7 +193,9 @@ export default {
     const gridStore = useGrid();
     const _loadedNodes = ref<NodeInfo[]>([]);
     const loadedNodes = computed(() => {
-      return _loadedNodes.value.filter(node => isNodeValid(node, props.selectedMachines, filters.value));
+      return _loadedNodes.value.filter(
+        node => node.nodeId === props.modelValue?.nodeId || isNodeValid(node, props.selectedMachines, filters.value),
+      );
     });
     const nodesTask = useAsync(loadValidNodes, {
       shouldRun: () => props.validFilters,
