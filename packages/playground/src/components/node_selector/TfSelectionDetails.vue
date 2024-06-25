@@ -22,6 +22,7 @@
           <TfSelectFarm :valid-filters="validFilters" :filters="filters" :location="location" v-model="farm" />
           <TfAutoNodeSelector
             :selected-machines="selectedMachines"
+            :nodes-lock="nodesLock"
             :valid-filters="validFilters"
             :filters="filters"
             :location="location"
@@ -33,6 +34,7 @@
 
         <TfManualNodeSelector
           :selected-machines="selectedMachines"
+          :nodes-lock="nodesLock"
           :valid-filters="validFilters"
           :filters="filters"
           v-model="node"
@@ -69,6 +71,7 @@
 <script lang="ts">
 import type { FarmInfo, GPUCardInfo, NodeInfo } from "@threefold/grid_client";
 import { NodeStatus } from "@threefold/gridproxy_client";
+import type AwaitLock from "await-lock";
 import noop from "lodash/fp/noop.js";
 import type { DeepPartial } from "utility-types";
 import { computed, getCurrentInstance, onMounted, onUnmounted, type PropType, ref, watch } from "vue";
@@ -113,6 +116,7 @@ export default {
       type: Array as PropType<SelectedMachine[]>,
       default: () => [],
     },
+    nodesLock: Object as PropType<AwaitLock>,
   },
   emits: {
     "update:model-value": (value: SelectionDetails) => true || value,

@@ -53,6 +53,7 @@
 
 <script lang="ts">
 import type { NodeInfo } from "@threefold/grid_client";
+import type AwaitLock from "await-lock";
 import isInt from "validator/lib/isInt";
 import { onUnmounted, type PropType, ref, watch } from "vue";
 
@@ -62,7 +63,7 @@ import { ValidatorStatus } from "../../hooks/form_validator";
 import { useGrid } from "../../stores";
 import type { SelectedMachine, SelectionDetailsFilters } from "../../types/nodeSelector";
 import { normalizeError } from "../../utils/helpers";
-import { checkNodeCapacityPool, nodesLock, resolveAsync, validateRentContract } from "../../utils/nodeSelector";
+import { checkNodeCapacityPool, resolveAsync, validateRentContract } from "../../utils/nodeSelector";
 import TfNodeDetailsCard from "./TfNodeDetailsCard.vue";
 
 const _defaultError =
@@ -83,6 +84,7 @@ export default {
       type: Array as PropType<SelectedMachine[]>,
       required: true,
     },
+    nodesLock: Object as PropType<AwaitLock>,
   },
   emits: {
     "update:model-value": (node?: NodeInfo) => true || node,
@@ -203,12 +205,12 @@ export default {
         onReset: bindStatus,
         shouldRun: () => props.validFilters,
         async onBeforeTask() {
-          await nodesLock.acquireAsync();
+          await props.nodesLock?.acquireAsync();
           bindStatus(ValidatorStatus.Pending);
         },
         onAfterTask: ({ data }) => {
           bindStatus(data ? ValidatorStatus.Valid : ValidatorStatus.Invalid);
-          nodesLock.release();
+          props.nodesLock?.release();
         },
       },
     );

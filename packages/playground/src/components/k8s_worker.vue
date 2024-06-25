@@ -85,6 +85,7 @@
 
     <TfSelectionDetails
       :selected-machines="selectedMachines"
+      :nodes-lock="nodesLock"
       :filters-validators="{
         memory: { min: 1024 },
         rootFilesystemSize: { min: rootFs($props.modelValue.cpu ?? 0, $props.modelValue.memory ?? 0) },
@@ -104,6 +105,7 @@
 </template>
 
 <script lang="ts">
+import type AwaitLock from "await-lock";
 import { computed, type PropType } from "vue";
 
 import type { SelectedMachine } from "@/types/nodeSelector";
@@ -157,6 +159,7 @@ export default {
       type: Array as PropType<K8SWorker[]>,
       default: () => [],
     },
+    nodesLock: Object as PropType<AwaitLock>,
   },
   setup(props) {
     const selectedMachines = computed(() => {

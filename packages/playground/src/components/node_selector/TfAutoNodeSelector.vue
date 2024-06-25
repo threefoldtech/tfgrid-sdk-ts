@@ -144,6 +144,7 @@
 <script lang="ts">
 import type { FarmInfo, FilterOptions, NodeInfo } from "@threefold/grid_client";
 import { RequestError } from "@threefold/types";
+import type AwaitLock from "await-lock";
 import equals from "lodash/fp/equals.js";
 import { computed, nextTick, onMounted, onUnmounted, type PropType, ref } from "vue";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -160,7 +161,6 @@ import {
   loadValidNodes,
   normalizeNodeFilters,
   normalizeNodeOptions,
-  releaseLoadValidNodesLock,
   selectValidNode,
   validateRentContract,
 } from "../../utils/nodeSelector";
@@ -183,6 +183,7 @@ export default {
       type: Array as PropType<SelectedMachine[]>,
       required: true,
     },
+    nodesLock: Object as PropType<AwaitLock>,
   },
   emits: {
     "update:model-value": (node?: NodeInfo) => true || node,
@@ -216,7 +217,7 @@ export default {
         bindModelValue(node);
         nodeInputValidateTask.value.run(node);
       } else {
-        releaseLoadValidNodesLock();
+        props.nodesLock?.release();
       }
     }
 
@@ -226,7 +227,7 @@ export default {
     const options = computed(() => normalizeNodeOptions(gridStore, props.location, pagination, props.farm));
     const filters = computed(() => normalizeNodeFilters(props.filters, options.value));
 
-    const reloadNodes = () => nodesTask.value.run(gridStore, props.filters, filters.value, pagination);
+    const reloadNodes = () => nodesTask.value.run(gridStore, props.filters, filters.value, pagination, props.nodesLock);
     const loadingError = computed(() => {
       if (!nodesTask.value.error) return "";
       if (nodesTask.value.error instanceof RequestError) return "Failed to fetch nodes due to a network error";
@@ -287,7 +288,7 @@ export default {
           const rentContractValid = props.filters.dedicated ? await validateRentContract(gridStore, node) : true;
           return nodeCapacityValid && rentContractValid;
         } finally {
-          releaseLoadValidNodesLock();
+          props.nodesLock?.release();
         }
       },
       {
