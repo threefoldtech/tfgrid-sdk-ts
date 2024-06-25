@@ -125,7 +125,7 @@ async function deploy() {
     ? selectionDetails.value.domain.customDomain
     : subdomain + "." + selectionDetails.value?.domain?.selectedDomain?.publicConfig.domain;
 
-  let vm: VM;
+  let vm: VM[];
 
   try {
     layout.value?.validateSSH();
@@ -166,30 +166,29 @@ async function deploy() {
         },
       ],
     });
+    if (!selectionDetails.value?.domain?.enableSelectedDomain) {
+      vm[0].customDomain = selectionDetails.value?.domain?.customDomain;
+      finalize(vm);
+      return;
+    }
+
+    try {
+      layout.value.setStatus("deploy", "Preparing to deploy gateway...");
+      await deployGatewayName(grid, selectionDetails.value.domain, {
+        subdomain,
+        ip: vm[0].interfaces[0].ip,
+        port: 34416,
+        network: vm[0].interfaces[0].network,
+      });
+
+      finalize(vm);
+    } catch (e) {
+      layout.value.setStatus("deploy", "Rollbacking back due to fail to deploy gateway...");
+
+      await rollbackDeployment(grid!, name.value);
+      layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Node Pilot instance."));
+    }
   } catch (e) {
-    layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Node Pilot instance."));
-  }
-
-  if (!selectionDetails.value?.domain?.enableSelectedDomain) {
-    vm[0].customDomain = selectionDetails.value?.domain?.customDomain;
-    finalize(vm);
-    return;
-  }
-
-  try {
-    layout.value.setStatus("deploy", "Preparing to deploy gateway...");
-    await deployGatewayName(grid, selectionDetails.value.domain, {
-      subdomain,
-      ip: vm[0].interfaces[0].ip,
-      port: 34416,
-      network: vm[0].interfaces[0].network,
-    });
-
-    finalize(vm);
-  } catch (e) {
-    layout.value.setStatus("deploy", "Rollbacking back due to fail to deploy gateway...");
-
-    await rollbackDeployment(grid!, name.value);
     layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Node Pilot instance."));
   }
 }
@@ -210,7 +209,7 @@ import type { SelectionDetails } from "../types/nodeSelector";
 import { deployGatewayName, getSubdomain, rollbackDeployment } from "../utils/gateway";
 import { updateGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
-import { VM } from "../utils/types";
+import type { VM } from "../utils/types";
 
 export default {
   name: "NodePilot",

@@ -27,6 +27,7 @@ export interface VM {
   publicIP: string;
   planetary: string;
   myceliumIP: string;
+  customDomain?: string;
   interfaces: {
     network: string;
     ip: string;
@@ -45,4 +46,7 @@ export interface VM {
   rootfs_size: number;
   corex: boolean;
   gpu: any[];
+  deploymentName: string;
+  projectName: string;
+  wireguard: string;
 }
