@@ -236,13 +236,21 @@
               <tbody>
                 <tr>
                   <td>Price after discount</td>
-                  <td>{{ monthlyPriceAfterDiscount }}$/month</td>
-                  <td>{{ hourlyPriceAfterDiscount }}$/hr</td>
+                  <td>
+                    <strong>{{ monthlyPriceAfterDiscount }}$/month</strong>
+                  </td>
+                  <td>
+                    <strong>{{ hourlyPriceAfterDiscount }}$/hr</strong>
+                  </td>
                 </tr>
                 <tr>
                   <td>Price before discount</td>
-                  <td class="text-decoration-line-through">{{ price_usd?.toFixed(2) }} $/month</td>
-                  <td class="text-decoration-line-through no-border">{{ (price_usd! / 24 / 30).toFixed(2) }} $/hr</td>
+                  <td class="text-decoration-line-through">
+                    <strong>{{ price_usd?.toFixed(2) }} $/month</strong>
+                  </td>
+                  <td class="text-decoration-line-through no-border">
+                    <strong>{{ (price_usd! / 24 / 30).toFixed(2) }} $/hr</strong>
+                  </td>
                 </tr>
               </tbody>
             </v-table>
