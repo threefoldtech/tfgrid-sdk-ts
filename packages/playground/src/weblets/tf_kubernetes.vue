@@ -73,8 +73,8 @@
           <K8SWorker
             v-model="workers[index]"
             :other-workers="[workers, master].flat(1).filter((_, i) => i !== index)"
+            :nodes-lock="nodesLock"
           />
-          <!-- :nodes-lock="nodesLock" -->
         </ExpandableLayout>
       </template>
     </d-tabs>
