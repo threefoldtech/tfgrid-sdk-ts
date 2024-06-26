@@ -53,6 +53,14 @@ class GridClient {
 
   readonly _mnemonic: string;
 
+  /**
+   * The `GridClient` class is a main entry point for interacting with the Grid.
+   * It provides methods to connect to the `chain`, manage node resources, and interact with various modules.
+   *
+   * Initializes a new instance of the `GridClient` class.
+   *
+   * @param {ClientOptions} clientOptions - The client options for configuring the Grid client.
+   */
   constructor(public clientOptions: ClientOptions) {
     if (!clientOptions.storeSecret && validateMnemonic(clientOptions.mnemonic)) {
       this._mnemonic = clientOptions.mnemonic;
@@ -86,6 +94,17 @@ class GridClient {
       throw new GridClientError(`Unknown NETWORK selected! Acceptable networks are [dev | qa | test | main ]`);
     }
   }
+
+  /**
+   * Connects to the Grid based on the network, could be [`devnet`, `qanet`, `testnet`, `mainnet`].
+   *
+   * This method sets up the necessary clients for interacting with the Grid,
+   * establishes connections, and performs key migrations if required.
+   *
+   * @returns {Promise<void>} A promise that resolves when the connection is established.
+   *
+   * @throws {TwinNotExistError} If the twin for the provided mnemonic does not exist on the network.
+   */
   async connect(): Promise<void> {
     const urls = this.getDefaultUrls(this.clientOptions.network);
 
@@ -120,6 +139,11 @@ class GridClient {
     await migrateKeysEncryption.apply(this, [GridClient]);
   }
 
+  /**
+   * Internal method to initialize the client configuration and modules.
+   *
+   * This method is called internally to set up the configuration and instantiate the modules.
+   */
   _connect(): void {
     const urls = this.getDefaultUrls(this.clientOptions.network);
     const storePath = PATH.join(appPath, this.clientOptions.network, String(this.twinId));
@@ -152,6 +176,15 @@ class GridClient {
     }
   }
 
+  /**
+   * Tests the connection URLs to ensure they are reachable.
+   *
+   * @param {Record<string, string>} urls - The URLs to test.
+   *
+   * @returns {Promise<void>} A promise that resolves when the URLs are successfully tested.
+   *
+   * @throws {Error} If any of the URLs fail to connect.
+   */
   async testConnectionUrls(urls: Record<string, string>): Promise<void> {
     try {
       await send("get", urlJoin(urls.rmbProxy, "version"), "", {});
@@ -171,6 +204,13 @@ class GridClient {
     }
   }
 
+  /**
+   * Gets the default URLs for the specified network environment.
+   *
+   * @param {NetworkEnv} network - The network environment.
+   *
+   * @returns {Record<string, string>} The default URLs for the network environment.
+   */
   getDefaultUrls(network: NetworkEnv): Record<string, string> {
     const base = network === NetworkEnv.main ? "grid.tf" : `${network}.grid.tf`;
     const { proxyURL, relayURL, substrateURL, graphqlURL, activationURL } = this.clientOptions;
@@ -185,18 +225,33 @@ class GridClient {
     return urls;
   }
 
+  /**
+   * Disconnects from the Grid clients.
+   *
+   * This method disconnects the RMB and TF clients, terminating the connection to the Grid network.
+   *
+   * @returns {Promise<void>} A promise that resolves when the disconnection is complete.
+   */
   async disconnect(): Promise<void> {
     if (this.rmbClient) await this.rmbClient.disconnect();
     if (this.tfclient) await this.tfclient.disconnect();
   }
 
-  async invoke(message, args) {
+  /**
+   * Invokes a method on a specified module with the provided arguments.
+   *
+   * This method allows dynamic invocation of module methods by specifying the module and method names.
+   *
+   * @param {string} message - The message specifying the module and method.
+   * @param {string} args - The args of the module.
+   */
+  async invoke(message: string, args: any) {
     const namespaces = message.split(".");
     if (namespaces.length > 2) {
       throw new ValidationError(`Message must include 2 parts only not ${namespaces.length}.`);
     }
 
-    const method = namespaces.pop();
+    const method = namespaces.pop() as string;
 
     const module_name = namespaces[0];
     if (!this.modules.includes(module_name)) {
