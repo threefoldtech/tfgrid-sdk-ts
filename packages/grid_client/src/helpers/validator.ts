@@ -36,7 +36,7 @@ interface ValidationOptions {
   methods?: boolean | string | string[];
 }
 
-function Validate(options?: ValidationOptions): ClassDecorator {
+function ValidateMembers(options?: ValidationOptions): ClassDecorator {
   const _options = _normalizeValidationOptions(options);
   return (target: any): any => {
     const methods = _getMethods(target, _options);
@@ -64,13 +64,13 @@ function Validate(options?: ValidationOptions): ClassDecorator {
             enumerable: true,
             get: () => _value,
             set(value) {
+              _value = value;
               const errors = validateSync(this);
               for (const error of errors) {
                 if (error.property === prop) {
                   throw error;
                 }
               }
-              _value = value;
             },
           });
         }
@@ -133,4 +133,4 @@ function _getMethods(ctor: any, options: Required<ValidationOptions>): string[] 
   return [];
 }
 
-export { validateObject, validateInput, validateHexSeed, type ValidationOptions, Validate };
+export { validateObject, validateInput, validateHexSeed, type ValidationOptions, ValidateMembers };
