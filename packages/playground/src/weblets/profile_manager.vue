@@ -117,87 +117,90 @@
               >
                 <!-- Mnemonic Input -->
                 <template #activator="{ props: tooltipProps }">
-                  <PasswordInputWrapper #="{ props: passwordInputProps }">
-                    <InputValidator
-                      :value="mnemonic"
-                      :rules="[
-                        validators.required('Mnemonic or Hex Seed is required.'),
-                        v => {
-                          clearError();
-                          if (
-                            validateMnemonic(v) ||
-                            ((v.length === 64 || v.length === 66) && isAddress(v.length === 66 ? v : `0x${v}`))
-                          ) {
-                            return;
-                          }
-                          return {
-                            message: 'Mnemonic or Hex Seed doesn\'t seem to be valid.',
-                          };
-                        },
-                      ]"
-                      valid-message="Mnemonic or Hex Seed is valid."
-                      #="{ props: validationProps }"
-                      ref="mnemonicInput"
-                    >
-                      <v-row>
-                        <v-col cols="12" md="9">
-                          <div v-bind="tooltipProps">
-                            <VTextField
-                              :append-icon="!enableReload && !activatingAccount && mnemonic !== '' ? 'mdi-reload' : ''"
-                              label="Mnemonic or Hex Seed"
-                              placeholder="Please insert your Mnemonic or Hex Seed"
-                              v-model="mnemonic"
-                              v-bind="{
-                                ...passwordInputProps,
-                                ...validationProps,
-                              }"
-                              :disabled="creatingAccount || activatingAccount || activating"
-                              @click:append="reloadValidation"
-                              autocomplete="off"
-                            >
-                              <template v-slot:prepend-inner v-if="validationProps.hint || validationProps.error">
-                                <v-icon :color="validationProps.error ? 'red' : 'green'">
-                                  {{ validationProps.error ? "mdi-close" : "mdi-check" }}
-                                </v-icon>
-                              </template></VTextField
-                            >
-                          </div>
-                        </v-col>
-                        <v-col cols="12" md="3">
-                          <v-tooltip
-                            location="top"
-                            text="Using different keypair types will lead to a completely different account."
+                  <InputValidator
+                    :value="mnemonic"
+                    :rules="[
+                      validators.required('Mnemonic or Hex Seed is required.'),
+                      v => {
+                        clearError();
+                        if (
+                          validateMnemonic(v) ||
+                          ((v.length === 64 || v.length === 66) && isAddress(v.length === 66 ? v : `0x${v}`))
+                        ) {
+                          return;
+                        }
+                        return {
+                          message: 'Mnemonic or Hex Seed doesn\'t seem to be valid.',
+                        };
+                      },
+                    ]"
+                    valid-message="Mnemonic or Hex Seed is valid."
+                    #="{ props: validationProps }"
+                    ref="mnemonicInput"
+                  >
+                    <v-row>
+                      <v-col cols="12" md="9">
+                        <div v-bind="tooltipProps">
+                          <VTextField
+                            :type="showMnemonic ? 'text' : 'password'"
+                            :append-icon="!enableReload && !activatingAccount && mnemonic !== '' ? 'mdi-reload' : ''"
+                            label="Mnemonic or Hex Seed"
+                            placeholder="Please insert your Mnemonic or Hex Seed"
+                            v-model="mnemonic"
+                            v-bind="{
+                              ...validationProps,
+                            }"
+                            :disabled="creatingAccount || activatingAccount || activating"
+                            @click:append="reloadValidation"
+                            autocomplete="off"
                           >
-                            <template #activator="{ props }">
-                              <v-autocomplete
-                                label="Keypair Type"
-                                v-bind="props"
-                                :items="[...keyType]"
-                                item-title="name"
-                                v-model="keypairType"
-                                v-if="activeTab === 1"
-                              />
+                            <template v-slot:prepend-inner v-if="validationProps.hint || validationProps.error">
+                              <v-icon :color="validationProps.error ? 'red' : 'green'">
+                                {{ validationProps.error ? "mdi-close" : "mdi-check" }}
+                              </v-icon>
                             </template>
-                          </v-tooltip>
-                        </v-col>
-                      </v-row>
-
-                      <div class="d-flex flex-column flex-md-row justify-end mb-10">
-                        <VBtn
-                          class="mt-2 ml-3"
-                          color="secondary"
-                          variant="outlined"
-                          :disabled="
-                            isValidForm || !!mnemonic || shouldActivateAccount || keypairType === KeypairType.ed25519
-                          "
-                          :loading="creatingAccount"
-                          @click="openAcceptTerms = termsLoading = true"
+                            <template v-slot:append-inner>
+                              <v-icon tabindex="-1" @click="showMnemonic = !showMnemonic">
+                                {{ showMnemonic ? "mdi-eye-outline" : "mdi-eye-off-outline" }}
+                              </v-icon>
+                            </template>
+                          </VTextField>
+                        </div>
+                      </v-col>
+                      <v-col cols="12" md="3">
+                        <v-tooltip
+                          location="top"
+                          text="Using different keypair types will lead to a completely different account."
                         >
-                          create account
-                        </VBtn>
-                      </div>
-                    </InputValidator>
-                  </PasswordInputWrapper>
+                          <template #activator="{ props }">
+                            <v-autocomplete
+                              label="Keypair Type"
+                              v-bind="props"
+                              :items="[...keyType]"
+                              item-title="name"
+                              v-model="keypairType"
+                              v-if="activeTab === 1"
+                            />
+                          </template>
+                        </v-tooltip>
+                      </v-col>
+                    </v-row>
+
+                    <div class="d-flex flex-column flex-md-row justify-end mb-10">
+                      <VBtn
+                        class="mt-2 ml-3"
+                        color="secondary"
+                        variant="outlined"
+                        :disabled="
+                          isValidForm || !!mnemonic || shouldActivateAccount || keypairType === KeypairType.ed25519
+                        "
+                        :loading="creatingAccount"
+                        @click="openAcceptTerms = termsLoading = true"
+                      >
+                        create account
+                      </VBtn>
+                    </div>
+                  </InputValidator>
                 </template>
               </VTooltip>
 
@@ -263,55 +266,65 @@
               </input-validator>
 
               <!-- Password Input -->
-              <PasswordInputWrapper #="{ props: passwordInputProps }">
-                <InputValidator
-                  :value="password"
-                  :rules="[
-                    validators.required('Password is required.'),
-                    validators.minLength('Password must be at least 6 characters.', 6),
-                    validatePassword,
-                  ]"
-                  #="{ props: validationProps }"
-                  ref="passwordInput"
+              <InputValidator
+                :value="password"
+                :rules="[
+                  validators.required('Password is required.'),
+                  validators.minLength('Password must be at least 6 characters.', 6),
+                  validatePassword,
+                ]"
+                #="{ props: validationProps }"
+                ref="passwordInput"
+              >
+                <v-tooltip
+                  location="top right"
+                  text="Used to encrypt your mnemonic on your local system, and is used to login from the same device."
                 >
-                  <v-tooltip
-                    location="top right"
-                    text="Used to encrypt your mnemonic on your local system, and is used to login from the same device."
-                  >
-                    <template #activator="{ props: tooltipProps }">
-                      <div v-bind="tooltipProps">
-                        <VTextField
-                          label="Password"
-                          v-model="password"
-                          v-bind="{ ...passwordInputProps, ...validationProps }"
-                          :disabled="creatingAccount || activatingAccount || activating"
-                          autocomplete="off"
-                        />
-                      </div>
-                    </template>
-                  </v-tooltip>
-                </InputValidator>
-              </PasswordInputWrapper>
+                  <template #activator="{ props: tooltipProps }">
+                    <div v-bind="tooltipProps">
+                      <VTextField
+                        :type="showPassword ? 'text' : 'password'"
+                        label="Password"
+                        v-model="password"
+                        v-bind="{ ...validationProps }"
+                        :disabled="creatingAccount || activatingAccount || activating"
+                        autocomplete="off"
+                      >
+                        <template v-slot:append-inner>
+                          <v-icon tabindex="-1" @click="showPassword = !showPassword">
+                            {{ showPassword ? "mdi-eye-outline" : "mdi-eye-off-outline" }}
+                          </v-icon>
+                        </template></VTextField
+                      >
+                    </div>
+                  </template>
+                </v-tooltip>
+              </InputValidator>
 
-              <PasswordInputWrapper #="{ props: confirmPasswordInputProps }" v-if="activeTab === 1">
-                <InputValidator
-                  :value="confirmPassword"
-                  :rules="[validators.required('A confirmation password is required.'), validateConfirmPassword]"
-                  #="{ props: validationProps }"
-                  ref="confirmPasswordInput"
+              <InputValidator
+                v-if="activeTab === 1"
+                :value="confirmPassword"
+                :rules="[validators.required('A confirmation password is required.'), validateConfirmPassword]"
+                #="{ props: validationProps }"
+                ref="confirmPasswordInput"
+              >
+                <VTextField
+                  :type="showConfirmPassword ? 'text' : 'password'"
+                  label="Confirm Password"
+                  v-model="confirmPassword"
+                  v-bind="{
+                    ...validationProps,
+                  }"
+                  :disabled="creatingAccount || activatingAccount || activating"
+                  autocomplete="off"
                 >
-                  <VTextField
-                    label="Confirm Password"
-                    v-model="confirmPassword"
-                    v-bind="{
-                      ...confirmPasswordInputProps,
-                      ...validationProps,
-                    }"
-                    :disabled="creatingAccount || activatingAccount || activating"
-                    autocomplete="off"
-                  />
-                </InputValidator>
-              </PasswordInputWrapper>
+                  <template v-slot:append-inner>
+                    <v-icon tabindex="-1" @click="showConfirmPassword = !showConfirmPassword">
+                      {{ showConfirmPassword ? "mdi-eye-outline" : "mdi-eye-off-outline" }}
+                    </v-icon>
+                  </template>
+                </VTextField>
+              </InputValidator>
 
               <v-alert type="error" variant="tonal" class="mt-2 mb-4" v-if="loginError">
                 {{ loginError }}
@@ -319,11 +332,14 @@
             </FormValidator>
 
             <div class="d-flex justify-center mt-2">
-              <VBtn color="anchor" variant="outlined" @click="$emit('update:modelValue', false)"> Close </VBtn>
+              <VBtn tabindex="2" color="anchor" variant="outlined" @click="$emit('update:modelValue', false)">
+                Close
+              </VBtn>
               <VBtn
                 class="ml-2"
                 type="submit"
                 color="secondary"
+                tabindex="1"
                 :loading="activating"
                 :disabled="
                   !isValidForm ||
@@ -451,6 +467,9 @@ const keypairType = ref(KeypairType.sr25519);
 const enableReload = ref(true);
 const theme = useTheme();
 const qrCodeText = ref("");
+const showMnemonic = ref(false);
+const showPassword = ref(false);
+const showConfirmPassword = ref(false);
 const props = defineProps({
   modelValue: {
     required: false,

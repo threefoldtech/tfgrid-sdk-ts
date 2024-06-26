@@ -9,13 +9,11 @@ import InputValidator from "./components/input_validator.vue";
 import TfSelectCountry from "./components/node_selector/select_location_internals/TfSelectCountry.vue";
 import TfSelectRegion from "./components/node_selector/select_location_internals/TfSelectRegion.vue";
 import TfSelectionDetails from "./components/node_selector/TfSelectionDetails.vue";
-import PasswordInputWrapper from "./components/password_input_wrapper.vue";
 import ViewLayout from "./components/view_layout.vue";
 import WebletLayout from "./components/weblet_layout.vue";
 import type * as validators from "./utils/validators";
 declare module "@vue/runtime-core" {
   export interface GlobalComponents {
-    PasswordInputWrapper: typeof PasswordInputWrapper;
     WebletLayout: typeof WebletLayout;
     CopyInputWrapper: typeof CopyInputWrapper;
     DTabs: typeof DTabs;
