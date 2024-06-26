@@ -21,6 +21,7 @@
     "es6-build": "tsc --build tsconfig-es6.json"
   },
   "dependencies": {
+    "@jimber/pkid": "1.0.5",
     "@noble/secp256k1": "^1.7.1",
     "@polkadot/api": "^8.9.1",
     "@threefold/tfchain_client": "^2.5.0-rc2",
@@ -29,9 +30,14 @@
     "bip39": "^3.1.0",
     "buffer": "^6.0.3",
     "crypto-js": "^4.1.1",
+    "cypress": "13.12.0",
     "google-protobuf": "^3.21.2",
     "js-crypto-aes": "^1.0.4",
+    "lerna": "8.1.5",
+    "pdfjs-dist": "4.3.136",
+    "stellar-sdk": "12.1.0",
     "uuid": "^8.3.2",
+    "vue3-pdfjs": "0.0.1",
     "ws": "^8.12.0"
   },
   "devDependencies": {
@@ -40,7 +46,7 @@
     "@types/node": "^18.11.18",
     "@types/uuid": "^9.0.0",
     "@types/ws": "^8.5.4",
-    "nodemon": "^2.0.20",
+    "nodemon": "^3.1.4",
     "npm-run-all": "^4.1.5",
     "protoc-gen-ts": "^0.8.5",
     "ts-node": "^10.9.1",
