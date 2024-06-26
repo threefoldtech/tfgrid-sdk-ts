@@ -218,8 +218,8 @@
             >
               <template #bottom></template>
             </v-data-table>
-            <v-divider class="pt-3" />
-            <ul class="pl-5 py-5">
+
+            <ul class="pl-5 py-2">
               <li>
                 {{ rentedByUser ? "You receive " : "You'll receive " }} a
                 <strong class="mr-1">50%</strong>
@@ -235,8 +235,8 @@
                 <a target="_blank" :href="manual?.discount_levels"> staking discounts </a>
               </li>
             </ul>
-            <v-divider class="py-3" />
-            <v-table density="compact" class="mb-3 no-border discount-table" :hide-default="true">
+            <v-divider class="" />
+            <v-table density="compact" class="mb-2 no-border discount-table" :hide-default="true">
               <tbody>
                 <tr class="no-border">
                   <td class="no-border">Price after discount</td>
