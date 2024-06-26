@@ -51,7 +51,7 @@
         :medium="{ cpu: 2, memory: 4, disk: 100 }"
       />
 
-      <Networks v-model:mycelium="mycelium" v-model:planetary="planetary" />
+      <Networks v-model:mycelium="mycelium" v-model:planetary="planetary" v-model:ipv6="ipv6" />
 
       <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
         <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
@@ -64,6 +64,7 @@
       <TfSelectionDetails
         :filters="{
           ipv4,
+          ipv6,
           certified,
           dedicated,
           cpu: solution?.cpu,
@@ -104,6 +105,7 @@ const profileManager = useProfileManager();
 const name = ref(generateName({ prefix: "ss" }));
 const endpoint = ref("");
 const ipv4 = ref(false);
+const ipv6 = ref(false);
 const planetary = ref(false);
 const mycelium = ref(true);
 const solution = ref() as Ref<SolutionFlavor>;
@@ -170,6 +172,7 @@ async function deploy() {
           flist: flist.value,
           entryPoint: flist.entryPoint,
           publicIpv4: ipv4.value,
+          publicIpv6: ipv6.value,
           mycelium: mycelium.value,
           planetary: planetary.value,
           envs: [

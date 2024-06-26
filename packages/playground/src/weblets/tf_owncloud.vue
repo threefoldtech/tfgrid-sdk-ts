@@ -80,7 +80,7 @@
           :medium="{ cpu: 4, memory: 16, disk: 500 }"
           :large="{ cpu: 8, memory: 32, disk: 1000 }"
         />
-        <Networks v-model:ipv4="ipv4" v-model:mycelium="mycelium" />
+        <Networks v-model:ipv4="ipv4" v-model:mycelium="mycelium" v-model:ipv6="ipv6" />
         <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
           <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
         </input-tooltip>
@@ -92,6 +92,7 @@
         <TfSelectionDetails
           :filters="{
             ipv4,
+            ipv6,
             certified,
             dedicated,
             cpu: solution?.cpu,
@@ -150,6 +151,7 @@ const flist: Flist = {
 const dedicated = ref(false);
 const certified = ref(false);
 const ipv4 = ref(false);
+const ipv6 = ref(false);
 const mycelium = ref(true);
 const smtp = ref(createSMTPServer());
 const rootFilesystemSize = computed(() =>
@@ -207,6 +209,7 @@ async function deploy() {
           entryPoint: flist.entryPoint,
           rootFilesystemSize: rootFilesystemSize.value,
           publicIpv4: ipv4.value,
+          publicIpv6: ipv6.value,
           planetary: true,
           mycelium: mycelium.value,
           envs: [
