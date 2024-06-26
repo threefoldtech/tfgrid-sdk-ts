@@ -207,7 +207,11 @@
             <v-data-table
               class="my-5 rounded-lg"
               hover
-              :headers="discountPackagesHeaders"
+              :headers="[
+                { title: 'Packages', align: 'center', key: 'name', sortable: false },
+                { title: 'Discount', align: 'center', key: 'discount', sortable: false },
+                { title: 'TFT needed', align: 'center', key: 'tfts', sortable: false },
+              ]"
               :items="discountPackagesItems"
               disable-sort="true"
               density="compact"
@@ -498,11 +502,7 @@ export default {
         }
       }
     }
-    const discountPackagesHeaders = [
-      { title: "Packages", align: "center", key: "name", sortable: false },
-      { title: "Discount", align: "center", key: "discount", sortable: false },
-      { title: "TFT needed", align: "center", key: "tfts", sortable: false },
-    ];
+
     const discountPackagesItems = [
       { name: "Default", discount: -20, tfts: 200 },
       { name: "Bronze", discount: -30, tfts: 400 },
@@ -531,7 +531,7 @@ export default {
     return {
       hourlyPriceAfterDiscount,
       monthlyPriceAfterDiscount,
-      discountPackagesHeaders,
+
       discountPackagesItems,
       cruText,
       mruText,
