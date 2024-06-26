@@ -504,10 +504,10 @@ export default {
     }
 
     const discountPackagesItems = [
-      { name: "Default", discount: -20, tfts: 200 },
-      { name: "Bronze", discount: -30, tfts: 400 },
-      { name: "Silver", discount: -40, tfts: 600 },
-      { name: "Gold", discount: -60, tfts: 1000 },
+      { name: "Default", discount: "-20%", tfts: 200 },
+      { name: "Bronze", discount: "-30%", tfts: 400 },
+      { name: "Silver", discount: "-40%", tfts: 600 },
+      { name: "Gold", discount: "-60%", tfts: 1000 },
     ];
     const monthlyPriceAfterDiscount = computed(() => {
       if (price_usd.value) {
@@ -531,7 +531,6 @@ export default {
     return {
       hourlyPriceAfterDiscount,
       monthlyPriceAfterDiscount,
-
       discountPackagesItems,
       cruText,
       mruText,
