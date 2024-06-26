@@ -133,26 +133,9 @@ jobs:
           steps.zdb.outcome != 'success' ||
           steps.deleteall.outcome != 'success'
         run: exit 1
-        continue-on-error: true
-
-
-
-      - name: Check for duplicate issues
-        id: check_duplicates
-        uses: wow-actions/potential-duplicates@v1
-        with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          filter: ''
-          exclude: ''
-          label: potential-duplicate
-          state: all
-          threshold: 0.6
-          reactions: 'eyes, confused'
-          comment: >
-            The Tests failed today also.
 
       - name: Create GitHub Issue on Failure
-        if: failure() && steps.check_duplicates.outputs.duplicate == 'false' && '$(date +%u)' != '5' && '$(date +%u)' != '6'
+        if: failure() && '$(date +%u)' != '5' && '$(date +%u)' != '6'
         uses: dacbd/create-issue-action@main
         with:
           token: ${{ github.token }}
