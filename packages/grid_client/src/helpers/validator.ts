@@ -36,6 +36,51 @@ interface ValidationOptions {
   methods?: boolean | string | string[];
 }
 
+/*
+ * <script lang="ts">
+ * import { isLength, isInt } from "class-validator";
+ * // Example 1
+ * @ValidateMembers()
+ * class User {
+ *   @isLength(2) name: string
+ *   @isInt() age: number
+ *
+ * greeting() {
+ * // Some logic
+ * }
+ * }
+ * </script> */
+
+/**
+ * @description
+ * This `ValidateMembers` is a config method which returns back a *classDecrator*
+ * Allows to configure which setter/methods should trigger validation for that specific class
+ *
+ * Example As follow
+ * @example
+ * ```typescript
+ * import { isLength, isInt } from "class-validator";
+ *
+ * // ⁣@ValidateMembers({ props: false, methods: true }) // - disable validation on set props
+ * // ⁣@ValidateMembers({ props: true, methods: false }) // - disable validation on call methods
+ * // ⁣@ValidateMembers({ props: 'name', methods: false }) // - validate only on setting 'name' prop
+ * // And so on...
+ * ⁣@ValidateMembers() // = ⁣@ValidateMembers({ props: true, methods: true })
+ * class User {
+ *   ⁣@isLength(2) name: string
+ *   ⁣⁣@isInt() age: number
+ *
+ *   greeting() {
+ *     // Some logic
+ *   }
+ * }
+ * ```
+ *
+ *
+ *
+ * @param options { ValidationOptions | undefined }
+ * @returns { ClassDecorator }
+ */
 function ValidateMembers(options?: ValidationOptions): ClassDecorator {
   const _options = _normalizeValidationOptions(options);
   return (target: any): any => {
