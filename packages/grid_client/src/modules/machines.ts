@@ -4,10 +4,12 @@ import { Addr } from "netaddr";
 import { GridClientConfig } from "../config";
 import { events } from "../helpers/events";
 import { expose } from "../helpers/expose";
+import { ZmachineData } from "../helpers/types";
 import { validateInput } from "../helpers/validator";
 import { VMHL } from "../high_level/machine";
-import { TwinDeployment } from "../high_level/models";
+import { DeploymentResultContracts, TwinDeployment } from "../high_level/models";
 import { Network } from "../primitives/network";
+import { Deployment } from "../zos";
 import { WorkloadTypes } from "../zos/workload";
 import { BaseModule } from "./base";
 import { AddMachineModel, DeleteMachineModel, MachinesDeleteModel, MachinesGetModel, MachinesModel } from "./models";
@@ -25,11 +27,25 @@ class MachinesModule extends BaseModule {
     WorkloadTypes.zlogs,
   ]; // TODO: remove deprecated
   vm: VMHL;
+  /**
+   * The MachinesModule class is responsible for managing virtual machine deployments.
+   * It extends the BaseModule class and provides methods to deploy, list, get, update, add, and delete machines.
+   *
+   * Initializes the VMHL instance with the provided configuration.
+   *
+   * @param {GridClientConfig} config - The configuration object for the GridClient.
+   */
   constructor(public config: GridClientConfig) {
     super(config);
     this.vm = new VMHL(config);
   }
 
+  /**
+   * Creates a deployment for a set of machines.
+   *
+   * @param {MachinesModel} options - The options for creating the machine deployment.
+   * @returns {Promise<[TwinDeployment[], Network, string]>} - A promise that resolves to an array of twin deployments, the network, and the WireGuard configuration string.
+   */
   async _createDeployment(options: MachinesModel): Promise<[TwinDeployment[], Network, string]> {
     const network = new Network(options.network.name, options.network.ip_range, this.config);
     await network.load();
@@ -88,10 +104,37 @@ class MachinesModule extends BaseModule {
     return [twinDeployments, network, wireguardConfig];
   }
 
+  /**
+   * Deploys a machine or a set of machines.
+   *
+   * @param {MachinesModel} options - The options for deploying the machine(s).
+   * @returns {Promise<{ contracts: any; wireguard_config: string }>} - A promise that resolves to the deployment contracts and WireGuard configuration.
+   *
+   * @example
+   *
+   * const networkOptions = {
+   *   name: "wedtest",
+   *   ip_range: "10.249.0.0/16",
+   * };
+   *
+   * const options: MachinesModel = {
+   *   name: "test",
+   *   network: networkOptions,
+   *   machines: [...],
+   * };
+   *
+   * const result = await MachinesModule.deploy(options);
+   * console.log(result.contracts);
+   *
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   * - `@checkBalance`: Checks the balance before proceeding.
+   */
   @expose
   @validateInput
   @checkBalance
-  async deploy(options: MachinesModel) {
+  async deploy(options: MachinesModel): Promise<{ contracts: any; wireguard_config: string }> {
     if (await this.exists(options.name)) {
       throw new ValidationError(`Another machine deployment with the same name ${options.name} already exists.`);
     }
@@ -102,12 +145,37 @@ class MachinesModule extends BaseModule {
     return { contracts: contracts, wireguard_config: wireguardConfig };
   }
 
+  /**
+   * Lists all machine deployments.
+   *
+   * @returns {Promise<string[]>} - A promise that resolves to a list of the names of machine contracts.
+   *
+   * @example
+   *
+   * const result = await MachinesModule.list();
+   * console.log(result);
+   *
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   */
   @expose
-  async list() {
+  async list(): Promise<string[]> {
     return await this._list();
   }
 
-  async getObj(deploymentName: string) {
+  /**
+   * Retrieves the object representation of a machine deployment.
+   *
+   * @param {string} deploymentName - The name of the deployment to retrieve.
+   * @returns {Promise<ZmachineData[]>} - A promise that resolves to the object representation of the machine deployment.
+   *
+   * @example
+   *
+   * const result = await MachinesModule.getObj("testName");
+   * console.log(result.contracts);
+   *
+   */
+  async getObj(deploymentName: string): Promise<ZmachineData[]> {
     const deployments = await this._get(deploymentName);
     const workloads = await this._getWorkloadsByTypes(deploymentName, deployments, [WorkloadTypes.zmachine]);
     const promises = workloads.map(
@@ -116,24 +184,89 @@ class MachinesModule extends BaseModule {
     return await Promise.all(promises);
   }
 
+  /**
+   * Retrieves a specific machine deployment by name.
+   *
+   * @param {MachinesGetModel} options - The options containing the name of the deployment to retrieve.
+   * @returns {Promise<Deployment[]>} - A promise that resolves to an array of the machine deployments.
+   *
+   * @example
+   *
+   * const options: NetworkAddNodeModel = {
+   *   name: "test",
+   * };
+   *
+   * const result = await MachinesModule.get(options);
+   * console.log(result);
+   *
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   */
   @expose
   @validateInput
-  async get(options: MachinesGetModel) {
+  async get(options: MachinesGetModel): Promise<Deployment[]> {
     return await this._get(options.name);
   }
 
+  /**
+   * Method to delete a machine deployment after validating input and checking balance.
+   * Emits a log event before deleting the machine deployment.
+   *
+   * @param options The options for deleting the machine deployment.
+   * @returns A promise that resolves to an object with information about created, deleted, and updated deployments.
+   *
+   * @example
+   *
+   * const options: NetworkAddNodeModel = {
+   *   name: "test",
+   * };
+   *
+   * const result = await MachinesModule.delete(options);
+   * console.log(result);
+   *
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   * - `@checkBalance`: Checks the balance before proceeding.
+   */
   @expose
   @validateInput
   @checkBalance
-  async delete(options: MachinesDeleteModel) {
+  async delete(options: MachinesDeleteModel): Promise<{ created: never[]; deleted: never[]; updated: never[] }> {
     events.emit("logs", `Start deleting the machine deployment with name ${options.name}`);
     return await this._delete(options.name);
   }
 
+  /**
+   * Method to update a machine deployment after validating input and checking balance.
+   *
+   * @throws {ValidationError} - Throws a ValidationError if the machine with the provided name does not exist.
+   * @throws {WorkloadUpdateError} - Throws a WorkloadUpdateError if trying to change the network name or IP range.
+   *
+   * @param {MachinesModel} options - The options for updating the machine deployment.
+   * @returns {Promise<{ contracts: DeploymentResultContracts }>} - A promise that resolves after updating the machine deployment.
+   *
+   * @example
+   *
+   * const options: MachinesModel = {
+   *   name: "test",
+   *   network: networkOptions,
+   *   machines: [...],
+   * };
+   *
+   * const result = await MachinesModule.update(options);
+   * console.log(result);
+   *
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   * - `@checkBalance`: Checks the balance before proceeding.
+   */
   @expose
   @validateInput
   @checkBalance
-  async update(options: MachinesModel) {
+  async update(options: MachinesModel): Promise<{ contracts: DeploymentResultContracts }> {
     if (!(await this.exists(options.name))) {
       throw new ValidationError(`There is no machine with the name: ${options.name}`);
     }
@@ -150,10 +283,33 @@ class MachinesModule extends BaseModule {
     return await this._update(this.vm, options.name, oldDeployments, twinDeployments, network);
   }
 
+  /**
+   * Method to add a new machine to an existing deployment after validating input and checking balance.
+   * Emits a log event before adding the machine to the deployment.
+   *
+   * @param {AddMachineModel} options - The options for adding the machine to the deployment.
+   * @returns {Promise<DeploymentResultContracts>} - A promise that resolves to an object with information about created, deleted, and updated deployments.
+   *
+   * @example
+   *
+   * const options: AddMachineModel = {
+   *   deployment_name: "deploymentName",
+   *   myceliumNetworkSeed: "seedValue",
+   *   // Add other required options here
+   * };
+   *
+   * const result = await MachinesModule.add_machine(options);
+   * console.log(result);
+   *
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   * - `@checkBalance`: Checks the balance before proceeding.
+   */
   @expose
   @validateInput
   @checkBalance
-  async add_machine(options: AddMachineModel) {
+  async add_machine(options: AddMachineModel): Promise<{ contracts: DeploymentResultContracts }> {
     if (!(await this.exists(options.deployment_name))) {
       throw new ValidationError(`There are no machine deployments with the name: ${options.deployment_name}.`);
     }
@@ -210,10 +366,32 @@ class MachinesModule extends BaseModule {
     return await this._add(options.deployment_name, options.node_id, oldDeployments, twinDeployments, network);
   }
 
+  /**
+   * Method to delete a machine deployment after validating input and checking balance.
+   * Emits a log event before deleting the machine deployment.
+   *
+   * @param {DeleteMachineModel} options - The options for deleting the machine deployment.
+   * @returns {Promise<DeploymentResultContracts>} - A promise that resolves to an object with information about created, deleted, and updated deployments.
+   *
+   * @example
+   *
+   * const options: DeleteMachineModel = {
+   *   name: "test",
+   *   deployment_name: "deploymentName",
+   * };
+   *
+   * const result = await MachinesModule.delete_machine(options);
+   * console.log(result);
+   *
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   * - `@checkBalance`: Checks the balance before proceeding.
+   */
   @expose
   @validateInput
   @checkBalance
-  async delete_machine(options: DeleteMachineModel) {
+  async delete_machine(options: DeleteMachineModel): Promise<DeploymentResultContracts> {
     if (!(await this.exists(options.deployment_name))) {
       throw new ValidationError(`There are no machine deployments with the name: ${options.deployment_name}.`);
     }

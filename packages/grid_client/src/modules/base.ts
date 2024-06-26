@@ -185,8 +185,6 @@ class BaseModule {
         projectName: this.projectName,
       });
 
-      console.log({ contracts });
-
       const alreadyFetchedContracts: GqlNodeContract[] = [];
 
       for (const contract of BaseModule.newContracts) {
@@ -232,10 +230,14 @@ class BaseModule {
   }
 
   private _getContractsName(contracts: Required<GqlNodeContract>[]): string[] {
-    console.log({ contracts });
     return Array.from(new Set(contracts.map(c => c.parsedDeploymentData.name)));
   }
 
+  /**
+   * Lists all of the contracts based on the user secret.
+   *
+   * @returns {Promise<any>} - A promise that resolves to the list of contract names.
+   */
   async _list(): Promise<string[]> {
     await this._migrateListKeys();
     const contracts = await this.getMyContracts(true);
@@ -386,6 +388,12 @@ class BaseModule {
     }
   }
 
+  /**
+   * Retrieves the deployments associated with a given name.
+   *
+   * @param {string} name - The name of the deployment to retrieve.
+   * @returns {Promise<Deployment[]>} - A promise that resolves to an array of deployments.
+   */
   async _get(name: string): Promise<Deployment[]> {
     const deployments: Deployment[] = [];
     if (!(await this._list()).includes(name)) {
@@ -589,6 +597,19 @@ class BaseModule {
     return [pubIPDeployments, noPubIPDeployments];
   }
 
+  /**
+   * Update deployments for a specific module.
+   *
+   * This method updates deployments for a specific module by handling twin deployments.
+   * It filters deployments based on whether they have public IPs or not, and then updates them accordingly.
+   *
+   * @param {KubernetesHL | ZdbHL | VMHL} module - The module to update deployments for.
+   * @param {string} name - The name of the deployment.
+   * @param {Deployment[]} oldDeployments - The old deployments to be updated.
+   * @param {TwinDeployment[]} twinDeployments - The new twin deployments to update to.
+   * @param {Network} network - The network configuration for the deployments.
+   * @returns {Promise<string | { contracts: DeploymentResultContracts }> | string} - A message indicating the update status or the updated contracts.
+   */
   async _update(
     module: KubernetesHL | ZdbHL | VMHL,
     name: string,
@@ -627,7 +648,8 @@ class BaseModule {
 
     const contracts = await this.twinDeploymentHandler.handle(finalTwinDeployments);
     if (contracts.created.length === 0 && contracts.updated.length === 0 && contracts.deleted.length === 0) {
-      return "Nothing found to update";
+      console.log("Nothing found to update");
+      return { contracts: contracts };
     }
     await this.save(name, contracts);
     return { contracts: contracts };
@@ -676,7 +698,11 @@ class BaseModule {
     return { contracts: contracts };
   }
 
-  async _deleteInstance(module: KubernetesHL | ZdbHL | VMHL, deployment_name: string, name: string) {
+  async _deleteInstance(
+    module: KubernetesHL | ZdbHL | VMHL,
+    deployment_name: string,
+    name: string,
+  ): Promise<DeploymentResultContracts> {
     const deployments = await this._get(deployment_name);
     for (const deployment of deployments) {
       const twinDeployments = await module.delete(deployment, [name]);
@@ -690,6 +716,12 @@ class BaseModule {
     throw new ValidationError(`Instance with name ${name} is not found.`);
   }
 
+  /**
+   * Deletes a specific deployment by name.
+   *
+   * @param {string} name - The name of the deployment to delete.
+   * @returns {Promise<{created: never[]; deleted: never[]; updated: never[];}>} - A promise that resolves to the result of the deletion.
+   */
   async _delete(name: string) {
     const contracts = { created: [], deleted: [], updated: [] };
     if (!(await this._list()).includes(name)) {

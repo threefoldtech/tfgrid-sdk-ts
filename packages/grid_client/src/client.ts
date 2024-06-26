@@ -23,6 +23,7 @@ class GridClient {
   config: GridClientConfig;
   rmbClient: RMBClient;
   tfclient: TFClient;
+  /**The `MachinesModule` class provides methods to interact with machine operations.*/
   machines: modules.machines;
   k8s: modules.k8s;
   zdbs: modules.zdbs;
