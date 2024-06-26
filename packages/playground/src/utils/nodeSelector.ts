@@ -246,6 +246,14 @@ export async function validateRentContract(
   }
 }
 
+export function release(lock?: AwaitLock) {
+  if (lock?.acquired) {
+    lock.release();
+    return true;
+  }
+  return false;
+}
+
 export async function loadValidNodes(
   gridStore: ReturnType<typeof useGrid>,
   selectionFitlers: SelectionDetailsFilters,
@@ -315,7 +323,7 @@ export async function selectValidNode(
 
     if (node && isNodeValid(node, selectedMachines, filters)) {
       if (nodesLock && !locked) {
-        nodesLock.release();
+        release(nodesLock);
       }
       return node;
     }
@@ -324,14 +332,14 @@ export async function selectValidNode(
   for (const node of shuffle(nodes)) {
     if (isNodeValid(node, selectedMachines, filters)) {
       if (nodesLock && !locked) {
-        nodesLock.release();
+        release(nodesLock);
       }
       return node;
     }
   }
 
   if (nodesLock && !locked) {
-    nodesLock.release();
+    release(nodesLock);
   }
 }
 

@@ -63,7 +63,7 @@ import { ValidatorStatus } from "../../hooks/form_validator";
 import { useGrid } from "../../stores";
 import type { SelectedMachine, SelectionDetailsFilters } from "../../types/nodeSelector";
 import { normalizeError } from "../../utils/helpers";
-import { checkNodeCapacityPool, resolveAsync, validateRentContract } from "../../utils/nodeSelector";
+import { checkNodeCapacityPool, release, resolveAsync, validateRentContract } from "../../utils/nodeSelector";
 import TfNodeDetailsCard from "./TfNodeDetailsCard.vue";
 
 const _defaultError =
@@ -210,7 +210,7 @@ export default {
         },
         onAfterTask: ({ data }) => {
           bindStatus(data ? ValidatorStatus.Valid : ValidatorStatus.Invalid);
-          props.nodesLock?.release();
+          release(props.nodesLock);
         },
       },
     );

@@ -161,6 +161,7 @@ import {
   loadValidNodes,
   normalizeNodeFilters,
   normalizeNodeOptions,
+  release,
   selectValidNode,
   validateRentContract,
 } from "../../utils/nodeSelector";
@@ -219,7 +220,7 @@ export default {
         bindModelValue(node);
         nodeInputValidateTask.value.run(node);
       } else {
-        props.nodesLock?.release();
+        release(props.nodesLock);
       }
     }
 
@@ -285,19 +286,16 @@ export default {
 
     const nodeInputValidateTask = useAsync<true, string, [NodeInfo | undefined]>(
       async node => {
-        try {
-          const nodeCapacityValid = await checkNodeCapacityPool(gridStore, node, props.filters);
-          const rentContractValid = props.filters.dedicated ? await validateRentContract(gridStore, node) : true;
-          return nodeCapacityValid && rentContractValid;
-        } finally {
-          props.nodesLock?.release();
-        }
+        const nodeCapacityValid = await checkNodeCapacityPool(gridStore, node, props.filters);
+        const rentContractValid = props.filters.dedicated ? await validateRentContract(gridStore, node) : true;
+        return nodeCapacityValid && rentContractValid;
       },
       {
         tries: 1,
         shouldRun: () => props.validFilters,
         onBeforeTask: () => bindStatus(ValidatorStatus.Pending),
         onAfterTask({ data }) {
+          release(props.nodesLock);
           bindStatus(data ? ValidatorStatus.Valid : ValidatorStatus.Invalid);
           const container = nodesContainer.value as HTMLDivElement;
           if (container) {
