@@ -24,6 +24,10 @@ enum BackendStorageType {
   pkid = "pkid",
 }
 
+/**
+ * Represents a class that provides an abstraction for interacting with different backend storage implementations.
+ * The class allows for loading, listing, removing, dumping, and updating data in the storage.
+ */
 class BackendStorage {
   storage: BackendStorageInterface;
   constructor(
@@ -64,6 +68,11 @@ class BackendStorage {
     }
   }
 
+  /**
+   * Checks if the environment is Node.js by verifying the existence of the 'process' object and the 'process.versions.node' property.
+   *
+   * @returns A boolean value indicating whether the code is running in a Node.js environment.
+   */
   static isEnvNode(): boolean {
     return (
       typeof process === "object" &&
@@ -72,30 +81,69 @@ class BackendStorage {
     );
   }
 
-  async load(key: string) {
+  /**
+   * Loads the value stored under the specified key from the storage.
+   *
+   * @param key The key of the value to be loaded.
+   * @returns A promise that resolves with an object representing the value stored under the key.
+   */
+  async load(key: string): Promise<Record<string, string>> {
     const data = await this.storage.get(key);
     return JSON.parse(data.toString());
   }
 
+  /**
+   * Retrieves a list of values stored under the specified key from the storage.
+   *
+   * @param key The key of the values to be retrieved.
+   * @returns A promise that resolves with an array of strings representing the values stored under the key.
+   */
   list(key: string): Promise<string[]> {
     return this.storage.list(key);
   }
 
+  /**
+   * Removes the value stored under the specified key from the storage.
+   *
+   * @param key The key of the value to be removed.
+   * @returns A promise that resolves after removing the value from the storage.
+   */
   async remove(key: string) {
     return await this.storage.remove(key);
   }
 
-  async dump(key: string, value) {
+  /**
+   * Saves the provided value under the specified key in the storage.
+   *
+   * @param key The key under which the value will be stored.
+   * @param value The value to be stored, in the form of a key-value pair object.
+   * @returns A promise that resolves after saving the value in the storage.
+   */
+  async dump(key: string, value: Record<string, string>) {
     return await this.storage.set(key, JSON.stringify(value));
   }
 
-  async update(key: string, field: string, data = null, action: StorageUpdateAction = StorageUpdateAction.add) {
+  /**
+   * Updates the stored data for a specific key by adding or deleting a field.
+   *
+   * @param key The key to identify the data to be updated.
+   * @param field The field within the data to be updated.
+   * @param data The new data to be added to the specified field. Defaults to null.
+   * @param action The action to be performed, either 'add' or 'delete'. Defaults to 'add'.
+   * @returns A promise that resolves after updating the data.
+   */
+  async update(
+    key: string,
+    field: string,
+    data: string | null = null,
+    action: StorageUpdateAction = StorageUpdateAction.add,
+  ) {
     let storedData = await this.load(key);
     if (!storedData) {
       storedData = {};
     }
     if (action === StorageUpdateAction.add) {
-      storedData[field] = data;
+      Reflect.set(storedData, field, data);
     } else if (action === StorageUpdateAction.delete) {
       delete storedData[field];
     }

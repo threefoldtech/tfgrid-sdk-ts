@@ -37,6 +37,7 @@ class GridClient {
   capacity: modules.capacity;
   twinId: number;
   nodes: modules.nodes;
+  /**The `Algorand` class provides methods to interact with algorand operations.*/
   algorand: modules.algorand;
   tfchain: modules.tfchain;
   stellar: modules.stellar;
