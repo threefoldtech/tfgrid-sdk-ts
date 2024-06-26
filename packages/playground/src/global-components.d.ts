@@ -10,9 +10,11 @@ import TfSelectCountry from "./components/node_selector/select_location_internal
 import TfSelectRegion from "./components/node_selector/select_location_internals/TfSelectRegion.vue";
 import TfSelectionDetails from "./components/node_selector/TfSelectionDetails.vue";
 import PasswordInputWrapper from "./components/password_input_wrapper.vue";
+import TfErrorFormater from "./components/tf_error_formater.vue";
 import ViewLayout from "./components/view_layout.vue";
 import WebletLayout from "./components/weblet_layout.vue";
 import type * as validators from "./utils/validators";
+
 declare module "@vue/runtime-core" {
   export interface GlobalComponents {
     PasswordInputWrapper: typeof PasswordInputWrapper;
@@ -27,6 +29,7 @@ declare module "@vue/runtime-core" {
     TfSelectionDetails: typeof TfSelectionDetails;
     TfSelectRegion: typeof TfSelectRegion;
     TfSelectCountry: typeof TfSelectCountry;
+    TfErrorFormater: typeof TfErrorFormater;
   }
 
   interface ComponentCustomProperties {
