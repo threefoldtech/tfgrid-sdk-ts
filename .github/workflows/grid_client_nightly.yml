@@ -134,12 +134,8 @@ jobs:
           steps.deleteall.outcome != 'success'
         run: exit 1
 
-      - name: Get the day of the week
-        id: dayofweek
-        run: echo "DAY_OF_WEEK=$(date +%u)" >> $GITHUB_ENV
-
       - name: Create GitHub Issue on Failure
-        if: failure() && env.DAY_OF_WEEK != '5' && env.DAY_OF_WEEK != '6'
+        if: failure() && '$(date +%u)' != '5' && '$(date +%u)' != '6'
         uses: dacbd/create-issue-action@main
         with:
           token: ${{ github.token }}
