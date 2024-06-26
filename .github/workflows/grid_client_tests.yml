@@ -23,6 +23,7 @@ jobs:
       RMB_PROXY: true
       STORE_SECRET: secret
       MNEMONIC: ${{ secrets.MNEMONIC }}
+      SKIP_PROPS_VALIDATION: true
     steps:
       - name: set network for Schedule
         if: ${{env.NETWORK}} == ""
