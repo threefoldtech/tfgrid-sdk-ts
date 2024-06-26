@@ -7,7 +7,7 @@ This guide covers the steps to generate chain types using `@polkadot/typegen` an
 Inside tfchain_client directory run:
 
 ```bash
-yarn yarn generate-types -e <<CHAIN_URL>>
+yarn generate-types -e <<CHAIN_URL>>
 ```
 
 > replace `<<CHAIN_URL>>` with URL of the desired chain stack, e.g. `https://tfchain.dev.grid.tf/`
