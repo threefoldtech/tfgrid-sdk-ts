@@ -235,7 +235,7 @@
                 <a target="_blank" :href="manual?.discount_levels"> staking discounts </a>
               </li>
             </ul>
-            <v-divider class="" />
+            <v-divider />
             <v-table density="compact" class="mb-2 no-border discount-table" :hide-default="true">
               <tbody>
                 <tr class="no-border">
