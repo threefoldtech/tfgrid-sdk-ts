@@ -11,6 +11,13 @@ class NetworkModule extends BaseModule {
   moduleName = "networks";
   network: NetworkHL;
 
+  /**
+   * The `NetworkModule` class provides methods to interact with network operations.
+   *
+   * Initializes a new instance of the `NetworkModule` class.
+   *
+   * @param {GridClientConfig} config - The grid client configuration.
+   */
   constructor(public config: GridClientConfig) {
     super(config);
     this.network = new NetworkHL(config);
@@ -72,7 +79,7 @@ class NetworkModule extends BaseModule {
   /**
    * Retrieves a list of network names.
    *
-   * This method exposes the functionality to retrieve a list of all network names associated with the current configuration.
+   * This method exposes the functionality to retrieve a list of all network names associated with the current account.
    * It simply calls the internal `_list` method to perform the actual retrieval.
    *
    * @returns {Promise<string[]>} A promise that resolves to an array of network names.
@@ -89,15 +96,65 @@ class NetworkModule extends BaseModule {
     return await this._list();
   }
 
+  /**
+   * Checks if a node exists in the network based on the specified options.
+   *
+   * This method validates the input options and checks if a node with the specified network name, IP range, and node ID
+   * exists within the network associated with the current configuration.
+   *
+   * @param {NetworkHasNodeModel} options - The options for checking if the node exists.
+   *   - `name` (string): The name of the network.
+   *   - `ipRange` (string): The IP range of the network.
+   *   - `nodeId` (number): The ID of the node to check.
+   *
+   * @returns {Promise<boolean>} A promise that resolves to a boolean indicating whether the node exists in the network.
+   *
+   * @example
+   * const options = {
+   *   name: "exampleNetwork",
+   *   ipRange: "10.0.0.0/16",
+   *   nodeId: 123
+   * };
+   * const doesNodeExist = await networkModule.hasNode(options);
+   * console.log(doesNodeExist); // true or false
+   *
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   */
   @expose
   @validateInput
   async hasNode(options: NetworkHasNodeModel): Promise<boolean> {
     return await this.network.hasNode(options.name, options.ipRange, options.nodeId);
   }
 
+  /**
+   * Retrieves WireGuard configurations for a network based on the specified options.
+   *
+   * This method validates the input options and retrieves the WireGuard configurations
+   * for the specified network name and IP range.
+   *
+   * @param {NetworkGetModel} options - The options for retrieving WireGuard configurations.
+   *   - `name` (string): The name of the network.
+   *   - `ipRange` (string): The IP range of the network.
+   *
+   * @returns {Promise<string[]>} A promise that resolves to an array of WireGuard configuration strings.
+   *
+   * @example
+   * const options = {
+   *   name: "exampleNetwork",
+   *   ipRange: "10.0.0.0/16"
+   * };
+   * const wireGuardConfigs = await networkModule.getWireGuardConfigs(options);
+   * console.log(wireGuardConfigs); // ["config1", "config2", ...]
+   *
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   */
   @expose
   @validateInput
-  async getWireGuardConfigs(options: NetworkGetModel) {
+  async getWireGuardConfigs(options: NetworkGetModel): Promise<string[]> {
     return await this.network.getWireguardConfigs(options.name, options.ipRange);
   }
 }

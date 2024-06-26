@@ -45,6 +45,7 @@ class GridClient {
   utility: modules.utility;
   farmerbot: modules.farmerbot;
   farms: modules.farms;
+  /**The `NetworkModule` class provides methods to interact with network operations.*/
   networks: modules.networks;
   dao: modules.dao;
   bridge: modules.bridge;
