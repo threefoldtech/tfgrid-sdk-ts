@@ -10,15 +10,17 @@ async function addNode(client: GridClient, node: NetworkAddNodeModel) {
 }
 
 async function main() {
-  const grid3: GridClient = await getClient();
-  const node: NetworkAddNodeModel = {
-    name: "wedtest",
-    ipRange: "10.249.0.0/16",
-    nodeId: 14,
-    mycelium: false,
-  };
-  // if the network is not created, it will create one and add this node to it.
-  await addNode(grid3, node);
+  const grid3: GridClient = await getClient("vm/vmu0sir");
+  const list = await grid3.networks.list();
+  console.log({ list });
+  // const node: NetworkAddNodeModel = {
+  //   name: "wedtest",
+  //   ipRange: "10.249.0.0/16",
+  //   nodeId: 14,
+  //   mycelium: false,
+  // };
+  // // if the network is not created, it will create one and add this node to it.
+  // await addNode(grid3, node);
 
   await grid3.disconnect();
 }

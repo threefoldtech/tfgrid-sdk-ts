@@ -185,6 +185,8 @@ class BaseModule {
         projectName: this.projectName,
       });
 
+      console.log({ contracts });
+
       const alreadyFetchedContracts: GqlNodeContract[] = [];
 
       for (const contract of BaseModule.newContracts) {
@@ -230,6 +232,7 @@ class BaseModule {
   }
 
   private _getContractsName(contracts: Required<GqlNodeContract>[]): string[] {
+    console.log({ contracts });
     return Array.from(new Set(contracts.map(c => c.parsedDeploymentData.name)));
   }
 
