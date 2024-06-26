@@ -241,10 +241,10 @@
                 <tr>
                   <td>Price after discount</td>
                   <td>
-                    <strong>{{ monthlyPriceAfterDiscount }}$/month</strong>
+                    <strong>{{ monthlyPriceAfterDiscount }} $/month</strong>
                   </td>
                   <td>
-                    <strong>{{ hourlyPriceAfterDiscount }}$/hr</strong>
+                    <strong>{{ hourlyPriceAfterDiscount }} $/hr</strong>
                   </td>
                 </tr>
                 <tr>
