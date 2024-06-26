@@ -179,6 +179,8 @@ function normalizeCaproverWorker(worker: CW, envs: Env[]): Machine {
     publicIpv4: true,
     planetary: true,
     mycelium: worker.mycelium || false,
+    publicIpv6: worker.ipv6 || false,
+
     rootFilesystemSize: calculateRootFileSystem({
       CPUCores: worker.solution!.cpu,
       RAMInMegaBytes: worker.solution!.memory,

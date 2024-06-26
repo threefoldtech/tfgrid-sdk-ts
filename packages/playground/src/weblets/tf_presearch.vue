@@ -57,7 +57,14 @@
           </password-input-wrapper>
         </input-validator>
 
-        <Network required v-model:ipv4="ipv4" v-model:planetary="planetary" v-model:mycelium="mycelium" ref="network" />
+        <Network
+          required
+          v-model:ipv4="ipv4"
+          v-model:planetary="planetary"
+          v-model:mycelium="mycelium"
+          v-model:ipv6="ipv6"
+          ref="network"
+        />
 
         <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
           <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
@@ -69,6 +76,7 @@
         <TfSelectionDetails
           :filters="{
             ipv4,
+            ipv6,
             certified,
             dedicated,
             cpu,
@@ -122,6 +130,7 @@ const tabs = ref();
 const name = ref(generateName({ prefix: "ps" }));
 const code = ref("");
 const ipv4 = ref(false);
+const ipv6 = ref(false);
 const planetary = ref(true);
 const cpu = 1;
 const memory = 512;
@@ -170,6 +179,7 @@ async function deploy() {
           ],
           planetary: planetary.value,
           publicIpv4: ipv4.value,
+          publicIpv6: ipv6.value,
           mycelium: mycelium.value,
           envs: [
             {
