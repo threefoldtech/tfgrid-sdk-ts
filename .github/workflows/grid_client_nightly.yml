@@ -131,7 +131,7 @@ jobs:
           steps.kubernetesqsfs.outcome != 'success' ||
           steps.kvstore.outcome != 'success' ||
           steps.zdb.outcome != 'success' ||
-          steps.deleteall.outcome != 'success' 
+          steps.deleteall.outcome != 'success'
         run: exit 1
 
       - name: Get the day of the week
@@ -139,7 +139,7 @@ jobs:
         run: echo "DAY_OF_WEEK=$(date +%u)" >> $GITHUB_ENV
 
       - name: Create GitHub Issue on Failure
-        if: needs.teststatus.result == 'failure' && env.DAY_OF_WEEK != '5' && env.DAY_OF_WEEK != '6'
+        if: failure() && env.DAY_OF_WEEK != '5' && env.DAY_OF_WEEK != '6'
         uses: dacbd/create-issue-action@main
         with:
           token: ${{ github.token }}
