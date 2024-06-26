@@ -1,15 +1,10 @@
 <template>
   <v-row>
-    <v-col v-for="card in cards" :key="card.title" cols="12" sm="12" md="12" lg="6" xl="4">
+    <v-col v-for="card in cards" :key="card.title" cols="12" sm="12" md="12" lg="6" :xl="cards.length > 3 ? 4 : 6">
       <router-link :to="card.route">
         <v-hover>
           <template v-slot:default="{ isHovering, props }">
-            <v-card
-              class="pa-3 pt-6"
-              :height="isMobile && tallestCard > 200 ? tallestCard + 15 : 200"
-              v-bind="props"
-              :class="isHovering ? 'card-opacity' : undefined"
-            >
+            <v-card :height="200" class="pa-3 pt-6" v-bind="props" :class="isHovering ? 'card-opacity' : undefined">
               <v-img
                 class="d-inline-block ml-3 mb-2"
                 width="35"
@@ -26,7 +21,7 @@
                   {{ tag }}
                 </v-chip>
               </v-card-title>
-              <v-card-text class="mt-2"> {{ card.excerpt }} </v-card-text>
+              <v-card-text class="mt-2" v-bind="props"> {{ card.excerpt }} </v-card-text>
             </v-card>
           </template></v-hover
         >
@@ -36,8 +31,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, type PropType, ref } from "vue";
-import { useDisplay } from "vuetify";
+import { defineComponent, type PropType } from "vue";
 
 import type { ApplicationCard } from "@/utils/types";
 
@@ -49,21 +43,10 @@ export default defineComponent({
       required: true,
     },
   },
-  setup(props) {
+  setup() {
     const baseURL = import.meta.env.BASE_URL;
-    const tallestCard = ref(0);
-    const isMobile = useDisplay().mobile;
-
-    props.cards.forEach(card => {
-      if (card.excerpt.length > tallestCard.value) {
-        tallestCard.value = card.excerpt.length;
-      }
-    });
-
     return {
       baseURL,
-      tallestCard,
-      isMobile,
     };
   },
 });
