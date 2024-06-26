@@ -45,7 +45,7 @@ interface ExtendedMountData extends BaseMountData {
 // Union type for the mount data
 type MountData = BaseMountData | ExtendedMountData;
 
-export interface ZmachineData {
+interface ZmachineData {
   /** The version of the workload */
   version: number;
   /** The contract ID associated with the workload */
@@ -89,6 +89,7 @@ export interface ZmachineData {
   /** The list of the GPUs */
   gpu: string[] | undefined;
 }
+
 interface VM {
   version: number;
   contractId: number;
@@ -110,19 +111,19 @@ interface VM {
     cpu: number;
     memory: number;
   };
-  mounts: any[];
+  mounts: MountData[];
   env: {
     SSH_KEY: string;
   };
   entrypoint: string;
-  metadata?: any;
-  description?: any;
+  metadata?: string;
+  description?: string;
   rootfs_size: number;
   corex: boolean;
-  gpu: any[];
+  gpu?: string[];
   deploymentName: string;
   projectName: string;
   wireguard: string;
 }
 
-export { VM };
+export { ZmachineData, VM };
