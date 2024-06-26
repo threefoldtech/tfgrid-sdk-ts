@@ -236,20 +236,20 @@
               </li>
             </ul>
             <v-divider class="py-3" />
-            <v-table density="compact" class="mb-3 no-border" :hide-default="true">
+            <v-table density="compact" class="mb-3 no-border discount-table" :hide-default="true">
               <tbody>
-                <tr>
-                  <td>Price after discount</td>
-                  <td>
+                <tr class="no-border">
+                  <td class="no-border">Price after discount</td>
+                  <td class="no-border">
                     <strong>{{ monthlyPriceAfterDiscount }} $/month</strong>
                   </td>
-                  <td>
+                  <td class="no-border">
                     <strong>{{ hourlyPriceAfterDiscount }} $/hr</strong>
                   </td>
                 </tr>
-                <tr>
-                  <td>Price before discount</td>
-                  <td class="text-decoration-line-through">
+                <tr class="no-border">
+                  <td class="no-border">Price before discount</td>
+                  <td class="text-decoration-line-through no-border">
                     <strong>{{ price_usd?.toFixed(2) }} $/month</strong>
                   </td>
                   <td class="text-decoration-line-through no-border">
@@ -594,8 +594,11 @@ export default {
     transform: scale(1.2);
   }
 }
-.v-table.no-border {
+.discount-table,
+tr,
+td.no-border {
   border: none !important;
+  background-color: transparent;
 }
 
 .v-icon--disabled {
