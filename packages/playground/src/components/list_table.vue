@@ -5,12 +5,13 @@
     item-title="title"
     item-value="key"
     hover
-    :items-per-page="-1"
     hide-default-footer
     show-select
     v-model="selectedItems"
     hide-no-data
     :return-object="returnObject"
+    @update:options="selectedItems = []"
+    v-bind="$attrs"
   >
     <template #[`header.data-table-select`]>
       <div class="d-flex align-center justify-space-between">
@@ -54,7 +55,14 @@
       <slot :name="slot" v-bind="scope" />
     </template>
 
-    <template #bottom>
+    <template
+      #bottom
+      v-if="
+        deleting ||
+        (loading && items.length === 0) ||
+        (!loading && items.length === 0 && (noDataText || $slots['no-data-text']))
+      "
+    >
       <v-row class="my-5" v-if="loading && items.length === 0">
         <v-spacer />
         <div class="d-flex my-6 align-center justify-center">
