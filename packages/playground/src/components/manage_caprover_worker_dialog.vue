@@ -82,7 +82,6 @@ import { ref } from "vue";
 
 import { useGrid } from "../stores";
 import { addMachine, deleteMachine, loadVM } from "../utils/deploy_vm";
-import rootFs from "../utils/root_fs";
 
 const props = defineProps<{ master: any; data: any[]; projectName: string }>();
 const emits = defineEmits<{ (event: "close"): void; (event: "update:caprover", data: any): void }>();
@@ -139,7 +138,10 @@ async function deploy(layout: any) {
         { key: "SWM_NODE_MODE", value: "worker" },
         { key: "PUBLIC_KEY", value: props.master.env.PUBLIC_KEY },
       ],
-      rootFilesystemSize: rootFs(worker.value.solution!.cpu, worker.value.solution!.memory),
+      rootFilesystemSize: calculateRootFileSystem({
+        CPUCores: worker.value.solution!.cpu,
+        RAMInMegaBytes: worker.value.solution!.memory,
+      }),
     });
 
     const [leader, ...workers] = vm;
@@ -181,7 +183,7 @@ async function onDelete(cb: (workers: any[]) => void) {
 </script>
 
 <script lang="ts">
-import type { GridClient } from "@threefold/grid_client";
+import { calculateRootFileSystem, type GridClient } from "@threefold/grid_client";
 
 import CaproverWorker, { createWorker } from "../components/caprover_worker.vue";
 import ListTable from "../components/list_table.vue";

@@ -73,6 +73,7 @@ export interface CaproverWorker {
   certified?: boolean;
   selectionDetails?: SelectionDetails;
   mycelium: boolean;
+  ipv6: boolean;
 }
 
 export interface FarmInterface {

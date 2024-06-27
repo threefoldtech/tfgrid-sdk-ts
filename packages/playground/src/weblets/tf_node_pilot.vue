@@ -62,6 +62,7 @@
           rootFilesystemSize,
         }"
         v-model="selectionDetails"
+        require-domain
       />
 
       <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
@@ -80,7 +81,7 @@ import { manual } from "@/utils/manual";
 
 import Network from "../components/networks.vue";
 import { useLayout } from "../components/weblet_layout.vue";
-import { useGrid } from "../stores";
+import { useGrid, useProfileManager } from "../stores";
 import { type Flist, ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
 import { generateName } from "../utils/strings";
@@ -102,20 +103,41 @@ const selectionDetails = ref<SelectionDetails>();
 const selectedSSHKeys = ref("");
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
+const profileManager = useProfileManager();
 
+function finalize(deployment: any) {
+  layout.value.reloadDeploymentsList();
+  layout.value.setStatus("success", "Successfully deployed a Node Pilot instance.");
+  layout.value.openDialog(deployment, deploymentListEnvironments.nodepilot);
+}
 async function deploy() {
   layout.value.setStatus("deploy");
 
   const projectName = ProjectName.NodePilot.toLowerCase() + "/" + name.value;
+
+  const subdomain = getSubdomain({
+    deploymentName: name.value,
+    projectName,
+    twinId: profileManager.profile!.twinId,
+  });
+
+  const domain = selectionDetails.value?.domain?.enabledCustomDomain
+    ? selectionDetails.value.domain.customDomain
+    : subdomain + "." + selectionDetails.value?.domain?.selectedDomain?.publicConfig.domain;
+
+  let vm: VM[];
 
   try {
     layout.value?.validateSSH();
     updateGrid(grid, { projectName });
 
     await layout.value.validateBalance(grid!);
-
-    const vm = await deployVM(grid!, {
+    vm = await deployVM(grid!, {
       name: name.value,
+      network: {
+        addAccess: selectionDetails.value!.domain!.enableSelectedDomain,
+        accessNodeId: selectionDetails.value!.domain?.selectedDomain?.nodeId,
+      },
       machines: [
         {
           name: name.value,
@@ -127,7 +149,10 @@ async function deploy() {
           publicIpv6: ipv6.value,
           planetary: planetary.value,
           mycelium: mycelium.value,
-          envs: [{ key: "SSH_KEY", value: selectedSSHKeys.value }],
+          envs: [
+            { key: "SSH_KEY", value: selectedSSHKeys.value },
+            { key: "NODE_PILOT_HOSTNAME", value: domain },
+          ],
           rootFilesystemSize,
           disks: [
             {
@@ -141,10 +166,28 @@ async function deploy() {
         },
       ],
     });
+    if (!selectionDetails.value?.domain?.enableSelectedDomain) {
+      vm[0].customDomain = selectionDetails.value?.domain?.customDomain;
+      finalize(vm);
+      return;
+    }
 
-    layout.value.reloadDeploymentsList();
-    layout.value.setStatus("success", "Successfully deployed a node pilot instance.");
-    layout.value.openDialog(vm, deploymentListEnvironments.vm);
+    try {
+      layout.value.setStatus("deploy", "Preparing to deploy gateway...");
+      await deployGatewayName(grid, selectionDetails.value.domain, {
+        subdomain,
+        ip: vm[0].interfaces[0].ip,
+        port: 34416,
+        network: vm[0].interfaces[0].network,
+      });
+
+      finalize(vm);
+    } catch (e) {
+      layout.value.setStatus("deploy", "Rollbacking back due to fail to deploy gateway...");
+
+      await rollbackDeployment(grid!, name.value);
+      layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Node Pilot instance."));
+    }
   } catch (e) {
     layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Node Pilot instance."));
   }
@@ -156,13 +199,14 @@ function updateSSHkeyEnv(selectedKeys: string) {
 </script>
 
 <script lang="ts">
-import type { GridClient } from "@threefold/grid_client";
+import type { GridClient, VM } from "@threefold/grid_client";
 
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";
 import type { solutionFlavor as SolutionFlavor } from "../types";
 import type { SelectionDetails } from "../types/nodeSelector";
+import { deployGatewayName, getSubdomain, rollbackDeployment } from "../utils/gateway";
 import { updateGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
 

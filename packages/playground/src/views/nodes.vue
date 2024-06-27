@@ -1,11 +1,14 @@
 <template>
-  <div class="hint">
-    <v-alert class="mb-4" type="info" variant="tonal">
-      Node status is updated every 90 minutes. For a realtime status, click on the node's card.
-    </v-alert>
-  </div>
-
   <view-layout>
+    <v-card color="primary" class="d-flex justify-center items-center pa-3 text-center">
+      <v-icon size="30" class="pr-3">mdi-access-point</v-icon>
+      <v-card-title class="pa-0">Node Finder</v-card-title>
+    </v-card>
+    <div class="hint mt-3">
+      <v-alert class="mb-4" type="info" variant="tonal">
+        Node status is updated every 90 minutes. For a realtime status, click on the node's card.
+      </v-alert>
+    </div>
     <TfFiltersLayout>
       <template #filters>
         <TfFiltersContainer class="mb-4" @apply="loadNodes(true)" :loading="loading">
