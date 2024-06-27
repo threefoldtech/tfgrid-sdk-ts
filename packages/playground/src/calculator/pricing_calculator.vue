@@ -229,7 +229,7 @@
 
 <script lang="ts">
 import { QueryClient } from "@threefold/tfchain_client";
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { VForm } from "vuetify/components/VForm";
 
@@ -285,6 +285,8 @@ export default {
         shouldRun: () => valid.value,
       },
     );
+
+    watch(userBalance, () => priceTask.value.run());
 
     const dedicatedPriceUSD = computed(() => {
       const price = priceTask.value.data?.dedicatedPrice;
