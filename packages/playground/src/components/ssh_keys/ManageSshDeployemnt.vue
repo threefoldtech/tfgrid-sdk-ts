@@ -89,7 +89,9 @@ export default defineComponent({
       selectedKey.value = selectedKeys.value.findIndex(k => k.id === selectedKeys.value[0].id);
       // TODO: Remove the below `selectedKeys.value = [selectedKeys.value[0]];` to make the user select more than one key
       // after fixing this issue: https://github.com/threefoldtech/tf-images/issues/231
-      selectedKeys.value = [selectedKeys.value[0]];
+      if (selectedKeys.value.length) {
+        selectedKeys.value = [selectedKeys.value[0]];
+      }
       handleKeys();
       emit("selectedKeys", selectedKeysString.value);
     });
@@ -116,7 +118,9 @@ export default defineComponent({
     }
 
     function handleKeys() {
-      selectedKeysString.value = selectedKeys.value.map(_key => _key.publicKey).join("\n\n");
+      if (selectedKeys.value.length) {
+        selectedKeysString.value = selectedKeys.value.map(_key => _key.publicKey).join("\n\n");
+      }
     }
 
     /* interact with form_validator */
