@@ -90,37 +90,8 @@ interface ZmachineData {
   gpu: string[] | undefined;
 }
 
-interface VM {
-  version: number;
-  contractId: number;
-  nodeId: number;
-  name: string;
-  created: number;
-  status: string;
-  message: string;
-  flist: string;
-  publicIP: string;
-  planetary: string;
-  myceliumIP: string;
+interface VM extends ZmachineData {
   customDomain?: string;
-  interfaces: {
-    network: string;
-    ip: string;
-  }[];
-  capacity: {
-    cpu: number;
-    memory: number;
-  };
-  mounts: MountData[];
-  env: {
-    SSH_KEY: string;
-  };
-  entrypoint: string;
-  metadata?: string;
-  description?: string;
-  rootfs_size: number;
-  corex: boolean;
-  gpu?: string[];
   deploymentName: string;
   projectName: string;
   wireguard: string;
