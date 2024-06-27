@@ -41,6 +41,7 @@ class GridClient {
   algorand: modules.algorand;
   tfchain: modules.tfchain;
   stellar: modules.stellar;
+  /**The `Blockchain` class representing a Blockchain interface that manages accounts across different blockchain types such as Algorand, Stellar, and TFChain.*/
   blockchain: modules.blockchain;
   calculator: modules.calculator;
   currency: modules.currency;
