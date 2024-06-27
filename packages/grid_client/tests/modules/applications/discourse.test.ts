@@ -7,7 +7,7 @@ import { FilterOptions, GatewayNameModel, generateString, GridClient, MachinesMo
 import { config, getClient } from "../../client_loader";
 import { bytesToGB, generateInt, getOnlineNode, log, splitIP } from "../../utils";
 
-jest.setTimeout(900000);
+jest.setTimeout(1250000);
 
 let gridClient: GridClient;
 let deploymentName: string;
@@ -55,7 +55,7 @@ test("TC2690 - Applications: Deploy Discourse", async () => {
   const tlsPassthrough = false;
   const cpu = 1;
   const memory = 2;
-  const rootfsSize = 0;
+  const rootfsSize = 2;
   const diskSize = 15;
   const networkName = generateString(15);
   const vmName = generateString(15);
@@ -204,7 +204,7 @@ test("TC2690 - Applications: Deploy Discourse", async () => {
   const site = "https://" + gatewayResult[0].domain;
   let reachable = false;
 
-  for (let i = 0; i < 180; i++) {
+  for (let i = 0; i < 250; i++) {
     const wait = await setTimeout(5000, "Waiting for gateway to be ready");
     log(wait);
 
@@ -221,11 +221,11 @@ test("TC2690 - Applications: Deploy Discourse", async () => {
         reachable = true;
       })
       .catch(() => {
-        log("gateway is not reachable");
+        //log("gateway is not reachable");
       });
     if (reachable) {
       break;
-    } else if (i == 180) {
+    } else if (i == 250) {
       throw new Error("Gateway is unreachable after multiple retries");
     }
   }

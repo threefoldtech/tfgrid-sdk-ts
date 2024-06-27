@@ -40,7 +40,7 @@ test("TC2694 - Applications: Deploy Umbrel", async () => {
   //Test Data
   const cpu = 1;
   const memory = 2;
-  const rootfsSize = 0;
+  const rootfsSize = 2;
   const disk1Size = 10;
   const disk2Size = 10;
   const networkName = generateString(15);

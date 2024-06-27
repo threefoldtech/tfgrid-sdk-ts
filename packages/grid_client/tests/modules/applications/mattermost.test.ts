@@ -24,7 +24,7 @@ const ipRegex = /(^127\.)|(^10\.)|(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1
 test("TC2689 - Applications: Deploy Mattermost", async () => {
   /**********************************************
      Test Suite: Grid3_Client_TS (Automated)
-     Test Cases: TC2689 - Applications: Deploy Funkwhale
+     Test Cases: TC2689 - Applications: Deploy Mattermost
      Scenario:
         - Generate Test Data/mattermost Config/Gateway Config.
         - Select a Node To Deploy the mattermost on.
@@ -48,7 +48,7 @@ test("TC2689 - Applications: Deploy Mattermost", async () => {
   const tlsPassthrough = false;
   const cpu = 1;
   const memory = 2;
-  const rootfsSize = 0;
+  const rootfsSize = 2;
   const diskSize = 15;
   const networkName = generateString(15);
   const vmName = generateString(15);
