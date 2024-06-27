@@ -287,7 +287,7 @@ export default {
     );
 
     watch(userBalance, () => {
-      if (userBalance.value && resources.value.useCurrentBalance) priceTask.value.run();
+      if (resources.value.useCurrentBalance) priceTask.value.run();
     });
 
     const dedicatedPriceUSD = computed(() => {
