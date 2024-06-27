@@ -233,7 +233,7 @@ class MachinesModule extends BaseModule {
   @expose
   @validateInput
   @checkBalance
-  async delete(options: MachinesDeleteModel): Promise<{ created: never[]; deleted: never[]; updated: never[] }> {
+  async delete(options: MachinesDeleteModel) {
     events.emit("logs", `Start deleting the machine deployment with name ${options.name}`);
     return await this._delete(options.name);
   }

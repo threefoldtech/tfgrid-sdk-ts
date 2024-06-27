@@ -87,7 +87,7 @@ class BackendStorage {
    * @param key The key of the value to be loaded.
    * @returns A promise that resolves with an object representing the value stored under the key.
    */
-  async load(key: string): Promise<Record<string, string>> {
+  async load(key: string): Promise<Record<string, any>> {
     const data = await this.storage.get(key);
     return JSON.parse(data.toString());
   }
@@ -119,7 +119,7 @@ class BackendStorage {
    * @param value The value to be stored, in the form of a key-value pair object.
    * @returns A promise that resolves after saving the value in the storage.
    */
-  async dump(key: string, value: Record<string, string>) {
+  async dump(key: string, value: any) {
     return await this.storage.set(key, JSON.stringify(value));
   }
 

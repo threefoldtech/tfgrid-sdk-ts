@@ -72,7 +72,7 @@ class Stellar implements blockchainInterface {
     if (data[name]) {
       throw new ValidationError(`A wallet with the same name ${name} already exists.`);
     }
-    const updateOperations = await this.backendStorage.update(path, name, secret);
+    const updateOperations = await this.backendStorage.update(path as string, name, secret);
     await this.saveIfKVStoreBackend(updateOperations);
   }
 
@@ -177,7 +177,7 @@ class Stellar implements blockchainInterface {
   @validateInput
   async list(): Promise<BlockchainListResultModel[]> {
     const [, data] = await this._load();
-    const accounts = [];
+    const accounts: BlockchainListResultModel[] = [];
 
     for (const [name, secret] of Object.entries(data)) {
       accounts.push({
@@ -216,7 +216,7 @@ class Stellar implements blockchainInterface {
   @validateInput
   async balance_by_address(options: StellarWalletBalanceByAddressModel): Promise<BlockchainAssetModel[]> {
     const account = await server.loadAccount(options.address);
-    const balances = [];
+    const balances: BlockchainAssetModel[] = [];
     for (const balance of account.balances) {
       if (!balance.asset_code) {
         balance.asset_code = "XLM";
@@ -288,7 +288,12 @@ class Stellar implements blockchainInterface {
     if (!data[options.name]) {
       throw new ValidationError(`Couldn't find a wallet with name ${options.name}.`);
     }
-    const updateOperations = await this.backendStorage.update(path, options.name, "", StorageUpdateAction.delete);
+    const updateOperations = await this.backendStorage.update(
+      path as string,
+      options.name,
+      "",
+      StorageUpdateAction.delete,
+    );
     await this.saveIfKVStoreBackend(updateOperations);
     return "Deleted";
   }

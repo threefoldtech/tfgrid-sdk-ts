@@ -89,7 +89,7 @@ class TFChain implements blockchainInterface {
     if (data[name]) {
       throw new ValidationError(`An account with the same name ${name} already exists.`);
     }
-    const updateOperations = await this.backendStorage.update(path, name, mnemonic);
+    const updateOperations = await this.backendStorage.update(path as string, name, mnemonic);
     await this.saveIfKVStoreBackend(updateOperations);
   }
 
