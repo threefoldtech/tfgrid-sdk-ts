@@ -39,7 +39,9 @@ class GridClient {
   nodes: modules.nodes;
   /**The `Algorand` class provides methods to interact with algorand operations.*/
   algorand: modules.algorand;
+  /**The `TFChain` class provides methods to interact with tfchain operations.*/
   tfchain: modules.tfchain;
+  /**The `Stellar` class provides methods to interact with stellar operations.*/
   stellar: modules.stellar;
   /**The `Blockchain` class representing a Blockchain interface that manages accounts across different blockchain types such as Algorand, Stellar, and TFChain.*/
   blockchain: modules.blockchain;
