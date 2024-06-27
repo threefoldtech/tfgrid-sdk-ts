@@ -9,7 +9,7 @@
     :dedicated="dedicated"
     :SelectedNode="selectionDetails?.node"
     :valid-filters="selectionDetails?.validFilters"
-    title-image="images/icons/vm.png"
+    title-image="images/icons/gitea.png"
   >
     <template #title>Deploy a Gitea Machine </template>
 
