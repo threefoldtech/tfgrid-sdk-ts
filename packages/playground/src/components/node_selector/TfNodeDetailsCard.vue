@@ -273,7 +273,9 @@
 </template>
 <script lang="ts">
 import type { GridClient, NodeInfo, NodeResources } from "@threefold/grid_client";
-import { CertificationType, Discount, type GridNode } from "@threefold/gridproxy_client";
+import { calculator as Calculator } from "@threefold/grid_client";
+import { CertificationType, type GridNode } from "@threefold/gridproxy_client";
+import { QueryClient } from "@threefold/tfchain_client";
 import { computed, onMounted, ref, watch } from "vue";
 import { capitalize } from "vue";
 
@@ -284,6 +286,7 @@ import { getCountryCode } from "@/utils/get_nodes";
 import { manual } from "@/utils/manual";
 import toReadableDate from "@/utils/to_readable_data";
 
+import { useAsync } from "../../hooks";
 import { useGrid, useProfileManager } from "../../stores";
 import formatResourceSize from "../../utils/format_resource_size";
 import { toGigaBytes } from "../../utils/helpers";
@@ -309,6 +312,7 @@ export default {
     const stakingDiscount = ref<number>();
     const loadingStakingDiscount = ref<boolean>(false);
     const lastDeploymentTime = ref<number>(0);
+    const dedicatedDiscount = ref<number>(0);
     const rentedByUser = computed(() => {
       return props.node?.rentedByTwinId === profileManager.profile?.twinId;
     });
@@ -333,7 +337,8 @@ export default {
     async function refreshStakingDiscount() {
       loadingStakingDiscount.value = true;
       if (props.node) {
-        stakingDiscount.value = (await getStakingDiscount()) || 0;
+        await getDedicatedPriceTFT();
+        stakingDiscount.value = getStakingDiscount() || 0;
       }
       loadingStakingDiscount.value = false;
     }
@@ -442,11 +447,11 @@ export default {
     function formatSpeed(speed: number): string {
       return formatResourceSize(speed, true).toLocaleLowerCase() + "ps";
     }
-
-    async function getStakingDiscount() {
+    async function getDedicatedPriceTFT() {
       try {
         const total_resources = props.node?.total_resources;
         const { cru, hru, mru, sru } = total_resources as NodeResources;
+
         const price = await grid?.calculator.calculateWithMyBalance({
           cru,
           hru: toGigaBytes(hru),
@@ -456,10 +461,19 @@ export default {
           certified: props.node?.certificationType === CertificationType.Certified,
         });
 
-        return price?.dedicatedPackage.discount;
+        dedicatedDiscount.value = price?.dedicatedPackage.discount;
+        console.log(price?.dedicatedPrice);
+        return price?.dedicatedPrice;
       } catch (err) {
         console.error(err);
       }
+    }
+
+    function getStakingDiscount() {
+      if (dedicatedDiscount.value) {
+        return dedicatedDiscount.value;
+      }
+      return null;
     }
 
     function onReserveChange() {
@@ -557,6 +571,7 @@ export default {
       formatSpeed,
       onReserveChange,
       getNodeStatusColor,
+      getDedicatedPriceTFT,
       lastDeploymentTime,
     };
   },
