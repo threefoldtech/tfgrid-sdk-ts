@@ -26,17 +26,17 @@
 </template>
 
 <script lang="ts" setup>
+import { calculateRootFileSystem } from "@threefold/grid_client";
 import { ref, watch } from "vue";
 
 import type { Validators } from "../types";
-import rootFs from "../utils/root_fs";
 
 const props = defineProps<{ cpu?: number; memory?: number; modelValue?: number }>();
 const emits = defineEmits<{ (event: "update:model-value", value: number): void }>();
 
 const input = ref();
 
-const value = ref(rootFs(props.cpu ?? 0, props.memory ?? 0));
+const value = ref(calculateRootFileSystem({ CPUCores: props.cpu ?? 0, RAMInMegaBytes: props.memory ?? 0 }));
 watch(value, value => emits("update:model-value", value), { immediate: true });
 
 const edit = ref(false);
@@ -47,14 +47,14 @@ watch(
     await input.value.validate(value.value);
 
     if (!edit) {
-      value.value = rootFs(cpu, memory);
+      value.value = calculateRootFileSystem({ CPUCores: cpu, RAMInMegaBytes: memory });
     }
   },
 );
 
 function dynamicValidateRootFs(validators: Validators) {
   return (value: string) => {
-    const min = rootFs(props.cpu ?? 0, props.memory ?? 0);
+    const min = calculateRootFileSystem({ CPUCores: props.cpu ?? 0, RAMInMegaBytes: props.memory ?? 0 });
     return validators.min(`SSD Storage min value is ${min}GB.`, min)(value);
   };
 }

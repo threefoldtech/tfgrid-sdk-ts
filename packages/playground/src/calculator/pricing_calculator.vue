@@ -1,10 +1,10 @@
 <template>
   <ViewLayout>
     <VCard>
-      <VCardTitle class="bg-primary text-center">
-        <VIcon icon="mdi-calculator" />
-        Pricing Calculator
-      </VCardTitle>
+      <v-card color="primary" class="d-flex justify-center items-center pa-3 text-center">
+        <v-icon size="30" class="pr-3">mdi-currency-usd</v-icon>
+        <v-card-title class="pa-0">Pricing Calculator</v-card-title>
+      </v-card>
       <VCardText>
         <VContainer fluid>
           <VAlert type="info" class="mb-10">
@@ -171,7 +171,11 @@
                   </p>
                 </input-tooltip>
               </div>
-              <section class="card mt-5" v-if="priceTask.data?.dedicatedPackage.package !== 'gold'">
+
+              <section
+                class="card mt-5"
+                v-if="!priceTask.loading && priceTask.data?.dedicatedPackage.package !== 'gold'"
+              >
                 <p class="card-info pa-2">
                   <b>Too expensive?</b> can upgrade to <b>Gold package</b> to get discount up to 60% when you fund your
                   wallet with <b>{{ dedicatedUpgradePrice }}</b> TFT
@@ -198,7 +202,10 @@
                   </p>
                 </input-tooltip>
               </div>
-              <section class="card mt-5 pa-2" v-if="priceTask.data?.sharedPackage.package !== 'gold'">
+              <section
+                class="card mt-5 pa-2"
+                v-if="!priceTask.loading && priceTask.data?.sharedPackage.package !== 'gold'"
+              >
                 <p class="card-info">
                   <b>Too expensive?</b> can upgrade to <b>Gold package</b> to get discount up to 60% when you fund your
                   wallet with <b>{{ sharedUpgradePrice }}</b> TFT

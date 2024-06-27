@@ -69,6 +69,7 @@ enum ApplicationRoutes {
   Freeflow = "/deploy/applications/freeflow/",
   TFRobot = "/deploy/applications/tfrobot/",
   Gitea = "/deploy/applications/gitea/",
+  Nostr = "/deploy/applications/nostr/",
 }
 
 const DashboardRoutes = {

@@ -1,5 +1,9 @@
 <template>
   <view-layout>
+    <v-card color="primary" class="d-flex justify-center items-center pa-3 mb-3 text-center">
+      <v-icon size="30" class="pr-3">mdi-lan-connect</v-icon>
+      <v-card-title class="pa-0">Farm Finder</v-card-title>
+    </v-card>
     <v-alert type="info" variant="tonal" class="mb-6"> Click on the row to view farm details. </v-alert>
     <TfFiltersLayout>
       <template #filters>
@@ -89,6 +93,7 @@
           { value: 5, title: '5' },
           { value: 10, title: '10' },
           { value: 15, title: '15' },
+          { value: 50, title: '50' },
         ]"
         :items-per-page="size"
         @update:items-per-page="

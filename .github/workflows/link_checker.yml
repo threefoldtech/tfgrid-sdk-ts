@@ -1,0 +1,17 @@
+name: Link Checker
+
+on:
+  schedule:
+    - cron: '0 8 * * *'
+
+jobs:
+  check-links:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Link Checker
+        id: checker
+        uses: docker://ghcr.io/threefoldfoundation/website-link-checker:latest
+        with:
+          args: 'https://staging.dashboard.dev.grid.tf -e 404 501 503 504 -w all'

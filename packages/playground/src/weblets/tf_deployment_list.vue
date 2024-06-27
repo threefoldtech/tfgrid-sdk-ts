@@ -26,9 +26,9 @@
             @click="openDialog(tabs[activeTab].value, item)"
           />
 
-          <IconActionBtn icon="mdi-cog" tooltip="Manage Domains" @click="dialog = item.deploymentName" />
+          <IconActionBtn icon="mdi-cog" tooltip="Manage Domains" @click="dialog = item.name" />
 
-          <ManageGatewayDialog v-if="dialog === item.deploymentName" :vm="item" @close="dialog = undefined" />
+          <ManageGatewayDialog v-if="dialog === item.name" :vm="item" @close="dialog = undefined" />
         </template>
 
         <template #VM-actions="{ item }">
@@ -42,10 +42,10 @@
             icon="mdi-cog"
             tooltip="Manage Domains"
             :disabled="item.fromAnotherClient"
-            @click="dialog = item.deploymentName"
+            @click="dialog = item.name"
           />
 
-          <ManageGatewayDialog v-if="dialog === item.deploymentName" :vm="item" @close="dialog = undefined" />
+          <ManageGatewayDialog v-if="dialog === item.name" :vm="item" @close="dialog = undefined" />
         </template>
 
         <template #CapRover-actions="{ item, update }">
@@ -60,10 +60,10 @@
             icon="mdi-view-dashboard"
             :href="'http://captain.' + item.env.CAPROVER_ROOT_DOMAIN"
           />
-          <IconActionBtn icon="mdi-cog" tooltip="Manage Workers" @click="dialog = item.deploymentName" />
+          <IconActionBtn icon="mdi-cog" tooltip="Manage Workers" @click="dialog = item.name" />
 
           <ManageCaproverWorkerDialog
-            v-if="dialog === item.deploymentName"
+            v-if="dialog === item.name"
             :master="item"
             :data="item.workers || []"
             :project-name="item.projectName"
@@ -290,6 +290,14 @@
           />
         </template>
 
+        <template #Nostr-actions="{ item }">
+          <IconActionBtn
+            tooltip="Show Details"
+            icon="mdi-eye-outline"
+            @click="openDialog(tabs[activeTab].value, item)"
+          />
+        </template>
+
         <template #Wordpress-actions="{ item }">
           <IconActionBtn
             tooltip="Show Details"
@@ -325,11 +333,11 @@
               icon="mdi-cog"
               :disabled="item.fromAnotherClient"
               tooltip="Manage Workers"
-              @click="dialog = item.deploymentName"
+              @click="dialog = item.name"
             />
 
             <ManageK8SWorkerDialog
-              v-if="dialog === item.deploymentName"
+              v-if="dialog === item.name"
               :data="item"
               @close="dialog = undefined"
               @update:k8s="item.workers = $event.workers"
@@ -357,8 +365,8 @@
         <strong>Delete the following deployments?</strong>
       </v-card-title>
       <v-card-text>
-        <v-chip class="ma-1" v-for="item in selectedItems" :key="item.deploymentName">
-          {{ item.deploymentName }}
+        <v-chip class="ma-1" v-for="item in selectedItems" :key="item.name">
+          {{ item.name }}
         </v-chip>
         <v-divider />
       </v-card-text>
@@ -408,6 +416,7 @@ const tabs: Tab[] = [
   { title: "Static Website", value: "StaticWebsite", imgPath: "images/icons/wordpress.png" },
   { title: "TFRobot", value: "TFRobot", imgPath: "images/icons/tfrobot.png" },
   { title: "Gitea", value: "Gitea", imgPath: "images/icons/vm.png" },
+  { title: "Nostr", value: "Nostr", imgPath: "images/icons/nostr.png" },
 ];
 
 const layout = useLayout();
@@ -430,17 +439,19 @@ async function onDelete(k8s = false) {
     for (const item of selectedItems.value) {
       try {
         await deleteDeployment(updateGrid(grid!, { projectName: item.projectName }), {
-          name: item.deploymentName,
+          deploymentName: item.deploymentName,
+          name: k8s ? item.deploymentName : item.name,
           projectName: item.projectName,
+          ip: item.interfaces?.[0]?.ip,
           k8s,
         });
       } catch (e: any) {
-        createCustomToast(`Failed to delete deployment with name: ${item.deploymentName}`, ToastType.danger);
+        createCustomToast(`Failed to delete deployment with name: ${item.name}`, ToastType.danger);
         console.log("Error while deleting deployment", e.message);
         continue;
       }
-      table.value?.loadDeployments();
     }
+    table.value?.loadDeployments();
   } catch (e) {
     createCustomToast((e as Error).message, ToastType.danger);
   } finally {

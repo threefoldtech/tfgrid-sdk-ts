@@ -17,7 +17,8 @@
               ></v-select>
               <input-validator
                 :value="publicIP"
-                :rules="[validators.required('IP is required.'), validators.isIPRange('Not a valid IP'), ipcheck]"
+                :rules="[validators.required('IP is required.'), validators.isIPRange('Not a valid IP')]"
+                :async-rules="[ipcheck]"
                 #="{ props }"
               >
                 <input-tooltip tooltip="IP address in CIDR format xxx.xxx.xxx.xxx/xx">
@@ -35,7 +36,8 @@
               <input-validator
                 v-if="type === IPType.range"
                 :value="toPublicIP"
-                :rules="[validators.required('IP is required.'), validators.isIPRange('Not a valid IP'), toIpCheck]"
+                :rules="[validators.required('IP is required.'), validators.isIPRange('Not a valid IP')]"
+                :async-rules="[toIpCheck]"
                 #="{ props }"
               >
                 <input-tooltip tooltip="IP address in CIDR format xxx.xxx.xxx.xxx/xx">
@@ -101,10 +103,12 @@
 
 <script lang="ts">
 import { TFChainErrors } from "@threefold/types";
+import { contains } from "cidr-tools";
 import { getIPRange } from "get-ip-range";
 import { default as PrivateIp } from "private-ip";
 import { ref, watch } from "vue";
 
+import { gqlClient } from "@/clients";
 import { IPType } from "@/utils/types";
 
 import { useGrid } from "../../stores";
@@ -145,12 +149,19 @@ export default {
       { deep: true },
     );
 
-    function ipcheck() {
+    async function ipcheck() {
       if (PrivateIp(publicIP.value.split("/")[0])) {
         return {
           message: "IP is not public",
         };
       }
+
+      if (await IpExistsCheck(publicIP.value)) {
+        return {
+          message: "IP exists.",
+        };
+      }
+
       return undefined;
     }
 
@@ -161,8 +172,11 @@ export default {
       },
       { deep: true },
     );
-
-    function toIpCheck() {
+    async function IpExistsCheck(pubIp: string) {
+      const ips = await gqlClient.publicIps({ ip: true }, { where: { ip_eq: pubIp } });
+      return ips.length > 0;
+    }
+    async function toIpCheck() {
       if (toPublicIP.value.split("/")[1] !== publicIP.value.split("/")[1]) {
         return {
           message: "Subnet is different.",
@@ -200,12 +214,30 @@ export default {
           message: "IP is not public.",
         };
       }
+      if (await IpExistsCheck(toPublicIP.value)) {
+        return {
+          message: "IP exists.",
+        };
+      }
       return undefined;
     }
 
     function gatewayCheck() {
       const firstIP = publicIP?.value.split("/")[0];
       const lastIP = toPublicIP?.value.split("/")[0];
+      let isRange = false;
+
+      try {
+        isRange = contains(publicIP.value, gateway.value);
+      } catch {
+        isRange = false;
+      }
+
+      if (!isRange) {
+        return {
+          message: "Gateway IP not in the provided IP range.",
+        };
+      }
 
       if (firstIP === gateway.value || lastIP === gateway.value) {
         return {

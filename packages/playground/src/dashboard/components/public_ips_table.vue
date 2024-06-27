@@ -17,7 +17,7 @@
         {{ item.contractId ?? "-" }}
       </template>
       <template #bottom>
-        <div class="d-flex align-end justify-end">
+        <div v-if="publicIps.length > 0" class="d-flex align-end justify-end">
           <v-btn
             class="ma-3"
             color="error"
@@ -28,6 +28,9 @@
             Delete
           </v-btn>
         </div>
+        <div v-else>
+          <p class="my-4">No IPs added on this farm.</p>
+        </div>
       </template>
     </ListTable>
     <v-dialog v-model="showDialogue" max-width="600">
@@ -36,7 +39,7 @@
           <strong>Delete the following IPs?</strong>
         </v-card-title>
         <v-card-text>
-          <v-chip class="mb-5" v-for="item in selectedItems" :key="item">
+          <v-chip class="mb-5 mr-2" v-for="item in selectedItems" :key="item">
             {{ item.ip }}
           </v-chip>
           <v-divider />

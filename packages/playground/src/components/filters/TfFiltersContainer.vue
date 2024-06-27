@@ -179,8 +179,15 @@ export default {
       collapsible.value = breakpoint > window.innerWidth;
     }
 
+    function onEnterApply(e: KeyboardEvent) {
+      if (e.keyCode == 13 && valid.value && changed.value) apply();
+    }
+
     onMounted(() => typeof breakpoint === "number" && window.addEventListener("resize", onResize));
+    onMounted(() => window.addEventListener("keyup", onEnterApply));
     onUnmounted(() => typeof breakpoint === "number" && window.removeEventListener("resize", onResize));
+    onUnmounted(() => window.removeEventListener("keyup", onEnterApply));
+
     typeof breakpoint === "number" && onResize();
 
     return { empty, changed, clear, apply, valid, collapsible, filterOpened };
