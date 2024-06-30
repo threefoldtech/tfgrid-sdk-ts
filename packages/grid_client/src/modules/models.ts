@@ -20,6 +20,7 @@ import {
   ValidateNested,
 } from "class-validator";
 
+import { IsAlphanumericExceptUnderscore } from "../helpers";
 import { Deployment } from "../zos/deployment";
 import { ZdbModes } from "../zos/zdb";
 import { blockchainType } from "./blockchainInterface";
@@ -101,7 +102,7 @@ class BaseGetDeleteModel {
 }
 
 class MachineModel {
-  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
+  @Expose() @IsString() @IsNotEmpty() @MaxLength(NameLength) @IsAlphanumericExceptUnderscore() name: string;
   @Expose() @IsInt() @Min(1) node_id: number;
   @Expose() @IsOptional() @Type(() => DiskModel) @ValidateNested({ each: true }) disks?: DiskModel[];
   @Expose() @IsOptional() @Type(() => QSFSDiskModel) @ValidateNested({ each: true }) qsfs_disks?: QSFSDiskModel[];
@@ -124,7 +125,7 @@ class MachineModel {
 }
 
 class MachinesModel {
-  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
+  @Expose() @IsString() @IsNotEmpty() @IsAlphanumericExceptUnderscore() @MaxLength(NameLength) name: string;
   @Expose() @Type(() => NetworkModel) @ValidateNested() network: NetworkModel;
   @Expose() @Type(() => MachineModel) @ValidateNested({ each: true }) machines: MachineModel[];
   @Expose() @IsString() @IsOptional() metadata?: string;

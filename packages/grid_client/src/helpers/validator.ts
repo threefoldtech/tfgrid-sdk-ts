@@ -1,6 +1,6 @@
 import { ValidationError } from "@threefold/types";
 import { plainToInstance } from "class-transformer";
-import { validateSync } from "class-validator";
+import { registerDecorator, validateSync, ValidationOptions } from "class-validator";
 
 function validateObject(obj) {
   const errors = validateSync(obj);
@@ -31,4 +31,21 @@ function validateHexSeed(seed: string, length: number): boolean {
   return true;
 }
 
-export { validateObject, validateInput, validateHexSeed };
+function IsAlphanumericExceptUnderscore(validationOptions?: ValidationOptions) {
+  return function (object: any, propertyName: string) {
+    registerDecorator({
+      name: "IsAlphanumericExceptUnderscore",
+      target: object.constructor,
+      propertyName: propertyName,
+      options: validationOptions,
+      constraints: [`${propertyName} must contain only letters, numbers, and underscores`],
+      validator: {
+        validate(value: any) {
+          return /^[a-zA-Z0-9_]*$/.test(value);
+        },
+      },
+    });
+  };
+}
+
+export { validateObject, validateInput, validateHexSeed, IsAlphanumericExceptUnderscore };
