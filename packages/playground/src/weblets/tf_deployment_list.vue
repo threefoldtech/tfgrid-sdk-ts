@@ -249,7 +249,7 @@
             tooltip="Visit"
             icon="mdi-web"
             color="anchor"
-            :href="'http://' + (item.publicIP?.ip ? item.publicIP.ip.slice(0, -3) : '[' + item.planetary + ']')"
+            :href="'https://' + item.env.NODE_PILOT_HOSTNAME"
           />
         </template>
 

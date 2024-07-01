@@ -169,4 +169,9 @@ export const deploymentListEnvironments = {
   nostr: {
     SSH_KEY: _ssh,
   },
+
+  nodepilot: {
+    SSH_KEY: _ssh,
+    NODE_PILOT_HOSTNAME: "Node Pilot Hostname",
+  },
 };
