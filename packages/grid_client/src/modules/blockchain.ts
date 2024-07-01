@@ -3,30 +3,13 @@ import { GridClientError, ValidationError } from "@threefold/types";
 import { GridClientConfig } from "../config";
 import { expose } from "../helpers/expose";
 import { validateInput } from "../helpers/validator";
-import {
-  algorand,
-  BlockchainAssetsModel,
-  BlockchainCreateModel,
-  BlockchainCreateResultModel,
-  BlockchainDeleteModel,
-  BlockchainGetModel,
-  BlockchainGetResultModel,
-  BlockchainInitModel,
-  BlockchainListModel,
-  BlockchainListResultModel,
-  BlockchainPayModel,
-  BlockchainPayNoNameModel,
-  BlockchainSignModel,
-  BlockchainSignNoNameModel,
-  stellar,
-  tfchain,
-} from ".";
+import * as blockchain from ".";
 import blockchainInterface, { blockchainType } from "./blockchainInterface";
 
 class Blockchain implements blockchainInterface {
-  stellar: stellar;
-  algorand: algorand;
-  tfchain: tfchain;
+  stellar: blockchain.stellar;
+  algorand: blockchain.algorand;
+  tfchain: blockchain.tfchain;
   current_account: string;
   blockchain_type: blockchainType;
 
@@ -37,9 +20,9 @@ class Blockchain implements blockchainInterface {
    *
    */
   constructor(public config: GridClientConfig) {
-    this.stellar = new stellar(config);
-    this.algorand = new algorand(config);
-    this.tfchain = new tfchain(config);
+    this.stellar = new blockchain.stellar(config);
+    this.algorand = new blockchain.algorand(config);
+    this.tfchain = new blockchain.tfchain(config);
   }
 
   /**
@@ -48,7 +31,7 @@ class Blockchain implements blockchainInterface {
    * @param {BlockchainGetModel} options - The options containing the account name to check.
    * @returns {Promise<blockchainType | undefined>} The type of blockchain where the account exists or undefined.
    */
-  async exist_in(options: BlockchainGetModel): Promise<blockchainType | undefined> {
+  async exist_in(options: blockchain.BlockchainGetModel): Promise<blockchainType | undefined> {
     if (await this.stellar.exist(options)) return blockchainType.stellar;
     else if (await this.algorand.exist(options)) return blockchainType.algorand;
     else if (await this.tfchain.exist(options)) return blockchainType.tfchain;
@@ -65,7 +48,7 @@ class Blockchain implements blockchainInterface {
    */
   @expose
   @validateInput
-  async exist(options: BlockchainGetModel): Promise<boolean> {
+  async exist(options: blockchain.BlockchainGetModel): Promise<boolean> {
     return (
       (await this.stellar.exist({ name: options.name })) ||
       (await this.algorand.exist({ name: options.name })) ||
@@ -87,7 +70,7 @@ class Blockchain implements blockchainInterface {
    */
   @expose
   @validateInput
-  async select(options: BlockchainGetModel): Promise<string> {
+  async select(options: blockchain.BlockchainGetModel): Promise<string> {
     const account_exists = await this.exist(options);
 
     if (!account_exists) throw new ValidationError(`Account ${options.name} doesn't exist.`);
@@ -113,7 +96,7 @@ class Blockchain implements blockchainInterface {
    */
   @expose
   @validateInput
-  async create(options: BlockchainCreateModel): Promise<BlockchainCreateResultModel> {
+  async create(options: blockchain.BlockchainCreateModel): Promise<blockchain.BlockchainCreateResultModel> {
     const account_exists = await this.exist(options);
 
     if (account_exists) throw new ValidationError(`Name ${options.name} already exists.`);
@@ -135,10 +118,10 @@ class Blockchain implements blockchainInterface {
    */
   @expose
   @validateInput
-  async sign(options: BlockchainSignNoNameModel): Promise<string> {
+  async sign(options: blockchain.BlockchainSignNoNameModel): Promise<string> {
     if (!this.current_account) throw new ValidationError(`No account is selected. Please select an account first.`);
 
-    const modified_options: BlockchainSignModel = { name: this.current_account, content: options.content };
+    const modified_options: blockchain.BlockchainSignModel = { name: this.current_account, content: options.content };
 
     return this[this.blockchain_type].sign(modified_options);
   }
@@ -156,7 +139,7 @@ class Blockchain implements blockchainInterface {
    */
   @expose
   @validateInput
-  async init(options: BlockchainInitModel): Promise<string> {
+  async init(options: blockchain.BlockchainInitModel): Promise<string> {
     return this[options.blockchain_type].init(options);
   }
 
@@ -173,7 +156,7 @@ class Blockchain implements blockchainInterface {
    */
   @expose
   @validateInput
-  async get(): Promise<BlockchainGetResultModel> {
+  async get(): Promise<blockchain.BlockchainGetResultModel> {
     if (!this.current_account) throw new ValidationError(`No account is selected. Please select an account first.`);
 
     const options = { name: this.current_account };
@@ -194,7 +177,7 @@ class Blockchain implements blockchainInterface {
    */
   @expose
   @validateInput
-  async list(options?: BlockchainListModel): Promise<BlockchainListResultModel[]> {
+  async list(options?: blockchain.BlockchainListModel): Promise<blockchain.BlockchainListResultModel[]> {
     if (!options || !options.blockchain_type) {
       const stellar_accounts = await this.stellar.list();
       const algorand_accounts = await this.algorand.list();
@@ -218,7 +201,7 @@ class Blockchain implements blockchainInterface {
    */
   @expose
   @validateInput
-  async assets(): Promise<BlockchainAssetsModel> {
+  async assets(): Promise<blockchain.BlockchainAssetsModel> {
     if (!this.current_account) throw new ValidationError(`No account is selected. Please select an account first.`);
 
     const options = { name: this.current_account };
@@ -242,13 +225,13 @@ class Blockchain implements blockchainInterface {
   @expose
   @validateInput
   // TODO : bridge, still
-  async pay(options: BlockchainPayNoNameModel): Promise<any> {
+  async pay(options: blockchain.BlockchainPayNoNameModel): Promise<any> {
     if (!this.current_account) throw new ValidationError(`No account is selected. Please select an account first.`);
 
     if (this.blockchain_type != options.blockchain_type_dest)
       throw new GridClientError(`Transfer between blockchains isn't implemented yet.`);
 
-    const modified_options: BlockchainPayModel = {
+    const modified_options: blockchain.BlockchainPayModel = {
       name: this.current_account,
       blockchain_type_dest: options.blockchain_type_dest,
       description: options.description,
@@ -276,7 +259,7 @@ class Blockchain implements blockchainInterface {
   async delete(): Promise<any> {
     if (!this.current_account) throw new ValidationError(`No account is selected. Please select an account first.`);
 
-    const options: BlockchainDeleteModel = { name: this.current_account };
+    const options: blockchain.BlockchainDeleteModel = { name: this.current_account };
 
     return this[this.blockchain_type].delete(options);
   }
