@@ -16,9 +16,9 @@ interface ComputeCapacity {
 
 interface BaseMountData {
   /** The name of the mount */
-  name: string;
+  name?: string;
   /** The mount point in the filesystem */
-  mountPoint: string;
+  mountPoint?: string;
 }
 
 interface ExtendedMountData extends BaseMountData {
@@ -97,4 +97,4 @@ interface VM extends ZmachineData {
   wireguard: string;
 }
 
-export { ZmachineData, VM };
+export { ZmachineData, VM, ExtendedMountData };
