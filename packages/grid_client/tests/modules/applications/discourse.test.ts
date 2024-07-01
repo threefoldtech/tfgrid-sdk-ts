@@ -204,7 +204,7 @@ test("TC2690 - Applications: Deploy Discourse", async () => {
   const site = "https://" + gatewayResult[0].domain;
   let reachable = false;
 
-  for (let i = 0; i < 250; i++) {
+  for (let i = 0; i <= 250; i++) {
     const wait = await setTimeout(5000, "Waiting for gateway to be ready");
     log(wait);
 
@@ -221,7 +221,7 @@ test("TC2690 - Applications: Deploy Discourse", async () => {
         reachable = true;
       })
       .catch(() => {
-        //log("gateway is not reachable");
+        log("gateway is not reachable");
       });
     if (reachable) {
       break;

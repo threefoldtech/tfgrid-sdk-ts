@@ -160,7 +160,7 @@ test("TC2701 - Applications: Deploy Nodepilot", async () => {
     }),
   });
 
-  for (let i = 0; i < 180; i++) {
+  for (let i = 0; i <= 180; i++) {
     const wait = await setTimeout(5000, "Waiting for gateway to be ready");
     log(wait);
 

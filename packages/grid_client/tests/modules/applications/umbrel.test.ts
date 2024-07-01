@@ -155,7 +155,7 @@ test("TC2694 - Applications: Deploy Umbrel", async () => {
   let reachable = false;
   log(site);
 
-  for (let i = 0; i < 180; i++) {
+  for (let i = 0; i <= 180; i++) {
     const wait = await setTimeout(5000, "Waiting for gateway to be ready");
     log(wait);
 

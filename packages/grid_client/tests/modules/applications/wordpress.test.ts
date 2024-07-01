@@ -192,7 +192,7 @@ test("TC2700 - Applications: Deploy Wordpress", async () => {
   const site = "https://" + gatewayResult[0].domain;
   let reachable = false;
 
-  for (let i = 0; i < 180; i++) {
+  for (let i = 0; i <= 180; i++) {
     const wait = await setTimeout(5000, "Waiting for gateway to be ready");
     log(wait);
 
