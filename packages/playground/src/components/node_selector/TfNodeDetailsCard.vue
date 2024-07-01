@@ -290,6 +290,7 @@ import { useAsync } from "../../hooks";
 import { useGrid, useProfileManager } from "../../stores";
 import formatResourceSize from "../../utils/format_resource_size";
 import { toGigaBytes } from "../../utils/helpers";
+import { normalizePrice } from "../../utils/pricing_calculator";
 import ResourceDetails from "./node_details_internals/ResourceDetails.vue";
 
 export default {
@@ -312,7 +313,7 @@ export default {
     const stakingDiscount = ref<number>();
     const loadingStakingDiscount = ref<boolean>(false);
     const lastDeploymentTime = ref<number>(0);
-    const dedicatedDiscount = ref<number>(0);
+    const dedicatedPriceTFTAfterDiscount = ref<number>(0);
     const rentedByUser = computed(() => {
       return props.node?.rentedByTwinId === profileManager.profile?.twinId;
     });
@@ -337,8 +338,7 @@ export default {
     async function refreshStakingDiscount() {
       loadingStakingDiscount.value = true;
       if (props.node) {
-        await getDedicatedPriceTFT();
-        stakingDiscount.value = getStakingDiscount() || 0;
+        stakingDiscount.value = (await getStakingDiscount()) || 0;
       }
       loadingStakingDiscount.value = false;
     }
@@ -447,7 +447,11 @@ export default {
     function formatSpeed(speed: number): string {
       return formatResourceSize(speed, true).toLocaleLowerCase() + "ps";
     }
-    async function getDedicatedPriceTFT() {
+    const tftPriceTask = useAsync(() => calculator.tftPrice(), {
+      init: true,
+      default: 0,
+    });
+    async function getStakingDiscount() {
       try {
         const total_resources = props.node?.total_resources;
         const { cru, hru, mru, sru } = total_resources as NodeResources;
@@ -460,20 +464,16 @@ export default {
           ipv4u: false,
           certified: props.node?.certificationType === CertificationType.Certified,
         });
+        const tftPrice = tftPriceTask.value.data;
+        if (tftPrice) {
+          dedicatedPriceTFTAfterDiscount.value = normalizePrice(price?.dedicatedPrice / tftPrice);
+          console.log(dedicatedPriceTFTAfterDiscount.value);
+        }
 
-        dedicatedDiscount.value = price?.dedicatedPackage.discount;
-        console.log(price?.dedicatedPrice);
-        return price?.dedicatedPrice;
+        return price?.dedicatedPackage.discount;
       } catch (err) {
         console.error(err);
       }
-    }
-
-    function getStakingDiscount() {
-      if (dedicatedDiscount.value) {
-        return dedicatedDiscount.value;
-      }
-      return null;
     }
 
     function onReserveChange() {
@@ -516,6 +516,7 @@ export default {
         }
       }
     }
+    const calculator = new Calculator(new QueryClient(window.env.SUBSTRATE_URL));
 
     const discountPackagesItems = [
       { name: "Default", discount: "-20%", tfts: 200 },
@@ -571,7 +572,6 @@ export default {
       formatSpeed,
       onReserveChange,
       getNodeStatusColor,
-      getDedicatedPriceTFT,
       lastDeploymentTime,
     };
   },
