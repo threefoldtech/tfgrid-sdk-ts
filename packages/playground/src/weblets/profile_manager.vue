@@ -83,6 +83,7 @@
           () => {
             clearError();
             clearFields();
+            disableSelection();
           }
         "
         destroy
@@ -319,10 +320,13 @@
             </FormValidator>
 
             <div class="d-flex justify-center mt-2">
-              <VBtn color="anchor" variant="outlined" @click="$emit('update:modelValue', false)"> Close </VBtn>
+              <VBtn color="anchor" tabindex="1" variant="outlined" @click="$emit('update:modelValue', false)">
+                Close
+              </VBtn>
               <VBtn
                 class="ml-2"
                 type="submit"
+                tabindex="1"
                 color="secondary"
                 :loading="activating"
                 :disabled="
@@ -701,8 +705,15 @@ async function activate(mnemonic: string, keypairType: KeypairType) {
     activating.value = false;
   }
 }
+function disableSelection() {
+  nextTick(() => {
+    const elements = document.querySelectorAll(".v-field__append-inner i");
+    elements.forEach(element => element.setAttribute("tabindex", "-1"));
+  });
+}
 
 onMounted(async () => {
+  disableSelection();
   await mounted();
 });
 
