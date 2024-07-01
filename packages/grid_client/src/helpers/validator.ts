@@ -1,6 +1,6 @@
 import { ValidationError } from "@threefold/types";
 import { plainToInstance } from "class-transformer";
-import { registerDecorator, validateSync, ValidationOptions } from "class-validator";
+import { buildMessage, registerDecorator, validateSync, ValidationOptions } from "class-validator";
 
 function validateObject(obj) {
   const errors = validateSync(obj);
@@ -43,6 +43,10 @@ function IsAlphanumericExceptUnderscore(validationOptions?: ValidationOptions) {
         validate(value: any) {
           return /^[a-zA-Z0-9_]*$/.test(value);
         },
+        defaultMessage: buildMessage(
+          eachPrefix => eachPrefix + "$property must contain only letters, numbers, and underscores",
+          validationOptions,
+        ),
       },
     });
   };
