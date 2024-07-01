@@ -1,21 +1,43 @@
+import { Proposals } from "@threefold/tfchain_client";
+
 import { TFClient } from "../clients/tf-grid/client";
 import { GridClientConfig } from "../config";
 import { expose } from "../helpers/expose";
 import { validateInput } from "../helpers/validator";
 import { DaoVoteModel } from "./models";
+
 class Dao {
   client: TFClient;
+
+  /**
+   * Represents a class that interacts with the `DAO` using a `TFClient` instance.
+   *
+   * @param {GridClientConfig} config - The configuration object for initializing the client.
+   */
   constructor(public config: GridClientConfig) {
     this.client = config.tfclient;
   }
+
+  /**
+   * Asynchronously retrieves data from the `DAO` using the `TFClient` instance.
+   *
+   * @returns {Promise<Proposals>} A promise that resolves with the data retrieved from the `DAO`.
+   */
   @expose
   @validateInput
-  async get() {
+  async get(): Promise<Proposals> {
     return await this.client.dao.get();
   }
+
+  /**
+   * Asynchronously submits a vote to the `DAO` using the provided options.
+   *
+   * @param {DaoVoteModel} options - The options for casting the vote, including `address`, `farmId`, `approval status`, and `hash`.
+   * @returns {Promise<any>} A promise that resolves with the result of the vote submission.
+   */
   @expose
   @validateInput
-  async vote(options: DaoVoteModel) {
+  async vote(options: DaoVoteModel): Promise<any> {
     return (await this.client.dao.vote(options)).apply();
   }
 }
