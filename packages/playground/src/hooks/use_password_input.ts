@@ -9,7 +9,7 @@ export function usePasswordInput(defaultShow = false) {
     "onClick:append-inner": () => (show.value = !show.value),
     ref: () => {
       const elements = document.querySelectorAll(".v-field__append-inner i");
-      elements.forEach((el: any) => el.setAttribute("tabindex", "-1"));
+      elements.forEach(el => el.setAttribute("tabindex", "-1"));
     },
   });
 }
