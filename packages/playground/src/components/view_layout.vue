@@ -6,8 +6,10 @@
     />
 
     <template v-if="requireSSH && !ssh">
-      <VAlert variant="tonal" type="error" :text="title + ' requires public ssh key.'" class="mb-4" />
-      <SshkeyView />
+      <VAlert variant="tonal" type="error" class="mb-4">
+        {{ title }} requires a public SSH key. You can generate or import it from the
+        <router-link :to="DashboardRoutes.Deploy.SSHKey">SSH Keys</router-link> page.
+      </VAlert>
     </template>
     <slot v-else :key="tick" />
 
@@ -21,12 +23,11 @@
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import { useRoute } from "vue-router";
 
+import { DashboardRoutes } from "@/router/routes";
 import { useProfileManager } from "@/stores";
-import SshkeyView from "@/views/sshkey_view.vue";
 
 export default {
   name: "ViewLayout",
-  components: { SshkeyView },
   setup() {
     const route = useRoute();
     const profileManager = useProfileManager();
@@ -55,6 +56,7 @@ export default {
       requireSSH: computed(() => route.meta.requireSSH),
       tick,
       viewLayoutContainer,
+      DashboardRoutes,
     };
   },
 };
