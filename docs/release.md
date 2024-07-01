@@ -18,10 +18,10 @@ appVersion: "x.x.x"
 - This can be done by running this command:
 
   ```bash
-  lerna version --force-publish
+  lerna version --force-publish --exact
   ```
 
-  This command will Update the versions of all packages and also it will update the package version if it's used as a dependency in the other packages in the monorepo.
+  This command will Update the versions of all packages and also it will update the package version if it's used as a dependency in the other packages in the monorepo. Make sure to add `exact` flag; this will specify updated dependencies in updated packages exactly (with no punctuation).
 
 ## Create a new release
 
