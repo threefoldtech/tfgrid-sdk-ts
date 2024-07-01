@@ -464,11 +464,15 @@ export default {
           ipv4u: false,
           certified: props.node?.certificationType === CertificationType.Certified,
         });
-        const tftPrice = tftPriceTask.value.data;
-        if (tftPrice) {
-          dedicatedPriceTFTAfterDiscount.value = normalizePrice(price?.dedicatedPrice / tftPrice);
-          console.log(dedicatedPriceTFTAfterDiscount.value);
-        }
+        const pricing = await grid?.calculator.calculateTFTsNeeded({
+          cru,
+          hru: toGigaBytes(hru),
+          mru: toGigaBytes(mru),
+          sru: toGigaBytes(sru),
+          ipv4u: false,
+          certified: props.node?.certificationType === CertificationType.Certified,
+        });
+        console.log(pricing);
 
         return price?.dedicatedPackage.discount;
       } catch (err) {

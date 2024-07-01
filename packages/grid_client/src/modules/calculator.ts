@@ -1,4 +1,5 @@
 import { QueryClient } from "@threefold/tfchain_client";
+import { validate } from "class-validator";
 
 import { TFClient } from "../clients/tf-grid/client";
 import { GridClientConfig } from "../config";
@@ -105,6 +106,11 @@ class Calculator {
       24 *
       30;
     return { musd_month: musd_month, dedicatedDiscount: price.discountForDedicationNodes };
+  }
+  @expose
+  @validateInput
+  async calculateTFTsNeeded(options: CalculatorModel) {
+    return this.pricing(options);
   }
   @expose
   @validateInput
