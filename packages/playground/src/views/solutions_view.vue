@@ -32,6 +32,13 @@ export default {
         route: DashboardRoutes.Applications.Nostr,
       },
       {
+        title: "Gitea",
+        excerpt:
+          "Gitea is a forge software package for hosting software development version control using Git as well as other collaborative features like bug tracking, code review, continuous integration, kanban boards, tickets, and wikis. It supports self-hosting but also provides a free public first-party instance.",
+        icon: "gitea.png",
+        route: DashboardRoutes.Applications.Gitea,
+      },
+      {
         title: "TFRobot",
         excerpt:
           "TFRobot is a command line interface tool that offers simultaneous mass deployment of groups of VMs on the ThreeFold Grid, with support of multiple retries for failed deployments, and customizable configurations.",

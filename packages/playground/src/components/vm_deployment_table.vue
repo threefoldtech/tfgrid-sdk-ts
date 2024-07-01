@@ -267,7 +267,13 @@ const filteredHeaders = computed(() => {
     { title: "Actions", key: "actions", sortable: false },
   ];
 
-  const IPV6Solutions = [ProjectName.VM, ProjectName.Fullvm, ProjectName.TFRobot, ProjectName.Nostr] as string[];
+  const IPV6Solutions = [
+    ProjectName.VM,
+    ProjectName.Fullvm,
+    ProjectName.TFRobot,
+    ProjectName.Gitea,
+    ProjectName.Nostr,
+  ] as string[];
 
   const IPV4Solutions = [
     ProjectName.VM,
@@ -283,6 +289,7 @@ const filteredHeaders = computed(() => {
     ProjectName.StaticWebsite,
     ProjectName.Wordpress,
     ProjectName.TFRobot,
+    ProjectName.Gitea,
     ProjectName.Nostr,
   ] as string[];
 
