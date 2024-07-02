@@ -65,16 +65,12 @@
       </template>
 
       <template #master>
-        <K8SWorker v-model="master" :other-workers="workers" :nodes-lock="nodesLock" />
+        <K8SWorker v-model="master" />
       </template>
 
       <template #workers>
         <ExpandableLayout v-model="workers" @add="addWorker" #="{ index }">
-          <K8SWorker
-            v-model="workers[index]"
-            :other-workers="[workers, master].flat(1).filter((_, i) => i !== index)"
-            :nodes-lock="nodesLock"
-          />
+          <K8SWorker v-model="workers[index]" />
         </ExpandableLayout>
       </template>
     </d-tabs>
@@ -86,7 +82,7 @@
 </template>
 
 <script lang="ts" setup>
-import { markRaw, ref } from "vue";
+import { ref } from "vue";
 
 import { createWorker } from "../components/k8s_worker.vue";
 import { useLayout } from "../components/weblet_layout.vue";
@@ -98,7 +94,6 @@ import { generateName, generatePassword } from "../utils/strings";
 
 const layout = useLayout();
 const tabs = ref();
-const nodesLock = markRaw(new AwaitLock());
 const name = ref(generateName({ prefix: "k8s" }));
 const clusterToken = ref(generatePassword(10));
 const master = ref(createWorker(generateName({ prefix: "mr" })));
@@ -143,7 +138,6 @@ function updateSSHkeyEnv(selectedKeys: string) {
 
 <script lang="ts">
 import type { GridClient } from "@threefold/grid_client";
-import AwaitLock from "await-lock";
 
 import ExpandableLayout from "../components/expandable_layout.vue";
 import K8SWorker from "../components/k8s_worker.vue";
