@@ -16,7 +16,7 @@ class Twins {
    * It also includes functionality to get the current user's Twin ID and retrieve Twin ID by account ID.
    *
    * @class Twins
-   * @param {GridClientConfig} config - The configuration object for initializing the Nodes class.
+   * @param {GridClientConfig} config - The configuration object for initializing the client.
    */
   constructor(public config: GridClientConfig) {
     this.client = config.tfclient;

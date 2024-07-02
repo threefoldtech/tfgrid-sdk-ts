@@ -41,7 +41,7 @@ class Stellar implements blockchainInterface {
    * listing, retrieving assets, checking balance by address, and making payments for Stellar wallets.
    *
    * @class Stellar
-   * @param {GridClientConfig} config - The configuration object for initializing the Nodes class.
+   * @param {GridClientConfig} config - The configuration object for initializing the client.
    */
   constructor(public config: GridClientConfig) {
     this.mnemonic = config.mnemonic;

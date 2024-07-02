@@ -29,7 +29,7 @@ class Nodes {
    * It utilizes the `TFClient` and capacity classes for performing these operations.
    *
    * @class Nodes
-   * @param {GridClientConfig} config - The configuration object for initializing the Nodes class.
+   * @param {GridClientConfig} config - The configuration object for initializing the client.
    */
   constructor(public config: GridClientConfig) {
     this.client = config.tfclient;

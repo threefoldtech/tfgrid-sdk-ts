@@ -25,7 +25,7 @@ class QSFSZdbsModule extends BaseModule {
    * It also includes methods for checking balance before deploying, updating deployments, and retrieving ZDB information.
    *
    * @class QSFSZdbsModule
-   * @param {GridClientConfig} config - The configuration object for initializing the Nodes class.
+   * @param {GridClientConfig} config - The configuration object for initializing the client.
    */
   constructor(public config: GridClientConfig) {
     super(config);
