@@ -31,10 +31,10 @@ function validateHexSeed(seed: string, length: number): boolean {
   return true;
 }
 
-function IsAlphanumericExceptUnderscore(validationOptions?: ValidationOptions) {
+function IsAlphanumericExpectUnderscore(validationOptions?: ValidationOptions) {
   return function (object: any, propertyName: string) {
     registerDecorator({
-      name: "IsAlphanumericExceptUnderscore",
+      name: "IsAlphanumericExpectUnderscore",
       target: object.constructor,
       propertyName: propertyName,
       options: validationOptions,
@@ -52,4 +52,4 @@ function IsAlphanumericExceptUnderscore(validationOptions?: ValidationOptions) {
   };
 }
 
-export { validateObject, validateInput, validateHexSeed, IsAlphanumericExceptUnderscore };
+export { validateObject, validateInput, validateHexSeed, IsAlphanumericExpectUnderscore };
