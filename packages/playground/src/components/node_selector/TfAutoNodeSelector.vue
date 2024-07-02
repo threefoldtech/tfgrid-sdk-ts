@@ -144,8 +144,8 @@
 <script lang="ts">
 import type { FarmInfo, FilterOptions, NodeInfo } from "@threefold/grid_client";
 import { RequestError } from "@threefold/types";
-import type AwaitLock from "await-lock";
 import equals from "lodash/fp/equals.js";
+import sample from "lodash/fp/sample.js";
 import { computed, nextTick, onMounted, onUnmounted, type PropType, ref } from "vue";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { VCard } from "vuetify/components/VCard";
@@ -153,16 +153,13 @@ import type { VCard } from "vuetify/components/VCard";
 import { useAsync, usePagination, useWatchDeep } from "../../hooks";
 import { ValidatorStatus } from "../../hooks/form_validator";
 import { useGrid } from "../../stores";
-import type { SelectedLocation, SelectedMachine, SelectionDetailsFilters } from "../../types/nodeSelector";
+import type { SelectedLocation, SelectionDetailsFilters } from "../../types/nodeSelector";
 import {
   checkNodeCapacityPool,
   getNodePageCount,
-  isNodeValid,
   loadValidNodes,
   normalizeNodeFilters,
   normalizeNodeOptions,
-  release,
-  selectValidNode,
   validateRentContract,
 } from "../../utils/nodeSelector";
 import TfNodeDetailsCard from "./TfNodeDetailsCard.vue";
@@ -180,11 +177,6 @@ export default {
     location: Object as PropType<SelectedLocation>,
     farm: Object as PropType<FarmInfo>,
     status: String as PropType<ValidatorStatus>,
-    selectedMachines: {
-      type: Array as PropType<SelectedMachine[]>,
-      required: true,
-    },
-    nodesLock: Object as PropType<AwaitLock>,
   },
   emits: {
     "update:model-value": (node?: NodeInfo) => true || node,
@@ -192,12 +184,7 @@ export default {
   },
   setup(props, ctx) {
     const gridStore = useGrid();
-    const _loadedNodes = ref<NodeInfo[]>([]);
-    const loadedNodes = computed(() => {
-      return _loadedNodes.value.filter(
-        node => node.nodeId === props.modelValue?.nodeId || isNodeValid(node, props.selectedMachines, filters.value),
-      );
-    });
+    const loadedNodes = ref<NodeInfo[]>([]);
     const nodesTask = useAsync(loadValidNodes, {
       shouldRun: () => props.validFilters,
       onBeforeTask() {
@@ -205,24 +192,16 @@ export default {
         bindModelValue();
         return oldNode?.nodeId;
       },
-      async onAfterTask({ data }, oldNodeId: number) {
-        _loadedNodes.value = _loadedNodes.value.concat(data as NodeInfo[]);
+      onAfterTask({ data }, oldNodeId: number) {
+        loadedNodes.value = loadedNodes.value.concat(data as NodeInfo[]);
 
-        await _setValidNode(oldNodeId);
+        const node = loadedNodes.value.find(n => n.nodeId === oldNodeId) || sample(loadedNodes.value);
+        node && bindModelValue(node);
+        node && nodeInputValidateTask.value.run(node);
         pagination.value.next();
       },
       default: [],
     });
-
-    async function _setValidNode(oldNodeId?: number) {
-      const node = await selectValidNode(_loadedNodes.value, props.selectedMachines, filters.value, oldNodeId);
-      if (node) {
-        bindModelValue(node);
-        nodeInputValidateTask.value.run(node);
-      } else {
-        release(props.nodesLock);
-      }
-    }
 
     const pageCountTask = useAsync(getNodePageCount, { default: 1, shouldRun: () => props.validFilters });
     const pagination = usePagination();
@@ -230,7 +209,7 @@ export default {
     const options = computed(() => normalizeNodeOptions(gridStore, props.location, pagination, props.farm));
     const filters = computed(() => normalizeNodeFilters(props.filters, options.value));
 
-    const reloadNodes = () => nodesTask.value.run(gridStore, props.filters, filters.value, pagination, props.nodesLock);
+    const reloadNodes = () => nodesTask.value.run(gridStore, props.filters, filters.value, pagination);
     const loadingError = computed(() => {
       if (!nodesTask.value.error) return "";
       if (nodesTask.value.error instanceof RequestError) return "Failed to fetch nodes due to a network error";
@@ -280,7 +259,7 @@ export default {
       await pageCountTask.value.run(gridStore, filters.value);
       pagination.value.reset(pageCountTask.value.data as number);
       await nextTick();
-      _loadedNodes.value = [];
+      loadedNodes.value = [];
       return reloadNodes();
     }
 
@@ -295,7 +274,6 @@ export default {
         shouldRun: () => props.validFilters,
         onBeforeTask: () => bindStatus(ValidatorStatus.Pending),
         onAfterTask({ data }) {
-          release(props.nodesLock);
           bindStatus(data ? ValidatorStatus.Valid : ValidatorStatus.Invalid);
           const container = nodesContainer.value as HTMLDivElement;
           if (container) {
@@ -335,18 +313,6 @@ export default {
     }
 
     const nodesContainer = ref<HTMLDivElement>();
-
-    useWatchDeep(
-      () => props.selectedMachines.map(m => m.nodeId),
-      () => {
-        if (props.modelValue || nodesTask.value.loading) {
-          return;
-        }
-
-        _setValidNode();
-      },
-      { debounce: 1000 },
-    );
 
     return {
       pageCountTask,
