@@ -24,7 +24,7 @@ import { IsAlphanumericExpectUnderscore } from "../helpers";
 import { Deployment } from "../zos/deployment";
 import { ZdbModes } from "../zos/zdb";
 import { blockchainType } from "./blockchainInterface";
-const NameLength = 15;
+const NameLength = 50;
 const FarmNameLength = 40;
 
 enum ContractStates {

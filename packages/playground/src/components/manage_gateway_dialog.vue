@@ -121,7 +121,7 @@
                   validators.isAlphanumeric('Subdomain should consist of letters and numbers only.'),
                   subdomain => validators.isAlpha('Subdomain must start with alphabet char.')(subdomain[0]),
                   validators.minLength('Subdomain must be at least 4 characters.', 4),
-                  subdomain => validators.maxLength('Subdomain cannot exceed 30 characters.', 30)(subdomain),
+                  subdomain => validators.maxLength('Subdomain cannot exceed 50 characters.', 50)(subdomain),
                 ]"
                 :async-rules="gatewayTab === 1 ? [validateSubdomain] : []"
                 #="{ props }"
