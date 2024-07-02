@@ -98,7 +98,7 @@ class MyceliumNetworkModel {
 }
 
 class BaseGetDeleteModel {
-  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
+  @Expose() @IsString() @IsNotEmpty() @IsAlphanumericExpectUnderscore() @MaxLength(NameLength) name: string;
 }
 
 class MachineModel {
