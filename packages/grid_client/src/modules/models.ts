@@ -138,7 +138,7 @@ class AddMachineModel extends MachineModel {
 }
 
 class DeleteMachineModel {
-  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
+  @Expose() @IsString() @IsNotEmpty() @IsAlphanumericExpectUnderscore() @MaxLength(NameLength) name: string;
   @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) deployment_name: string;
 }
 
