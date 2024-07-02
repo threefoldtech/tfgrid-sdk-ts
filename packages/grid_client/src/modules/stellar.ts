@@ -34,6 +34,15 @@ class Stellar implements blockchainInterface {
   mnemonic: string;
   tfClient: TFClient;
 
+  /**
+   * Class representing a Stellar blockchain implementation that implements the blockchainInterface.
+   *
+   * This class provides methods for creating, initializing, signing, verifying, updating, checking existence,
+   * listing, retrieving assets, checking balance by address, and making payments for Stellar wallets.
+   *
+   * @class Stellar
+   * @param {GridClientConfig} config - The configuration object for initializing the Nodes class.
+   */
   constructor(public config: GridClientConfig) {
     this.mnemonic = config.mnemonic;
     this.backendStorage = new BackendStorage(
@@ -48,7 +57,13 @@ class Stellar implements blockchainInterface {
     this.tfClient = config.tfclient;
   }
 
-  private async saveIfKVStoreBackend(extrinsics) {
+  /**
+   * Saves the extrinsics to the `key-value` store backend if the backend storage type is `tfkvstore` and extrinsics are provided.
+   *
+   * @param {any[]} extrinsics - The extrinsics to be saved to the `key-value` store backend.
+   * @returns {Promise<void>} - A promise that resolves once the extrinsics are saved to the backend.
+   */
+  private async saveIfKVStoreBackend(extrinsics: any[]): Promise<void> {
     if (this.config.backendStorageType === BackendStorageType.tfkvstore && extrinsics && extrinsics.length > 0) {
       extrinsics = extrinsics.filter(e => e !== undefined);
       if (extrinsics.length > 0) {
@@ -58,7 +73,12 @@ class Stellar implements blockchainInterface {
     }
   }
 
-  async _load() {
+  /**
+   * Loads data from the backend storage using the specified path.
+   *
+   * @returns {Promise<[string, any]>} A promise that resolves with an array containing the path and the loaded data.
+   */
+  async _load(): Promise<[string, any]> {
     const path = PATH.join(appPath, this.fileName);
     let data = await this.backendStorage.load(path);
     if (!data) {
@@ -67,7 +87,15 @@ class Stellar implements blockchainInterface {
     return [path, data];
   }
 
-  async save(name: string, secret: string) {
+  /**
+   * Saves a wallet with the provided name and secret to the backend storage.
+   *
+   * @param {string} name - The name of the wallet to be saved.
+   * @param {string} secret - The secret key of the wallet to be saved.
+   * @throws {`ValidationError`} - If there is another wallet with the same name.
+   * @returns {Promise<void>} - A promise that resolves once the wallet is saved to the backend storage.
+   */
+  async save(name: string, secret: string): Promise<void> {
     const [path, data] = await this._load();
     if (data[name]) {
       throw new ValidationError(`A wallet with the same name ${name} already exists.`);
@@ -76,7 +104,14 @@ class Stellar implements blockchainInterface {
     await this.saveIfKVStoreBackend(updateOperations);
   }
 
-  async getWalletSecret(name: string) {
+  /**
+   * Retrieves the secret key of a wallet by its name from the backend storage.
+   *
+   * @param {string} name - The name of the wallet to retrieve the secret key for.
+   * @throws {`ValidationError`} - If the wallet with the provided name is not found in the backend storage.
+   * @returns {Promise<string>} - A promise that resolves with the secret key of the wallet.
+   */
+  async getWalletSecret(name: string): Promise<string> {
     const [, data] = await this._load();
     if (!data[name]) {
       throw new ValidationError(`Couldn't find a wallet with name ${name}.`);
@@ -84,6 +119,17 @@ class Stellar implements blockchainInterface {
     return data[name];
   }
 
+  /**
+   * Creates a new Stellar wallet with the provided name and saves it to the backend storage.
+   *
+   * @param {StellarWalletCreateModel} options - The options for creating the Stellar wallet, including the name.
+   * @returns {Promise<BlockchainCreateResultModel>} - A promise that resolves with the details of the created wallet, including name, public key, secret, and blockchain type.
+   * @throws {`ValidationError`} - If a wallet with the same name already exists.
+   * @throws {`RequestError`} - If an error occurs while creating the account.
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   */
   @expose
   @validateInput
   async create(options: StellarWalletCreateModel): Promise<BlockchainCreateResultModel> {
@@ -107,25 +153,57 @@ class Stellar implements blockchainInterface {
     };
   }
 
+  /**
+   * Signs the provided content using the secret key of the wallet associated with the given name.
+   *
+   * @param {BlockchainSignModel} options - The options containing the name of the wallet and the content to sign.
+   * @returns {Promise<string>} A Promise that resolves the signed content in `hexadecimal` format.
+   * @throws {`ValidationError`} - If the wallet with the provided name is not found in the backend storage.
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   */
   @expose
   @validateInput
-  async sign(options: BlockchainSignModel) {
+  async sign(options: BlockchainSignModel): Promise<string> {
     const secret = await this.getWalletSecret(options.name);
     const walletKeypair = StellarSdk.Keypair.fromSecret(secret);
     const signed_content = walletKeypair.sign(options.content);
     return Buffer.from(signed_content).toString("hex");
   }
 
+  /**
+   * Verifies the provided content using the public key and signed content.
+   *
+   * @param {StellarWalletVerifyModel} options - The options containing the public key, content, and signed content.
+   * @returns {boolean} - A boolean indicating whether the content is successfully verified.
+   * @throws {`ValidationError`} - If the provided public key is invalid or the verification fails.
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   */
   @expose
   @validateInput
-  async verify(options: StellarWalletVerifyModel) {
+  verify(options: StellarWalletVerifyModel): boolean {
     const walletKeypair = StellarSdk.Keypair.fromPublicKey(options.public_key);
     return walletKeypair.verify(options.content, Buffer.from(options.signedContent, "hex"));
   }
 
+  /**
+   * Initializes a new `Stellar wallet` with the provided `name` and `secret key`.
+   *
+   * This method generates a new `Stellar wallet` using the provided `secret key`, loads the account associated with the wallet's `public key`, and saves the wallet to the backend storage.
+   *
+   * @param {StellarWalletInitModel} options - The options for initializing the `Stellar` wallet, including the name and `secret key`.
+   * @returns {Promise<string>} A Promise that resolves the `public key` of the initialized `Stellar` wallet.
+   * @throws {`ValidationError`} - If the provided `secret key` is invalid or the account cannot be loaded.
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   */
   @expose
   @validateInput
-  async init(options: StellarWalletInitModel) {
+  async init(options: StellarWalletInitModel): Promise<string> {
     const walletKeypair = StellarSdk.Keypair.fromSecret(options.secret);
     const walletPublicKey = walletKeypair.publicKey();
     await server.loadAccount(walletPublicKey);
@@ -133,6 +211,18 @@ class Stellar implements blockchainInterface {
     return walletPublicKey;
   }
 
+  /**
+   * Retrieves the details of a `Stellar wallet` by its name from the backend storage.
+   *
+   * This method fetches the public key and `secret key` associated with the provided wallet `name`.
+   *
+   * @param {BlockchainGetModel} options - The options containing the name of the wallet to retrieve.
+   * @returns {Promise<BlockchainGetResultModel>} - A promise that resolves with the details of the wallet, including `name`, `public key`, `secret key`, and `blockchain type`.
+   * @throws {`ValidationError`} - If the wallet with the provided name is not found in the backend storage.
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   */
   @expose
   @validateInput
   async get(options: BlockchainGetModel): Promise<BlockchainGetResultModel> {
@@ -147,9 +237,21 @@ class Stellar implements blockchainInterface {
     // TODO: return wallet secret after adding security context on the server calls
   }
 
+  /**
+   * Updates an existing `Stellar wallet` with the provided `name` and `secret key`.
+   *
+   * This method first checks if a wallet with the provided `name` exists, then deletes the wallet and reinitializes it with the new `secret key`.
+   *
+   * @param {StellarWalletInitModel} options - The options for updating the `Stellar wallet`, including the `name` and new `secret key`.
+   * @returns {Promise<string>} - A promise that resolves with the public key of the updated `Stellar wallet`.
+   * @throws {`ValidationError`} - If the wallet with the provided `name` is not found or if there is an issue during the update process.
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   */
   @expose
   @validateInput
-  async update(options: StellarWalletInitModel) {
+  async update(options: StellarWalletInitModel): Promise<string> {
     if (!(await this.exist(options))) {
       throw new ValidationError(`Couldn't find a wallet with name ${options.name} to update.`);
     }
@@ -167,12 +269,32 @@ class Stellar implements blockchainInterface {
     }
   }
 
+  /**
+   * Checks if a wallet with the provided `name` exists in the backend storage.
+   *
+   * @param {BlockchainGetModel} options - The options containing the `name` of the wallet to check.
+   * @returns {Promise<boolean>} - A promise that resolves with a boolean indicating whether the wallet exists.
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   */
   @expose
   @validateInput
-  async exist(options: BlockchainGetModel) {
+  async exist(options: BlockchainGetModel): Promise<boolean> {
     return (await this.list()).map(account => account.name == options.name).includes(true);
   }
 
+  /**
+   * Retrieves a list of `Stellar wallets` from the backend storage.
+   *
+   * This method fetches the `names`, `public keys`, and `blockchain types` of all `Stellar wallets` stored in the backend.
+   *
+   * @returns {Promise<BlockchainListResultModel[]>} - A promise that resolves with an array of objects representing each `Stellar wallet`, including `name`, `public key`, and `blockchain type`.
+   * @throws {ValidationError} - If there is an issue while retrieving the list of wallets from the backend storage.
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   */
   @expose
   @validateInput
   async list(): Promise<BlockchainListResultModel[]> {
@@ -190,6 +312,18 @@ class Stellar implements blockchainInterface {
     return accounts;
   }
 
+  /**
+   * Retrieves the assets associated with a `Stellar wallet` by its `name` from the backend storage.
+   *
+   * This method fetches the `public key` of the wallet, retrieves the balances by address, and returns the assets including the asset code and balance.
+   *
+   * @param {BlockchainGetModel} options - The options containing the `name` of the wallet to retrieve assets for.
+   * @returns {Promise<BlockchainAssetsModel>} - A promise that resolves with the assets of the wallet, including `name`, `public key`, `blockchain type`, and `assets array`.
+   * @throws {`ValidationError`} - If the wallet with the provided `name` is not found in the backend storage.
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   */
   @expose
   @validateInput
   async assets(options: BlockchainGetModel): Promise<BlockchainAssetsModel> {
@@ -212,6 +346,18 @@ class Stellar implements blockchainInterface {
     };
   }
 
+  /**
+   * Retrieves the assets associated with a `Stellar wallet` by its `address` from the backend storage.
+   *
+   * This method fetches the `balances` of the account associated with the provided `address` and returns the assets including the `asset code` and `balance`.
+   *
+   * @param {StellarWalletBalanceByAddressModel} options - The options containing the `address` of the wallet to retrieve assets for.
+   * @returns {Promise<BlockchainAssetModel[]>} - A promise that resolves with the assets of the wallet, including `asset` and `amount`.
+   * @throws {`ValidationError`} - If the wallet with the provided `address` is not found in the backend storage.
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   */
   @expose
   @validateInput
   async balance_by_address(options: StellarWalletBalanceByAddressModel): Promise<BlockchainAssetModel[]> {
@@ -226,9 +372,23 @@ class Stellar implements blockchainInterface {
     return balances;
   }
 
+  /**
+   * Pays the specified `amount` of a given `asset` to a destination `address` from a `Stellar wallet`.
+   *
+   * This method retrieves the `secret key` of the wallet associated with the provided `name`, loads the source account,
+   * constructs a transaction to make a payment to the destination address with the specified asset and amount,
+   * signs the transaction with the wallet's secret key, and submits the transaction to the Stellar network.
+   *
+   * @param {StellarWalletTransferModel} options - The options for making the payment, including the name of the wallet, destination address, amount, asset, and optional description.
+   * @returns {Promise<string>} - A promise that resolves with the URL to view the transaction details on the Stellar network.
+   * @throws {`ValidationError`} - If the wallet with the provided name is not found or if there is an issue during the payment process.
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   */
   @expose
   @validateInput
-  async pay(options: StellarWalletTransferModel) {
+  async pay(options: StellarWalletTransferModel): Promise<string> {
     const secret = await this.getWalletSecret(options.name);
     if (!secret) {
       throw new ValidationError(`Couldn't find a wallet with name ${options.name}`);
@@ -281,9 +441,22 @@ class Stellar implements blockchainInterface {
     }
   }
 
+  /**
+   * Deletes a wallet with the provided `name` from the backend storage.
+   *
+   * This method checks if a wallet with the given `name` exists, deletes it from the backend storage,
+   * and saves the changes to the backend if the storage type is `tfkvstore`.
+   *
+   * @param {BlockchainDeleteModel} options - The options containing the name of the wallet to delete.
+   * @returns {Promise<string>} - A promise that resolves with a message indicating the deletion was successful.
+   * @throws {`ValidationError`} - If the wallet with the provided name is not found in the backend storage.
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   */
   @expose
   @validateInput
-  async delete(options: BlockchainDeleteModel) {
+  async delete(options: BlockchainDeleteModel): Promise<string> {
     const [path, data] = await this._load();
     if (!data[options.name]) {
       throw new ValidationError(`Couldn't find a wallet with name ${options.name}.`);
