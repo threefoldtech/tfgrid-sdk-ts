@@ -77,7 +77,7 @@ import { SpRuntimeModuleError } from "@polkadot/types/lookup";
 
 There are two blockers now from building the project:
 
-1. As we din't have any defined types `src/interfaces/chain/types` is empty and will gives an error while build, for now we just need to export an empty object on it so we add `export {}` to the file.
+1. As we don't have any defined types `src/interfaces/chain/types` is empty and will give an error while build, for now we just need to export an empty object on it so we add `export {}` to the file.
 2. Types with reserved names:
    In `src/interfaces/chain/augment-api-tx.ts` we have `createFarmingPolicy` and `updateFarmingPolicy` functions in tfgridmodule each of them contains parameter named `default` this is not acceptable on Typescript as it is a reserved word, so we could replace it with `_default`.
 
