@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import { env } from "process";
 
-import { BackendStorageType, GridClient, KeypairType } from "../src";
+import { GridClient } from "../src";
 
 const os = require("os");
 
@@ -11,17 +11,18 @@ const mnemonic = env.MNEMONIC;
 const storeSecret = env.STORE_SECRET;
 const ssh_key = fs.readFileSync(os.homedir() + "/.ssh/id_ed25519.pub", "utf-8");
 let config;
+const defaultConfig = JSON.parse(fs.readFileSync(path.join(__dirname, "./config.json"), "utf-8"));
 
 if (!network || !mnemonic || !ssh_key) {
   console.log("Credentials not all found in env variables. Loading all credentials from default config.json...");
-  config = JSON.parse(fs.readFileSync(path.join(__dirname, "./config.json"), "utf-8"));
+  config = defaultConfig;
 } else {
-  console.log("Credentials loaded from env variables...");
+  console.log("Credentials loaded from env variables or default config.json...");
   config = {
-    network: network,
-    mnemonic: mnemonic,
-    storeSecret: storeSecret,
-    ssh_key: ssh_key,
+    network: network || defaultConfig.network,
+    mnemonic: mnemonic || defaultConfig.mnemonic,
+    storeSecret: storeSecret || defaultConfig.storeSecret,
+    ssh_key: ssh_key || defaultConfig.ssh_key,
   };
 }
 

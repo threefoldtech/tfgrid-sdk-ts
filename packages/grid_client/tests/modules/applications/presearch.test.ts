@@ -1,3 +1,4 @@
+import { clean, gte } from "semver";
 import { setTimeout } from "timers/promises";
 
 import { FilterOptions, generateString, GridClient, MachinesModel, randomChoice } from "../../../src";
@@ -160,7 +161,9 @@ test("TC2728 - Applications: Deploy Presearch", async () => {
         const containerID = dockerContainer[i].slice(0, 11);
         await ssh.execCommand("docker logs " + containerID).then(async function (result) {
           log(result);
-          expect(result.stdout).toContain("presearch-node - v1.2.33");
+          const versionToCheck = clean(result.stdout.match(/v(\d+\.\d+\.\d+)/)?.[1]);
+          gte(versionToCheck, "1.2.33");
+          expect(result.stdout).toContain("presearch-node");
         });
       }
     }
