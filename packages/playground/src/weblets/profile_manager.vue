@@ -4,6 +4,7 @@
     class="mx-auto"
     :model-value="$props.modelValue"
     @update:model-value="handleProfileDialog($event)"
+    attach="#modals"
   >
     <template #activator="{ props }">
       <VCard v-bind="props" class="pa-3 d-inline-flex align-center">
@@ -153,6 +154,7 @@
                               }"
                               :disabled="creatingAccount || activatingAccount || activating"
                               @click:append="reloadValidation"
+                              autocomplete="off"
                             >
                               <template v-slot:prepend-inner v-if="validationProps.hint || validationProps.error">
                                 <v-icon :color="validationProps.error ? 'red' : 'green'">
@@ -200,7 +202,7 @@
                 </template>
               </VTooltip>
 
-              <v-dialog v-model="openAcceptTerms" fullscreen width="100%">
+              <v-dialog v-model="openAcceptTerms" fullscreen width="100%" attach="#modals">
                 <v-card v-if="!termsLoading">
                   <v-card-text class="pa-15" v-html="acceptTermsContent"></v-card-text>
                   <div class="terms-footer">
@@ -257,6 +259,7 @@
                   v-model="email"
                   v-bind="props"
                   :disabled="creatingAccount || activatingAccount || activating"
+                  autocomplete="off"
                 />
               </input-validator>
 
@@ -283,6 +286,7 @@
                           v-model="password"
                           v-bind="{ ...passwordInputProps, ...validationProps }"
                           :disabled="creatingAccount || activatingAccount || activating"
+                          autocomplete="off"
                         />
                       </div>
                     </template>
@@ -305,6 +309,7 @@
                       ...validationProps,
                     }"
                     :disabled="creatingAccount || activatingAccount || activating"
+                    autocomplete="off"
                   />
                 </InputValidator>
               </PasswordInputWrapper>

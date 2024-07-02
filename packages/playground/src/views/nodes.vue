@@ -44,6 +44,9 @@
           <TfFilter query-route="ipv6" v-model="filters.ipv6">
             <v-switch color="primary" inset label="IPv6" v-model="filters.ipv6" density="compact" hide-details />
           </TfFilter>
+          <TfFilter query-route="mine" v-model="filters.mine" v-if="profileManager.profile">
+            <v-switch color="primary" inset label="Mine" v-model="filters.mine" density="compact" hide-details />
+          </TfFilter>
 
           <TfFilter class="mt-4" query-route="node-status" v-model="filters.status">
             <v-select
@@ -416,6 +419,12 @@
           <v-row>
             <v-col cols="12">
               <div class="table">
+                <VAlert type="error" class="text-body-1 mb-4" v-if="error">
+                  Failed to load Nodes. Please try again!
+                  <template #append>
+                    <VBtn icon="mdi-reload" color="error" variant="plain" density="compact" @click="loadNodes(true)" />
+                  </template>
+                </VAlert>
                 <nodes-table
                   v-model="nodes"
                   max-height="730px"
@@ -495,6 +504,7 @@ export default {
   setup() {
     const profileManager = useProfileManager();
     const size = ref(window.env.PAGE_SIZE);
+    const error = ref(false);
     const page = ref(1);
     const filters = ref({
       nodeId: "",
@@ -517,6 +527,7 @@ export default {
       numGpu: "",
       rentable: false,
       ipv6: false,
+      mine: false,
     });
 
     const loading = ref<boolean>(true);
@@ -535,6 +546,7 @@ export default {
     async function loadNodes(retCount = false) {
       _nodes.value = [];
       loading.value = true;
+      error.value = false;
       if (retCount) page.value = 1;
       try {
         const { count, data } = await requestNodes(
@@ -564,6 +576,7 @@ export default {
             numGpu: +filters.value.numGpu || undefined,
             rentable: filters.value.rentable ? filters.value.rentable : undefined,
             hasIPv6: filters.value.ipv6 ? filters.value.ipv6 : undefined,
+            rentedBy: filters.value.mine && profileManager.profile ? profileManager.profile.twinId : undefined,
           },
           { loadFarm: true },
         );
@@ -572,6 +585,7 @@ export default {
         if (retCount) nodesCount.value = count ?? 0;
       } catch (err) {
         console.log(err);
+        error.value = true;
       } finally {
         loading.value = false;
       }
@@ -617,6 +631,7 @@ export default {
       UnifiedNodeStatus,
       size,
       page,
+      error,
       loadNodes,
     };
   },

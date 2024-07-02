@@ -249,7 +249,7 @@
             tooltip="Visit"
             icon="mdi-web"
             color="anchor"
-            :href="'http://' + (item.publicIP?.ip ? item.publicIP.ip.slice(0, -3) : '[' + item.planetary + ']')"
+            :href="'https://' + item.env.NODE_PILOT_HOSTNAME"
           />
         </template>
 
@@ -275,6 +275,22 @@
         </template>
 
         <template #TFRobot-actions="{ item }">
+          <IconActionBtn
+            tooltip="Show Details"
+            icon="mdi-eye-outline"
+            @click="openDialog(tabs[activeTab].value, item)"
+          />
+        </template>
+
+        <template #Gitea-actions="{ item }">
+          <IconActionBtn
+            tooltip="Show Details"
+            icon="mdi-eye-outline"
+            @click="openDialog(tabs[activeTab].value, item)"
+          />
+        </template>
+
+        <template #Nostr-actions="{ item }">
           <IconActionBtn
             tooltip="Show Details"
             icon="mdi-eye-outline"
@@ -343,7 +359,7 @@
     </template>
   </weblet-layout>
 
-  <v-dialog v-model="deletingDialog" scrollable width="600">
+  <v-dialog v-model="deletingDialog" scrollable width="600" attach="#modals">
     <v-card>
       <v-card-title>
         <strong>Delete the following deployments?</strong>
@@ -399,6 +415,8 @@ const tabs: Tab[] = [
   { title: "Wordpress", value: "Wordpress", imgPath: "images/icons/wordpress.png" },
   { title: "Static Website", value: "StaticWebsite", imgPath: "images/icons/wordpress.png" },
   { title: "TFRobot", value: "TFRobot", imgPath: "images/icons/tfrobot.png" },
+  { title: "Gitea", value: "Gitea", imgPath: "images/icons/gitea.png" },
+  { title: "Nostr", value: "Nostr", imgPath: "images/icons/nostr.png" },
 ];
 
 const layout = useLayout();

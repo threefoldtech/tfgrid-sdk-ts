@@ -1,0 +1,24 @@
+# When the action is executed, it runs yarn audit command in all the paths that is mentioned in the input. The exit codes of the commands are compared and if it is greater than 7 (only high severity as of now), the action will try to fetch the open issues in the repo with the label provided in the input. The label is mandatory to prevent from creating duplicate issues. If there are no open issues with the given label in open state, the action will try to create a Github Issue with the details provided in the input.
+
+name: Full Clients Audit
+
+on:
+  push:
+    branches: [development, development_2.6]
+  pull_request:
+    branches: [development, development_2.6]
+
+jobs:
+  audit-and-open-issue:
+    runs-on: ubuntu-latest
+    steps:
+          - uses: actions/checkout@v2
+          - name: Yarn Audit
+            uses: pragatheeswarans/yarn-audit-action@v1.0.0
+            with:
+              token: ${{ github.token }}
+              label: 'audit'
+              title: "${{ github.workflow }}: Critical Security Vulnerability Identified"
+              description: 'High severity issues are identified in the repo.'
+              paths: |
+                .

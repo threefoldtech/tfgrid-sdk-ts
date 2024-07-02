@@ -4,6 +4,7 @@
       <v-icon size="30" class="pr-3">mdi-lan-connect</v-icon>
       <v-card-title class="pa-0">Farm Finder</v-card-title>
     </v-card>
+    <v-alert type="info" variant="tonal" class="mb-6"> Click on the row to view farm details. </v-alert>
     <TfFiltersLayout>
       <template #filters>
         <TfFiltersContainer @apply="loadFarms(true)" class="mb-4" :loading="loading">
@@ -92,6 +93,7 @@
           { value: 5, title: '5' },
           { value: 10, title: '10' },
           { value: 15, title: '15' },
+          { value: 50, title: '50' },
         ]"
         :items-per-page="size"
         @update:items-per-page="
@@ -112,7 +114,7 @@
       </v-data-table-server>
     </TfFiltersLayout>
 
-    <v-dialog v-model="dialog" hide-overlay transition="dialog-bottom-transition">
+    <v-dialog v-model="dialog" hide-overlay transition="dialog-bottom-transition" attach="#modals">
       <v-container>
         <v-toolbar :height="35">
           <div class="ml-auto">

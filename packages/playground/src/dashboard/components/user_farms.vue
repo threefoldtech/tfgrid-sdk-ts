@@ -10,6 +10,9 @@
     <v-alert type="warning" variant="tonal" v-if="farmsCount == 0" class="my-8">
       Can't see any of your farms? Try changing your key type in your TFChain Wallet above.
     </v-alert>
+    <v-alert type="info" variant="tonal" v-if="farmsCount > 0" class="my-8">
+      Click on the row to view farm details.
+    </v-alert>
     <v-data-table-server
       :loading="loading"
       :items-length="farmsCount"
@@ -83,7 +86,7 @@
         </tr>
 
         <v-container v-if="showDialogue">
-          <v-dialog v-model="showDialogue" max-width="600">
+          <v-dialog v-model="showDialogue" max-width="600" attach="#modals">
             <v-card>
               <v-toolbar color="primary" dark>
                 <v-toolbar-title class="custom-toolbar_title mb-6"> Add/Edit Stellar V2 Address </v-toolbar-title>
@@ -200,22 +203,6 @@ export default {
     const refreshPublicIPs = ref(false);
 
     const reloadFarms = debounce(getUserFarms, 20000);
-    function filter(items: Farm[]) {
-      const start = (page.value - 1) * pageSize.value;
-      const end = start + pageSize.value;
-
-      let filteredItems;
-      if (search.value) {
-        filteredItems = items.filter(
-          item => item.name.toLowerCase().includes(search.value!.toLowerCase()) || item.farmId == +search.value!,
-        );
-      }
-
-      const paginated = filteredItems ? filteredItems.slice(start, end) : items;
-
-      return paginated;
-    }
-
     async function getUserFarms() {
       try {
         const { data, count } = await gridProxyClient.farms.list({
@@ -223,11 +210,11 @@ export default {
           twinId,
           page: page.value,
           size: pageSize.value,
+          nameContains: search.value,
         });
 
-        const filteredFarms = filter(data);
-        farms.value = filteredFarms as unknown as Farm[];
-        farmsCount.value = count || filteredFarms.length;
+        farms.value = data as Farm[];
+        farmsCount.value = count || farms.value.length;
       } catch (error) {
         console.log(error);
         createCustomToast("Failed to get user farms!", ToastType.danger);

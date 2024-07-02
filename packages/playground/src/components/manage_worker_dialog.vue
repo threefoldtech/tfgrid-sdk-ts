@@ -4,6 +4,7 @@
     scrollable
     :persistent="layout?.status === 'deploy' || deleting"
     @update:model-value="$emit('close')"
+    attach="#modals"
   >
     <weblet-layout ref="layout" @back="$emit('back')">
       <template #title><slot name="title"></slot> </template>
@@ -47,7 +48,7 @@
     </weblet-layout>
   </v-dialog>
 
-  <v-dialog width="50%" v-model="deletingDialog">
+  <v-dialog width="50%" v-model="deletingDialog" attach="#modals">
     <v-card>
       <v-card-title class="text-h5"> Are you sure you want to delete the following workers? </v-card-title>
       <v-card-text>

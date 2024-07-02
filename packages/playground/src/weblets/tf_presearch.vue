@@ -57,7 +57,14 @@
           </password-input-wrapper>
         </input-validator>
 
-        <Network required v-model:ipv4="ipv4" v-model:planetary="planetary" v-model:mycelium="mycelium" ref="network" />
+        <Network
+          required
+          v-model:ipv4="ipv4"
+          v-model:planetary="planetary"
+          v-model:mycelium="mycelium"
+          v-model:ipv6="ipv6"
+          ref="network"
+        />
 
         <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
           <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
@@ -69,6 +76,7 @@
         <TfSelectionDetails
           :filters="{
             ipv4,
+            ipv6,
             certified,
             dedicated,
             cpu,
@@ -115,7 +123,6 @@ import { useGrid } from "../stores";
 import { type Flist, ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
 import { normalizeError } from "../utils/helpers";
-import rootFs from "../utils/root_fs";
 import { generateName } from "../utils/strings";
 
 const layout = useLayout();
@@ -123,10 +130,11 @@ const tabs = ref();
 const name = ref(generateName({ prefix: "ps" }));
 const code = ref("");
 const ipv4 = ref(false);
+const ipv6 = ref(false);
 const planetary = ref(true);
 const cpu = 1;
 const memory = 512;
-const rootFilesystemSize = rootFs(cpu, memory);
+const rootFilesystemSize = calculateRootFileSystem({ CPUCores: cpu, RAMInMegaBytes: memory });
 const dockerDiskSize = 10;
 const privateRestoreKey = ref("");
 const publicRestoreKey = ref("");
@@ -171,6 +179,7 @@ async function deploy() {
           ],
           planetary: planetary.value,
           publicIpv4: ipv4.value,
+          publicIpv6: ipv6.value,
           mycelium: mycelium.value,
           envs: [
             {
@@ -212,7 +221,7 @@ function updateSSHkeyEnv(selectedKeys: string) {
 </script>
 
 <script lang="ts">
-import type { GridClient } from "@threefold/grid_client";
+import { calculateRootFileSystem, type GridClient } from "@threefold/grid_client";
 
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";

@@ -22,7 +22,7 @@
       :small="{ cpu: 1, memory: 2, disk: 50 }"
       :medium="{ cpu: 2, memory: 4, disk: 100 }"
     />
-    <Networks v-model:mycelium="$props.modelValue.mycelium" />
+    <Networks v-model:mycelium="$props.modelValue.mycelium" v-model:ipv6="$props.modelValue.ipv6" />
 
     <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
       <v-switch color="primary" inset label="Dedicated" v-model="$props.modelValue.dedicated" />
@@ -36,6 +36,7 @@
       :nodes-lock="nodesLock"
       :filters="{
         ipv4: true,
+        ipv6: $props.modelValue.ipv6,
         certified: $props.modelValue.certified,
         dedicated: $props.modelValue.dedicated,
         cpu: $props.modelValue.solution?.cpu,
@@ -49,6 +50,7 @@
 </template>
 
 <script lang="ts">
+import { calculateRootFileSystem } from "@threefold/grid_client";
 import type AwaitLock from "await-lock";
 import { computed, type PropType } from "vue";
 
@@ -57,12 +59,11 @@ import { manual } from "@/utils/manual";
 
 import Networks from "../components/networks.vue";
 import type { CaproverWorker } from "../types";
-import rootFs from "../utils/root_fs";
 import { generateName } from "../utils/strings";
 import SelectSolutionFlavor from "./select_solution_flavor.vue";
 
 export function createWorker(name: string = generateName({ prefix: "wr" })): CaproverWorker {
-  return { name, mycelium: true };
+  return { name, mycelium: true, ipv6: false };
 }
 
 function toMachine(rootFilesystemSize: number, worker?: CaproverWorker): SelectedMachine | undefined {
@@ -95,7 +96,10 @@ export default {
   setup(props) {
     const rootFilesystemSize = computed(() => {
       const { cpu = 0, memory = 0 } = props.modelValue.solution || {};
-      return rootFs(cpu, memory);
+      return calculateRootFileSystem({
+        CPUCores: cpu,
+        RAMInMegaBytes: memory,
+      });
     });
 
     const selectedMachines = computed(() => {

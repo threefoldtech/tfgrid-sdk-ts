@@ -62,7 +62,7 @@
     </template>
   </v-card>
   <!-- locked amount Dialog -->
-  <v-dialog width="500" v-model="unlockDialog" v-if="lockedContracts?.totalAmountLocked">
+  <v-dialog width="500" v-model="unlockDialog" v-if="lockedContracts?.totalAmountLocked" attach="#modals">
     <v-card>
       <v-card-title class="bg-primary">
         Unlock All Contracts
@@ -170,6 +170,11 @@
               loadContracts(table.type);
             }
           "
+          @update:sort="
+            sort => {
+              loadContracts(table.type, { sort });
+            }
+          "
         />
       </v-expansion-panel-text>
     </v-expansion-panel>
@@ -256,6 +261,7 @@ async function _normalizeContracts(
 async function loadContractsByType(
   contractType: ContractType.Node | ContractType.Name | ContractType.Rent,
   contractsRef: Ref<NormalizedContract[]>,
+  options?: { sort: { key: string; order: "asc" | "desc" }[] },
 ) {
   const table = contractsTables.find(table => table.type === contractType);
   if (!table) {
@@ -276,6 +282,11 @@ async function loadContractsByType(
 
     table.count.value = response.count ?? 0;
     const normalizedContracts = await _normalizeContracts(response.data, contractType);
+
+    if (options && options.sort.length) {
+      contractsRef.value = sortContracts(normalizedContracts, options.sort);
+    }
+
     contractsRef.value = normalizedContracts;
   } catch (error: any) {
     loadingErrorMessage.value = `Error while listing ${contractType} contracts: ${error.message}`;
@@ -285,7 +296,22 @@ async function loadContractsByType(
   }
 }
 
-async function loadContracts(type?: ContractType) {
+function sortContracts(
+  contracts: NormalizedContract[],
+  sort: { key: string; order: "asc" | "desc" }[],
+): NormalizedContract[] {
+  const sortKey = sort[0].key;
+  const sortOrder = sort[0].order;
+
+  contracts = contracts.sort((a, b) => {
+    const aValue = Reflect.get(a, sortKey) ?? Reflect.get(a.details, sortKey);
+    const bValue = Reflect.get(b, sortKey) ?? Reflect.get(b.details, sortKey);
+    return sortOrder === "desc" ? bValue - aValue : aValue - bValue;
+  });
+  return contracts;
+}
+
+async function loadContracts(type?: ContractType, options?: { sort: { key: string; order: "asc" | "desc" }[] }) {
   totalCost.value = undefined;
   totalCostUSD.value = undefined;
   loadingErrorMessage.value = undefined;
@@ -298,20 +324,20 @@ async function loadContracts(type?: ContractType) {
     if (type) {
       switch (type) {
         case ContractType.Name:
-          await loadContractsByType(ContractType.Name, nameContracts);
+          await loadContractsByType(ContractType.Name, nameContracts, options);
           break;
         case ContractType.Node:
-          await loadContractsByType(ContractType.Node, nodeContracts);
+          await loadContractsByType(ContractType.Node, nodeContracts, options);
           break;
         case ContractType.Rent:
-          await loadContractsByType(ContractType.Rent, rentContracts);
+          await loadContractsByType(ContractType.Rent, rentContracts, options);
           break;
       }
     } else {
       await Promise.all([
-        loadContractsByType(ContractType.Name, nameContracts),
-        loadContractsByType(ContractType.Node, nodeContracts),
-        loadContractsByType(ContractType.Rent, rentContracts),
+        loadContractsByType(ContractType.Name, nameContracts, options),
+        loadContractsByType(ContractType.Node, nodeContracts, options),
+        loadContractsByType(ContractType.Rent, rentContracts, options),
       ]);
     }
     await getContractsLockDetails();
@@ -437,7 +463,7 @@ const nodeTableHeaders: VDataTableHeader = [
   },
   { title: "Type", key: "deploymentType", sortable: false },
   { title: "Expiration", key: "expiration" },
-  { title: "Farm ID", key: "farmId" },
+  { title: "Farm ID", key: "farm_id" },
   {
     title: "Node",
     key: "node",
@@ -452,14 +478,14 @@ const nodeTableHeaders: VDataTableHeader = [
 
 const nameTableHeaders: VDataTableHeader = [
   ...baseTableHeaders,
-  { title: "Solution Name", key: "solutionName" },
+  { title: "Solution Name", key: "solutionName", sortable: false },
   { title: "Expiration", key: "expiration" },
   { title: "Details", key: "actions", sortable: false },
 ];
 
 const RentTableHeaders: VDataTableHeader = [
   ...baseTableHeaders,
-  { title: "Farm ID", key: "farmId" },
+  { title: "Farm ID", key: "farm_id" },
   {
     title: "Node",
     key: "node",
