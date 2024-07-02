@@ -157,7 +157,7 @@
         <VCol class="tf-node-resource">
           <ResourceDetails
             name="CPU"
-            :used="(node?.used_resources.cru ?? 0) + selectedMachines.reduce((r, m) => r + m.cpu, 0)"
+            :used="node?.used_resources.cru ?? 0"
             :total="node?.total_resources.cru ?? 0"
             :text="cruText"
             :cpuType="dmi?.processor[0]?.version"
@@ -166,7 +166,7 @@
         <VCol class="tf-node-resource">
           <ResourceDetails
             name="Memory"
-            :used="(node?.used_resources.mru ?? 0) + selectedMachines.reduce((r, m) => r + (m.memory / 1024) * 1e9, 0)"
+            :used="node?.used_resources.mru ?? 0"
             :total="node?.total_resources.mru ?? 0"
             :text="mruText"
             :memoryType="dmi?.memory[0]?.type"
@@ -178,7 +178,7 @@
         <VCol class="tf-node-resource">
           <ResourceDetails
             name="SSD Disks"
-            :used="(node?.used_resources.sru ?? 0) + selectedMachines.reduce((r, m) => r + m.disk * 1e9, 0)"
+            :used="node?.used_resources.sru ?? 0"
             :total="node?.total_resources.sru ?? 0"
             :text="sruText"
           />
@@ -238,11 +238,10 @@
 import type { GridClient, NodeInfo, NodeResources } from "@threefold/grid_client";
 import { CertificationType, type GridNode } from "@threefold/gridproxy_client";
 import { computed, onMounted, ref, watch } from "vue";
-import { capitalize, type PropType } from "vue";
+import { capitalize } from "vue";
 
 import { gridProxyClient } from "@/clients";
 import ReserveBtn from "@/dashboard/components/reserve_action_btn.vue";
-import type { SelectedMachine } from "@/types/nodeSelector";
 import toHumanDate from "@/utils/date";
 import { getCountryCode } from "@/utils/get_nodes";
 import { manual } from "@/utils/manual";
@@ -261,7 +260,6 @@ export default {
     status: String as () => "Init" | "Pending" | "Invalid" | "Valid",
     selectable: Boolean,
     flat: Boolean,
-    selectedMachines: { type: Array as PropType<SelectedMachine[]>, default: () => [] },
   },
   emits: {
     "node:select": (node: NodeInfo) => true || node,
@@ -380,16 +378,7 @@ export default {
           return "";
         }
 
-        let additionalUsed = 0;
-        if (name === "mru") {
-          additionalUsed = props.selectedMachines.reduce((r, m) => r + (m.memory / 1024) * 1e9, 0);
-        }
-
-        if (name === "sru") {
-          additionalUsed = props.selectedMachines.reduce((r, m) => r + m.disk * 1e9, 0);
-        }
-
-        const used = formatResourceSize(props.node.used_resources[name] + additionalUsed);
+        const used = formatResourceSize(props.node.used_resources[name]);
         const total = formatResourceSize(props.node.total_resources[name]);
 
         if (total === "0") return "";
