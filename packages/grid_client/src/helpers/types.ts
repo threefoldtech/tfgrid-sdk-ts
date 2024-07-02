@@ -97,4 +97,19 @@ interface VM extends ZmachineData {
   wireguard: string;
 }
 
-export { ZmachineData, VM, ExtendedMountData };
+interface GatewayDeploymentData {
+  version: number;
+  contractId: number;
+  name: string;
+  created: number;
+  status: string;
+  message: string;
+  type: string;
+  domain: string;
+  tls_passthrough: boolean;
+  backends: string[];
+  metadata: string;
+  description: string;
+}
+
+export { ZmachineData, VM, ExtendedMountData, GatewayDeploymentData };

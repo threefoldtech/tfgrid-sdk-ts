@@ -37,6 +37,7 @@ class Farms {
    * @decorators
    * - `@expose`: Exposes the method for external use.
    * - `@validateInput`: Validates the input options.
+   * - `@checkBalance`: Checks the balance to ensure there are enough funds available.
    */
   @expose
   @validateInput
@@ -56,6 +57,7 @@ class Farms {
    * @decorators
    * - `@expose`: Exposes the method for external use.
    * - `@validateInput`: Validates the input options.
+   * - `@checkBalance`: Checks the balance to ensure there are enough funds available.
    */
   @expose
   @validateInput
@@ -75,6 +77,7 @@ class Farms {
    * @decorators
    * - `@expose`: Exposes the method for external use.
    * - `@validateInput`: Validates the input options.
+   * - `@checkBalance`: Checks the balance to ensure there are enough funds available.
    */
   @expose
   @validateInput
