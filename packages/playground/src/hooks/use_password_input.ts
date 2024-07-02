@@ -7,9 +7,11 @@ export function usePasswordInput(defaultShow = false) {
     type: computed(() => (show.value ? "text" : "password")),
     "append-inner-icon": computed(() => (show.value ? "mdi-eye-outline" : "mdi-eye-off-outline")),
     "onClick:append-inner": () => (show.value = !show.value),
-    ref: () => {
-      const elements = document.querySelectorAll(".v-field__append-inner i");
-      elements.forEach(el => el.setAttribute("tabindex", "-1"));
+    ref: el => {
+      if (el) {
+        const innerIcons = el.$el.querySelectorAll(".v-field__append-inner i");
+        innerIcons.forEach(icon => icon.setAttribute("tabindex", "-1"));
+      }
     },
   });
 }
