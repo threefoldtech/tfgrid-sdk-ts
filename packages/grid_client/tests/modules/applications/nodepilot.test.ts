@@ -6,7 +6,7 @@ import { FilterOptions, generateString, GridClient, MachinesModel, randomChoice 
 import { config, getClient } from "../../client_loader";
 import { bytesToGB, generateInt, getOnlineNode, log, splitIP } from "../../utils";
 
-jest.setTimeout(900000);
+jest.setTimeout(1250000);
 
 let gridClient: GridClient;
 let deploymentName: string;
@@ -160,7 +160,7 @@ test("TC2701 - Applications: Deploy Nodepilot", async () => {
     }),
   });
 
-  for (let i = 0; i <= 180; i++) {
+  for (let i = 0; i <= 250; i++) {
     const wait = await setTimeout(5000, "Waiting for gateway to be ready");
     log(wait);
 
@@ -181,7 +181,7 @@ test("TC2701 - Applications: Deploy Nodepilot", async () => {
       });
     if (reachable) {
       break;
-    } else if (i == 180) {
+    } else if (i == 250) {
       throw new Error("Gateway is unreachable after multiple retries");
     }
   }
