@@ -109,6 +109,14 @@ export function requiredTrue(msg: string) {
   };
 }
 
+export function IsAlphanumericExpectUnderscore(msg: string) {
+  return (value: string) => {
+    if (!/^[a-zA-Z0-9_]*$/.test(value)) {
+      return { message: msg, requiredTrue: true };
+    }
+  };
+}
+
 export function isAfter(msg: string, date?: string) {
   return (value: string) => {
     if (!validator.isAfter(value, date)) {

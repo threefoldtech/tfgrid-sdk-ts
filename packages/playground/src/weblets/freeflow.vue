@@ -18,7 +18,7 @@
         :value="threebotName"
         :rules="[
           validators.required('Name is required.'),
-          validators.isAlphanumeric('Name should consist of letters and numbers only.'),
+          validators.IsAlphanumericExpectUnderscore('Name should consist of letters ,numbers and undersocres only.'),
           validators.minLength('Name must be at least 4 characters.', 4),
           validators.maxLength('Name cannot exceed 15 characters.', 15),
         ]"

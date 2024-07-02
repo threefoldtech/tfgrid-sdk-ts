@@ -29,7 +29,7 @@
             validators.required('Name is required.'),
             validators.isLowercase('Name should consist of lowercase letters only.'),
             name => validators.isAlpha('Name must start with alphabet char.')(name[0]),
-            validators.isAlphanumeric('Name should consist of alphabets & numbers only.'),
+            validators.IsAlphanumericExpectUnderscore('Name should consist of letters ,numbers and undersocres only.'),
             validators.minLength('Name minimum length is 2 chars.', 2),
             validators.maxLength('Name max length is 15 chars.', 15),
           ]"
