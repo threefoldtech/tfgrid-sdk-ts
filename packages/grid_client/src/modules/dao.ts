@@ -22,6 +22,9 @@ class Dao {
    * Asynchronously retrieves data from the `DAO` using the `TFClient` instance.
    *
    * @returns {Promise<Proposals>} A promise that resolves with the data retrieved from the `DAO`.
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
    */
   @expose
   @validateInput
@@ -34,6 +37,9 @@ class Dao {
    *
    * @param {DaoVoteModel} options - The options for casting the vote, including `address`, `farmId`, `approval status`, and `hash`.
    * @returns {Promise<any>} A promise that resolves with the result of the vote submission.
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
    */
   @expose
   @validateInput
