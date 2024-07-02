@@ -28,6 +28,7 @@ class Nodes {
    * `getting node information`, `setting node power`, `adding public configuration` to a node, `listing all nodes`, and `filtering nodes`.
    * It utilizes the `TFClient` and capacity classes for performing these operations.
    *
+   * @class Nodes
    * @param {GridClientConfig} config - The configuration object for initializing the Nodes class.
    */
   constructor(public config: GridClientConfig) {
