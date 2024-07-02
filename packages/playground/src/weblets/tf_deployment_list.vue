@@ -359,7 +359,7 @@
     </template>
   </weblet-layout>
 
-  <v-dialog v-model="deletingDialog" scrollable width="600">
+  <v-dialog v-model="deletingDialog" scrollable width="600" attach="#modals">
     <v-card>
       <v-card-title>
         <strong>Delete the following deployments?</strong>

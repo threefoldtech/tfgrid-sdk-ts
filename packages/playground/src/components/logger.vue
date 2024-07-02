@@ -76,7 +76,7 @@
     </v-expansion-panels>
   </VBottomNavigation>
 
-  <v-dialog max-width="400px" v-model="clearDialog">
+  <v-dialog max-width="400px" v-model="clearDialog" attach="#modals">
     <v-card>
       <VCardTitle v-text="'Clear Logs'" />
       <VCardText v-text="'This will delete all of your logs. Be careful this operation is irreversible!'" />

@@ -33,7 +33,7 @@
         </div>
       </template>
     </ListTable>
-    <v-dialog v-model="showDialogue" max-width="600">
+    <v-dialog v-model="showDialogue" max-width="600" attach="#modals">
       <v-card>
         <v-card-title class="text-subtitle-1">
           <strong>Delete the following IPs?</strong>

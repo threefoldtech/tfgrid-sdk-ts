@@ -10,6 +10,7 @@
     @update:model-value="setOpenInfo($event)"
     :width="loading ? 'auto' : '60%'"
     scrollable
+    attach="#modals"
   >
     <v-card v-if="loading" class="d-flex justify-center align-center pa-10">
       <v-progress-circular indeterminate />

@@ -4,6 +4,7 @@
     class="mx-auto"
     :model-value="$props.modelValue"
     @update:model-value="handleProfileDialog($event)"
+    attach="#modals"
   >
     <template #activator="{ props }">
       <VCard v-bind="props" class="pa-3 d-inline-flex align-center">
@@ -201,7 +202,7 @@
                 </template>
               </VTooltip>
 
-              <v-dialog v-model="openAcceptTerms" fullscreen width="100%">
+              <v-dialog v-model="openAcceptTerms" fullscreen width="100%" attach="#modals">
                 <v-card v-if="!termsLoading">
                   <v-card-text class="pa-15" v-html="acceptTermsContent"></v-card-text>
                   <div class="terms-footer">

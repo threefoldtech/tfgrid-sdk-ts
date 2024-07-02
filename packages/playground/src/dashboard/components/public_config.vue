@@ -16,7 +16,7 @@
     </v-tooltip>
 
     <template v-if="showDialogue">
-      <v-dialog v-model="showDialogue" max-width="600" @click:outside="reset">
+      <v-dialog v-model="showDialogue" max-width="600" @click:outside="reset" attach="#modals">
         <v-card>
           <v-card-title class="bg-primary">
             Add a public config to your node with ID: {{ $props.nodeId }}
@@ -138,7 +138,7 @@
 
     <!-- Remove Config Dialog -->
     <template v-if="showClearDialogue">
-      <v-dialog v-model="showClearDialogue" width="650">
+      <v-dialog v-model="showClearDialogue" width="650" attach="#modals">
         <v-card>
           <v-card-title class="bg-primary"> Remove Public Config </v-card-title>
           <v-card-text>Are you sure you want to remove this node's public config? </v-card-text>

@@ -140,7 +140,7 @@
     </template>
   </weblet-layout>
 
-  <v-dialog width="800" v-model="contractStateDialog">
+  <v-dialog width="800" v-model="contractStateDialog" attach="#modals">
     <v-card>
       <v-toolbar color="primary" class="custom-toolbar">
         <p class="mb-5">Contract lock Details</p>
@@ -197,7 +197,7 @@
     </v-card>
   </v-dialog>
 
-  <v-dialog width="800" v-model="deletingDialog">
+  <v-dialog width="800" v-model="deletingDialog" attach="#modals">
     <v-card>
       <v-card-title class="bg-primary"> Delete the following contracts? </v-card-title>
       <v-alert class="ma-4" type="warning" variant="tonal"
@@ -219,7 +219,7 @@
     </v-card>
   </v-dialog>
 
-  <v-dialog width="800" v-model="unlockDialog">
+  <v-dialog width="800" v-model="unlockDialog" attach="#modals">
     <v-card>
       <v-card-title class="bg-primary">
         Unlock the following Contract<span v-if="selectedContracts.length > 1">s</span>
