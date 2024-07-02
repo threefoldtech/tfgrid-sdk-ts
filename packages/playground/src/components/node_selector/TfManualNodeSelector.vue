@@ -1,6 +1,7 @@
 <template>
   <div>
     <TfNodeDetailsCard
+      :selected-machines="selectedMachines.filter(m => m.nodeId === nodeId)"
       v-show="modelValue || placeholderNode"
       :key="modelValue?.rentedByTwinId"
       flat
@@ -52,6 +53,7 @@
 
 <script lang="ts">
 import type { NodeInfo } from "@threefold/grid_client";
+import type AwaitLock from "await-lock";
 import isInt from "validator/lib/isInt";
 import { onUnmounted, type PropType, ref, watch } from "vue";
 
@@ -59,9 +61,9 @@ import { gridProxyClient } from "../../clients";
 import { useAsync, useWatchDeep } from "../../hooks";
 import { ValidatorStatus } from "../../hooks/form_validator";
 import { useGrid } from "../../stores";
-import type { SelectionDetailsFilters } from "../../types/nodeSelector";
+import type { SelectedMachine, SelectionDetailsFilters } from "../../types/nodeSelector";
 import { normalizeError } from "../../utils/helpers";
-import { checkNodeCapacityPool, resolveAsync, validateRentContract } from "../../utils/nodeSelector";
+import { checkNodeCapacityPool, release, resolveAsync, validateRentContract } from "../../utils/nodeSelector";
 import TfNodeDetailsCard from "./TfNodeDetailsCard.vue";
 
 const _defaultError =
@@ -78,6 +80,11 @@ export default {
       required: true,
     },
     status: String as PropType<ValidatorStatus>,
+    selectedMachines: {
+      type: Array as PropType<SelectedMachine[]>,
+      required: true,
+    },
+    nodesLock: Object as PropType<AwaitLock>,
   },
   emits: {
     "update:model-value": (node?: NodeInfo) => true || node,
@@ -159,7 +166,14 @@ export default {
         }
 
         const { cru, mru, sru } = resources;
-        const { cpu = 0, memory = 0, ssdDisks = [], solutionDisk = 0, rootFilesystemSize = 0 } = props.filters;
+        const { ssdDisks = [], rootFilesystemSize = 0 } = props.filters;
+
+        const machinesWithSameNode = props.selectedMachines.filter(machine => machine.nodeId === nodeId);
+        let { cpu = 0, memory = 0, solutionDisk = 0 } = props.filters;
+
+        cpu += machinesWithSameNode.reduce((res, machine) => res + machine.cpu, 0);
+        memory += machinesWithSameNode.reduce((res, machine) => res + machine.memory, 0);
+        solutionDisk += machinesWithSameNode.reduce((res, machine) => res + machine.disk, 0);
 
         const memorySize = memory / 1024;
         const requiredMru = Math.ceil(Math.round(memorySize) * 1024 ** 3);
@@ -190,9 +204,13 @@ export default {
         tries: 1,
         onReset: bindStatus,
         shouldRun: () => props.validFilters,
-        onBeforeTask: () => bindStatus(ValidatorStatus.Pending),
+        async onBeforeTask() {
+          await props.nodesLock?.acquireAsync();
+          bindStatus(ValidatorStatus.Pending);
+        },
         onAfterTask: ({ data }) => {
           bindStatus(data ? ValidatorStatus.Valid : ValidatorStatus.Invalid);
+          release(props.nodesLock);
         },
       },
     );
@@ -200,6 +218,11 @@ export default {
     // reset validation to prevent form from being valid
     useWatchDeep(() => props.filters, validationTask.value.reset);
     useWatchDeep(nodeId, validationTask.value.reset);
+    useWatchDeep(
+      () => props.selectedMachines.map(m => m.nodeId),
+      () => nodeId.value && validationTask.value.run(nodeId.value),
+      { debounce: 1000 },
+    );
 
     // revalidate if filters updated
     useWatchDeep(
