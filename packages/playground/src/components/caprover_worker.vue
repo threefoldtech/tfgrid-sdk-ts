@@ -32,8 +32,6 @@
     </input-tooltip>
 
     <TfSelectionDetails
-      :selected-machines="selectedMachines"
-      :nodes-lock="nodesLock"
       :filters="{
         ipv4: true,
         certified: $props.modelValue.certified,
@@ -49,10 +47,8 @@
 </template>
 
 <script lang="ts">
-import type AwaitLock from "await-lock";
 import { computed, type PropType } from "vue";
 
-import type { SelectedMachine } from "@/types/nodeSelector";
 import { manual } from "@/utils/manual";
 
 import Networks from "../components/networks.vue";
@@ -65,50 +61,17 @@ export function createWorker(name: string = generateName({ prefix: "wr" })): Cap
   return { name, mycelium: true };
 }
 
-function toMachine(rootFilesystemSize: number, worker?: CaproverWorker): SelectedMachine | undefined {
-  if (!worker || !worker.selectionDetails || !worker.selectionDetails.node) {
-    return undefined;
-  }
-
-  return {
-    nodeId: worker.selectionDetails.node.nodeId,
-    cpu: worker.solution?.cpu ?? 0,
-    memory: worker.solution?.memory ?? 0,
-    disk: (worker.solution?.disk ?? 0) + (rootFilesystemSize ?? 0),
-  };
-}
-
 export default {
   name: "CaproverWorker",
   components: { SelectSolutionFlavor, Networks },
-  props: {
-    modelValue: {
-      type: Object as PropType<CaproverWorker>,
-      required: true,
-    },
-    otherWorkers: {
-      type: Array as PropType<CaproverWorker[]>,
-      default: () => [],
-    },
-    nodesLock: Object as PropType<AwaitLock>,
-  },
+  props: { modelValue: { type: Object as PropType<CaproverWorker>, required: true } },
   setup(props) {
     const rootFilesystemSize = computed(() => {
       const { cpu = 0, memory = 0 } = props.modelValue.solution || {};
       return rootFs(cpu, memory);
     });
 
-    const selectedMachines = computed(() => {
-      return props.otherWorkers.reduce((res, worker) => {
-        const machine = toMachine(rootFilesystemSize.value, worker);
-        if (machine) {
-          res.push(machine);
-        }
-        return res;
-      }, [] as SelectedMachine[]);
-    });
-
-    return { rootFilesystemSize, manual, selectedMachines };
+    return { rootFilesystemSize, manual };
   },
 };
 </script>
