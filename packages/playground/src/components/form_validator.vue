@@ -3,7 +3,7 @@
 </template>
 
 <script lang="ts">
-import { computed, ref, watch } from "vue";
+import { computed, type Ref, ref, watch } from "vue";
 
 import { type FormValidatorService, provideForm, ValidatorStatus } from "@/hooks/form_validator";
 import type { InputValidatorService } from "@/hooks/input_validator";
@@ -30,7 +30,7 @@ export default {
     watch(valid, valid => emit("update:modelValue", valid), { immediate: true });
 
     const form: FormValidatorService = {
-      register(uid, service) {
+      register(uid, service: any) {
         statusMap.value.set(uid, ValidatorStatus.Init);
         serviceMap.value.set(uid, service);
       },
@@ -54,8 +54,8 @@ export default {
           const input =
             el instanceof HTMLElement
               ? el
-              : el && typeof el === "object" && "value" in el && el.value instanceof HTMLElement
-              ? el.value
+              : el && typeof el === "object" && "value" in el && (el as Ref<HTMLElement>).value instanceof HTMLElement
+              ? (el as Ref<HTMLElement>).value
               : null;
 
           if (input) {
@@ -69,7 +69,7 @@ export default {
         [...serviceMap.value.values()].map(({ reset }) => reset());
       },
 
-      get: uid => serviceMap.value.get(uid),
+      get: uid => serviceMap.value.get(uid) as InputValidatorService | undefined,
 
       valid,
       invalid: computed(() => [...statusMap.value.values()].some(status => status === ValidatorStatus.Invalid)),

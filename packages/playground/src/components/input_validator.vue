@@ -16,7 +16,7 @@
 
 <script lang="ts">
 import debounce from "lodash/debounce.js";
-import { computed, getCurrentInstance, onMounted, onUnmounted, type PropType, ref, watch } from "vue";
+import { computed, getCurrentInstance, onMounted, onUnmounted, type PropType, type Ref, ref, watch } from "vue";
 
 import { useForm, ValidatorStatus } from "@/hooks/form_validator";
 import type { InputValidatorService } from "@/hooks/input_validator";
@@ -56,7 +56,7 @@ export default {
     const { uid: _uid } = getCurrentInstance() as { uid: number };
     const uid = props.inputName || _uid.toString();
     const form = useForm();
-    const inputElement = ref<HTMLElement | null>(null);
+    const inputElement: Ref<HTMLElement | null | undefined> | null = null;
 
     const required = computed(() => props.rules.some(rule => "required" in (rule("") || {})));
 
