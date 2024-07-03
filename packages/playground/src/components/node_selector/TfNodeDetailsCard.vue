@@ -212,7 +212,7 @@
                 { title: 'Discount', align: 'center', key: 'discount', sortable: false },
                 { title: 'TFT needed', align: 'center', key: 'tfts', sortable: false },
               ]"
-              :items="discountPackagesItems"
+              :items="discountItems"
               disable-sort="true"
               density="compact"
             >
@@ -273,9 +273,7 @@
 </template>
 <script lang="ts">
 import type { GridClient, NodeInfo, NodeResources } from "@threefold/grid_client";
-import { calculator as Calculator } from "@threefold/grid_client";
 import { CertificationType, type GridNode } from "@threefold/gridproxy_client";
-import { QueryClient } from "@threefold/tfchain_client";
 import { computed, onMounted, ref, watch } from "vue";
 import { capitalize, type PropType } from "vue";
 
@@ -287,7 +285,6 @@ import { getCountryCode } from "@/utils/get_nodes";
 import { manual } from "@/utils/manual";
 import toReadableDate from "@/utils/to_readable_data";
 
-import { useAsync } from "../../hooks";
 import { useGrid, useProfileManager } from "../../stores";
 import formatResourceSize from "../../utils/format_resource_size";
 import { toGigaBytes } from "../../utils/helpers";
@@ -315,7 +312,8 @@ export default {
     const stakingDiscount = ref<number>();
     const loadingStakingDiscount = ref<boolean>(false);
     const lastDeploymentTime = ref<number>(0);
-    const dedicatedPriceTFTAfterDiscount = ref<number>(0);
+    const tftsNeededArr = ref<number[]>([]);
+    const discountsArr = ref<number[]>([0.2, 0.3, 0.4, 0.6]);
     const rentedByUser = computed(() => {
       return props.node?.rentedByTwinId === profileManager.profile?.twinId;
     });
@@ -341,6 +339,7 @@ export default {
       loadingStakingDiscount.value = true;
       if (props.node) {
         stakingDiscount.value = (await getStakingDiscount()) || 0;
+        tftsNeededArr.value = (await tftsNeeded()) || [];
       }
       loadingStakingDiscount.value = false;
     }
@@ -458,10 +457,7 @@ export default {
     function formatSpeed(speed: number): string {
       return formatResourceSize(speed, true).toLocaleLowerCase() + "ps";
     }
-    const tftPriceTask = useAsync(() => calculator.tftPrice(), {
-      init: true,
-      default: 0,
-    });
+
     async function getStakingDiscount() {
       try {
         const total_resources = props.node?.total_resources;
@@ -475,15 +471,6 @@ export default {
           ipv4u: false,
           certified: props.node?.certificationType === CertificationType.Certified,
         });
-        const pricing = await grid?.calculator.calculateTFTsNeeded({
-          cru,
-          hru: toGigaBytes(hru),
-          mru: toGigaBytes(mru),
-          sru: toGigaBytes(sru),
-          ipv4u: false,
-          certified: props.node?.certificationType === CertificationType.Certified,
-        });
-        console.log(pricing);
 
         return price?.dedicatedPackage.discount;
       } catch (err) {
@@ -531,13 +518,34 @@ export default {
         }
       }
     }
-    const calculator = new Calculator(new QueryClient(window.env.SUBSTRATE_URL));
-
-    const discountPackagesItems = [
-      { name: "Default", discount: "-20%", tfts: 200 },
-      { name: "Bronze", discount: "-30%", tfts: 400 },
-      { name: "Silver", discount: "-40%", tfts: 600 },
-      { name: "Gold", discount: "-60%", tfts: 1000 },
+    async function tftsNeeded() {
+      const total_resources = props.node?.total_resources;
+      const { cru, hru, mru, sru } = total_resources as NodeResources;
+      tftsNeededArr.value = [];
+      discountsArr.value.map(async disc => {
+        const tft = normalizePrice(
+          await grid?.calculator.calculateTFTsNeeded(
+            {
+              cru,
+              hru: toGigaBytes(hru),
+              mru: toGigaBytes(mru),
+              sru: toGigaBytes(sru),
+              ipv4u: false,
+              certified: props.node?.certificationType === CertificationType.Certified,
+            },
+            disc,
+          ),
+        );
+        console.log(tft);
+        tftsNeededArr.value.push(tft);
+      });
+      return tftsNeededArr.value;
+    }
+    const discountItems = [
+      { name: "Default", discount: "-20%", tfts: tftsNeededArr.value[0] },
+      { name: "Bronze", discount: "-30%", tfts: tftsNeededArr.value[1] },
+      { name: "Silver", discount: "-40%", tfts: tftsNeededArr.value[2] },
+      { name: "Gold", discount: "-60%", tfts: tftsNeededArr.value[3] },
     ];
     const monthlyPriceAfterDiscount = computed(() => {
       if (price_usd.value) {
@@ -561,7 +569,7 @@ export default {
     return {
       hourlyPriceAfterDiscount,
       monthlyPriceAfterDiscount,
-      discountPackagesItems,
+
       cruText,
       mruText,
       sruText,
@@ -587,6 +595,7 @@ export default {
       formatSpeed,
       onReserveChange,
       getNodeStatusColor,
+      discountItems,
       lastDeploymentTime,
     };
   },
