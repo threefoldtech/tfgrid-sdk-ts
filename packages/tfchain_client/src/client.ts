@@ -1,3 +1,6 @@
+import "./interfaces";
+import "@polkadot/api-augment";
+
 import { ApiPromise, WsProvider } from "@polkadot/api";
 import { Signer } from "@polkadot/api/types";
 import { SubmittableExtrinsic } from "@polkadot/api-base/types";

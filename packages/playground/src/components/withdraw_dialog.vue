@@ -5,6 +5,7 @@
       max-width="50%"
       v-model="withdrawDialog"
       @update:model-value="closeDialog"
+      attach="#modals"
     >
       <v-card>
         <v-card-title class="bg-primary"> Withdraw TFT </v-card-title>

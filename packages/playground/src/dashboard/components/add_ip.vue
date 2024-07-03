@@ -4,7 +4,7 @@
   >
   <v-container>
     <v-container v-if="showDialogue">
-      <v-dialog v-model="showDialogue" max-width="600">
+      <v-dialog v-model="showDialogue" max-width="600" attach="#modals">
         <v-card>
           <v-card-title class="bg-primary">Add Public IP to Farm</v-card-title>
           <v-card-text>
@@ -74,7 +74,7 @@
             </form-validator>
             <v-divider />
           </v-card-text>
-          <v-dialog v-model="showIPs" max-width="500">
+          <v-dialog v-model="showIPs" max-width="500" attach="#modals">
             <v-card>
               <v-card-title class="text-h5">IPs range</v-card-title>
               <v-card-text v-for="(IP, i) in IPs" :key="IP">{{ i + 1 }}- {{ IP }}</v-card-text>

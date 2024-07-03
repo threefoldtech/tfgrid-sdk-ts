@@ -123,6 +123,7 @@ export enum ProjectName {
   FreeFlow = "Freeflow",
   StaticWebsite = "StaticWebsite",
   TFRobot = "TFRobot",
+  Gitea = "Gitea",
   Nostr = "Nostr",
 }
 
@@ -151,6 +152,7 @@ export enum SolutionCode {
   wordpress = "wp",
   staticwebsite = "sw",
   tfrobot = "tfr",
+  gitea = "gt",
   nostr = "nt",
 }
 
@@ -176,6 +178,7 @@ export const solutionType: { [key: string]: string } = {
   wordpress: "Wordpress",
   staticwebsite: "Static Website",
   tfrobot: "TFRobot",
+  Gitea: "Gitea",
   nostr: "Nostr",
 };
 
