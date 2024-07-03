@@ -20,7 +20,13 @@
         </template>
       </v-tooltip>
 
-      <v-dialog transition="dialog-bottom-transition" v-model="showDialog" max-width="500px" scrollable>
+      <v-dialog
+        transition="dialog-bottom-transition"
+        v-model="showDialog"
+        max-width="500px"
+        scrollable
+        attach="#modals"
+      >
         <v-card>
           <v-card-title style="font-weight: bold">Failed Deployments</v-card-title>
           <v-divider color="#FFCC00" />
@@ -267,7 +273,13 @@ const filteredHeaders = computed(() => {
     { title: "Actions", key: "actions", sortable: false },
   ];
 
-  const IPV6Solutions = [ProjectName.VM, ProjectName.Fullvm, ProjectName.TFRobot, ProjectName.Nostr] as string[];
+  const IPV6Solutions = [
+    ProjectName.VM,
+    ProjectName.Fullvm,
+    ProjectName.TFRobot,
+    ProjectName.Gitea,
+    ProjectName.Nostr,
+  ] as string[];
 
   const IPV4Solutions = [
     ProjectName.VM,
@@ -283,6 +295,7 @@ const filteredHeaders = computed(() => {
     ProjectName.StaticWebsite,
     ProjectName.Wordpress,
     ProjectName.TFRobot,
+    ProjectName.Gitea,
     ProjectName.Nostr,
   ] as string[];
 

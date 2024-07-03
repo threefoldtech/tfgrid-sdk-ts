@@ -410,6 +410,28 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
       },
     },
     {
+      path: DashboardRoutes.Applications.Gitea,
+      component: () => import("../views/gitea_view.vue"),
+      meta: {
+        title: "Gitea",
+        info: { page: "info/gitea.md" },
+        navbarConfig: {
+          back: true,
+          path: [
+            { title: "Deploy" },
+            {
+              title: "Applications",
+              disabled: false,
+              to: DashboardRoutes.Deploy.Applications,
+            },
+            {
+              title: "Gitea",
+            },
+          ],
+        },
+      },
+    },
+    {
       path: DashboardRoutes.Applications.Nostr,
       component: () => import("../views/nostr_view.vue"),
       meta: {

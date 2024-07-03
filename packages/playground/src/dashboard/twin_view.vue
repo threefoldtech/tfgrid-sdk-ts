@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-container v-if="editingTwin">
-      <v-dialog v-model="editingTwin" max-width="600">
+      <v-dialog v-model="editingTwin" max-width="600" attach="#modals">
         <v-card>
           <v-toolbar color="primary" dark class="custom-toolbar">Edit Twin</v-toolbar>
           <div class="text-h2 pa-10">
@@ -15,7 +15,7 @@
       </v-dialog>
     </v-container>
 
-    <v-dialog v-model="openVotePopup" max-width="600">
+    <v-dialog v-model="openVotePopup" max-width="600" attach="#modals">
       <v-card>
         <v-toolbar color="primary" dark class="custom-toolbar bold-text">Vote Reminder</v-toolbar>
         <v-card-text>There are {{ numberOfProposalsToVoteOn }} active proposals you can vote on now</v-card-text>
