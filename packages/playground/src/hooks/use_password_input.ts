@@ -1,7 +1,7 @@
 import { computed, reactive, ref } from "vue";
 
 interface PasswordInputProps {
-  type: "text" | "password";
+  type?: "text" | "password";
   "append-inner-icon"?: "mdi-eye-outline" | "mdi-eye-off-outline";
   "onClick:append-inner"?: () => boolean;
   ref?: (el: HTMLFormElement) => void;
