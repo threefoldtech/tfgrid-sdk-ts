@@ -534,7 +534,7 @@ export default {
       () => filters.value.rentable,
       rentable => {
         if (rentable && filters.value.status == "") {
-          filters.value.status = "Up & Standby";
+          filters.value.status = UnifiedNodeStatus.UpStandby;
         }
       },
     );
