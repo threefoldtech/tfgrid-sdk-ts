@@ -4,9 +4,9 @@ name: Full Clients Audit
 
 on:
   push:
-    branches: [development, development_2.6]
+    branches: [development]
   pull_request:
-    branches: [development, development_2.6]
+    branches: [development]
 
 jobs:
   audit-and-open-issue:
