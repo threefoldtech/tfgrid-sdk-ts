@@ -73,6 +73,7 @@
         v-model:planetary="planetary"
         v-model:wireguard="wireguard"
         v-model:mycelium="mycelium"
+        v-model:ipv6="ipv6"
       />
 
       <SelectSolutionFlavor
@@ -96,6 +97,7 @@
         }"
         :filters="{
           ipv4,
+          ipv6,
           certified,
           dedicated,
           cpu: solution?.cpu,
@@ -128,7 +130,6 @@ import type { Flist, solutionFlavor as SolutionFlavor } from "../types";
 import { ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
 import { normalizeError } from "../utils/helpers";
-import rootFs from "../utils/root_fs";
 import { generateName, generatePassword } from "../utils/strings";
 
 const layout = useLayout();
@@ -136,6 +137,7 @@ const name = ref(generateName({ prefix: "um" }));
 const username = ref("admin");
 const password = ref(generatePassword());
 const ipv4 = ref(false);
+const ipv6 = ref(false);
 const planetary = ref(true);
 const wireguard = ref(false);
 const network = ref();
@@ -146,7 +148,9 @@ const flist: Flist = {
 };
 const dedicated = ref(false);
 const certified = ref(false);
-const rootFilesystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solution.value?.memory ?? 0));
+const rootFilesystemSize = computed(() =>
+  calculateRootFileSystem({ CPUCores: solution.value?.cpu ?? 0, RAMInMegaBytes: solution.value?.memory ?? 0 }),
+);
 const selectionDetails = ref<SelectionDetails>();
 const mycelium = ref(true);
 const selectedSSHKeys = ref("");
@@ -189,6 +193,7 @@ async function deploy() {
           planetary: planetary.value,
           mycelium: mycelium.value,
           publicIpv4: ipv4.value,
+          publicIpv6: ipv6.value,
           envs: [
             { key: "SSH_KEY", value: selectedSSHKeys.value },
             { key: "USERNAME", value: username.value },
@@ -217,7 +222,7 @@ function updateSSHkeyEnv(selectedKeys: string) {
 </script>
 
 <script lang="ts">
-import type { GridClient } from "@threefold/grid_client";
+import { calculateRootFileSystem, type GridClient } from "@threefold/grid_client";
 
 import { updateGrid } from "@/utils/grid";
 

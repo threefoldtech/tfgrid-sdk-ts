@@ -21,6 +21,7 @@
         :value="$props.modelValue.username"
         :rules="[
           validators.required('Email is required.'),
+          validators.isEmail('Please provide a valid email address.'),
           v => {
             return isDiscourse ? undefined : validators.isEmail('Please provide a valid email address.')(v);
           },

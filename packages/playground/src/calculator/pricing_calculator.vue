@@ -1,10 +1,10 @@
 <template>
   <ViewLayout>
     <VCard>
-      <VCardTitle class="bg-primary text-center">
-        <VIcon icon="mdi-calculator" />
-        Pricing Calculator
-      </VCardTitle>
+      <v-card color="primary" class="d-flex justify-center items-center pa-3 text-center">
+        <v-icon size="30" class="pr-3">mdi-currency-usd</v-icon>
+        <v-card-title class="pa-0">Pricing Calculator</v-card-title>
+      </v-card>
       <VCardText>
         <VContainer fluid>
           <VAlert type="info" class="mb-10">
@@ -229,7 +229,7 @@
 
 <script lang="ts">
 import { QueryClient } from "@threefold/tfchain_client";
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { VForm } from "vuetify/components/VForm";
 
@@ -285,6 +285,10 @@ export default {
         shouldRun: () => valid.value,
       },
     );
+
+    watch(userBalance, () => {
+      if (resources.value.useCurrentBalance) priceTask.value.run();
+    });
 
     const dedicatedPriceUSD = computed(() => {
       const price = priceTask.value.data?.dedicatedPrice;

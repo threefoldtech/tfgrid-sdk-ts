@@ -1,8 +1,12 @@
+import "./interfaces";
+import "@polkadot/api-augment";
+
 import { ApiPromise, WsProvider } from "@polkadot/api";
 import { Signer } from "@polkadot/api/types";
 import { SubmittableExtrinsic } from "@polkadot/api-base/types";
 import { Keyring } from "@polkadot/keyring";
 import { KeyringPair } from "@polkadot/keyring/types";
+import { DispatchError } from "@polkadot/types/interfaces";
 import { ISubmittableResult } from "@polkadot/types/types";
 import { KeypairType } from "@polkadot/util-crypto/types";
 import { waitReady } from "@polkadot/wasm-crypto";
@@ -338,8 +342,7 @@ class Client extends QueryClient {
             if (section === SYSTEM && method === ExtrinsicState.ExtrinsicFailed) {
               try {
                 const [dispatchError, _] = data;
-                const errorIndex = dispatchError.asModule.error[0];
-                reject(errorIndex);
+                reject(dispatchError);
               } catch (e) {
                 reject(e);
               }
@@ -370,26 +373,20 @@ class Client extends QueryClient {
     });
     return promise
       .then((res: any) => res as T)
-      .catch(e => {
-        let section: string = extrinsic.method.section;
-        if (
-          extrinsic.method.section === UTILITY &&
-          BATCH_METHODS.includes(extrinsic.method.method) &&
-          resultSections.length > 0
-        )
-          section = resultSections[0];
-        const errorName = TFChainErrors[section].Errors[+e];
-        if (errorName) {
-          throw new TFChainErrors[section][errorName](`Failed to apply ${JSON.stringify(extrinsic.method.toHuman())}`);
-        } else {
-          const errorMsg = `Failed to apply ${JSON.stringify(extrinsic.method.toHuman())} due to error: ${
-            Object.keys(this.api.errors[section])[+e] ?? e
-          }`;
-
-          if ((e as Error).message.includes("Inability to pay some fees")) {
-            throw new InsufficientBalanceError(errorMsg);
+      .catch(async e => {
+        const errorMsg = `Failed to apply ${JSON.stringify(extrinsic.method.toHuman())} due to error:`;
+        if ((e as DispatchError).isModule) {
+          const { section, name } = this.api.registry.findMetaError((e as DispatchError).asModule);
+          if (TFChainErrors[section]?.Errors[name]) {
+            throw new TFChainErrors[section][name](`Failed to apply ${JSON.stringify(extrinsic.method.toHuman())}`);
+          } else {
+            throw new TFChainError(`${errorMsg} '${section}-${name}'`);
           }
-          throw new TFChainError(errorMsg);
+        } else {
+          if ((e as Error).message.includes("Inability to pay some fees")) {
+            throw new InsufficientBalanceError(errorMsg + e);
+          }
+          throw new TFChainError(`Failed to apply ${JSON.stringify(extrinsic.method.toHuman())} due to error: ${e}`);
         }
       });
   }

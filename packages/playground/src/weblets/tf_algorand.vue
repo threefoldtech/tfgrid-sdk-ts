@@ -28,7 +28,7 @@
           <v-text-field label="Name" v-model="name" v-bind="props" />
         </input-tooltip>
       </input-validator>
-      <Networks v-model:mycelium="mycelium" v-model:planetary="planetary" v-model:ipv4="ipv4" />
+      <Networks v-model:mycelium="mycelium" v-model:planetary="planetary" v-model:ipv4="ipv4" v-model:ipv6="ipv6" />
       <AlgorandCapacity
         :network="network"
         :type="type"
@@ -83,6 +83,7 @@
         }"
         :filters="{
           ipv4,
+          ipv6,
           certified,
           dedicated,
           cpu,
@@ -121,6 +122,7 @@ const flist: Flist = {
 };
 const name = ref(generateName({ prefix: "al" }));
 const ipv4 = ref(false);
+const ipv6 = ref(false);
 const planetary = ref(true);
 const mycelium = ref(true);
 const cpu = ref() as Ref<number>;
@@ -171,6 +173,7 @@ async function deploy() {
               : [],
           rootFilesystemSize: rootFilesystemSize.value,
           publicIpv4: ipv4.value,
+          publicIpv6: ipv6.value,
           mycelium: mycelium.value,
           planetary: planetary.value,
           nodeId: selectionDetails.value!.node!.nodeId,

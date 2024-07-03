@@ -1,5 +1,9 @@
 <template>
   <view-layout>
+    <v-card color="primary" class="d-flex justify-center items-center pa-3 mb-3 text-center">
+      <v-icon size="30" class="pr-3">mdi-lan-connect</v-icon>
+      <v-card-title class="pa-0">Farm Finder</v-card-title>
+    </v-card>
     <v-alert type="info" variant="tonal" class="mb-6"> Click on the row to view farm details. </v-alert>
     <TfFiltersLayout>
       <template #filters>
@@ -110,7 +114,7 @@
       </v-data-table-server>
     </TfFiltersLayout>
 
-    <v-dialog v-model="dialog" hide-overlay transition="dialog-bottom-transition">
+    <v-dialog v-model="dialog" hide-overlay transition="dialog-bottom-transition" attach="#modals">
       <v-container>
         <v-toolbar :height="35">
           <div class="ml-auto">

@@ -6,8 +6,18 @@
     :disk="
       workers.reduce(
         (disk, worker) =>
-          disk + (worker.solution?.disk ?? 0) + rootFs(worker.solution?.cpu ?? 0, worker.solution?.memory ?? 0),
-        leader.solution?.disk ?? 0 + rootFs(leader.solution?.cpu ?? 0, leader.solution?.memory ?? 0),
+          disk +
+          (worker.solution?.disk ?? 0) +
+          calculateRootFileSystem({
+            CPUCores: worker.solution?.cpu ?? 0,
+            RAMInMegaBytes: worker.solution?.memory ?? 0,
+          }),
+        leader.solution?.disk ??
+          0 +
+            calculateRootFileSystem({
+              CPUCores: leader.solution?.cpu ?? 0,
+              RAMInMegaBytes: leader.solution?.memory ?? 0,
+            }),
       )
     "
     :ipv4="true"
@@ -76,12 +86,16 @@
       </template>
 
       <template #leader>
-        <CaproverWorker v-model="leader" />
+        <CaproverWorker v-model="leader" :other-workers="workers" :nodes-lock="nodesLock" />
       </template>
 
       <template #workers>
         <ExpandableLayout v-model="workers" @add="addWorker" #="{ index }">
-          <CaproverWorker v-model="workers[index]" />
+          <CaproverWorker
+            v-model="workers[index]"
+            :other-workers="[workers, leader].flat(1).filter((_, i) => i !== index)"
+            :nodes-lock="nodesLock"
+          />
         </ExpandableLayout>
       </template>
     </d-tabs>
@@ -106,6 +120,7 @@ import { generateName, generatePassword } from "../utils/strings";
 
 const layout = useLayout();
 const tabs = ref();
+const nodesLock = markRaw(new AwaitLock());
 const profileManager = useProfileManager();
 const domain = ref("");
 const password = ref(generatePassword(10));
@@ -169,7 +184,12 @@ function normalizeCaproverWorker(worker: CW, envs: Env[]): Machine {
     publicIpv4: true,
     planetary: true,
     mycelium: worker.mycelium || false,
-    rootFilesystemSize: rootFs(worker.solution!.cpu, worker.solution!.memory),
+    publicIpv6: worker.ipv6 || false,
+
+    rootFilesystemSize: calculateRootFileSystem({
+      CPUCores: worker.solution!.cpu,
+      RAMInMegaBytes: worker.solution!.memory,
+    }),
     disks: [
       {
         name: "data0",
@@ -190,7 +210,9 @@ function updateSSHkeyEnv(selectedKeys: string) {
 </script>
 
 <script lang="ts">
-import type { GridClient } from "@threefold/grid_client";
+import { calculateRootFileSystem, type GridClient } from "@threefold/grid_client";
+import AwaitLock from "await-lock";
+import { markRaw } from "vue";
 
 import { createNetwork } from "@/utils/deploy_helpers";
 
@@ -199,7 +221,6 @@ import ExpandableLayout from "../components/expandable_layout.vue";
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";
 import { updateGrid } from "../utils/grid";
-import rootFs from "../utils/root_fs";
 
 export default {
   name: "TfCaprover",

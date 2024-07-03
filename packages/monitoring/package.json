@@ -1,6 +1,6 @@
 {
   "name": "@threefold/monitoring",
-  "version": "2.5.0-rc2",
+  "version": "2.5.0",
   "description": "Threefold monitoring package",
   "license": "Apache-2.0",
   "main": "dist/index.js",
@@ -16,9 +16,9 @@
     "access": "public"
   },
   "dependencies": {
-    "@threefold/rmb_direct_client": "^2.5.0-rc2",
-    "@threefold/tfchain_client": "^2.5.0-rc2",
-    "@threefold/types": "^2.5.0-rc2",
+    "@threefold/rmb_direct_client": "2.5.0",
+    "@threefold/tfchain_client": "2.5.0",
+    "@threefold/types": "2.5.0",
     "axios": "^0.27.2",
     "chalk": "4.1.2",
     "stellar-sdk": "^12.1.0",

@@ -13,30 +13,7 @@
           <router-link :to="DashboardRoutes.Deploy.SSHKey">SSH keys management page</router-link>
           and add more as needed.
         </v-alert>
-        <VDivider class="mt-3" />
-      </v-card-text>
-
-      <v-card-actions class="justify-end mb-1 mr-2">
-        <v-btn
-          color="secondary"
-          @click="openManageDialog = true"
-          :disabled="sshKeysManagement.list() && sshKeysManagement.list().length === 0"
-        >
-          Manage SSH keys
-        </v-btn>
-      </v-card-actions>
-    </v-card>
-  </div>
-
-  <v-dialog v-model="openManageDialog" max-width="800">
-    <v-card>
-      <v-card-title class="bg-primary">
-        <v-icon>mdi-cog-sync</v-icon>
-        Manage SSH keys
-      </v-card-title>
-
-      <v-card-text>
-        <v-alert type="info" class="mb-5">
+        <v-alert type="info" class="mt-3">
           <!--
             TODO: Return the message back when return the multiple keys feature.
             The keys selected here will be forwarded to your deployment. To change keys, simply toggle on the keys you
@@ -44,7 +21,8 @@
           -->
           To change the key that you want to use over the deployment, simply click on it.
         </v-alert>
-
+      </v-card-text>
+      <v-chip-group class="ml-3" v-model="selectedKey" mandatory>
         <v-tooltip
           v-for="_key of sshKeysManagement.list()"
           :key="_key.id"
@@ -53,7 +31,7 @@
         >
           <template #activator="{ props }">
             <v-chip
-              class="pa-5 ml-5 mt-5"
+              class="pa-5 mb-3"
               :variant="isKeySelected(_key) ? 'flat' : 'outlined'"
               :color="
                 isKeySelected(_key) ? 'primary' : theme.name.value === AppThemeSelection.light ? 'primary' : 'white'
@@ -72,22 +50,9 @@
             </v-chip>
           </template>
         </v-tooltip>
-        <v-divider class="mt-3" />
-      </v-card-text>
-
-      <v-card-actions class="justify-end mb-1 mr-2">
-        <v-btn color="anchor" text="Close" @click="openManageDialog = false" />
-      </v-card-actions>
+      </v-chip-group>
     </v-card>
-  </v-dialog>
-
-  <!-- View SSH Key -->
-  <ssh-data-dialog
-    :open="isViewSSHKey"
-    :selected-key="selectedKey"
-    :all-keys="selectedKeys"
-    @close="onCloseSelectKey"
-  />
+  </div>
 </template>
 
 <script lang="ts">
@@ -96,7 +61,6 @@ import { capitalize, defineComponent, getCurrentInstance, nextTick, onMounted, r
 import { onUnmounted } from "vue";
 import { useTheme } from "vuetify";
 
-import SshDataDialog from "@/components/ssh_keys/SshDataDialog.vue";
 import { useForm, ValidatorStatus } from "@/hooks/form_validator";
 import type { InputValidatorService } from "@/hooks/input_validator";
 import { DashboardRoutes } from "@/router/routes";
@@ -107,22 +71,12 @@ import SSHKeysManagement from "@/utils/ssh";
 export default defineComponent({
   name: "ManageSshDeployemnt",
   emits: ["selectedKeys"],
-  components: {
-    SshDataDialog,
-  },
 
   setup(_, { emit }) {
     const inputElement = ref<HTMLElement>();
-    const defaultKeyData = {
-      createdAt: "",
-      id: 0,
-      publicKey: "",
-      name: "",
-      isActive: false,
-    };
     const openManageDialog = ref<boolean>(false);
-    const selectedKey = ref<SSHKeyData>(defaultKeyData);
     const selectedKeys = ref<SSHKeyData[]>([]);
+    const selectedKey = ref<number>();
     const isViewSSHKey = ref<boolean>(false);
     const sshKeysManagement = new SSHKeysManagement();
     const theme = useTheme();
@@ -132,9 +86,12 @@ export default defineComponent({
 
     onMounted(() => {
       selectedKeys.value = sshKeysManagement.list().filter(_key => _key.isActive === true);
+      selectedKey.value = selectedKeys.value.findIndex(k => k.id === selectedKeys.value[0].id);
       // TODO: Remove the below `selectedKeys.value = [selectedKeys.value[0]];` to make the user select more than one key
       // after fixing this issue: https://github.com/threefoldtech/tf-images/issues/231
-      selectedKeys.value = [selectedKeys.value[0]];
+      if (selectedKeys.value.length) {
+        selectedKeys.value = [selectedKeys.value[0]];
+      }
       handleKeys();
       emit("selectedKeys", selectedKeysString.value);
     });
@@ -160,20 +117,10 @@ export default defineComponent({
       emit("selectedKeys", selectedKeysString.value);
     }
 
-    function onSelectKey(key: SSHKeyData) {
-      selectedKey.value = key;
-      isViewSSHKey.value = true;
-    }
-
-    function onCloseSelectKey() {
-      isViewSSHKey.value = false;
-      nextTick(() => {
-        selectedKey.value = defaultKeyData;
-      });
-    }
-
     function handleKeys() {
-      selectedKeysString.value = selectedKeys.value.map(_key => _key.publicKey).join("\n\n");
+      if (selectedKeys.value.length) {
+        selectedKeysString.value = selectedKeys.value.map(_key => _key.publicKey).join("\n\n");
+      }
     }
 
     /* interact with form_validator */
@@ -209,16 +156,12 @@ export default defineComponent({
       selectedKeys,
       selectedKey,
       isViewSSHKey,
-      defaultKeyData,
       selectedKeysString,
       DashboardRoutes,
       sshKeysManagement,
       theme,
       AppThemeSelection,
-
       capitalize,
-      onSelectKey,
-      onCloseSelectKey,
       selectKey,
       isKeySelected,
     };

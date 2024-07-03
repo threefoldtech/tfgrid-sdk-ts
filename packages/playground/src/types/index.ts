@@ -73,6 +73,7 @@ export interface CaproverWorker {
   certified?: boolean;
   selectionDetails?: SelectionDetails;
   mycelium: boolean;
+  ipv6: boolean;
 }
 
 export interface FarmInterface {
@@ -122,6 +123,8 @@ export enum ProjectName {
   FreeFlow = "Freeflow",
   StaticWebsite = "StaticWebsite",
   TFRobot = "TFRobot",
+  Gitea = "Gitea",
+  Nostr = "Nostr",
 }
 
 export enum SolutionCode {
@@ -149,6 +152,8 @@ export enum SolutionCode {
   wordpress = "wp",
   staticwebsite = "sw",
   tfrobot = "tfr",
+  gitea = "gt",
+  nostr = "nt",
 }
 
 export const solutionType: { [key: string]: string } = {
@@ -173,6 +178,8 @@ export const solutionType: { [key: string]: string } = {
   wordpress: "Wordpress",
   staticwebsite: "Static Website",
   tfrobot: "TFRobot",
+  Gitea: "Gitea",
+  nostr: "Nostr",
 };
 
 export interface solutionFlavor {

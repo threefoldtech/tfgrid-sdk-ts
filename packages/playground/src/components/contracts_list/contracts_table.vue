@@ -140,7 +140,7 @@
     </template>
   </weblet-layout>
 
-  <v-dialog width="800" v-model="contractStateDialog">
+  <v-dialog width="800" v-model="contractStateDialog" attach="#modals">
     <v-card>
       <v-toolbar color="primary" class="custom-toolbar">
         <p class="mb-5">Contract lock Details</p>
@@ -167,7 +167,7 @@
           above.</v-alert
         >
 
-        <v-card-actions>
+        <v-card-actions class="justify-end mb-1 mr-2">
           <v-btn color="anchor" class="mr-2 px-3" @click="contractStateDialog = false"> Close </v-btn>
           <v-tooltip
             :text="
@@ -197,7 +197,7 @@
     </v-card>
   </v-dialog>
 
-  <v-dialog width="800" v-model="deletingDialog">
+  <v-dialog width="800" v-model="deletingDialog" attach="#modals">
     <v-card>
       <v-card-title class="bg-primary"> Delete the following contracts? </v-card-title>
       <v-alert class="ma-4" type="warning" variant="tonal"
@@ -219,7 +219,7 @@
     </v-card>
   </v-dialog>
 
-  <v-dialog width="800" v-model="unlockDialog">
+  <v-dialog width="800" v-model="unlockDialog" attach="#modals">
     <v-card>
       <v-card-title class="bg-primary">
         Unlock the following Contract<span v-if="selectedContracts.length > 1">s</span>
@@ -247,7 +247,7 @@
         <v-chip class="ma-1" label v-for="c in selectedContracts" :key="c.contract_id">
           {{ c.contract_id }}
         </v-chip>
-        <v-card-actions>
+        <v-card-actions class="justify-end mb-1 mr-2">
           <v-btn color="anchor" @click="unlockDialog = false"> Cancel </v-btn>
           <v-tooltip
             :text="
@@ -343,11 +343,11 @@ const getAmountLocked = computed(() => {
 
 const isNodeInRentContracts = computed(() => {
   if (props.contractsType == ContractType.Node && selectedItem.value) {
-    const nodeIds = props.contracts.value
-      .map(contract => contract.details.nodeId)
-      .filter(nodeId => nodeId !== undefined) as number[];
+    const nodeIds = new Set(
+      props.contracts.value.map(contract => contract.details.nodeId).filter(nodeId => nodeId !== undefined) as number[],
+    );
     if (contractLocked.value && contractLocked.value.amountLocked === 0) {
-      return nodeIds.includes(selectedItem.value.nodeId);
+      return nodeIds.has(selectedItem.value.details.nodeId);
     }
   }
   return false;

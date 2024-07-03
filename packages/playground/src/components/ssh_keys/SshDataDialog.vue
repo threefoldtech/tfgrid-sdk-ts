@@ -4,6 +4,7 @@
     @keydown.esc="() => $emit('close')"
     v-model="$props.open"
     max-width="800"
+    attach="#modals"
   >
     <template v-slot:default>
       <v-card>

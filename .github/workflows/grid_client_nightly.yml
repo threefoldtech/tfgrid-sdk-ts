@@ -26,11 +26,11 @@ jobs:
       - uses: actions/checkout@v4
         if: ${{ env.NETWORK == 'qa' }}
         with:
-          ref: refs/tags/v2.4.3
+          ref: refs/tags/v2.5.0-rc2
       - uses: actions/checkout@v4
         if: ${{ env.NETWORK == 'test' }}
         with:
-          ref: refs/tags/v2.4.3
+          ref: refs/tags/v2.5.0-rc2
       - uses: actions/checkout@v4
         if: ${{ env.NETWORK == 'main' }}
         with:
@@ -131,10 +131,11 @@ jobs:
           steps.kubernetesqsfs.outcome != 'success' ||
           steps.kvstore.outcome != 'success' ||
           steps.zdb.outcome != 'success' ||
-          steps.deleteall.outcome != 'success' 
+          steps.deleteall.outcome != 'success'
         run: exit 1
 
       - name: Create GitHub Issue on Failure
+        if: failure() && '$(date +%u)' != '5' && '$(date +%u)' != '6'
         uses: dacbd/create-issue-action@main
         with:
           token: ${{ github.token }}
@@ -151,7 +152,6 @@ jobs:
             - Commit: ${{ github.sha }}
             - Network: `${{ env.NETWORK }}`
   
-
             Dynamic Single Vm: ${{ steps.dynamicsinglevm.outcome }}
             Multiple Vm: ${{ steps.multiplevm.outcome }}
             Kubernetes: ${{ steps.kubernetes.outcome }}
@@ -160,5 +160,4 @@ jobs:
             Kvstore: ${{ steps.kvstore.outcome }}
             Zdb: ${{ steps.zdb.outcome }}
             Delete all contracts: ${{ steps.deleteall.outcome }}
-          labels: type_bug , grid_client                 
-
+          labels: type_bug, grid_client

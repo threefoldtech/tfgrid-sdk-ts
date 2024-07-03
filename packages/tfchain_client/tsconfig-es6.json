@@ -21,7 +21,11 @@
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
         "baseUrl": ".",
-        "skipLibCheck": true /* Skip type checking all .d.ts files. */
+        "skipLibCheck": true, /* Skip type checking all .d.ts files. */
+        "paths": {
+            "@polkadot/types/lookup": ["src/interfaces/chain/types-lookup.ts"],
+            "@polkadot/api-augment*": ["src/interfaces/chain/augment-api.ts"]
+        }
 
     },
     "include": [

@@ -5,6 +5,7 @@
     @click:outside="() => $emit('close-dialog', false)"
     transition="dialog-bottom-transition"
     hide-overlay
+    attach="#modals"
   >
     <v-toolbar color="primary">
       <div class="d-flex justify-center">

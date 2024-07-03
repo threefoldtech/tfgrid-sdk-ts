@@ -22,7 +22,7 @@
       :small="{ cpu: 1, memory: 2, disk: 50 }"
       :medium="{ cpu: 2, memory: 4, disk: 100 }"
     />
-    <Networks v-model:mycelium="$props.modelValue.mycelium" />
+    <Networks v-model:mycelium="$props.modelValue.mycelium" v-model:ipv6="$props.modelValue.ipv6" />
 
     <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
       <v-switch color="primary" inset label="Dedicated" v-model="$props.modelValue.dedicated" />
@@ -32,8 +32,11 @@
     </input-tooltip>
 
     <TfSelectionDetails
+      :selected-machines="selectedMachines"
+      :nodes-lock="nodesLock"
       :filters="{
         ipv4: true,
+        ipv6: $props.modelValue.ipv6,
         certified: $props.modelValue.certified,
         dedicated: $props.modelValue.dedicated,
         cpu: $props.modelValue.solution?.cpu,
@@ -47,31 +50,69 @@
 </template>
 
 <script lang="ts">
+import { calculateRootFileSystem } from "@threefold/grid_client";
+import type AwaitLock from "await-lock";
 import { computed, type PropType } from "vue";
 
+import type { SelectedMachine } from "@/types/nodeSelector";
 import { manual } from "@/utils/manual";
 
 import Networks from "../components/networks.vue";
 import type { CaproverWorker } from "../types";
-import rootFs from "../utils/root_fs";
 import { generateName } from "../utils/strings";
 import SelectSolutionFlavor from "./select_solution_flavor.vue";
 
 export function createWorker(name: string = generateName({ prefix: "wr" })): CaproverWorker {
-  return { name, mycelium: true };
+  return { name, mycelium: true, ipv6: false };
+}
+
+function toMachine(rootFilesystemSize: number, worker?: CaproverWorker): SelectedMachine | undefined {
+  if (!worker || !worker.selectionDetails || !worker.selectionDetails.node) {
+    return undefined;
+  }
+
+  return {
+    nodeId: worker.selectionDetails.node.nodeId,
+    cpu: worker.solution?.cpu ?? 0,
+    memory: worker.solution?.memory ?? 0,
+    disk: (worker.solution?.disk ?? 0) + (rootFilesystemSize ?? 0),
+  };
 }
 
 export default {
   name: "CaproverWorker",
   components: { SelectSolutionFlavor, Networks },
-  props: { modelValue: { type: Object as PropType<CaproverWorker>, required: true } },
+  props: {
+    modelValue: {
+      type: Object as PropType<CaproverWorker>,
+      required: true,
+    },
+    otherWorkers: {
+      type: Array as PropType<CaproverWorker[]>,
+      default: () => [],
+    },
+    nodesLock: Object as PropType<AwaitLock>,
+  },
   setup(props) {
     const rootFilesystemSize = computed(() => {
       const { cpu = 0, memory = 0 } = props.modelValue.solution || {};
-      return rootFs(cpu, memory);
+      return calculateRootFileSystem({
+        CPUCores: cpu,
+        RAMInMegaBytes: memory,
+      });
     });
 
-    return { rootFilesystemSize, manual };
+    const selectedMachines = computed(() => {
+      return props.otherWorkers.reduce((res, worker) => {
+        const machine = toMachine(rootFilesystemSize.value, worker);
+        if (machine) {
+          res.push(machine);
+        }
+        return res;
+      }, [] as SelectedMachine[]);
+    });
+
+    return { rootFilesystemSize, manual, selectedMachines };
   },
 };
 </script>

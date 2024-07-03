@@ -84,7 +84,7 @@
             You selected a certified node. Please note that this deployment costs more TFT.
           </div>
         </div>
-        <div>Please Note that the Bandwidth affects the total cost.</div>
+        <div v-if="ipv4">Please Note that the Bandwidth affects the total cost (1 Bandwidth = 0.01 TFT/hour).</div>
         <a :href="manual.pricing" target="_blank" class="app-link">
           Learn more about the pricing and how to unlock discounts.
         </a>
@@ -196,7 +196,7 @@ provideService({
   },
 });
 
-function validateBeforeDeploy(fn: () => void) {
+function validateBeforeDeploy(fn: () => void, documentScrollend = true) {
   const forms = __forms;
 
   let errorInput: [number, any, boolean] | null = null;
@@ -243,7 +243,8 @@ function validateBeforeDeploy(fn: () => void) {
         return;
       }
 
-      document.addEventListener("scrollend", _improveUx, { once: true });
+      documentScrollend && document.addEventListener("scrollend", _improveUx, { once: true });
+      !documentScrollend && setTimeout(_improveUx, 500);
       _input.scrollIntoView({ behavior: "smooth", block: "center" });
 
       async function _improveUx() {
