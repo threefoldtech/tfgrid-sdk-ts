@@ -12,16 +12,10 @@ help:
 run:
 ifeq ($(project), playground)
 	cd packages/playground && yarn dev
-else ifeq ($(project), dashboard)
-	cd packages/dashboard && yarn serve
-else ifeq ($(project), UI)
-	cd packages/UI && yarn dev
 endif
 
 build:
-ifeq ($(project), dashboard)
-	cd packages/dashboard && yarn build
-else ifeq ($(project), grid_client)
+ifeq ($(project), grid_client)
 	cd packages/grid_client && yarn build
 else ifeq ($(project), grid_http_server)
 	cd packages/grid_http_server && yarn build
@@ -37,16 +31,12 @@ else ifeq ($(project), stats)
 	cd packages/stats && yarn build
 else ifeq ($(project), tfchain_client)
 	cd packages/tfchain_client && yarn build
-else ifeq ($(project), weblets)
-	cd packages/weblets/playground && yarn build
 else ifeq ($(project), playground)
 	cd packages/playground && yarn build
 else ifeq ($(project), graphql_client)
 	cd packages/graphql_client && yarn build
 else ifeq ($(project), gridproxy_client)
 	cd packages/gridproxy_client && yarn build
-else ifeq ($(project), UI)
-	cd packages/UI && yarn build
 else
 	yarn lerna run build --no-private
 endif
