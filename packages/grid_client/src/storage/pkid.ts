@@ -41,7 +41,7 @@ class PKID implements BackendStorageInterface {
   @crop
   async get(key: string) {
     key = key.replace(/\//g, "");
-    const value = await this.pkid.getDoc(this.pkid.keyPair.publicKey, key);
+    const value = await this.pkid.getDoc(this.keypair.publicKey, key);
 
     if (value.data) {
       return value.data;
