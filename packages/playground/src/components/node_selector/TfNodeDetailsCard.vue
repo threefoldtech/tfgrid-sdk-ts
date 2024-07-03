@@ -542,7 +542,7 @@ export default {
     const monthlyPriceAfterDiscount = computed(() => {
       if (price_usd.value) {
         if (stakingDiscount.value) {
-          return (price_usd.value - 0.5 * price_usd.value - stakingDiscount.value * price_usd.value).toFixed(2);
+          return (price_usd.value - 0.5 * price_usd.value - (stakingDiscount.value / 100) * price_usd.value).toFixed(2);
         }
         return (price_usd.value - 0.5 * price_usd.value).toFixed(2);
       }
@@ -552,7 +552,7 @@ export default {
       if (price_usd.value) {
         const hourlyPrice = price_usd.value / 24 / 30;
         if (stakingDiscount.value) {
-          return (hourlyPrice - 0.5 * hourlyPrice - stakingDiscount.value * hourlyPrice).toFixed(2);
+          return (hourlyPrice - 0.5 * hourlyPrice - (stakingDiscount.value / 100) * hourlyPrice).toFixed(2);
         }
         return (hourlyPrice - 0.5 * hourlyPrice).toFixed(2);
       }
