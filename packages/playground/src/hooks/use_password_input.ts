@@ -1,6 +1,17 @@
 import { computed, reactive, ref } from "vue";
 
-export function usePasswordInput(defaultShow = false) {
+interface PasswordInputProps {
+  type: "text" | "password";
+  "append-inner-icon"?: "mdi-eye-outline" | "mdi-eye-off-outline";
+  "onClick:append-inner"?: () => boolean;
+  ref?: (el: HTMLFormElement) => void;
+  disabled?: boolean;
+  label?: string;
+  readonly?: boolean;
+  modelValue?: string;
+}
+
+export function usePasswordInput(defaultShow = false): PasswordInputProps {
   const show = ref(defaultShow);
 
   return reactive({
