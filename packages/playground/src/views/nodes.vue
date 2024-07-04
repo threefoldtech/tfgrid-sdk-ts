@@ -530,12 +530,15 @@ export default {
       ipv6: false,
       mine: false,
     });
-
+    const oldNodeStatus = ref();
     watch(
       () => filters.value.rentable,
       rentable => {
         if (rentable) {
+          oldNodeStatus.value = filters.value.status;
           filters.value.status = UnifiedNodeStatus.UpStandby;
+        } else {
+          filters.value.status = oldNodeStatus.value;
         }
       },
     );
