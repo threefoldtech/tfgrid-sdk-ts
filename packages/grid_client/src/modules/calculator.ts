@@ -1,5 +1,4 @@
 import { QueryClient } from "@threefold/tfchain_client";
-import { validate } from "class-validator";
 
 import { TFClient } from "../clients/tf-grid/client";
 import { GridClientConfig } from "../config";
@@ -19,7 +18,7 @@ export interface PricingInfo {
     discount: number;
   };
 }
-const discountPackages = {
+export const discountPackages = {
   none: {
     duration: 0,
     discount: 0,
