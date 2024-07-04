@@ -528,9 +528,9 @@ export default {
     async function formatTFTsNeeded(duration: number) {
       const tftMarketPrice = await grid?.calculator.tftPrice();
       if (price_usd.value) {
-        return normalizePrice((price_usd.value * 0.5 * duration) / tftMarketPrice).toFixed(2);
+        return Math.ceil(normalizePrice((price_usd.value * 0.5 * duration) / tftMarketPrice));
       }
-      return null;
+      return 0;
     }
     async function tftsNeeded() {
       loadingdiscountTableItems.value = true;

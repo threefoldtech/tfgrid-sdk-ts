@@ -39,7 +39,7 @@ export enum NodeHealth {
 export interface discountItems {
   name: string;
   discount: string;
-  tfts: string | null;
+  tfts: number;
 }
 export async function getAllNodes(grid: GridClient | null, options?: NodeFilters): Promise<NodeInfo[] | number[]> {
   const isFlat = options?.flat || false;
