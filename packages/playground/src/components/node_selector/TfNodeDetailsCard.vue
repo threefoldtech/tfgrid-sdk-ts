@@ -339,7 +339,6 @@ export default {
       loadingStakingDiscount.value = true;
       if (props.node) {
         stakingDiscount.value = (await getStakingDiscount()) || 0;
-        tftsNeededArr.value = (await tftsNeeded()) || [];
       }
       loadingStakingDiscount.value = false;
     }
@@ -348,6 +347,7 @@ export default {
       () => profileManager.profile,
       async () => {
         await refreshStakingDiscount();
+        await tftsNeeded();
       },
       { immediate: true, deep: true },
     );
@@ -521,36 +521,35 @@ export default {
     async function tftsNeeded() {
       const total_resources = props.node?.total_resources;
       const { cru, hru, mru, sru } = total_resources as NodeResources;
-      tftsNeededArr.value = [];
-      discountsArr.value.map(async disc => {
-        const tft = normalizePrice(
-          await grid?.calculator.calculateTFTsNeeded(
-            {
-              cru,
-              hru: toGigaBytes(hru),
-              mru: toGigaBytes(mru),
-              sru: toGigaBytes(sru),
-              ipv4u: false,
-              certified: props.node?.certificationType === CertificationType.Certified,
-            },
-            disc,
-          ),
+
+      discountsArr.value.map(async (disc, i) => {
+        const tft = await grid?.calculator.calculateTFTsNeeded(
+          {
+            cru,
+            hru: toGigaBytes(hru),
+            mru: toGigaBytes(mru),
+            sru: toGigaBytes(sru),
+            ipv4u: false,
+            certified: props.node?.certificationType === CertificationType.Certified,
+          },
+          disc,
         );
+
         console.log(tft);
-        tftsNeededArr.value.push(tft);
+        discountItems[i].tfts = normalizePrice(tft);
       });
-      return tftsNeededArr.value;
     }
     const discountItems = [
-      { name: "Default", discount: "-20%", tfts: tftsNeededArr.value[0] },
-      { name: "Bronze", discount: "-30%", tfts: tftsNeededArr.value[1] },
-      { name: "Silver", discount: "-40%", tfts: tftsNeededArr.value[2] },
-      { name: "Gold", discount: "-60%", tfts: tftsNeededArr.value[3] },
+      { name: "Default", discount: "-20%", tfts: 0 },
+      { name: "Bronze", discount: "-30%", tfts: 0 },
+      { name: "Silver", discount: "-40%", tfts: 0 },
+      { name: "Gold", discount: "-60%", tfts: 0 },
     ];
     const monthlyPriceAfterDiscount = computed(() => {
       if (price_usd.value) {
         if (stakingDiscount.value) {
-          return (price_usd.value - 0.5 * price_usd.value - (stakingDiscount.value / 100) * price_usd.value).toFixed(2);
+          const priceAfterDiscount = price_usd.value - 0.5 * price_usd.value;
+          return (priceAfterDiscount - (stakingDiscount.value / 100) * priceAfterDiscount).toFixed(2);
         }
         return (price_usd.value - 0.5 * price_usd.value).toFixed(2);
       }
@@ -560,7 +559,8 @@ export default {
       if (price_usd.value) {
         const hourlyPrice = price_usd.value / 24 / 30;
         if (stakingDiscount.value) {
-          return (hourlyPrice - 0.5 * hourlyPrice - (stakingDiscount.value / 100) * hourlyPrice).toFixed(2);
+          const priceAfterDiscount = hourlyPrice - 0.5 * hourlyPrice;
+          return (priceAfterDiscount - (stakingDiscount.value / 100) * priceAfterDiscount).toFixed(2);
         }
         return (hourlyPrice - 0.5 * hourlyPrice).toFixed(2);
       }
