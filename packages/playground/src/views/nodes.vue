@@ -50,6 +50,7 @@
 
           <TfFilter class="mt-4" query-route="node-status" v-model="filters.status">
             <v-select
+              :disabled="filters.rentable"
               :model-value="filters.status || undefined"
               @update:model-value="filters.status = $event || ''"
               :items="[
@@ -533,7 +534,7 @@ export default {
     watch(
       () => filters.value.rentable,
       rentable => {
-        if (rentable && filters.value.status == "") {
+        if (rentable) {
           filters.value.status = UnifiedNodeStatus.UpStandby;
         }
       },
