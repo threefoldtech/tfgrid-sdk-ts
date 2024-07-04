@@ -528,7 +528,8 @@ export default {
     async function formatTFTsNeeded(duration: number) {
       const tftMarketPrice = await grid?.calculator.tftPrice();
       if (price_usd.value) {
-        return Math.ceil(normalizePrice((price_usd.value * 0.5 * duration) / tftMarketPrice));
+        const tfts = normalizePrice((price_usd.value * 0.5 * duration) / tftMarketPrice);
+        return Math.ceil(tfts);
       }
       return 0;
     }
