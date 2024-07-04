@@ -208,7 +208,7 @@
             <v-data-table
               class="my-5 rounded-lg"
               hover
-              :loading="loadingStakingDiscount"
+              :loading="loadingdiscountTableItems"
               :headers="[
                 { title: 'Packages', align: 'center', key: 'name', sortable: false },
                 { title: 'Discount', align: 'center', key: 'discount', sortable: false },
@@ -315,6 +315,7 @@ export default {
     const grid = gridStore.client as unknown as GridClient;
     const stakingDiscount = ref<number>();
     const loadingStakingDiscount = ref<boolean>(false);
+    const loadingdiscountTableItems = ref<boolean>(false);
     const lastDeploymentTime = ref<number>(0);
     const discountTableItems = ref<discountItems[]>([]);
     const rentedByUser = computed(() => {
@@ -532,6 +533,7 @@ export default {
       return null;
     }
     async function tftsNeeded() {
+      loadingdiscountTableItems.value = true;
       if (price_usd.value) {
         discountTableItems.value = [
           {
@@ -556,6 +558,7 @@ export default {
           },
         ];
       }
+      loadingdiscountTableItems.value = false;
     }
 
     const monthlyPriceAfterDiscount = computed(() => {
@@ -610,6 +613,7 @@ export default {
       getNodeStatusColor,
       discountTableItems,
       lastDeploymentTime,
+      loadingdiscountTableItems,
     };
   },
 };
