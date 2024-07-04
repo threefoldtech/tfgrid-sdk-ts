@@ -652,7 +652,6 @@ function logout() {
   if (router.currentRoute.value.path.includes("/overview")) {
     router.push("/");
   }
-  emit("update:modelValue", false);
 }
 
 const activating = ref(false);
