@@ -1,4 +1,4 @@
-import { ComponentPublicInstance, computed, reactive, ref } from "vue";
+import { type ComponentPublicInstance, computed, reactive, ref } from "vue";
 
 export function usePasswordInput(defaultShow = false) {
   const show = ref(defaultShow);
