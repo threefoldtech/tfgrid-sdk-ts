@@ -209,7 +209,7 @@
           </v-card>
         </v-window-item>
       </v-window>
-      <v-dialog v-model="openVDialog" max-width="600" scrollable>
+      <v-dialog v-model="openVDialog" max-width="600" scrollable attach="#modals">
         <v-card>
           <v-card-title>Cast Vote</v-card-title>
           <v-card-text>
@@ -235,7 +235,7 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
-      <v-dialog v-model="openInfoModal" width="50vw">
+      <v-dialog v-model="openInfoModal" width="50vw" attach="#modals">
         <v-card>
           <v-card-title class="text-h5 my-2"> Proposals Information </v-card-title>
           <v-divider></v-divider>

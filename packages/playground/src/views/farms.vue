@@ -114,7 +114,7 @@
       </v-data-table-server>
     </TfFiltersLayout>
 
-    <v-dialog v-model="dialog" hide-overlay transition="dialog-bottom-transition">
+    <v-dialog v-model="dialog" hide-overlay transition="dialog-bottom-transition" attach="#modals">
       <v-container>
         <v-toolbar :height="35">
           <div class="ml-auto">

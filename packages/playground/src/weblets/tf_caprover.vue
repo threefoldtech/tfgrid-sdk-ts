@@ -86,12 +86,16 @@
       </template>
 
       <template #leader>
-        <CaproverWorker v-model="leader" />
+        <CaproverWorker v-model="leader" :other-workers="workers" :nodes-lock="nodesLock" />
       </template>
 
       <template #workers>
         <ExpandableLayout v-model="workers" @add="addWorker" #="{ index }">
-          <CaproverWorker v-model="workers[index]" />
+          <CaproverWorker
+            v-model="workers[index]"
+            :other-workers="[workers, leader].flat(1).filter((_, i) => i !== index)"
+            :nodes-lock="nodesLock"
+          />
         </ExpandableLayout>
       </template>
     </d-tabs>
@@ -116,6 +120,7 @@ import { generateName, generatePassword } from "../utils/strings";
 
 const layout = useLayout();
 const tabs = ref();
+const nodesLock = markRaw(new AwaitLock());
 const profileManager = useProfileManager();
 const domain = ref("");
 const password = ref(generatePassword(10));
@@ -206,6 +211,8 @@ function updateSSHkeyEnv(selectedKeys: string) {
 
 <script lang="ts">
 import { calculateRootFileSystem, type GridClient } from "@threefold/grid_client";
+import AwaitLock from "await-lock";
+import { markRaw } from "vue";
 
 import { createNetwork } from "@/utils/deploy_helpers";
 

@@ -86,7 +86,7 @@
         </tr>
 
         <v-container v-if="showDialogue">
-          <v-dialog v-model="showDialogue" max-width="600">
+          <v-dialog v-model="showDialogue" max-width="600" attach="#modals">
             <v-card>
               <v-toolbar color="primary" dark>
                 <v-toolbar-title class="custom-toolbar_title mb-6"> Add/Edit Stellar V2 Address </v-toolbar-title>

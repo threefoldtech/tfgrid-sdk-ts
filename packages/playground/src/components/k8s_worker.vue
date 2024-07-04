@@ -84,6 +84,8 @@
     </input-tooltip>
 
     <TfSelectionDetails
+      :selected-machines="selectedMachines"
+      :nodes-lock="nodesLock"
       :filters-validators="{
         memory: { min: 1024 },
         rootFilesystemSize: {
@@ -109,8 +111,10 @@
 
 <script lang="ts">
 import { calculateRootFileSystem } from "@threefold/grid_client";
-import type { PropType } from "vue";
+import type AwaitLock from "await-lock";
+import { computed, type PropType } from "vue";
 
+import type { SelectedMachine } from "@/types/nodeSelector";
 import { manual } from "@/utils/manual";
 
 import Networks from "../components/networks.vue";
@@ -135,6 +139,19 @@ export function createWorker(name: string = generateName({ prefix: "wr" })): K8S
   };
 }
 
+function toMachine(worker?: K8SWorker): SelectedMachine | undefined {
+  if (!worker || !worker.selectionDetails || !worker.selectionDetails.node) {
+    return undefined;
+  }
+
+  return {
+    nodeId: worker.selectionDetails.node.nodeId,
+    cpu: worker.cpu,
+    memory: worker.memory,
+    disk: (worker.diskSize ?? 0) + (worker.rootFsSize ?? 0),
+  };
+}
+
 export default {
   name: "K8SWorker",
   components: { RootFsSize, Networks },
@@ -143,9 +160,24 @@ export default {
       type: Object as PropType<K8SWorker>,
       required: true,
     },
+    otherWorkers: {
+      type: Array as PropType<K8SWorker[]>,
+      default: () => [],
+    },
+    nodesLock: Object as PropType<AwaitLock>,
   },
-  setup() {
-    return { calculateRootFileSystem, manual };
+  setup(props) {
+    const selectedMachines = computed(() => {
+      return props.otherWorkers.reduce((res, worker) => {
+        const machine = toMachine(worker);
+        if (machine) {
+          res.push(machine);
+        }
+        return res;
+      }, [] as SelectedMachine[]);
+    });
+
+    return { calculateRootFileSystem, manual, selectedMachines };
   },
 };
 </script>
