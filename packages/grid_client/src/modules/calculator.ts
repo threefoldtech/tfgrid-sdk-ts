@@ -106,14 +106,7 @@ class Calculator {
       30;
     return { musd_month: musd_month, dedicatedDiscount: price.discountForDedicationNodes };
   }
-  @expose
-  @validateInput
-  async calculateTFTsNeeded(options: CalculatorModel, discount: number) {
-    const pricing = await this.pricing(options);
-    const dedicatedPrice = pricing.musd_month - pricing.musd_month * (+discount / 100);
-    const TFTPrice = await this.tftPrice();
-    return dedicatedPrice / TFTPrice;
-  }
+
   @expose
   @validateInput
   async calculate(options: CalculatorModel): Promise<PricingInfo> {
