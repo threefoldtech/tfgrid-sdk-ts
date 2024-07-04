@@ -212,7 +212,7 @@
               :headers="[
                 { title: 'Packages', align: 'center', key: 'name', sortable: false },
                 { title: 'Discount', align: 'center', key: 'discount', sortable: false },
-                { title: 'TFT needed', align: 'center', key: 'tfts', sortable: false },
+                { title: 'TFTs Required', align: 'center', key: 'tfts', sortable: false },
               ]"
               :items="discountTableItems"
               disable-sort="true"
