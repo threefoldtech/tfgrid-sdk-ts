@@ -277,6 +277,7 @@
 import type { GridClient, NodeInfo, NodeResources } from "@threefold/grid_client";
 import { discountPackages } from "@threefold/grid_client";
 import { CertificationType, type GridNode } from "@threefold/gridproxy_client";
+import { QueryClient } from "@threefold/tfchain_client";
 import { computed, onMounted, ref, watch } from "vue";
 import { capitalize, type PropType } from "vue";
 
@@ -289,6 +290,8 @@ import { getCountryCode } from "@/utils/get_nodes";
 import { manual } from "@/utils/manual";
 import toReadableDate from "@/utils/to_readable_data";
 
+import { calculator as Calculator } from "../../../../grid_client/dist/es6";
+import { useAsync } from "../../hooks";
 import { useGrid, useProfileManager } from "../../stores";
 import formatResourceSize from "../../utils/format_resource_size";
 import { toGigaBytes } from "../../utils/helpers";
@@ -318,6 +321,8 @@ export default {
     const loadingdiscountTableItems = ref<boolean>(false);
     const lastDeploymentTime = ref<number>(0);
     const discountTableItems = ref<discountItems[]>([]);
+    const tftMarketPrice = ref<number>(0);
+    const calculator = new Calculator(new QueryClient(window.env.SUBSTRATE_URL));
     const rentedByUser = computed(() => {
       return props.node?.rentedByTwinId === profileManager.profile?.twinId;
     });
@@ -334,9 +339,14 @@ export default {
 
       return imageUrl;
     });
-
+    const tftPriceTask = useAsync(() => calculator.tftPrice(), {
+      init: true,
+      default: 0,
+    });
     onMounted(async () => {
       await getLastDeploymentTime();
+      tftMarketPrice.value = tftPriceTask.value.data;
+      tftsNeeded();
     });
 
     async function refreshStakingDiscount() {
@@ -351,7 +361,6 @@ export default {
       () => profileManager.profile,
       async () => {
         await refreshStakingDiscount();
-        await tftsNeeded();
       },
       { immediate: true, deep: true },
     );
@@ -522,43 +531,44 @@ export default {
         }
       }
     }
+
     function formatDiscount(discount: number) {
       return `-${discount}%`;
     }
-    async function formatTFTsNeeded(duration: number) {
-      const tftMarketPrice = await grid?.calculator.tftPrice();
+    function formatTFTsNeeded(duration: number) {
       if (price_usd.value) {
-        const tfts = normalizePrice((price_usd.value * 0.5 * duration) / tftMarketPrice);
+        const tfts = normalizePrice((price_usd.value * 0.5 * duration) / tftMarketPrice.value);
         return Math.ceil(tfts);
       }
       return 0;
     }
-    async function tftsNeeded() {
+
+    function tftsNeeded() {
       loadingdiscountTableItems.value = true;
-      if (price_usd.value) {
-        discountTableItems.value = [
-          {
-            name: "Default",
-            discount: formatDiscount(discountPackages.default.discount),
-            tfts: await formatTFTsNeeded(discountPackages.default.duration),
-          },
-          {
-            name: "Bronze",
-            discount: formatDiscount(discountPackages.bronze.discount),
-            tfts: await formatTFTsNeeded(discountPackages.bronze.duration),
-          },
-          {
-            name: "Silver",
-            discount: formatDiscount(discountPackages.silver.discount),
-            tfts: await formatTFTsNeeded(discountPackages.silver.duration),
-          },
-          {
-            name: "Gold",
-            discount: formatDiscount(discountPackages.gold.discount),
-            tfts: await formatTFTsNeeded(discountPackages.gold.duration),
-          },
-        ];
-      }
+
+      discountTableItems.value = [
+        {
+          name: "Default",
+          discount: formatDiscount(discountPackages.default.discount),
+          tfts: formatTFTsNeeded(discountPackages.default.duration),
+        },
+        {
+          name: "Bronze",
+          discount: formatDiscount(discountPackages.bronze.discount),
+          tfts: formatTFTsNeeded(discountPackages.bronze.duration),
+        },
+        {
+          name: "Silver",
+          discount: formatDiscount(discountPackages.silver.discount),
+          tfts: formatTFTsNeeded(discountPackages.silver.duration),
+        },
+        {
+          name: "Gold",
+          discount: formatDiscount(discountPackages.gold.discount),
+          tfts: formatTFTsNeeded(discountPackages.gold.duration),
+        },
+      ];
+
       loadingdiscountTableItems.value = false;
     }
 
