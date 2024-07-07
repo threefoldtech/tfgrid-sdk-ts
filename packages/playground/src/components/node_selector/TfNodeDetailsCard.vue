@@ -204,9 +204,9 @@
 
           <span>
             <v-spacer />
-
+            <v-card class="text-center pa-4 mt-3"><strong>Available Discount Packages</strong></v-card>
             <v-data-table
-              class="my-5 rounded-lg"
+              class="mb-5 mt-2 rounded-lg"
               hover
               :loading="loadingdiscountTableItems"
               :headers="[
@@ -321,7 +321,7 @@ export default {
     const loadingdiscountTableItems = ref<boolean>(false);
     const lastDeploymentTime = ref<number>(0);
     const discountTableItems = ref<discountItems[]>([]);
-    const tftMarketPrice = ref<number>(0);
+    const tftMarketPrice = ref<number | null>(0);
     const calculator = new Calculator(new QueryClient(window.env.SUBSTRATE_URL));
     const rentedByUser = computed(() => {
       return props.node?.rentedByTwinId === profileManager.profile?.twinId;
