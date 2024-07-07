@@ -141,9 +141,9 @@
 
   <v-dialog width="800" v-model="contractStateDialog">
     <v-card>
-      <v-toolbar color="primary" class="custom-toolbar">
-        <p class="mb-5">Contract lock Details</p>
-      </v-toolbar>
+      <v-card-title class="bg-primary">
+        <p class="pl-2">Contract lock Details</p>
+      </v-card-title>
       <v-card-text class="mt-4">
         <v-row class="d-flex justify-center">
           Amount Locked:
