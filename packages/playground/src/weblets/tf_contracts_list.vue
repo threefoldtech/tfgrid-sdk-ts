@@ -91,7 +91,8 @@
           <v-row class="d-flex" v-else>
             <v-alert class="ma-4" type="warning" variant="tonal">
               <div v-if="lockedContracts?.totalAmountLocked < freeBalance" class="font-weigh-black">
-                You have enough balance to unlock your contracts!
+                You have enough balance to unlock your contracts; this will cost you around
+                {{ Math.ceil(lockedContracts?.totalAmountLocked) }} TFTs.
               </div>
               <div v-else>
                 You need to fund your account with
@@ -201,7 +202,7 @@ import { useGrid } from "../stores";
 
 const profileManagerController = useProfileManagerController();
 const balance = profileManagerController.balance;
-const freeBalance = computed(() => balance.value?.free ?? 0 - (balance.value?.locked ?? 0));
+const freeBalance = computed(() => (balance.value?.free ?? 0) - (balance.value?.locked ?? 0));
 const isLoading = ref<boolean>(false);
 
 const profileManager = useProfileManager();

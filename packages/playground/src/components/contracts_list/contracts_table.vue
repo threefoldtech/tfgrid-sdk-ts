@@ -141,9 +141,9 @@
 
   <v-dialog width="800" v-model="contractStateDialog">
     <v-card>
-      <v-toolbar color="primary" class="custom-toolbar">
-        <p class="mb-5">Contract lock Details</p>
-      </v-toolbar>
+      <v-card-title class="bg-primary">
+        <p class="pl-2">Contract lock Details</p>
+      </v-card-title>
       <v-card-text class="mt-4">
         <v-row class="d-flex justify-center">
           Amount Locked:
@@ -235,7 +235,8 @@
       <v-card-text v-else>
         <v-alert class="my-4" type="warning" variant="tonal">
           <div v-if="selectedLockedAmount < freeBalance">
-            You have enough balance to unlock your contract<span v-if="selectedContracts.length > 1">s</span>!
+            You have enough balance to unlock your contract<span v-if="selectedContracts.length > 1">s</span>; this will
+            cost you around {{ Math.ceil(selectedLockedAmount) }} TFTs.
           </div>
           <div v-else-if="selectedLockedAmount > 0">
             You need to fund your account with
@@ -375,7 +376,7 @@ const selectedContracts = ref<NormalizedContract[]>([]);
 const selectedItem = ref();
 const profileManagerController = useProfileManagerController();
 const balance = profileManagerController.balance;
-const freeBalance = computed(() => balance.value?.free ?? 0 - (balance.value?.locked ?? 0));
+const freeBalance = computed(() => (balance.value?.free ?? 0) - (balance.value?.locked ?? 0));
 const unlockContractLoading = ref(false);
 const unlockDialog = ref(false);
 const selectedLockedContracts = computed(() => {
