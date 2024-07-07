@@ -48,25 +48,35 @@
             <v-switch color="primary" inset label="Mine" v-model="filters.mine" density="compact" hide-details />
           </TfFilter>
 
-          <TfFilter class="mt-4" query-route="node-status" v-model="filters.status">
-            <v-select
-              :model-value="filters.status || undefined"
-              @update:model-value="filters.status = $event || ''"
-              :items="[
-                { title: 'Up', value: UnifiedNodeStatus.Up },
-                { title: 'Standby', value: UnifiedNodeStatus.Standby },
-                { title: 'Up & Standby', value: UnifiedNodeStatus.UpStandby },
-                { title: 'Down', value: UnifiedNodeStatus.Down },
-              ]"
-              label="Select Nodes Status"
-              item-title="title"
-              item-value="value"
-              variant="outlined"
-              clearable
-              @click:clear="filters.status = ''"
-              density="compact"
-            />
-          </TfFilter>
+          <VTooltip
+            location="bottom"
+            offset="-25"
+            :disabled="!filters.rentable"
+            text="The 'Rentable' filter will list only 'Standby & Up' nodes."
+          >
+            <template #activator="{ props }">
+              <TfFilter class="mt-4" v-bind="props" query-route="node-status" v-model="filters.status">
+                <v-select
+                  :disabled="filters.rentable"
+                  :model-value="filters.status || undefined"
+                  @update:model-value="filters.status = $event || ''"
+                  :items="[
+                    { title: 'Up', value: UnifiedNodeStatus.Up },
+                    { title: 'Standby', value: UnifiedNodeStatus.Standby },
+                    { title: 'Up & Standby', value: UnifiedNodeStatus.UpStandby },
+                    { title: 'Down', value: UnifiedNodeStatus.Down },
+                  ]"
+                  label="Select Nodes Status"
+                  item-title="title"
+                  item-value="value"
+                  variant="outlined"
+                  clearable
+                  @click:clear="filters.status = ''"
+                  density="compact"
+                />
+              </TfFilter>
+            </template>
+          </VTooltip>
 
           <TfFilter
             query-route="node-id"
@@ -462,7 +472,7 @@
 <script lang="ts">
 import { type GridNode, SortBy, SortOrder, UnifiedNodeStatus } from "@threefold/gridproxy_client";
 import { sortBy } from "lodash";
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 
 import NodeDetails from "@/components/node_details.vue";
@@ -529,7 +539,18 @@ export default {
       ipv6: false,
       mine: false,
     });
-
+    const oldNodeStatus = ref();
+    watch(
+      () => filters.value.rentable,
+      rentable => {
+        if (rentable) {
+          oldNodeStatus.value = filters.value.status;
+          filters.value.status = UnifiedNodeStatus.UpStandby;
+        } else {
+          filters.value.status = oldNodeStatus.value;
+        }
+      },
+    );
     const loading = ref<boolean>(true);
     const _nodes = ref<GridNode[]>([]);
 
