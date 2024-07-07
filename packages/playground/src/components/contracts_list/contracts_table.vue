@@ -235,7 +235,8 @@
       <v-card-text v-else>
         <v-alert class="my-4" type="warning" variant="tonal">
           <div v-if="selectedLockedAmount < freeBalance">
-            You have enough balance to unlock your contract<span v-if="selectedContracts.length > 1">s</span>!
+            You have enough balance to unlock your contract<span v-if="selectedContracts.length > 1">s</span>; this will
+            cost you around {{ Math.ceil(selectedLockedAmount) }} TFTs.
           </div>
           <div v-else-if="selectedLockedAmount > 0">
             You need to fund your account with
