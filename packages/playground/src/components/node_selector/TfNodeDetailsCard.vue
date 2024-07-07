@@ -536,7 +536,7 @@ export default {
       return `-${discount}%`;
     }
     function formatTFTsNeeded(duration: number) {
-      if (price_usd.value) {
+      if (price_usd.value && tftMarketPrice.value) {
         const tfts = normalizePrice((price_usd.value * 0.5 * duration) / tftMarketPrice.value);
         return Math.ceil(tfts);
       }
