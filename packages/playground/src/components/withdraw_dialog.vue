@@ -69,7 +69,7 @@
 </template>
 
 <script setup lang="ts">
-import { StrKey } from "stellar-sdk";
+import { StrKey } from "@stellar/stellar-sdk";
 import { onMounted, ref } from "vue";
 
 import { useProfileManagerController } from "../components/profile_manager_controller.vue";

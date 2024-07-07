@@ -1,5 +1,5 @@
+import * as StellarSdk from "@stellar/stellar-sdk";
 import type { GridClient } from "@threefold/grid_client";
-import StellarSdk from "stellar-sdk";
 import validator from "validator";
 import type { Options } from "validator/lib/isBoolean";
 import type { IsEmailOptions } from "validator/lib/isEmail";
@@ -744,15 +744,16 @@ export function isValidDecimalNumber(length: number, msg: string) {
   };
 }
 export async function isValidStellarAddress(target: string): Promise<RuleReturn> {
-  const server = new StellarSdk.Server(window.env.STELLAR_HORIZON_URL);
+  const server = new StellarSdk.Horizon.Server(window.env.STELLAR_HORIZON_URL);
   try {
     // check if the account provided exists on stellar
     const account = await server.loadAccount(target);
     // check if the account provided has the appropriate trustlines
-    const includes = account.balances.find(
-      (b: { asset_code: string; asset_issuer: string }) =>
-        b.asset_code === "TFT" && b.asset_issuer === window.env.TFT_ASSET_ISSUER,
-    );
+    const includes = account.balances.find(b => {
+      if ("asset_type" in b && "asset_issuer" in b) {
+        return b.asset_code === "TFT" && b.asset_issuer === window.env.TFT_ASSET_ISSUER;
+      }
+    });
     if (!includes) throw new Error("Invalid trustline");
   } catch (e) {
     const message =

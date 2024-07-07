@@ -33,7 +33,7 @@
     "*.{js,ts,css,scss,md,svelte,vue,yaml}": "prettier .prettierrc --write"
   },
   "dependencies": {
-    "pdfjs-dist": "4.3.136",
-    "stellar-sdk": "12.1.0"
+    "@stellar/stellar-sdk": "^12.1.0",
+    "pdfjs-dist": "4.3.136"
   }
 }
