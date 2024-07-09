@@ -1,5 +1,7 @@
+import { KeypairType } from "@polkadot/util-crypto/types";
+
 import { monitorEvents } from "../helpers/events";
-import { IDisconnectHandler, ILivenessChecker } from "../types";
+import { IDisconnectHandler, ILivenessChecker, ServiceName, ServicesUrls, StackPickerOptions } from "../types";
 
 /**
  * Represents a service monitor that periodically checks the liveness of multiple services.
@@ -75,5 +77,74 @@ export class ServiceMonitor {
   public async pingService(): Promise<void> {
     await this.checkLivenessOnce();
     await this.disconnect();
+  }
+}
+
+export class ServiceUrlManager {
+  private result: ServicesUrls = {};
+  private retries = 3;
+  private [ServiceName.tfChain]?: string[];
+  private [ServiceName.GraphQl]?: string[];
+  private [ServiceName.RMB]?: string[];
+  private [ServiceName.GirdProxy]?: string[];
+  private mnemonic?: string;
+  private keypairType?: KeypairType = "sr25519";
+
+  constructor(options: StackPickerOptions) {
+    Object.assign(this, options);
+  }
+
+  /**
+   * Pings the given service to check if it is alive.
+   *
+   * This method checks the liveness of the provided service by calling its `isAlive` method.
+   * If the service supports disconnection (implements IDisconnectHandler), it calls the `disconnect` method after the liveness check.
+   *
+   * @param {ILivenessChecker} service - An instance of ILivenessChecker that provides methods to check the service's liveness.
+   *
+   * @returns {Promise<{alive: boolean, error?: Error}>} - A promise that resolves with the liveness status of the service.
+   */
+  private async pingService(service: ILivenessChecker) {
+    const status = await service.isAlive();
+    if ("disconnect" in service) {
+      await (service as IDisconnectHandler).disconnect();
+    }
+    return status;
+  }
+
+  /**
+   * Attempts to find a reachable service URL from a list of provided URLs.
+   *
+   * This method iterates through the list of URLs, repeatedly pinging the service to
+   * check if it is alive. If a reachable URL is found, it is returned. If all URLs
+   * are exhausted without finding a reachable service, an error is thrown.
+   *
+   * @param {string[]} urls - An array of service URLs to check for reachability.
+   * @param {ILivenessChecker} service - An instance of ILivenessChecker that provides methods
+   * to check the service's liveness and manage service URLs.
+   *
+   * @returns {Promise<string>} - A promise that resolves with the reachable service URL.
+   *
+   * @throws {Error} - Throws an error if no reachable service URL is found after checking all URLs.
+   *
+   */
+  async getAvailableServiceStack(urls: string[], service: ILivenessChecker) {
+    let index = 0;
+    let error: Error;
+    if (urls.length === 0) throw new Error("No URLs provided");
+    do {
+      for (let i = 0; i < this.retries; i++) {
+        const status = await this.pingService(service);
+        if (status.alive) return service.serviceUrl();
+        error = status.error;
+      }
+      monitorEvents.log(
+        `${service.serviceName()}: failed to ping ${service.serviceUrl()} after ${this.retries} retries; ${error}`,
+        "red",
+      );
+      index++;
+      await service.updateUrl(urls[index]);
+    } while (index < urls.length);
+    throw new Error(` Failed to reach ${service.serviceName()} on all provided stacks`);
   }
 }
