@@ -133,22 +133,23 @@ export class ServiceUrlManager {
    *
    */
   async getAvailableServiceStack(urls: string[], service: ILivenessChecker) {
-    let index = 0;
     let error: Error;
-    if (urls.length === 0) throw new Error("No URLs provided");
-    do {
-      for (let i = 0; i < this.retries; i++) {
+    for (let i = 0; i < urls.length; i++) {
+      if (i != 0) await service.updateUrl(urls[i]);
+      monitorEvents.log(`${service.serviceName()}: pinging ${service.serviceUrl()}`, "gray");
+      for (let retry = 0; retry < this.retries; retry++) {
         const status = await this.pingService(service);
-        if (status.alive) return service.serviceUrl();
+        if (status.alive) {
+          monitorEvents.log(`${service.serviceName()} on ${service.serviceUrl()} Success!`, "green");
+          return service.serviceUrl();
+        }
         error = status.error;
       }
       monitorEvents.log(
         `${service.serviceName()}: failed to ping ${service.serviceUrl()} after ${this.retries} retries; ${error}`,
         "red",
       );
-      index++;
-      await service.updateUrl(urls[index]);
-    } while (index < urls.length);
+    }
     throw new Error(` Failed to reach ${service.serviceName()} on all provided stacks`);
   }
 
@@ -166,12 +167,13 @@ export class ServiceUrlManager {
         this[ServiceName.tfChain],
         new TFChainMonitor(this[ServiceName.tfChain][0]),
       );
-    if (this[ServiceName.RMB]?.length > 0)
+    if (this[ServiceName.RMB]?.length > 0) {
       if (!this.result[ServiceName.tfChain]) throw new Error("Can't validate RMB urls; There is no Chain ulr provided");
-    this.result[ServiceName.RMB] = await this.getAvailableServiceStack(
-      this[ServiceName.RMB],
-      new RMBMonitor(this[ServiceName.RMB][0], this.result[ServiceName.tfChain], this.mnemonic, this.keypairType),
-    );
+      this.result[ServiceName.RMB] = await this.getAvailableServiceStack(
+        this[ServiceName.RMB],
+        new RMBMonitor(this[ServiceName.RMB][0], this.result[ServiceName.tfChain], this.mnemonic, this.keypairType),
+      );
+    }
     if (this[ServiceName.GraphQl]?.length > 0) {
       this.result[ServiceName.GraphQl] = await this.getAvailableServiceStack(
         this[ServiceName.GraphQl],
