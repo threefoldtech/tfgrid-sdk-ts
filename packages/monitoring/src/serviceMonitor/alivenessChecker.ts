@@ -2,6 +2,10 @@ import { KeypairType } from "@polkadot/util-crypto/types";
 
 import { monitorEvents } from "../helpers/events";
 import { IDisconnectHandler, ILivenessChecker, ServiceName, ServicesUrls, StackPickerOptions } from "../types";
+import { GraphQLMonitor } from "./graphql";
+import { GridProxyMonitor } from "./gridproxy";
+import { RMBMonitor } from "./rmb";
+import { TFChainMonitor } from "./tfChain";
 
 /**
  * Represents a service monitor that periodically checks the liveness of multiple services.
@@ -146,5 +150,41 @@ export class ServiceUrlManager {
       await service.updateUrl(urls[index]);
     } while (index < urls.length);
     throw new Error(` Failed to reach ${service.serviceName()} on all provided stacks`);
+  }
+
+  /**
+   * Fetches available service URLs for tfChain and RMB services.
+   *
+   * This method checks the availability of URLs for services by utilizing
+   * the `getAvailableServiceStack` method. It updates the `result` property with the reachable URLs.
+   *
+   * @returns {Promise<ServicesUrls>} - A promise that resolves with an object containing the available service URLs.
+   */
+  async GetAvailableServices(): Promise<ServicesUrls> {
+    if (this[ServiceName.tfChain]?.length > 0)
+      this.result[ServiceName.tfChain] = await this.getAvailableServiceStack(
+        this[ServiceName.tfChain],
+        new TFChainMonitor(this[ServiceName.tfChain][0]),
+      );
+    if (this[ServiceName.RMB]?.length > 0)
+      if (!this.result[ServiceName.tfChain]) throw new Error("Can't validate RMB urls; There is no Chain ulr provided");
+    this.result[ServiceName.RMB] = await this.getAvailableServiceStack(
+      this[ServiceName.RMB],
+      new RMBMonitor(this[ServiceName.RMB][0], this.result[ServiceName.tfChain], this.mnemonic, this.keypairType),
+    );
+    if (this[ServiceName.GraphQl]?.length > 0) {
+      this.result[ServiceName.GraphQl] = await this.getAvailableServiceStack(
+        this[ServiceName.GraphQl],
+        new GraphQLMonitor(this[ServiceName.GraphQl][0]),
+      );
+    }
+    if (this[ServiceName.GirdProxy]?.length > 0) {
+      this.result[ServiceName.GirdProxy] = await this.getAvailableServiceStack(
+        this[ServiceName.GirdProxy],
+        new GridProxyMonitor(this[ServiceName.GirdProxy][0]),
+      );
+    }
+
+    return this.result;
   }
 }
