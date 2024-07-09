@@ -3,8 +3,8 @@
   "version": "2.5.0",
   "description": "Threefold monitoring package",
   "license": "Apache-2.0",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/node/index.js",
+  "types": "dist/node/index.d.ts",
   "scripts": {
     "example": "yarn run ts-node --project tsconfig.json example/index.ts",
     "build": "tsc",
