@@ -96,6 +96,7 @@ export class ServiceUrlManager {
 
   constructor(options: StackPickerOptions) {
     Object.assign(this, options);
+    if (this[ServiceName.RMB] && !this.mnemonic) throw new Error("Mnemonic is required to monitor RMB");
   }
 
   /**
