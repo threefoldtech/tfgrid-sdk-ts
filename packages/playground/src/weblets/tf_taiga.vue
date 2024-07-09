@@ -215,7 +215,7 @@ async function deploy() {
             },
           ],
           flist: flist.value,
-          entryPoint: flist.entryPoint,
+          entryPoint: flist.entryPoint ?? "",
           rootFilesystemSize: rootFilesystemSize.value,
           publicIpv4: ipv4.value,
           planetary: true,

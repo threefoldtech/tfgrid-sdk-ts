@@ -161,7 +161,7 @@ async function deploy() {
           cpu: cpu,
           memory: memory,
           flist: flist.value,
-          entryPoint: flist.entryPoint,
+          entryPoint: flist.entryPoint ?? "",
           disks: [
             {
               name: "docker",

@@ -110,7 +110,7 @@ async function deploy() {
           cpu: solution.value.cpu,
           memory: solution.value.memory,
           flist: flist.value,
-          entryPoint: flist.entryPoint,
+          entryPoint: flist.entryPoint ?? "",
           publicIpv4: true,
           publicIpv6: true,
           planetary: false,

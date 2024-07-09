@@ -162,7 +162,7 @@ const images: VmImage[] = [
   {
     name: "Ubuntu-24.04",
     flist: "https://hub.grid.tf/tf-official-vms/ubuntu-24.04-full.flist",
-    entryPoint: "/init.sh",
+    entryPoint: "",
   },
   {
     name: "Ubuntu-22.04",
@@ -251,8 +251,11 @@ async function deploy() {
           cpu: solution.value.cpu,
           memory: solution.value.memory,
           flist: flist.value!.value,
-          entryPoint: flist.value!.entryPoint,
-          disks: [{ size: solution?.value.disk, mountPoint: "/" }, ...disks.value],
+          entryPoint: flist.value?.entryPoint ?? "",
+          disks:
+            flist.value?.name === "Ubuntu-24.04" || flist.value?.name === "Other"
+              ? [...disks.value]
+              : [{ size: solution?.value.disk, mountPoint: "/" }, ...disks.value],
           publicIpv4: ipv4.value,
           publicIpv6: ipv6.value,
           planetary: planetary.value,
