@@ -17,8 +17,8 @@ class MonitorEventEmitter extends EventEmitter {
     this.addListener(MonitorEvents.storeStatus, this.addToServiceSummary);
     this.addListener(MonitorEvents.summarize, this.printStatusSummary);
   }
-  public log(message: string) {
-    this.emit("MonitorLog", message);
+  public log(message: string, color?: string) {
+    this.emit("MonitorLog", message, color);
   }
   public summarize() {
     this.emit("MonitorSummarize");
@@ -30,8 +30,12 @@ class MonitorEventEmitter extends EventEmitter {
     this.emit("MonitorServiceDown", serviceName, error);
   }
 
-  private monitorLogsHandler(msg) {
-    console.log(msg);
+  private monitorLogsHandler(msg: unknown, color?: string) {
+    if (chalk[color]) {
+      console.log(chalk[color](msg));
+    } else {
+      console.log(msg);
+    }
   }
   private serviceDownHandler(serviceName: string, error: Error) {
     console.log(`${chalk.red.bold(serviceName + " is Down")}`);
