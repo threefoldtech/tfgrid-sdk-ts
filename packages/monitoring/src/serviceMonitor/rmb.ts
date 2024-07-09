@@ -21,6 +21,11 @@ export class RMBMonitor implements ILivenessChecker, IDisconnectHandler {
   public serviceUrl() {
     return this.url;
   }
+  async setUrl(url: string) {
+    await this.disconnect();
+    this.url = url;
+    this.rmbClient.relayUrl = url;
+  }
   public async isAlive(): Promise<ServiceStatus> {
     if (!this.rmbClient?.con?.OPEN) await this.setUp();
     return resolveServiceStatus(this.rmbClient.ping(2));
