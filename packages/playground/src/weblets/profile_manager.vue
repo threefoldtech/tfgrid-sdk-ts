@@ -154,7 +154,9 @@
                               }"
                               :disabled="creatingAccount || activatingAccount || activating"
                               @click:append="reloadValidation"
-                              autocomplete="off"
+                              readonly
+                              ref="mnemonicRef"
+                              @focus="handleFocus(mnemonicRef)"
                             >
                               <template v-slot:prepend-inner v-if="validationProps.hint || validationProps.error">
                                 <v-icon :color="validationProps.error ? 'red' : 'green'">
@@ -259,7 +261,9 @@
                   v-model="email"
                   v-bind="props"
                   :disabled="creatingAccount || activatingAccount || activating"
-                  autocomplete="off"
+                  readonly
+                  ref="emailRef"
+                  @focus="handleFocus(emailRef)"
                 />
               </input-validator>
 
@@ -459,6 +463,9 @@ const props = defineProps({
     type: Boolean,
   },
 });
+const mnemonicRef = ref();
+const emailRef = ref();
+
 const emit = defineEmits<{ (event: "update:modelValue", value: boolean): void }>();
 const bridge = (window as any).env.BRIDGE_TFT_ADDRESS;
 
@@ -475,6 +482,9 @@ const apps = [
   },
 ];
 const online = useOnline();
+const handleFocus = (elementRef: HTMLInputElement) => {
+  elementRef.removeAttribute("readonly");
+};
 watch(
   () => [online.value, props.modelValue],
   ([online, m], [wasOnline]) => {
