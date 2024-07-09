@@ -694,7 +694,7 @@ function createDeployRoutes(): RouteRecordRaw[] {
           component: () => import("../dashboard/contracts_list.vue"),
           meta: {
             title: "Your Contracts List",
-            info: { page: "info/contracts_list.md" },
+            // info: { page: "info/contracts_list.md" },
           },
         },
 

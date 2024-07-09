@@ -13,6 +13,25 @@
     <v-icon size="30" class="pr-3">mdi-file-document-edit</v-icon>
     <v-card-title class="pa-0">Contracts List</v-card-title>
   </v-card>
+
+  <v-alert class="mb-4 text-subtitle-2 font-weight-regular" type="info" variant="tonal">
+    For more details about Contract Types, Billing Cycle & Grace Period, check
+    <a
+      class="app-link font-weight-medium"
+      target="_blank"
+      href="https://www.manual.grid.tf/documentation/developers/tfchain/tfchain.html"
+      >Contract Documentation,
+    </a>
+    To explore further contract details, check
+    <a
+      class="app-link font-weight-medium"
+      target="_blank"
+      href="https://www.manual.grid.tf/documentation/dashboard/deploy/your_contracts.html"
+      >Node Contract Documentation.</a
+    >
+    <br />
+  </v-alert>
+
   <v-card variant="text" class="my-3">
     <section class="d-flex align-center">
       <v-spacer />
