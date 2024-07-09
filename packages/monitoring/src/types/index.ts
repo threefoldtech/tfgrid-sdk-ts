@@ -1,3 +1,4 @@
+import { KeypairType } from "@polkadot/util-crypto/types";
 /**
  * Represents a basic service interface.
  */
@@ -48,3 +49,18 @@ export enum MonitorEvents {
   "storeStatus" = "MonitorStoreStatus",
   "serviceDown" = "MonitorServiceDown",
 }
+
+export enum ServiceName {
+  "GirdProxy" = "gridproxy",
+  "GraphQl" = "graphql",
+  "RMB" = "rmb",
+  "tfChain" = "tfChain",
+}
+
+export type ServicesUrls = {
+  [key in ServiceName]?: string;
+};
+type ServicesStacks = {
+  [key in ServiceName]?: string[];
+};
+export type StackPickerOptions = ServicesStacks & { mnemonic?: string; keypairType?: KeypairType; retries?: number };
