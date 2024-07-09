@@ -204,9 +204,10 @@ class Client {
   }
 
   async disconnect() {
-    if (this.con.readyState === this.con.CONNECTING) await this.waitForOpenConnection();
+    if (this.con?.readyState !== undefined && this.con?.readyState === this.con?.CONNECTING)
+      await this.waitForOpenConnection();
     if (this.__pingPongTimeout) clearTimeout(this.__pingPongTimeout);
-    this.con.removeAllListeners();
+    if (this.con) this.con.removeAllListeners();
     await this.waitForResponses();
     await this.tfclient.disconnect();
     if (this.con?.readyState !== this.con?.CLOSED) this.con.close();
