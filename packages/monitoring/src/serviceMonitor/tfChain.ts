@@ -19,6 +19,10 @@ export class TFChainMonitor implements ILivenessChecker, IDisconnectHandler {
   serviceUrl() {
     return this.url;
   }
+  setUrl(url: string) {
+    this.url = url;
+    this.tfClient = new QueryClient(this.url);
+  }
   public async isAlive(): Promise<ServiceStatus> {
     try {
       if (!this.tfClient.api) await this.setUp();
