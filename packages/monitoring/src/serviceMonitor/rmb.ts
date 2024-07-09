@@ -21,7 +21,7 @@ export class RMBMonitor implements ILivenessChecker, IDisconnectHandler {
   public serviceUrl() {
     return this.url;
   }
-  async setUrl(url: string) {
+  async updateUrl(url: string) {
     await this.disconnect();
     this.url = url;
     this.rmbClient.relayUrl = url;

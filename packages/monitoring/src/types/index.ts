@@ -21,7 +21,7 @@ interface IServiceBase {
    * This method sets a new URL for the service, updating its internal state to point to the provided URL.
    * @param {string} url - The new URL to be set for the service.
    */
-  setUrl: (url: string) => void;
+  updateUrl: (url: string) => void;
 }
 
 /**

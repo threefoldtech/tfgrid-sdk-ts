@@ -19,7 +19,7 @@ export class TFChainMonitor implements ILivenessChecker, IDisconnectHandler {
   serviceUrl() {
     return this.url;
   }
-  setUrl(url: string) {
+  updateUrl(url: string) {
     this.url = url;
     this.tfClient = new QueryClient(this.url);
   }
