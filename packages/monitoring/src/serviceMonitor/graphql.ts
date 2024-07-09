@@ -3,7 +3,7 @@ import { ILivenessChecker, ServiceStatus } from "../types";
 
 export class GraphQLMonitor implements ILivenessChecker {
   private readonly name = "GraphQl";
-  private readonly url: string;
+  private url: string;
   constructor(graphQlUrl: string) {
     this.url = graphQlUrl;
   }
@@ -12,6 +12,9 @@ export class GraphQLMonitor implements ILivenessChecker {
   }
   serviceUrl() {
     return this.url;
+  }
+  setUrl(url: string) {
+    this.url = url;
   }
 
   async isAlive(): Promise<ServiceStatus> {

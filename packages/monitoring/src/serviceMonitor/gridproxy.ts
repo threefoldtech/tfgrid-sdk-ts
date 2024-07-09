@@ -13,6 +13,9 @@ export class GridProxyMonitor implements ILivenessChecker {
   serviceUrl() {
     return this.url;
   }
+  setUrl(url: string) {
+    this.url = url;
+  }
   async isAlive(): Promise<ServiceStatus> {
     return resolveServiceStatus(sendGetRequest(this.url));
   }
