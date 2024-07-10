@@ -295,7 +295,7 @@ async function deploy() {
           cpu: solution.value.cpu,
           memory: solution.value.memory,
           flist: flist.value!.value,
-          entryPoint: flist.value?.entryPoint ?? "",
+          entryPoint: flist.value!.entryPoint,
           disks: disks.value,
           envs: envs.value,
           planetary: planetary.value,

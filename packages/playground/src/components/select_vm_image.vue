@@ -25,7 +25,7 @@
       #="{ props }"
     >
       <input-tooltip tooltip="Add a custom flist link, you can visit our 0-hub for more information.">
-        <v-text-field label="Flist" v-model="flist" v-bind="props" />
+        <v-text-field label="Flist" v-model="flist" />
       </input-tooltip>
     </input-validator>
 
@@ -59,7 +59,7 @@ const props = defineProps({
 });
 const emits = defineEmits<{ (event: "update:model-value", value?: Flist): void }>();
 const flist = ref<string>();
-const entryPoint = ref<string>();
+const entryPoint = ref<string>("");
 
 const image = ref<VmImage>(props.images[0]);
 const name = ref<string>();

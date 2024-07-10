@@ -158,7 +158,7 @@ async function deploy() {
           memory: solution.value.memory,
           disks: disks.value,
           flist: flist?.value!.value,
-          entryPoint: flist.value?.entryPoint ?? "",
+          entryPoint: flist.value!.entryPoint,
           publicIpv4: ipv4.value,
           envs: [
             { key: "SSH_KEY", value: selectedSSHKeys.value },

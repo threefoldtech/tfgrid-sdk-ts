@@ -36,7 +36,6 @@
             <v-text-field label="Name" v-model="name" v-bind="props" />
           </input-tooltip>
         </input-validator>
-
         <SelectVmImage :images="images" v-model="flist" />
         <SelectSolutionFlavor
           :small="{ cpu: 1, memory: 2, disk: 25 }"
@@ -251,7 +250,7 @@ async function deploy() {
           cpu: solution.value.cpu,
           memory: solution.value.memory,
           flist: flist.value!.value,
-          entryPoint: flist.value?.entryPoint ?? "",
+          entryPoint: flist.value!.entryPoint,
           disks:
             flist.value?.name === "Ubuntu-24.04" || flist.value?.name === "Other"
               ? [...disks.value]
