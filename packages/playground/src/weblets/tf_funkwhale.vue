@@ -204,7 +204,7 @@ async function deploy() {
             },
           ],
           flist: flist.value,
-          entryPoint: flist!.entryPoint,
+          entryPoint: flist.entryPoint,
           publicIpv4: ipv4.value,
           mycelium: mycelium.value,
           envs: [

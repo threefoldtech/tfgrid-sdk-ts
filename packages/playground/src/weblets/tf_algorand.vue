@@ -160,7 +160,7 @@ async function deploy() {
           cpu: cpu.value,
           memory: memory.value,
           flist: flist.value,
-          entryPoint: flist!.entryPoint,
+          entryPoint: flist.entryPoint,
           disks:
             type.value === "indexer"
               ? [

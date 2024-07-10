@@ -178,7 +178,7 @@ async function deploy() {
           memory: solution.value.memory,
           disks: [{ size: solution.value?.disk, mountPoint: "/var/lib/docker" }],
           flist: flist.value,
-          entryPoint: flist!.entryPoint,
+          entryPoint: flist.entryPoint,
           rootFilesystemSize: rootFilesystemSize.value,
           publicIpv4: ipv4.value,
           planetary: true,

@@ -146,7 +146,7 @@ async function deploy() {
           memory: solution.value.memory,
           disks: [{ size: solution?.value.disk, mountPoint: "/data" }],
           flist: flist.value,
-          entryPoint: flist!.entryPoint,
+          entryPoint: flist.entryPoint,
           publicIpv4: ipv4.value,
           mycelium: mycelium.value,
           envs: [
