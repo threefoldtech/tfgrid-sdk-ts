@@ -196,6 +196,11 @@ const tabs = ref();
 
 const images = [
   {
+    name: "Ubuntu-24.04",
+    flist: "https://hub.grid.tf/tf-official-vms/ubuntu-24.04-latest.flist",
+    entryPoint: "/sbin/zinit init",
+  },
+  {
     name: "Ubuntu-23.10",
     flist: "https://hub.grid.tf/tf-official-vms/ubuntu-23.10-mycelium.flist",
     entryPoint: "/sbin/zinit init",
