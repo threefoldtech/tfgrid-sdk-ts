@@ -16,12 +16,12 @@ interface ComputeCapacity {
 
 interface BaseMountData {
   /** The name of the mount */
-  name?: string;
+  name: string;
   /** The mount point in the filesystem */
-  mountPoint?: string;
+  mountPoint: string;
 }
 
-interface ExtendedMountData extends BaseMountData {
+interface ExtendedMountData extends Partial<BaseMountData> {
   /** The size of the mount (optional) */
   size?: number;
   /** The state of the mount result (optional) */
