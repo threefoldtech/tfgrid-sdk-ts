@@ -22,7 +22,7 @@
       href="https://www.manual.grid.tf/documentation/developers/tfchain/tfchain.html"
       >Contract Documentation,
     </a>
-    To explore further contract details, check
+    and to explore further contract details, check
     <a
       class="app-link font-weight-medium"
       target="_blank"
