@@ -154,7 +154,7 @@ test("TC2728 - Applications: Deploy Presearch", async () => {
         log(result);
         dockerContainer = result.stdout.split("\n");
       });
-      if (dockerContainer.length != 1) break;
+      if (dockerContainer.length > 1) break;
     }
     for (let i = 0; i < dockerContainer.length; i++) {
       if (dockerContainer[i].includes("presearch/node")) {

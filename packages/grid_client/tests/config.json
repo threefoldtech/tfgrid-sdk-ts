@@ -1,6 +1,6 @@
 {
   "network": "dev",
-  "mnemonic": "remove panel whale mushroom squirrel gather chase pyramid eye rail dilemma december",
+  "mnemonic": "",
   "storeSecret": "",
-  "ssh_key": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILx0pLjcIbiZBSQTHI3bQ9MXQTQJu+UQzVIR1GxzZMRT harby@ahmed-Saleh-Harby"
+  "ssh_key": ""
 }
