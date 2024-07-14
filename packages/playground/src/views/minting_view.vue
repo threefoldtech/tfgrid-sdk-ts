@@ -4,7 +4,32 @@
       <v-icon size="30" class="pr-3">mdi-file-document-edit</v-icon>
       <v-card-title class="pa-0">TF Minting Reports</v-card-title>
     </v-card>
-    <v-alert variant="tonal" type="warning" class="mb-4"> All data subject to change </v-alert>
+    <v-alert class="mb-4 text-subtitle-2 font-weight-regular" type="info" variant="tonal">
+      For more information about minting check
+      <a
+        class="app-link font-weight-medium"
+        target="_blank"
+        href="https://www.manual.grid.tf/documentation/faq/faq.html#what-is-the-tft-minting-process-is-it-fully-automated"
+        >TFT minting process.
+      </a>
+      <br />
+      The user can verify the 3Nodes' payments on Stellar Blockchain through the Threefold's
+      <a
+        class="app-link font-weight-medium"
+        target="_blank"
+        href="https://www.manual.grid.tf/documentation/dashboard/tfchain/tf_minting_reports.html"
+        >minting tool.
+      </a>
+      <br />
+      TFT minting address on Stellar Chain:
+      <a
+        class="app-link font-weight-medium"
+        target="_blank"
+        href="https://stellar.expert/explorer/public/account/GBOVQKJYHXRR3DX6NOX2RRYFRCUMSADGDESTDNBDS6CDVLGVESRTAC47"
+        >GBOVQKJYHXRR3DX6NOX2RRYFRCUMSADGDESTDNBDS6CDVLGVESRTAC47.</a
+      >
+      <br />
+    </v-alert>
     <v-form class="d-inline-flex w-100">
       <FormValidator v-model="isValidForm">
         <InputValidator
