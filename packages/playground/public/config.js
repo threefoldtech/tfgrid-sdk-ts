@@ -1,6 +1,6 @@
 window.env = {
   NETWORK: "dev",
-  GRAPHQL_URL: "https://graphql.dev.grid.tf/graphql",
+  GRAPHQL_URLS: ["test", "ttttt", "https://graphql.dev.grid.tf/graphql"],
   GRIDPROXY_URL: "https://gridproxy.dev.grid.tf",
   SUBSTRATE_URL: "wss://tfchain.dev.grid.tf/ws",
   ACTIVATION_SERVICE_URL: "https://activation.dev.grid.tf/activation/activate",

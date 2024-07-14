@@ -40,6 +40,7 @@ declare global {
     $$appLoader: () => void;
     env: {
       NETWORK: NetworkEnv;
+      GRAPHQL_URLS: string[];
       GRAPHQL_URL: string;
       GRIDPROXY_URL: string;
       SUBSTRATE_URL: string;

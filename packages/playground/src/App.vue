@@ -1,5 +1,5 @@
 <template>
-  <v-app>
+  <v-app v-if="!loadingApp">
     <TfNavigationLoader />
     <TfOfflineNotifier />
     <profile-manager-controller>
@@ -206,6 +206,7 @@ import { useTheme } from "vuetify";
 
 import TfLogger from "@/components/logger.vue";
 
+import { setGlobalEnv } from "./config";
 import { useProfileManager } from "./stores/profile_manager";
 const $route = useRoute();
 const $router = useRouter();
@@ -248,7 +249,17 @@ function navigateToHome() {
   return $router.push(DashboardRoutes.Other.HomePage);
 }
 
-onMounted(window.$$appLoader || noop);
+const loadingApp = ref(false);
+function disableAppLoader() {
+  loadingApp.value = false;
+  const disable = window.$$appLoader || noop;
+  disable();
+}
+
+onMounted(async () => {
+  await setGlobalEnv();
+  // disableAppLoader();
+});
 
 // eslint-disable-next-line no-undef
 const version = process.env.VERSION as any;

@@ -4,7 +4,7 @@ import { ServiceStatus } from "src/types";
 
 export async function sendGetRequest(url: string, options: AxiosRequestConfig = {}) {
   try {
-    return await axios.get(url, options);
+    return await axios.get(url, { withCredentials: false, ...options });
   } catch (e) {
     const { response } = e as AxiosError;
     const errorMessage = (response?.data as { error: string })?.error || (e as Error).message;
