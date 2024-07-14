@@ -291,7 +291,6 @@ import { manual } from "@/utils/manual";
 import toReadableDate from "@/utils/to_readable_data";
 
 import { calculator as Calculator } from "../../../../grid_client/dist/es6";
-import { useAsync } from "../../hooks";
 import { useGrid, useProfileManager } from "../../stores";
 import formatResourceSize from "../../utils/format_resource_size";
 import { toGigaBytes } from "../../utils/helpers";
@@ -321,7 +320,7 @@ export default {
     const loadingdiscountTableItems = ref<boolean>(false);
     const lastDeploymentTime = ref<number>(0);
     const discountTableItems = ref<discountItems[]>([]);
-    const tftMarketPrice = ref<number | null>(0);
+    const tftMarketPrice = ref<number>(0);
     const calculator = new Calculator(new QueryClient(window.env.SUBSTRATE_URL));
     const rentedByUser = computed(() => {
       return props.node?.rentedByTwinId === profileManager.profile?.twinId;
@@ -339,13 +338,10 @@ export default {
 
       return imageUrl;
     });
-    const tftPriceTask = useAsync(() => calculator.tftPrice(), {
-      init: true,
-      default: 0,
-    });
+
     onMounted(async () => {
       await getLastDeploymentTime();
-      tftMarketPrice.value = tftPriceTask.value.data;
+      tftMarketPrice.value = await calculator.tftPrice();
       tftsNeeded();
     });
 
