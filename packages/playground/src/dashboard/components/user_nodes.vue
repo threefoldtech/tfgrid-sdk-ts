@@ -7,12 +7,6 @@
       :loading="loading"
       :items="nodes"
       :items-length="nodesCount"
-      :items-per-page-options="[
-        { value: 5, title: '5' },
-        { value: 10, title: '10' },
-        { value: 15, title: '15' },
-        { value: 50, title: '50' },
-      ]"
       :headers="headers"
       v-model:page="page"
       v-model:items-per-page="pageSize"

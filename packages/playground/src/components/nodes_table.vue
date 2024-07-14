@@ -9,12 +9,6 @@
           :items="modelValue"
           :items-length="count"
           :items-per-page="$props.size"
-          :items-per-page-options="[
-            { value: 5, title: '5' },
-            { value: 10, title: '10' },
-            { value: 15, title: '15' },
-            { value: 50, title: '50' },
-          ]"
           :page="$props.page"
           @update:page="$emit('update:page', $event)"
           @update:items-per-page="$emit('update:size', $event)"
