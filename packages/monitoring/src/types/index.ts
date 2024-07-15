@@ -66,7 +66,7 @@ export enum ServiceName {
 }
 
 export type ServicesUrls = {
-  [key in ServiceName]?: string;
+  [key in ServiceName]?: Promise<string>;
 };
 type ServicesStacks = {
   [key in ServiceName]?: string[];
