@@ -149,7 +149,7 @@ export class ServiceUrlManager {
    *
    */
   async getAvailableServiceStack(urls: string[], service: ILivenessChecker) {
-    let error: Error;
+    let error: Error | string = "";
     for (let i = 0; i < urls.length; i++) {
       if (i != 0) await service.updateUrl(urls[i]);
       monitorEvents.log(`${service.serviceName()}: pinging ${service.serviceUrl()}`, "gray");
@@ -159,7 +159,7 @@ export class ServiceUrlManager {
           monitorEvents.log(`${service.serviceName()} on ${service.serviceUrl()} Success!`, "green");
           return service.serviceUrl();
         }
-        error = status.error;
+        error = status.error ?? "";
       }
       monitorEvents.log(
         `${service.serviceName()}: failed to ping ${service.serviceUrl()} after ${this.retries} retries; ${error}`,

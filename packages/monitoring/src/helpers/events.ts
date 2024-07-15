@@ -26,12 +26,12 @@ class MonitorEventEmitter extends EventEmitter {
   public storeStatus(serviceName: string, isAlive: boolean) {
     this.emit("MonitorStoreStatus", serviceName, isAlive);
   }
-  public serviceDown(serviceName: string, error: Error) {
+  public serviceDown(serviceName: string, error?: Error) {
     this.emit("MonitorServiceDown", serviceName, error);
   }
 
   private monitorLogsHandler(msg: unknown, color?: string) {
-    if (chalk[color]) {
+    if (color && chalk[color]) {
       console.log(chalk[color](msg));
     } else {
       console.log(msg);
