@@ -71,4 +71,10 @@ export type ServicesUrls = {
 type ServicesStacks = {
   [key in ServiceName]?: string[];
 };
-export type StackPickerOptions = ServicesStacks & { mnemonic?: string; keypairType?: KeypairType; retries?: number };
+export type StackPickerOptions = ServicesStacks & {
+  mnemonic?: string;
+  keypairType?: KeypairType;
+  retries?: number;
+  rmbTFchainUrls?: string[];
+  rmbValidatesChain?: boolean;
+};
