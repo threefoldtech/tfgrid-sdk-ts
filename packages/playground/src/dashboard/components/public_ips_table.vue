@@ -1,76 +1,54 @@
 <template>
   <div>
-    <v-data-table-server
-      :loading="loadingIps"
-      loading-text="Loading farm IPs..."
-      :headers="headers"
-      :items="copyPublicIps"
-      :items-length="publicIps.length"
-      :items-per-page="size"
-      :items-per-page-options="[
-        { value: 5, title: '5' },
-        { value: 10, title: '10' },
-        { value: 15, title: '15' },
-        { value: 20, title: '20' },
-        { value: 50, title: '50' },
-      ]"
-      :page="page"
-      @update:items-per-page="size => updateIPPageSize(size)"
-      @update:page="page => updateIPPage(page)"
-      class="elevation-1 v-data-table-header"
-      density="compact"
-      :disable-sort="true"
-      hide-default-header
-      :hover="true"
-    >
+    <ListTable :headers="headers" :items="publicIps" :loading="loading" :deleting="isRemoving" v-model="selectedItems">
       <template v-slot:top>
-        <v-alert class="pa-5" style="height: 20px">
+        <v-alert>
           <h4 class="text-center font-weight-medium">Public IPs</h4>
         </v-alert>
       </template>
       <template #[`item.ip`]="{ item }">
-        {{ item.value.ip || "-" }}
+        {{ item.ip || "-" }}
       </template>
       <template #[`item.gateway`]="{ item }">
-        {{ item.value.gateway || "-" }}
+        {{ item.gateway || "-" }}
       </template>
 
-      <template #[`item.contract_id`]="{ item }">
-        {{ item.value.contract_id || "-" }}
+      <template #[`item.contractId`]="{ item }">
+        {{ item.contractId ?? "-" }}
       </template>
-      <template #[`item.actions`]="{ item, index }">
-        <v-btn
-          class="text-subtitle-2"
-          size="small"
-          color="error"
-          @click="
-            () => {
-              showDialogue = true;
-              itemToDelete = { ip: item.raw.ip, index };
-            }
-          "
-          :disabled="loading"
-          :loading="loading"
-        >
-          Delete IP
-        </v-btn>
+      <template #bottom>
+        <div class="d-flex align-end justify-end">
+          <v-btn
+            class="ma-3"
+            color="error"
+            prepend-icon="mdi-delete"
+            :disabled="selectedItems.length === 0 || isRemoving"
+            @click="showDialogue = true"
+          >
+            Delete
+          </v-btn>
+        </div>
       </template>
-    </v-data-table-server>
+    </ListTable>
     <v-dialog v-model="showDialogue" max-width="600">
       <v-card>
-        <v-toolbar color="primary" class="custom-toolbar">
-          <p class="mb-5">Delete IP</p>
-        </v-toolbar>
-        <v-card-text class="text-subtitle-1">Delete IP {{ itemToDelete?.ip }}? </v-card-text>
-        <v-card-actions class="justify-end px-5 pb-5 pt-0">
-          <v-btn @click="showDialogue = false" variant="outlined" color="anchor">Close</v-btn>
+        <v-card-title class="text-subtitle-1">
+          <strong>Delete the following IPs?</strong>
+        </v-card-title>
+        <v-card-text>
+          <v-chip class="mb-5" v-for="item in selectedItems" :key="item">
+            {{ item.ip }}
+          </v-chip>
+          <v-divider />
+        </v-card-text>
+        <v-card-actions class="justify-end mb-1 mr-2">
+          <v-btn @click="showDialogue = false" color="anchor">Close</v-btn>
           <v-btn
-            variant="outlined"
             text="Confirm"
-            color="error"
             :loading="isRemoving"
+            color="error"
             :disabled="isRemoving"
-            @click="removeFarmIp({ farmId: $props.farmId, ip: itemToDelete?.ip }, itemToDelete?.index)"
+            @click="removeFarmIps"
           ></v-btn>
         </v-card-actions>
       </v-card>
@@ -83,13 +61,14 @@ import type { RemoveFarmIPModel } from "@threefold/grid_client";
 import type { PublicIp } from "@threefold/tfchain_client";
 import { onMounted, ref, watch } from "vue";
 
+import ListTable from "@/components/list_table.vue";
 import { useGrid } from "@/stores";
 import { IPType } from "@/utils/types";
 
 import { createCustomToast, ToastType } from "../../utils/custom_toast";
-
 export default {
   name: "PublicIPsTable",
+  components: { ListTable },
   props: {
     farmId: {
       type: Number,
@@ -104,21 +83,21 @@ export default {
         title: "IP",
         align: "center",
         key: "ip",
+        sortable: false,
       },
       {
         title: "Gateway",
         align: "center",
         key: "gateway",
+        sortable: false,
       },
       {
         title: "Deployed Contract ID",
         align: "center",
         key: "contractId",
       },
-      { title: "Actions", align: "center", sortable: false, key: "actions" },
     ] as any;
     const publicIps = ref<PublicIp[]>([]);
-    const copyPublicIps = ref<PublicIp[]>([]);
     const loading = ref(false);
     const loadingIps = ref(false);
     const showDialogue = ref(false);
@@ -127,53 +106,40 @@ export default {
     const toPublicIP = ref();
     const gateway = ref();
     const isRemoving = ref(false);
-    const itemToDelete = ref();
-    const size = ref(5);
-    const page = ref(1);
+    const selectedItems = ref<any[]>([]);
+    const items = ref<RemoveFarmIPModel[]>([]);
 
     onMounted(async () => {
       await getFarmByID(props.farmId);
     });
-
-    function updateIPPageSize(pageSize: number) {
-      loadingIps.value = true;
-      size.value = pageSize;
-      copyPublicIps.value = publicIps.value.slice(0, size.value) as unknown as PublicIp[];
-      loadingIps.value = false;
-    }
-    function updateIPPage(pageNumber: number) {
-      page.value = pageNumber;
-      loadingIps.value = true;
-      const startIndex = (pageNumber - 1) * size.value;
-      const endIndex = startIndex + size.value;
-      copyPublicIps.value = publicIps.value.slice(startIndex, endIndex) as unknown as PublicIp[];
-      loadingIps.value = false;
-    }
 
     async function getFarmByID(id: number) {
       loadingIps.value = true;
       try {
         const farm = await gridStore.grid.farms.getFarmByID({ id });
         publicIps.value = farm.publicIps as unknown as PublicIp[];
-        copyPublicIps.value = publicIps.value.slice(0, size.value);
       } catch (error) {
         createCustomToast(`Failed to get public IPs! ${error}`, ToastType.danger);
       }
       loadingIps.value = false;
     }
-    async function removeFarmIp(options: RemoveFarmIPModel, index: number) {
+    async function removeFarmIps() {
       try {
         isRemoving.value = true;
-        await gridStore.grid.farms.removeFarmIp({ ip: options.ip, farmId: options.farmId });
+        items.value = selectedItems.value.map(item => ({
+          ip: item.ip,
+          farmId: props.farmId,
+        }));
+        await gridStore.grid.farms.removeFarmIps(items.value);
         createCustomToast("IP is deleted successfully!", ToastType.success);
-        publicIps.value.splice(index, 1);
+        await getFarmByID(props.farmId);
       } catch (error) {
         console.log(error);
         createCustomToast("Failed to delete IP!", ToastType.danger);
       } finally {
         isRemoving.value = false;
         showDialogue.value = false;
-        itemToDelete.value = undefined;
+        selectedItems.value = [];
       }
     }
     watch(
@@ -183,6 +149,7 @@ export default {
       },
       { deep: true },
     );
+
     return {
       gridStore,
       headers,
@@ -194,21 +161,10 @@ export default {
       loading,
       showDialogue,
       isRemoving,
-      itemToDelete,
-      removeFarmIp,
-      page,
-      size,
-      updateIPPage,
-      copyPublicIps,
+      removeFarmIps,
+      selectedItems,
       loadingIps,
-      updateIPPageSize,
     };
   },
 };
 </script>
-<style scoped>
-.custom-toolbar {
-  height: 2.5rem !important;
-  padding-left: 10px;
-}
-</style>

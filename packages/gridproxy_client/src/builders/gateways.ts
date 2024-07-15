@@ -7,6 +7,13 @@ export enum NodeStatus {
   Standby = "standby",
 }
 
+export enum UnifiedNodeStatus {
+  Up = "up",
+  Down = "down",
+  Standby = "standby",
+  UpStandby = "up,standby",
+}
+
 export interface GatewaysQuery {
   page: number;
   size: number;

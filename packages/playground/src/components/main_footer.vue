@@ -1,15 +1,15 @@
 <template>
-  <v-footer class="py-5 mainfooter border">
+  <v-footer class="py-3 mainfooter mt-5">
     <v-container>
       <v-row justify="center" no-gutters>
-        <v-col class="px-4 pr-10" cols="12" md="4" sm="12">
+        <v-col class="px-4" cols="12" md="4">
           <v-img
             :src="`${
               theme.name.value === AppThemeSelection.light
                 ? baseUrl + 'images/logoTF_dark.png'
                 : baseUrl + 'images/logoTF_light.png'
             }`"
-            width="160px"
+            width="140px"
             @click="navigateToHome"
             class="clickable-logo"
           />
@@ -21,45 +21,31 @@
               href="https://github.com/threefoldtech/tfgrid-sdk-ts"
               target="_blank"
               :style="{ color: 'rgb(var(--v-footer-color-link)) !important' }"
-              ><v-btn class="" icon="mdi-github" variant="text"></v-btn
+              ><v-btn color="anchor" icon="mdi-github" variant="text"></v-btn
             ></a>
             <a
               href="mailto:info@threefold.io"
               target="_blank"
               :style="{ color: 'rgb(var(--v-footer-color)) !important' }"
-              ><v-btn class="" icon="mdi-email-outline" variant="text"></v-btn
+              ><v-btn color="anchor" icon="mdi-email-outline" variant="text"></v-btn
             ></a>
           </div>
         </v-col>
-        <v-col class="" cols="4" md="2">
+        <v-col class="mb-2" cols="12" sm="3" md="2">
           <p class="text-subtitle-1 footer_header" color="secondary">Take Action</p>
           <div>
-            <a
-              color="error"
-              href="https://www.manual.grid.tf/documentation/threefold_token/buy_sell_tft/buy_sell_tft.html"
-              class="app-link text-subtitle-2"
-              target="_blank"
+            <a color="error" :href="manual.buy_sell_tft" class="app-link text-subtitle-2" target="_blank"
               >Buy the Token</a
             >
           </div>
           <div>
-            <a
-              href="https://www.manual.grid.tf/documentation/farmers/farmers.html"
-              class="app-link text-subtitle-2"
-              target="_blank"
-              >Start Farming</a
-            >
+            <a :href="manual.farmers" class="app-link text-subtitle-2" target="_blank">Start Farming</a>
           </div>
           <div>
-            <a
-              href="https://manual.grid.tf/knowledge_base/about/governance.html"
-              class="app-link text-subtitle-2"
-              target="_blank"
-              >Governance</a
-            >
+            <a :href="manual.governance" class="app-link text-subtitle-2" target="_blank">Governance</a>
           </div>
         </v-col>
-        <v-col class="mx-3" cols="4" md="2">
+        <v-col class="mx-3 mb-3" cols="12" sm="3" md="2">
           <p color="primary" class="text-subtitle-1 footer_header">About Us</p>
           <div>
             <a
@@ -77,12 +63,9 @@
           <div>
             <a href="https://www.threefold.io/newsroom/" class="app-link text-subtitle-2" target="_blank">News Room</a>
           </div>
-          <div>
-            <a href="https://www.threefold.io/community/" class="app-link text-subtitle-2" target="_blank">Community</a>
-          </div>
         </v-col>
 
-        <v-col class="mx-3" cols="2">
+        <v-col class="mx-3" cols="12" sm="3" md="2">
           <p class="text-subtitle-1 footer_header" color="secondary">Contact</p>
           <div>
             <a href="https://t.me/threefold" class="app-link text-subtitle-2" target="_blank">Main Chat</a>
@@ -98,8 +81,8 @@
           </div>
         </v-col>
       </v-row>
-      <v-divider class="my-4" />
-      <div class="text-center">{{ new Date().getFullYear() }} — ThreeFoldTech</div>
+      <v-divider class="my-3 w-25 mx-auto" />
+      <div class="text-center mb-12">{{ new Date().getFullYear() }} — ThreeFoldTech</div>
     </v-container>
   </v-footer>
 </template>
@@ -110,6 +93,7 @@ import { useTheme } from "vuetify";
 
 import { DashboardRoutes } from "@/router/routes";
 import { AppThemeSelection } from "@/utils/app_theme";
+import { manual } from "@/utils/manual";
 
 const theme = useTheme();
 
@@ -146,5 +130,14 @@ export default {
 .footer_header {
   color: rgb(var(--v-footer-color-header)) !important;
   font-weight: 500;
+}
+
+@media only screen and (max-width: 992px) {
+  .v-footer {
+    text-align: center !important;
+  }
+  .v-img {
+    margin: auto;
+  }
 }
 </style>

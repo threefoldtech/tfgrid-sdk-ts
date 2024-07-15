@@ -1,7 +1,12 @@
 <template>
   <view-layout>
+    <v-card color="primary" class="d-flex justify-center items-center mb-4 pa-3 text-center">
+      <v-icon size="30" class="pr-3">mdi-lightbulb-on-outline</v-icon>
+      <v-card-title class="pa-0">Applications</v-card-title>
+    </v-card>
+    <v-text-field label="Search Applications" v-model="searchItem" class="mb-5" clearable></v-text-field>
     <v-row>
-      <v-col sm="12" md="6" lg="4" v-for="card in cards" :key="card.title">
+      <v-col sm="12" md="6" lg="4" v-for="card in filteredCards" :key="card.title">
         <router-link :to="card.route">
           <v-hover>
             <template v-slot:default="{ isHovering, props }">
@@ -18,14 +23,7 @@
                 />
                 <v-card-title class="d-inline-block">
                   {{ card.title }}
-                  <v-chip
-                    v-for="tag in card.tags"
-                    :key="tag"
-                    class="ml-2 pulse-animation"
-                    color="#1AA18F"
-                    small
-                    text-color="white"
-                  >
+                  <v-chip v-for="tag in card.tags" :key="tag" class="ml-2 pulse-animation">
                     {{ tag }}
                   </v-chip>
                 </v-card-title>
@@ -35,11 +33,14 @@
           >
         </router-link>
       </v-col>
+      <p v-if="filteredCards.length === 0" class="mx-3 mb-3">No solution was found with the provided search query.</p>
     </v-row>
   </view-layout>
 </template>
 
 <script lang="ts">
+import { computed, ref } from "vue";
+
 import { DashboardRoutes } from "@/router/routes";
 
 interface Card {
@@ -53,7 +54,14 @@ interface Card {
 export default {
   name: "SolutionsView",
   setup() {
-    const cards: Card[] = [
+    let cards: Card[] = [
+      {
+        title: "TFRobot",
+        excerpt:
+          "TFRobot is a command line interface tool that offers simultaneous mass deployment of groups of VMs on the ThreeFold Grid, with support of multiple retries for failed deployments, and customizable configurations.",
+        icon: "tfrobot.png",
+        route: DashboardRoutes.Applications.TFRobot,
+      },
       {
         title: "Peertube",
         excerpt: "Peertube aspires to be a decentralized and free/libre alternative to video broadcasting services.",
@@ -89,13 +97,13 @@ export default {
         icon: "taiga.png",
         route: DashboardRoutes.Applications.Taiga,
       },
-      // {
-      //   title: "Owncloud",
-      //   excerpt:
-      //     "ownCloud develops and provides open-source software for content collaboration, allowing teams to easily share and work on files seamlessly regardless of device or location.",
-      //   icon: "owncloud.png",
-      //   route: DashboardRoutes.Applications.Owncloud,
-      // },
+      {
+        title: "Static Website",
+        excerpt:
+          "Static Website is an application where a user provides a Github repository url and it's automatically served using Caddy.",
+        icon: "static_website.png",
+        route: DashboardRoutes.Applications.StaticWebsite,
+      },
       {
         title: "Nextcloud",
         excerpt:
@@ -146,13 +154,6 @@ export default {
         icon: "umbrel.png",
         route: DashboardRoutes.Applications.Umbrel,
       },
-      //       {
-      //         title: "Freeflow",
-      //         excerpt: `Freeflow is a convenient ecosystem on top of a resilient internet grid. We bring you a new internet with a set of
-      // productivity tools so you can enhance collaboration within your country, your company, your community.`,
-      //         icon: "freeflow.png",
-      //         route: DashboardRoutes.Applications.Freeflow,
-      //       },
       {
         title: "Wordpress",
         excerpt:
@@ -161,11 +162,19 @@ export default {
         route: DashboardRoutes.Applications.Wordpress,
       },
     ];
+    cards = cards.sort((a, b) => a.title.localeCompare(b.title));
+
     const baseURL = import.meta.env.BASE_URL;
+    const searchItem = ref("");
+    const filteredCards = computed(() =>
+      cards.filter(n => n.title.toLocaleLowerCase().includes(searchItem.value.toLocaleLowerCase())),
+    );
 
     return {
       cards,
       baseURL,
+      searchItem,
+      filteredCards,
     };
   },
 };

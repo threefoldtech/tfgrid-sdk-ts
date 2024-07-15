@@ -59,11 +59,7 @@
 
         <Network required v-model:ipv4="ipv4" v-model:planetary="planetary" v-model:mycelium="mycelium" ref="network" />
 
-        <input-tooltip
-          inline
-          tooltip="Click to know more about dedicated machines."
-          href="https://www.manual.grid.tf/documentation/dashboard/deploy/dedicated_machines.html"
-        >
+        <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
           <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
         </input-tooltip>
         <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
@@ -83,6 +79,8 @@
           }"
           v-model="selectionDetails"
         />
+
+        <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
       </template>
 
       <template #restore>
@@ -100,10 +98,8 @@
       </template>
     </d-tabs>
 
-    <template #footer-actions>
-      <v-btn color="secondary" variant="outlined" :disabled="tabs?.invalid || network?.error" @click="deploy">
-        Deploy
-      </v-btn>
+    <template #footer-actions="{ validateBeforeDeploy }">
+      <v-btn color="secondary" @click="validateBeforeDeploy(deploy)" text="Deploy" />
     </template>
   </weblet-layout>
 </template>
@@ -111,19 +107,19 @@
 <script lang="ts" setup>
 import { ref } from "vue";
 
+import { manual } from "@/utils/manual";
+
 import Network from "../components/networks.vue";
 import { useLayout } from "../components/weblet_layout.vue";
-import { useProfileManager } from "../stores";
+import { useGrid } from "../stores";
 import { type Flist, ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
-import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
 import rootFs from "../utils/root_fs";
 import { generateName } from "../utils/strings";
 
 const layout = useLayout();
 const tabs = ref();
-const profileManager = useProfileManager();
 const name = ref(generateName({ prefix: "ps" }));
 const code = ref("");
 const ipv4 = ref(false);
@@ -142,7 +138,10 @@ const flist: Flist = {
 const dedicated = ref(false);
 const certified = ref(false);
 const selectionDetails = ref<SelectionDetails>();
-const mycelium = ref(false);
+const mycelium = ref(true);
+const selectedSSHKeys = ref("");
+const gridStore = useGrid();
+const grid = gridStore.client as GridClient;
 
 async function deploy() {
   layout.value.setStatus("deploy");
@@ -151,8 +150,7 @@ async function deploy() {
 
   try {
     layout.value?.validateSSH();
-    const grid = await getGrid(profileManager.profile!, projectName);
-
+    updateGrid(grid, { projectName });
     await layout.value.validateBalance(grid!);
 
     const vm = await deployVM(grid!, {
@@ -177,7 +175,7 @@ async function deploy() {
           envs: [
             {
               key: "SSH_KEY",
-              value: profileManager.profile!.ssh,
+              value: selectedSSHKeys.value,
             },
             {
               key: "PRESEARCH_REGISTRATION_CODE",
@@ -192,7 +190,7 @@ async function deploy() {
               value: publicRestoreKey.value,
             },
           ],
-          rootFilesystemSize: rootFilesystemSize,
+          rootFilesystemSize,
           nodeId: selectionDetails.value!.node!.nodeId,
           rentedBy: dedicated.value ? grid!.twinId : undefined,
           certified: certified.value,
@@ -207,13 +205,22 @@ async function deploy() {
     layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Presearch instance."));
   }
 }
+
+function updateSSHkeyEnv(selectedKeys: string) {
+  selectedSSHKeys.value = selectedKeys;
+}
 </script>
 
 <script lang="ts">
+import type { GridClient } from "@threefold/grid_client";
+
+import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";
 import type { SelectionDetails } from "../types/nodeSelector";
+import { updateGrid } from "../utils/grid";
 
 export default {
   name: "TFPresearch",
+  component: { ManageSshDeployemnt },
 };
 </script>

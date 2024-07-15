@@ -326,7 +326,6 @@ class Network {
     events.emit("logs", `Loading network ${this.name}`);
 
     if (await this.existOnNewNetwork()) {
-      await new Promise(f => setTimeout(f, 60000));
       await this.loadNetworkFromContracts();
     } else {
       const network = await this.getNetwork();
@@ -798,6 +797,7 @@ PersistentKeepalive = 25\nEndpoint = ${endpoint}`;
       Network.newContracts.push({
         contractID: String(AddedContract.contractId),
         createdAt: Date.now().toString(),
+        updatedAt: Date.now().toString(),
         deploymentData: AddedContract.contractType.nodeContract.deploymentData,
         deploymentHash: AddedContract.contractType.nodeContract.deploymentHash,
         gridVersion: "4",

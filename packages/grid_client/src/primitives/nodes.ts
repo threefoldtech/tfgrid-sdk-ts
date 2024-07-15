@@ -1,3 +1,4 @@
+import { SortBy, SortOrder } from "@threefold/gridproxy_client";
 import { Client as RMBClient } from "@threefold/rmb_direct_client";
 import { QueryClient } from "@threefold/tfchain_client";
 import {
@@ -15,6 +16,7 @@ import { RMB } from "../clients";
 import { Graphql } from "../clients/graphql/client";
 import { formatErrorMessage } from "../helpers";
 import { send, sendWithFullResponse } from "../helpers/requests";
+import { convertObjectToQueryString } from "../helpers/utils";
 import { FarmFilterOptions, FilterOptions, NodeStatus } from "../modules/models";
 
 interface FarmInfo {
@@ -62,6 +64,10 @@ interface NodeInfo {
   rentedByTwinId: number;
   rentContractId: number;
   serialNumber?: string;
+  healthy: boolean;
+  rentable: boolean;
+  rented: boolean;
+  price_usd: number;
 }
 interface PublicConfig {
   domain: string;
@@ -130,13 +136,22 @@ class Nodes {
     let nodes: NodeInfo[] = [];
     let page = 1;
     do {
-      nodes = await this.filterNodes({ accessNodeV4: true, accessNodeV6: true, availableFor, page });
+      nodes = await this.filterNodes({
+        accessNodeV4: true,
+        accessNodeV6: true,
+        availableFor,
+        page,
+      });
       for (const node of nodes) {
         const ipv4 = node.publicConfig.ipv4;
         const ipv6 = node.publicConfig.ipv6;
         const domain = node.publicConfig.domain;
         if (PrivateIp(ipv4.split("/")[0]) === false) {
-          accessNodes[+node.nodeId] = { ipv4: ipv4, ipv6: ipv6, domain: domain };
+          accessNodes[+node.nodeId] = {
+            ipv4: ipv4,
+            ipv6: ipv6,
+            domain: domain,
+          };
         }
       }
       page++;
@@ -274,7 +289,13 @@ class Nodes {
         .request([node_twin_id], "zos.statistics.get", "")
         .then(res => {
           const node: RMBNodeCapacity = res;
-          const ret: NodeResources = { cru: 0, mru: 0, hru: 0, sru: 0, ipv4u: 0 };
+          const ret: NodeResources = {
+            cru: 0,
+            mru: 0,
+            hru: 0,
+            sru: 0,
+            ipv4u: 0,
+          };
 
           ret.cru = +node.total.cru;
           ret.mru = +node.total.mru - +node.used.mru;
@@ -386,6 +407,7 @@ class Nodes {
       free_ips: options.publicIPs ? 1 : "",
       ipv4: options.accessNodeV4,
       ipv6: options.accessNodeV6,
+      has_ipv6: options.hasIPv6,
       certification_type: options.certified ? "Certified" : "",
       farm_ids: options.farmId ? [options.farmId] : options.farmIds,
       farm_name: options.farmName,
@@ -403,15 +425,16 @@ class Nodes {
       ret_count: options.ret_count,
       region: options.region,
       healthy: options.healthy,
+      sort_by: SortBy.FreeCRU,
+      sort_order: SortOrder.Desc,
     };
+
     if (options.gateway) {
       params["ipv4"] = true;
       params["ipv6"] = true;
       params["domain"] = true;
     }
-    return Object.entries(params)
-      .map(param => param.join("="))
-      .join("&");
+    return convertObjectToQueryString(params);
   }
 
   getFarmUrlQuery(options: FarmFilterOptions = {}) {
@@ -426,6 +449,7 @@ class Nodes {
       country: options.country,
       dedicated: options.dedicated,
       node_available_for: options.availableFor,
+      node_has_ipv6: options.nodeHasIPv6,
       node_status: "up",
       page: options.page,
       size: options.size,
@@ -438,9 +462,8 @@ class Nodes {
       ret_count: options.ret_count,
       region: options.region,
     };
-    return Object.entries(params)
-      .map(param => param.join("="))
-      .join("&");
+
+    return convertObjectToQueryString(params);
   }
 
   async nodeHasResources(nodeId: number, options: FilterOptions): Promise<boolean> {

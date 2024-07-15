@@ -1,43 +1,43 @@
 <template>
   <v-container>
-    <v-dialog
-      transition="dialog-bottom-transition"
-      max-width="1000"
-      v-model="depositDialog"
-      @update:model-value="closeDialog"
-    >
+    <v-dialog transition="dialog-bottom-transition" v-model="depositDialog" @update:model-value="closeDialog">
       <v-card>
-        <v-toolbar color="primary" dark class="d-flex justify-center bold-text"> Deposit TFT </v-toolbar>
+        <VCardTitle class="bg-primary">Deposit TFT</VCardTitle>
         <v-card-text>
           <v-container>
-            <v-row class="py-2 pb-5">
+            <v-row class="py-2">
               <v-col cols="6" class="mx-4">
                 <div class="mb-2">
-                  <p class="mb-8">
+                  <p>
                     Deposit your TFTs to Threefold Bridge using a
                     {{ selectedName ? selectedName.charAt(0).toUpperCase() + selectedName.slice(1) : "" }}
                     transaction.
                   </p>
+                  <p class="mt-1 mb-8 text-secondary text-sm-subtitle-2 font-weight-bold">Deposit fee is 1 TFT</p>
                 </div>
                 <input-tooltip
                   v-if="selectedName == 'stellar'"
-                  tooltip="Threefold Staller account"
+                  tooltip="Threefold Stellar account"
                   :href="stellarLink"
                   target="_blank"
                 >
                   <CopyReadonlyInput label="Destination" :data="depositWallet"></CopyReadonlyInput>
                 </input-tooltip>
                 <CopyReadonlyInput v-else label="Destination" :data="depositWallet"></CopyReadonlyInput>
-                <CopyReadonlyInput label="Memo Text" :data="`twin_${twinId}`"></CopyReadonlyInput>
-                <v-btn
-                  variant="outlined"
-                  color="secondary"
-                  href="https://www.manual.grid.tf/documentation/threefold_token/tft_bridges/tft_bridges.html"
-                  target="_blank"
-                  >Learn more?</v-btn
-                >
-                <div style="position: absolute; bottom: 10rem">
-                  <p :style="{ paddingBottom: '3rem', color: '#7de3c8' }">Waiting for receiving TFTs{{ dots }}</p>
+                <div class="memo-text-warn">
+                  <CopyReadonlyInput
+                    label="Memo Text"
+                    :data="`twin_${twinId}`"
+                    hint="Add twin ID as memo text or you will lose your tokens"
+                  />
+                </div>
+                <div style="margin-top: 5rem">
+                  <p
+                    :class="theme.name.value === AppThemeSelection.light ? 'text-primary' : 'text-info'"
+                    :style="{ paddingBottom: '3rem' }"
+                  >
+                    Waiting for receiving TFTs{{ dots }}
+                  </p>
                 </div>
               </v-col>
               <v-divider class="mx-4" vertical></v-divider>
@@ -62,18 +62,14 @@
                   </div>
                 </div>
               </v-col>
-              <v-divider class="my-4" horizontal></v-divider>
             </v-row>
-            <v-alert type="warning" variant="tonal" class="d-flex row justify-start text-subtitle-1">
-              <p :style="{ maxWidth: '880px' }">
-                Amount: should be larger than {{ depositFee }}TFT (deposit fee is: {{ depositFee }}TFT)
-              </p>
-            </v-alert>
           </v-container>
-          <v-card-actions class="justify-end">
-            <v-btn variant="outlined" color="anchor" class="mr-2 px-3" @click="closeDialog"> Close </v-btn>
-          </v-card-actions>
+          <v-divider />
         </v-card-text>
+        <v-card-actions class="justify-end my-1 mr-2">
+          <v-btn color="anchor" @click="closeDialog"> Close </v-btn>
+          <v-btn color="secondary" :href="manual.tft_bridges" target="_blank" text="Learn more?" />
+        </v-card-actions>
       </v-card>
     </v-dialog>
   </v-container>
@@ -82,12 +78,15 @@
 <script setup lang="ts">
 import { Decimal } from "decimal.js";
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
+import { useTheme } from "vuetify";
+
+import { AppThemeSelection } from "@/utils/app_theme";
+import { manual } from "@/utils/manual";
 
 import { useProfileManagerController } from "../components/profile_manager_controller.vue";
 import QrcodeGenerator from "../components/qrcode_generator.vue";
-import { useProfileManager } from "../stores";
+import { useGrid, useProfileManager } from "../stores";
 import { createCustomToast, ToastType } from "../utils/custom_toast";
-import { getGrid } from "../utils/grid";
 import CopyReadonlyInput from "./copy_readonly_input.vue";
 const depositDialog = ref(false);
 const emits = defineEmits(["close"]);
@@ -97,6 +96,9 @@ const loading = ref(false);
 const dots = ref(".");
 const interval = ref<number | null>(null);
 const ProfileManagerController = useProfileManagerController();
+const gridStore = useGrid();
+const grid = gridStore.client as GridClient;
+const theme = useTheme();
 
 const apps = [
   {
@@ -143,7 +145,7 @@ onMounted(async () => {
   interval.value = window.setInterval(loadingDots, 500);
   try {
     loading.value = true;
-    const grid = await getGrid(profileManager.profile!);
+    updateGrid(grid, { projectName: "" });
     const address = profileManager.profile?.address as string;
     const receivedDeposit = await grid!.bridge.listenToMintCompleted({
       address: address,
@@ -173,7 +175,10 @@ onBeforeUnmount(() => {
 });
 </script>
 <script lang="ts">
+import type { GridClient } from "@threefold/grid_client";
 import { defineComponent } from "vue";
+
+import { updateGrid } from "../utils/grid";
 
 export default defineComponent({
   name: "DepositDialog",
@@ -184,5 +189,9 @@ export default defineComponent({
 .bold-text {
   font-weight: 500;
   padding-left: 1rem;
+}
+
+.memo-text-warn .copy-input-wrapper .v-messages__message {
+  color: rgb(var(--v-theme-warning));
 }
 </style>

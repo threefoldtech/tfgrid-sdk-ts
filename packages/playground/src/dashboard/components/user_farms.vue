@@ -54,33 +54,27 @@
           >
             <v-row>
               <v-col cols="12" class="mt-4">
-                <card-details :loading="false" title="Farm Details" :items="getFarmDetails(item.raw)"></card-details>
+                <card-details :loading="false" title="Farm Details" :items="getFarmDetails(item)"></card-details>
               </v-col>
             </v-row>
 
             <v-row>
               <v-col cols="12 my-2">
-                <PublicIPsTable :farmId="item.raw.farmId" :refreshPublicIPs="refreshPublicIPs" />
+                <PublicIPsTable :farmId="item.farmId" :refreshPublicIPs="refreshPublicIPs" />
                 <v-card-actions>
                   <v-row class="justify-center mt-3">
-                    <v-btn
-                      class="text-subtitle-1 px-6"
-                      color="secondary"
-                      variant="outlined"
-                      @click="showDialogue = true"
-                    >
+                    <v-btn class="text-subtitle-1 px-6" color="secondary" @click="showDialogue = true">
                       Add/Edit Stellar Payout Address
                     </v-btn>
                     <v-btn
                       class="text-subtitle-1 px-6"
                       v-if="network == 'main'"
                       color="secondary"
-                      variant="outlined"
-                      @click="downloadFarmReceipts(item.value.farmId)"
+                      @click="downloadFarmReceipts(item.farmId)"
                     >
                       Download Minting Receipts
                     </v-btn>
-                    <AddIP v-model:farmId="item.raw.farmId" @ip-added-successfully="handleIpAdded" />
+                    <AddIP v-model:farmId="item.farmId" @ip-added-successfully="handleIpAdded" />
                   </v-row>
                 </v-card-actions>
               </v-col>
@@ -99,23 +93,24 @@
                   <input-validator
                     :value="address"
                     :rules="[validators.required('Address is required.'), customStellarValidation]"
+                    :async-rules="[validators.isValidStellarAddress]"
                     #="{ props }"
                   >
                     <v-text-field
                       v-model="address"
                       v-bind="props"
                       outlined
+                      :loading="props.loading"
                       label="Stellar Wallet Address"
                     ></v-text-field>
                   </input-validator>
                 </form-validator>
               </div>
               <v-card-actions class="justify-end px-5 pb-5 pt-0">
-                <v-btn @click="showDialogue = false" variant="outlined" color="anchor">Close</v-btn>
+                <v-btn @click="showDialogue = false" color="anchor">Close</v-btn>
                 <v-btn
                   color="secondary"
-                  variant="outlined"
-                  @click="setStellarAddress(item.raw.farmId, address)"
+                  @click="setStellarAddress(item.farmId, address)"
                   :loading="isAdding"
                   :disabled="!valid || isAdding"
                   >Submit</v-btn
@@ -331,8 +326,12 @@ export default {
       refreshPublicIPs.value = !refreshPublicIPs.value;
     }
 
-    function getFarmsNames() {
-      return farms.value?.map(farm => farm.name.toLocaleLowerCase());
+    async function getFarmsNames() {
+      const { data } = await gridProxyClient.farms.list({
+        retCount: true,
+        twinId,
+      });
+      return data.map(farm => farm.name.toLocaleLowerCase());
     }
 
     context.expose({ getFarmsNames, reloadFarms });

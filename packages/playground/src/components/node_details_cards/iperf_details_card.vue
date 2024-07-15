@@ -52,12 +52,10 @@ export default {
     function format(speed: number) {
       return formatResourceSize(speed) + "/s" || "-";
     }
-
     function isIPv4(ip: string) {
       const ipv4Regex = /^(\d{1,3}\.){3}\d{1,3}$/;
       return ipv4Regex.test(ip);
     }
-
     const getNodeIPerfCard = async (): Promise<NodeDetailsCard[]> => {
       const res = await gridStore.grid.zos.getNodeIPerfTest({ nodeId: props.node.nodeId });
       // filter the returned result to show node other than the one being tested against
@@ -66,17 +64,15 @@ export default {
           (node: any) => node.download_speed && node.upload_speed && !node.error && node.node_id !== props.node.nodeId,
         )
         .slice(0, 4)
-        .map(node => ({
+        .map((node: any) => ({
           name: node.test_type.toLocaleUpperCase(),
           type: isIPv4(node.node_ip) ? "IPv4" : "IPv6",
           downloadSpeed: format(node.download_speed),
           uploadSpeed: format(node.upload_speed),
         }));
-
       IperfDetails.value = array;
       return IperfDetails.value;
     };
-
     return {
       IperfDetails,
       loading,

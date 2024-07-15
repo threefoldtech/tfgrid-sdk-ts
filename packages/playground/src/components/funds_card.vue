@@ -1,28 +1,12 @@
 <template>
   <v-tooltip location="bottom" close-delay="1000" color="primary">
     <template #activator="{ props }">
-      <v-btn
-        id="tftBtn"
-        width="2000"
-        color="white"
-        @click="addTFT"
-        class="px-lg-6 px-md-2 px-sm-0 mx-sm-0"
-        style="color: white; max-width: 140px; width: auto; background-color: var(--primary)"
-        :loading="loadingAddTFT"
-        v-bind="props"
-      >
-        GET TFT
-      </v-btn>
+      <v-btn id="tftBtn" variant="elevated" @click="addTFT" :loading="loadingAddTFT" v-bind="props"> GET TFT </v-btn>
     </template>
     <div>
       Get TFT on Stellar using BTC or Credit card, then you can bridge it to your tfchain account using the Bridge in
       the dashboard section.
-      <v-btn
-        icon
-        small
-        @click.stop
-        href="https://www.manual.grid.tf/documentation/threefold_token/buy_sell_tft/buy_sell_tft.html"
-        target="_blank"
+      <v-btn icon small @click.stop :href="manual.buy_sell_tft" target="_blank"
         ><v-icon>mdi-information-outline</v-icon></v-btn
       >
     </div>
@@ -31,6 +15,8 @@
 
 <script lang="ts">
 import { ref } from "vue";
+
+import { manual } from "@/utils/manual";
 
 import { useProfileManagerController } from "../components/profile_manager_controller.vue";
 import { useProfileManager } from "../stores";
@@ -41,8 +27,9 @@ export default {
   name: "FundsCard",
   setup() {
     const loadingAddTFT = ref(false);
-    const profileManager = useProfileManager();
     const ProfileManagerController = useProfileManagerController();
+    const profileManager = useProfileManager();
+
     const addTFT = async () => {
       if (window.env.NETWORK !== "dev" && window.env.NETWORK !== "qa") {
         window.open("https://gettft.com/gettft/", "_blank");
@@ -63,6 +50,7 @@ export default {
     };
     return {
       loadingAddTFT,
+      manual,
       addTFT,
     };
   },
@@ -72,7 +60,7 @@ export default {
 <style>
 #tftBtn {
   display: inline-block;
-  min-width: 10px !important;
+  font-weight: bold;
 }
 
 :root {

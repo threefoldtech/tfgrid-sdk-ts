@@ -4,18 +4,47 @@ import "vuetify/styles";
 import { createVuetify } from "vuetify";
 import * as components from "vuetify/components";
 import * as directives from "vuetify/directives";
-import { VDataTable, VDataTableServer } from "vuetify/labs/VDataTable";
-const vuetify = createVuetify({
-  defaults: {
-    VAlert: {
+
+const defaults = {
+  VAlert: {
+    variant: "tonal",
+  },
+  VProgressCircular: {
+    size: 50,
+    width: 7,
+    color: "primary",
+  },
+  VBtn: {
+    variant: "outlined",
+    color: "primary",
+    VIcon: {
       variant: "tonal",
     },
+    VProgressCircular: {
+      size: undefined,
+      width: undefined,
+      color: undefined,
+    },
   },
-  components: {
-    ...components,
-    VDataTable,
-    VDataTableServer,
+  VCardActions: {
+    VBtn: {
+      variant: "outlined",
+      color: "primary",
+    },
   },
+  VChip: {
+    variant: "tonal",
+    color: "primary",
+    size: "small",
+  },
+  VDialog: {
+    width: "70%",
+  },
+};
+
+const vuetify = createVuetify({
+  defaults,
+  components,
   directives,
   theme: {
     defaultTheme: "dark",
@@ -31,10 +60,12 @@ const vuetify = createVuetify({
           warning: "#FFCC00",
           link: "#5695ff",
           anchor: "#d4d4d4",
+          disable: "#d4d4d4",
         },
         variables: {
           "footer-color-link": "#fff",
           "footer-color-header": "#74DDC3",
+          "speed-chip": "#424242",
         },
       },
       light: {
@@ -45,10 +76,12 @@ const vuetify = createVuetify({
           info: "#1AA18F",
           secondary: "#14A1B8",
           anchor: "#000000",
+          disable: "#d4d4d4",
         },
         variables: {
           "footer-color-link": "#333",
           "footer-color-header": "#1aa18f",
+          "speed-chip": "#EEEEEE",
         },
       },
     },

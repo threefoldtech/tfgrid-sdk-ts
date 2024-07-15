@@ -55,7 +55,6 @@
             <v-btn
               :disabled="!isValidForm || loading || !(formHasValues || Object.keys(route.query).length > 0)"
               @click="resetFilters"
-              variant="outlined"
               color="anchor"
               text="Clear"
             />

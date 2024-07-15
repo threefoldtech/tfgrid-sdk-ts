@@ -11,7 +11,7 @@
     title-image="images/icons/algorand.png"
   >
     <template #title>Deploy a Algorand Instance </template>
-    <form-validator v-model="valid">
+    <d-tabs :tabs="[{ title: 'Config', value: 'config' }]">
       <input-validator
         :value="name"
         :rules="[
@@ -56,93 +56,15 @@
             label="Node Type"
             :items="[
               { title: 'Default', value: 'default' },
-              { title: 'Participant', value: 'participant' },
               { title: 'Relay', value: 'relay' },
               { title: 'Indexer', value: 'indexer' },
             ]"
             v-model="type"
           />
         </input-tooltip>
-
-        <template v-if="type === 'participant'">
-          <input-validator
-            :value="account"
-            :rules="[
-              validators.required('Mnemonic is required.'),
-              value => {
-                return validators.isAlpha('Mnemonic can contain only alphabetic characters.')(value.replace(/\s/g, ''));
-              },
-              customAccountValidation,
-            ]"
-            #="{ props }"
-          >
-            <input-tooltip
-              tooltip="Account mnemonic is the private key of your Algorand wallet and it consists of 24 words "
-            >
-              <v-text-field
-                label="Account Mnemonic"
-                placeholder="Algorand Account Mnemonic"
-                v-model.trim="account"
-                v-bind="props"
-                autofocus
-                counter
-              >
-                <template #counter>
-                  <span :class="{ 'text-red': wordsLength > 25 }">{{ wordsLength }}</span>
-                  / 25
-                </template>
-              </v-text-field>
-            </input-tooltip>
-          </input-validator>
-
-          <input-validator
-            :value="firstRound"
-            :rules="[
-              validators.required('First round is required.'),
-              validators.isInt('First round must be a valid integer.'),
-              validators.min('First round must be greater than 0.', 1),
-            ]"
-            #="{ props }"
-          >
-            <input-tooltip tooltip="First Validation Block.">
-              <v-text-field
-                label="First Round"
-                placeholder="First Validation Block"
-                v-model.number="firstRound"
-                v-bind="props"
-                type="number"
-              />
-            </input-tooltip>
-          </input-validator>
-
-          <input-validator
-            :value="lastRound"
-            :rules="[
-              validators.required('Last round is required.'),
-              validators.isInt('Last round must be a valid integer.'),
-              customLastRoundValidation(validators),
-            ]"
-            #="{ props }"
-            ref="lastRoundInput"
-          >
-            <input-tooltip tooltip="Last Validation Block">
-              <v-text-field
-                label="Last Round"
-                placeholder="Last Validation Block"
-                v-model.number="lastRound"
-                v-bind="props"
-                type="number"
-              />
-            </input-tooltip>
-          </input-validator>
-        </template>
       </AlgorandCapacity>
 
-      <input-tooltip
-        inline
-        tooltip="Click to know more about dedicated machines."
-        href="https://www.manual.grid.tf/documentation/dashboard/deploy/dedicated_machines.html"
-      >
+      <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
         <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
       </input-tooltip>
 
@@ -173,9 +95,11 @@
         }"
         v-model="selectionDetails"
       />
-    </form-validator>
-    <template #footer-actions>
-      <v-btn color="secondary" variant="outlined" @click="deploy" :disabled="!valid"> Deploy </v-btn>
+
+      <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
+    </d-tabs>
+    <template #footer-actions="{ validateBeforeDeploy }">
+      <v-btn color="secondary" @click="validateBeforeDeploy(deploy)" text="Deploy" />
     </template>
   </weblet-layout>
 </template>
@@ -183,37 +107,37 @@
 <script lang="ts" setup>
 import { computed, type Ref, ref, watch } from "vue";
 
+import { manual } from "@/utils/manual";
+
 import { useLayout } from "../components/weblet_layout.vue";
-import { useProfileManager } from "../stores";
-import { type Flist, ProjectName, type Validators } from "../types";
+import { useGrid } from "../stores";
+import { type Flist, ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
-import { getGrid } from "../utils/grid";
 import { generateName } from "../utils/strings";
 
 const layout = useLayout();
-const valid = ref(false);
 const lastRoundInput = ref();
-const profileManager = useProfileManager();
 const flist: Flist = {
   value: "https://hub.grid.tf/tf-official-apps/algorand-latest.flist",
   entryPoint: "/sbin/zinit init",
 };
 const name = ref(generateName({ prefix: "al" }));
 const ipv4 = ref(false);
-const mycelium = ref(false);
+const mycelium = ref(true);
 const cpu = ref() as Ref<number>;
 const memory = ref() as Ref<number>;
 const storage = ref() as Ref<number>;
 const network = ref("mainnet");
 const type = ref("default");
-const account = ref("");
-const wordsLength = computed(() => (account.value ? account.value.split(" ").length : 0));
 const firstRound = ref(24000000);
 const lastRound = ref(26000000);
 const dedicated = ref(false);
 const certified = ref(false);
 const rootFilesystemSize = computed(() => storage.value);
 const selectionDetails = ref<SelectionDetails>();
+const selectedSSHKeys = ref("");
+const gridStore = useGrid();
+const grid = gridStore.client as GridClient;
 
 watch(firstRound, () => lastRoundInput.value.validate(lastRound.value.toString()));
 
@@ -224,7 +148,7 @@ async function deploy() {
 
   try {
     layout.value?.validateSSH();
-    const grid = await getGrid(profileManager.profile!, projectName);
+    updateGrid(grid, { projectName });
 
     await layout.value.validateBalance(grid!);
 
@@ -255,16 +179,9 @@ async function deploy() {
           certified: certified.value,
 
           envs: [
-            { key: "SSH_KEY", value: profileManager.profile!.ssh },
+            { key: "SSH_KEY", value: selectedSSHKeys.value },
             { key: "NETWORK", value: network.value },
             { key: "NODE_TYPE", value: type.value },
-            ...(type.value === "participant"
-              ? [
-                  { key: "ACCOUNT_MNEMONICS", value: account.value },
-                  { key: "FIRST_ROUND", value: firstRound.value.toString() },
-                  { key: "LAST_ROUND", value: lastRound.value.toString() },
-                ]
-              : []),
           ],
         },
       ],
@@ -278,29 +195,24 @@ async function deploy() {
   }
 }
 
-function customAccountValidation(value: string) {
-  if (value.split(" ").length !== 25) {
-    return { message: "Mnemonic must have 25 words separated by spaces." };
-  }
-}
-
-function customLastRoundValidation(validators: Validators) {
-  return (value: string) => {
-    const min = firstRound.value;
-    return validators.min(`Last round must be greater than ${min}`, min + 1)(value);
-  };
+function updateSSHkeyEnv(selectedKeys: string) {
+  selectedSSHKeys.value = selectedKeys;
 }
 </script>
 
 <script lang="ts">
+import type { GridClient } from "@threefold/grid_client";
+
 import AlgorandCapacity from "../components/algorand_capacity.vue";
 import Networks from "../components/networks.vue";
+import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";
 import type { SelectionDetails } from "../types/nodeSelector";
+import { updateGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
 
 export default {
   name: "TfAlgorand",
-  components: { AlgorandCapacity, Networks },
+  components: { AlgorandCapacity, Networks, ManageSshDeployemnt },
 };
 </script>

@@ -15,21 +15,12 @@
 
     <input-tooltip tooltip="Select a node ID to deploy on." align-center>
       <div class="w-100" :style="{ position: 'relative' }">
-        <VProgressLinear
-          v-if="loadedNodes.length > 0 && (pageCountTask.loading || nodesTask.loading)"
-          indeterminate
-          :style="{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            zIndex: 9,
-            transform: 'none',
-            width: 'calc(100% - 16px)',
-          }"
-          height="2px"
-          color="primary"
-        />
-
+        <div class="d-flex my-6 align-center justify-center">
+          <v-progress-circular
+            indeterminate
+            v-if="loadedNodes.length > 0 && (pageCountTask.loading || nodesTask.loading)"
+          />
+        </div>
         <VCard
           flat
           class="mb-4 border"
@@ -42,24 +33,32 @@
         >
           <VContainer v-if="loadedNodes.length === 0 && (pageCountTask.loading || nodesTask.loading)">
             <VRow align="center" justify="center" class="pa-4">
-              <VProgressCircular color="primary" indeterminate class="mr-2" /> Loading Nodes...
+              <v-progress-circular indeterminate class="mr-2" />
+              Loading Nodes...
             </VRow>
           </VContainer>
 
           <VContainer v-if="loadedNodes.length === 0 && !(pageCountTask.loading || nodesTask.loading)">
-            <VAlert type="error" text="No Nodes were found!" />
+            <VAlert v-if="loadingError" type="error" :text="loadingError" />
+
+            <VAlert v-else type="error" text="No Nodes were found!" />
           </VContainer>
 
           <div
             ref="nodesContainer"
-            :style="{ maxHeight: '450px', paddingBottom: '100px', backgroundColor: 'rgb(var(--v-theme-background))' }"
+            :style="{
+              maxHeight: '450px',
+              paddingBottom: '100px',
+              backgroundColor: 'rgb(var(--v-theme-background))',
+            }"
             class="overflow-auto px-4"
             v-if="loadedNodes.length"
           >
-            <template v-for="node in loadedNodes" :key="node.id">
+            <template v-for="(node, index) in loadedNodes" :key="node.id">
               <div class="my-4">
                 <TfNodeDetailsCard
-                  :node="node"
+                  :key="node.rentedByTwinId"
+                  v-model:node="loadedNodes[index]"
                   :selected="!validFilters || filtersUpdated ? false : $props.modelValue === node"
                   selectable
                   @node:select="bindModelValueAndValidate"
@@ -74,7 +73,6 @@
                   "
                 />
               </div>
-              <!-- <div class="border-b" :style="{ borderBottomWidth: '2px !important' }" /> -->
             </template>
 
             <VContainer v-if="loadedNodes.length > 0 && pagination.page !== -1">
@@ -97,7 +95,13 @@
         <VAlert
           :type="!validFilters ? 'error' : 'warning'"
           variant="elevated"
-          :style="{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 9 }"
+          :style="{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            zIndex: 9,
+          }"
           v-if="!validFilters || (filtersUpdated && validFilters)"
         >
           <span v-if="!validFilters" v-text="'Please provide valid data.'" />
@@ -109,7 +113,12 @@
         <VAlert
           type="info"
           variant="elevated"
-          :style="{ position: 'absolute', bottom: '31px', right: '31px', zIndex: 9 }"
+          :style="{
+            position: 'absolute',
+            bottom: '31px',
+            right: '31px',
+            zIndex: 9,
+          }"
           v-else-if="nodeInputValidateTask.loading"
           text="Checking if the deployment will fit in the node's disks..."
         />
@@ -118,7 +127,12 @@
           type="error"
           variant="elevated"
           v-if="!filtersUpdated && nodeInputValidateTask.error"
-          :style="{ position: 'absolute', bottom: '31px', right: '31px', zIndex: 9 }"
+          :style="{
+            position: 'absolute',
+            bottom: '31px',
+            right: '31px',
+            zIndex: 9,
+          }"
           :text="nodeInputValidateTask.error"
           closable
         />
@@ -129,6 +143,7 @@
 
 <script lang="ts">
 import type { FarmInfo, FilterOptions, NodeInfo } from "@threefold/grid_client";
+import { RequestError } from "@threefold/types";
 import equals from "lodash/fp/equals.js";
 import sample from "lodash/fp/sample.js";
 import { computed, nextTick, onMounted, onUnmounted, type PropType, ref } from "vue";
@@ -145,6 +160,7 @@ import {
   loadValidNodes,
   normalizeNodeFilters,
   normalizeNodeOptions,
+  validateRentContract,
 } from "../../utils/nodeSelector";
 import TfNodeDetailsCard from "./TfNodeDetailsCard.vue";
 
@@ -194,7 +210,11 @@ export default {
     const filters = computed(() => normalizeNodeFilters(props.filters, options.value));
 
     const reloadNodes = () => nodesTask.value.run(gridStore, props.filters, filters.value, pagination);
-
+    const loadingError = computed(() => {
+      if (!nodesTask.value.error) return "";
+      if (nodesTask.value.error instanceof RequestError) return "Failed to fetch nodes due to a network error";
+      else return "Something went wrong while getting nodes, please try again later";
+    });
     let initialized = false;
     onMounted(async () => {
       initialized = true;
@@ -244,7 +264,11 @@ export default {
     }
 
     const nodeInputValidateTask = useAsync<true, string, [NodeInfo | undefined]>(
-      node => checkNodeCapacityPool(gridStore, node, props.filters),
+      async node => {
+        const nodeCapacityValid = await checkNodeCapacityPool(gridStore, node, props.filters);
+        const rentContractValid = props.filters.dedicated ? await validateRentContract(gridStore, node) : true;
+        return nodeCapacityValid && rentContractValid;
+      },
       {
         tries: 1,
         shouldRun: () => props.validFilters,
@@ -297,7 +321,7 @@ export default {
       reloadNodes,
       resetPageAndReloadNodes,
       pagination,
-
+      loadingError,
       filtersUpdated,
       nodeInputValidateTask,
 

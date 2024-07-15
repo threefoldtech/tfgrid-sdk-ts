@@ -128,7 +128,9 @@
               </TfSwapPrice>
             </div>
           </v-spacer>
-          <v-btn class="capitalize" :style="{ pointerEvents: 'none' }" variant="text"> {{ network }}net </v-btn>
+          <v-btn class="capitalize" color="anchor" :style="{ pointerEvents: 'none' }" variant="text">
+            {{ network }}net
+          </v-btn>
           <v-divider vertical class="mx-2" />
           <AppTheme />
           <v-divider vertical class="mx-2" />
@@ -148,14 +150,18 @@
           height="50"
         >
           <v-row>
-            <v-breadcrumbs class="ma-3" :items="navbarConfig.path" active-color="secondary">
+            <v-breadcrumbs class="ma-3" :items="navbarConfig.path">
               <template v-slot:divider>
                 <v-icon icon="mdi-chevron-right"></v-icon>
               </template>
               <template v-slot:item="{ item }">
-                <router-link :to="item.to" :class="{ 'clickable-item': !item.disabled }">
+                <component
+                  :is="item.to ? 'router-link' : 'span'"
+                  :to="item.to"
+                  :class="{ 'text-secondary text-decoration-none': !!item.to }"
+                >
                   {{ item.title }}
-                </router-link>
+                </component>
               </template>
             </v-breadcrumbs>
           </v-row>
@@ -177,7 +183,7 @@
                 @click="openSidebar = true"
                 icon="mdi-menu"
                 variant="tonal"
-                class="mr-2"
+                class="mr-2 mb-4"
               />
             </div>
 
@@ -214,11 +220,28 @@ const navbarConfig = ref();
 
 const hasGrid = computed(() => !!gridStore.grid);
 
+// eslint-disable-next-line no-undef
+const permanent = ref(window.innerWidth > 980);
+const openSidebar = ref(permanent.value);
+
+function setSidebarOnResize() {
+  permanent.value =
+    window.innerWidth >
+    ($route.meta && "sidebarBreakpoint" in $route.meta && typeof $route.meta["sidebarBreakpoint"] === "number"
+      ? $route.meta.sidebarBreakpoint
+      : 980);
+  openSidebar.value = permanent.value;
+}
+
+window.addEventListener("resize", setSidebarOnResize);
+
 watch(
   () => $route.meta,
   meta => {
     (document.title = "Threefold Dashboard" + (meta && "title" in meta ? ` | ${meta.title}` : ``)),
       (navbarConfig.value = meta.navbarConfig);
+
+    setSidebarOnResize();
   },
 );
 function navigateToHome() {
@@ -286,12 +309,6 @@ const routes: AppRoute[] = [
         tooltip: "Deploy your orchestrator instances.",
       },
       {
-        title: "Dedicated Machines",
-        icon: "mdi-resistor-nodes",
-        route: DashboardRoutes.Deploy.DedicatedMachines,
-        tooltip: "Explore dedicated machines available on the ThreeFold grid.",
-      },
-      {
         title: "Applications",
         icon: "mdi-lightbulb-on-outline",
         route: DashboardRoutes.Deploy.Applications,
@@ -310,10 +327,10 @@ const routes: AppRoute[] = [
         tooltip: "Find or Publish your Flist on 0-Hub.",
       },
       {
-        title: "SSH Key",
+        title: "SSH Keys",
         icon: "mdi-key-plus",
         route: DashboardRoutes.Deploy.SSHKey,
-        tooltip: "Generate or update your SSH Key.",
+        tooltip: "Generate or update your SSH Keys.",
       },
     ],
   },
@@ -396,10 +413,6 @@ const routes: AppRoute[] = [
   },
 ];
 
-// eslint-disable-next-line no-undef
-const permanent = window.innerWidth > 980;
-const openSidebar = ref(permanent);
-
 const baseUrl = import.meta.env.BASE_URL;
 
 function clickHandler({ route, url }: AppRouteItem): void {
@@ -467,5 +480,18 @@ export default {
 <style>
 .clickable-logo:hover {
   cursor: pointer;
+}
+.v-theme--light .v-btn--disabled,
+.v-theme--dark .v-btn--disabled,
+.v-theme--light .v-field--disabled {
+  opacity: 0.5 !important;
+  pointer-events: none !important;
+}
+.v-theme--light .v-field--disabled {
+  background-color: #f0f0f0 !important;
+}
+.v-theme--light .v-btn--disabled,
+.v-theme--dark .v-btn--disabled {
+  color: #7b7b7b !important;
 }
 </style>

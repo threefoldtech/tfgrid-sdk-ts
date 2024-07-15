@@ -5,6 +5,9 @@
       <p v-else>Configure your SMTP Server.</p>
     </v-alert>
 
+    <v-alert variant="tonal" type="warning" class="mt-3">
+      SMTP functionality requires IPv4. Enabling SMTP will automatically activate IPv4.
+    </v-alert>
     <input-tooltip
       v-if="!persistent"
       inline
@@ -18,17 +21,20 @@
         :value="$props.modelValue.username"
         :rules="[
           validators.required('Email is required.'),
-          validators.isEmail('Please provide a valid email address.'),
+          v => {
+            return isDiscourse ? undefined : validators.isEmail('Please provide a valid email address.')(v);
+          },
         ]"
         #="{ props }"
       >
-        <input-tooltip tooltip="SMTP admin email.">
+        <input-tooltip :tooltip="isDiscourse ? 'SMTP admin email, Username or API key.' : 'SMTP admin email'">
           <v-text-field
             label="Admin Email"
             placeholder="email@example.com"
             v-model="$props.modelValue.username"
             v-bind="props"
             autofocus
+            class="mt-3"
           />
         </input-tooltip>
       </input-validator>
@@ -39,7 +45,7 @@
           :rules="[
             validators.required('Password is required.'),
             validators.minLength('Password must be at least 6 characters.', 6),
-            validators.maxLength('Password cannot exceed 15 characters.', 15),
+            validators.maxLength('Password cannot exceed 50 characters.', 50),
             validators.pattern('Password should not contain whitespaces.', {
               pattern: /^[^\s]+$/,
             }),
@@ -132,17 +138,21 @@ defineProps<{
   tls?: boolean;
   email?: boolean;
   persistent?: boolean;
+  isDiscourse?: boolean;
 }>();
 </script>
 
 <script lang="ts">
+import { useProfileManager } from "../stores";
 import type { SMTPServer } from "../types";
 import { generatePassword } from "../utils/strings";
+
+const profileManager = useProfileManager();
 
 export function createSMTPServer(options: Partial<SMTPServer> = {}): SMTPServer {
   return {
     enabled: options.enabled || false,
-    username: options.username || "",
+    username: profileManager.profile?.email || options.username || "",
     email: options.email || "",
     hostname: options.hostname || "smtp.gmail.com",
     port: options.port || 587,

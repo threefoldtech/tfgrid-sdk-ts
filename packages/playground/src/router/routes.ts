@@ -4,7 +4,6 @@ enum DeployRoutes {
   NodeFinder = "/deploy/node-finder/",
   VirtualMachines = "/deploy/virtual-machines/",
   Orchestrators = "/deploy/orchestrators/",
-  DedicatedMachines = "/deploy/dedicated-nodes/",
   Applications = "/deploy/applications/",
   YourContracts = "/deploy/your-contracts/",
   Images = "https://hub.grid.tf/",
@@ -53,6 +52,7 @@ enum OtherRoutes {
 enum ApplicationRoutes {
   BaseRoute = "/deploy/applications/",
   Peertube = "/deploy/applications/peertube/",
+  StaticWebsite = "/deploy/applications/static_website/",
   Funkwhale = "/deploy/applications/funkwhale/",
   Mattermost = "/deploy/applications/mattermost/",
   Discourse = "/deploy/applications/discourse/",
@@ -67,9 +67,10 @@ enum ApplicationRoutes {
   Wordpress = "/deploy/applications/wordpress/",
   Umbrel = "/deploy/applications/umbrel/",
   Freeflow = "/deploy/applications/freeflow/",
+  TFRobot = "/deploy/applications/tfrobot/",
 }
 
-export const DashboardRoutes = {
+const DashboardRoutes = {
   TFGrid: { ...TFGridRoutes },
   TFChain: { ...TFChainRoutes },
   Deploy: { ...DeployRoutes },
@@ -78,4 +79,16 @@ export const DashboardRoutes = {
   Other: { ...OtherRoutes },
   VirtualMachines: { ...VirtualMachinesRoutes },
   Orchestrators: { ...OrchestratorsRoutes },
-} as const;
+};
+
+export {
+  DashboardRoutes,
+  VirtualMachinesRoutes,
+  TFGridRoutes,
+  TFChainRoutes,
+  OtherRoutes,
+  OrchestratorsRoutes,
+  FarmRoutes,
+  DeployRoutes,
+  ApplicationRoutes,
+};

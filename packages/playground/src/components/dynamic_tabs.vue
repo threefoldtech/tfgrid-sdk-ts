@@ -8,11 +8,15 @@
         class="mr-2"
         :alt="tab.title"
         v-else-if="tab.imgPath"
-        :style="{ filter: `brightness(${$vuetify.theme.global.name === 'light' ? 0.2 : 1})` }"
+        :style="{
+          filter: `brightness(${$vuetify.theme.global.name === 'light' ? 0.2 : 1})`,
+        }"
       />
       {{ tab.title }}
+      <v-chip color="info" v-if="tab.workers && tab.workers > 0" class="ml-1">{{ tab.workers }}</v-chip>
       <v-chip color="info" v-if="forms[tabs.indexOf(tab)]?.pending" class="ml-1">
-        Validating <v-progress-circular class="ml-1" indeterminate size="15" width="3" />
+        Validating
+        <v-progress-circular class="ml-1" indeterminate size="20" width="2" />
       </v-chip>
       <v-chip color="error" v-else-if="forms[tabs.indexOf(tab)]?.invalid" class="ml-1">invalid</v-chip>
     </v-tab>
@@ -41,11 +45,14 @@ import { computed, ref, watch } from "vue";
 
 import { useFormRef } from "@/hooks/form_validator";
 
+import { useWebletLayoutServie } from "./weblet_layout.vue";
+
 export interface Tab {
   title: string;
   value: string;
   icon?: string;
   imgPath?: string;
+  workers?: number;
 }
 
 const props = defineProps<{
@@ -60,12 +67,17 @@ const emits = defineEmits<{
   (event: "tab:change", value: number): void;
 }>();
 
+const webletLayoutServie = useWebletLayoutServie();
 const forms = useFormRef(true);
 
 const activeTab = ref<number>(props.modelValue ?? 0);
 watch(activeTab, t => {
   emits("update:modelValue", t);
   emits("tab:change", t);
+});
+
+webletLayoutServie.set(forms.value, (tab: number) => {
+  activeTab.value = tab;
 });
 
 const valid = computed(() => forms.value.reduce((r, f) => r && (f.valid as unknown as boolean), true));

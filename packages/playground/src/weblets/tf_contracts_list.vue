@@ -4,22 +4,48 @@
     Error while listing contracts due: {{ loadingErrorMessage }}
   </v-alert>
 
+  <v-alert type="success" variant="tonal" class="mt-2 mb-4" v-if="loadingTablesMessage">
+    {{ loadingTablesMessage }}
+  </v-alert>
+
   <!-- Contracts List Card -->
-  <v-card variant="text" class="mb-4">
+  <v-card color="primary" class="d-flex justify-center items-center mb-4 pa-3 text-center">
+    <v-icon size="30" class="pr-3">mdi-file-document-edit</v-icon>
+    <v-card-title class="pa-0">Contracts List</v-card-title>
+  </v-card>
+  <v-card variant="text" class="my-3">
     <section class="d-flex align-center">
-      <v-card-title class="font-weight-bold d-flex align-center title ma-0 pa-0"> Contracts List </v-card-title>
       <v-spacer />
-      <v-btn prepend-icon="mdi-refresh" color="info" variant="outlined" :disabled="isLoading" @click="onMount">
+      <v-btn
+        v-if="lockedContracts?.totalAmountLocked && !isLoading"
+        class="mr-2"
+        color="warning"
+        @click="openUnlockDialog"
+        :loading="unlockContractLoading"
+      >
+        Unlock All
+      </v-btn>
+      <v-btn
+        prepend-icon="mdi-refresh"
+        color="info"
+        @click="
+          contractsTable.forEach(t => t.reset());
+          loadContracts();
+        "
+        :disabled="totalCost === undefined"
+      >
         refresh
       </v-btn>
     </section>
   </v-card>
 
   <!-- Total Cost Card -->
-  <v-card variant="tonal" :loading="totalCost === undefined" class="mb-3 bg-blue-primary-lighten-3">
+  <v-card :loading="totalCost === undefined" variant="tonal" class="mb-3 bg-blue-primary-lighten-3">
     <template #title>
       <v-row>
-        <v-col class="d-flex justify-start"> <p class="text-subtitle-1">Total cost of contracts</p> </v-col>
+        <v-col class="d-flex justify-start">
+          <p class="text-subtitle-1">Total cost of contracts</p>
+        </v-col>
       </v-row>
     </template>
     <template #text>
@@ -35,27 +61,116 @@
       <small v-else> loading total cost... </small>
     </template>
   </v-card>
-
+  <!-- locked amount Dialog -->
+  <v-dialog width="500" v-model="unlockDialog" v-if="lockedContracts?.totalAmountLocked">
+    <v-card>
+      <v-card-title class="bg-primary">
+        Unlock All Contracts
+        <v-tooltip text="Grace period contracts documentation" location="bottom right">
+          <template #activator="{ props }">
+            <v-btn
+              @click.stop
+              v-bind="props"
+              color="white"
+              variant="text"
+              icon="mdi-information-outline"
+              height="24px"
+              width="24px"
+              target="_blank"
+              :href="manual.contract_locking"
+            />
+          </template>
+        </v-tooltip>
+      </v-card-title>
+      <v-card-text>
+        <v-container>
+          <v-row v-if="loadingLockDetails" class="d-flex flex-column justify-center align-center py-4">
+            <v-progress-circular indeterminate />
+            <div class="text-subtitle-2 pt-2">Loading contracts lock details</div>
+          </v-row>
+          <v-row class="d-flex" v-else>
+            <v-alert class="ma-4" type="warning" variant="tonal">
+              <div v-if="lockedContracts?.totalAmountLocked < freeBalance" class="font-weigh-black">
+                You have enough balance to unlock your contracts; this will cost you around
+                {{ Math.ceil(lockedContracts?.totalAmountLocked) }} TFTs.
+              </div>
+              <div v-else>
+                You need to fund your account with
+                <span class="font-weight-black">
+                  {{ Math.ceil(lockedContracts?.totalAmountLocked - freeBalance) }}
+                  TFTs
+                </span>
+                to resume your contracts
+              </div>
+            </v-alert>
+          </v-row>
+        </v-container>
+      </v-card-text>
+      <v-card-actions class="justify-end my-1 mr-2">
+        <v-btn color="anchor" @click="unlockDialog = false"> Close </v-btn>
+        <v-tooltip
+          :text="
+            freeBalance < lockedContracts?.totalAmountLocked
+              ? `You don't have enough balance to unlock your contracts`
+              : `Get your contracts ready again`
+          "
+          location="top center"
+        >
+          <template #activator="{ props }">
+            <div v-bind="props">
+              <v-btn
+                :disabled="freeBalance < lockedContracts.totalAmountLocked || loadingLockDetails"
+                color="warning"
+                @click="unlockAllContracts"
+                :loading="unlockContractLoading"
+                class="ml-2"
+              >
+                Unlock contracts
+              </v-btn>
+            </div>
+          </template>
+        </v-tooltip>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
   <!-- Contracts Tables -->
   <v-expansion-panels v-model="panel" multiple>
     <v-expansion-panel class="mb-4" :elevation="3" v-for="(table, idx) of contractsTables" :key="idx">
-      <v-expansion-panel-title color="primary" style="height: 50px !important; min-height: 15px !important">
+      <v-expansion-panel-title color="primary" style="height: 40px !important; min-height: 15px !important">
         <v-icon size="24" class="pr-3">{{ table.icon }}</v-icon>
         <v-card-title class="pa-0 text-subtitle-1">
           <strong>{{ table.title }}</strong>
         </v-card-title>
       </v-expansion-panel-title>
-
       <v-expansion-panel-text>
         <!-- Contracts Table Component -->
         <contracts-table
+          ref="contractsTable"
           :node-status="nodeStatus"
           :loading="table.loading"
           :contracts="table.contracts"
+          :locked-contracts="lockedContracts !== undefined ? lockedContracts[`${table.type}Contracts`] : {}"
           :grid="table.grid"
           :contracts-type="table.type"
           :table-headers="table.headers"
+          :count="table.count"
+          :page="table.page"
+          :size="table.size"
+          @update:unlock-contracts="loadContracts"
           @update:deleted-contracts="onDeletedContracts"
+          @update:lock-details="getContractsLockDetails"
+          @update:page="
+            newPage => {
+              table.page.value = newPage;
+              loadContracts(table.type);
+            }
+          "
+          @update:size="
+            newSize => {
+              table.size.value = newSize;
+              loadContracts(table.type);
+            }
+          "
         />
       </v-expansion-panel-text>
     </v-expansion-panel>
@@ -63,126 +178,276 @@
 </template>
 
 <script lang="ts" setup>
-import type { GridClient } from "@threefold/grid_client";
-import type { NodeStatus } from "@threefold/gridproxy_client";
+import type { GridClient, LockContracts } from "@threefold/grid_client";
+import { type Contract, ContractState, NodeStatus } from "@threefold/gridproxy_client";
 import { Decimal } from "decimal.js";
 import { computed, defineComponent, onMounted, type Ref, ref } from "vue";
 
 import ContractsTable from "@/components/contracts_list/contracts_table.vue";
+import { useProfileManagerController } from "@/components/profile_manager_controller.vue";
 import { useProfileManager } from "@/stores/profile_manager";
 import type { VDataTableHeader } from "@/types";
 import {
   type ContractsTableType,
   ContractType,
-  getNodeStatus,
-  getUserContracts,
+  getNodeInfo,
+  normalizeContract,
   type NormalizedContract,
 } from "@/utils/contracts";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
-import { getGrid } from "@/utils/grid";
+import { manual } from "@/utils/manual";
 
-import { queryClient } from "../clients";
+import { gridProxyClient, queryClient } from "../clients";
+import { useGrid } from "../stores";
 
+const profileManagerController = useProfileManagerController();
+const balance = profileManagerController.balance;
+const freeBalance = computed(() => (balance.value?.free ?? 0) - (balance.value?.locked ?? 0));
 const isLoading = ref<boolean>(false);
+
 const profileManager = useProfileManager();
-const grid = ref<GridClient>();
+const gridStore = useGrid();
+const grid = gridStore.client as GridClient;
 
 const contracts = ref<NormalizedContract[]>([]);
+
 const nameContracts = ref<NormalizedContract[]>([]);
 const nodeContracts = ref<NormalizedContract[]>([]);
 const rentContracts = ref<NormalizedContract[]>([]);
+
 const loadingErrorMessage = ref<string>();
+const loadingTablesMessage = ref<string>();
+
 const totalCost = ref<number>();
 const totalCostUSD = ref<number>();
+const lockedContracts = ref<LockContracts>();
+const unlockDialog = ref<boolean>(false);
 
 const panel = ref<number[]>([0, 1, 2]);
-const nodeStatus = ref() as Ref<{ [x: number]: NodeStatus }>;
-
+const nodeInfo: Ref<{ [nodeId: number]: { status: NodeStatus; farmId: number } }> = ref({});
+const unlockContractLoading = ref<boolean>(false);
+const contractsTable = ref<(typeof ContractsTable)[]>([]);
+const loadingLockDetails = ref(false);
 // Computed property to get unique node IDs from contracts
 const nodeIDs = computed(() => {
-  const allNodes = contracts.value.map(contract => contract.nodeId);
-  return [...new Set(allNodes)];
+  return [...new Set(contracts.value.map(contract => contract.details.nodeId) || [])];
 });
+// To avoid multiple requests
+const cachedNodeIDs = ref<number[]>([]);
 
-onMounted(onMount);
+onMounted(loadContracts);
 
-async function onMount() {
-  contracts.value = nameContracts.value = nodeContracts.value = rentContracts.value = [];
-  isLoading.value = true;
+async function _normalizeContracts(
+  contracts: Contract[],
+  contractType: ContractType.Node | ContractType.Name | ContractType.Rent,
+): Promise<NormalizedContract[]> {
+  const normalizedContracts = await Promise.all(
+    contracts.map(async contract => {
+      try {
+        return await normalizeContract(grid, contract, contractType);
+      } catch (error) {
+        loadingErrorMessage.value = `Error normalizing contract: ${error}`;
+        throw new Error(loadingErrorMessage.value);
+      }
+    }),
+  );
+  return normalizedContracts.filter(Boolean) as NormalizedContract[];
+}
+
+async function loadContractsByType(
+  contractType: ContractType.Node | ContractType.Name | ContractType.Rent,
+  contractsRef: Ref<NormalizedContract[]>,
+) {
+  const table = contractsTables.find(table => table.type === contractType);
+  if (!table) {
+    loadingErrorMessage.value = `No table found for contract type: ${contractType}`;
+    throw new Error(loadingErrorMessage.value);
+  }
+
+  table.loading.value = true;
+  try {
+    const response = await gridProxyClient.contracts.list({
+      twinId: profileManager.profile!.twinId,
+      state: [ContractState.Created, ContractState.GracePeriod],
+      size: table.size.value,
+      page: table.page.value,
+      type: contractType,
+      retCount: true,
+    });
+
+    table.count.value = response.count ?? 0;
+    const normalizedContracts = await _normalizeContracts(response.data, contractType);
+    contractsRef.value = normalizedContracts;
+  } catch (error: any) {
+    loadingErrorMessage.value = `Error while listing ${contractType} contracts: ${error.message}`;
+    createCustomToast(loadingErrorMessage.value, ToastType.danger, {});
+  } finally {
+    table.loading.value = false;
+  }
+}
+
+async function loadContracts(type?: ContractType) {
   totalCost.value = undefined;
   totalCostUSD.value = undefined;
   loadingErrorMessage.value = undefined;
+  loadingTablesMessage.value = undefined;
+  nodeInfo.value = {};
+  contracts.value = [];
+  cachedNodeIDs.value = [];
 
-  if (profileManager.profile) {
-    const _grid = await getGrid(profileManager.profile);
-    if (_grid) {
-      grid.value = _grid;
-      try {
-        // Fetch user contracts, node status, and calculate total cost
-        contracts.value = await getUserContracts(grid.value);
-        nodeContracts.value = contracts.value.filter(c => c.type === ContractType.NODE);
-        nameContracts.value = contracts.value.filter(c => c.type === ContractType.NAME);
-        rentContracts.value = contracts.value.filter(c => c.type === ContractType.RENT);
-        nodeStatus.value = await getNodeStatus(nodeIDs.value);
-        totalCost.value = getTotalCost(contracts.value);
-        const TFTInUSD = await queryClient.tftPrice.get();
-        totalCostUSD.value = totalCost.value * (TFTInUSD / 1000);
-      } catch (error: any) {
-        // Handle errors and display toast messages
-        loadingErrorMessage.value = error.message;
-        createCustomToast(`Error while listing contracts due: ${error.message}`, ToastType.danger, {});
+  try {
+    if (type) {
+      switch (type) {
+        case ContractType.Name:
+          await loadContractsByType(ContractType.Name, nameContracts);
+          break;
+        case ContractType.Node:
+          await loadContractsByType(ContractType.Node, nodeContracts);
+          break;
+        case ContractType.Rent:
+          await loadContractsByType(ContractType.Rent, rentContracts);
+          break;
       }
     } else {
-      loadingErrorMessage.value = "Failed to initialize an instance of grid type.";
-      createCustomToast("Failed to initialize an instance of grid type.", ToastType.danger, {});
+      await Promise.all([
+        loadContractsByType(ContractType.Name, nameContracts),
+        loadContractsByType(ContractType.Node, nodeContracts),
+        loadContractsByType(ContractType.Rent, rentContracts),
+      ]);
     }
-  } else {
-    loadingErrorMessage.value =
-      "Failed to initialize an instance of the profile manager, please make sure that you have a stable connection.";
-    createCustomToast(
-      "Failed to initialize an instance of the profile manager, please make sure that you have a stable connection.",
-      ToastType.danger,
-      {},
-    );
-  }
+    await getContractsLockDetails();
+    contracts.value = [...nodeContracts.value, ...nameContracts.value, ...rentContracts.value];
 
-  // Update UI
-  isLoading.value = false;
+    // Update the total cost of the contracts.
+    await getTotalCost();
+    // Get the node info e.g. node status.
+    nodeInfo.value = await getNodeInfo(nodeIDs.value, cachedNodeIDs.value);
+    cachedNodeIDs.value.push(...nodeIDs.value);
+  } catch (error: any) {
+    loadingErrorMessage.value = `Error while loading contracts: ${error.message}`;
+    createCustomToast(loadingErrorMessage.value, ToastType.danger, {});
+  }
 }
 
-// Calculate the total cost of contracts
-function getTotalCost(contracts: NormalizedContract[]) {
-  totalCost.value = 0;
-  for (const contract of contracts) {
-    totalCost.value = +new Decimal(totalCost.value).add(contract.consumption);
+async function openUnlockDialog() {
+  loadingLockDetails.value = true;
+  unlockDialog.value = true;
+  try {
+    await getContractsLockDetails();
+    await profileManagerController.reloadBalance();
+  } catch (e) {
+    loadingErrorMessage.value = `Failed to get contracts lock details`;
+    createCustomToast(loadingErrorMessage.value, ToastType.danger, {});
+  } finally {
+    loadingLockDetails.value = false;
   }
-  return +totalCost.value.toFixed(3);
+}
+
+async function unlockAllContracts() {
+  try {
+    unlockContractLoading.value = true;
+    await grid.contracts.unlockMyContracts();
+    loadingTablesMessage.value =
+      "Your request to unlock your contracts has been processed successfully. Changes may take a few minutes to reflect";
+    createCustomToast(loadingTablesMessage.value, ToastType.info);
+    setTimeout(() => {
+      loadContracts();
+      loadingTablesMessage.value = undefined;
+    }, 30000);
+    unlockDialog.value = false;
+  } catch (e) {
+    loadingErrorMessage.value = `Failed to unlock contract your contracts`;
+    createCustomToast(loadingErrorMessage.value, ToastType.danger, {});
+  } finally {
+    unlockContractLoading.value = false;
+    unlockDialog.value = false;
+  }
+}
+
+const nodeStatus = computed(() => {
+  const statusObject: { [x: number]: NodeStatus } = {};
+  for (const nodeId in nodeInfo.value) {
+    if (Object.prototype.hasOwnProperty.call(nodeInfo.value, nodeId)) {
+      statusObject[nodeId] = nodeInfo.value[nodeId].status;
+    }
+  }
+  return statusObject;
+});
+
+// Calculate the total cost of contracts
+async function getTotalCost() {
+  totalCost.value = 0;
+  for (const contract of contracts.value) {
+    totalCost.value = +new Decimal(totalCost.value).add(contract.consumption?.valueOf() || 0);
+  }
+  totalCost.value = +totalCost.value.toFixed(3);
+  const TFTInUSD = await queryClient.tftPrice.get();
+  totalCostUSD.value = totalCost.value * (TFTInUSD / 1000);
 }
 
 // Handle updates when contracts are deleted
-function onDeletedContracts(_contracts: NormalizedContract[]) {
-  contracts.value = _contracts;
+async function onDeletedContracts(_contracts: NormalizedContract[]) {
+  if (_contracts.length) {
+    switch (_contracts[0].type) {
+      case ContractType.Name:
+        nameContracts.value = _contracts;
+        break;
+      case ContractType.Rent:
+        rentContracts.value = _contracts;
+        break;
+      case ContractType.Node:
+        nodeContracts.value = _contracts;
+        break;
+    }
+  }
+  loadingTablesMessage.value =
+    "The contracts have been successfully deleted. Please note that all tables will be reloaded in 30 seconds.";
+  createCustomToast(loadingTablesMessage.value, ToastType.info);
+  setTimeout(() => {
+    loadContracts();
+    loadingTablesMessage.value = undefined;
+  }, 30000);
+  await getTotalCost();
+  contracts.value = [...rentContracts.value, ...nameContracts.value, ...nodeContracts.value];
   totalCost.value = undefined;
-  totalCost.value = getTotalCost(contracts.value);
+}
+async function getContractsLockDetails() {
+  lockedContracts.value = await grid.contracts.getContractsLockDetails();
 }
 
 // Define base table headers for contracts tables
 const baseTableHeaders: VDataTableHeader = [
   { title: "PLACEHOLDER", key: "data-table-select" },
-  { title: "ID", key: "contractId" },
-  { title: "State", key: "state" },
+  { title: "ID", key: "contract_id" },
+  { title: "State", key: "state", sortable: false },
   { title: "Billing Rate", key: "consumption" },
-  { title: "Created At", key: "createdAt" },
+  { title: "Created At", key: "created_at" },
 ];
 
 // Define specific table headers for each contract type
 const nodeTableHeaders: VDataTableHeader = [
   ...baseTableHeaders,
-  { title: "Solution Type", key: "solutionType" },
-  { title: "Solution Name", key: "solutionName" },
+  {
+    title: "Solution",
+    key: "solution",
+    sortable: false,
+    children: [
+      { title: "Type", key: "solutionType", sortable: false },
+      { title: "Name", key: "solutionName", sortable: false },
+    ],
+  },
+  { title: "Type", key: "deploymentType", sortable: false },
   { title: "Expiration", key: "expiration" },
-  { title: "Node ID", key: "nodeId" },
-  { title: "Node Status", key: "nodeStatus", sortable: false },
+  { title: "Farm ID", key: "farmId" },
+  {
+    title: "Node",
+    key: "node",
+    sortable: false,
+    children: [
+      { title: "ID", key: "nodeId" },
+      { title: "Status", key: "nodeStatus", sortable: false },
+    ],
+  },
   { title: "Details", key: "actions", sortable: false },
 ];
 
@@ -195,8 +460,16 @@ const nameTableHeaders: VDataTableHeader = [
 
 const RentTableHeaders: VDataTableHeader = [
   ...baseTableHeaders,
-  { title: "Node ID", key: "nodeId" },
-  { title: "Node Status", key: "nodeStatus", sortable: false },
+  { title: "Farm ID", key: "farmId" },
+  {
+    title: "Node",
+    key: "node",
+    sortable: false,
+    children: [
+      { title: "ID", key: "nodeId" },
+      { title: "Status", key: "nodeStatus", sortable: false },
+    ],
+  },
   { title: "Details", key: "actions", sortable: false },
 ];
 
@@ -204,30 +477,39 @@ const RentTableHeaders: VDataTableHeader = [
 const contractsTables: ContractsTableType[] = [
   {
     headers: nodeTableHeaders,
-    type: ContractType.NODE,
+    type: ContractType.Node,
     contracts: nodeContracts,
     icon: "mdi-file",
     title: "Node Contracts",
     grid: grid,
-    loading: isLoading,
+    loading: ref(false),
+    count: ref(0),
+    page: ref(1),
+    size: ref(5),
   },
   {
     headers: nameTableHeaders,
-    type: ContractType.NAME,
+    type: ContractType.Name,
     contracts: nameContracts,
     icon: "mdi-note-edit-outline",
     title: "Name Contracts",
     grid: grid,
-    loading: isLoading,
+    loading: ref(false),
+    count: ref(0),
+    page: ref(1),
+    size: ref(5),
   },
   {
     headers: RentTableHeaders,
-    type: ContractType.RENT,
+    type: ContractType.Rent,
     contracts: rentContracts,
     icon: "mdi-newspaper-variant",
     title: "Rent Contracts",
     grid: grid,
-    loading: isLoading,
+    loading: ref(false),
+    count: ref(0),
+    page: ref(1),
+    size: ref(5),
   },
 ];
 </script>

@@ -22,7 +22,7 @@ export interface ContractsQuery {
   nodeId: number;
   name: string;
   type: ContractType;
-  state: ContractState;
+  state: ContractState[];
   deploymentData: string;
   deploymentHash: string;
   numberOfPublicIps: number;
@@ -56,8 +56,13 @@ const CONTRACTS_VALIDATOR: BuilderValidator<ContractsQuery> = {
     assertIn(value, [ContractType.Name, ContractType.Node, ContractType.Rent]);
   },
   state(value) {
-    assertString(value);
-    assertIn(value, [ContractState.Created, ContractState.GracePeriod, ContractState.Deleted]);
+    if (!Array.isArray(value)) {
+      throw new Error("Invalid state format. Must be an array of ContractState enums.");
+    }
+    value.forEach(item => {
+      assertString(item);
+      assertIn(item, [ContractState.Created, ContractState.GracePeriod, ContractState.Deleted]);
+    });
   },
   deploymentData: assertString,
   deploymentHash: assertString,

@@ -1,5 +1,5 @@
 <template>
-  <section>
+  <section class="mt-4">
     <template v-if="!disableNodeSelection">
       <h3 class="bg-primary pa-2 text-h6 rounded">Node Selection</h3>
       <p class="text-h6 mb-4 mt-2 ml-2">Choose a way to select Node</p>
@@ -16,26 +16,28 @@
         </InputTooltip>
       </v-radio-group>
 
-      <template v-if="wayToSelect === 'automated'">
-        <TfSelectLocation v-model="location" title="Choose a Location" :status="NodeStatus.Up" />
-        <TfSelectFarm :valid-filters="validFilters" :filters="filters" :location="location" v-model="farm" />
-        <TfAutoNodeSelector
+      <div ref="input">
+        <template v-if="wayToSelect === 'automated'">
+          <TfSelectLocation v-model="location" title="Choose a Location" :status="NodeStatus.Up" />
+          <TfSelectFarm :valid-filters="validFilters" :filters="filters" :location="location" v-model="farm" />
+          <TfAutoNodeSelector
+            :valid-filters="validFilters"
+            :filters="filters"
+            :location="location"
+            :farm="farm"
+            v-model="node"
+            v-model:status="nodeStatus"
+          />
+        </template>
+
+        <TfManualNodeSelector
           :valid-filters="validFilters"
           :filters="filters"
-          :location="location"
-          :farm="farm"
           v-model="node"
           v-model:status="nodeStatus"
+          v-else
         />
-      </template>
-
-      <TfManualNodeSelector
-        :valid-filters="validFilters"
-        :filters="filters"
-        v-model="node"
-        v-model:status="nodeStatus"
-        v-else
-      />
+      </div>
 
       <VExpandTransition>
         <TfSelectGpu
@@ -55,6 +57,7 @@
         :hide-title="$props.disableNodeSelection"
         v-model="domain"
         v-model:status="domainStatus"
+        :use-fqdn="$props.useFqdn"
         v-if="requireDomain"
       />
     </VExpandTransition>
@@ -102,12 +105,14 @@ export default {
     requireDomain: Boolean,
     disableNodeSelection: { type: Boolean, default: () => false },
     status: String as PropType<ValidatorStatus>,
+    useFqdn: Boolean,
   },
   emits: {
     "update:model-value": (value: SelectionDetails) => true || value,
     "update:status": (value: ValidatorStatus) => true || value,
   },
   setup(props, ctx) {
+    const input = ref<HTMLElement>();
     const filtersValidator = computed(() => createSelectionDetailsFiltersValidator(props.filtersValidators));
     const validFilters = computed(() => filtersValidator.value.safeParse(props.filters).success);
 
@@ -147,10 +152,12 @@ export default {
       reset: noop,
       status: ValidatorStatus.Init,
       error: null,
+      $el: input,
+      highlightOnError: true,
     };
 
-    onMounted(() => form?.register(uid, fakeService));
-    onUnmounted(() => form?.unregister(uid));
+    onMounted(() => form?.register(uid.toString(), fakeService));
+    onUnmounted(() => form?.unregister(uid.toString()));
 
     const invalid = computed(() => {
       return (
@@ -186,7 +193,8 @@ export default {
     watch(
       status,
       status => {
-        form?.updateStatus(uid, status);
+        fakeService.status = status;
+        form?.updateStatus(uid.toString(), status);
         bindStatus(status);
       },
       { deep: true, immediate: true },
@@ -202,6 +210,7 @@ export default {
     }
 
     return {
+      input,
       validFilters,
       ValidatorStatus,
       wayToSelect,

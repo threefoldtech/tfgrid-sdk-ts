@@ -17,7 +17,7 @@
         </template>
       </v-tooltip>
 
-      <v-dialog transition="dialog-bottom-transition" v-model="showDialog" max-width="500px">
+      <v-dialog transition="dialog-bottom-transition" v-model="showDialog">
         <v-card>
           <v-card-title style="color: #ffcc00; font-weight: bold">Failed Deployments</v-card-title>
           <v-divider color="#FFCC00" />
@@ -49,8 +49,8 @@
               </template>
             </li>
           </v-card-text>
-          <v-card-actions class="justify-end">
-            <v-btn @click="showDialog = false" variant="outlined" color="anchor">Close</v-btn>
+          <v-card-actions class="justify-end my-1 mr-2">
+            <v-btn @click="showDialog = false" color="anchor">Close</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -59,17 +59,30 @@
     <AccessDeploymentAlert />
 
     <InputTooltip tooltip="Didn't find your deployments in the list? Enable to show all deployments." inline>
-      <VSwitch inset color="primary" label="Show All Deployments" v-model="showAllDeployments" />
+      <VSwitch
+        inset
+        color="primary"
+        label="Show All Deployments"
+        @update:model-value="loadDeployments"
+        v-model="showAllDeployments"
+      />
     </InputTooltip>
 
     <ListTable
       :headers="[
         { title: 'PLACEHOLDER', key: 'data-table-select' },
         { title: 'Name', key: 'name' },
-        { title: 'Public IPv4', key: 'ipv4', sortable: false },
-        { title: 'Public IPv6', key: 'ipv6', sortable: false },
-        { title: 'Planetary Network IP', key: 'planetary', sortable: false },
-        { title: 'Mycelium Network IP', key: 'mycelium', sortable: false },
+        {
+          title: 'Networks',
+          key: 'networks',
+          sortable: false,
+          children: [
+            { title: 'Public IPv4', key: 'ipv4', sortable: false },
+            { title: 'Public IPv6', key: 'ipv6', sortable: false },
+            { title: 'Planetary IP', key: 'planetary', sortable: false },
+            { title: 'Mycelium IP', key: 'mycelium', sortable: false },
+          ],
+        },
         { title: 'Workers', key: 'workersLength' },
         { title: 'Billing Rate', key: 'billing' },
         { title: 'Created At', key: 'created' },
@@ -85,31 +98,29 @@
       :sort-by="sortBy"
     >
       <template #[`item.created`]="{ item }">
-        {{ toHumanDate(item.value.masters[0].created) }}
+        {{ toHumanDate(item.masters[0].created) }}
       </template>
 
       <template #[`item.mycelium`]="{ item }">
-        {{ item.value.myceliumIP || "-" }}
+        {{ item.masters[0].myceliumIP || "-" }}
       </template>
 
       <template #[`item.status`]="{ item }">
-        <v-chip :color="getNodeHealthColor(item.value.masters[0].status as string).color">
-          <v-tooltip v-if="item.value.masters[0].status == NodeHealth.Error" activator="parent" location="top">{{
-            item.value.masters[0].message
+        <v-chip :color="getNodeHealthColor(item.masters[0].status as string).color">
+          <v-tooltip v-if="item.masters[0].status == NodeHealth.Error" activator="parent" location="top">{{
+            item.masters[0].message
           }}</v-tooltip>
-          <v-tooltip v-if="item.value.masters[0].status == NodeHealth.Paused" activator="parent" location="top"
+          <v-tooltip v-if="item.masters[0].status == NodeHealth.Paused" activator="parent" location="top"
             >The deployment contract is in grace period</v-tooltip
           >
           <span class="text-uppercase">
-            {{ getNodeHealthColor(item.value.masters[0].status as string).type }}
+            {{ getNodeHealthColor(item.masters[0].status as string).type }}
           </span>
         </v-chip>
       </template>
 
       <template #[`item.actions`]="{ item }">
-        <v-chip color="error" variant="tonal" v-if="deleting && ($props.modelValue || []).includes(item.value)">
-          Deleting...
-        </v-chip>
+        <v-chip color="error" v-if="deleting && ($props.modelValue || []).includes(item.value)"> Deleting... </v-chip>
         <v-btn-group variant="tonal" v-else>
           <slot name="actions" :item="item"></slot>
         </v-btn-group>
@@ -141,7 +152,7 @@ import { getNodeHealthColor, NodeHealth } from "@/utils/get_nodes";
 import { useProfileManager } from "../stores";
 import { getGrid, updateGrid } from "../utils/grid";
 import { markAsFromAnotherClient } from "../utils/helpers";
-import { loadK8s, mergeLoadedDeployments } from "../utils/load_deployment";
+import { type K8S, type LoadedDeployments, loadK8s, mergeLoadedDeployments } from "../utils/load_deployment";
 const profileManager = useProfileManager();
 const showDialog = ref(false);
 const showEncryption = ref(false);
@@ -166,11 +177,14 @@ async function loadDeployments() {
   const grid = await getGrid(profileManager.profile!, props.projectName);
   const chunk1 = await loadK8s(grid!);
   const chunk2 = await loadK8s(updateGrid(grid!, { projectName: props.projectName.toLowerCase() }));
-  const chunk3 = await loadK8s(updateGrid(grid!, { projectName: "" }));
+  let chunk3: LoadedDeployments<K8S> = { count: 0, items: [], failedDeployments: [] };
 
-  chunk3.items = chunk3.items.map(i => {
-    return !i.projectName || i.projectName === "Kubernetes" ? markAsFromAnotherClient(i) : i;
-  });
+  if (showAllDeployments.value) {
+    chunk3 = await loadK8s(updateGrid(grid!, { projectName: "" }));
+    chunk3.items = chunk3.items.map(i => {
+      return !i.projectName || i.projectName === "Kubernetes" ? markAsFromAnotherClient(i) : i;
+    });
+  }
 
   const clusters = mergeLoadedDeployments(chunk1, chunk2, chunk3);
   failedDeployments.value = clusters.failedDeployments;
@@ -178,9 +192,9 @@ async function loadDeployments() {
   count.value = clusters.count;
   items.value = clusters.items.map((item: any) => {
     item.name = item.deploymentName;
-    item.ipv4 = item.masters[0].publicIP?.ip?.split("/")?.[0] || item.masters[0].publicIP?.ip || "None";
-    item.ipv6 = item.masters[0].publicIP?.ip6 || "None";
-    item.planetary = item.masters[0].planetary || "None";
+    item.ipv4 = item.masters[0].publicIP?.ip?.split("/")?.[0] || item.masters[0].publicIP?.ip || "-";
+    item.ipv6 = item.masters[0].publicIP?.ip6.replace(/\/64$/, "") || "-";
+    item.planetary = item.masters[0].planetary || "-";
     item.workersLength = item.workers.length;
     item.billing = item.masters[0].billing;
     item.created = item.masters[0].created;

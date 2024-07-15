@@ -17,6 +17,8 @@ export interface RouteMeta {
   info?: InfoMeta;
   publicPath?: boolean;
   requireSSH?: boolean;
+  sidebarBreakpoint?: number;
+  filtersCollapsibleBreakpoint?: number;
 }
 
 /**
@@ -339,6 +341,29 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
         },
       },
     },
+
+    {
+      path: DashboardRoutes.Applications.StaticWebsite,
+      component: () => import("../views/staticwebsite_view.vue"),
+      meta: {
+        title: "Static Website",
+        info: { page: "info/static_website.md" },
+        navbarConfig: {
+          back: true,
+          path: [
+            { title: "Deploy" },
+            {
+              title: "Applications",
+              disabled: false,
+              to: DashboardRoutes.Deploy.Applications,
+            },
+            {
+              title: "Static Website",
+            },
+          ],
+        },
+      },
+    },
     // Commented for now and will be user later.
     // {
     //   path: DashboardRoutes.Applications.Freeflow,
@@ -362,6 +387,28 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
     //     },
     //   },
     // },
+    {
+      path: DashboardRoutes.Applications.TFRobot,
+      component: () => import("../views/tfrobot_view.vue"),
+      meta: {
+        title: "TFRobot",
+        info: { page: "info/tfrobot.md" },
+        navbarConfig: {
+          back: true,
+          path: [
+            { title: "Deploy" },
+            {
+              title: "Applications",
+              disabled: false,
+              to: DashboardRoutes.Deploy.Applications,
+            },
+            {
+              title: "TFRobot",
+            },
+          ],
+        },
+      },
+    },
   ];
 }
 
@@ -403,7 +450,7 @@ function createTFFarmsRoutes(): RouteRecordRaw[] {
         {
           path: DashboardRoutes.Farms.FarmFinder,
           component: () => import("@/views/farms.vue"),
-          meta: { title: "Farm Finder", publicPath: true },
+          meta: { title: "Farm Finder", publicPath: true, sidebarBreakpoint: 1000, filtersCollapsibleBreakpoint: 1350 },
         },
         {
           path: DashboardRoutes.Farms.Simulator,
@@ -469,13 +516,13 @@ function createDeployRoutes(): RouteRecordRaw[] {
       children: [
         {
           path: DashboardRoutes.Deploy.PricingCalculator,
-          component: () => import("../calculator/resource_pricing.vue"),
+          component: () => import("../calculator/pricing_calculator.vue"),
           meta: { title: "Resource Pricing", publicPath: true },
         },
         {
           path: DashboardRoutes.Deploy.NodeFinder,
           component: () => import("@/views/nodes.vue"),
-          meta: { title: "Nodes", publicPath: true },
+          meta: { title: "Nodes", publicPath: true, sidebarBreakpoint: 1150, filtersCollapsibleBreakpoint: 850 },
         },
         {
           path: DashboardRoutes.Deploy.VirtualMachines,
@@ -590,12 +637,6 @@ function createDeployRoutes(): RouteRecordRaw[] {
               },
             },
           ],
-        },
-
-        {
-          path: DashboardRoutes.Deploy.DedicatedMachines,
-          component: () => import("../dashboard/dedicated_nodes_view.vue"),
-          meta: { title: "Dedicated Nodes" },
         },
 
         {

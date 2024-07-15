@@ -1,10 +1,11 @@
 <template>
   <view-layout>
-    <h2 class="mb-4 text-capitalize">Grid Minting Explorer</h2>
-    <v-alert variant="tonal" type="warning" class="mb-4 pa-2">
-      <p>All data subject to change</p>
-    </v-alert>
-    <v-form @submit.prevent="mintingHash()" class="d-inline-flex w-100">
+    <v-card color="primary" class="d-flex justify-center items-center mb-4 pa-3 text-center">
+      <v-icon size="30" class="pr-3">mdi-file-document-edit</v-icon>
+      <v-card-title class="pa-0">TF Minting Reports</v-card-title>
+    </v-card>
+    <v-alert variant="tonal" type="warning" class="mb-4"> All data subject to change </v-alert>
+    <v-form class="d-inline-flex w-100">
       <FormValidator v-model="isValidForm">
         <InputValidator
           :value="receiptHash"
@@ -13,6 +14,7 @@
             validators.equal('Receipt hash must be 64 characters long.', 64),
             validators.isHash('Invalid hash', 'sha256'),
           ]"
+          :asyncRules="[mintingHash()]"
           #="{ props: validationProps }"
           ref="hashInput"
         >
@@ -22,14 +24,15 @@
             v-model="receiptHash"
             v-bind="{ ...validationProps }"
             :loading="loading"
+            @update:modelValue="reset"
         /></InputValidator>
-
-        <VBtn type="submit" color="secondary" variant="outlined" :disabled="!isValidForm" :loading="loading">
-          View
-        </VBtn>
       </FormValidator>
     </v-form>
     <v-container class="mt-8" v-if="item && item.Minting">
+      <VAlert type="info" class="mb-10">
+        For more information about Minting Receipts check,
+        <a class="app-link" target="_blank" :href="manual.minting_receipts" v-text="'Minting Receipts'" />
+      </VAlert>
       <v-card>
         <v-card-title class="font-weight-bold bg-primary">Node Info</v-card-title>
         <v-list class="custom-list">
@@ -175,26 +178,22 @@
         </v-list>
       </v-card>
     </v-container>
-
-    <v-alert type="error" variant="tonal" class="mt-2 mb-4" v-if="noData">
-      {{ noData }}
-    </v-alert>
   </view-layout>
 </template>
 
 <script lang="ts" setup>
 import { ref } from "vue";
 
+import type { AsyncRule, RuleReturn } from "@/components/input_validator.vue";
 import { useInputRef } from "@/hooks/input_validator";
+import { manual } from "@/utils/manual";
 
-import { normalizeError } from "../utils/helpers";
 import { getMintingData } from "../utils/mintings";
 
 const receiptHash = ref();
 const isValidForm = ref(false);
 const hashInput = useInputRef();
 const loading = ref(false);
-const noData = ref<string | null>(null);
 const item = ref();
 const mintNodeInfoHeaders = ["ID", "Farm", "Measured Uptime"];
 const fixupNodeInfoHeaders = ["ID", "Farm"];
@@ -205,18 +204,22 @@ const fixupPayoutHeaders = ["TFT Received", "TFT Owed", "Additional TFT Minted",
 
 function reset() {
   item.value = null;
-  noData.value = null;
 }
-async function mintingHash() {
-  loading.value = true;
-  reset();
-  try {
-    item.value = await getMintingData(receiptHash.value);
-  } catch (e) {
-    noData.value = normalizeError(e, "Something went wrong while fetching data.");
-  } finally {
-    loading.value = false;
-  }
+function mintingHash(): AsyncRule {
+  const asyncValidator: AsyncRule = async (): Promise<RuleReturn> => {
+    loading.value = true;
+    reset();
+    try {
+      item.value = await getMintingData(receiptHash.value);
+      return { message: "" };
+    } catch (e) {
+      return { message: "Receipt not found." };
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  return asyncValidator;
 }
 </script>
 

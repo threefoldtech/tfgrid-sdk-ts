@@ -1,7 +1,7 @@
 <template>
   <v-tooltip location="left" :text="tooltip">
     <template #activator="{ props }">
-      <v-btn v-bind="props" icon="mdi-information-outline" @click="setOpenInfo(true)" />
+      <v-btn v-bind="props" variant="tonal" color="anchor" icon="mdi-information-outline" @click="setOpenInfo(true)" />
     </template>
   </v-tooltip>
 
@@ -12,7 +12,7 @@
     scrollable
   >
     <v-card v-if="loading" class="d-flex justify-center align-center pa-10">
-      <v-progress-circular indeterminate size="50" color="primary" />
+      <v-progress-circular indeterminate />
     </v-card>
     <v-card v-else class="markdown">
       <v-card-title class="font-weight-bold d-flex align-center text-h5 my-2" v-if="title">
@@ -24,7 +24,7 @@
 
       <v-divider class="mb-2" />
       <v-card-actions class="d-flex justify-end">
-        <v-btn color="anchor" variant="outlined" @click="setOpenInfo(false)">Close</v-btn>
+        <v-btn color="anchor" class="mr-2 my-1" @click="setOpenInfo(false)">Close</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

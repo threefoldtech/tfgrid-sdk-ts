@@ -21,7 +21,7 @@
       :tabs="[
         { title: 'Config', value: 'config' },
         { title: 'Leader', value: 'leader' },
-        { title: 'Workers', value: 'workers' },
+        { title: 'Workers', value: 'workers', workers: workers.length },
       ]"
       ref="tabs"
     >
@@ -49,13 +49,7 @@
 
           <p class="font-weight-bold mt-4">
             If you don't know what the Captain root domain is, make sure to read the
-            <a
-              target="_blank"
-              href="https://www.manual.grid.tf/documentation/dashboard/solutions/caprover.html"
-              :style="{ color: 'inherit' }"
-            >
-              quick start documentation.
-            </a>
+            <a target="_blank" :href="manual.caprover" :style="{ color: 'inherit' }"> quick start documentation. </a>
           </p>
         </v-alert>
 
@@ -77,6 +71,8 @@
             </input-tooltip>
           </input-validator>
         </password-input-wrapper>
+
+        <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
       </template>
 
       <template #leader>
@@ -90,8 +86,8 @@
       </template>
     </d-tabs>
 
-    <template #footer-actions>
-      <v-btn color="secondary" variant="outlined" @click="deploy" :disabled="tabs?.invalid"> Deploy </v-btn>
+    <template #footer-actions="{ validateBeforeDeploy }">
+      <v-btn color="secondary" @click="validateBeforeDeploy(deploy)" text="Deploy" />
     </template>
   </weblet-layout>
 </template>
@@ -99,11 +95,12 @@
 <script lang="ts" setup>
 import { ref } from "vue";
 
+import { manual } from "@/utils/manual";
+
 import { useLayout } from "../components/weblet_layout.vue";
-import { useProfileManager } from "../stores";
+import { useGrid, useProfileManager } from "../stores";
 import { type CaproverWorker as CW, ProjectName } from "../types";
 import { deployVM, type Env, type Machine } from "../utils/deploy_vm";
-import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
 import { generateName, generatePassword } from "../utils/strings";
 
@@ -114,6 +111,9 @@ const domain = ref("");
 const password = ref(generatePassword(10));
 const leader = ref(createWorker(generateName({ prefix: "cr" })));
 const workers = ref<CW[]>([]);
+const selectedSSHKeys = ref("");
+const gridStore = useGrid();
+const grid = gridStore.client as GridClient;
 
 async function deploy() {
   layout.value.setStatus("deploy");
@@ -122,7 +122,7 @@ async function deploy() {
 
   try {
     layout.value?.validateSSH();
-    const grid = await getGrid(profileManager.profile!, projectName);
+    updateGrid(grid, { projectName });
 
     await layout.value.validateBalance(grid!);
 
@@ -134,14 +134,14 @@ async function deploy() {
           { key: "SWM_NODE_MODE", value: "leader" },
           { key: "CAPROVER_ROOT_DOMAIN", value: domain.value },
           { key: "CAPTAIN_IMAGE_VERSION", value: "latest" },
-          { key: "PUBLIC_KEY", value: profileManager.profile!.ssh },
+          { key: "PUBLIC_KEY", value: selectedSSHKeys.value },
           { key: "DEFAULT_PASSWORD", value: password.value },
           { key: "CAPTAIN_IS_DEBUG", value: "true" },
         ]),
         ...workers.value.map(worker =>
           normalizeCaproverWorker(worker, [
             { key: "SWM_NODE_MODE", value: "worker" },
-            { key: "PUBLIC_KEY", value: profileManager.profile!.ssh },
+            { key: "PUBLIC_KEY", value: selectedSSHKeys.value },
           ]),
         ),
       ],
@@ -183,14 +183,22 @@ function normalizeCaproverWorker(worker: CW, envs: Env[]): Machine {
     certified: worker.certified,
   };
 }
+
+function updateSSHkeyEnv(selectedKeys: string) {
+  selectedSSHKeys.value = selectedKeys;
+}
 </script>
 
 <script lang="ts">
+import type { GridClient } from "@threefold/grid_client";
+
 import { createNetwork } from "@/utils/deploy_helpers";
 
 import CaproverWorker, { createWorker } from "../components/caprover_worker.vue";
 import ExpandableLayout from "../components/expandable_layout.vue";
+import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";
+import { updateGrid } from "../utils/grid";
 import rootFs from "../utils/root_fs";
 
 export default {
@@ -198,6 +206,7 @@ export default {
   components: {
     CaproverWorker,
     ExpandableLayout,
+    ManageSshDeployemnt,
   },
 };
 </script>

@@ -1,30 +1,17 @@
 <template>
-  <div class="border px-4 pb-4 rounded position-relative mt-10" :class="{ 'pt-10': hasInfo, 'pt-6': !hasInfo }">
+  <div class="border px-4 pb-4 rounded position-relative pt-3 mt-1" ref="viewLayoutContainer">
     <div
-      class="mb-6"
       :style="{ opacity: $vuetify.theme.name === 'dark' ? 'var(--v-medium-emphasis-opacity)' : '' }"
       v-if="$slots.description"
     />
 
-    <div
-      class="position-absolute pa-1 rounded-circle border"
-      :style="{
-        top: 0,
-        right: '16px',
-        transform: 'translateY(-50%)',
-        zIndex: 99,
-        backgroundColor: 'rgb(var(--v-theme-background))',
-      }"
-      v-if="hasInfo"
-    >
-      <AppInfo />
-    </div>
-
     <template v-if="requireSSH && !ssh">
-      <VAlert variant="tonal" type="error" :text="title + ' requires public ssh key.'" class="mb-4" />
-      <SshkeyView />
+      <VAlert variant="tonal" type="error" class="mb-4">
+        {{ title }} requires a public SSH key. You can generate or import it from the
+        <router-link :to="DashboardRoutes.Deploy.SSHKey">SSH Keys</router-link> page.
+      </VAlert>
     </template>
-    <slot v-else />
+    <slot v-else :key="tick" />
 
     <div class="mt-4" v-if="$slots.list">
       <slot name="list" />
@@ -33,26 +20,43 @@
 </template>
 
 <script lang="ts">
-import { computed } from "vue";
+import { computed, onMounted, onUnmounted, ref } from "vue";
 import { useRoute } from "vue-router";
 
+import { DashboardRoutes } from "@/router/routes";
 import { useProfileManager } from "@/stores";
-import SshkeyView from "@/views/sshkey_view.vue";
-
-import AppInfo from "./app_info.vue";
 
 export default {
   name: "ViewLayout",
-  components: { AppInfo, SshkeyView },
   setup() {
     const route = useRoute();
     const profileManager = useProfileManager();
+    const viewLayoutContainer = ref<HTMLElement>();
+    const tick = ref(0);
+
+    function reRender(e: Event) {
+      e.stopPropagation();
+      tick.value++;
+    }
+
+    onMounted(() => {
+      if (viewLayoutContainer.value) {
+        viewLayoutContainer.value?.addEventListener("render:solution", reRender);
+      }
+    });
+
+    onUnmounted(() => {
+      viewLayoutContainer.value?.removeEventListener("render:solution", reRender);
+    });
 
     return {
       title: computed(() => route.meta.title),
       hasInfo: computed(() => profileManager.profile && route.meta.info),
       ssh: computed(() => profileManager.profile?.ssh),
       requireSSH: computed(() => route.meta.requireSSH),
+      tick,
+      viewLayoutContainer,
+      DashboardRoutes,
     };
   },
 };

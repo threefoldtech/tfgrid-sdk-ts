@@ -16,9 +16,19 @@ import type {
   SelectionDetailsFilters,
   SelectionDetailsFiltersValidators,
 } from "../types/nodeSelector";
+import { createCustomToast, ToastType } from "./custom_toast";
 import { normalizeError } from "./helpers";
 
-export async function getLocations(status?: NodeStatus): Promise<Locations> {
+export interface GetLocationsConfig {
+  /**
+   * @default true
+   */
+  onlyWithNodes?: boolean;
+}
+
+export async function getLocations(status?: NodeStatus, config: GetLocationsConfig = {}): Promise<Locations> {
+  const { onlyWithNodes = true } = config;
+
   const countries = await gqlClient.countries({
     name: true,
     region: true,
@@ -49,7 +59,8 @@ export async function getLocations(status?: NodeStatus): Promise<Locations> {
         country.name = con.name;
       }
     });
-    if (allowedCountriesList.includes(country.name)) {
+
+    if (allowedCountriesList.includes(country.name) || !onlyWithNodes) {
       const region = country.region !== "unknown region" ? country.region : country.subregion;
       locations[region] = locations[region] || [];
       locations[region].push(country.name);
@@ -93,6 +104,7 @@ export function normalizeFarmFilters(
     publicIp: filters.ipv4 || undefined,
     nodeCertified: filters.certified || undefined,
     nodeHasGPU: filters.hasGPU || undefined,
+    nodeHasIPv6: filters.ipv6 || undefined,
   };
 }
 
@@ -184,6 +196,7 @@ export function normalizeNodeFilters(
         (filters.solutionDisk ?? 0) + (filters.rootFilesystemSize ?? 0),
       ) || undefined,
     publicIPs: filters.ipv4 || undefined,
+    hasIPv6: filters.ipv6 || undefined,
     hasGPU: filters.hasGPU || undefined,
     rentedBy: filters.dedicated ? options.twinId : undefined,
     certified: filters.certified || undefined,
@@ -199,6 +212,36 @@ export function loadNodes(gridStore: ReturnType<typeof useGrid>, filters: Filter
   return gridStore.client.capacity.filterNodes(filters);
 }
 
+export async function validateRentContract(
+  gridStore: ReturnType<typeof useGrid>,
+  node: NodeInfo | undefined | null,
+): Promise<true> | never {
+  if (!node || !node.nodeId) {
+    throw "Node ID is required.";
+  }
+
+  try {
+    if (node.rentContractId !== 0) {
+      const contractInfo = await gridStore.grid.contracts.get({
+        id: node.rentContractId,
+      });
+      if (contractInfo.state.gracePeriod) {
+        createCustomToast(
+          `You can't deploy on node ${node.nodeId}, its rent contract is in grace period.`,
+          ToastType.danger,
+        );
+      }
+    }
+
+    return true;
+  } catch (error) {
+    const err = normalizeError(
+      error,
+      "Something went wrong while checking status of the node. Please check your connection and try again.",
+    );
+    throw err;
+  }
+}
 export async function loadValidNodes(
   gridStore: ReturnType<typeof useGrid>,
   selectionFitlers: SelectionDetailsFilters,

@@ -340,7 +340,7 @@ class GetServiceContractModel {
   @Expose() @IsInt() @Min(1) serviceId: number;
 }
 class NameContractGetModel {
-  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
+  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength + 20) name: string;
 }
 
 class NodeContractUpdateModel {
@@ -593,6 +593,7 @@ class FilterOptions {
   @Expose() @IsOptional() @Min(0) sru?: number; // GB
   @Expose() @IsOptional() @Min(0) hru?: number; // GB
   @Expose() @IsOptional() @IsBoolean() publicIPs?: boolean;
+  @Expose() @IsOptional() @IsBoolean() hasIPv6?: boolean;
   @Expose() @IsOptional() @IsBoolean() accessNodeV4?: boolean;
   @Expose() @IsOptional() @IsBoolean() accessNodeV6?: boolean;
   @Expose() @IsOptional() @IsBoolean() gateway?: boolean;
@@ -629,6 +630,7 @@ class FarmFilterOptions {
   @Expose() @IsOptional() @Min(0) nodeSRU?: number; // GB
   @Expose() @IsOptional() @Min(0) nodeHRU?: number; // GB
   @Expose() @IsOptional() @IsBoolean() publicIp?: boolean;
+  @Expose() @IsOptional() @IsBoolean() nodeHasIPv6?: boolean;
   @Expose() @IsOptional() @IsBoolean() certificationType?: CertificationType;
   @Expose() @IsOptional() @IsString() farmName?: string;
   @Expose() @IsOptional() @IsString() country?: string;
@@ -654,6 +656,7 @@ class CalculatorModel {
   @Expose() @IsBoolean() @IsNotEmpty() ipv4u: boolean;
   @Expose() @IsBoolean() @IsOptional() certified?: boolean;
   @Expose() @IsOptional() @IsNumber() @Min(0) balance?: number;
+  @Expose() @IsOptional() @IsNumber() @Min(0) nu?: number;
 }
 
 class CUModel {
@@ -664,6 +667,10 @@ class CUModel {
 class SUModel {
   @Expose() @IsNumber() @IsNotEmpty() @Min(0) hru: number; // GB
   @Expose() @IsNumber() @IsNotEmpty() @Min(0) sru: number; // GB
+}
+
+class NUModel {
+  @Expose() @IsNumber() @IsNotEmpty() @Min(0) nu: number; // GB
 }
 
 class BatchModel<T> {
@@ -827,6 +834,10 @@ class GetActiveContractsModel {
   @Expose() @IsInt() @IsNotEmpty() @Min(1) nodeId: number;
 }
 
+class CurrencyModel {
+  @Expose() @IsNumber() @IsNotEmpty() @Min(0) amount: number; // hourly amount
+}
+
 interface GPUCardInfo {
   id: string;
   contract: number;
@@ -939,6 +950,7 @@ export {
   CalculatorModel,
   CUModel,
   SUModel,
+  NUModel,
   BatchModel,
   ZOSGetDeploymentModel,
   ZOSNodeModel,
@@ -971,4 +983,5 @@ export {
   NodeCPUTest,
   NodeIPValidation,
   NodeIPerf,
+  CurrencyModel,
 };

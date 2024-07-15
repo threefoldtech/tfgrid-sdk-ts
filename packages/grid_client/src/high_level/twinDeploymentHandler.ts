@@ -358,7 +358,7 @@ class TwinDeploymentHandler {
         rootfsDisks.push(workload.data["size"]);
         sru += workload.data["size"];
       }
-      if (workload.type == WorkloadTypes.zmount) {
+      if (workload.type == WorkloadTypes.zmount || workload.type == WorkloadTypes.volume) {
         ssdDisks.push(workload.data["size"]);
         sru += workload.data["size"];
       }

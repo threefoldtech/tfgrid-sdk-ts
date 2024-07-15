@@ -10,14 +10,17 @@ export enum ValidatorStatus {
 }
 
 export interface FormValidatorService {
-  register(uid: number, service: InputValidatorService): void;
-  updateStatus(uid: number, status: ValidatorStatus): void;
+  register(uid: string, service: InputValidatorService): void;
+  updateStatus(uid: string, status: ValidatorStatus): void;
   validate(): Promise<boolean>;
-  unregister(uid: number): void;
+  unregister(uid: string): void;
   reset(): void;
+  get(name: string): InputValidatorService | undefined;
   valid: ComputedRef<boolean>;
   invalid: ComputedRef<boolean>;
   pending: ComputedRef<boolean>;
+  validOnInit: boolean;
+  inputs: ComputedRef<InputValidatorService[]>;
 }
 
 export const formValidatorKey = Symbol("form:validator");

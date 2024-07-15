@@ -1,5 +1,5 @@
 <template>
-  <VBottomNavigation :height="debugOpened === 0 ? openHeight : undefined">
+  <VBottomNavigation class="border" :height="debugOpened === 0 ? openHeight : undefined">
     <v-expansion-panels :model-value="debugOpened" @update:model-value="bindDebugOpened" :multiple="false">
       <v-expansion-panel eager>
         <v-expansion-panel-title :class="{ 'text-error': !!connectDB.error }">
@@ -80,10 +80,9 @@
     <v-card>
       <VCardTitle v-text="'Clear Logs'" />
       <VCardText v-text="'This will delete all of your logs. Be careful this operation is irreversible!'" />
-      <v-card-actions>
-        <v-spacer />
-        <v-btn variant="outlined" @click="clearDialog = false" text="Cancel" />
-        <v-btn variant="outlined" color="error" @click="clearLogs.run()" text="clear" />
+      <v-card-actions class="justify-end mb-1 mr-2">
+        <v-btn color="anchor" @click="clearDialog = false" text="Cancel" />
+        <v-btn color="error" @click="clearLogs.run()" text="clear" />
       </v-card-actions>
     </v-card>
   </v-dialog>

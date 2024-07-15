@@ -2,8 +2,10 @@
   <div>
     <TfNodeDetailsCard
       v-show="modelValue || placeholderNode"
+      :key="modelValue?.rentedByTwinId"
       flat
       :node="modelValue || placeholderNode"
+      @update:node="$emit('update:model-value', $event as any)"
       :status="
         validationTask.loading
           ? 'Pending'
@@ -59,7 +61,7 @@ import { ValidatorStatus } from "../../hooks/form_validator";
 import { useGrid } from "../../stores";
 import type { SelectionDetailsFilters } from "../../types/nodeSelector";
 import { normalizeError } from "../../utils/helpers";
-import { checkNodeCapacityPool, resolveAsync } from "../../utils/nodeSelector";
+import { checkNodeCapacityPool, resolveAsync, validateRentContract } from "../../utils/nodeSelector";
 import TfNodeDetailsCard from "./TfNodeDetailsCard.vue";
 
 const _defaultError =
@@ -176,6 +178,7 @@ export default {
             throw `Node ${nodeId} doesn't have enough Storage`;
         }
 
+        await validateRentContract(gridStore, node);
         await checkNodeCapacityPool(gridStore, node, props.filters);
 
         bindModelValue(node);

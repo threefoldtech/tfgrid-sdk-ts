@@ -58,13 +58,9 @@
           :medium="{ cpu: 2, memory: 4, disk: 50 }"
           :large="{ cpu: 4, memory: 16, disk: 100 }"
         />
-        <Networks v-model:mycelium="mycelium" />
+        <Networks v-model:mycelium="mycelium" v-model:ipv4="ipv4" />
 
-        <input-tooltip
-          inline
-          tooltip="Click to know more about dedicated machines."
-          href="https://www.manual.grid.tf/documentation/dashboard/deploy/dedicated_machines.html"
-        >
+        <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
           <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
         </input-tooltip>
 
@@ -85,16 +81,19 @@
           require-domain
           v-model="selectionDetails"
         />
+
+        <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
       </template>
 
       <template #mail>
-        <SmtpServer v-model="smtp" :persistent="true" :tls="true">
+        <SmtpServer v-model="smtp" :persistent="true" :tls="true" :is-discourse="true">
           Discourse needs SMTP service so please configure these settings properly.
         </SmtpServer>
       </template>
     </d-tabs>
-    <template #footer-actions>
-      <v-btn color="secondary" variant="outlined" @click="deploy()" :disabled="tabs?.invalid"> Deploy </v-btn>
+
+    <template #footer-actions="{ validateBeforeDeploy }">
+      <v-btn color="secondary" @click="validateBeforeDeploy(deploy)" text="Deploy" />
     </template>
   </weblet-layout>
 </template>
@@ -103,15 +102,16 @@
 import type { GridClient } from "@threefold/grid_client";
 import { Buffer } from "buffer";
 import TweetNACL from "tweetnacl";
-import { computed, type Ref, ref } from "vue";
+import { computed, type Ref, ref, watch } from "vue";
+
+import { manual } from "@/utils/manual";
 
 import { useLayout } from "../components/weblet_layout.vue";
-import { useProfileManager } from "../stores";
+import { useGrid, useProfileManager } from "../stores";
 import type { Flist, solutionFlavor as SolutionFlavor } from "../types";
 import { ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
 import { deployGatewayName, getSubdomain, rollbackDeployment } from "../utils/gateway";
-import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
 import rootFs from "../utils/root_fs";
 import { generateName, generatePassword } from "../utils/strings";
@@ -120,10 +120,10 @@ const layout = useLayout();
 const tabs = ref();
 const profileManager = useProfileManager();
 const name = ref(generateName({ prefix: "dc" }));
-const email = ref("");
+const email = ref(profileManager.profile?.email || "");
 const solution = ref() as Ref<SolutionFlavor>;
 const ipv4 = ref(false);
-const mycelium = ref(false);
+const mycelium = ref(true);
 const smtp = ref(createSMTPServer());
 const dedicated = ref(false);
 const certified = ref(false);
@@ -133,6 +133,9 @@ const flist: Flist = {
   value: "https://hub.grid.tf/tf-official-apps/forum-docker-v3.1.2.flist",
   entryPoint: "/sbin/zinit init",
 };
+const selectedSSHKeys = ref("");
+const gridStore = useGrid();
+const grid = gridStore.client as GridClient;
 
 function finalize(deployment: any) {
   layout.value.reloadDeploymentsList();
@@ -155,12 +158,11 @@ async function deploy() {
     ? selectionDetails.value.domain.customDomain
     : subdomain + "." + selectionDetails.value?.domain?.selectedDomain?.publicConfig.domain;
 
-  let grid: GridClient | null;
   let vm: any;
 
   try {
     layout.value?.validateSSH();
-    grid = await getGrid(profileManager.profile!, projectName);
+    updateGrid(grid, { projectName });
     await layout.value.validateBalance(grid!);
 
     vm = await deployVM(grid!, {
@@ -182,7 +184,7 @@ async function deploy() {
           planetary: true,
           mycelium: mycelium.value,
           envs: [
-            { key: "SSH_KEY", value: profileManager.profile!.ssh },
+            { key: "SSH_KEY", value: selectedSSHKeys.value },
             { key: "DISCOURSE_HOSTNAME", value: domain },
             { key: "DISCOURSE_DEVELOPER_EMAILS", value: email.value },
             { key: "DISCOURSE_SMTP_ADDRESS", value: smtp.value.hostname },
@@ -215,7 +217,7 @@ async function deploy() {
     await deployGatewayName(grid, selectionDetails.value.domain, {
       subdomain,
       ip: vm[0].interfaces[0].ip,
-      port: 80,
+      port: 88,
       network: vm[0].interfaces[0].network,
     });
 
@@ -231,17 +233,45 @@ function generatePubKey(): string {
   const keypair = TweetNACL.box.keyPair();
   return Buffer.from(keypair.publicKey).toString("base64");
 }
+
+function updateSSHkeyEnv(selectedKeys: string) {
+  selectedSSHKeys.value = selectedKeys;
+}
+
+watch(
+  () => smtp.value.enabled,
+  newValue => {
+    if (newValue) {
+      ipv4.value = true;
+    }
+  },
+);
+watch(
+  () => ipv4.value,
+  newValue => {
+    if (!newValue && smtp.value.enabled) {
+      smtp.value.enabled = false;
+    }
+  },
+);
 </script>
 
 <script lang="ts">
 import Networks from "../components/networks.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import SmtpServer, { createSMTPServer } from "../components/smtp_server.vue";
+import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";
 import type { SelectionDetails } from "../types/nodeSelector";
+import { updateGrid } from "../utils/grid";
 
 export default {
   name: "TfDiscourse",
-  components: { SmtpServer, SelectSolutionFlavor, Networks },
+  components: {
+    SmtpServer,
+    SelectSolutionFlavor,
+    Networks,
+    ManageSshDeployemnt,
+  },
 };
 </script>

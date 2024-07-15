@@ -1,6 +1,6 @@
 <template>
   <VCard
-    class="rounded-0 w-100"
+    class="tf-node-card rounded-0 w-100 pb-3 text-left"
     :class="{ 'selected-node': status !== 'Init' }"
     :color="
       status === 'Valid'
@@ -16,7 +16,7 @@
       onClick: selectable
         ? () => {
             if (status === 'Init' && node) {
-              $emit('node:select', node);
+              $emit('node:select', (node as NodeInfo));
             }
           }
         : undefined,
@@ -45,10 +45,10 @@
 
     <template #title>
       Node ID: {{ node?.nodeId }}
-      <VTooltip text="Node Serial Number" v-if="node && node.serialNumber">
+      <VTooltip text="Node Serial Number" v-if="node && serialNumber">
         <template #activator="{ props }">
           <VChip size="x-small" v-bind="props">
-            <span class="font-weight-bold" v-text="checkSerialNumber(node?.serialNumber)" />
+            <span class="font-weight-bold" v-text="checkSerialNumber(serialNumber)" />
           </VChip>
         </template>
       </VTooltip>
@@ -63,43 +63,119 @@
 
     <template #subtitle>
       <span v-if="node"> Farm: <span class="font-weight-bold" v-text="node.farmName" /> </span>
+      <span class="ml-2" v-if="node">
+        Uptime:
+        <span class="font-weight-bold" v-text="toReadableDate(node.uptime)" />
+      </span>
+      <span class="ml-2" v-if="node"
+        >Last Deployment Time: {{ lastDeploymentTime === 0 ? "N/A" : toHumanDate(lastDeploymentTime) }}
+      </span>
     </template>
 
     <template #append>
       <template v-if="node">
-        <VChip v-if="node?.hasGPU" color="secondary" text="Node Has GPU" />
-        <VChip class="mx-2" color="primary" :text="node?.certificationType" />
-        <VChip
-          :color="node?.rentedByTwinId === 0 ? 'secondary' : 'success'"
-          :text="(node?.rentedByTwinId === 0 ? 'Shared' : 'Dedicated') + ' Node'"
-        />
+        <div class="d-flex align-center">
+          <VTooltip
+            :text="dedicated ? 'This node is dedicated for one user only' : 'Multiple users can deploy on this node'"
+            location="top"
+            v-if="node"
+          >
+            <template #activator="{ props }">
+              <VChip
+                v-bind="props"
+                class="mr-2"
+                :color="dedicated ? 'success' : 'secondary'"
+                :text="dedicated ? 'Dedicated' : 'Shared'"
+              />
+            </template>
+          </VTooltip>
+
+          <VTooltip text="Node Status" location="top" v-if="node && node.status">
+            <template #activator="{ props }">
+              <VChip
+                v-bind="props"
+                :color="getNodeStatusColor(node?.status)"
+                class="mr-2"
+                :text="capitalize(node.status)"
+              />
+            </template>
+          </VTooltip>
+
+          <VTooltip
+            v-if="rentable || rented"
+            location="top"
+            :text="
+              rentable ? 'You can rent it exclusively for your workloads' : 'Rented as full node for a single user'
+            "
+          >
+            <template #activator="{ props }">
+              <VChip
+                v-if="rentable || rented"
+                v-bind="props"
+                class="mr-2"
+                color="secondary"
+                :text="rentable ? 'Rentable' : 'Rented'"
+              />
+            </template>
+          </VTooltip>
+
+          <VChip v-if="num_gpu" class="mr-2" color="secondary" :text="num_gpu + ' GPU'" />
+
+          <VTooltip v-if="node && node.certificationType" location="top" text="Certification type">
+            <template #activator="{ props }">
+              <VChip
+                v-bind="props"
+                class="mr-2"
+                color="primary"
+                :text="
+                  node?.certificationType === 'Diy' ? node?.certificationType.toUpperCase() : node?.certificationType
+                "
+              />
+            </template>
+          </VTooltip>
+
+          <VTooltip v-if="speed" location="top" text="Network Speed Test">
+            <template #activator="{ props }">
+              <span v-bind="props" v-if="speed?.upload && speed?.download" class="speed-chip mr-2 grey-darken-3">
+                <span>
+                  <v-icon icon="mdi-arrow-up"></v-icon>
+                  <span class="mx-1"> {{ formatSpeed(speed.upload) }}</span>
+                </span>
+                <span>
+                  <v-icon icon="mdi-arrow-down"></v-icon>
+                  <span class="mx-1">{{ formatSpeed(speed.download) }}</span>
+                </span>
+              </span>
+            </template>
+          </VTooltip>
+        </div>
       </template>
     </template>
 
     <template #text>
       <VRow>
-        <VCol>
-          <InputTooltip tooltip="CPU can be greater than 100% due to overprovisioning." align-center>
-            <ResourceDetails
-              name="CPU"
-              :used="node?.used_resources.cru ?? 0"
-              :total="node?.total_resources.cru ?? 0"
-              :text="cruText"
-            />
-          </InputTooltip>
+        <VCol class="tf-node-resource">
+          <ResourceDetails
+            name="CPU"
+            :used="node?.used_resources.cru ?? 0"
+            :total="node?.total_resources.cru ?? 0"
+            :text="cruText"
+            :cpuType="dmi?.processor[0]?.version"
+          />
         </VCol>
-        <VCol>
+        <VCol class="tf-node-resource">
           <ResourceDetails
             name="Memory"
             :used="node?.used_resources.mru ?? 0"
             :total="node?.total_resources.mru ?? 0"
             :text="mruText"
+            :memoryType="dmi?.memory[0]?.type"
           />
         </VCol>
       </VRow>
 
       <VRow>
-        <VCol>
+        <VCol class="tf-node-resource">
           <ResourceDetails
             name="SSD Disks"
             :used="node?.used_resources.sru ?? 0"
@@ -107,7 +183,7 @@
             :text="sruText"
           />
         </VCol>
-        <VCol>
+        <VCol class="tf-node-resource">
           <ResourceDetails
             name="HDD Disks"
             :used="node?.used_resources.hru ?? 0"
@@ -116,49 +192,187 @@
           />
         </VCol>
       </VRow>
+      <div class="mt-5 ml-auto text-right">
+        <v-tooltip bottom color="primary" close-delay="100" :disabled="!(node && node.dedicated)">
+          <template v-slot:activator="{ isActive, props }">
+            <span v-bind="props" v-on="isActive" class="font-weight-bold"
+              ><v-icon class="scale_beat mr-2" color="warning" :disabled="!(node && node.dedicated)"
+                >mdi-brightness-percent</v-icon
+              >{{ (price_usd! / 24 / 30).toFixed(2) }} USD/Hour</span
+            >
+          </template>
+
+          <span>
+            Discounts:
+            <v-spacer />
+            <ul class="pl-2">
+              <li>
+                {{ rentedByUser ? "You receive " : "You'll receive " }} a
+                <strong class="mr-1">50%</strong>
+                <a target="_blank" :href="manual?.billing_pricing">discount</a>
+                {{ rentedByUser ? " as you reserve the" : " if you reserve the" }}
+                entire node
+              </li>
+              <li>
+                {{ rentedByUser ? "You receive" : "You'll receive" }} a
+                <VProgressCircular indeterminate size="10" width="1" color="info" v-if="loadingStakingDiscount" />
+                <strong v-else>{{ stakingDiscount }}%</strong>
+                discount as per the
+                <a target="_blank" :href="manual?.discount_levels"> staking discounts </a>
+              </li>
+            </ul>
+          </span>
+        </v-tooltip>
+
+        <reserve-btn
+          v-if="node?.dedicated && node?.status !== 'down'"
+          class="ml-4"
+          :node="(node as GridNode)"
+          @updateTable="onReserveChange"
+        />
+      </div>
     </template>
   </VCard>
 </template>
-
 <script lang="ts">
-import type { NodeInfo } from "@threefold/grid_client";
-import type { GridNode } from "@threefold/gridproxy_client";
-import { computed, type PropType, ref } from "vue";
+import type { GridClient, NodeInfo, NodeResources } from "@threefold/grid_client";
+import { CertificationType, type GridNode } from "@threefold/gridproxy_client";
+import { computed, onMounted, ref, watch } from "vue";
+import { capitalize } from "vue";
 
+import { gridProxyClient } from "@/clients";
+import ReserveBtn from "@/dashboard/components/reserve_action_btn.vue";
+import toHumanDate from "@/utils/date";
 import { getCountryCode } from "@/utils/get_nodes";
+import { manual } from "@/utils/manual";
+import toReadableDate from "@/utils/to_readable_data";
 
+import { useGrid, useProfileManager } from "../../stores";
 import formatResourceSize from "../../utils/format_resource_size";
+import { toGigaBytes } from "../../utils/helpers";
 import ResourceDetails from "./node_details_internals/ResourceDetails.vue";
 
 export default {
   name: "TfNodeDetailsCard",
-  components: { ResourceDetails },
+  components: { ResourceDetails, ReserveBtn },
   props: {
-    node: Object as PropType<NodeInfo>,
-    status: String as PropType<"Init" | "Pending" | "Invalid" | "Valid">,
+    node: Object as () => NodeInfo | GridNode,
+    status: String as () => "Init" | "Pending" | "Invalid" | "Valid",
     selectable: Boolean,
     flat: Boolean,
   },
   emits: {
     "node:select": (node: NodeInfo) => true || node,
+    "update:node": (node: NodeInfo | GridNode) => true || node,
   },
-  setup(props) {
+  setup(props, ctx) {
+    const profileManager = useProfileManager();
+    const gridStore = useGrid();
+    const grid = gridStore.client as unknown as GridClient;
+    const stakingDiscount = ref<number>();
+    const loadingStakingDiscount = ref<boolean>(false);
+    const lastDeploymentTime = ref<number>(0);
+    const rentedByUser = computed(() => {
+      return props.node?.rentedByTwinId === profileManager.profile?.twinId;
+    });
     const countryFlagSrc = computed(() => {
-      const conuntryCode = getCountryCode(props.node as unknown as GridNode);
-
-      if (conuntryCode.length > 2) {
+      const countryCode = getCountryCode(props.node as GridNode);
+      if (countryCode.length > 2) {
         return "";
       }
 
       const imageUrl =
-        conuntryCode.toLocaleLowerCase() != "ch"
-          ? `https://www.worldatlas.com/r/w425/img/flag/${conuntryCode?.toLocaleLowerCase()}-flag.jpg`
-          : `https://www.worldatlas.com/r/w425/img/flag/${conuntryCode?.toLocaleLowerCase()}-flag.png`;
+        countryCode.toLowerCase() !== "ch"
+          ? `https://www.worldatlas.com/r/w425/img/flag/${countryCode.toLowerCase()}-flag.jpg`
+          : `https://www.worldatlas.com/r/w425/img/flag/${countryCode.toLowerCase()}-flag.png`;
 
       return imageUrl;
     });
 
-    function normalizeBytesResourse(name: "mru" | "sru" | "hru") {
+    onMounted(async () => {
+      await getLastDeploymentTime();
+    });
+
+    async function refreshStakingDiscount() {
+      loadingStakingDiscount.value = true;
+      if (props.node) {
+        stakingDiscount.value = (await getStakingDiscount()) || 0;
+      }
+      loadingStakingDiscount.value = false;
+    }
+
+    watch(
+      () => profileManager.profile,
+      async () => {
+        await refreshStakingDiscount();
+      },
+      { immediate: true, deep: true },
+    );
+
+    // A guard to check node type
+    function isGridNode(node: unknown): node is GridNode {
+      return !!node && typeof node === "object" && "num_gpu" in node;
+    }
+
+    const dedicated = computed(() => {
+      if (isGridNode(props.node)) {
+        return props.node?.dedicated;
+      }
+      return null;
+    });
+
+    const serialNumber = computed(() => {
+      if (isGridNode(props.node)) {
+        return null;
+      }
+      return props.node?.serialNumber;
+    });
+
+    const num_gpu = computed(() => {
+      if (isGridNode(props.node)) {
+        return props.node?.num_gpu;
+      }
+      return props.node?.hasGPU;
+    });
+
+    const rentable = computed(() => {
+      if (isGridNode(props.node)) {
+        return props.node?.rentable;
+      }
+      return null;
+    });
+
+    const rented = computed(() => {
+      if (isGridNode(props.node)) {
+        return props.node?.rented;
+      }
+      return null;
+    });
+
+    const speed = computed(() => {
+      if (isGridNode(props.node)) {
+        return props.node?.speed;
+      }
+      return null;
+    });
+
+    const price_usd = computed(() => {
+      if (isGridNode(props.node)) {
+        // convert extra fee from mili usd to usd
+        const extraFee = props.node?.extraFee / 1000;
+        return props.node?.price_usd + extraFee;
+      }
+      return null;
+    });
+
+    const dmi = computed(() => {
+      if (isGridNode(props.node)) {
+        return props.node?.dmi;
+      }
+      return null;
+    });
+
+    function normalizeBytesResource(name: "mru" | "sru" | "hru") {
       return () => {
         if (!props.node) {
           return "";
@@ -184,11 +398,102 @@ export default {
     const cruText = computed(() =>
       props.node ? `${props.node.used_resources.cru} / ${props.node.total_resources.cru} (Cores)` : "",
     );
-    const mruText = computed(normalizeBytesResourse("mru"));
-    const sruText = computed(normalizeBytesResourse("sru"));
-    const hruText = computed(normalizeBytesResourse("hru"));
+    const mruText = computed(normalizeBytesResource("mru"));
+    const sruText = computed(normalizeBytesResource("sru"));
+    const hruText = computed(normalizeBytesResource("hru"));
 
-    return { cruText, mruText, sruText, hruText, checkSerialNumber, countryFlagSrc };
+    function formatSpeed(speed: number): string {
+      return formatResourceSize(speed, true).toLocaleLowerCase() + "ps";
+    }
+
+    async function getStakingDiscount() {
+      try {
+        const total_resources = props.node?.total_resources;
+        const { cru, hru, mru, sru } = total_resources as NodeResources;
+        const price = await grid?.calculator.calculateWithMyBalance({
+          cru,
+          hru: toGigaBytes(hru),
+          mru: toGigaBytes(mru),
+          sru: toGigaBytes(sru),
+          ipv4u: false,
+          certified: props.node?.certificationType === CertificationType.Certified,
+        });
+
+        return price?.dedicatedPackage.discount;
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function onReserveChange() {
+      if (!props.node) {
+        return;
+      }
+
+      const n = { ...props.node } as NodeInfo | GridNode;
+      const gotReserved = n.rentedByTwinId === 0;
+
+      if (gotReserved) {
+        n.rentedByTwinId = profileManager.profile!.twinId;
+        n.rented = true;
+      } else {
+        n.rentedByTwinId = 0;
+        n.rented = false;
+      }
+      n.rentable = !n.rented;
+      ctx.emit("update:node", n);
+    }
+
+    function getNodeStatusColor(status: string): string {
+      if (status === "up") {
+        return "success";
+      } else if (status === "standby") {
+        return "warning";
+      } else {
+        return "error";
+      }
+    }
+
+    async function getLastDeploymentTime() {
+      if (props.node?.id) {
+        try {
+          const obj = await gridProxyClient.nodes.statsById(props.node.nodeId);
+          lastDeploymentTime.value = obj.users.last_deployment_timestamp;
+        } catch (error) {
+          console.log(`Error getting node object for node ID ${props.node.nodeId}: `, error);
+          lastDeploymentTime.value = 0;
+        }
+      }
+    }
+
+    return {
+      cruText,
+      mruText,
+      sruText,
+      hruText,
+      countryFlagSrc,
+      dedicated,
+      serialNumber,
+      num_gpu,
+      rentable,
+      rented,
+      speed,
+      price_usd,
+      dmi,
+      manual,
+      rentedByUser,
+      loadingStakingDiscount,
+      stakingDiscount,
+      toReadableDate,
+      toHumanDate,
+      checkSerialNumber,
+      capitalize,
+      formatResourceSize,
+      formatSpeed,
+      onReserveChange,
+      getNodeStatusColor,
+      lastDeploymentTime,
+    };
   },
 };
 </script>
@@ -200,5 +505,32 @@ export default {
   border-radius: 50%;
   color: white;
   font-weight: 700;
+}
+
+.speed-chip {
+  display: flex;
+  flex-direction: column !important;
+  font-size: 0.7rem;
+  font-weight: bold;
+  background-color: rgb(var(--v-speed-chip));
+  padding: 5px 12px;
+  border-radius: 9999px;
+}
+
+.scale_beat {
+  animation: crescendo 0.5s alternate infinite ease-in;
+}
+
+@keyframes crescendo {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.2);
+  }
+}
+
+.v-icon--disabled {
+  opacity: 0 !important;
 }
 </style>

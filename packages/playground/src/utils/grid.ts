@@ -1,6 +1,8 @@
 import { BackendStorageType, GridClient, KeypairType, NetworkEnv } from "@threefold/grid_client";
 import { InsufficientBalanceError } from "@threefold/types";
 
+import type { SSHKeyData } from "@/types";
+
 import type { Profile } from "../stores/profile_manager";
 const network = (process.env.NETWORK as NetworkEnv) || window.env.NETWORK;
 export async function getGrid(
@@ -90,33 +92,50 @@ export async function loadProfile(grid: GridClient): Promise<Profile> {
     relay: grid.getDefaultUrls(network).relay.slice(6),
     pk: (await grid.twins.get({ id: grid!.twinId })).pk,
     keypairType: grid.clientOptions!.keypairType,
+    email: await readEmail(grid),
   };
 }
 
 export async function getMetadata(grid: GridClient): Promise<{ [key: string]: any }> {
   try {
-    const metadata = await grid.kvstore.get({ key: "metadata" });
-    return JSON.parse(metadata);
-  } catch {
+    const metadata = await grid.tfchain.backendStorage.load("metadata");
+    return metadata;
+  } catch (e) {
+    console.log(`Error while trying to get metadata due: ${e}`);
     return {};
   }
 }
 
-export async function readSSH(grid: GridClient): Promise<string> {
+export async function readSSH(grid: GridClient): Promise<SSHKeyData[]> {
   const metadata = await getMetadata(grid);
-  return metadata.sshkey || "";
+  return metadata.sshkey;
 }
 
-export async function storeSSH(grid: GridClient, newSSH: string): Promise<void> {
+export async function storeSSH(grid: GridClient, newSSH: SSHKeyData[]): Promise<void> {
   const metadata = await getMetadata(grid);
-  const ssh = metadata.sshkey;
-  if (ssh === newSSH) return;
-
-  return grid.kvstore.set({
-    key: "metadata",
-    value: JSON.stringify({
-      ...metadata,
-      sshkey: newSSH,
-    }),
+  const ext = await grid.tfchain.backendStorage.dump("metadata", {
+    ...metadata,
+    sshkey: newSSH,
   });
+
+  await grid.tfclient.applyAllExtrinsics(ext);
+}
+
+export async function readEmail(grid: GridClient): Promise<string> {
+  const metadata = await getMetadata(grid);
+
+  return metadata.email || "";
+}
+
+export async function storeEmail(grid: GridClient, newEmail: string): Promise<void> {
+  const metadata = await getMetadata(grid);
+  const email = metadata.email;
+  if (email === newEmail) return;
+
+  const ext = await grid.tfchain.backendStorage.dump("metadata", {
+    ...metadata,
+    email: newEmail,
+  });
+
+  await grid.tfclient.applyAllExtrinsics(ext);
 }

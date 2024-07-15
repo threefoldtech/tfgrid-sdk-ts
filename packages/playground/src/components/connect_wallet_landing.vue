@@ -56,7 +56,7 @@
         </div>
 
         <div class="d-flex justify-center mt-5">
-          <v-btn color="primary" target="_blank" :href="statsUrl"> Explore ThreeFold Grid Capacity </v-btn>
+          <v-btn variant="elevated" target="_blank" :href="statsUrl"> Explore ThreeFold Grid Capacity </v-btn>
         </div>
       </div>
       <div class="text-center">
@@ -67,9 +67,7 @@
           Metaverse and more.
         </p>
         <div class="d-flex justify-center align-center flex-wrap my-4">
-          <v-btn color="secondary" variant="outlined" class="mr-2" target="_blank" href="https://manual.grid.tf/">
-            Learn about the grid
-          </v-btn>
+          <v-btn variant="elevated" class="mr-2" target="_blank" :href="MANUAL_URL"> Learn about the grid </v-btn>
         </div>
       </div>
     </v-container>

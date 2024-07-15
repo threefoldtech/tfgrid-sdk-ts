@@ -13,7 +13,6 @@ import PasswordInputWrapper from "./components/password_input_wrapper.vue";
 import ViewLayout from "./components/view_layout.vue";
 import WebletLayout from "./components/weblet_layout.vue";
 import type * as validators from "./utils/validators";
-
 declare module "@vue/runtime-core" {
   export interface GlobalComponents {
     PasswordInputWrapper: typeof PasswordInputWrapper;
@@ -32,6 +31,7 @@ declare module "@vue/runtime-core" {
 
   interface ComponentCustomProperties {
     validators: typeof validators;
+    MANUAL_URL: typeof MANUAL_URL;
   }
 }
 
@@ -53,6 +53,7 @@ declare global {
       STATS_URL: string;
       TIMEOUT: number;
       PAGE_SIZE: number;
+      MANUAL_URL: string;
     };
   }
 }

@@ -1,12 +1,12 @@
 <template>
   <v-row justify="center">
-    <v-dialog model-value @update:model-value="$emit('close')" scrollable width="70%">
+    <v-dialog model-value @update:model-value="$emit('close')" scrollable>
       <v-card>
         <v-card-title class="d-flex flex-column" v-if="!onlyJson">
           <div class="d-flex justify-center">
             <v-btn-toggle divided v-model="showType" mandatory>
-              <v-btn variant="outlined"> details </v-btn>
-              <v-btn variant="outlined"> JSON</v-btn>
+              <v-btn> details </v-btn>
+              <v-btn> JSON</v-btn>
             </v-btn-toggle>
           </div>
 
@@ -31,7 +31,8 @@
             <v-form readonly v-if="contract">
               <v-alert class="my-4" variant="tonal" v-if="contract.customDomain" type="info">
                 Make sure to create an A record on your name provider with
-                <span class="font-weight-bold">{{ contract.customDomain }}</span> pointing to
+                <span class="font-weight-bold">{{ contract.customDomain }}</span>
+                pointing to
                 <span class="font-weight-bold">{{ contract.publicIP?.ip.split("/")[0] || contract.publicIP?.ip }}</span>
               </v-alert>
               <CopyReadonlyInput label="Name" :data="contract.name" />
@@ -44,7 +45,11 @@
                   :data="contract.publicIP.ip.split('/')[0] || contract.publicIP.ip"
                   v-if="contract.publicIP.ip"
                 />
-                <CopyReadonlyInput label="Public IPv6" :data="contract.publicIP.ip6" v-if="contract.publicIP.ip6" />
+                <CopyReadonlyInput
+                  label="Public IPv6"
+                  :data="contract.publicIP.ip6 ? contract.publicIP.ip6.replace(/\/64$/, '') : '-'"
+                  v-if="contract.publicIP.ip6"
+                />
               </template>
 
               <CopyReadonlyInput label="Planetary Network IP" :data="contract.planetary" v-if="contract.planetary" />
@@ -102,14 +107,13 @@
             <HighlightDark v-if="$vuetify.theme.name === 'dark'" />
             <HighlightLight v-else />
             <pre>
-            <code class="hljs json dark-bg" v-html="html"></code>
+            <code class="hljs json" :class="[$vuetify.theme.name ==='dark' ? 'dark-bg' : 'light-bg']" v-html="html"></code>
           </pre>
           </template>
         </v-card-text>
-        <v-card-actions class="my-1">
-          <v-spacer />
-          <v-btn color="anchor" variant="outlined" @click="$emit('close')">Close</v-btn>
-          <v-btn color="secondary" variant="outlined" @click="copy">Copy</v-btn>
+        <v-card-actions class="justify-end my-1 mr-2">
+          <v-btn color="anchor" @click="$emit('close')">Close</v-btn>
+          <v-btn color="secondary" @click="copy">Copy</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -159,7 +163,8 @@ const contracts = computed(() => {
 const contract = computed(() => contracts.value?.[activeTab.value] ?? {});
 const code = computed(() => JSON.stringify(props.data || {}, undefined, 2));
 const html = computed(() => hljs.highlight(code.value, { language: "json" }).value);
-const profileManager = useProfileManager();
+const gridStore = useGrid();
+const grid = gridStore.client as GridClient;
 
 function copy() {
   navigator.clipboard.writeText(code.value);
@@ -192,9 +197,8 @@ function getValue(key: string) {
 
 async function getGrafanaUrl() {
   isLoading.value = true;
-  const grid = await getGrid(profileManager.profile!);
   if (grid) {
-    if (contract.value.type !== ContractType.NAME) {
+    if (contract.value.type !== ContractType.Name) {
       const nodeId = await grid.capacity.getNodeIdFromContractId({
         contractId: contract.value.contractId || contract.value.contract_id,
       });
@@ -209,8 +213,6 @@ getGrafanaUrl();
 
 async function getGPUInfo() {
   loadingCard.value = true;
-
-  const grid = await getGrid(profileManager.profile!);
   if (grid) {
     const nodeId = await grid.capacity.getNodeIdFromContractId({
       contractId: contract.value.contractId,
@@ -298,13 +300,13 @@ function getTooltipText(contract: any, index: number) {
 </script>
 
 <script lang="ts">
-import { useProfileManager } from "@/stores/profile_manager";
+import type { GridClient } from "@threefold/grid_client";
+
 import { ContractType } from "@/utils/contracts";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
 import { GrafanaStatistics } from "@/utils/get_metrics_url";
-import { getGrid } from "@/utils/grid";
 
-import type { NodeInfo } from "../../../grid_client/dist/es6";
+import { useGrid } from "../stores";
 import type { Disk } from "../utils/deploy_vm";
 import CopyReadonlyInput from "./copy_readonly_input.vue";
 import { HighlightDark, HighlightLight } from "./highlight_themes";

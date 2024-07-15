@@ -38,47 +38,17 @@
             class="py-4 px-8 border border-anchor"
             :style="{ backgroundColor: 'rgb(var(--v-theme-background))' }"
             :colspan="columns.length"
-            key="item.id"
+            :key="item.id"
           >
-            <card-details :loading="false" title="Node Details" :items="getNodeDetails(item.raw)"></card-details>
+            <card-details :loading="false" title="Node Details" :items="getNodeDetails(item)"></card-details>
 
             <v-card class="mt-4">
               <v-alert class="pa-5" style="height: 20px">
                 <h4 class="text-center font-weight-medium">Resource Units Reserved</h4>
               </v-alert>
-              <v-card-item>
-                <v-row class="mt-5 mb-5">
-                  <v-col v-for="(value, key) in item.raw.total_resources" :key="key" align="center">
-                    <p class="text-center">{{ getKey(key) }}</p>
-                    <v-flex class="text-truncate">
-                      <v-tooltip bottom class="d-none">
-                        <template v-slot:activator="{ props }">
-                          <v-progress-circular
-                            v-bind="props"
-                            :rotate="-90"
-                            :size="150"
-                            :width="12"
-                            :model-value="getPercentage(item.raw, key)"
-                            class="my-3"
-                            color="primary"
-                          />
-                          <template v-if="item.raw.used_resources">
-                            <p v-if="item.raw.total_resources[key] > 1000">
-                              {{ byteToGB(item.raw.used_resources[key]) }} /
-                              {{ byteToGB(item.raw.total_resources[key]) }} GB
-                            </p>
-                            <p v-else-if="item.raw.total_resources[key] == 0">NA</p>
-                            <p v-else>
-                              {{ item.raw.used_resources[key] }} /
-                              {{ item.raw.total_resources[key] }}
-                            </p>
-                          </template>
-                        </template>
-                      </v-tooltip>
-                    </v-flex>
-                  </v-col>
-                </v-row>
-              </v-card-item>
+              <v-card-text class="pb-8">
+                <NodeResources :node="item" />
+              </v-card-text>
             </v-card>
 
             <v-card class="mt-4" v-if="network == 'main'" focusable single model-value>
@@ -86,7 +56,7 @@
                 <h4 class="text-center font-weight-medium">Node Statistics</h4>
               </v-alert>
               <v-card-item>
-                <NodeMintingDetails :node="item.value" />
+                <NodeMintingDetails :node="item" />
               </v-card-item>
             </v-card>
           </td>
@@ -94,28 +64,28 @@
       </template>
 
       <template #[`item.status`]="{ item }">
-        <v-chip :color="getNodeStatusColor(item.raw.status as string).color">
-          {{ capitalize(item.raw.status as string) }}
+        <v-chip :color="getNodeStatusColor(item.status as string).color">
+          {{ capitalize(item.status as string) }}
         </v-chip>
       </template>
 
       <template #[`item.actions`]="{ item }">
         <PublicConfig
           class="me-2"
-          :nodeId="item.raw.nodeId"
-          :farmId="item.raw.farmId"
+          :nodeId="item.nodeId"
+          :farmId="item.farmId"
           @remove-config="config => toggleConfig(item, config)"
           @add-config="config => toggleConfig(item, config)"
         />
-        <SetExtraFee class="me-2" :nodeId="item.raw.nodeId" />
+        <SetExtraFee class="me-2" :nodeId="item.nodeId" />
       </template>
 
       <template v-slot:[`item.country`]="{ item }">
-        {{ item.raw.country || "-" }}
+        {{ item.country || "-" }}
       </template>
 
       <template v-slot:[`item.serialNumber`]="{ item }">
-        {{ item.raw.serialNumber || "-" }}
+        {{ item.serialNumber || "-" }}
       </template>
     </v-data-table-server>
   </div>
@@ -134,6 +104,7 @@ import { createCustomToast, ToastType } from "@/utils/custom_toast";
 import { getNodeStatusColor } from "@/utils/get_nodes";
 import { calculateUptime, getNodeAvailability, getNodeMintingFixupReceipts, type NodeInterface } from "@/utils/node";
 
+import NodeResources from "../../components/node_resources.vue";
 import NodeMintingDetails from "./NodeMintingDetails.vue";
 import PublicConfig from "./public_config.vue";
 import SetExtraFee from "./set_extra_fee.vue";
@@ -145,6 +116,7 @@ export default {
     PublicConfig,
     SetExtraFee,
     CardDetails,
+    NodeResources,
   },
   setup() {
     const profileManager = useProfileManager();
@@ -222,7 +194,11 @@ export default {
           try {
             const network = process.env.NETWORK || (window as any).env.NETWORK;
             node.receipts = [];
-            if (network == "main") node.receipts = await getNodeMintingFixupReceipts(node.nodeId);
+            try {
+              if (network == "main") node.receipts = await getNodeMintingFixupReceipts(node.nodeId);
+            } catch (e) {
+              createCustomToast(`Failed to get node ${node.nodeId} minting receipts!`, ToastType.danger);
+            }
             node.availability = await getNodeAvailability(node.nodeId);
             node.uptime = +calculateUptime(node.availability.currentPeriod, node.availability.downtime);
           } catch (error) {
@@ -292,7 +268,7 @@ export default {
     }
 
     function toggleConfig(item: any, config: PublicConfigModel) {
-      item.raw.publicConfig = config;
+      item.publicConfig = config;
       reloadNodes();
     }
 

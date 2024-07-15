@@ -1,146 +1,341 @@
 <template>
-  <v-card>
-    <v-alert v-if="hasEnoughBalance" type="info" variant="tonal" class="ma-4">
-      Updating or generating SSH key will cost you up to 0.01 TFT
-    </v-alert>
-    <v-alert v-else-if="balance" type="warning" variant="tonal" class="ma-4">
-      Your balance is not enough to {{ profileManager.profile?.ssh ? "update the" : `generate a` }} SSH key. Please make
-      sure you have at least 0.01 TFT.
-    </v-alert>
-    <VTooltip
-      text="SSH Keys are used to authenticate you to the deployment instance for management purposes. If you don't have an SSH Key or are not familiar, we can generate one for you."
-      location="bottom"
-      max-width="600px"
-    >
-      <template #activator="{ props }">
-        <CopyInputWrapper :data="profileManager.profile?.ssh" #="{ props: copyInputProps }">
-          <VTextarea
-            class="mx-4"
-            label="Public SSH Key"
-            no-resize
-            :spellcheck="false"
-            v-model.trim="ssh"
-            v-bind="{ ...props, ...copyInputProps }"
-            :disabled="updatingSSH || generatingSSH || !hasEnoughBalance"
-            :hint="
-              updatingSSH
-                ? 'Updating your public ssh key.'
-                : generatingSSH
-                ? 'Generating a new public ssh key.'
-                : SSHKeyHint
-            "
-            :persistent-hint="updatingSSH || generatingSSH || !!SSHKeyHint"
-            :rules="[value => !!value || 'SSH key is required']"
-          />
-        </CopyInputWrapper>
+  <view-layout>
+    <v-card color="primary" class="d-flex justify-center items-center pa-3 mb-3 text-center">
+      <v-icon size="30" class="pr-3">mdi-key-plus</v-icon>
+      <v-card-title class="pa-0">SSH keys</v-card-title>
+    </v-card>
+    <v-alert type="info"> Multiple keys support is coming up soon </v-alert>
 
-        <div class="d-flex justify-end mb-5 mx-4">
-          <VBtn
-            class="mr-2 text-subtitle-2"
-            color="secondary"
-            variant="outlined"
-            :disabled="!!ssh || updatingSSH || generatingSSH || !hasEnoughBalance"
-            :loading="generatingSSH"
-            @click="generateSSH"
-          >
-            Generate SSH Keys
-          </VBtn>
-          <VBtn
-            class="text-subtitle-2"
-            color="secondary"
-            variant="outlined"
-            @click="updateSSH"
-            :disabled="!ssh || profileManager.profile?.ssh === ssh || updatingSSH || !hasEnoughBalance"
-            :loading="updatingSSH"
-          >
-            Update Public SSH Key
-          </VBtn>
-        </div>
-      </template>
-    </VTooltip>
-  </v-card>
+    <v-card class="mt-3 mb-1" color="transparent">
+      <v-col class="px-0 d-flex justify-end">
+        <v-btn
+          class="mr-2"
+          @click="() => openDialog(SSHCreationMethod.Import)"
+          prepend-icon="mdi-key-plus"
+          color="secondary"
+          :disabled="loading || deleting || generatingSSH || savingKey || activating"
+        >
+          Import
+        </v-btn>
+
+        <v-btn
+          @click="exportAllKeys"
+          class="mr-2"
+          prepend-icon="mdi-export"
+          color="secondary"
+          :disabled="
+            !allKeys ||
+            allKeys.length === 0 ||
+            loading ||
+            deleting ||
+            generatingSSH ||
+            savingKey ||
+            isExporting ||
+            activating
+          "
+          :loading="isExporting"
+        >
+          Export all
+        </v-btn>
+
+        <v-btn
+          class=""
+          variant="elevated"
+          :disabled="loading || deleting || generatingSSH || savingKey || activating"
+          @click="openDialog(SSHCreationMethod.Generate)"
+          prepend-icon="mdi-key-plus"
+        >
+          Generate
+        </v-btn>
+      </v-col>
+    </v-card>
+
+    <ssh-table
+      @delete="deleteKey"
+      @view="viewSelectedKey"
+      @export="exportSelectedKeys"
+      @update:activation="updateActivation"
+      :ssh-keys="allKeys"
+      :loading="loading"
+      :loading-message="tableLoadingMessage"
+      :deleting="deleting"
+    />
+
+    <!-- Dialogs -->
+    <!-- Generate -->
+    <ssh-form-dialog
+      v-if="dialogType === SSHCreationMethod.Generate"
+      :open="dialogType === SSHCreationMethod.Generate"
+      :all-keys="allKeys"
+      :dialog-type="dialogType"
+      :generating="generatingSSH"
+      :saving-key="savingKey"
+      @save="addKey($event)"
+      @close="closeDialog"
+      @generate="generateSSHKeys($event)"
+    />
+
+    <!-- Import -->
+    <ssh-form-dialog
+      v-if="dialogType === SSHCreationMethod.Import"
+      :open="dialogType === SSHCreationMethod.Import"
+      :all-keys="allKeys"
+      :dialog-type="dialogType"
+      :generating="generatingSSH"
+      :saving-key="savingKey"
+      @save="addKey($event)"
+      @close="closeDialog"
+      @generate="generateSSHKeys($event)"
+    />
+
+    <!-- View -->
+    <ssh-data-dialog
+      :open="isViewKey"
+      :all-keys="allKeys"
+      :selected-key="selectedKey"
+      @close="isViewKey = false"
+      @update="updateKeys"
+    />
+  </view-layout>
 </template>
+
 <script lang="ts" setup>
-import { ref, watch } from "vue";
-import { computed } from "vue";
+import { InsufficientBalanceError } from "@threefold/types";
+import { defineComponent, onMounted, ref } from "vue";
 import { generateKeyPair } from "web-ssh-keygen";
 
-import { useProfileManager } from "../stores";
-import type { Profile } from "../stores/profile_manager";
-import { type Balance, getGrid, loadBalance, storeSSH } from "../utils/grid";
-import { downloadAsFile } from "../utils/helpers";
-import { isEnoughBalance } from "../utils/helpers";
+import SshDataDialog from "@/components/ssh_keys/SshDataDialog.vue";
+import SshFormDialog from "@/components/ssh_keys/SshFormDialog.vue";
+import SshTable from "@/components/ssh_keys/SshTable.vue";
+import { SSHCreationMethod, type SSHKeyData } from "@/types";
+import { createCustomToast, ToastType } from "@/utils/custom_toast";
+import { downloadAsFile } from "@/utils/helpers";
+import SSHKeysManagement from "@/utils/ssh";
 
-const balance = ref<Balance>();
-const SSHKeyHint = ref("");
-const generatingSSH = ref(false);
-const profileManager = useProfileManager();
-const ssh = ref(profileManager.profile!.ssh);
-const updatingSSH = ref(false);
-const loadingBalance = ref(false);
+const loading = ref<boolean>(false);
+const savingKey = ref<boolean>(false);
+const deleting = ref<boolean>(false);
+const activating = ref<boolean>(false);
+const isViewKey = ref<boolean>(false);
+const isExporting = ref<boolean>(false);
+const generatingSSH = ref<boolean>(false);
 
-const hasEnoughBalance = computed(() => isEnoughBalance(balance.value, 0.01));
-let interval: any;
+const allKeys = ref<SSHKeyData[]>([]);
+const dialogType = ref<SSHCreationMethod>(SSHCreationMethod.None);
+const tableLoadingMessage = ref("");
 
-async function __loadBalance(profile?: Profile, tries = 1) {
-  profile = profile || profileManager.profile!;
-  if (!profile) return;
+const selectedKey = ref<SSHKeyData>({
+  id: 0,
+  publicKey: "",
+  name: "",
+  createdAt: "",
+  isActive: false,
+});
+
+const sshKeysManagement = new SSHKeysManagement();
+
+onMounted(async () => {
+  loading.value = true;
+  if (!sshKeysManagement.migrated()) {
+    tableLoadingMessage.value = "Migrating your old key...";
+    const migrationInterval = setInterval(async () => {
+      const migrated = !sshKeysManagement.migrated();
+      if (migrated) {
+        clearInterval(migrationInterval);
+        allKeys.value = sshKeysManagement.list();
+        tableLoadingMessage.value = "";
+      }
+    }, 1000);
+  } else {
+    allKeys.value = sshKeysManagement.list();
+    tableLoadingMessage.value = "";
+  }
+  loading.value = false;
+});
+
+const openDialog = (type: SSHCreationMethod) => {
+  dialogType.value = type;
+};
+
+const closeDialog = () => {
+  dialogType.value = SSHCreationMethod.None;
+};
+
+const exportAllKeys = () => {
+  isExporting.value = true;
+  sshKeysManagement.export(allKeys.value);
+  isExporting.value = false;
+};
+
+const exportSelectedKeys = (keys: SSHKeyData[]) => {
+  isExporting.value = true;
+  let exportKeys: SSHKeyData[] = [];
+
+  if (Array.isArray(keys) && keys.length > 0 && typeof keys[0] === "number") {
+    exportKeys = allKeys.value.filter(key => keys.includes(key.id as SSHKeyData & number));
+  } else {
+    exportKeys = keys as SSHKeyData[];
+  }
+
+  exportKeys.forEach(key => {
+    delete key.deleting;
+    delete key.activating;
+  });
+
+  sshKeysManagement.export(exportKeys);
+  isExporting.value = false;
+};
+
+const updateActivation = async (key: SSHKeyData) => {
+  activating.value = key.activating = true;
 
   try {
-    loadingBalance.value = true;
-    const grid = await getGrid(profile);
-    balance.value = await loadBalance(grid!);
-    loadingBalance.value = false;
-  } catch {
-    if (tries > 10) {
-      loadingBalance.value = false;
-      return;
+    key.isActive = !key.isActive;
+    await sshKeysManagement.update(allKeys.value);
+    createCustomToast(
+      `The activation of ${key.name} key has been ${key.isActive ? "enabled" : "disabled"}.`,
+      ToastType.success,
+    );
+    activating.value = key.activating = false;
+  } catch (e: any) {
+    key.isActive = !key.isActive;
+    if (e instanceof InsufficientBalanceError) {
+      createCustomToast(
+        "Your wallet balance is insufficient to save your SSH key. To avoid losing your SSH key, please recharge your wallet.",
+        ToastType.danger,
+      );
+    } else {
+      createCustomToast(e.message, ToastType.danger);
     }
 
-    setTimeout(() => __loadBalance(profile, tries + 1), Math.floor(Math.exp(tries) * 1_000));
+    activating.value = key.activating = false;
+    return;
   }
-}
-watch(
-  () => profileManager.profile,
-  profile => {
-    if (profile) {
-      __loadBalance(profile);
-      if (interval) clearInterval(interval);
-      interval = setInterval(__loadBalance.bind(undefined, profile), 1000 * 60 * 2);
+};
+
+const deleteKey = async (selectedKeys: SSHKeyData[]) => {
+  deleting.value = true;
+  const ids: number[] = selectedKeys.map(key => key.id);
+  const keysToNotDelete = allKeys.value.filter(_key => !ids.includes(_key.id));
+  selectedKeys.map(key => (key.deleting = true));
+
+  try {
+    await sshKeysManagement.update(keysToNotDelete);
+  } catch (e: any) {
+    if (e instanceof InsufficientBalanceError) {
+      createCustomToast(
+        "Your wallet balance is insufficient to save your SSH key. To avoid losing your SSH key, please recharge your wallet.",
+        ToastType.danger,
+      );
     } else {
-      if (interval) clearInterval(interval);
-      balance.value = undefined;
+      createCustomToast(e.message, ToastType.danger);
     }
-  },
-  { immediate: true, deep: true },
-);
-async function updateSSH() {
-  updatingSSH.value = true;
-  const grid = await getGrid(profileManager.profile!);
-  await storeSSH(grid!, ssh.value);
-  profileManager.updateSSH(ssh.value);
-  updatingSSH.value = false;
-  SSHKeyHint.value = "SSH key updated successfully.";
-}
-async function generateSSH() {
+
+    deleting.value = false;
+    return;
+  }
+
+  selectedKeys.map(key => (key.deleting = false));
+  allKeys.value = keysToNotDelete;
+  createCustomToast(
+    `The selected ${selectedKeys.length > 1 ? "keys have" : "key has"} been deleted successfully.`,
+    ToastType.success,
+  );
+  deleting.value = false;
+};
+
+const addKey = async (key: SSHKeyData) => {
+  savingKey.value = true;
+  if (!key.fingerPrint) {
+    key.fingerPrint = sshKeysManagement.calculateFingerprint(key.publicKey);
+  }
+
+  const copiedAllkeys = [...allKeys.value, key];
+
+  try {
+    await sshKeysManagement.update(copiedAllkeys);
+  } catch (e: any) {
+    if (e instanceof InsufficientBalanceError) {
+      createCustomToast(
+        "Your wallet balance is insufficient to save your SSH key. To avoid losing your SSH key, please recharge your wallet.",
+        ToastType.danger,
+      );
+    } else {
+      createCustomToast(e.message, ToastType.danger);
+    }
+
+    savingKey.value = false;
+    return;
+  }
+
+  loading.value = true;
+  allKeys.value = copiedAllkeys;
+  savingKey.value = false;
+  loading.value = false;
+  closeDialog();
+};
+
+const updateKeys = async (updatedKey: SSHKeyData) => {
+  const index = allKeys.value.findIndex(key => key.id === updatedKey.id);
+  allKeys.value[index] = { ...updatedKey };
+  try {
+    await sshKeysManagement.update(allKeys.value);
+    createCustomToast("SSH Key updated successfully.", ToastType.success);
+  } catch (error) {
+    createCustomToast("Failed to update the SSH Key.", ToastType.danger);
+  } finally {
+    isViewKey.value = false;
+  }
+};
+
+const generateSSHKeys = async (key: SSHKeyData) => {
   generatingSSH.value = true;
   const keys = await generateKeyPair({
     alg: "RSASSA-PKCS1-v1_5",
     hash: "SHA-256",
-    name: "Threefold",
+    name: key.name,
     size: 4096,
   });
-  const grid = await getGrid(profileManager.profile!);
-  await storeSSH(grid!, keys.publicKey);
-  profileManager.updateSSH(keys.publicKey);
-  ssh.value = profileManager.profile!.ssh;
+
+  key.fingerPrint = sshKeysManagement.calculateFingerprint(keys.publicKey);
+  key.publicKey = keys.publicKey;
+
+  const copiedAllkeys = [...allKeys.value, key];
+
+  try {
+    await sshKeysManagement.update(copiedAllkeys);
+  } catch (e: any) {
+    if (e instanceof InsufficientBalanceError) {
+      createCustomToast(
+        "Your wallet balance is insufficient to save your SSH key. To avoid losing your SSH key, please recharge your wallet.",
+        ToastType.danger,
+      );
+    } else {
+      createCustomToast(e.message, ToastType.danger);
+    }
+
+    generatingSSH.value = false;
+    loading.value = false;
+    return;
+  }
+
+  loading.value = true;
   downloadAsFile("id_rsa", keys.privateKey);
+  createCustomToast(`${key.name} key has been generated successfully.`, ToastType.success);
+  allKeys.value = copiedAllkeys;
   generatingSSH.value = false;
-  SSHKeyHint.value = "SSH key generated successfully.";
-}
-</script>
-<script lang="ts">
-export default {
-  name: "SSHkey",
+  loading.value = false;
+  closeDialog();
 };
+
+const viewSelectedKey = (key: SSHKeyData) => {
+  selectedKey.value = key;
+  isViewKey.value = true;
+};
+</script>
+
+<script lang="ts">
+export default defineComponent({
+  name: "SSHView",
+});
 </script>

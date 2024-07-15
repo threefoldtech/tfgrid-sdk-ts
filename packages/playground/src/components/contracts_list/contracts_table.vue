@@ -1,86 +1,136 @@
 <template>
   <weblet-layout ref="layout" @mount="() => {}">
-    <list-table
+    <v-data-table-server
       v-if="$props.tableHeaders"
       :headers="$props.tableHeaders"
-      :items="contracts"
-      :loading="$props.loading.value"
-      :deleting="deleting"
+      :loading="$props.loading.value || deleting"
+      loading-text="Loading contracts..."
       v-model="selectedContracts"
-      :no-data-text="capitalize(`No ${props.contractsType} contracts found on your account.`)"
+      :deleting="deleting"
       v-bind:onClick:row="loading || deleting ? undefined : onClickRow"
+      :no-data-text="capitalize(`No ${props.contractsType} contracts found on your account.`)"
+      :items-per-page-options="[
+        { value: 5, title: '5' },
+        { value: 10, title: '10' },
+        { value: 15, title: '15' },
+        { value: 50, title: '50' },
+      ]"
+      class="elevation-1 v-data-table-header"
+      density="compact"
+      :items-length="$props.count.value"
+      :items-per-page="$props.size.value"
+      :page="$props.page.value"
+      :items="contracts.value"
+      return-object
+      show-select
+      @update:page="updatePage"
+      @update:items-per-page="updateSize"
     >
+      <template #[`item.nodeId`]="{ item }">
+        <span v-if="['node', 'rent'].includes(item.type)">{{ item.details.nodeId }}</span>
+      </template>
+
+      <template #[`item.created_at`]="{ item }">
+        {{ toHumanDate(item.created_at) }}
+      </template>
+
+      <template #[`item.consumption`]="{ item }">
+        <p v-if="item?.consumption !== 0 && item?.consumption !== undefined">
+          {{ item.consumption.toFixed(3) }} TFT/hour
+        </p>
+        <p v-else>No Data Available</p>
+      </template>
+
+      <template #[`item.farmId`]="{ item }">
+        <span v-if="['node', 'rent'].includes(item.type)">
+          {{ item.details.farm_id ? item.details.farm_id : "-" }}
+        </span>
+      </template>
+
+      <template #[`item.solutionType`]="{ item }">
+        <span v-if="item.type === 'node'">
+          {{ item.solutionType }}
+        </span>
+      </template>
+
       <template #[`item.nodeStatus`]="{ item }">
         <v-chip
-          v-if="$props.nodeStatus && item.value.nodeId !== '-' && !$props.loading.value"
-          :color="getNodeStateColor($props.nodeStatus[item.value.nodeId])"
+          v-if="$props.nodeStatus && !$props.loading.value"
+          :color="getNodeStateColor($props.nodeStatus[item.details.nodeId])"
           class="text-capitalize"
         >
-          {{ $props.nodeStatus[item.value.nodeId] }}
+          {{ $props.nodeStatus[item.details.nodeId] }}
         </v-chip>
         <p v-else>-</p>
       </template>
 
       <template #[`item.state`]="{ item }">
         <v-tooltip
-          v-if="item && item.value.state === ContractStates.GracePeriod"
+          v-if="item && item.state === ContractStates.GracePeriod && loadingShowDetails && item == selectedItem"
           :text="'Click here to check the amount of tokens needed to unlock your contract and resume your workload.'"
           location="top center"
         >
           <template #activator="{ props }">
-            <v-chip
-              @click.stop="contractLockDetails(item.value)"
-              v-bind="props"
-              :color="getStateColor(item.value.state)"
-            >
-              {{ item.value.state === ContractStates.GracePeriod ? "Grace Period" : item.value.state }}
+            <VProgressCircular v-bind="props" :color="getStateColor(item.state)" indeterminate size="20" width="3" />
+          </template>
+        </v-tooltip>
+        <v-tooltip
+          v-else-if="item && item.state === ContractStates.GracePeriod"
+          :text="'Click here to check the amount of tokens needed to unlock your contract and resume your workload.'"
+          location="top center"
+        >
+          <template #activator="{ props }">
+            <v-chip @click.stop="contractLockDetails(item)" v-bind="props" :color="getStateColor(item.state)">
+              {{ item.state === ContractStates.GracePeriod ? "Grace Period" : item.state }}
             </v-chip>
           </template>
         </v-tooltip>
-        <v-chip v-else :color="getStateColor(item.value.state)">
-          {{ item.value.state }}
+        <v-chip v-else :color="getStateColor(item.state)">
+          {{ item.state }}
         </v-chip>
       </template>
 
-      <template #[`item.consumption`]="{ item }">
-        <p v-if="item.raw.consumption !== 0">{{ item.raw.consumption.toFixed(3) }} TFT/hour</p>
-        <p v-else>No Data Available</p>
-      </template>
-
       <template #[`item.actions`]="{ item }">
-        <v-tooltip :text="failedContractId == item.value.contractId ? 'Retry' : 'Show Details'">
+        <v-tooltip :text="failedContractId == item.contract_id ? 'Retry' : 'Show Details'">
           <template #activator="{ props }">
             <v-btn
-              :color="failedContractId == item.value.contractId ? 'error' : ''"
+              :color="failedContractId == item.contract_id ? 'error' : ''"
               variant="tonal"
-              @click="showDetails(item.value)"
-              :disabled="(loadingShowDetails && loadingContractId !== item.value.contractId) || deleting"
-              :loading="loadingContractId == item.value.contractId"
+              @click="showDetails(item)"
+              :disabled="(loadingShowDetails && loadingContractId !== item.contract_id) || deleting"
+              :loading="loadingContractId == item.contract_id"
               v-bind="props"
             >
-              <v-icon class="pt-1" v-if="failedContractId == item.value.contractId">mdi-refresh</v-icon>
+              <v-icon class="pt-1" v-if="failedContractId == item.contract_id">mdi-refresh</v-icon>
               <v-icon v-else>mdi-eye-outline</v-icon>
             </v-btn>
           </template>
         </v-tooltip>
       </template>
-    </list-table>
+    </v-data-table-server>
 
     <template #footer-actions>
       <v-btn
-        variant="outlined"
+        v-if="Object.keys(props.lockedContracts).length > 0"
+        :disabled="!selectedLockedContracts"
+        color="warning"
+        @click="openUnlockDialog"
+        >Unlock</v-btn
+      >
+
+      <v-btn
         color="anchor"
         prepend-icon="mdi-export-variant"
-        :disabled="isExporting || !contracts || contracts.length === 0 || loadingDelete || deleting"
+        :disabled="isExporting || !contracts || contracts.value.length === 0 || loading.value"
         @click="exportData"
       >
         Export
       </v-btn>
 
       <v-btn
-        variant="outlined"
         color="error"
-        :disabled="!selectedContracts.length || loadingDelete || deleting"
+        :disabled="!selectedContracts.length || deleting"
+        :loading="deleting"
         prepend-icon="mdi-trash-can-outline"
         @click="deletingDialog = true"
       >
@@ -91,11 +141,13 @@
 
   <v-dialog width="800" v-model="contractStateDialog">
     <v-card>
-      <v-card-title class="text-h5 mt-2"> Contract lock Details</v-card-title>
-      <v-card-text>
+      <v-card-title class="bg-primary">
+        <p class="pl-2">Contract lock Details</p>
+      </v-card-title>
+      <v-card-text class="mt-4">
         <v-row class="d-flex justify-center">
           Amount Locked:
-          {{ getAmountLocked() }}
+          {{ getAmountLocked }}
           TFTs.
         </v-row>
         <v-alert
@@ -114,11 +166,31 @@
           above.</v-alert
         >
 
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn variant="outlined" color="anchor" class="mr-2 px-3" @click="contractStateDialog = false">
-            Close
-          </v-btn>
+        <v-card-actions class="justify-end mb-1 mr-2">
+          <v-btn color="anchor" class="mr-2 px-3" @click="contractStateDialog = false"> Close </v-btn>
+          <v-tooltip
+            :text="
+              freeBalance < getAmountLocked
+                ? `You don't have enough balance to unlock this contract`
+                : `Unlock this contract from the grace period state.`
+            "
+            location="top center"
+          >
+            <template #activator="{ props }">
+              <div v-bind="props">
+                <v-btn
+                  v-if="!isNodeInRentContracts"
+                  :disabled="freeBalance < getAmountLocked"
+                  color="warning"
+                  class="mr-2 px-3"
+                  @click="unlockContract([selectedItem.contract_id])"
+                  :loading="unlockContractLoading"
+                >
+                  Unlock Contract
+                </v-btn>
+              </div>
+            </template>
+          </v-tooltip>
         </v-card-actions>
       </v-card-text>
     </v-card>
@@ -126,7 +198,7 @@
 
   <v-dialog width="800" v-model="deletingDialog">
     <v-card>
-      <v-card-title class="text-h5 mt-2"> Delete the following contracts? </v-card-title>
+      <v-card-title class="bg-primary"> Delete the following contracts? </v-card-title>
       <v-alert class="ma-4" type="warning" variant="tonal"
         >It is advisable to remove the contract from its solution page, especially when multiple contracts may be linked
         to the same instance.</v-alert
@@ -134,33 +206,93 @@
 
       <v-alert class="mx-4" type="warning" variant="tonal">Deleting contracts may take a while to complete.</v-alert>
       <v-card-text>
-        <v-chip class="ma-1" color="primary" label v-for="c in selectedContracts" :key="c.contractId">
-          {{ c.contractId }}
+        <v-chip class="ma-1" label v-for="c in selectedContracts" :key="c.contract_id">
+          {{ c.contract_id }}
         </v-chip>
+        <v-divider class="mt-3" />
       </v-card-text>
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn color="anchor" variant="outlined" @click="deletingDialog = false"> Cancel </v-btn>
-        <v-btn color="error" variant="outlined" @click="onDelete"> Delete </v-btn>
+      <v-card-actions class="justify-end mb-1 mr-2">
+        <v-btn color="anchor" @click="deletingDialog = false"> Cancel </v-btn>
+        <v-btn color="error" @click="onDelete"> Delete </v-btn>
       </v-card-actions>
+    </v-card>
+  </v-dialog>
+
+  <v-dialog width="800" v-model="unlockDialog">
+    <v-card>
+      <v-card-title class="bg-primary">
+        Unlock the following Contract<span v-if="selectedContracts.length > 1">s</span>
+      </v-card-title>
+      <v-card-text
+        class="d-flex flex-column justify-center align-center"
+        style="height: 20vh"
+        v-if="loadingShowDetails"
+      >
+        <v-progress-circular indeterminate />
+
+        <div class="text-subtitle-2">Loading contracts lock details</div>
+      </v-card-text>
+      <v-card-text v-else>
+        <v-alert class="my-4" type="warning" variant="tonal">
+          <div v-if="selectedLockedAmount < freeBalance">
+            You have enough balance to unlock your contract<span v-if="selectedContracts.length > 1">s</span>; this will
+            cost you around {{ Math.ceil(selectedLockedAmount) }} TFTs.
+          </div>
+          <div v-else-if="selectedLockedAmount > 0">
+            You need to fund your account with
+            <span class="font-weight-bold">{{ Math.ceil(selectedLockedAmount - freeBalance) }} TFTs</span>
+            to resume your contracts
+          </div>
+        </v-alert>
+        <v-chip class="ma-1" label v-for="c in selectedContracts" :key="c.contract_id">
+          {{ c.contract_id }}
+        </v-chip>
+        <v-card-actions class="justify-end mb-1 mr-2">
+          <v-btn color="anchor" @click="unlockDialog = false"> Cancel </v-btn>
+          <v-tooltip
+            :text="
+              freeBalance < selectedLockedAmount
+                ? `You don't have enough balance to unlock your contract${selectedContracts.length > 1 ? `s` : ``}`
+                : `Unlock your contract${selectedContracts.length > 1 ? `s` : ``} from the grace period state.`
+            "
+            location="top center"
+          >
+            <template #activator="{ props }">
+              <div v-bind="props">
+                <v-btn
+                  :disabled="selectedLockedAmount > freeBalance"
+                  color="warning"
+                  class="ml-2"
+                  :loading="unlockContractLoading"
+                  @click="
+                    unlockContract([...selectedContracts.map(contract => contract.contract_id), ...rentContractIds])
+                  "
+                >
+                  Unlock
+                </v-btn>
+              </div>
+            </template>
+          </v-tooltip>
+        </v-card-actions>
+      </v-card-text>
     </v-card>
   </v-dialog>
 </template>
 
 <script lang="ts" setup>
 // Import necessary types and libraries
-import { ContractStates, type GridClient } from "@threefold/grid_client";
+import { ContractStates, type GridClient, type LockDetails } from "@threefold/grid_client";
 import type { NodeStatus } from "@threefold/gridproxy_client";
 import type { ContractLock } from "@threefold/tfchain_client";
 import { DeploymentKeyDeletionError, TFChainErrors } from "@threefold/types";
-import { capitalize, computed, defineComponent, type PropType, type Ref, ref } from "vue";
+import { capitalize, computed, defineComponent, type PropType, type Ref, ref, watch } from "vue";
 
+import { useProfileManagerController } from "@/components/profile_manager_controller.vue";
 import type { VDataTableHeader } from "@/types";
 import { ContractType, getNodeStateColor, getStateColor, type NormalizedContract } from "@/utils/contracts";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
+import toHumanDate from "@/utils/date";
 import { downloadAsJson, normalizeError } from "@/utils/helpers";
-
-import ListTable from "../../components/list_table.vue";
 
 const props = defineProps({
   contracts: {
@@ -172,7 +304,7 @@ const props = defineProps({
     required: true,
   },
   grid: {
-    type: Object as PropType<Ref<GridClient | undefined>>,
+    type: Object as PropType<GridClient>,
     required: true,
   },
   loading: {
@@ -187,52 +319,88 @@ const props = defineProps({
     type: Object as PropType<ContractType>,
     required: true,
   },
+  lockedContracts: {
+    type: Object as PropType<LockDetails>,
+    required: true,
+  },
+  size: {
+    required: true,
+    type: Object as PropType<Ref<number>>,
+  },
+  page: {
+    required: true,
+    type: Object as PropType<Ref<number>>,
+  },
+  count: {
+    required: true,
+    type: Object as PropType<Ref<number>>,
+  },
 });
-
-const getAmountLocked = (): number => {
+const getAmountLocked = computed(() => {
   const amountLocked = contractLocked?.value?.amountLocked ?? 0;
   return amountLocked > 0 ? parseFloat(amountLocked.toFixed(3)) : 0;
-};
+});
 
 const isNodeInRentContracts = computed(() => {
-  if (props.contractsType == ContractType.RENT) {
-    const nodeIds = contracts.value.map(contract => contract.nodeId).filter(nodeId => nodeId !== undefined) as number[];
+  if (props.contractsType == ContractType.Node && selectedItem.value) {
+    const nodeIds = new Set(
+      props.contracts.value.map(contract => contract.details.nodeId).filter(nodeId => nodeId !== undefined) as number[],
+    );
     if (contractLocked.value && contractLocked.value.amountLocked === 0) {
-      return nodeIds.includes(selectedItem.value.nodeId);
+      return nodeIds.has(selectedItem.value.details.nodeId);
     }
   }
   return false;
 });
 
-const emits = defineEmits(["update:deleted-contracts"]);
+const emits = defineEmits(["update:deleted-contracts", "update:unlock-contracts", "update:page", "update:size"]);
+
+function updatePage(page: number) {
+  emits("update:page", page);
+}
+
+function updateSize(size: number) {
+  emits("update:size", size);
+}
 
 const layout = ref();
 const contractLocked = ref<ContractLock>();
 const deleting = ref<boolean>(false);
 const loadingShowDetails = ref<boolean>(false);
-const loadingDelete = ref<boolean>(false);
 const contractStateDialog = ref<boolean>(false);
 const isExporting = ref<boolean>(false);
 const deletingDialog = ref<boolean>(false);
 const failedContractId = ref<number>();
 const loadingContractId = ref<number>();
 const selectedContracts = ref<NormalizedContract[]>([]);
-const contracts = ref<Ref<NormalizedContract[]>>(props.contracts);
 const selectedItem = ref();
-
+const profileManagerController = useProfileManagerController();
+const balance = profileManagerController.balance;
+const freeBalance = computed(() => (balance.value?.free ?? 0) - (balance.value?.locked ?? 0));
+const unlockContractLoading = ref(false);
+const unlockDialog = ref(false);
+const selectedLockedContracts = computed(() => {
+  if (selectedContracts.value.length == 0) return false;
+  for (const contract of selectedContracts.value) {
+    if (contract.state != ContractStates.GracePeriod) return false;
+  }
+  return true;
+});
+const rentContractIds = ref<number[]>([]);
+const selectedLockedAmount = ref(0);
 // Function to show details of a contract
 async function showDetails(value: any) {
   failedContractId.value = undefined;
-  if (value.type === ContractType.NAME || value.type === ContractType.RENT) {
+  if (value.type === ContractType.Name || value.type === ContractType.Rent) {
     return layout.value.openDialog(value, false, true);
   }
 
   loadingShowDetails.value = true;
-  const contractId: number = value.contractId;
+  const contractId: number = value.contract_id;
   loadingContractId.value = contractId;
 
   try {
-    const deployment = await props.grid.value?.zos.getDeployment({ contractId });
+    const deployment = await props.grid?.zos.getDeployment({ contractId });
     return layout.value.openDialog(deployment, false, true);
   } catch (e) {
     failedContractId.value = contractId;
@@ -243,35 +411,74 @@ async function showDetails(value: any) {
   }
 }
 
+async function openUnlockDialog() {
+  loadingShowDetails.value = true;
+  unlockDialog.value = true;
+  rentContractIds.value = [];
+  selectedLockedAmount.value = 0;
+  const nodeIDsGracePeriod = new Set<number>();
+  try {
+    // get actual locked amount
+    for (const contract of selectedContracts.value) {
+      if (contract.consumption == 0 && contract.type == ContractType.Node && contract.details.nodeId) {
+        nodeIDsGracePeriod.add(contract.details.nodeId);
+      } else {
+        selectedLockedAmount.value += (await getLockDetails(contract.contract_id)).amountLocked || 0;
+      }
+    }
+    for (const nodeId of nodeIDsGracePeriod) {
+      const rentContractId = await props.grid.nodes.getRentContractId({ nodeId });
+      if (rentContractId) {
+        rentContractIds.value.push(rentContractId);
+        selectedLockedAmount.value += (await getLockDetails(rentContractId)).amountLocked || 0;
+      }
+    }
+    await profileManagerController.reloadBalance();
+  } catch (e) {
+    createCustomToast("Failed to load contracts lock details, please try again later", ToastType.danger);
+    console.log(e);
+    unlockDialog.value = false;
+  } finally {
+    loadingShowDetails.value = false;
+  }
+}
+
+async function getLockDetails(contractId: number) {
+  return await props.grid.contracts.contractLock({ id: contractId });
+}
 // Function to fetch contract lock details
 async function contractLockDetails(item: any) {
-  contractStateDialog.value = true;
-  loadingShowDetails.value = true;
   selectedItem.value = item;
-  await props.grid.value?.contracts
-    .contractLock({ id: item.contractId })
+  loadingShowDetails.value = true;
+  await profileManagerController.reloadBalance();
+  await getLockDetails(item.contract_id);
+  await props.grid?.contracts
+    .contractLock({ id: item.contract_id })
     .then((data: ContractLock) => {
       contractLocked.value = data;
+      contractStateDialog.value = true;
     })
-    .catch(err => {
+    .catch((err: any) => {
       layout.value.setStatus(
         "failed",
-        normalizeError(err, `Failed to fetch the contract ${item.contractId} lock details.`),
+        normalizeError(err, `Failed to fetch the contract ${item.contract_id} lock details.`),
       );
       contractStateDialog.value = false;
+    })
+    .finally(() => {
+      loadingShowDetails.value = false;
     });
-  loadingShowDetails.value = false;
 }
 
 // Function to export contract data as JSON
 function exportData() {
   isExporting.value = true;
-  downloadAsJson(contracts.value, `${props.contractsType}_contracts`);
+  downloadAsJson(props.contracts, `${props.contractsType}_contracts`);
   isExporting.value = false;
 }
 
 // Function called on clicking a row to show details
-const onClickRow = (_: any, data: any) => showDetails(data.item.value);
+const onClickRow = (_: any, data: any) => showDetails(data.item);
 
 // Function to handle contract deletion
 async function onDelete() {
@@ -279,15 +486,14 @@ async function onDelete() {
   deleting.value = true;
 
   try {
-    await props.grid.value?.contracts.batchCancelContracts({
-      ids: selectedContracts.value.map(c => c.contractId),
+    await props.grid?.contracts.batchCancelContracts({
+      ids: selectedContracts.value.map(c => c.contract_id),
     });
-    contracts.value = contracts.value.filter(c => !selectedContracts.value.includes(c));
-    emits("update:deleted-contracts", contracts.value);
+    const contracts = props.contracts.value.filter(c => !selectedContracts.value.includes(c));
+    emits("update:deleted-contracts", contracts);
     selectedContracts.value = [];
   } catch (e) {
     if (e instanceof DeploymentKeyDeletionError) {
-      contracts.value = contracts.value.filter(c => !selectedContracts.value.includes(c));
       selectedContracts.value = [];
       createCustomToast("Failed to delete some keys, You don't have enough tokens", ToastType.danger);
     } else if (e instanceof TFChainErrors.smartContractModule.NodeHasActiveContracts) {
@@ -301,6 +507,36 @@ async function onDelete() {
   }
   deleting.value = false;
 }
+
+// function to unlock grace period contracts
+async function unlockContract(contractId: number[]) {
+  try {
+    unlockContractLoading.value = true;
+    await props.grid.contracts.unlockContracts(contractId.filter(id => props.lockedContracts[id]?.amountLocked !== 0));
+    createCustomToast(
+      `Your request to unlock contract ${contractId} has been processed successfully. Changes may take a few minutes to reflect`,
+      ToastType.info,
+    );
+    setTimeout(() => emits("update:unlock-contracts"), 30000);
+    contractStateDialog.value = false;
+    unlockDialog.value = false;
+    rentContractIds.value = [];
+    selectedContracts.value = [];
+  } catch (e) {
+    createCustomToast(`Failed to unlock contract ${contractId}`, ToastType.danger);
+    console.error(e);
+  } finally {
+    unlockContractLoading.value = false;
+  }
+}
+watch(contractStateDialog, contractStateDialog => {
+  if (!contractStateDialog) selectedItem.value = undefined;
+});
+defineExpose({
+  reset() {
+    selectedContracts.value = [];
+  },
+});
 </script>
 
 <script lang="ts">

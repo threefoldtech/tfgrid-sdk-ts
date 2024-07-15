@@ -24,11 +24,7 @@
     />
     <Networks v-model:mycelium="$props.modelValue.mycelium" />
 
-    <input-tooltip
-      inline
-      tooltip="Click to know more about dedicated machines."
-      href="https://www.manual.grid.tf/documentation/dashboard/deploy/dedicated_machines.html"
-    >
+    <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
       <v-switch color="primary" inset label="Dedicated" v-model="$props.modelValue.dedicated" />
     </input-tooltip>
     <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
@@ -53,6 +49,8 @@
 <script lang="ts">
 import { computed, type PropType } from "vue";
 
+import { manual } from "@/utils/manual";
+
 import Networks from "../components/networks.vue";
 import type { CaproverWorker } from "../types";
 import rootFs from "../utils/root_fs";
@@ -60,7 +58,7 @@ import { generateName } from "../utils/strings";
 import SelectSolutionFlavor from "./select_solution_flavor.vue";
 
 export function createWorker(name: string = generateName({ prefix: "wr" })): CaproverWorker {
-  return { name, mycelium: false };
+  return { name, mycelium: true };
 }
 
 export default {
@@ -73,7 +71,7 @@ export default {
       return rootFs(cpu, memory);
     });
 
-    return { rootFilesystemSize };
+    return { rootFilesystemSize, manual };
   },
 };
 </script>

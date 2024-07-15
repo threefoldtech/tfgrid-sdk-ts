@@ -1,5 +1,9 @@
 <template>
   <view-layout>
+    <v-card color="primary" class="d-flex justify-center items-center mb-4 pa-3 text-center">
+      <v-icon size="30" class="pr-3">mdi-television</v-icon>
+      <v-card-title class="pa-0">Virtual Machines</v-card-title>
+    </v-card>
     <v-row>
       <v-col v-for="card in cards" :key="card.title">
         <router-link :to="card.route">
@@ -18,9 +22,7 @@
                 />
                 <v-card-title class="d-inline-block">
                   {{ card.title }}
-                  <v-chip v-if="card.flare" class="ml-2 pulse-animation" color="#1AA18F" small text-color="white">
-                    Community
-                  </v-chip>
+                  <v-chip v-if="card.flare" class="ml-2 pulse-animation"> Community </v-chip>
                 </v-card-title>
                 <v-card-text class="mt-2"> {{ card.excerpt }} </v-card-text>
               </v-card>

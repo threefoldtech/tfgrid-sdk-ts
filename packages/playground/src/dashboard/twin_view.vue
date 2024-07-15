@@ -7,9 +7,9 @@
           <div class="text-h2 pa-10">
             <v-text-field v-model="relay" outlined label="Relay" :error-messages="errorMsg"></v-text-field>
           </div>
-          <v-card-actions class="justify-end pa-5">
-            <v-btn @click="editingTwin = false" class="grey lighten-2 black--text">Close</v-btn>
-            <v-btn @click="UpdateRelay" class="primary white--text">Save</v-btn>
+          <v-card-actions class="justify-end mb-1 mr-2">
+            <v-btn @click="editingTwin = false" color="anchor">Close</v-btn>
+            <v-btn @click="UpdateRelay">Save</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -19,15 +19,13 @@
       <v-card>
         <v-toolbar color="primary" dark class="custom-toolbar bold-text">Vote Reminder</v-toolbar>
         <v-card-text>There are {{ numberOfProposalsToVoteOn }} active proposals you can vote on now</v-card-text>
-        <v-card-actions class="justify-end pa-5">
-          <v-btn @click="redirectToDao" variant="elevated" color="primary" class="mr-2 text-subtitle-2">Vote</v-btn>
-          <v-btn @click="openVotePopup = false" variant="outlined" color="anchor" class="mr-2 text-subtitle-2"
-            >Close</v-btn
-          >
+        <v-card-actions class="justify-end mb-1 mr-2">
+          <v-btn @click="redirectToDao" variant="elevated">Vote</v-btn>
+          <v-btn @click="openVotePopup = false" color="anchor">Close</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <div class="border px-4 pb-4 rounded position-relative mt-2">
+    <div class="border px-4 pb-4 rounded position-relative">
       <v-card color="primary" class="d-flex justify-center items-center mt-3 pa-3 text-center">
         <v-icon size="30" class="pr-3">mdi-account-supervisor-outline</v-icon>
         <v-card-title class="pa-0">Twin Details</v-card-title>
@@ -52,6 +50,56 @@
                         location="right center"
                       />
                     </div>
+                  </v-list-item>
+                </v-col>
+              </v-row>
+              <v-row class="row-style">
+                <v-col cols="1" sm="2" style="min-width: fit-content">
+                  <v-list-item> E-mail :</v-list-item>
+                </v-col>
+                <v-col>
+                  <v-list-item v-if="!editEmail">
+                    <div style="display: flex; justify-content: space-between">
+                      {{ profileManager.profile?.email }}
+                      <v-icon @click="editEmail = true">mdi-pencil</v-icon>
+                    </div>
+                  </v-list-item>
+
+                  <v-list-item v-if="editEmail">
+                    <v-form
+                      @submit.prevent="saveEmail"
+                      style="display: flex; justify-content: space-between"
+                      v-model="isValid"
+                    >
+                      <input-validator
+                        :value="email"
+                        :rules="[
+                          validators.required('Email is required.'),
+                          validators.isEmail('Please provide a valid email address.'),
+                        ]"
+                        #="{ props }"
+                      >
+                        <v-text-field
+                          class="mr-2"
+                          placeholder="email@example.com"
+                          v-model="email"
+                          v-bind="props"
+                          :loading="loading"
+                          autofocus
+                        />
+                      </input-validator>
+                      <v-btn
+                        type="submit"
+                        icon="mdi-content-save-all"
+                        class="mt-2"
+                        color="anchor"
+                        variant="text"
+                        :disabled="!isValid || savingEmail"
+                      >
+                      </v-btn>
+                      <v-btn icon="mdi-close" class="mt-2" color="anchor" variant="text" @click="editEmail = false">
+                      </v-btn>
+                    </v-form>
                   </v-list-item>
                 </v-col>
               </v-row>
@@ -100,13 +148,7 @@
             <div class="text-center my-3">
               <p>
                 Scan the QR code using
-                <a
-                  class="app-link"
-                  href="https://www.manual.grid.tf/documentation/threefold_token/storing_tft/tf_connect_app.html"
-                  target="_blank"
-                >
-                  ThreeFold Connect
-                </a>
+                <a class="app-link" :href="manual.tf_connect_app" target="_blank"> ThreeFold Connect </a>
                 to fund your account
               </p>
             </div>
@@ -129,8 +171,8 @@
             </div>
           </v-col>
         </v-row>
-        <v-card-actions v-if="updateRelay" class="justify-end mx-4 mb-4">
-          <v-btn class="custom-button bg-primary" @click="editTwin">Edit</v-btn>
+        <v-card-actions v-if="updateRelay" class="justify-end mb-1 mr-2">
+          <v-btn variant="elevated" class="custom-button" @click="editTwin">Edit</v-btn>
         </v-card-actions>
       </v-card>
     </div>
@@ -141,12 +183,14 @@
 import { generatePublicKey } from "@threefold/rmb_direct_client";
 import { onMounted, ref } from "vue";
 
+import { manual } from "@/utils/manual";
+
 import router from "../router";
-import { useProfileManager } from "../stores";
+import { useGrid, useProfileManager } from "../stores";
 import type { FarmInterface } from "../types";
 import { createCustomToast, ToastType } from "../utils/custom_toast";
 import { getFarms } from "../utils/get_farms";
-import { getGrid } from "../utils/grid";
+import { type Balance, loadBalance, storeEmail } from "../utils/grid";
 const profileManager = useProfileManager();
 
 const editingTwin = ref(false);
@@ -158,6 +202,13 @@ const numberOfProposalsToVoteOn = ref(0);
 const userFarms = ref<FarmInterface[]>();
 const activeProposalsUserHasVotedOn = ref(0);
 const bridge = (window as any).env.BRIDGE_TFT_ADDRESS;
+const email = ref(profileManager.profile?.email || "");
+const loading = ref<boolean>(false);
+const editEmail = ref<boolean>(false);
+const isValid = ref<boolean>(false);
+const savingEmail = ref<boolean>(false);
+const gridStore = useGrid();
+const grid = gridStore.client as GridClient;
 
 const apps = [
   {
@@ -173,7 +224,6 @@ const apps = [
 ];
 onMounted(async () => {
   const profile = profileManager.profile!;
-  const grid = await getGrid(profile);
 
   if (!grid) {
     createCustomToast("Fetch Grid Failed", ToastType.danger);
@@ -211,6 +261,29 @@ onMounted(async () => {
 function redirectToDao() {
   router.push({ path: "/tf-chain/dao" });
 }
+
+async function saveEmail() {
+  try {
+    const balance: Balance = await loadBalance(grid!);
+    if (balance.free < 1) {
+      editEmail.value = false;
+      createCustomToast(
+        "Transaction Error: Unable to Process Payment - Insufficient Account Balance.",
+        ToastType.danger,
+      );
+    } else {
+      loading.value = true;
+      savingEmail.value = true;
+      profileManager.updateEmail(email.value);
+      await storeEmail(grid!, email.value);
+      editEmail.value = false;
+      loading.value = false;
+      savingEmail.value = false;
+    }
+  } catch (e) {
+    console.log(e);
+  }
+}
 onMounted(validateEdit);
 async function validateEdit() {
   try {
@@ -235,7 +308,6 @@ function editTwin() {
 async function UpdateRelay() {
   try {
     const pk = await generatePublicKey(profileManager.profile!.mnemonic);
-    const grid = await getGrid(profileManager.profile!);
     await grid?.twins.update({ relay: relay.value });
     profileManager.updateRelay(relay.value);
     profileManager.updatePk(pk);
@@ -252,6 +324,8 @@ function copy(id: string) {
 }
 </script>
 <script lang="ts">
+import type { GridClient } from "@threefold/grid_client";
+
 import QrcodeGenerator from "../components/qrcode_generator.vue";
 
 export default {
@@ -277,11 +351,6 @@ export default {
   border-bottom: 0.1px solid #8a8a8a;
   margin-left: 10px;
   margin-right: 10px;
-}
-
-.custom-button {
-  font-size: 16px;
-  font-weight: bold;
 }
 
 .custom-toolbar {

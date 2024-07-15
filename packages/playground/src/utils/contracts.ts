@@ -7,13 +7,16 @@ import { solutionType, type VDataTableHeader } from "@/types";
 
 import { normalizeBalance } from "./helpers";
 
+// Cache to store results of `getNodeInfo` requests
+const NODE_INFO_CACHE: { [key: number]: { status: NodeStatus; farmId: number } } = {};
+
 export async function getUserContracts(grid: GridClient) {
   const res: any = await grid!.contracts.listMyContracts();
 
   const promises = [
-    ...res.nameContracts.map((c: any) => normalizeContract(grid!, c, ContractType.NAME)),
-    ...res.nodeContracts.map((c: any) => normalizeContract(grid!, c, ContractType.NODE)),
-    ...res.rentContracts.map((c: any) => normalizeContract(grid!, c, ContractType.RENT)),
+    ...res.nameContracts.map((c: any) => normalizeContract(grid!, c, ContractType.Name)),
+    ...res.nodeContracts.map((c: any) => normalizeContract(grid!, c, ContractType.Node)),
+    ...res.rentContracts.map((c: any) => normalizeContract(grid!, c, ContractType.Rent)),
   ];
 
   return Promise.allSettled(promises).then(results =>
@@ -29,19 +32,19 @@ function parseProjectName(projectName: string) {
   return projectName;
 }
 
-async function normalizeContract(
+export async function normalizeContract(
   grid: GridClient,
   c: { [key: string]: any },
   type: ContractType,
 ): Promise<NormalizedContract> {
-  const id = +c.contractID;
+  const id = +c.contract_id;
 
   let data: { [key: string]: string };
   try {
-    data = JSON.parse(c.deploymentData);
+    data = JSON.parse(c.details.deployment_data);
     data.projectName = parseProjectName(data.projectName);
   } catch {
-    data = { name: c.name };
+    data = { name: c.details.name };
   }
 
   let expiration = "-";
@@ -58,17 +61,21 @@ async function normalizeContract(
   }
 
   return {
-    contractId: id,
-    twinID: c.twinID,
+    contract_id: id,
+    twin_id: c.twin_id,
     type,
+    deploymentType: data.type,
     state: c.state,
-    createdAt: new Date(+c.createdAt * 1000).toLocaleString(),
-    nodeId: c.nodeID || "-",
-    solutionProviderID: c.solutionProviderID,
+    created_at: c.created_at,
+    details: {
+      nodeId: c.details.nodeId || "-",
+      deployment_data: c.details.deployment_data ? JSON.parse(c.details.deployment_data) : undefined,
+      farm_id: c.details.farm_id || "-",
+    },
     solutionName: data.name || "-",
     solutionType: data.projectName || data.type || "-",
     expiration,
-    consumption,
+    consumption: consumption,
   };
 }
 
@@ -99,36 +106,61 @@ export function formatConsumption(value: number): string {
   return normalizeBalance(value) + " TFT/hour";
 }
 
-export async function getNodeStatus(nodeIDs: (number | undefined)[]) {
-  const resultPromises = nodeIDs.map(async nodeId => {
+export async function getNodeInfo(nodeIDs: number[], requestedNodes: number[]) {
+  // Ensure we have unique node IDs
+  const uniqueNodeIDs = Array.from(new Set(nodeIDs));
+  const uniqueRequestedNodes = new Set(requestedNodes);
+
+  const nodeIDsToRequest = uniqueNodeIDs.filter(
+    nodeId => !uniqueRequestedNodes.has(nodeId) && !NODE_INFO_CACHE[nodeId],
+  );
+
+  const resultPromises = nodeIDsToRequest.map(async nodeId => {
     if (typeof nodeId !== "number") return {};
-    const status = (await gridProxyClient.nodes.byId(nodeId)).status;
-    return { [nodeId]: status };
+    const nodeInfo = await gridProxyClient.nodes.byId(nodeId);
+    // Store result in cache
+    NODE_INFO_CACHE[nodeId] = { status: nodeInfo.status, farmId: nodeInfo.farmId };
+    return { [nodeId]: NODE_INFO_CACHE[nodeId] };
   });
 
   const resultsArray = await Promise.all(resultPromises);
+  const results = resultsArray.reduce((acc, obj) => Object.assign(acc, obj), {});
 
-  return resultsArray.reduce((acc, obj) => Object.assign(acc, obj), {});
+  for (const nodeId of uniqueNodeIDs) {
+    if (NODE_INFO_CACHE[nodeId]) {
+      results[nodeId] = NODE_INFO_CACHE[nodeId];
+    }
+  }
+
+  return results;
+}
+
+export interface ContractDetails {
+  nodeId: number;
+  deployment_data?: string;
+  deployment_hash?: string;
+  number_of_public_ips?: number;
+  farm_id: number;
 }
 
 export interface NormalizedContract {
-  contractId: number;
-  type: "name" | "node" | "rent";
+  contract_id: number;
+  twin_id: number;
   state: ContractStates;
-  createdAt: string;
-  nodeId?: number;
-  solutionName?: string;
+  created_at: number;
+  type: "name" | "node" | "rent";
+  details: ContractDetails;
+  consumption?: number;
   solutionType?: string;
+  solutionName?: string;
+  deploymentType?: string;
   expiration?: string;
-  consumption: number;
-  solutionProviderID: number;
-  twinID: number;
 }
 
 export enum ContractType {
-  NODE = "node",
-  RENT = "rent",
-  NAME = "name",
+  Node = "node",
+  Rent = "rent",
+  Name = "name",
 }
 
 export type ContractsTableType = {
@@ -136,7 +168,10 @@ export type ContractsTableType = {
   type: ContractType;
   icon: string;
   title: string;
-  grid: Ref<GridClient | undefined>;
+  grid: GridClient;
   contracts: Ref<NormalizedContract[]>;
   loading: Ref<boolean>;
+  count: Ref<number>;
+  page: Ref<number>;
+  size: Ref<number>;
 };

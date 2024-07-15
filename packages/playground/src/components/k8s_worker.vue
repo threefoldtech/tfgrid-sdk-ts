@@ -75,11 +75,7 @@
       v-model.number="$props.modelValue.rootFsSize"
     />
 
-    <input-tooltip
-      inline
-      tooltip="Click to know more about dedicated machines."
-      href="https://www.manual.grid.tf/documentation/dashboard/deploy/dedicated_machines.html"
-    >
+    <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
       <v-switch color="primary" inset label="Dedicated" v-model="$props.modelValue.dedicated" />
     </input-tooltip>
 
@@ -109,6 +105,8 @@
 <script lang="ts">
 import type { PropType } from "vue";
 
+import { manual } from "@/utils/manual";
+
 import Networks from "../components/networks.vue";
 import type { K8SWorker } from "../types";
 import rootFs from "../utils/root_fs";
@@ -124,7 +122,7 @@ export function createWorker(name: string = generateName({ prefix: "wr" })): K8S
     ipv4: false,
     ipv6: false,
     planetary: true,
-    mycelium: false,
+    mycelium: true,
     rootFsSize: 2,
     dedicated: false,
     certified: false,
@@ -142,7 +140,7 @@ export default {
     },
   },
   setup() {
-    return { rootFs };
+    return { rootFs, manual };
   },
 };
 </script>

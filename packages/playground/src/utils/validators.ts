@@ -1,12 +1,21 @@
+import type { GridClient } from "@threefold/grid_client";
+import StellarSdk from "stellar-sdk";
 import validator from "validator";
 import type { Options } from "validator/lib/isBoolean";
 import type { IsEmailOptions } from "validator/lib/isEmail";
 import type { IsFQDNOptions } from "validator/lib/isFQDN";
 import type { IsURLOptions } from "validator/lib/isURL";
 
+import type { RuleReturn } from "@/components/input_validator.vue";
+
+/**
+ * Checks if a value is empty, undefined, or null.
+ * @param msg - The error message to be returned if the value is empty.
+ * @returns A validation function that takes in a value and returns an object with the error message and a `required` property set to `true` if the value is empty, undefined, or null.
+ */
 export function required(msg: string) {
   return (value: string) => {
-    if (value === "" || value === undefined || value === null) {
+    if (!value) {
       return { message: msg, required: true };
     }
   };
@@ -723,4 +732,40 @@ export function pattern(msg: string, config: RegexPattern) {
       return { message: msg, pattern: String(regex) };
     }
   };
+}
+
+export function isValidDecimalNumber(length: number, msg: string) {
+  return (value: string) => {
+    if (!(value.toString().split(".").length > 1 ? value.toString().split(".")[1].length <= length : true)) {
+      return {
+        message: msg,
+      };
+    }
+  };
+}
+export async function isValidStellarAddress(target: string): Promise<RuleReturn> {
+  const server = new StellarSdk.Server(window.env.STELLAR_HORIZON_URL);
+  try {
+    // check if the account provided exists on stellar
+    const account = await server.loadAccount(target);
+    // check if the account provided has the appropriate trustlines
+    const includes = account.balances.find(
+      (b: { asset_code: string; asset_issuer: string }) =>
+        b.asset_code === "TFT" && b.asset_issuer === window.env.TFT_ASSET_ISSUER,
+    );
+    if (!includes) throw new Error("Invalid trustline");
+  } catch (e) {
+    const message =
+      (e as Error).message === "Invalid trustline"
+        ? "Address does not have a valid trustline to TFT"
+        : "Address not found";
+    return { message };
+  }
+}
+
+export async function isAvailableName(grid: GridClient, name: string) {
+  const valid = await grid.contracts.get_name_contract({ name });
+  if (name && !!valid) {
+    return { message: "Name is already taken." };
+  }
 }

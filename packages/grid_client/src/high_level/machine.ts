@@ -77,6 +77,17 @@ class VMHL extends HighLevelBase {
       throw new GridClientErrors.Nodes.UnavailableNodeError(
         `Node ${nodeId} is not available for user with twinId: ${twinId}, maybe it's rented by another user or node is dedicated. use capacity planning with availableFor option.`,
       );
+    } else {
+      // If Available for twinId (dedicated), check it's not in grace period
+      const nodeInfo = await this.nodes.getNode(nodeId);
+      if (nodeInfo.rentContractId !== 0) {
+        const contract = await this.config.tfclient.contracts.get({ id: nodeInfo.rentContractId });
+        if (contract && contract.state.gracePeriod) {
+          throw new GridClientErrors.Nodes.UnavailableNodeError(
+            `Can't deploy on node: ${nodeId}, its rent contract in grace period.`,
+          );
+        }
+      }
     }
 
     // qsfs disks
@@ -131,7 +142,6 @@ class VMHL extends HighLevelBase {
     }
 
     // ipv4
-    // TODO: make sure that the farm has a free public ip before continuing the deployment
     let ipName = "";
     let publicIps = 0;
     if (publicIp || publicIp6) {
@@ -139,6 +149,15 @@ class VMHL extends HighLevelBase {
       ipName = `${name}_pubip`;
       workloads.push(ip.create(ipName, "", description, 0, publicIp, publicIp6));
       if (publicIp) {
+        const node = await this.nodes.getNode(nodeId);
+        const _farm = await this.config.tfclient.farms.get({ id: node.farmId });
+        const freeIps = _farm.publicIps.filter(res => res.contractId === 0).length;
+        if (freeIps < 1) {
+          throw new GridClientErrors.Farms.InvalidResourcesError(
+            `Farm ${_farm.id} doesn't have enough public IPs: requested IPs=1 for machine with name: ${name},
+            , available IPs=${freeIps}.`,
+          );
+        }
         publicIps++;
       }
     }
@@ -382,6 +401,7 @@ class VMHL extends HighLevelBase {
       WorkloadTypes.ip,
       WorkloadTypes.ipv4, // TODO: remove deprecated
       WorkloadTypes.zmount,
+      WorkloadTypes.volume,
       WorkloadTypes.zmachine,
       WorkloadTypes.qsfs,
       WorkloadTypes.zlogs,

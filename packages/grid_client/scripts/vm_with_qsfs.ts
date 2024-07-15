@@ -46,13 +46,13 @@ async function main() {
   const vmQueryOptions: FilterOptions = {
     cru: 1,
     mru: 1, // GB
-    sru: 1,
+    sru: 7,
     availableFor: grid3.twinId,
     farmId: 1,
   };
 
   const qsfsQueryOptions: FilterOptions = {
-    hru: 6,
+    hru: 15,
     availableFor: grid3.twinId,
     farmId: 1,
   };

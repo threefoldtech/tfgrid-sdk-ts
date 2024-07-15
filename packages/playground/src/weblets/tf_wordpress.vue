@@ -12,7 +12,7 @@
   >
     <template #title>Deploy a Wordpress Instance </template>
 
-    <form-validator v-model="valid">
+    <d-tabs :tabs="[{ title: 'Config', value: 'config' }]">
       <input-validator
         :value="name"
         :rules="[
@@ -92,11 +92,7 @@
 
       <Networks v-model:ipv4="ipv4" v-model:mycelium="mycelium" />
 
-      <input-tooltip
-        inline
-        tooltip="Click to know more about dedicated machines."
-        href="https://www.manual.grid.tf/documentation/dashboard/deploy/dedicated_machines.html"
-      >
+      <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
         <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
       </input-tooltip>
 
@@ -117,10 +113,12 @@
         require-domain
         v-model="selectionDetails"
       />
-    </form-validator>
 
-    <template #footer-actions>
-      <v-btn color="secondary" variant="outlined" @click="deploy()" :disabled="!valid"> Deploy </v-btn>
+      <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
+    </d-tabs>
+
+    <template #footer-actions="{ validateBeforeDeploy }">
+      <v-btn color="secondary" @click="validateBeforeDeploy(deploy)" text="Deploy" />
     </template>
   </weblet-layout>
 </template>
@@ -129,22 +127,23 @@
 import type { GridClient } from "@threefold/grid_client";
 import { computed, type Ref, ref } from "vue";
 
+import { updateGrid } from "@/utils/grid";
+import { manual } from "@/utils/manual";
+
 import { useLayout } from "../components/weblet_layout.vue";
-import { useProfileManager } from "../stores";
+import { useGrid, useProfileManager } from "../stores";
 import type { Flist, solutionFlavor as SolutionFlavor } from "../types";
 import { ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
 import { deployGatewayName, getSubdomain, rollbackDeployment } from "../utils/gateway";
-import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
 import { generateName, generatePassword } from "../utils/strings";
 
 const layout = useLayout();
-const valid = ref(false);
 const profileManager = useProfileManager();
 const name = ref(generateName({ prefix: "wp" }));
 const username = ref("admin");
-const email = ref("");
+const email = ref(profileManager.profile?.email || "");
 const password = ref(generatePassword());
 const solution = ref() as Ref<SolutionFlavor>;
 const flist: Flist = {
@@ -154,10 +153,12 @@ const flist: Flist = {
 const dedicated = ref(false);
 const certified = ref(false);
 const ipv4 = ref(false);
-const mycelium = ref(false);
+const mycelium = ref(true);
 const rootFilesystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solution.value?.memory ?? 0));
 const selectionDetails = ref<SelectionDetails>();
-
+const selectedSSHKeys = ref("");
+const gridStore = useGrid();
+const grid = gridStore.client as GridClient;
 function finalize(deployment: any) {
   layout.value.reloadDeploymentsList();
   layout.value.setStatus("success", "Successfully deployed a Wordpress instance.");
@@ -167,6 +168,7 @@ async function deploy() {
   layout.value.setStatus("deploy");
 
   const projectName = ProjectName.Wordpress.toLowerCase() + "/" + name.value;
+  updateGrid(grid, { projectName });
 
   const subdomain = getSubdomain({
     deploymentName: name.value,
@@ -178,15 +180,12 @@ async function deploy() {
     ? selectionDetails.value.domain.customDomain
     : subdomain + "." + selectionDetails.value?.domain?.selectedDomain?.publicConfig.domain;
 
-  let grid: GridClient | null;
   let vm: any;
   try {
     layout.value?.validateSSH();
-    grid = await getGrid(profileManager.profile!, projectName);
+    await layout.value.validateBalance(grid);
 
-    await layout.value.validateBalance(grid!);
-
-    vm = await deployVM(grid!, {
+    vm = await deployVM(grid, {
       name: name.value,
       network: {
         addAccess: selectionDetails.value!.domain!.enableSelectedDomain,
@@ -208,7 +207,7 @@ async function deploy() {
           publicIpv4: ipv4.value,
           mycelium: mycelium.value,
           envs: [
-            { key: "SSH_KEY", value: profileManager.profile!.ssh },
+            { key: "SSH_KEY", value: selectedSSHKeys.value },
             { key: "MYSQL_USER", value: username.value },
             { key: "MYSQL_PASSWORD", value: password.value },
             { key: "ADMIN_EMAIL", value: email.value },
@@ -245,21 +244,26 @@ async function deploy() {
   } catch (e) {
     layout.value.setStatus("deploy", "Rollbacking back due to fail to deploy gateway...");
 
-    await rollbackDeployment(grid!, name.value);
+    await rollbackDeployment(grid, name.value);
     layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Wordpress instance."));
   }
+}
+
+function updateSSHkeyEnv(selectedKeys: string) {
+  selectedSSHKeys.value = selectedKeys;
 }
 </script>
 
 <script lang="ts">
 import Networks from "../components/networks.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
+import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";
 import type { SelectionDetails } from "../types/nodeSelector";
 import rootFs from "../utils/root_fs";
 
 export default {
   name: "TFWordpress",
-  components: { SelectSolutionFlavor, Networks },
+  components: { SelectSolutionFlavor, Networks, ManageSshDeployemnt },
 };
 </script>

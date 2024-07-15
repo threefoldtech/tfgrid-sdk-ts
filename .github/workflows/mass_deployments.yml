@@ -19,6 +19,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: refs/tags/v2.4.3
       - name: Set up node 18
         uses: actions/setup-node@v3
         with:
@@ -54,3 +56,11 @@ jobs:
         if: |
           steps.massdeployments.outcome != 'success'
         run: exit 1
+
+      - name: Send Telegram Notification
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          MESSAGE="Deployment Summary:\\nSuccessful Deployments: ${{ steps.massdeployments.outputs.success_count }}\\nFailed Deployments: ${{ steps.massdeployments.outputs.failed_count }}\\nErrors: ${{ steps.massdeployments.outputs.errors }}"
+          curl -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" -d "chat_id=${TELEGRAM_CHAT_ID}&text=${MESSAGE}&parse_mode=Markdown"

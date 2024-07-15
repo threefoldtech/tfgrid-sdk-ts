@@ -1,15 +1,17 @@
 <template>
-  <slot
-    :props="{
-      onBlur,
-      loading,
-      errorMessages,
-      error: showError,
-      hint: inputHint,
-      'persistent-hint': hintPersistent,
-      class: extraClass,
-    }"
-  ></slot>
+  <div ref="inputElement" class="input-validator w-100">
+    <slot
+      :props="{
+        onBlur,
+        loading,
+        errorMessages,
+        error: showError,
+        hint: inputHint,
+        'persistent-hint': hintPersistent,
+        class: extraClass,
+      }"
+    ></slot>
+  </div>
 </template>
 
 <script lang="ts">
@@ -43,6 +45,7 @@ export default {
     hint: String,
     disableValidation: Boolean,
     debounceTime: Number,
+    inputName: String,
   },
   emits: {
     "update:modelValue": (valid: boolean) => valid,
@@ -50,8 +53,10 @@ export default {
     "update:error": (error: string | null) => true || error,
   },
   setup(props, { emit, expose }) {
-    const { uid } = getCurrentInstance() as { uid: number };
+    const { uid: _uid } = getCurrentInstance() as { uid: number };
+    const uid = props.inputName || _uid.toString();
     const form = useForm();
+    const inputElement = ref<HTMLElement | null>(null);
 
     const required = computed(() => props.rules.some(rule => "required" in (rule("") || {})));
 
@@ -136,6 +141,7 @@ export default {
 
     // Set Form connection
     const obj: InputValidatorService = {
+      $el: inputElement,
       validate: validate as InputValidatorService["validate"],
       setStatus,
       reset() {
@@ -151,6 +157,7 @@ export default {
     expose(obj);
 
     return {
+      inputElement,
       onBlur: computed(() => (blured.value ? undefined : onBlur)),
       loading: computed(() => status.value === ValidatorStatus.Pending),
       errorMessages: computed(() => (error.value ? [error.value] : [])),

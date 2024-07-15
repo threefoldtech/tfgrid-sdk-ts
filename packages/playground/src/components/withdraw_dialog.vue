@@ -2,53 +2,62 @@
   <v-container>
     <v-dialog
       transition="dialog-bottom-transition"
-      max-width="1000"
+      max-width="50%"
       v-model="withdrawDialog"
       @update:model-value="closeDialog"
     >
       <v-card>
-        <v-toolbar color="primary" dark class="bold-text justify-center"> Withdraw TFT </v-toolbar>
+        <v-card-title class="bg-primary"> Withdraw TFT </v-card-title>
         <v-card-text>
           Interact with the bridge in order to withdraw your TFT to
           {{ selectedName?.charAt(0).toUpperCase() + selectedName!.slice(1) }} (withdraw fee is: {{ withdrawFee }} TFT)
         </v-card-text>
         <v-card-text>
-          <v-form v-model="isValidSwap">
-            <v-text-field
-              v-model="target"
-              :label="selectedName?.charAt(0).toUpperCase() + selectedName!.slice(1) + ' Target Wallet Address'"
-              :error-messages="targetError"
-              :disabled="validatingAddress"
-              :loading="validatingAddress"
-              :rules="[() => !!target || 'This field is required', swapAddressCheck]"
+          <FormValidator v-model="valid">
+            <InputValidator
+              :value="target"
+              :rules="[validators.required('This field is required'), () => swapAddressCheck()]"
+              :async-rules="[validateAddress]"
+              #="{ props: validationProps }"
             >
-            </v-text-field>
-            <v-text-field
-              @paste.prevent
-              label="Amount (TFT)"
-              v-model="amount"
-              type="number"
-              onkeydown="javascript: return event.keyCode == 69 || /^\+$/.test(event.key) ? false : true"
+              <v-text-field
+                v-bind="{ ...validationProps }"
+                v-model="target"
+                :label="selectedName?.charAt(0).toUpperCase() + selectedName!.slice(1) + ' Target Wallet Address'"
+                :disabled="validatingAddress"
+                :loading="validationProps.loading"
+              >
+              </v-text-field>
+            </InputValidator>
+            <InputValidator
+              :value="amount"
+              #="{ props: validationProps }"
               :rules="[
-                () => !!amount || 'This field is required',
-                () =>
-                  (amount.toString().split('.').length > 1 ? amount.toString().split('.')[1].length <= 3 : true) ||
-                  'Amount must have 3 decimals only',
-                () => amount >= 2 || 'Amount should be at least 2 TFT',
-                () => amount < freeBalance! || 'Amount cannot exceed balance',
-              ]"
+              validators.required('This field is required'),
+              validators.min('Amount should be at least 2 TFT', 2),
+              validators.max( 'Amount cannot exceed balance',freeBalance!),
+              validators.isValidDecimalNumber(3,'Amount must have 3 decimals only')
+            ]"
             >
-            </v-text-field>
-          </v-form>
+              <v-text-field
+                v-bind="{ ...validationProps }"
+                @paste.prevent
+                label="Amount (TFT)"
+                v-model="amount"
+                type="number"
+                onkeydown="javascript: return event.keyCode == 69 || /^\+$/.test(event.key) ? false : true"
+              >
+              </v-text-field>
+            </InputValidator>
+          </FormValidator>
+          <v-divider />
         </v-card-text>
-        <v-card-actions class="justify-end pb-4 px-6">
-          <v-btn variant="outlined" color="anchor" class="px-3" @click="closeDialog"> Close </v-btn>
+        <v-card-actions class="justify-end mb-1 mr-2">
+          <v-btn color="anchor" @click="closeDialog"> Close </v-btn>
           <v-btn
-            class="px-3"
             color="secondary"
-            variant="outlined"
             @click="withdrawTFT(target, amount)"
-            :disabled="!isValidSwap || validatingAddress"
+            :disabled="!valid || validatingAddress"
             :loading="loadingWithdraw"
             >Send</v-btn
           >
@@ -59,25 +68,24 @@
 </template>
 
 <script setup lang="ts">
-import { default as StellarSdk, StrKey } from "stellar-sdk";
+import { StrKey } from "stellar-sdk";
 import { onMounted, ref } from "vue";
 
 import { useProfileManagerController } from "../components/profile_manager_controller.vue";
-import { useProfileManager } from "../stores";
+import { useGrid } from "../stores";
 import { createCustomToast, ToastType } from "../utils/custom_toast";
-import { getGrid } from "../utils/grid";
-
+import { isValidStellarAddress } from "../utils/validators";
 const withdrawDialog = ref(false);
 const targetError = ref("");
 const target = ref("");
-const isValidSwap = ref(false);
+const valid = ref(false);
 const validatingAddress = ref(false);
-const server = new StellarSdk.Server(window.env.STELLAR_HORIZON_URL);
 const loadingWithdraw = ref(false);
 const ProfileManagerController = useProfileManagerController();
-const profileManager = useProfileManager();
 const amount = ref(2);
 const emits = defineEmits(["close"]);
+const gridStore = useGrid();
+const grid = gridStore.client as GridClient;
 
 const props = defineProps({
   selectedName: String,
@@ -94,8 +102,7 @@ onMounted(async () => {
 function swapAddressCheck() {
   targetError.value = "";
   if (!target.value) {
-    isValidSwap.value = false;
-    return true;
+    return;
   }
   const isValid = StrKey.isValidEd25519PublicKey(target.value);
   const blockedAddresses = [
@@ -103,50 +110,26 @@ function swapAddressCheck() {
     "GA2CWNBUHX7NZ3B5GR4I23FMU7VY5RPA77IUJTIXTTTGKYSKDSV6LUA4",
   ];
   if (blockedAddresses.includes(target.value)) {
-    targetError.value = "Blocked Address";
-    return false;
+    return {
+      message: "Blocked Address",
+    };
   }
   if (!isValid || target.value.match(/\W/)) {
-    targetError.value = "invalid address";
-    isValidSwap.value = false;
-    return false;
+    return {
+      message: "Invalid address",
+    };
   }
   targetError.value = "";
-  validatingAddress.value = true;
-  isValidSwap.value = true;
-  if (props.selectedName == "stellar") validateAddress();
-  return true;
 }
 
 async function validateAddress() {
-  try {
-    // check if the account provided exists on stellar
-    const account = await server.loadAccount(target.value);
-    // check if the account provided has the appropriate trustlines
-    const includes = account.balances.find(
-      (b: { asset_code: string; asset_issuer: string }) =>
-        b.asset_code === "TFT" && b.asset_issuer === window.env.TFT_ASSET_ISSUER,
-    );
-    if (!includes) throw new Error("invalid trustline");
-  } catch (e) {
-    targetError.value =
-      (e as Error).message === "invalid trustline"
-        ? "Address does not have a valid trustline to TFT"
-        : "Address not found";
-    validatingAddress.value = false;
-    isValidSwap.value = false;
-    return;
-  }
-
-  validatingAddress.value = false;
-  isValidSwap.value = true;
-  return;
+  if (props.selectedName == "stellar") return await isValidStellarAddress(target.value);
 }
 
 async function withdrawTFT(targetAddress: string, withdrawAmount: number) {
   loadingWithdraw.value = true;
   try {
-    const grid = await getGrid(profileManager.profile!);
+    updateGrid(grid, { projectName: "" });
     await grid?.bridge.swapToStellar({ amount: +withdrawAmount, target: targetAddress });
 
     await ProfileManagerController.reloadBalance();
@@ -166,7 +149,10 @@ const closeDialog = () => {
 };
 </script>
 <script lang="ts">
+import type { GridClient } from "@threefold/grid_client";
 import { defineComponent } from "vue";
+
+import { updateGrid } from "../utils/grid";
 
 export default defineComponent({
   name: "WithdrawDialog",

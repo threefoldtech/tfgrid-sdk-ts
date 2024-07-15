@@ -14,7 +14,6 @@ import PasswordInputWrapper from "./components/password_input_wrapper.vue";
 import ViewLayout from "./components/view_layout.vue";
 import WebletLayout from "./components/weblet_layout.vue";
 import * as validators from "./utils/validators";
-
 const GLOBAL_COMPONENTS: { [key: string]: Component } = {
   PasswordInputWrapper,
   WebletLayout,
@@ -40,6 +39,16 @@ export function defineGlobals(app: App<Element>): void {
         const margin = Math.max(7 - level, 3);
         return `<h${level} class="text-h${level} mb-${margin}">${text}</h${level}>`;
       },
+      list(body) {
+        return `<ul style="list-style: none;padding: 10px;">${body}</ul>`;
+      },
+      blockquote(quote) {
+        return `
+          <blockquote class="md-blockquote">
+            <p>${quote}</p>
+          </blockquote>
+        `;
+      },
       link(href, title, text) {
         const t = title ? `title="${title}"` : "";
         const h = `href="${href}"`;
@@ -57,4 +66,5 @@ function defineGlobalComponents(app: App<Element>) {
 
 function defineGlobalProps(app: App<Element>) {
   app.config.globalProperties.validators = validators;
+  app.config.globalProperties.MANUAL_URL = window.env.MANUAL_URL;
 }

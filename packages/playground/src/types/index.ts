@@ -1,6 +1,6 @@
 import { CertificationType, type GridNode, type NodeStats, NodeStatus } from "@threefold/gridproxy_client";
 import { capitalize } from "vue";
-import type { VDataTable } from "vuetify/lib/labs/components";
+import type { VDataTable } from "vuetify/components";
 
 import type { AsyncRule, SyncRule } from "@/components/input_validator.vue";
 
@@ -83,11 +83,18 @@ export interface FarmInterface {
 }
 
 export interface Flist {
+  name?: string;
   value: string;
   entryPoint: string;
 }
 
-export type VDataTableHeader = VDataTable["headers"];
+export type VDataTableHeader = {
+  title: string;
+  key: string;
+  sortable?: boolean;
+  children?: VDataTableHeader;
+  [key: string]: any;
+}[];
 
 export enum ProjectName {
   Kubernetes = "Kubernetes",
@@ -114,6 +121,8 @@ export enum ProjectName {
   Qvm = "Qvm",
   Umbrel = "Umbrel",
   FreeFlow = "Freeflow",
+  StaticWebsite = "StaticWebsite",
+  TFRobot = "TFRobot",
 }
 
 export enum SolutionCode {
@@ -139,6 +148,8 @@ export enum SolutionCode {
   qvm = "qvm",
   umbrel = "um",
   wordpress = "wp",
+  staticwebsite = "sw",
+  tfrobot = "tfr",
 }
 
 export const solutionType: { [key: string]: string } = {
@@ -161,6 +172,8 @@ export const solutionType: { [key: string]: string } = {
   umbrel: "Umbrel",
   vm: "Micro Virtual Machine",
   wordpress: "Wordpress",
+  staticwebsite: "Static Website",
+  tfrobot: "TFRobot",
 };
 
 export interface solutionFlavor {
@@ -281,6 +294,7 @@ export const nodeStatsInitializer: NodeStats = {
   users: {
     deployments: 0,
     workloads: 0,
+    last_deployment_timestamp: 0,
   },
 };
 
@@ -323,4 +337,51 @@ export const nodeInitializer: GridNode = {
   cards: [],
   num_gpu: 0,
   healthy: false,
+  rentable: false,
+  rented: false,
+  dmi: {
+    bios: {
+      vendor: "",
+      version: "",
+    },
+    baseboard: {
+      manufacturer: "",
+      product_name: "",
+    },
+    processor: [
+      {
+        version: "",
+        thread_count: "",
+      },
+    ],
+    memory: [
+      {
+        manufacturer: "",
+        type: "",
+      },
+    ],
+  },
+  speed: {
+    upload: 0,
+    download: 0,
+  },
+  price_usd: 0,
+  extraFee: 0,
 };
+
+export interface SSHKeyData {
+  id: number;
+  publicKey: string;
+  name: string;
+  createdAt: string;
+  isActive: boolean;
+  fingerPrint?: string;
+  deleting?: boolean;
+  activating?: boolean;
+}
+
+export enum SSHCreationMethod {
+  None = "",
+  Generate = "generate",
+  Import = "import",
+}
