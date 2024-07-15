@@ -94,9 +94,8 @@ export class ServiceUrlManager {
   private mnemonic?: string;
   private keypairType?: KeypairType = "sr25519";
 
-  constructor(options: StackPickerOptions) {
+  constructor(options?: StackPickerOptions) {
     Object.assign(this, options);
-    if (this[ServiceName.RMB] && !this.mnemonic) throw new Error("Mnemonic is required to monitor RMB");
   }
 
   /**
@@ -162,32 +161,38 @@ export class ServiceUrlManager {
    *
    * @returns {Promise<ServicesUrls>} - A promise that resolves with an object containing the available service URLs.
    */
-  async GetAvailableServices(): Promise<ServicesUrls> {
-    if (this[ServiceName.tfChain]?.length > 0)
-      this.result[ServiceName.tfChain] = await this.getAvailableServiceStack(
-        this[ServiceName.tfChain],
-        new TFChainMonitor(this[ServiceName.tfChain][0]),
-      );
-    if (this[ServiceName.RMB]?.length > 0) {
-      if (!this.result[ServiceName.tfChain]) throw new Error("Can't validate RMB urls; There is no Chain ulr provided");
-      this.result[ServiceName.RMB] = await this.getAvailableServiceStack(
-        this[ServiceName.RMB],
-        new RMBMonitor(this[ServiceName.RMB][0], this.result[ServiceName.tfChain], this.mnemonic, this.keypairType),
-      );
-    }
+  async getAvailableServices(): Promise<ServicesUrls> {
     if (this[ServiceName.GraphQl]?.length > 0) {
-      this.result[ServiceName.GraphQl] = await this.getAvailableServiceStack(
+      this.result[ServiceName.GraphQl] = this.getAvailableServiceStack(
         this[ServiceName.GraphQl],
         new GraphQLMonitor(this[ServiceName.GraphQl][0]),
       );
     }
     if (this[ServiceName.GirdProxy]?.length > 0) {
-      this.result[ServiceName.GirdProxy] = await this.getAvailableServiceStack(
+      this.result[ServiceName.GirdProxy] = this.getAvailableServiceStack(
         this[ServiceName.GirdProxy],
         new GridProxyMonitor(this[ServiceName.GirdProxy][0]),
       );
     }
 
+    if (this[ServiceName.tfChain]?.length > 0)
+      this.result[ServiceName.tfChain] = this.getAvailableServiceStack(
+        this[ServiceName.tfChain],
+        new TFChainMonitor(this[ServiceName.tfChain][0]),
+      );
+    if (this[ServiceName.RMB]?.length > 0) {
+      if (this[ServiceName.RMB] && !this.mnemonic) throw new Error("Mnemonic is required to monitor RMB");
+      if (!this.result[ServiceName.tfChain]) throw new Error("Can't validate RMB urls; There is no Chain ulr provided");
+      this.result[ServiceName.RMB] = this.getAvailableServiceStack(
+        this[ServiceName.RMB],
+        new RMBMonitor(
+          this[ServiceName.RMB][0],
+          await this.result[ServiceName.tfChain],
+          this.mnemonic,
+          this.keypairType,
+        ),
+      );
+    }
     return this.result;
   }
 }

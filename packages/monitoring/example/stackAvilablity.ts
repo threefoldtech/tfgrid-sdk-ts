@@ -8,7 +8,8 @@ import { ServiceUrlManager, StackPickerOptions } from "../src";
 
 async function checkStacksAvailability(services: StackPickerOptions) {
   try {
-    const pickedUrls = await new ServiceUrlManager(services).GetAvailableServices();
+    const pickedUrls = await new ServiceUrlManager(services).getAvailableServices();
+    await Promise.all(Object.values(pickedUrls));
     console.log(pickedUrls);
     process.exit(0);
   } catch (err) {
