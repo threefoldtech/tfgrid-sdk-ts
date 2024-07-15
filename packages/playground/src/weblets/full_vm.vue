@@ -260,7 +260,10 @@ async function deploy() {
           planetary: planetary.value,
           mycelium: mycelium.value,
           envs: [{ key: "SSH_KEY", value: selectedSSHKeys.value }],
-          rootFilesystemSize,
+          rootFilesystemSize:
+            flist.value?.name === "Ubuntu-24.04" || flist.value?.name === "Other"
+              ? solution.value?.disk
+              : rootFilesystemSize,
           hasGPU: hasGPU.value,
           nodeId: selectionDetails.value?.node?.nodeId,
           gpus: hasGPU.value ? selectionDetails.value?.gpuCards.map(card => card.id) : undefined,
