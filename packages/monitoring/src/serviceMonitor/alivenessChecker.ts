@@ -92,6 +92,8 @@ export class ServiceMonitor {
  * @property {string[]} [ServiceName.GraphQl] - URLs for GraphQL service.
  * @property {string[]} [ServiceName.RMB] - URLs for RMB service.
  * @property {string[]} [ServiceName.GirdProxy] - URLs for GridProxy service.
+ * @property {string[]} [ServiceName.Stats] - URLs for stats service.
+ * @property {string[]} [ServiceName.Activation] - URLs for activation service.
  * @property {string} [mnemonic] - Mnemonic required for RMB service.
  * @property {KeypairType} keypairType - Type of keypair, default is "sr25519".
  * @property {boolean} rmbValidatesChain - Indicates if RMB will validate the chain url.
@@ -105,6 +107,8 @@ export class ServiceUrlManager {
   private [ServiceName.GraphQl]?: string[];
   private [ServiceName.RMB]?: string[];
   private [ServiceName.GirdProxy]?: string[];
+  private [ServiceName.Activation]?: string[];
+  private [ServiceName.Stats]?: string[];
   private mnemonic?: string;
   private keypairType: KeypairType = "sr25519";
   private rmbValidatesChain = false;
@@ -188,6 +192,20 @@ export class ServiceUrlManager {
       this.result[ServiceName.GirdProxy] = this.getAvailableServiceStack(
         this[ServiceName.GirdProxy],
         new GridProxyMonitor(this[ServiceName.GirdProxy][0]),
+      );
+    }
+
+    if (this[ServiceName.Stats] && this[ServiceName.Stats]?.length > 0) {
+      this.result[ServiceName.Stats] = this.getAvailableServiceStack(
+        this[ServiceName.Stats],
+        new GraphQLMonitor(this[ServiceName.Stats][0]),
+      );
+    }
+
+    if (this[ServiceName.Activation] && this[ServiceName.Activation]?.length > 0) {
+      this.result[ServiceName.Activation] = this.getAvailableServiceStack(
+        this[ServiceName.Activation],
+        new GraphQLMonitor(this[ServiceName.Activation][0]),
       );
     }
 

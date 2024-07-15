@@ -63,6 +63,8 @@ export enum ServiceName {
   "GraphQl" = "graphql",
   "RMB" = "rmb",
   "tfChain" = "tfChain",
+  "Activation" = "activation",
+  "Stats" = "stats",
 }
 
 export type ServicesUrls = {
