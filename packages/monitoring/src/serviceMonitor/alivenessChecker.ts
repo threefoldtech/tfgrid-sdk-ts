@@ -84,6 +84,20 @@ export class ServiceMonitor {
   }
 }
 
+/**
+ * Manages service URLs, checking their availability and ensuring they are reachable.
+ *
+ * @property {number} retries - Number of retry attempts for each URL.
+ * @property {string[]} [ServiceName.tfChain] - URLs for tfChain service.
+ * @property {string[]} [ServiceName.GraphQl] - URLs for GraphQL service.
+ * @property {string[]} [ServiceName.RMB] - URLs for RMB service.
+ * @property {string[]} [ServiceName.GirdProxy] - URLs for GridProxy service.
+ * @property {string} [mnemonic] - Mnemonic required for RMB service.
+ * @property {KeypairType} keypairType - Type of keypair, default is "sr25519".
+ * @property {boolean} rmbValidatesChain - Indicates if RMB will validate the chain url.
+ * @property {string[]} rmbTFchainUrls - URLs of TFChain for RMB service, Required in case there is no TFChain urls for tfChain service.
+ * If there is a tfChain availability service provided, and it's result is valid, we will ignore the rmb-tfChain options
+ */
 export class ServiceUrlManager {
   private result: ServicesUrls = {};
   private retries = 3;
