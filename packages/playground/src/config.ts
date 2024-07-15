@@ -1,4 +1,3 @@
-import { ServiceUrlManager } from "@threefold/monitoring";
 import { marked } from "marked";
 import type { App, Component } from "vue";
 
@@ -68,11 +67,4 @@ function defineGlobalComponents(app: App<Element>) {
 function defineGlobalProps(app: App<Element>) {
   app.config.globalProperties.validators = validators;
   app.config.globalProperties.MANUAL_URL = window.env.MANUAL_URL;
-}
-
-export async function setGlobalEnv() {
-  const urlManager = new ServiceUrlManager({ graphql: window.env.GRAPHQL_URLS });
-  // const services = await urlManager.GetAvailableServices();
-  // window.env.GRAPHQL_URL = services.graphql ?? "";
-  console.log(urlManager);
 }
