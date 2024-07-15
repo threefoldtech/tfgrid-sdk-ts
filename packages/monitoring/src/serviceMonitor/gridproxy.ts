@@ -1,4 +1,4 @@
-import { resolveServiceStatus, sendGetRequest } from "../helpers/utils";
+import { resolveServiceStatus, sendRequest } from "../helpers/utils";
 import { ILivenessChecker, ServiceStatus } from "../types";
 
 export class GridProxyMonitor implements ILivenessChecker {
@@ -17,6 +17,6 @@ export class GridProxyMonitor implements ILivenessChecker {
     this.url = url;
   }
   async isAlive(): Promise<ServiceStatus> {
-    return resolveServiceStatus(sendGetRequest(this.url));
+    return resolveServiceStatus(sendRequest(this.url, { method: "Get" }));
   }
 }

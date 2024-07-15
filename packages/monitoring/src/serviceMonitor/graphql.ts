@@ -1,4 +1,4 @@
-import { resolveServiceStatus, sendGetRequest } from "../helpers/utils";
+import { resolveServiceStatus, sendRequest } from "../helpers/utils";
 import { ILivenessChecker, ServiceStatus } from "../types";
 
 export class GraphQLMonitor implements ILivenessChecker {
@@ -18,6 +18,14 @@ export class GraphQLMonitor implements ILivenessChecker {
   }
 
   async isAlive(): Promise<ServiceStatus> {
-    return resolveServiceStatus(sendGetRequest(this.url));
+    return resolveServiceStatus(
+      sendRequest(this.url, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          query: "query monitoring{__typename}",
+        }),
+      }),
+    );
   }
 }
