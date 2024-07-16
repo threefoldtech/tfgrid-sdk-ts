@@ -1,9 +1,27 @@
 <template>
-  <div class="border px-4 pb-4 rounded position-relative pt-3 mt-1" ref="viewLayoutContainer">
+  <div
+    class="border px-4 pb-4 rounded position-relative mt-1"
+    :class="{ 'pt-10': hasInfo, 'pt-3': !hasInfo }"
+    ref="viewLayoutContainer"
+  >
     <div
       :style="{ opacity: $vuetify.theme.name === 'dark' ? 'var(--v-medium-emphasis-opacity)' : '' }"
       v-if="$slots.description"
     />
+
+    <div
+      class="position-absolute pa-1 rounded-circle border"
+      :style="{
+        top: 0,
+        right: '16px',
+        transform: 'translateY(-50%)',
+        zIndex: 99,
+        backgroundColor: 'rgb(var(--v-theme-background))',
+      }"
+      v-if="hasInfo"
+    >
+      <AppInfo />
+    </div>
 
     <template v-if="requireSSH && !ssh">
       <VAlert variant="tonal" type="error" class="mb-4">
@@ -26,8 +44,11 @@ import { useRoute } from "vue-router";
 import { DashboardRoutes } from "@/router/routes";
 import { useProfileManager } from "@/stores";
 
+import AppInfo from "./app_info.vue";
+
 export default {
   name: "ViewLayout",
+  components: { AppInfo },
   setup() {
     const route = useRoute();
     const profileManager = useProfileManager();

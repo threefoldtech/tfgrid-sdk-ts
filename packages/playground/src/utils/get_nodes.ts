@@ -36,7 +36,11 @@ export enum NodeHealth {
   Error = "error",
   Paused = "paused",
 }
-
+export interface discountItems {
+  name: string;
+  discount: string;
+  tfts: number;
+}
 export async function getAllNodes(grid: GridClient | null, options?: NodeFilters): Promise<NodeInfo[] | number[]> {
   const isFlat = options?.flat || false;
 

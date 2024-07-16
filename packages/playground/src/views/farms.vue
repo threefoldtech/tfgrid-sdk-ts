@@ -89,13 +89,13 @@
         loading-text="Loading Farms..."
         :items="farms"
         :items-length="totalFarms"
+        :items-per-page="size"
         :items-per-page-options="[
           { value: 5, title: '5' },
           { value: 10, title: '10' },
-          { value: 15, title: '15' },
+          { value: 20, title: '20' },
           { value: 50, title: '50' },
         ]"
-        :items-per-page="size"
         @update:items-per-page="
           size = $event;
           loadFarms();

@@ -13,6 +13,25 @@
     <v-icon size="30" class="pr-3">mdi-file-document-edit</v-icon>
     <v-card-title class="pa-0">Contracts List</v-card-title>
   </v-card>
+
+  <v-alert class="mb-4 text-subtitle-2 font-weight-regular" type="info" variant="tonal">
+    For more details about Contract Types, Billing Cycle & Grace Period, check
+    <a
+      class="app-link font-weight-medium"
+      target="_blank"
+      href="https://www.manual.grid.tf/documentation/developers/tfchain/tfchain.html"
+      >Contract Documentation,
+    </a>
+    and to explore further contract details, check
+    <a
+      class="app-link font-weight-medium"
+      target="_blank"
+      href="https://www.manual.grid.tf/documentation/dashboard/deploy/your_contracts.html"
+      >Node Contract Documentation.</a
+    >
+    <br />
+  </v-alert>
+
   <v-card variant="text" class="my-3">
     <section class="d-flex align-center">
       <v-spacer />
@@ -91,7 +110,8 @@
           <v-row class="d-flex" v-else>
             <v-alert class="ma-4" type="warning" variant="tonal">
               <div v-if="lockedContracts?.totalAmountLocked < freeBalance" class="font-weigh-black">
-                You have enough balance to unlock your contracts!
+                You have enough balance to unlock your contracts; this will cost you around
+                {{ Math.ceil(lockedContracts?.totalAmountLocked) }} TFTs.
               </div>
               <div v-else>
                 You need to fund your account with
@@ -206,7 +226,7 @@ import { useGrid } from "../stores";
 
 const profileManagerController = useProfileManagerController();
 const balance = profileManagerController.balance;
-const freeBalance = computed(() => balance.value?.free ?? 0 - (balance.value?.locked ?? 0));
+const freeBalance = computed(() => (balance.value?.free ?? 0) - (balance.value?.locked ?? 0));
 const isLoading = ref<boolean>(false);
 
 const profileManager = useProfileManager();

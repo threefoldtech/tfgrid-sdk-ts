@@ -1,6 +1,7 @@
 import { ValidationError } from "@threefold/types";
 import { plainToInstance } from "class-transformer";
-import { validateSync } from "class-validator";
+import { buildMessage, registerDecorator, validateSync } from "class-validator";
+import { ValidationOptions as ClassValidatorValidationOptions } from "class-validator";
 
 function validateObject(obj) {
   const errors = validateSync(obj);
@@ -30,7 +31,26 @@ function validateHexSeed(seed: string, length: number): boolean {
   }
   return true;
 }
-
+function IsAlphanumericExpectUnderscore(validationOptions?: ClassValidatorValidationOptions) {
+  return function (object: any, propertyName: string) {
+    registerDecorator({
+      name: "IsAlphanumericExpectUnderscore",
+      target: object.constructor,
+      propertyName: propertyName,
+      options: validationOptions,
+      constraints: [`${propertyName} must contain only letters, numbers, and underscores`],
+      validator: {
+        validate(value: any) {
+          return /^[a-zA-Z0-9_]*$/.test(value);
+        },
+        defaultMessage: buildMessage(
+          eachPrefix => eachPrefix + "$property must contain only letters, numbers, and underscores",
+          validationOptions,
+        ),
+      },
+    });
+  };
+}
 interface ValidationOptions {
   props?: boolean | string | string[];
   methods?: boolean | string | string[];
@@ -178,4 +198,11 @@ function _getMethods(ctor: any, options: Required<ValidationOptions>): string[] 
   return [];
 }
 
-export { validateObject, validateInput, validateHexSeed, type ValidationOptions, ValidateMembers };
+export {
+  validateObject,
+  validateInput,
+  validateHexSeed,
+  type ValidationOptions,
+  ValidateMembers,
+  IsAlphanumericExpectUnderscore,
+};

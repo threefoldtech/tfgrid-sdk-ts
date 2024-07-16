@@ -541,7 +541,6 @@ function createTFChainRoutes(): RouteRecordRaw[] {
         {
           path: DashboardRoutes.TFChain.TFMintingReports,
           component: () => import("../views/minting_view.vue"),
-          meta: { title: "Minting", info: { page: "info/minting.md" }, publicPath: true },
         },
       ],
     },
@@ -694,7 +693,6 @@ function createDeployRoutes(): RouteRecordRaw[] {
           component: () => import("../dashboard/contracts_list.vue"),
           meta: {
             title: "Your Contracts List",
-            info: { page: "info/contracts_list.md" },
           },
         },
 

@@ -18,6 +18,28 @@ export interface PricingInfo {
     discount: number;
   };
 }
+export const discountPackages = {
+  none: {
+    duration: 0,
+    discount: 0,
+  },
+  default: {
+    duration: 1.5,
+    discount: 20,
+  },
+  bronze: {
+    duration: 3,
+    discount: 30,
+  },
+  silver: {
+    duration: 6,
+    discount: 40,
+  },
+  gold: {
+    duration: 18,
+    discount: 60,
+  },
+};
 
 class Calculator {
   client: TFClient | QueryClient;
@@ -165,29 +187,6 @@ class Calculator {
     if (options.balance) {
       balance = TFTPrice * options.balance * 10000000;
     }
-
-    const discountPackages = {
-      none: {
-        duration: 0,
-        discount: 0,
-      },
-      default: {
-        duration: 1.5,
-        discount: 20,
-      },
-      bronze: {
-        duration: 3,
-        discount: 30,
-      },
-      silver: {
-        duration: 6,
-        discount: 40,
-      },
-      gold: {
-        duration: 18,
-        discount: 60,
-      },
-    };
 
     let dedicatedPackage = "none";
     let sharedPackage = "none";
