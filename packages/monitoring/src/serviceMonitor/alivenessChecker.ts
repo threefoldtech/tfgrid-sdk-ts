@@ -9,9 +9,11 @@ import {
   ServiceUrl,
   StackPickerOptions,
 } from "../types";
+import { Activation } from "./activation";
 import { GraphQLMonitor } from "./graphql";
 import { GridProxyMonitor } from "./gridproxy";
 import { RMBMonitor } from "./rmb";
+import { Stats } from "./stats";
 import { TFChainMonitor } from "./tfChain";
 
 /**
@@ -193,38 +195,69 @@ export class ServiceUrlManager<N extends boolean = false> {
    */
   async getAvailableServices(): Promise<ServicesUrls<N>> {
     const result: any = {};
-    if (this[ServiceName.GraphQl] && this[ServiceName.GraphQl]?.length > 0) {
-      result[ServiceName.GraphQl] = this.getAvailableServiceStack(
-        this[ServiceName.GraphQl],
-        new GraphQLMonitor(this[ServiceName.GraphQl][0]),
-      );
-    }
-    if (this[ServiceName.GirdProxy] && this[ServiceName.GirdProxy]?.length > 0) {
-      result[ServiceName.GirdProxy] = this.getAvailableServiceStack(
-        this[ServiceName.GirdProxy],
-        new GridProxyMonitor(this[ServiceName.GirdProxy][0]),
-      );
+
+    if (this[ServiceName.GraphQl]) {
+      if (this[ServiceName.GraphQl]?.length == 0)
+        result[ServiceName.GraphQl] = this.handleSilent(
+          "Can't validate GraphQL stacks; There is GraphQL urls provided",
+        );
+      else {
+        result[ServiceName.GraphQl] = this.getAvailableServiceStack(
+          this[ServiceName.GraphQl],
+          new GraphQLMonitor(this[ServiceName.GraphQl][0]),
+        );
+      }
     }
 
-    if (this[ServiceName.Stats] && this[ServiceName.Stats]?.length > 0) {
-      result[ServiceName.Stats] = this.getAvailableServiceStack(
-        this[ServiceName.Stats],
-        new GraphQLMonitor(this[ServiceName.Stats][0]),
-      );
+    if (this[ServiceName.GirdProxy]) {
+      if (this[ServiceName.GirdProxy]?.length == 0) {
+        result[ServiceName.GirdProxy] = this.handleSilent(
+          "Can't validate GridProxy stacks; There is GridProxy urls provided",
+        );
+      } else {
+        result[ServiceName.GirdProxy] = this.getAvailableServiceStack(
+          this[ServiceName.GirdProxy],
+          new GridProxyMonitor(this[ServiceName.GirdProxy][0]),
+        );
+      }
     }
 
-    if (this[ServiceName.Activation] && this[ServiceName.Activation]?.length > 0) {
-      result[ServiceName.Activation] = this.getAvailableServiceStack(
-        this[ServiceName.Activation],
-        new GraphQLMonitor(this[ServiceName.Activation][0]),
-      );
+    if (this[ServiceName.Stats]) {
+      if (this[ServiceName.Stats]?.length == 0) {
+        result[ServiceName.Stats] = this.handleSilent("Can't validate Stats stacks; There is Stats urls provided");
+      } else {
+        result[ServiceName.Stats] = this.getAvailableServiceStack(
+          this[ServiceName.Stats],
+          new Stats(this[ServiceName.Stats][0]),
+        );
+      }
     }
 
-    if (this[ServiceName.tfChain] && this[ServiceName.tfChain]?.length > 0)
-      result[ServiceName.tfChain] = this.getAvailableServiceStack(
-        this[ServiceName.tfChain],
-        new TFChainMonitor(this[ServiceName.tfChain][0]),
-      );
+    if (this[ServiceName.Activation]) {
+      if (this[ServiceName.Activation]?.length == 0) {
+        result[ServiceName.Activation] = this.handleSilent(
+          "Can't validate Activation stacks; There is Activation urls provided",
+        );
+      } else {
+        result[ServiceName.Activation] = this.getAvailableServiceStack(
+          this[ServiceName.Activation],
+          new Activation(this[ServiceName.Activation][0]),
+        );
+      }
+    }
+
+    if (this[ServiceName.tfChain]) {
+      if (this[ServiceName.tfChain]?.length == 0) {
+        result[ServiceName.tfChain] = this.handleSilent(
+          "Can't validate tfChain stacks; There is tfChain urls provided",
+        );
+      } else {
+        result[ServiceName.tfChain] = this.getAvailableServiceStack(
+          this[ServiceName.tfChain],
+          new TFChainMonitor(this[ServiceName.tfChain][0]),
+        );
+      }
+    }
 
     if (this[ServiceName.RMB])
       result[ServiceName.RMB] = this.validateRMBStacks(this[ServiceName.RMB], this.result?.tfChain);
@@ -247,7 +280,7 @@ export class ServiceUrlManager<N extends boolean = false> {
     if (!this.mnemonic) return this.handleSilent("Failed to validate RMB, Mnemonic is required");
 
     let chainUrl: ServiceUrl<N> | undefined = undefined;
-    if (rmbUrls.length == 0) return this.handleSilent("Can't validate RMB urls; There is RMB urls provided");
+    if (rmbUrls.length == 0) return this.handleSilent("Can't validate RMB stacks; There is RMB urls provided");
     if (!validatedChainUrl && (!this.rmbTFchainUrls || this.rmbTFchainUrls.length == 0))
       return this.handleSilent("Can't validate RMB urls; There is no Chain urls provided");
 
