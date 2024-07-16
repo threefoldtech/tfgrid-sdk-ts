@@ -100,7 +100,7 @@ export class ServiceMonitor {
  * @property {string[]} [ServiceName.tfChain] - URLs for tfChain service.
  * @property {string[]} [ServiceName.GraphQl] - URLs for GraphQL service.
  * @property {string[]} [ServiceName.RMB] - URLs for RMB service.
- * @property {string[]} [ServiceName.GirdProxy] - URLs for GridProxy service.
+ * @property {string[]} [ServiceName.GridPrixy] - URLs for GridProxy service.
  * @property {string[]} [ServiceName.Stats] - URLs for stats service.
  * @property {string[]} [ServiceName.Activation] - URLs for activation service.
  * @property {string} [mnemonic] - Mnemonic required for RMB service.
@@ -116,7 +116,7 @@ export class ServiceUrlManager<N extends boolean = false> {
   private [ServiceName.tfChain]?: string[];
   private [ServiceName.GraphQl]?: string[];
   private [ServiceName.RMB]?: string[];
-  private [ServiceName.GirdProxy]?: string[];
+  private [ServiceName.GridPrixy]?: string[];
   private [ServiceName.Activation]?: string[];
   private [ServiceName.Stats]?: string[];
   private mnemonic?: string;
@@ -209,15 +209,15 @@ export class ServiceUrlManager<N extends boolean = false> {
       }
     }
 
-    if (this[ServiceName.GirdProxy]) {
-      if (this[ServiceName.GirdProxy]?.length == 0) {
-        result[ServiceName.GirdProxy] = this.handleSilent(
+    if (this[ServiceName.GridPrixy]) {
+      if (this[ServiceName.GridPrixy]?.length == 0) {
+        result[ServiceName.GridPrixy] = this.handleSilent(
           "Can't validate GridProxy stacks; There is GridProxy urls provided",
         );
       } else {
-        result[ServiceName.GirdProxy] = this.getAvailableServiceStack(
-          this[ServiceName.GirdProxy],
-          new GridProxyMonitor(this[ServiceName.GirdProxy][0]),
+        result[ServiceName.GridPrixy] = this.getAvailableServiceStack(
+          this[ServiceName.GridPrixy],
+          new GridProxyMonitor(this[ServiceName.GridPrixy][0]),
         );
       }
     }

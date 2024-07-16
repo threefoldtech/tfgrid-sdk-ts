@@ -59,7 +59,7 @@ export enum MonitorEvents {
 }
 
 export enum ServiceName {
-  "GirdProxy" = "gridproxy",
+  "GridPrixy" = "gridproxy",
   "GraphQl" = "graphql",
   "RMB" = "rmb",
   "tfChain" = "tfChain",
