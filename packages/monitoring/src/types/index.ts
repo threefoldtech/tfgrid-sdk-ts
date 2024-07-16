@@ -66,17 +66,19 @@ export enum ServiceName {
   "Activation" = "activation",
   "Stats" = "stats",
 }
+export type ServiceUrl<N extends boolean> = N extends false ? string : string | null;
 
-export type ServicesUrls = {
-  [key in ServiceName]?: Promise<string>;
+export type ServicesUrls<N extends boolean> = {
+  [key in ServiceName]?: ServiceUrl<N>;
 };
 type ServicesStacks = {
   [key in ServiceName]?: string[];
 };
-export type StackPickerOptions = ServicesStacks & {
+export type StackPickerOptions<N extends boolean = false> = ServicesStacks & {
   mnemonic?: string;
   keypairType?: KeypairType;
   retries?: number;
   rmbTFchainUrls?: string[];
   rmbValidatesChain?: boolean;
+  silent?: N;
 };

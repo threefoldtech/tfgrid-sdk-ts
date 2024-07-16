@@ -1,7 +1,14 @@
 import { KeypairType } from "@polkadot/util-crypto/types";
 
 import { monitorEvents } from "../helpers/events";
-import { IDisconnectHandler, ILivenessChecker, ServiceName, ServicesUrls, StackPickerOptions } from "../types";
+import {
+  IDisconnectHandler,
+  ILivenessChecker,
+  ServiceName,
+  ServicesUrls,
+  ServiceUrl,
+  StackPickerOptions,
+} from "../types";
 import { GraphQLMonitor } from "./graphql";
 import { GridProxyMonitor } from "./gridproxy";
 import { RMBMonitor } from "./rmb";
@@ -99,9 +106,10 @@ export class ServiceMonitor {
  * @property {boolean} rmbValidatesChain - Indicates if RMB will validate the chain url.
  * @property {string[]} rmbTFchainUrls - URLs of TFChain for RMB service, Required in case there is no TFChain urls for tfChain service.
  * If there is a tfChain availability service provided, and it's result is valid, we will ignore the rmb-tfChain options
+ * @property {boolean} silent - To return null instead of throw an Error, Default is False
  */
-export class ServiceUrlManager {
-  private result: ServicesUrls = {};
+export class ServiceUrlManager<N extends boolean = false> {
+  private result: ServicesUrls<N> = {};
   private retries = 3;
   private [ServiceName.tfChain]?: string[];
   private [ServiceName.GraphQl]?: string[];
@@ -113,8 +121,9 @@ export class ServiceUrlManager {
   private keypairType: KeypairType = "sr25519";
   private rmbValidatesChain = false;
   private rmbTFchainUrls: string[];
+  private silent: N = false as N;
 
-  constructor(options?: StackPickerOptions) {
+  constructor(options?: StackPickerOptions<N>) {
     Object.assign(this, options);
   }
 
@@ -152,7 +161,7 @@ export class ServiceUrlManager {
    * @throws {Error} - Throws an error if no reachable service URL is found after checking all URLs.
    *
    */
-  async getAvailableServiceStack(urls: string[], service: ILivenessChecker) {
+  async getAvailableServiceStack(urls: string[], service: ILivenessChecker): Promise<ServiceUrl<N>> {
     let error: Error | string = "";
     for (let i = 0; i < urls.length; i++) {
       if (i != 0) await service.updateUrl(urls[i]);
@@ -170,6 +179,7 @@ export class ServiceUrlManager {
         "red",
       );
     }
+    if (this.silent) return null as any;
     throw new Error(` Failed to reach ${service.serviceName()} on all provided stacks`);
   }
 
@@ -181,57 +191,77 @@ export class ServiceUrlManager {
    *
    * @returns {Promise<ServicesUrls>} - A promise that resolves with an object containing the available service URLs.
    */
-  async getAvailableServices(): Promise<ServicesUrls> {
+  async getAvailableServices(): Promise<ServicesUrls<N>> {
+    const result: any = {};
     if (this[ServiceName.GraphQl] && this[ServiceName.GraphQl]?.length > 0) {
-      this.result[ServiceName.GraphQl] = this.getAvailableServiceStack(
+      result[ServiceName.GraphQl] = this.getAvailableServiceStack(
         this[ServiceName.GraphQl],
         new GraphQLMonitor(this[ServiceName.GraphQl][0]),
       );
     }
     if (this[ServiceName.GirdProxy] && this[ServiceName.GirdProxy]?.length > 0) {
-      this.result[ServiceName.GirdProxy] = this.getAvailableServiceStack(
+      result[ServiceName.GirdProxy] = this.getAvailableServiceStack(
         this[ServiceName.GirdProxy],
         new GridProxyMonitor(this[ServiceName.GirdProxy][0]),
       );
     }
 
     if (this[ServiceName.Stats] && this[ServiceName.Stats]?.length > 0) {
-      this.result[ServiceName.Stats] = this.getAvailableServiceStack(
+      result[ServiceName.Stats] = this.getAvailableServiceStack(
         this[ServiceName.Stats],
         new GraphQLMonitor(this[ServiceName.Stats][0]),
       );
     }
 
     if (this[ServiceName.Activation] && this[ServiceName.Activation]?.length > 0) {
-      this.result[ServiceName.Activation] = this.getAvailableServiceStack(
+      result[ServiceName.Activation] = this.getAvailableServiceStack(
         this[ServiceName.Activation],
         new GraphQLMonitor(this[ServiceName.Activation][0]),
       );
     }
 
     if (this[ServiceName.tfChain] && this[ServiceName.tfChain]?.length > 0)
-      this.result[ServiceName.tfChain] = this.getAvailableServiceStack(
+      result[ServiceName.tfChain] = this.getAvailableServiceStack(
         this[ServiceName.tfChain],
         new TFChainMonitor(this[ServiceName.tfChain][0]),
       );
 
-    if (this[ServiceName.RMB] && this[ServiceName.RMB]?.length > 0) {
-      let chainUrl = "";
-      if (!this.result[ServiceName.tfChain] && (!this.rmbTFchainUrls || this.rmbTFchainUrls.length == 0))
-        throw new Error("Can't validate RMB urls; There is no Chain urls provided");
+    if (this[ServiceName.RMB])
+      result[ServiceName.RMB] = this.validateRMBStacks(this[ServiceName.RMB], this.result?.tfChain);
 
-      if (this.result[ServiceName.tfChain]) chainUrl = await this.result[ServiceName.tfChain];
-      else
-        chainUrl = this.rmbValidatesChain
-          ? await this.getAvailableServiceStack(this.rmbTFchainUrls, new TFChainMonitor(this.rmbTFchainUrls[0]))
-          : this.rmbTFchainUrls[0];
-
-      if (this[ServiceName.RMB] && !this.mnemonic) throw new Error("Mnemonic is required to monitor RMB");
-      this.result[ServiceName.RMB] = this.getAvailableServiceStack(
-        this[ServiceName.RMB],
-        new RMBMonitor(this[ServiceName.RMB][0], chainUrl, this.mnemonic!, this.keypairType),
-      );
-    }
+    const entries = Object.entries(result);
+    const values = await Promise.all(entries.map(r => r[1]));
+    for (let i = 0; i < entries.length; i++) this.result[entries[i][0]] = values[i];
     return this.result;
+  }
+
+  private handleSilent(errorMsg: string) {
+    if (this.silent) {
+      console.log(errorMsg);
+      return null;
+    }
+    throw new Error(errorMsg);
+  }
+
+  private async validateRMBStacks(rmbUrls: string[], validatedChainUrl?: ServiceUrl<N> | undefined) {
+    if (!this.mnemonic) return this.handleSilent("Failed to validate RMB, Mnemonic is required");
+
+    let chainUrl: ServiceUrl<N> | undefined = undefined;
+    if (rmbUrls.length == 0) return this.handleSilent("Can't validate RMB urls; There is RMB urls provided");
+    if (!validatedChainUrl && (!this.rmbTFchainUrls || this.rmbTFchainUrls.length == 0))
+      return this.handleSilent("Can't validate RMB urls; There is no Chain urls provided");
+
+    // chain Url
+    if (validatedChainUrl) chainUrl = validatedChainUrl;
+    else
+      chainUrl = this.rmbValidatesChain
+        ? await this.getAvailableServiceStack(this.rmbTFchainUrls, new TFChainMonitor(this.rmbTFchainUrls[0]))
+        : this.rmbTFchainUrls[0];
+    if (!chainUrl) return this.handleSilent("Failed to validate RMB, there is no available valid Chain url");
+
+    return this.getAvailableServiceStack(
+      rmbUrls,
+      new RMBMonitor(rmbUrls[0], chainUrl, this.mnemonic!, this.keypairType),
+    );
   }
 }
