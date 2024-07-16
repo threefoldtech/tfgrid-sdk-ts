@@ -90,6 +90,12 @@
         :items="farms"
         :items-length="totalFarms"
         :items-per-page="size"
+        :items-per-page-options="[
+          { value: 10, title: '10' },
+          { value: 25, title: '25' },
+          { value: 50, title: '50' },
+          { value: 100, title: '100' },
+        ]"
         @update:items-per-page="
           size = $event;
           loadFarms();

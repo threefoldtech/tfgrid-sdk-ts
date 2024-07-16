@@ -10,6 +10,12 @@
       :headers="headers"
       v-model:page="page"
       v-model:items-per-page="pageSize"
+      :items-per-page-options="[
+        { value: 10, title: '10' },
+        { value: 25, title: '25' },
+        { value: 50, title: '50' },
+        { value: 100, title: '100' },
+      ]"
       show-expand
       :expanded="expanded"
       @update:expanded="
