@@ -9,18 +9,18 @@
       :deleting="deleting"
       v-bind:onClick:row="loading || deleting ? undefined : onClickRow"
       :no-data-text="capitalize(`No ${props.contractsType} contracts found on your account.`)"
-      :items-per-page-options="[
-        { value: 5, title: '5' },
-        { value: 10, title: '10' },
-        { value: 15, title: '15' },
-        { value: 50, title: '50' },
-      ]"
       class="elevation-1 v-data-table-header"
       density="compact"
       :items-length="$props.count.value"
       :items-per-page="$props.size.value"
       :page="$props.page.value"
       :items="contracts.value"
+      :items-per-page-options="[
+        { value: 5, title: '5' },
+        { value: 10, title: '10' },
+        { value: 20, title: '20' },
+        { value: 50, title: '50' },
+      ]"
       return-object
       show-select
       @update:page="updatePage"
