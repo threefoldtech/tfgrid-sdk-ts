@@ -31,15 +31,19 @@ export class RMBMonitor implements ILivenessChecker, IDisconnectHandler {
     if (!this.RMBProps.relayUrl) throw new Error("Can't access before initialization");
     return this.RMBProps.relayUrl;
   }
-  public set URL(url: string) {
-    async () => {
-      this.RMBProps.relayUrl = url;
-      if (this.rmbClient) {
-        await this.disconnect();
-        this.rmbClient.relayUrl = this.RMBProps.relayUrl;
-      } else this.factory();
-    };
+  private set URL(url: string) {
+    this.RMBProps.relayUrl = url;
   }
+
+  public async update(param: { url: string }) {
+    if (this.URL === param.url) return;
+    this.URL = param.url;
+    if (this.rmbClient) {
+      await this.disconnect();
+      this.rmbClient.relayUrl = this.URL;
+    } else this.factory();
+  }
+
   public async isAlive(): Promise<ServiceStatus> {
     try {
       if (!this.rmbClient?.con?.OPEN) await this.setUp();

@@ -14,8 +14,11 @@ export class StatsMonitor implements ILivenessChecker {
     if (!this.url) throw new Error("Can't access before initialization");
     return this.url;
   }
-  public set Url(url: string) {
+  private set URL(url: string) {
     this.url = url;
+  }
+  public update(param: { url: string }): void {
+    this.URL = param.url;
   }
   async isAlive(): Promise<ServiceStatus> {
     return resolveServiceStatus(sendRequest(this.url, { method: "Get" }));

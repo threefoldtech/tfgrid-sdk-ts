@@ -3,7 +3,7 @@ import { KeypairType } from "@polkadot/util-crypto/types";
 /**
  * Represents a basic service interface.
  */
-interface IServiceBase {
+interface IServiceBase<P> {
   /**
    * The name of the service.
    */
@@ -18,7 +18,7 @@ interface IServiceBase {
    * Updates the service with the provided parameters.
    * @param {object} param - The parameter object with specific keys, should be specified on class.
    */
-  update(param: object): void;
+  update(param: P): void;
 }
 
 /**
@@ -35,7 +35,7 @@ export interface IDisconnectHandler {
 /**
  * Represents a service with liveness checking capability.
  */
-export interface ILivenessChecker extends IServiceBase {
+export interface ILivenessChecker<P = { url: string }> extends IServiceBase<P> {
   /**
    * Checks if the service is alive.
    * @returns {Promise<ServiceStatus>} A promise that resolves with the current status of the service.
