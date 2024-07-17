@@ -138,7 +138,7 @@
 </template>
 
 <script lang="ts" setup>
-import { type Ref, ref, watch } from "vue";
+import { computed, type Ref, ref, watch } from "vue";
 
 import { manual } from "@/utils/manual";
 
@@ -198,7 +198,9 @@ const certified = ref(false);
 const disks = ref<Disk[]>([]);
 const network = ref();
 const hasGPU = ref(false);
-const rootFilesystemSize = 2;
+const rootFilesystemSize = computed(() =>
+  flist.value?.name === "Ubuntu-24.04" || flist.value?.name === "Other" ? solution.value?.disk : 2,
+);
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
 
@@ -260,10 +262,7 @@ async function deploy() {
           planetary: planetary.value,
           mycelium: mycelium.value,
           envs: [{ key: "SSH_KEY", value: selectedSSHKeys.value }],
-          rootFilesystemSize:
-            flist.value?.name === "Ubuntu-24.04" || flist.value?.name === "Other"
-              ? solution.value?.disk
-              : rootFilesystemSize,
+          rootFilesystemSize: rootFilesystemSize.value,
           hasGPU: hasGPU.value,
           nodeId: selectionDetails.value?.node?.nodeId,
           gpus: hasGPU.value ? selectionDetails.value?.gpuCards.map(card => card.id) : undefined,
