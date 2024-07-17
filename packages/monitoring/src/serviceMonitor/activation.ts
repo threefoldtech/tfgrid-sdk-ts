@@ -4,13 +4,14 @@ import { ILivenessChecker, ServiceStatus } from "../types";
 export class ActivationMonitor implements ILivenessChecker {
   private readonly name = "Activation";
   private url: string;
-  constructor(activationServiceUrl: string) {
-    this.url = activationServiceUrl;
+  constructor(activationServiceUrl?: string) {
+    if (activationServiceUrl) this.url = activationServiceUrl;
   }
   public get Name() {
     return this.name;
   }
   public get URL() {
+    if (!this.url) throw new Error("Can't access before initialization");
     return this.url;
   }
   public set URL(url: string) {

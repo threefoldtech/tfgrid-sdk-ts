@@ -7,16 +7,20 @@ export class TFChainMonitor implements ILivenessChecker, IDisconnectHandler {
   private url: string;
   private tfClient: QueryClient;
   constructor(tfChainUrl: string) {
-    this.url = tfChainUrl;
-    this.tfClient = new QueryClient(this.url);
+    if (tfChainUrl) {
+      this.url = tfChainUrl;
+      this.tfClient = new QueryClient(this.url);
+    }
   }
   private async setUp() {
+    if (!this.tfClient) throw new Error("Can't setUp before initialization");
     await this.tfClient?.connect();
   }
   public get Name() {
     return this.name;
   }
   public get URL() {
+    if (!this.url) throw new Error("Can't access before initialization");
     return this.url;
   }
   public set URL(url: string) {

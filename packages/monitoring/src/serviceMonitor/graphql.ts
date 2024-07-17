@@ -4,13 +4,14 @@ import { ILivenessChecker, ServiceStatus } from "../types";
 export class GraphQLMonitor implements ILivenessChecker {
   private readonly name = "GraphQl";
   private url: string;
-  constructor(graphQlUrl: string) {
-    this.url = graphQlUrl;
+  constructor(graphQlUrl?: string) {
+    if (graphQlUrl) this.url = graphQlUrl;
   }
   public get Name() {
     return this.name;
   }
   public get URL() {
+    if (!this.url) throw new Error("Can't access before initialization");
     return this.url;
   }
   public set URL(url: string) {

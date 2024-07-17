@@ -4,13 +4,14 @@ import { ILivenessChecker, ServiceStatus } from "../types";
 export class GridProxyMonitor implements ILivenessChecker {
   private readonly name = "GridProxy";
   private url: string;
-  constructor(gridProxyUrl: string) {
-    this.url = gridProxyUrl;
+  constructor(gridProxyUrl?: string) {
+    if (gridProxyUrl) this.url = gridProxyUrl;
   }
   public get Name() {
     return this.name;
   }
   public get URL() {
+    if (!this.url) throw new Error("Can't access before initialization");
     return this.url;
   }
   public set URL(url: string) {
