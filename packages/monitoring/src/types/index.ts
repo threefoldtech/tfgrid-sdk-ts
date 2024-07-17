@@ -5,23 +5,14 @@ import { KeypairType } from "@polkadot/util-crypto/types";
  */
 interface IServiceBase {
   /**
-   * Returns the name of the service.
-   * @returns {string} The service name.
+   * The name of the service.
    */
-  serviceName: () => string;
+  Name: string;
 
   /**
-   * Returns the URL of the service.
-   * @returns {string} The service URL.
+   * The URL of the service.
    */
-  serviceUrl: () => string;
-
-  /**
-   * Updates the service URL.
-   * This method sets a new URL for the service, updating its internal state to point to the provided URL.
-   * @param {string} url - The new URL to be set for the service.
-   */
-  updateUrl: (url: string) => void;
+  URL: string;
 }
 
 /**

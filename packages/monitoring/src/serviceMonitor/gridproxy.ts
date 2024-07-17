@@ -7,13 +7,13 @@ export class GridProxyMonitor implements ILivenessChecker {
   constructor(gridProxyUrl: string) {
     this.url = gridProxyUrl;
   }
-  serviceName() {
+  public get Name() {
     return this.name;
   }
-  serviceUrl() {
+  public get URL() {
     return this.url;
   }
-  updateUrl(url: string) {
+  public set URL(url: string) {
     this.url = url;
   }
   async isAlive(): Promise<ServiceStatus> {

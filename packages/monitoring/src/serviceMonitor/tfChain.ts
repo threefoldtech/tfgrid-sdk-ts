@@ -13,13 +13,13 @@ export class TFChainMonitor implements ILivenessChecker, IDisconnectHandler {
   private async setUp() {
     await this.tfClient?.connect();
   }
-  serviceName() {
+  public get Name() {
     return this.name;
   }
-  serviceUrl() {
+  public get URL() {
     return this.url;
   }
-  updateUrl(url: string) {
+  public set URL(url: string) {
     this.url = url;
     this.tfClient = new QueryClient(this.url);
   }

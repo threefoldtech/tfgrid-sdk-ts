@@ -1,19 +1,19 @@
 import { resolveServiceStatus, sendRequest } from "../helpers/utils";
 import { ILivenessChecker, ServiceStatus } from "../types";
 
-export class Activation implements ILivenessChecker {
+export class ActivationMonitor implements ILivenessChecker {
   private readonly name = "Activation";
   private url: string;
   constructor(activationServiceUrl: string) {
     this.url = activationServiceUrl;
   }
-  serviceName() {
+  public get Name() {
     return this.name;
   }
-  serviceUrl() {
+  public get URL() {
     return this.url;
   }
-  updateUrl(url: string) {
+  public set URL(url: string) {
     this.url = url;
   }
   async isAlive(): Promise<ServiceStatus> {

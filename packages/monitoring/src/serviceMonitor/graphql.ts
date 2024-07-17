@@ -7,13 +7,13 @@ export class GraphQLMonitor implements ILivenessChecker {
   constructor(graphQlUrl: string) {
     this.url = graphQlUrl;
   }
-  serviceName() {
+  public get Name() {
     return this.name;
   }
-  serviceUrl() {
+  public get URL() {
     return this.url;
   }
-  updateUrl(url: string) {
+  public set URL(url: string) {
     this.url = url;
   }
 

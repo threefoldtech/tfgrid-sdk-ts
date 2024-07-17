@@ -15,16 +15,18 @@ export class RMBMonitor implements ILivenessChecker, IDisconnectHandler {
   private async setUp() {
     await this.rmbClient.connect();
   }
-  public serviceName() {
+  public get Name() {
     return this.name;
   }
-  public serviceUrl() {
+  public get URL() {
     return this.url;
   }
-  async updateUrl(url: string) {
-    await this.disconnect();
-    this.url = url;
-    this.rmbClient.relayUrl = url;
+  public set URL(url: string) {
+    async () => {
+      await this.disconnect();
+      this.url = url;
+      this.rmbClient.relayUrl = url;
+    };
   }
   public async isAlive(): Promise<ServiceStatus> {
     try {
