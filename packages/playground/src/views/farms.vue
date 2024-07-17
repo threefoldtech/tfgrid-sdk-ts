@@ -106,9 +106,11 @@
           loadFarms();
         "
         @update:sort-by="
-          sortBy = $event[0].key == 'farmId' ? SortBy.FarmId : $event[0].key;
-          sortOrder = $event[0].order;
-          loadFarms();
+          if ($event[0]) {
+            sortBy = $event[0].key == 'farmId' ? SortBy.FarmId : $event[0].key;
+            sortOrder = $event[0].order;
+            loadFarms();
+          }
         "
         @update:options="loadFarms()"
         @click:row="openSheet"
