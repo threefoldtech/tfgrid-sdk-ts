@@ -49,27 +49,22 @@ export enum MonitorEvents {
   "serviceDown" = "MonitorServiceDown",
 }
 
-export enum ServiceName {
-  "GridPrixy" = "gridproxy",
-  "GraphQl" = "graphql",
-  "RMB" = "rmb",
-  "tfChain" = "tfChain",
-  "Activation" = "activation",
-  "Stats" = "stats",
-}
 export type ServiceUrl<N extends boolean> = N extends false ? string : string | null;
 
-export type ServicesUrls<N extends boolean> = {
-  [key in ServiceName]?: ServiceUrl<N>;
+export type Service = {
+  URLs: string[];
+  service: ILivenessChecker;
 };
-type ServicesStacks = {
-  [key in ServiceName]?: string[];
+export type RMBProps = {
+  chainUrl: string;
+  relayUrl?: string;
+  mnemonics: string;
+  session: string;
+  keypairType: KeypairType;
 };
-export type StackPickerOptions<N extends boolean = false> = ServicesStacks & {
-  mnemonic?: string;
-  keypairType?: KeypairType;
+
+export type StackManagerOptions<N extends boolean = false> = {
+  services: Service[];
   retries?: number;
-  rmbTFchainUrls?: string[];
-  rmbValidatesChain?: boolean;
   silent?: N;
 };
