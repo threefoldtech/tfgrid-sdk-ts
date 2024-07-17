@@ -13,6 +13,12 @@ interface IServiceBase {
    * The URL of the service.
    */
   URL: string;
+
+  /**
+   * Updates the service with the provided parameters.
+   * @param {object} param - The parameter object with specific keys, should be specified on class.
+   */
+  update(param: object): void;
 }
 
 /**
