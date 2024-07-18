@@ -52,7 +52,7 @@
 
       <TfSelectionDetails
         :filters="{
-          ipv4: true,
+          ipv4: ipv4,
           certified,
           dedicated,
           cpu: solution?.cpu,
