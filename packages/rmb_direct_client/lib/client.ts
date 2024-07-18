@@ -86,6 +86,7 @@ class Client {
       } else {
         this.con = new WebSocket(this.updateUrl()) as unknown as WSConnection;
       }
+      this.con.on("error", () => console.error);
       this.con.onmessage = async (e: any) => {
         let data: Uint8Array = e.data;
         if (!this.isEnvNode()) {
