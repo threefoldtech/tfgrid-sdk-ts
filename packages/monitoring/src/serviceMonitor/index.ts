@@ -3,3 +3,4 @@ export { TFChainMonitor } from "./tfChain";
 export { RMBMonitor } from "./rmb";
 export { ServiceMonitor } from "./alivenessChecker";
 export { GraphQLMonitor } from "./graphql";
+export { ServiceUrlManager } from "./serviceURLManager";

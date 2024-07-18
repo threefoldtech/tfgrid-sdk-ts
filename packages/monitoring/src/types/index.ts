@@ -63,3 +63,38 @@ export type RMBProps = {
   session: string;
   keypairType: KeypairType;
 };
+
+/**
+ * Represents a service with its stacks and its ILivenessChecker instance.
+ */
+export type Service = {
+  /**
+   * An array of URLs <Stacks> associated with the service.
+   */
+  URLs: string[];
+  /**
+   * An instance of a liveness checker for the service.
+   */
+  service: ILivenessChecker;
+};
+
+/**
+ * Options for configuring the stack manager.
+ * @template N - A boolean type that defaults to false, represents silent property type This will effect the result type as well.
+ */
+export type StackManagerOptions<N extends boolean = false> = {
+  /**
+   * An array of services to be managed by the stack manager.
+   */
+  services: Service[];
+  /**
+   * Optional. The number of retries for failed service checks for each stack.
+   */
+  retries?: number;
+  /**
+   * Optional. Determines if the stack manager should operate silently without throwing any errors and just return null as result.
+   */
+  silent?: N;
+};
+
+export type ServiceUrl<N extends boolean> = N extends false ? string : string | null;
