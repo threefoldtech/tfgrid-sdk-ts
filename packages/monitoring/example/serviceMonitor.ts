@@ -1,11 +1,16 @@
-import { GraphQLMonitor, GridProxyMonitor, RMBMonitor, ServiceMonitor, TFChainMonitor } from "../src/";
+import { GraphQLMonitor, GridProxyMonitor, RMBMonitor, ServiceMonitor, TFChainMonitor } from "../src";
 async function HealthCheck() {
   try {
     const services = [
       new GridProxyMonitor("<FakeURL>"),
       new GraphQLMonitor("https://graphql.dev.grid.tf/graphql"),
       new TFChainMonitor("wss://tfchain.dev.grid.tf/ws"),
-      new RMBMonitor("wss://relay.dev.grid.tf", "wss://tfchain.dev.grid.tf/ws", "mnemonic", "sr25519"),
+      new RMBMonitor({
+        relayUrl: "wss://relay.dev.grid.tf",
+        chainUrl: "wss://tfchain.dev.grid.tf/ws",
+        mnemonics: "mnemonic",
+        keypairType: "sr25519",
+      }),
     ];
     const serviceMonitor = new ServiceMonitor(services);
 
