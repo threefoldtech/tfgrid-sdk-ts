@@ -1,5 +1,5 @@
 import { monitorEvents } from "../helpers/events";
-import { IDisconnectHandler, ILivenessChecker, Service, ServiceUrl, StackManagerOptions } from "../types";
+import { IDisconnectHandler, ILivenessChecker, Service, ServiceUrl, URLManagerOptions } from "../types";
 
 /**
  * Manages service URLs, checking their availability and ensuring they are reachable.
@@ -7,7 +7,7 @@ import { IDisconnectHandler, ILivenessChecker, Service, ServiceUrl, StackManager
  * @template N - A boolean type that defaults to false, this got effected by silent value and effects the results type;
  *
  * @constructor
- * @param {StackManagerOptions<N>} [options] - The options for configuring the manager.
+ * @param {URLManagerOptions<N>} [options] - The options for configuring the manager.
  *
  * @property {Service[]} [services] - The list of services to be managed.
  */
@@ -17,7 +17,7 @@ export class ServiceUrlManager<N extends boolean = false> {
   private silent: N = false as N;
   public services: Service[];
 
-  constructor(options: StackManagerOptions<N>) {
+  constructor(options: URLManagerOptions<N>) {
     console.log(this);
     Object.assign(this, options);
     console.log(this);

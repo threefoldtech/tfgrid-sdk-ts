@@ -78,10 +78,10 @@ export type Service = {
 };
 
 /**
- * Options for configuring the stack manager.
+ * Options for configuring the URL manager.
  * @template N - A boolean type that defaults to false, represents silent property type This will effect the result type as well.
  */
-export type StackManagerOptions<N extends boolean = false> = {
+export type URLManagerOptions<N extends boolean = false> = {
   /**
    * An array of services to be managed by the stack manager.
    */
