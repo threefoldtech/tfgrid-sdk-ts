@@ -6,7 +6,7 @@ export class TFChainMonitor implements ILivenessChecker, IDisconnectHandler {
   private name = "TFChain";
   private url: string;
   private tfClient: QueryClient;
-  constructor(tfChainUrl: string) {
+  constructor(tfChainUrl?: string) {
     if (tfChainUrl) {
       this.url = tfChainUrl;
       this.tfClient = new QueryClient(this.url);
