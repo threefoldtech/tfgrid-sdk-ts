@@ -60,7 +60,6 @@ export type RMBProps = {
   chainUrl: string;
   relayUrl?: string;
   mnemonics: string;
-  session: string;
   keypairType: KeypairType;
 };
 
