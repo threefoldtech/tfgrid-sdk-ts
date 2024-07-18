@@ -1,4 +1,5 @@
-/** @type { HTMLDivElement } */
+/**
+ * @type { HTMLDivElement } */
 const appLoaderContainer = document.querySelector(".app-loader-dialog");
 
 /** @type { HTMLDivElement } */
@@ -10,8 +11,12 @@ const msgElement = document.querySelector(".app-loader-msg");
 /** @type { HTMLButtonElement} */
 const refreshBtn = document.querySelector(".app-loader-refresh");
 
-const slowConnectionTime = 60 * 1000;
-const noConnectionTime = 120 * 1000;
+const monitor = document.querySelector(".app-monitor-container");
+/** @type { HTMLUListElement} */
+const monitorList = document.querySelector(".app-monitor-status");
+
+const slowConnectionTime = 1 * 1000;
+const noConnectionTime = 1 * 1000;
 const appLoaderContainerTime = 0.3 * 1000;
 const welcomeMsgTime = (1 + appLoaderContainerTime / 1000) * 1000;
 
@@ -58,3 +63,52 @@ window.$$appLoader = () => {
     }
   }, welcomeMsgTime);
 };
+
+window.$$showMonitorError = urls => {
+  if (monitor) monitor.classList.add("active");
+  if (msgElement) {
+    msgElement.textContent = "Can't reach some services on provided stacks, Please try again";
+  }
+  if (monitorList) {
+    monitorList.innerHTML = Object.entries(urls).map(createElement).join(" ");
+  }
+  // refreshBtn && refreshBtn.classList.add("active");
+  // if (msgElement) {
+  //   msgElement.textContent = "Your connection seems to be broken, Please try again";
+  // }
+  // if(monitorList) {
+
+  // }
+  console.log(urls);
+};
+
+function createElement([serviceName, serviceStatus]) {
+  return `<li><div style="display:flex"><p class="service-name">${serviceName}</p> <p class="service-status service-${
+    serviceStatus !== null ? "reachable" : "unreachable"
+  }">${serviceStatus !== null ? "&#10003;" : "&#10007;"}</p></div></li>`;
+}
+
+//   const p = document.createElement("p");
+//   const serviceSpan = createSpan(serviceName);
+//   const statusSpan = document.createElement("span");
+//   if (serviceStatus !== null) {
+//     statusSpan.textContent("Reachable");
+//     statusSpan.classList.add("service-reachable");
+//   } else {
+//     statusSpan.textContent("Unreachable");
+//     statusSpan.classList.add("service-unreachable");
+//   }
+//   statusSpan.classList.add("service-status");
+
+//   p.appendChild(serviceSpan);
+//   p.appendChild(document.createTextNode(" : "));
+//   p.appendChild(serviceStatus);
+
+//   return li.appendChild(p);
+// }
+
+// function createSpan(text){
+//   const span = document.createElement("span");
+//   span.appendChild(document.createTextNode(text));
+//   return span
+// }

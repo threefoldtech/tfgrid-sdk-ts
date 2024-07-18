@@ -65,6 +65,7 @@
     "packages/UI/*.config.js",
     "packages/UI/src/index.css",
     "*.config.*",
-    "*global.css"
+    "*global.css",
+    "*.css"
   ]
 }

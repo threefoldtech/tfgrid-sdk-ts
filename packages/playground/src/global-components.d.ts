@@ -38,6 +38,7 @@ declare module "@vue/runtime-core" {
 declare global {
   interface Window {
     $$appLoader: () => void;
+    $$showMonitorError: (urls: { [key: string]: string | null }) => void;
     env: {
       NETWORK: NetworkEnv;
       GRAPHQL_URL: string;

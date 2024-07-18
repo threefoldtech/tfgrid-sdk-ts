@@ -68,3 +68,20 @@ function defineGlobalProps(app: App<Element>) {
   app.config.globalProperties.validators = validators;
   app.config.globalProperties.MANUAL_URL = window.env.MANUAL_URL;
 }
+
+export async function setGlobalEnv() {
+  // const services = await urlManager.getAvailableServices();
+  // if (services.graphql) window.env.GRAPHQL_URL = services.graphql;
+  // if (services.gridproxy) window.env.GRIDPROXY_URL;
+  // if (services.tfChain) window.env.SUBSTRATE_URL;
+  // await new Promise(r => setTimeout(r, 3000));
+  // if(true){
+  window.$$showMonitorError({ TFChain: null, RMB: "teiahio", GridProxy: null, GraphQL: "DFAJ", Activation: "testr" });
+  return false;
+  return true;
+  // if (Object.values(services).includes(null)) {
+  //   window.$$showMonitorError(services);
+  //   return false;
+  // }
+  return true;
+}
