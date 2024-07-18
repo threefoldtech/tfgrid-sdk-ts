@@ -175,7 +175,7 @@
       </VRow>
 
       <VRow>
-        <VCol class="tf-node-resource">
+        <VCol class="tf-node-resource mb-5">
           <ResourceDetails
             name="SSD Disks"
             :used="(node?.used_resources.sru ?? 0) + selectedMachines.reduce((r, m) => r + m.disk * 1e9, 0)"
@@ -192,7 +192,7 @@
           />
         </VCol>
       </VRow>
-      <div class="mt-5 ml-auto text-right">
+      <div class="ml-auto text-right" v-if="node && (node.rentable || rentedByUser)">
         <v-tooltip bottom color="primary" close-delay="100" :disabled="!(node && node.dedicated)">
           <template v-slot:activator="{ isActive, props }">
             <span v-bind="props" v-on="isActive" class="font-weight-bold"
@@ -278,8 +278,7 @@ import type { GridClient, NodeInfo, NodeResources } from "@threefold/grid_client
 import { discountPackages } from "@threefold/grid_client";
 import { CertificationType, type GridNode } from "@threefold/gridproxy_client";
 import { QueryClient } from "@threefold/tfchain_client";
-import { computed, onMounted, ref, watch } from "vue";
-import { capitalize, type PropType } from "vue";
+import { capitalize, computed, onMounted, type PropType, ref, watch } from "vue";
 
 import { gridProxyClient } from "@/clients";
 import ReserveBtn from "@/dashboard/components/reserve_action_btn.vue";
