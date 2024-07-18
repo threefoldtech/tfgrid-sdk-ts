@@ -1,18 +1,24 @@
+import { KeypairType } from "@polkadot/util-crypto/types";
 /**
  * Represents a basic service interface.
+ * @template P - The type of the parameter object used for the update method.
  */
-interface IServiceBase {
+interface IServiceBase<P> {
   /**
-   * Returns the name of the service.
-   * @returns {string} The service name.
+   * The name of the service.
    */
-  serviceName: () => string;
+  Name: string;
 
   /**
-   * Returns the URL of the service.
-   * @returns {string} The service URL.
+   * The URL of the service.
    */
-  serviceUrl: () => string;
+  URL: string;
+
+  /**
+   * Updates the service with the provided parameters.
+   * @param {P} param - The parameter object with specific keys, should be specified on class.
+   */
+  update(param: P): void;
 }
 
 /**
@@ -28,8 +34,9 @@ export interface IDisconnectHandler {
 
 /**
  * Represents a service with liveness checking capability.
+ * @template P - The type of the parameter object used for the update method. Defaults to {url:string}.
  */
-export interface ILivenessChecker extends IServiceBase {
+export interface ILivenessChecker<P = { url: string }> extends IServiceBase<P> {
   /**
    * Checks if the service is alive.
    * @returns {Promise<ServiceStatus>} A promise that resolves with the current status of the service.
@@ -48,3 +55,11 @@ export enum MonitorEvents {
   "storeStatus" = "MonitorStoreStatus",
   "serviceDown" = "MonitorServiceDown",
 }
+
+export type RMBProps = {
+  chainUrl: string;
+  relayUrl?: string;
+  mnemonics: string;
+  session: string;
+  keypairType: KeypairType;
+};

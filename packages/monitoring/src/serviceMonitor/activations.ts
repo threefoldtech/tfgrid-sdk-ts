@@ -1,11 +1,11 @@
 import { resolveServiceStatus, sendRequest } from "../helpers/utils";
 import { ILivenessChecker, ServiceStatus } from "../types";
 
-export class GridProxyMonitor implements ILivenessChecker {
-  private readonly name = "GridProxy";
+export class ActivationMonitor implements ILivenessChecker {
+  private readonly name = "Activation";
   private url: string;
-  constructor(gridProxyUrl?: string) {
-    if (gridProxyUrl) this.url = gridProxyUrl;
+  constructor(activationServiceUrl?: string) {
+    if (activationServiceUrl) this.url = activationServiceUrl;
   }
   public get Name() {
     return this.name;

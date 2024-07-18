@@ -23,13 +23,13 @@ export class ServiceMonitor {
       for (let retryCount = 1; retryCount <= this.retries; retryCount++) {
         const { alive, error } = await service.isAlive();
         if (alive) {
-          monitorEvents.storeStatus(service.serviceName(), alive);
+          monitorEvents.storeStatus(service.Name, alive);
           break;
         }
         if (retryCount < this.retries) {
-          monitorEvents.log(`${service.serviceName()} seems to be down; Retrying (${retryCount}/${this.retries})...`);
+          monitorEvents.log(`${service.Name} seems to be down; Retrying (${retryCount}/${this.retries})...`);
           await new Promise(resolve => setTimeout(resolve, this.retryInterval * 60));
-        } else monitorEvents.serviceDown(service.serviceName(), error);
+        } else monitorEvents.serviceDown(service.Name, error);
       }
     }
     monitorEvents.summarize();
