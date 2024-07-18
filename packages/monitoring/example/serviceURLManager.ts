@@ -13,7 +13,7 @@ const graphql = ["https://graphql.dev.grid.tf/graphql"];
 const tfChain = ["wss://tfchain.dev.grid.tf/ws", "wss://www.nonExistentChain.com"];
 const mnemonics = "<MNEMONIC>";
 
-async function checkStacksAvailability(services: URLManagerOptions) {
+async function checkStacksAvailability<N extends boolean>(services: URLManagerOptions<N>) {
   try {
     const pickedUrls = await new ServiceUrlManager(services).getAvailableServicesStack();
     console.log(pickedUrls);
