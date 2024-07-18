@@ -11,7 +11,6 @@ export class StatsMonitor implements ILivenessChecker {
     return this.name;
   }
   public get URL() {
-    if (!this.url) throw new Error("Can't access before initialization");
     return this.url;
   }
   private set URL(url: string) {

@@ -28,8 +28,7 @@ export class RMBMonitor implements ILivenessChecker, IDisconnectHandler {
     return this.name;
   }
   public get URL() {
-    if (!this.RMBProps.relayUrl) throw new Error("Can't access before initialization");
-    return this.RMBProps.relayUrl;
+    return this.RMBProps.relayUrl ?? "";
   }
   private set URL(url: string) {
     this.RMBProps.relayUrl = url;

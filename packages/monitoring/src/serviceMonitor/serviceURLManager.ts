@@ -18,9 +18,7 @@ export class ServiceUrlManager<N extends boolean = false> {
   public services: Service[];
 
   constructor(options: URLManagerOptions<N>) {
-    console.log(this);
     Object.assign(this, options);
-    console.log(this);
   }
 
   /**
