@@ -7,12 +7,12 @@ interface IServiceBase<P> {
   /**
    * The name of the service.
    */
-  Name: string;
+  name: string;
 
   /**
-   * The URL of the service.
+   * The url of the service.
    */
-  URL: string;
+  url: string;
 
   /**
    * Updates the service with the provided parameters.
