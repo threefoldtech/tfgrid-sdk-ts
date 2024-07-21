@@ -279,9 +279,11 @@ const filteredHeaders = computed(() => {
     ProjectName.TFRobot,
     ProjectName.Gitea,
     ProjectName.Nostr,
+    ProjectName.NodePilot,
   ] as string[];
 
   const IPV4Solutions = [
+    ProjectName.NodePilot,
     ProjectName.VM,
     ProjectName.Fullvm,
     ProjectName.Presearch,
