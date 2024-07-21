@@ -68,7 +68,8 @@
         <span class="font-weight-bold" v-text="toReadableDate(node.uptime)" />
       </span>
       <span class="ml-2" v-if="node"
-        >Last Deployment Time: {{ lastDeploymentTime === 0 ? "N/A" : toHumanDate(lastDeploymentTime) }}
+        >Last Deployment Time:
+        {{ lastDeploymentTime === 0 ? "N/A" : toHumanDate(lastDeploymentTime) }}
       </span>
     </template>
 
@@ -192,7 +193,7 @@
           />
         </VCol>
       </VRow>
-      <div class="ml-auto text-right" v-if="node && (node.rentable || rentedByUser)">
+      <div class="ml-auto text-right" v-if="node && (rentedByUser || (node.status !== 'down' && node.rentable))">
         <v-tooltip bottom color="primary" close-delay="100" :disabled="!(node && node.dedicated)">
           <template v-slot:activator="{ isActive, props }">
             <span v-bind="props" v-on="isActive" class="font-weight-bold"
@@ -210,9 +211,24 @@
               hover
               :loading="loadingdiscountTableItems"
               :headers="[
-                { title: 'Packages', align: 'center', key: 'name', sortable: false },
-                { title: 'Discount', align: 'center', key: 'discount', sortable: false },
-                { title: 'TFTs Required', align: 'center', key: 'tfts', sortable: false },
+                {
+                  title: 'Packages',
+                  align: 'center',
+                  key: 'name',
+                  sortable: false,
+                },
+                {
+                  title: 'Discount',
+                  align: 'center',
+                  key: 'discount',
+                  sortable: false,
+                },
+                {
+                  title: 'TFTs Required',
+                  align: 'center',
+                  key: 'tfts',
+                  sortable: false,
+                },
               ]"
               :items="discountTableItems"
               disable-sort="true"
