@@ -2,22 +2,22 @@ import { resolveServiceStatus, sendRequest } from "../helpers/utils";
 import { ILivenessChecker, ServiceStatus } from "../types";
 
 export class StatsMonitor implements ILivenessChecker {
-  private readonly name = "Stats";
-  private url: string;
+  private readonly _name = "Stats";
+  private _url: string;
   constructor(statusUrl?: string) {
     if (statusUrl) this.url = statusUrl;
   }
-  public get Name() {
-    return this.name;
+  public get name() {
+    return this._name;
   }
-  public get URL() {
-    return this.url;
+  public get url() {
+    return this._url ?? "";
   }
-  private set URL(url: string) {
-    this.url = url;
+  private set url(url: string) {
+    this._url = url;
   }
   public update(param: { url: string }): void {
-    this.URL = param.url;
+    this.url = param.url;
   }
   async isAlive(): Promise<ServiceStatus> {
     return resolveServiceStatus(sendRequest(this.url, { method: "Get" }));

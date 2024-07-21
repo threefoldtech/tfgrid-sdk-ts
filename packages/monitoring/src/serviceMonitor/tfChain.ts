@@ -3,36 +3,36 @@ import { QueryClient } from "@threefold/tfchain_client";
 import { IDisconnectHandler, ILivenessChecker, ServiceStatus } from "../types";
 
 export class TFChainMonitor implements ILivenessChecker, IDisconnectHandler {
-  private name = "TFChain";
-  private url: string;
-  private tfClient: QueryClient;
-  constructor(tfChainUrl?: string) {
+  private _name = "TFChain";
+  private _url: string;
+  private _tfClient: QueryClient;
+  constructor(tfChainUrl: string) {
     if (tfChainUrl) {
-      this.url = tfChainUrl;
-      this.tfClient = new QueryClient(this.url);
+      this._url = tfChainUrl;
+      this._tfClient = new QueryClient(this.url);
     }
   }
   private async setUp() {
-    if (!this.tfClient) throw new Error("Can't setUp before initialization");
-    await this.tfClient?.connect();
+    if (!this._tfClient) throw new Error("Can't setUp before initialization");
+    await this._tfClient?.connect();
   }
-  public get Name() {
-    return this.name;
+  public get name() {
+    return this._name;
   }
-  public get URL() {
-    return this.url;
+  public get url() {
+    return this._url ?? "";
   }
-  private set URL(url: string) {
-    this.url = url;
+  private set url(url: string) {
+    this._url = url;
   }
   public update(param: { url: string }): void {
-    if (this.URL === param.url) return;
-    this.URL = param.url;
-    this.tfClient = new QueryClient(this.url);
+    if (this.url === param.url) return;
+    this.url = param.url;
+    this._tfClient = new QueryClient(this.url);
   }
   public async isAlive(): Promise<ServiceStatus> {
     try {
-      if (!this.tfClient.api) await this.setUp();
+      if (!this._tfClient.api) await this.setUp();
       return {
         alive: true,
       };
@@ -44,6 +44,6 @@ export class TFChainMonitor implements ILivenessChecker, IDisconnectHandler {
     }
   }
   public async disconnect() {
-    await this.tfClient.disconnect();
+    await this._tfClient.disconnect();
   }
 }

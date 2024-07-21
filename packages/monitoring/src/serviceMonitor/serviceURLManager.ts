@@ -77,28 +77,28 @@ export class ServiceUrlManager<N extends boolean = false> {
     let error: Error | string = "";
     for (let i = 0; i < urls.length; i++) {
       await service.update({ url: urls[i] });
-      monitorEvents.log(`${service.Name}: pinging ${service.URL}`, "gray");
+      monitorEvents.log(`${service.name}: pinging ${service.url}`, "gray");
       for (let retry = 0; retry < this.retries; retry++) {
         const status = await this.pingService(service);
         if (status.alive) {
-          monitorEvents.log(`${service.Name} on ${service.URL} Success!`, "green");
-          return service.URL;
+          monitorEvents.log(`${service.name} on ${service.url} Success!`, "green");
+          return service.url;
         }
         error = status.error ?? "";
       }
       monitorEvents.log(
-        `${service.Name}: failed to ping ${service.URL} after ${this.retries} retries; ${error}`,
+        `${service.name}: failed to ping ${service.url} after ${this.retries} retries; ${error}`,
         "red",
       );
     }
-    return this.handleErrorsOnSilentMode(`Failed to reach ${service.Name} on all provided stacks`) as ServiceUrl<N>;
+    return this.handleErrorsOnSilentMode(`Failed to reach ${service.name} on all provided stacks`) as ServiceUrl<N>;
   }
 
   async getAvailableServicesStack(): Promise<{ [key: string]: ServiceUrl<N> }> {
     const result: { [key: string]: Promise<ServiceUrl<N>> } = {};
 
     for (const { URLs, service } of this.services) {
-      result[service.Name] = this.getAvailableStack(URLs, service);
+      result[service.name] = this.getAvailableStack(URLs, service);
     }
 
     const entries = Object.entries(result);
