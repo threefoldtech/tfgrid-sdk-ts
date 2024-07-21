@@ -44,6 +44,7 @@ export class RMBMonitor implements ILivenessChecker, IDisconnectHandler {
   }
 
   public async isAlive(): Promise<ServiceStatus> {
+    if (!this.url) throw new Error("Can't access before initialization");
     try {
       if (!this._rmbClient?.con?.OPEN) await this.setUp();
       return resolveServiceStatus(this._rmbClient.ping(2));

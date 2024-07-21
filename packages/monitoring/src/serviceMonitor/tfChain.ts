@@ -31,6 +31,7 @@ export class TFChainMonitor implements ILivenessChecker, IDisconnectHandler {
     this._tfClient = new QueryClient(this.url);
   }
   public async isAlive(): Promise<ServiceStatus> {
+    if (!this.url) throw new Error("Can't access before initialization");
     try {
       if (!this._tfClient.api) await this.setUp();
       return {
