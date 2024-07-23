@@ -21,6 +21,6 @@ export class StatsMonitor implements ILivenessChecker {
   }
   async isAlive(): Promise<ServiceStatus> {
     if (!this.url) throw new Error("Can't access before initialization");
-    return resolveServiceStatus(sendRequest(this.url, { method: "Get" }));
+    return resolveServiceStatus(sendRequest(`${this.url}/api/stats-summary`, { method: "Get" }));
   }
 }
