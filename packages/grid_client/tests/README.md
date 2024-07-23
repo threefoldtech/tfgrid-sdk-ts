@@ -1,5 +1,7 @@
 # Tests
 
+> Please be aware that before you can run the tests, you must have built the project and installed the prerequisites (some tests require the installation of Mycelium and Yggdrasil).
+
 ## Configure
 
 - Set your grid3 client configuration in `config.json`
@@ -13,7 +15,7 @@
 }
 ```
 
-> Please note you can leave its content empty and export everything as environment variables
+> Please take note that you must either complete all of the configuration listed above OR leave it empty and export all of the data as environment variables, as shown below.
 
 ```bash
 export NETWORK="dev"
