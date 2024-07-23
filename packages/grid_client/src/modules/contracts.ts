@@ -5,6 +5,7 @@ import {
   GqlNameContract,
   GqlNodeContract,
   GqlRentContract,
+  ListContractByAddressOptions,
   ListContractByTwinIdOptions,
   LockContracts,
 } from "../clients/tf-grid";
@@ -22,7 +23,6 @@ import {
   ContractGetByNodeIdAndHashModel,
   ContractGetModel,
   ContractLockModel,
-  ContractsByAddress,
   ContractState,
   ContractStates,
   CreateServiceContractModel,
@@ -178,10 +178,11 @@ class Contracts {
 
   @expose
   @validateInput
-  async listContractsByAddress(options: ContractsByAddress) {
+  async listContractsByAddress(options: ListContractByAddressOptions) {
     return this.client.contracts.listContractsByAddress({
       graphqlURL: this.config.graphqlURL,
-      accountId: options.address,
+      accountId: options.accountId,
+      stateList: options.stateList,
     });
   }
 
