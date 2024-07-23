@@ -241,7 +241,7 @@ if (contract.value.metadata?.includes("fullvm") && contract.value.contractId) ge
 function _transform(value: string): any {
   const v = value.toLowerCase();
   if (v === "true" || v === "false") {
-    return Boolean(v);
+    return v === "true";
   }
   return value;
 }
