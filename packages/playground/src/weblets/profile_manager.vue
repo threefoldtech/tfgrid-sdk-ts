@@ -4,6 +4,7 @@
     class="mx-auto"
     :model-value="$props.modelValue"
     @update:model-value="handleProfileDialog($event)"
+    attach="#modals"
   >
     <template #activator="{ props }">
       <VCard v-bind="props" class="pa-3 d-inline-flex align-center">
@@ -153,6 +154,9 @@
                               }"
                               :disabled="creatingAccount || activatingAccount || activating"
                               @click:append="reloadValidation"
+                              readonly
+                              ref="mnemonicRef"
+                              @focus="handleFocus(mnemonicRef)"
                             >
                               <template v-slot:prepend-inner v-if="validationProps.hint || validationProps.error">
                                 <v-icon :color="validationProps.error ? 'red' : 'green'">
@@ -200,7 +204,7 @@
                 </template>
               </VTooltip>
 
-              <v-dialog v-model="openAcceptTerms" fullscreen width="100%">
+              <v-dialog v-model="openAcceptTerms" fullscreen width="100%" attach="#modals">
                 <v-card v-if="!termsLoading">
                   <v-card-text class="pa-15" v-html="acceptTermsContent"></v-card-text>
                   <div class="terms-footer">
@@ -257,6 +261,9 @@
                   v-model="email"
                   v-bind="props"
                   :disabled="creatingAccount || activatingAccount || activating"
+                  readonly
+                  ref="emailRef"
+                  @focus="handleFocus(emailRef)"
                 />
               </input-validator>
 
@@ -283,6 +290,7 @@
                           v-model="password"
                           v-bind="{ ...passwordInputProps, ...validationProps }"
                           :disabled="creatingAccount || activatingAccount || activating"
+                          autocomplete="off"
                         />
                       </div>
                     </template>
@@ -305,6 +313,7 @@
                       ...validationProps,
                     }"
                     :disabled="creatingAccount || activatingAccount || activating"
+                    autocomplete="off"
                   />
                 </InputValidator>
               </PasswordInputWrapper>
@@ -454,6 +463,9 @@ const props = defineProps({
     type: Boolean,
   },
 });
+const mnemonicRef = ref();
+const emailRef = ref();
+
 const emit = defineEmits<{ (event: "update:modelValue", value: boolean): void }>();
 const bridge = (window as any).env.BRIDGE_TFT_ADDRESS;
 
@@ -470,6 +482,9 @@ const apps = [
   },
 ];
 const online = useOnline();
+const handleFocus = (elementRef: HTMLInputElement) => {
+  elementRef.removeAttribute("readonly");
+};
 watch(
   () => [online.value, props.modelValue],
   ([online, m], [wasOnline]) => {
@@ -647,7 +662,6 @@ function logout() {
   if (router.currentRoute.value.path.includes("/overview")) {
     router.push("/");
   }
-  emit("update:modelValue", false);
 }
 
 const activating = ref(false);

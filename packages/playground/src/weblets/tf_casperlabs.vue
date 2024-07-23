@@ -17,11 +17,10 @@
         :value="name"
         :rules="[
           validators.required('Name is required.'),
-          validators.isLowercase('Name should consist of lowercase letters only.'),
-          validators.isAlphanumeric('Name should consist of letters and numbers only.'),
+          validators.IsAlphanumericExpectUnderscore('Name should consist of letters ,numbers and underscores only.'),
           name => validators.isAlpha('Name must start with alphabet char.')(name[0]),
           validators.minLength('Name must be at least 2 characters.', 2),
-          validators.maxLength('Name cannot exceed 15 characters.', 15),
+          validators.maxLength('Name cannot exceed 50 characters.', 50),
         ]"
         #="{ props }"
       >
@@ -37,7 +36,7 @@
         :large="{ cpu: 8, memory: 32, disk: 1000 }"
       />
 
-      <Networks v-model:ipv4="ipv4" v-model:mycelium="mycelium" />
+      <Networks v-model:ipv4="ipv4" v-model:planetary="planetary" v-model:mycelium="mycelium" v-model:ipv6="ipv6" />
 
       <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
         <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
@@ -50,6 +49,7 @@
       <TfSelectionDetails
         :filters="{
           ipv4,
+          ipv6,
           certified,
           dedicated,
           cpu: solution?.cpu,
@@ -71,7 +71,7 @@
 </template>
 
 <script lang="ts" setup>
-import type { GridClient } from "@threefold/grid_client";
+import { calculateRootFileSystem, type GridClient } from "@threefold/grid_client";
 import { computed, type Ref, ref } from "vue";
 
 import { manual } from "@/utils/manual";
@@ -97,8 +97,12 @@ const flist: Flist = {
 const dedicated = ref(false);
 const certified = ref(false);
 const ipv4 = ref(false);
+const ipv6 = ref(false);
 const mycelium = ref(true);
-const rootFilesystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solution.value?.memory ?? 0));
+const planetary = ref(false);
+const rootFilesystemSize = computed(() =>
+  calculateRootFileSystem({ CPUCores: solution.value?.cpu ?? 0, RAMInMegaBytes: solution.value?.memory ?? 0 }),
+);
 const selectionDetails = ref<SelectionDetails>();
 const selectedSSHKeys = ref("");
 const gridStore = useGrid();
@@ -148,7 +152,9 @@ async function deploy() {
           flist: flist.value,
           entryPoint: flist.entryPoint,
           publicIpv4: ipv4.value,
+          publicIpv6: ipv6.value,
           mycelium: mycelium.value,
+          planetary: planetary.value,
           envs: [
             { key: "SSH_KEY", value: selectedSSHKeys.value },
             { key: "CASPERLABS_HOSTNAME", value: domain },
@@ -201,7 +207,6 @@ import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue"
 import { deploymentListEnvironments } from "../constants";
 import type { SelectionDetails } from "../types/nodeSelector";
 import { updateGrid } from "../utils/grid";
-import rootFs from "../utils/root_fs";
 
 export default {
   name: "TFCasperlabs",

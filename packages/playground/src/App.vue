@@ -494,4 +494,12 @@ export default {
 .v-theme--dark .v-btn--disabled {
   color: #7b7b7b !important;
 }
+body {
+  overflow: auto;
+  height: 100vh;
+}
+
+html {
+  overflow: hidden;
+}
 </style>

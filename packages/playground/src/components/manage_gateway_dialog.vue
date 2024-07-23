@@ -5,6 +5,7 @@
       @update:model-value="$emit('close')"
       scrollable
       :persistent="deleting || layout?.status === 'deploy'"
+      attach="#modals"
     >
       <weblet-layout
         ref="layout"
@@ -40,7 +41,7 @@
           </template>
         </v-alert>
 
-        <v-dialog v-model="failedDomainDialog" max-width="400px" scrollable>
+        <v-dialog v-model="failedDomainDialog" max-width="400px" scrollable attach="#modals">
           <v-card>
             <v-card-title class="bg-warning">Failed Domains</v-card-title>
 
@@ -121,7 +122,7 @@
                   validators.isAlphanumeric('Subdomain should consist of letters and numbers only.'),
                   subdomain => validators.isAlpha('Subdomain must start with alphabet char.')(subdomain[0]),
                   validators.minLength('Subdomain must be at least 4 characters.', 4),
-                  subdomain => validators.maxLength('Subdomain cannot exceed 30 characters.', 30)(subdomain),
+                  subdomain => validators.maxLength('Subdomain cannot exceed 50 characters.', 50)(subdomain),
                 ]"
                 :async-rules="gatewayTab === 1 ? [validateSubdomain] : []"
                 #="{ props }"
@@ -183,7 +184,7 @@
       </weblet-layout>
     </v-dialog>
 
-    <v-dialog v-model="requestDelete" max-width="600px">
+    <v-dialog v-model="requestDelete" max-width="600px" attach="#modals">
       <v-card>
         <v-card-title> Are you sure you want to delete the following gateways? </v-card-title>
         <v-card-text class="d-flex flex-wrap">

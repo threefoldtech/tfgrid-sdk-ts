@@ -17,11 +17,10 @@
         :value="name"
         :rules="[
           validators.required('Name is required.'),
-          validators.isLowercase('Name should consist of lowercase letters only.'),
-          validators.isAlphanumeric('Name should consist of letters and numbers only.'),
+          validators.IsAlphanumericExpectUnderscore('Name should consist of letters ,numbers and underscores only.'),
           name => validators.isAlpha('Name must start with alphabet char.')(name[0]),
           validators.minLength('Name must be at least 2 characters.', 2),
-          validators.maxLength('Name cannot exceed 15 characters.', 15),
+          validators.maxLength('Name cannot exceed 50 characters.', 50),
         ]"
         #="{ props }"
       >
@@ -38,7 +37,7 @@
           validators.isAlphanumeric('Username should consist of letters and numbers only.'),
           username => validators.isAlpha('Username must start with alphabet char.')(username[0]),
           validators.minLength('Username must be at least 2 characters.', 2),
-          validators.maxLength('Username cannot exceed 15 characters.', 15),
+          validators.maxLength('Username cannot exceed 50 characters.', 50),
         ]"
         #="{ props }"
       >
@@ -89,7 +88,7 @@
         :small="{ cpu: 1, memory: 2, disk: 50 }"
         :medium="{ cpu: 2, memory: 4, disk: 100 }"
       />
-      <Networks v-model:ipv4="ipv4" v-model:mycelium="mycelium" />
+      <Networks v-model:ipv4="ipv4" v-model:planetary="planetary" v-model:mycelium="mycelium" v-model:ipv6="ipv6" />
 
       <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
         <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
@@ -102,6 +101,7 @@
       <TfSelectionDetails
         :filters="{
           ipv4,
+          ipv6,
           certified,
           dedicated,
           cpu: solution?.cpu,
@@ -123,7 +123,7 @@
 </template>
 
 <script lang="ts" setup>
-import type { GridClient } from "@threefold/grid_client";
+import { calculateRootFileSystem, type GridClient } from "@threefold/grid_client";
 import { computed, type Ref, ref } from "vue";
 
 import { manual } from "@/utils/manual";
@@ -144,7 +144,9 @@ const username = ref("admin");
 const email = ref(profileManager.profile?.email || "");
 const password = ref(generatePassword(12));
 const solution = ref() as Ref<SolutionFlavor>;
-const rootFilesystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solution.value?.memory ?? 0));
+const rootFilesystemSize = computed(() =>
+  calculateRootFileSystem({ CPUCores: solution.value?.cpu ?? 0, RAMInMegaBytes: solution.value?.memory ?? 0 }),
+);
 const flist: Flist = {
   value: "https://hub.grid.tf/tf-official-apps/funkwhale-dec21.flist",
   entryPoint: "/init.sh",
@@ -152,7 +154,9 @@ const flist: Flist = {
 const dedicated = ref(false);
 const certified = ref(false);
 const ipv4 = ref(false);
+const ipv6 = ref(false);
 const mycelium = ref(true);
+const planetary = ref(false);
 const selectionDetails = ref<SelectionDetails>();
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
@@ -206,7 +210,9 @@ async function deploy() {
           flist: flist.value,
           entryPoint: flist.entryPoint,
           publicIpv4: ipv4.value,
+          publicIpv6: ipv6.value,
           mycelium: mycelium.value,
+          planetary: planetary.value,
           envs: [
             { key: "SSH_KEY", value: selectedSSHKeys.value },
             { key: "FUNKWHALE_HOSTNAME", value: domain },
@@ -262,7 +268,6 @@ import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue"
 import { deploymentListEnvironments } from "../constants";
 import type { SelectionDetails } from "../types/nodeSelector";
 import { updateGrid } from "../utils/grid";
-import rootFs from "../utils/root_fs";
 
 export default {
   name: "TfFunkwhale",

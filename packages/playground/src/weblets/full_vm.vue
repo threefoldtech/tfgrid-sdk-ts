@@ -24,11 +24,10 @@
           :value="name"
           :rules="[
             validators.required('Name is required.'),
-            validators.isLowercase('Name should consist of lowercase letters only.'),
-            validators.isAlphanumeric('Name should consist of letters and numbers only.'),
+            validators.IsAlphanumericExpectUnderscore('Name should consist of letters ,numbers and underscores only.'),
             name => validators.isAlpha('Name must start with alphabet char.')(name[0]),
             validators.minLength('Name must be at least 2 characters.', 2),
-            validators.maxLength('Name cannot exceed 15 characters.', 15),
+            validators.maxLength('Name cannot exceed 50 characters.', 50),
           ]"
           #="{ props }"
         >
@@ -36,6 +35,7 @@
             <v-text-field label="Name" v-model="name" v-bind="props" />
           </input-tooltip>
         </input-validator>
+
         <SelectVmImage :images="images" v-model="flist" />
         <SelectSolutionFlavor
           :small="{ cpu: 1, memory: 2, disk: 25 }"
@@ -105,7 +105,7 @@
               name => validators.isAlpha('Name must start with alphabet char.')(name[0]),
               validators.minLength('Disk minLength is 2 chars.', 2),
               validators.isAlphanumeric('Disk name only accepts alphanumeric chars.'),
-              validators.maxLength('Disk maxLength is 15 chars.', 15),
+              validators.maxLength('Disk maxLength is 50 chars.', 50),
             ]"
             #="{ props }"
           >
@@ -138,7 +138,7 @@
 </template>
 
 <script lang="ts" setup>
-import { type Ref, ref, watch } from "vue";
+import { computed, type Ref, ref, watch } from "vue";
 
 import { manual } from "@/utils/manual";
 
@@ -198,7 +198,9 @@ const certified = ref(false);
 const disks = ref<Disk[]>([]);
 const network = ref();
 const hasGPU = ref(false);
-const rootFilesystemSize = 2;
+const rootFilesystemSize = computed(() =>
+  flist.value?.name === "Ubuntu-24.04" || flist.value?.name === "Other" ? solution.value?.disk : 2,
+);
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
 
@@ -260,10 +262,7 @@ async function deploy() {
           planetary: planetary.value,
           mycelium: mycelium.value,
           envs: [{ key: "SSH_KEY", value: selectedSSHKeys.value }],
-          rootFilesystemSize:
-            flist.value?.name === "Ubuntu-24.04" || flist.value?.name === "Other"
-              ? solution.value?.disk
-              : rootFilesystemSize,
+          rootFilesystemSize: rootFilesystemSize.value,
           hasGPU: hasGPU.value,
           nodeId: selectionDetails.value?.node?.nodeId,
           gpus: hasGPU.value ? selectionDetails.value?.gpuCards.map(card => card.id) : undefined,

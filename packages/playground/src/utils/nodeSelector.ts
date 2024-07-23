@@ -266,7 +266,9 @@ export async function loadValidNodes(
 }
 
 export async function getNodePageCount(gridStore: ReturnType<typeof useGrid>, filters: FarmFilterOptions) {
-  const count = await gridStore.client.capacity.getNodesCount(filters);
+  const clonedFilter = { ...filters };
+  clonedFilter.size = 0;
+  const count = await gridStore.client.capacity.getNodesCount(clonedFilter);
   return Math.ceil(count / window.env.PAGE_SIZE);
 }
 

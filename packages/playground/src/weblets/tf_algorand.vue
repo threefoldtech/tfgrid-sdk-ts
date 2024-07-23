@@ -16,11 +16,10 @@
         :value="name"
         :rules="[
           validators.required('Name is required.'),
-          validators.isLowercase('Name should consist of lowercase letters only.'),
-          validators.isAlphanumeric('Name should consist of letters and numbers only.'),
+          validators.IsAlphanumericExpectUnderscore('Name should consist of letters ,numbers and underscores only.'),
           name => validators.isAlpha('Name must start with alphabet char.')(name[0]),
           validators.minLength('Name must be at least 2 characters.', 2),
-          validators.maxLength('Name cannot exceed 15 characters.', 15),
+          validators.maxLength('Name cannot exceed 50 characters.', 50),
         ]"
         #="{ props }"
       >
@@ -28,9 +27,7 @@
           <v-text-field label="Name" v-model="name" v-bind="props" />
         </input-tooltip>
       </input-validator>
-      <Networks v-model:mycelium="mycelium" />
-      <v-switch color="primary" inset label="IPv4" v-model="ipv4" hide-details />
-
+      <Networks v-model:mycelium="mycelium" v-model:planetary="planetary" v-model:ipv4="ipv4" v-model:ipv6="ipv6" />
       <AlgorandCapacity
         :network="network"
         :type="type"
@@ -85,6 +82,7 @@
         }"
         :filters="{
           ipv4,
+          ipv6,
           certified,
           dedicated,
           cpu,
@@ -123,6 +121,8 @@ const flist: Flist = {
 };
 const name = ref(generateName({ prefix: "al" }));
 const ipv4 = ref(false);
+const ipv6 = ref(false);
+const planetary = ref(true);
 const mycelium = ref(true);
 const cpu = ref() as Ref<number>;
 const memory = ref() as Ref<number>;
@@ -172,8 +172,9 @@ async function deploy() {
               : [],
           rootFilesystemSize: rootFilesystemSize.value,
           publicIpv4: ipv4.value,
+          publicIpv6: ipv6.value,
           mycelium: mycelium.value,
-          planetary: true,
+          planetary: planetary.value,
           nodeId: selectionDetails.value!.node!.nodeId,
           rentedBy: dedicated.value ? grid!.twinId : undefined,
           certified: certified.value,

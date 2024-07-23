@@ -171,7 +171,11 @@
                   </p>
                 </input-tooltip>
               </div>
-              <section class="card mt-5" v-if="priceTask.data?.dedicatedPackage.package !== 'gold'">
+
+              <section
+                class="card mt-5"
+                v-if="!priceTask.loading && priceTask.data?.dedicatedPackage.package !== 'gold'"
+              >
                 <p class="card-info pa-2">
                   <b>Too expensive?</b> can upgrade to <b>Gold package</b> to get discount up to 60% when you fund your
                   wallet with <b>{{ dedicatedUpgradePrice }}</b> TFT
@@ -198,7 +202,10 @@
                   </p>
                 </input-tooltip>
               </div>
-              <section class="card mt-5 pa-2" v-if="priceTask.data?.sharedPackage.package !== 'gold'">
+              <section
+                class="card mt-5 pa-2"
+                v-if="!priceTask.loading && priceTask.data?.sharedPackage.package !== 'gold'"
+              >
                 <p class="card-info">
                   <b>Too expensive?</b> can upgrade to <b>Gold package</b> to get discount up to 60% when you fund your
                   wallet with <b>{{ sharedUpgradePrice }}</b> TFT
@@ -222,7 +229,7 @@
 
 <script lang="ts">
 import { QueryClient } from "@threefold/tfchain_client";
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { VForm } from "vuetify/components/VForm";
 
@@ -278,6 +285,10 @@ export default {
         shouldRun: () => valid.value,
       },
     );
+
+    watch(userBalance, () => {
+      if (resources.value.useCurrentBalance) priceTask.value.run();
+    });
 
     const dedicatedPriceUSD = computed(() => {
       const price = priceTask.value.data?.dedicatedPrice;

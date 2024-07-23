@@ -409,6 +409,50 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
         },
       },
     },
+    {
+      path: DashboardRoutes.Applications.Gitea,
+      component: () => import("../views/gitea_view.vue"),
+      meta: {
+        title: "Gitea",
+        info: { page: "info/gitea.md" },
+        navbarConfig: {
+          back: true,
+          path: [
+            { title: "Deploy" },
+            {
+              title: "Applications",
+              disabled: false,
+              to: DashboardRoutes.Deploy.Applications,
+            },
+            {
+              title: "Gitea",
+            },
+          ],
+        },
+      },
+    },
+    {
+      path: DashboardRoutes.Applications.Nostr,
+      component: () => import("../views/nostr_view.vue"),
+      meta: {
+        title: "Nostr",
+        info: { page: "info/nostr.md" },
+        navbarConfig: {
+          back: true,
+          path: [
+            { title: "Deploy" },
+            {
+              title: "Applications",
+              disabled: false,
+              to: DashboardRoutes.Deploy.Applications,
+            },
+            {
+              title: "Nostr",
+            },
+          ],
+        },
+      },
+    },
   ];
 }
 
@@ -497,7 +541,6 @@ function createTFChainRoutes(): RouteRecordRaw[] {
         {
           path: DashboardRoutes.TFChain.TFMintingReports,
           component: () => import("../views/minting_view.vue"),
-          meta: { title: "Minting", info: { page: "info/minting.md" }, publicPath: true },
         },
       ],
     },
@@ -650,7 +693,6 @@ function createDeployRoutes(): RouteRecordRaw[] {
           component: () => import("../dashboard/contracts_list.vue"),
           meta: {
             title: "Your Contracts List",
-            info: { page: "info/contracts_list.md" },
           },
         },
 

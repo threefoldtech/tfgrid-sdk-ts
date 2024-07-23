@@ -18,9 +18,9 @@
         :value="threebotName"
         :rules="[
           validators.required('Name is required.'),
-          validators.isAlphanumeric('Name should consist of letters and numbers only.'),
+          validators.IsAlphanumericExpectUnderscore('Name should consist of letters ,numbers and underscores only.'),
           validators.minLength('Name must be at least 4 characters.', 4),
-          validators.maxLength('Name cannot exceed 15 characters.', 15),
+          validators.maxLength('Name cannot exceed 50 characters.', 50),
         ]"
         #="{ props }"
       >
@@ -46,7 +46,7 @@
         :large="{ cpu: 4, memory: 32, disk: 1000 }"
       />
 
-      <Networks v-model:ipv4="ipv4"></Networks>
+      <Networks v-model:ipv4="ipv4" v-model:ipv6="ipv6"></Networks>
 
       <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
         <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
@@ -59,6 +59,7 @@
       <TfSelectionDetails
         :filters="{
           ipv4,
+          ipv6,
           certified,
           dedicated,
           cpu: solution?.cpu,
@@ -81,7 +82,7 @@
 </template>
 
 <script lang="ts" setup>
-import type { GridClient } from "@threefold/grid_client";
+import { calculateRootFileSystem, type GridClient } from "@threefold/grid_client";
 import { computed, onMounted, type Ref, ref } from "vue";
 
 import { manual } from "@/utils/manual";
@@ -103,7 +104,10 @@ const disks = ref<Disk[]>([]);
 const dedicated = ref(false);
 const certified = ref(false);
 const ipv4 = ref(false);
-const rootFilesystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solution.value?.memory ?? 0));
+const ipv6 = ref(false);
+const rootFilesystemSize = computed(() =>
+  calculateRootFileSystem({ CPUCores: solution.value?.cpu ?? 0, RAMInMegaBytes: solution.value?.memory ?? 0 }),
+);
 const selectionDetails = ref<SelectionDetails>();
 const selectedSSHKeys = ref("");
 const gridStore = useGrid();
@@ -160,6 +164,7 @@ async function deploy() {
           flist: flist?.value!.value,
           entryPoint: flist.value!.entryPoint,
           publicIpv4: ipv4.value,
+          publicIpv6: ipv6.value,
           envs: [
             { key: "SSH_KEY", value: selectedSSHKeys.value },
             { key: "USER_ID", value: threebotName.value },
@@ -214,7 +219,6 @@ import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue"
 import { deploymentListEnvironments } from "../constants";
 import type { SelectionDetails } from "../types/nodeSelector";
 import { updateGrid } from "../utils/grid";
-import rootFs from "../utils/root_fs";
 
 export default {
   name: "TFFreeflow",

@@ -66,6 +66,14 @@
           />
         </input-tooltip>
       </input-validator>
+
+      <v-alert v-if="custom" type="info" class="mb-4">
+        Please check the required
+        <a href="https://developer.algorand.org/docs/run-a-node/setup/install/#hardware-requirements" target="_blank">
+          hardware requirements
+        </a>
+        before deciding to deploy a new Algorand instance.
+      </v-alert>
     </template>
   </div>
 </template>
@@ -88,8 +96,8 @@ const storageInput = ref();
 
 const custom = ref(false);
 
-const cpu = ref(2);
-const memory = ref(4096);
+const cpu = ref(8);
+const memory = ref(16384);
 const storage = ref(100);
 
 watch(cpu, cpu => emits("update:cpu", cpu), { immediate: true });
