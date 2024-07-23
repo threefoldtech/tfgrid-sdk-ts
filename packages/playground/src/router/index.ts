@@ -254,6 +254,28 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
       },
     },
     {
+      path: DashboardRoutes.Applications.ZOSBootGen,
+      component: () => import("../views/zosbootgen_view.vue"),
+      meta: {
+        title: "ZOS Boot Generator",
+        info: { page: "info/zosbootgen.md" },
+        navbarConfig: {
+          back: true,
+          path: [
+            { title: "Deploy" },
+            {
+              title: "Applications",
+              disabled: false,
+              to: DashboardRoutes.Deploy.Applications,
+            },
+            {
+              title: "ZOS Boot Generator",
+            },
+          ],
+        },
+      },
+    },
+    {
       path: DashboardRoutes.Applications.Algorand,
       component: () => import("../views/algorand_view.vue"),
       meta: {

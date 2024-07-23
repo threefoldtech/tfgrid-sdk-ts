@@ -289,6 +289,7 @@ const filteredHeaders = computed(() => {
     ProjectName.Nextcloud,
     ProjectName.Funkwhale,
     ProjectName.Casperlabs,
+    ProjectName.ZOSBootGen,
     ProjectName.Mattermost,
     ProjectName.Discourse,
     ProjectName.Taiga,

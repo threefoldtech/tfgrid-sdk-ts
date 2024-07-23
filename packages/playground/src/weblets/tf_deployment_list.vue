@@ -174,6 +174,15 @@
           />
         </template>
 
+        <template #ZOSBootGen-actions="{ item }">
+          <IconActionBtn
+            tooltip="Show Details"
+            icon="mdi-eye-outline"
+            @click="openDialog(tabs[activeTab].value, item)"
+          />
+          <IconActionBtn tooltip="Visit" icon="mdi-web" color="anchor" :href="'https://' + item.env.DOMAIN" />
+        </template>
+
         <template #Owncloud-actions="{ item }">
           <IconActionBtn
             tooltip="Show Details"
@@ -408,6 +417,7 @@ const tabs: Tab[] = [
   { title: "Presearch", value: "Presearch", imgPath: "images/icons/presearch.png" },
   { title: "Subsquid", value: "Subsquid", imgPath: "images/icons/subsquid.png" },
   { title: "Casperlabs", value: "Casperlabs", imgPath: "images/icons/casperlabs.png" },
+  { title: "ZOS Boot Generator", value: "ZOSBootGen", imgPath: "images/icons/zosbootgen.png" },
   { title: "Algorand", value: "Algorand", imgPath: "images/icons/algorand.png" },
   { title: "Node Pilot", value: "NodePilot", imgPath: "images/icons/vm.png" },
   { title: "Umbrel", value: "Umbrel", imgPath: "images/icons/umbrel.png" },

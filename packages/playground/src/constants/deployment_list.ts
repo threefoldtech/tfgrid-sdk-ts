@@ -178,4 +178,9 @@ export const deploymentListEnvironments = {
     SSH_KEY: _ssh,
     NODE_PILOT_HOSTNAME: "Node Pilot Hostname",
   },
+
+  zosbootgen: {
+    SSH_KEY: _ssh,
+    DOMAIN: "ZOS Boot Generator",
+  },
 };

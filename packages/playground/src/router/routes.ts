@@ -59,6 +59,7 @@ enum ApplicationRoutes {
   Taiga = "/deploy/applications/taiga/",
   Owncloud = "/deploy/applications/owncloud/",
   Nextcloud = "/deploy/applications/nextcloud/",
+  ZOSBootGen = "/deployment/applications/zosbootgen",
   Presearch = "/deploy/applications/presearch/",
   Subsquid = "/deploy/applications/subsquid/",
   Casperlabs = "/deploy/applications/casperlabs/",

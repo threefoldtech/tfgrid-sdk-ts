@@ -117,6 +117,12 @@ export default {
         route: DashboardRoutes.Applications.Casperlabs,
       },
       {
+        title: "ZOS Boot Generator",
+        excerpt: "The ZOS Boot Generator allows you to build Zero-OS bootstrap images.",
+        icon: "zosbootgen.png",
+        route: DashboardRoutes.Applications.ZOSBootGen,
+      },
+      {
         title: "Algorand",
         excerpt:
           "Algorand builds technology that accelerates the convergence between decentralized and traditional finance by enabling the simple creation of next-generation financial products, protocols, and exchange of value.",

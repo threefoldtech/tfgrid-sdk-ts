@@ -125,6 +125,7 @@ export enum ProjectName {
   TFRobot = "TFRobot",
   Gitea = "Gitea",
   Nostr = "Nostr",
+  ZOSBootGen = "ZOSBootGen",
 }
 
 export enum SolutionCode {
@@ -154,6 +155,7 @@ export enum SolutionCode {
   tfrobot = "tfr",
   gitea = "gt",
   nostr = "nt",
+  zosbootgen = "zbg",
 }
 
 export const solutionType: { [key: string]: string } = {
@@ -180,6 +182,7 @@ export const solutionType: { [key: string]: string } = {
   tfrobot: "TFRobot",
   Gitea: "Gitea",
   nostr: "Nostr",
+  zosbootgen: "ZOS Boot Generator",
 };
 
 export interface solutionFlavor {
