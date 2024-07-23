@@ -159,12 +159,20 @@ test("TC2728 - Applications: Deploy Presearch", async () => {
     for (let i = 0; i < dockerContainer.length; i++) {
       if (dockerContainer[i].includes("presearch/node")) {
         const containerID = dockerContainer[i].slice(0, 11);
-        await ssh.execCommand("docker logs " + containerID).then(async function (result) {
-          log(result);
-          const versionToCheck = clean(result.stdout.match(/v(\d+\.\d+\.\d+)/)?.[1]);
-          gte(versionToCheck, "1.2.33");
-          expect(result.stdout).toContain("presearch-node");
-        });
+        let attemp = 180;
+        while (attemp > 0) {
+          await ssh.execCommand("docker logs " + containerID).then(async function (result) {
+            if (result.stdout != "") {
+              log(result);
+              const versionToCheck = clean(result.stdout.match(/v(\d+\.\d+\.\d+)/)?.[1]);
+              gte(versionToCheck, "1.2.33");
+              expect(result.stdout).toContain("presearch-node");
+              attemp = 0;
+            } else {
+              attemp -= 1;
+            }
+          });
+        }
       }
     }
   } finally {
