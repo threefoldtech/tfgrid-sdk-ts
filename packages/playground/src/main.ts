@@ -1,6 +1,7 @@
 import "mosha-vue-toastify/dist/style.css";
 import "./global.scss";
 
+import * as Sentry from "@sentry/vue";
 import { createPinia } from "pinia";
 import { createApp } from "vue";
 
@@ -21,7 +22,18 @@ app.config.errorHandler = error => {
       `- Constructor: ${error && typeof error === "object" ? error.constructor.name : null}`,
   );
 };
-
+Sentry.init({
+  app,
+  dsn: "https://91c164300995b903065aad366e7ace26@dev.sentry.grid.tf/4",
+  integrations: [Sentry.browserTracingIntegration(), Sentry.replayIntegration()],
+  // Performance Monitoring
+  tracesSampleRate: 1.0, //  Capture 100% of the transactions
+  // Set 'tracePropagationTargets' to control for which URLs distributed tracing should be enabled
+  tracePropagationTargets: ["localhost", /^https:\/\/yourserver\.io\/api/],
+  // Session Replay
+  replaysSessionSampleRate: 0.1, // This sets the sample rate at 10%. You may want to change it to 100% while in development and then sample at a lower rate in production.
+  replaysOnErrorSampleRate: 1.0, // If you're not already sampling the entire session, change the sample rate to 100% when sampling sessions where errors occur.
+});
 app.use(createPinia());
 app.use(router);
 app.use(vuetify);
