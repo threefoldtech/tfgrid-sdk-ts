@@ -22,10 +22,12 @@ app.config.errorHandler = error => {
       `- Constructor: ${error && typeof error === "object" ? error.constructor.name : null}`,
   );
 };
+
 Sentry.init({
   app,
-  dsn: "https://91c164300995b903065aad366e7ace26@dev.sentry.grid.tf/4",
+  dsn: "http://63b4783eac8cce864dca278b3c5a0ee1@185.206.122.50:9000/2",
   integrations: [Sentry.browserTracingIntegration(), Sentry.replayIntegration()],
+  release: process.env.VERSION,
   // Performance Monitoring
   tracesSampleRate: 1.0, //  Capture 100% of the transactions
   // Set 'tracePropagationTargets' to control for which URLs distributed tracing should be enabled
