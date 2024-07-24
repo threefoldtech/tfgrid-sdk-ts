@@ -8,7 +8,7 @@
     :dedicated="dedicated"
     :SelectedNode="selectionDetails?.node"
     :valid-filters="selectionDetails?.validFilters"
-    title-image="images/icons/zosbootgen.png"
+    title-image="images/icons/dashboardsuite.png"
   >
     <template #title>Deploy a Dashboard Suite Instance </template>
     <d-tabs :tabs="[{ title: 'Config', value: 'config' }]">
