@@ -169,6 +169,7 @@ export const deploymentListEnvironments = {
 
   gitea: {
     SSH_KEY: _ssh,
+    GITEA_HOSTNAME: "Gitea Hostname",
   },
   nostr: {
     SSH_KEY: _ssh,
