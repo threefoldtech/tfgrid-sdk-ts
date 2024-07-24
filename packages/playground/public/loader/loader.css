@@ -23,6 +23,51 @@
   margin-top: 30vh;
 }
 
+.app-monitor-container {
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+  display: none;
+  border: 1px solid #fff;
+  border-radius: 5px;
+  padding: 5px 25px;
+}
+.app-monitor-container.active {
+  display: flex;
+}
+.app-monitor-status {
+  text-align: left;
+  color: #fff;
+  margin: 0;
+
+  font-family: sans-serif;
+  max-width: 500px;
+  line-height: 1;
+}
+
+.service-name {
+  color: #fff;
+  width: 100px;
+  padding: 2px 0px;
+  font-family: sans-serif;
+  line-height: 1;
+  font-weight: bold;
+  text-align: left;
+}
+
+.service-status {
+  display: inline;
+  font-family: sans-serif;
+  line-height: 1;
+  font-weight: bold;
+  font-size: x-large;
+}
+.service-reachable {
+  color: rgb(var(--v-theme-success, "76, 175, 80"));
+}
+.service-unreachable {
+  color: rgb(207, 102, 121);
+}
 .app-loader-logo {
   max-width: 100%;
   display: block;
@@ -86,7 +131,9 @@
   }
 }
 
-.app-loader-msg {
+.app-loader-msg,
+.app-monitor-msg {
+  display: none;
   color: #fff;
   margin: 0;
   margin-top: 20px;
@@ -95,7 +142,13 @@
   line-height: 1;
   text-align: center;
 }
-
+.app-monitor-msg {
+  display: none;
+}
+.app-loader-msg.active,
+.app-monitor-msg.active {
+  display: block;
+}
 .app-loader-refresh {
   border: none;
   outline: none;
