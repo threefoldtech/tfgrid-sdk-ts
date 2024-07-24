@@ -10,7 +10,7 @@
 
 <script lang="ts">
 import { ProjectName } from "../types";
-import TfCasperlabs from "../weblets/tf_dasbhboardsuite.vue";
+import TfCasperlabs from "../weblets/tf_dashboardsuite.vue";
 import TfDeploymentList from "../weblets/tf_deployment_list.vue";
 export default {
   name: "DashboardSuiteView",
