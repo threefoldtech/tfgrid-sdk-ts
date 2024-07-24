@@ -8,7 +8,7 @@ COPY . /app/
 RUN yarn install
 RUN yarn lerna run build --no-private && yarn workspace @threefold/stats build
 
-FROM nginx:1.25.3-alpine
+FROM nginx:1.27-alpine
 COPY --from=build /app/packages/stats/dist /usr/share/nginx/html
 COPY --from=build /app/packages/stats/nginx /etc/nginx
 RUN mkdir -p /etc/zinit;
