@@ -113,7 +113,7 @@ window.env = {
 "
 
 # decide the config file path
-[ -d dist ] && file="dist/config.js" || file="config.js"
+[ -d public ] && file="public/config.js" || file="config.js"
 
 # override the content of the config file & echo the result
 echo $configs > $file
