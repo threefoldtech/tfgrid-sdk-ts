@@ -88,7 +88,7 @@ import { generateName } from "../utils/strings";
 const layout = useLayout();
 const profileManager = useProfileManager();
 
-const name = ref(generateName({ prefix: "cl" }));
+const name = ref(generateName({ prefix: "zbg" }));
 const solution = ref() as Ref<SolutionFlavor>;
 const flist: Flist = {
   value: "https://hub.grid.tf/idrnd.3bot/logismosis-zos_boot_generator-latest.flist",
