@@ -178,4 +178,11 @@ export const deploymentListEnvironments = {
     SSH_KEY: _ssh,
     NODE_PILOT_HOSTNAME: "Node Pilot Hostname",
   },
+
+  dashboardsuite: {
+    SSH_KEY: _ssh,
+    DOMAIN: "Dashboard Suite",
+    NETWORK: "The Network (main, test, qa, dev)",
+    SEED: "Seedphrase of the network deployed with min 10 TFT.",
+  },
 };

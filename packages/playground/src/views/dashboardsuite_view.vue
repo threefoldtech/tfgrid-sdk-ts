@@ -1,0 +1,25 @@
+<template>
+  <view-layout>
+    <tf-casperlabs />
+
+    <template #list>
+      <TfDeploymentList title="Dashboard Suite Instances" :project-name="name" />
+    </template>
+  </view-layout>
+</template>
+
+<script lang="ts">
+import { ProjectName } from "../types";
+import TfCasperlabs from "../weblets/tf_dasbhboardsuite.vue";
+import TfDeploymentList from "../weblets/tf_deployment_list.vue";
+export default {
+  name: "DashboardSuiteView",
+  components: {
+    TfDeploymentList,
+    TfCasperlabs,
+  },
+  setup() {
+    return { name: ProjectName.DashboardSuite };
+  },
+};
+</script>

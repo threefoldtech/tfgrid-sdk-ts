@@ -299,6 +299,7 @@ const filteredHeaders = computed(() => {
     ProjectName.TFRobot,
     ProjectName.Gitea,
     ProjectName.Nostr,
+    ProjectName.DashboardSuite,
   ] as string[];
 
   const WireguardSolutions = [ProjectName.VM, ProjectName.Fullvm, ProjectName.Umbrel, ProjectName.TFRobot] as string[];

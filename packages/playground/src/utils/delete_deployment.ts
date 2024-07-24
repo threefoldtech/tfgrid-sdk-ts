@@ -76,6 +76,7 @@ export function solutionHasGateway(projectName: ProjectName) {
     ProjectName.Mastodon,
     ProjectName.Mattermost,
     ProjectName.Casperlabs,
+    ProjectName.DashboardSuite,
     ProjectName.Owncloud,
     ProjectName.Peertube,
     ProjectName.Subsquid,

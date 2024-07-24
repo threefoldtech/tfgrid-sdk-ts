@@ -126,6 +126,7 @@ export enum ProjectName {
   TFRobot = "TFRobot",
   Gitea = "Gitea",
   Nostr = "Nostr",
+  DashboadSuite = "DashboardSuite",
 }
 
 export enum SolutionCode {
@@ -155,6 +156,7 @@ export enum SolutionCode {
   tfrobot = "tfr",
   gitea = "gt",
   nostr = "nt",
+  dashboardsuite = "ds",
 }
 
 export const solutionType: { [key: string]: string } = {
@@ -181,6 +183,7 @@ export const solutionType: { [key: string]: string } = {
   tfrobot: "TFRobot",
   Gitea: "Gitea",
   nostr: "Nostr",
+  dashboardsuite: "Dashboard Suite",
 };
 
 export interface solutionFlavor {

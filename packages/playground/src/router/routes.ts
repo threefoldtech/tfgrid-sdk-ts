@@ -60,6 +60,7 @@ enum ApplicationRoutes {
   Owncloud = "/deploy/applications/owncloud/",
   Nextcloud = "/deploy/applications/nextcloud/",
   Presearch = "/deploy/applications/presearch/",
+  DashboardSuite = "/deployment/applications/dashboardsuite",
   Subsquid = "/deploy/applications/subsquid/",
   Casperlabs = "/deploy/applications/casperlabs/",
   Algorand = "/deploy/applications/algorand/",

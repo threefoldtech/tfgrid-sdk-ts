@@ -203,6 +203,15 @@
           />
         </template>
 
+        <template #DashboardSuite-actions="{ item }">
+          <IconActionBtn
+            tooltip="Show Details"
+            icon="mdi-eye-outline"
+            @click="openDialog(tabs[activeTab].value, item)"
+          />
+          <IconActionBtn tooltip="Visit" icon="mdi-web" color="anchor" :href="'https://dashboard' + item.env.DOMAIN" />
+        </template>
+
         <template #Subsquid-actions="{ item }">
           <IconActionBtn
             tooltip="Show Details"
@@ -406,6 +415,7 @@ const tabs: Tab[] = [
   { title: "Owncloud", value: "Owncloud", imgPath: "images/icons/owncloud.png" },
   { title: "Nextcloud", value: "Nextcloud", imgPath: "images/icons/nextcloud.png" },
   { title: "Presearch", value: "Presearch", imgPath: "images/icons/presearch.png" },
+  { title: "Dashboard Suite", value: "DashboardSuite", imgPath: "images/icons/dashboardsuite.png" },
   { title: "Subsquid", value: "Subsquid", imgPath: "images/icons/subsquid.png" },
   { title: "Casperlabs", value: "Casperlabs", imgPath: "images/icons/casperlabs.png" },
   { title: "Algorand", value: "Algorand", imgPath: "images/icons/algorand.png" },

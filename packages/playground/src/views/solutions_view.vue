@@ -131,6 +131,12 @@ export default {
         route: DashboardRoutes.Applications.Nodepilot,
       },
       {
+        title: "Dashboard Suite",
+        excerpt: "Deploy a grid instance with the Dashboard Suite app.",
+        icon: "dashboardsuite.png",
+        route: DashboardRoutes.Applications.DashboardSuite,
+      },
+      {
         title: "Umbrel",
         excerpt:
           "Umbrel is an OS for running a personal server in your home. Self-host open source apps like Nextcloud, Bitcoin node, and more.",

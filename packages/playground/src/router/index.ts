@@ -320,6 +320,28 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
       },
     },
     {
+      path: DashboardRoutes.Applications.DashboardSuite,
+      component: () => import("../views/dashboardsuite_view.vue"),
+      meta: {
+        title: "Dashboard Suite",
+        info: { page: "info/dashboardsuite.md" },
+        navbarConfig: {
+          back: true,
+          path: [
+            { title: "Deploy" },
+            {
+              title: "Applications",
+              disabled: false,
+              to: DashboardRoutes.Deploy.Applications,
+            },
+            {
+              title: "Dashboard Suite",
+            },
+          ],
+        },
+      },
+    },
+    {
       path: DashboardRoutes.Applications.Umbrel,
       component: () => import("../views/umbrel_view.vue"),
       meta: {
