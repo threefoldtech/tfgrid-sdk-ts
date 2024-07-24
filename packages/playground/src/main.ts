@@ -6,12 +6,12 @@ import { createApp } from "vue";
 
 import vuetify from "@/plugins/vuetify";
 
-import App from "./App.vue";
 import { defineGlobals } from "./config";
+import Monitor from "./Monitor.vue";
 import router from "./router";
 import { normalizeError } from "./utils/helpers";
 
-const app = createApp(App);
+const app = createApp(Monitor);
 
 app.config.errorHandler = error => {
   console.error(
