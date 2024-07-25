@@ -126,7 +126,7 @@ export enum ProjectName {
   TFRobot = "TFRobot",
   Gitea = "Gitea",
   Nostr = "Nostr",
-  DashboadSuite = "DashboardSuite",
+  DashboardSuite = "DashboardSuite",
 }
 
 export enum SolutionCode {
