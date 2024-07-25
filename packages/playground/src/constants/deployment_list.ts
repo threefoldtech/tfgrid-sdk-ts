@@ -181,8 +181,7 @@ export const deploymentListEnvironments = {
 
   dashboardsuite: {
     SSH_KEY: _ssh,
-    DOMAIN: "Dashboard Suite",
-    NETWORK: "The Network (main, test, qa, dev)",
-    SEED: "Seedphrase of the network deployed with min 10 TFT.",
+    DOMAIN: "Dashboard Suite Base Domain",
+    NETWORK: "Dashboard Suite Network",
   },
 };
