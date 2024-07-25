@@ -58,9 +58,9 @@
 
       <SelectSolutionFlavor
         v-model="solution"
-        :small="{ cpu: 2, memory: 4, disk: 100 }"
-        :medium="{ cpu: 4, memory: 16, disk: 500 }"
-        :large="{ cpu: 8, memory: 32, disk: 1000 }"
+        :small="{ cpu: 8, memory: 32, disk: 1000 }"
+        :medium="{ cpu: 8, memory: 32, disk: 1500 }"
+        :large="{ cpu: 8, memory: 32, disk: 2000 }"
       />
       <Networks v-model:planetary="planetary" v-model:mycelium="mycelium" />
       <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
@@ -159,7 +159,7 @@ async function deploy() {
           name: name.value,
           cpu: solution.value.cpu,
           memory: solution.value.memory,
-          disks: [{ size: solution?.value.disk, mountPoint: "/data" }],
+          disks: [{ size: solution?.value.disk, mountPoint: "/mnt/disk" }],
           flist: flist.value,
           entryPoint: flist.entryPoint,
           publicIpv4: ipv4.value,
