@@ -5,6 +5,7 @@
     :memory="solution?.memory"
     :disk="solution?.disk"
     :ipv4="ipv4"
+    :ipv6="ipv6"
     :dedicated="dedicated"
     :SelectedNode="selectionDetails?.node"
     :valid-filters="selectionDetails?.validFilters"
@@ -27,13 +28,41 @@
           <v-text-field label="Name" v-model="name" v-bind="props" />
         </input-tooltip>
       </input-validator>
+
+      <input-tooltip tooltip="Select the network of the grid instance.">
+        <v-select
+          label="Dashboard Network"
+          :items="[
+            { title: 'Mainnet', value: 'main' },
+            { title: 'Testnet', value: 'test' },
+            { title: 'QAnet', value: 'qa' },
+            { title: 'Devnet', value: 'dev' },
+          ]"
+          v-model="network"
+        />
+      </input-tooltip>
+
+      <input-validator
+        :value="seedPhrase"
+        :rules="[validators.required('Token is required.')]"
+        #="{ props: validationProps }"
+      >
+        <password-input-wrapper #="{ props }">
+          <input-tooltip
+            tooltip="Set a TFChain seedphrase of an active account with at least 10 TFT on the network of the grid instance."
+          >
+            <v-text-field label="Seed Phrase" v-bind="{ ...props, ...validationProps }" v-model="seedPhrase" />
+          </input-tooltip>
+        </password-input-wrapper>
+      </input-validator>
+
       <SelectSolutionFlavor
         v-model="solution"
         :small="{ cpu: 2, memory: 4, disk: 100 }"
         :medium="{ cpu: 4, memory: 16, disk: 500 }"
         :large="{ cpu: 8, memory: 32, disk: 1000 }"
       />
-      <Networks v-model:planetary="planetary" v-model:mycelium="mycelium" v-model:ipv6="ipv6" />
+      <Networks v-model:planetary="planetary" v-model:mycelium="mycelium" />
       <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
         <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
       </input-tooltip>
@@ -77,7 +106,7 @@ import { normalizeError } from "../utils/helpers";
 import { generateName } from "../utils/strings";
 const layout = useLayout();
 const profileManager = useProfileManager();
-const name = ref(generateName({ prefix: "cl" }));
+const name = ref(generateName({ prefix: "ds" }));
 const solution = ref() as Ref<SolutionFlavor>;
 const flist: Flist = {
   value: "https://hub.grid.tf/idrnd.3bot/logismosis-dashboard_suite-latest.flist",
@@ -86,7 +115,9 @@ const flist: Flist = {
 const dedicated = ref(false);
 const certified = ref(false);
 const ipv4 = ref(true);
-const ipv6 = ref(false);
+const ipv6 = ref(true);
+const network = ref("main");
+const seedPhrase = ref("");
 const mycelium = ref(true);
 const planetary = ref(false);
 const rootFilesystemSize = computed(() =>
@@ -98,12 +129,12 @@ const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
 function finalize(deployment: any) {
   layout.value.reloadDeploymentsList();
-  layout.value.setStatus("success", "Successfully deployed a ZOS Boot Generator instance.");
-  layout.value.openDialog(deployment, deploymentListEnvironments.zosbootgen);
+  layout.value.setStatus("success", "Successfully deployed a Dashboard Suite instance.");
+  layout.value.openDialog(deployment, deploymentListEnvironments.dashboardsuite);
 }
 async function deploy() {
   layout.value.setStatus("deploy");
-  const projectName = ProjectName.ZOSBootGen.toLowerCase() + "/" + name.value;
+  const projectName = ProjectName.DashboardSuite.toLowerCase() + "/" + name.value;
   const subdomain = getSubdomain({
     deploymentName: name.value,
     projectName,
@@ -138,8 +169,8 @@ async function deploy() {
           envs: [
             { key: "SSH_KEY", value: selectedSSHKeys.value },
             { key: "DOMAIN", value: domain },
-            { key: "NETWORK", value: "dev" },
-            { key: "SEED", value: "placeholder" },
+            { key: "NETWORK", value: network.value },
+            { key: "SEED", value: seedPhrase.value },
           ],
           nodeId: selectionDetails.value!.node!.nodeId,
           rentedBy: dedicated.value ? grid!.twinId : undefined,
@@ -149,7 +180,7 @@ async function deploy() {
       ],
     });
   } catch (e) {
-    return layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a ZOS Boot Generator instance."));
+    return layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Dashboard Suite instance."));
   }
   if (!selectionDetails.value?.domain?.enableSelectedDomain) {
     vm[0].customDomain = selectionDetails.value?.domain?.customDomain;
@@ -168,7 +199,7 @@ async function deploy() {
   } catch (e) {
     layout.value.setStatus("deploy", "Rollbacking back due to fail to deploy gateway...");
     await rollbackDeployment(grid!, name.value);
-    layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a ZOS Boot Generator instance."));
+    layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Dashboard Suite instance."));
   }
 }
 function updateSSHkeyEnv(selectedKeys: string) {
@@ -183,7 +214,7 @@ import { deploymentListEnvironments } from "../constants";
 import type { SelectionDetails } from "../types/nodeSelector";
 import { updateGrid } from "../utils/grid";
 export default {
-  name: "TFZOS",
+  name: "TFDashboardSuite",
   components: { SelectSolutionFlavor, Networks, ManageSshDeployemnt },
 };
 </script>

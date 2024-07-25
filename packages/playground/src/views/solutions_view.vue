@@ -132,7 +132,8 @@ export default {
       },
       {
         title: "Dashboard Suite",
-        excerpt: "Deploy a grid instance with the Dashboard Suite app.",
+        excerpt:
+          "The Dashboard Suite app allows you to deploy a ThreeFold grid stack (main, test, qa or dev net). This app is part of the TFGrid Full Stack Suite.",
         icon: "dashboardsuite.png",
         route: DashboardRoutes.Applications.DashboardSuite,
       },
