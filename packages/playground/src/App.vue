@@ -418,6 +418,7 @@ const baseUrl = import.meta.env.BASE_URL;
 function clickHandler({ route, url }: AppRouteItem): void {
   if (route) {
     $router.push(route);
+    throw new ValidationError("sentry error");
   } else if (url) {
     window.open(url, "_blank");
   }
@@ -425,6 +426,8 @@ function clickHandler({ route, url }: AppRouteItem): void {
 </script>
 
 <script lang="ts">
+import { ValidationError } from "@threefold/types";
+
 import { DashboardRoutes } from "@/router/routes";
 import { AppThemeSelection } from "@/utils/app_theme";
 

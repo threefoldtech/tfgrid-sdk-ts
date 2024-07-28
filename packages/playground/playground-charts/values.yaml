@@ -27,6 +27,8 @@ image:
       value: ""
     - name: "STELLAR_NETWORK"
       value: ""
+    - name: "SENTRY_DSN"
+      value: ""
 
 
 imagePullSecrets: []
