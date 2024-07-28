@@ -86,22 +86,12 @@ export async function setGlobalEnv() {
       { URLs: STATS_STACKS, service: new StatsMonitor() },
       { URLs: SUBSTRATE_STACKS, service: new TFChainMonitor() },
       { URLs: ACTIVATION_SERVICE_STACKS, service: new ActivationMonitor() },
+      { URLs: RELAY_STACKS, service: new RMBMonitor() },
     ],
     silent: true,
   });
   const result = await urlManger.getAvailableServicesStack();
 
-  // if (result.TFChain) {
-  //   result.RMB = await urlManger.getAvailableStack(
-  //     RELAY_STACKS,
-  //     new RMBMonitor({
-  //       chainUrl: result.TFChain,
-  //       mnemonics: "",
-  //       keypairType: "sr25519",
-  //     }),
-  //   );
-  // }
-  // result.test = null;
   if (Object.values(result).includes(null)) {
     window.$$showMonitorError(result);
     return false;
@@ -113,7 +103,7 @@ export async function setGlobalEnv() {
   window.env.GRAPHQL_URL = GraphQl!;
   window.env.SUBSTRATE_URL = TFChain!;
   window.env.ACTIVATION_SERVICE_URL = Activation!;
-  window.env.RELAY_DOMAIN = "wss://relay.dev.grid.tf"!;
+  window.env.RELAY_DOMAIN = RMB!;
 
   await new Promise(r => setTimeout(r, 3000));
 
