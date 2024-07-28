@@ -87,6 +87,10 @@ export type URLManagerOptions<N extends boolean = false> = {
    * Optional. Determines if the stack manager should operate silently without throwing any errors and just return null as result.
    */
   silent?: N;
+  /**
+   * Optional. timeout for each request in secondes;
+   */
+  timeout?: number;
 };
 
 export type ServiceUrl<N extends boolean> = N extends false ? string : string | null;
