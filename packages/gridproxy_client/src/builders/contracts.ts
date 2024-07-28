@@ -13,6 +13,19 @@ export enum ContractState {
   Deleted = "Deleted",
 }
 
+export enum SortByContracts {
+  CreatedAt = "created_at",
+  TwinId = "twin_id",
+  ContractId = "contract_id",
+  Type = "type",
+  State = "state",
+}
+
+export enum SortOrderContracts {
+  DESC = "desc",
+  ASC = "asc",
+}
+
 export interface ContractsQuery {
   page: number;
   size: number;
@@ -26,6 +39,8 @@ export interface ContractsQuery {
   deploymentData: string;
   deploymentHash: string;
   numberOfPublicIps: number;
+  sortBy: SortByContracts;
+  sortOrder: SortOrderContracts;
 }
 
 const CONTRACTS_MAPPER: BuilderMapper<ContractsQuery> = {
@@ -41,6 +56,8 @@ const CONTRACTS_MAPPER: BuilderMapper<ContractsQuery> = {
   deploymentData: "deployment_data",
   deploymentHash: "deployment_hash",
   numberOfPublicIps: "number_of_public_ips",
+  sortBy: "sort_by",
+  sortOrder: "sort_order",
 };
 
 const CONTRACTS_VALIDATOR: BuilderValidator<ContractsQuery> = {
@@ -67,6 +84,14 @@ const CONTRACTS_VALIDATOR: BuilderValidator<ContractsQuery> = {
   deploymentData: assertString,
   deploymentHash: assertString,
   numberOfPublicIps: assertNatural,
+  sortBy(value) {
+    assertString(value);
+    assertIn(value, Object.values(SortByContracts));
+  },
+  sortOrder(value) {
+    assertString(value);
+    assertIn(value, Object.values(SortOrderContracts));
+  },
 };
 
 export class ContractsBuilder extends AbstractBuilder<ContractsQuery> {
