@@ -1,91 +1,98 @@
-import GridProxyClient, { ContractState } from "@threefold/gridproxy_client";
+import TFGridGqlClient from "@threefold/graphql_client";
+import { ContractState } from "@threefold/gridproxy_client";
 
-import { ContractStates, LockContracts } from "../src";
+import { BalanceGetModel, GridClient } from "../src";
 import { getClient } from "./client_loader";
 
-async function getGracePeriodUsers(grid) {
-  const proxy = new GridProxyClient(grid.config.proxyURL);
-  let page = 1;
-  const contracts: any[] = [];
-  const twins = new Set();
-  const users: any[] = [];
+interface Contract {
+  contractID: string;
+  state: string;
+}
+async function getUsersWithContracts(grid: GridClient) {
+  let users: any[] = [];
+  const usersWithContracts: any[] = [];
 
-  // eslint-disable-next-line no-constant-condition
-  while (true) {
-    const { data } = await proxy.contracts.list({ page, state: [ContractState.GracePeriod] });
-    contracts.push(...data);
+  const graphql = new TFGridGqlClient(grid.config.graphqlURL);
+  users = await graphql.twins({ twinID: true, accountID: true });
 
-    contracts.map(c => {
-      if (!twins.has(c.twin_id)) {
-        twins.add(c.twin_id);
-      }
-    });
+  for (const user of users) {
+    const [nodeContracts, nameContracts, rentContracts] = await Promise.all([
+      graphql.nodeContracts(
+        { contractID: true, state: true },
+        {
+          where: {
+            twinID_eq: user.twinID,
+            state_in: [ContractState.Created, ContractState.GracePeriod],
+          },
+        },
+      ),
+      graphql.nameContracts(
+        { contractID: true, state: true },
+        {
+          where: {
+            twinID_eq: user.twinID,
+            state_in: [ContractState.Created, ContractState.GracePeriod],
+          },
+        },
+      ),
+      graphql.rentContracts(
+        { contractID: true, state: true },
+        {
+          where: {
+            twinID_eq: user.twinID,
+            state_in: [ContractState.Created, ContractState.GracePeriod],
+          },
+        },
+      ),
+    ]);
 
-    for (const twin of twins) {
-      const { data } = await proxy.twins.list({ page, twinId: twin as number });
-      users.push(...data);
+    user.contracts = [nodeContracts, nameContracts, rentContracts].flat(3);
+
+    if (user.contracts.length > 0) {
+      usersWithContracts.push(user);
     }
-
-    if (data.length < 50) {
-      break;
-    }
-    page++;
   }
 
-  return users;
+  console.log("usersWithContracts", usersWithContracts);
+  return usersWithContracts;
 }
 
-async function getUserBalance(grid, address) {
+async function getUserBalance(grid: GridClient, address: BalanceGetModel) {
   const balance = grid.balance.get(address);
   return balance;
 }
 
-async function getContractsLockedAmount(grid, accountId) {
-  const LockedContracts: LockContracts = {
-    nameContracts: {},
-    nodeContracts: {},
-    rentContracts: {},
-    totalAmountLocked: 0,
-  };
+async function getContractsLockedAmount(grid: GridClient, contracts: Contract[]) {
+  let totalAmountLocked = 0;
 
-  const contracts = await grid.contracts.listContractsByAddress({
-    accountId,
-    stateList: [ContractStates.GracePeriod],
-  });
-
-  if (contracts == undefined) return 0;
-
-  const contractTypes = ["nameContracts", "nodeContracts", "rentContracts"];
-
-  for (const type of contractTypes) {
-    for (const contract of contracts[type]) {
-      const contractID = parseInt(contract.contractID);
-      const contractLockDetails = await grid.contracts.contractLock({ id: contractID });
-      LockedContracts[type][contractID] = contractLockDetails;
-      LockedContracts.totalAmountLocked += contractLockDetails.amountLocked;
-    }
+  for (const contract of contracts) {
+    const contractLockDetails = await grid.contracts.contractLock({ id: +contract.contractID });
+    totalAmountLocked += contractLockDetails.amountLocked + contractLockDetails.extraAmountLocked;
   }
 
-  return LockedContracts.totalAmountLocked;
+  return totalAmountLocked;
 }
 
 (async function main() {
   const grid = await getClient();
   await grid.tfclient.connect();
 
-  // get all users that has grace period contracts
-  const users = await getGracePeriodUsers(grid);
-  const unmatchedBalanceAccounts: any = [];
+  // get all users that has grace period & created contracts
+  const users = await getUsersWithContracts(grid);
+
+  const unmatchedBalanceAccounts: any[] = [];
+
   for (const user of users) {
     // get user locked balance
-    const balances = await getUserBalance(grid, { address: user.accountId });
+    const balances = await getUserBalance(grid, { address: user.accountID });
 
     // get contracts locked balance
-    const contractsLockedBalance = await getContractsLockedAmount(grid, user.accountId);
+    const contractsLockedBalance = await getContractsLockedAmount(grid, user.contracts);
 
+    // if frozen balance != locked balance, push to unmatched accounts
     if (balances.frozen != contractsLockedBalance) {
       unmatchedBalanceAccounts.push({
-        twinId: user.twinId,
+        user,
         lockedBalance: balances.frozen,
         lockedContractsBalance: contractsLockedBalance,
       });
