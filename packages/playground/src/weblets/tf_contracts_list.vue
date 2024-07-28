@@ -203,7 +203,13 @@
 
 <script lang="ts" setup>
 import type { GridClient, LockContracts } from "@threefold/grid_client";
-import { type Contract, ContractState, NodeStatus } from "@threefold/gridproxy_client";
+import {
+  type Contract,
+  ContractState,
+  NodeStatus,
+  SortByContracts,
+  SortOrderContracts,
+} from "@threefold/gridproxy_client";
 import { Decimal } from "decimal.js";
 import { computed, defineComponent, onMounted, type Ref, ref } from "vue";
 
@@ -298,15 +304,12 @@ async function loadContractsByType(
       page: table.page.value,
       type: contractType,
       retCount: true,
+      sortBy: options && options.sort.length ? (options?.sort[0].key as SortByContracts) : undefined,
+      sortOrder: options && options.sort.length ? (options?.sort[0].order as SortOrderContracts) : undefined,
     });
 
     table.count.value = response.count ?? 0;
     const normalizedContracts = await _normalizeContracts(response.data, contractType);
-
-    if (options && options.sort.length) {
-      contractsRef.value = sortContracts(normalizedContracts, options.sort);
-    }
-
     contractsRef.value = normalizedContracts;
   } catch (error: any) {
     loadingErrorMessage.value = `Error while listing ${contractType} contracts: ${error.message}`;
@@ -314,21 +317,6 @@ async function loadContractsByType(
   } finally {
     table.loading.value = false;
   }
-}
-
-function sortContracts(
-  contracts: NormalizedContract[],
-  sort: { key: string; order: "asc" | "desc" }[],
-): NormalizedContract[] {
-  const sortKey = sort[0].key;
-  const sortOrder = sort[0].order;
-
-  contracts = contracts.sort((a, b) => {
-    const aValue = Reflect.get(a, sortKey) ?? Reflect.get(a.details, sortKey);
-    const bValue = Reflect.get(b, sortKey) ?? Reflect.get(b.details, sortKey);
-    return sortOrder === "desc" ? bValue - aValue : aValue - bValue;
-  });
-  return contracts;
 }
 
 async function loadContracts(type?: ContractType, options?: { sort: { key: string; order: "asc" | "desc" }[] }) {
@@ -463,10 +451,10 @@ async function getContractsLockDetails() {
 // Define base table headers for contracts tables
 const baseTableHeaders: VDataTableHeader = [
   { title: "PLACEHOLDER", key: "data-table-select" },
-  { title: "ID", key: "contract_id" },
+  { title: "ID", key: "contract_id", sortable: true },
   { title: "State", key: "state", sortable: false },
-  { title: "Billing Rate", key: "consumption" },
-  { title: "Created At", key: "created_at" },
+  { title: "Billing Rate", key: "consumption", sortable: false },
+  { title: "Created At", key: "created_at", sortable: true },
 ];
 
 // Define specific table headers for each contract type
@@ -482,14 +470,14 @@ const nodeTableHeaders: VDataTableHeader = [
     ],
   },
   { title: "Type", key: "deploymentType", sortable: false },
-  { title: "Expiration", key: "expiration" },
-  { title: "Farm ID", key: "farm_id" },
+  { title: "Expiration", key: "expiration", sortable: false },
+  { title: "Farm ID", key: "farm_id", sortable: false },
   {
     title: "Node",
     key: "node",
     sortable: false,
     children: [
-      { title: "ID", key: "nodeId" },
+      { title: "ID", key: "nodeId", sortable: false },
       { title: "Status", key: "nodeStatus", sortable: false },
     ],
   },
@@ -499,19 +487,19 @@ const nodeTableHeaders: VDataTableHeader = [
 const nameTableHeaders: VDataTableHeader = [
   ...baseTableHeaders,
   { title: "Solution Name", key: "solutionName", sortable: false },
-  { title: "Expiration", key: "expiration" },
+  { title: "Expiration", key: "expiration", sortable: false },
   { title: "Details", key: "actions", sortable: false },
 ];
 
 const RentTableHeaders: VDataTableHeader = [
   ...baseTableHeaders,
-  { title: "Farm ID", key: "farm_id" },
+  { title: "Farm ID", key: "farm_id", sortable: false },
   {
     title: "Node",
     key: "node",
     sortable: false,
     children: [
-      { title: "ID", key: "nodeId" },
+      { title: "ID", key: "nodeId", sortable: false },
       { title: "Status", key: "nodeStatus", sortable: false },
     ],
   },
