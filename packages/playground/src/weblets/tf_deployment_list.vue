@@ -288,6 +288,7 @@
             icon="mdi-eye-outline"
             @click="openDialog(tabs[activeTab].value, item)"
           />
+          <IconActionBtn tooltip="Visit" icon="mdi-web" color="anchor" :href="'https://' + item.env.GITEA_HOSTNAME" />
         </template>
 
         <template #Nostr-actions="{ item }">
@@ -296,6 +297,7 @@
             icon="mdi-eye-outline"
             @click="openDialog(tabs[activeTab].value, item)"
           />
+          <IconActionBtn tooltip="Visit" icon="mdi-web" color="anchor" :href="'https://' + item.env.NOSTR_HOSTNAME" />
         </template>
 
         <template #Wordpress-actions="{ item }">

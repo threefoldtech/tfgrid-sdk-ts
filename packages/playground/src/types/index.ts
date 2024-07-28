@@ -84,6 +84,7 @@ export interface FarmInterface {
 }
 
 export interface Flist {
+  name?: string;
   value: string;
   entryPoint: string;
 }
