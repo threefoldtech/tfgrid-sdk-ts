@@ -1,7 +1,6 @@
 <template>
   <weblet-layout
     ref="layout"
-    @mount="layoutMount"
     :cpu="solution?.cpu"
     :memory="solution?.memory"
     :disk="disks.reduce((total, disk) => total + disk.size, rootFilesystemSize)"
@@ -51,7 +50,7 @@
           v-model:ipv6="ipv6"
           v-model:planetary="planetary"
           v-model:mycelium="mycelium"
-          ref="network"
+          v-model:wireguard="wireguard"
         />
         <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
           <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
@@ -74,6 +73,7 @@
             rootFilesystemSize,
           }"
           v-model="selectionDetails"
+          require-domain
         />
 
         <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
@@ -92,16 +92,16 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, type Ref, ref, watch } from "vue";
+import { computed, type Ref, ref } from "vue";
 
 import { manual } from "@/utils/manual";
 
 import Network from "../components/networks.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import { useLayout } from "../components/weblet_layout.vue";
-import { useGrid } from "../stores";
+import { useGrid, useProfileManager } from "../stores";
 import { ProjectName } from "../types";
-import { deployVM, type Disk, type Env } from "../utils/deploy_vm";
+import { deployVM, type Disk } from "../utils/deploy_vm";
 import { generateName } from "../utils/strings";
 
 const layout = useLayout();
@@ -110,11 +110,10 @@ const tabs = ref();
 const name = ref(generateName({ prefix: "gt" }));
 const ipv4 = ref(false);
 const ipv6 = ref(false);
+const wireguard = ref(false);
 const planetary = ref(true);
 const mycelium = ref(true);
-const envs = ref<Env[]>([]);
 const disks = ref<Disk[]>([]);
-const network = ref();
 const dedicated = ref(false);
 const certified = ref(false);
 const rootFilesystemSize = computed(() => solution.value?.disk);
@@ -123,16 +122,12 @@ const selectedSSHKeys = ref("");
 const smtp = ref(createSMTPServer());
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
+const profileManager = useProfileManager();
 
-function layoutMount() {
-  if (envs.value.length > 0) {
-    envs.value.splice(0, 1);
-  }
-
-  envs.value.unshift({
-    key: "SSH_KEY",
-    value: selectedSSHKeys.value,
-  });
+function finalize(deployment: any) {
+  layout.value.reloadDeploymentsList();
+  layout.value.setStatus("success", "Successfully deployed a Node Pilot instance.");
+  layout.value.openDialog(deployment, deploymentListEnvironments.nodepilot);
 }
 
 async function deploy() {
@@ -140,15 +135,27 @@ async function deploy() {
 
   const projectName = ProjectName.Gitea.toLowerCase() + "/" + name.value;
 
+  let vm: VM[];
   try {
     updateGrid(grid, { projectName });
 
+    const subdomain = getSubdomain({
+      deploymentName: name.value,
+      projectName,
+      twinId: profileManager.profile!.twinId,
+    });
+
+    const domain = selectionDetails.value?.domain?.enabledCustomDomain
+      ? selectionDetails.value.domain.customDomain
+      : subdomain + "." + selectionDetails.value?.domain?.selectedDomain?.publicConfig.domain;
+
     await layout.value.validateBalance(grid!);
 
-    const vm = await deployVM(grid!, {
+    vm = await deployVM(grid!, {
       name: name.value,
       network: {
-        addAccess: false,
+        addAccess: selectionDetails.value!.domain!.enableSelectedDomain,
+        accessNodeId: selectionDetails.value!.domain?.selectedDomain?.nodeId,
       },
       machines: [
         {
@@ -158,7 +165,16 @@ async function deploy() {
           flist: "https://hub.grid.tf/tf-official-apps/gitea-mycelium.flist",
           entryPoint: "/sbin/zinit init",
           disks: disks.value,
-          envs: envs.value,
+          envs: [
+            {
+              key: "SSH_KEY",
+              value: selectedSSHKeys.value,
+            },
+            {
+              key: "GITEA_HOSTNAME",
+              value: domain,
+            },
+          ],
           planetary: planetary.value,
           mycelium: mycelium.value,
           publicIpv4: ipv4.value,
@@ -171,29 +187,47 @@ async function deploy() {
       ],
     });
 
-    layout.value.reloadDeploymentsList();
-    layout.value.setStatus("success", "Successfully deployed a Gitea machine.");
-    layout.value.openDialog(vm, deploymentListEnvironments.gitea);
+    if (!selectionDetails.value?.domain?.enableSelectedDomain) {
+      vm[0].customDomain = selectionDetails.value?.domain?.customDomain;
+      finalize(vm);
+      return;
+    }
+
+    try {
+      layout.value.setStatus("deploy", "Preparing to deploy gateway...");
+      await deployGatewayName(grid, selectionDetails.value.domain, {
+        subdomain,
+        ip: vm[0].interfaces[0].ip,
+        port: 3000,
+        network: vm[0].interfaces[0].network,
+      });
+
+      finalize(vm);
+    } catch (e) {
+      layout.value.setStatus("deploy", "Rollbacking back due to fail to deploy gateway...");
+
+      await rollbackDeployment(grid!, name.value);
+      layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Gitea instance."));
+    }
   } catch (e) {
-    layout.value.setStatus("failed", normalizeError(e, "Failed to deploy Gitea machine instance."));
+    layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Gitea instance."));
   }
 }
 
 function updateSSHkeyEnv(selectedKeys: string) {
   selectedSSHKeys.value = selectedKeys;
 }
-
-watch(selectedSSHKeys, layoutMount, { deep: true });
 </script>
 
 <script lang="ts">
-import type { GridClient } from "@threefold/grid_client";
+import type { GridClient, VM } from "@threefold/grid_client";
 
 import SmtpServer, { createSMTPServer } from "../components/smtp_server.vue";
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";
 import type { solutionFlavor as SolutionFlavor } from "../types";
 import type { SelectionDetails } from "../types/nodeSelector";
+import { deployGatewayName, getSubdomain, rollbackDeployment } from "../utils/gateway";
 import { updateGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
 
@@ -202,6 +236,7 @@ const solution = ref() as Ref<SolutionFlavor>;
 export default {
   name: "Gitea",
   components: {
+    ManageSshDeployemnt,
     SelectSolutionFlavor,
     SmtpServer,
   },

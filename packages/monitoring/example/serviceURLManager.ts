@@ -8,7 +8,7 @@ import {
 } from "../src";
 
 const gridproxy = ["http://www.nonexistentgridProxy.com", "http://www.gooogleTF.com", "https://gridproxy.dev.grid.tf/"];
-const rmb = ["wss://www.nonExistentRelay.com", "wss://relay.dev.grid.tf"];
+const rmb = ["https://graphql.dev.grid.tf", "wss://relay.dev.grid.tf"];
 const graphql = ["https://graphql.dev.grid.tf/graphql"];
 const tfChain = ["wss://tfchain.dev.grid.tf/ws", "wss://www.nonExistentChain.com"];
 const mnemonics = "<MNEMONIC>";
@@ -30,9 +30,10 @@ checkStacksAvailability({
     { service: new GridProxyMonitor(), URLs: gridproxy },
     { service: new GraphQLMonitor(), URLs: graphql },
     {
-      service: new RMBMonitor({ mnemonics, chainUrl: "wss://tfchain.02.dev.grid.tf/ws", keypairType: "sr25519" }),
+      service: new RMBMonitor(),
       URLs: rmb,
     },
     { service: new TFChainMonitor(), URLs: tfChain },
   ],
+  timeout: 10,
 });

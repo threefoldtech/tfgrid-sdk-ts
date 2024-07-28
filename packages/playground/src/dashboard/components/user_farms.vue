@@ -38,6 +38,13 @@
           }
         }
       "
+      @update:sort-by="
+        if ($event[0]) {
+          sortBy = $event[0].key == 'farmId' ? SortBy.FarmId : $event[0].key;
+          sortOrder = $event[0].order;
+          getUserFarms();
+        }
+      "
       expand-on-click
       @update:options="getUserFarms"
       :hover="true"
@@ -128,7 +135,7 @@
 </template>
 
 <script lang="ts">
-import type { Farm } from "@threefold/gridproxy_client";
+import { type Farm, SortBy, SortOrder } from "@threefold/gridproxy_client";
 import { jsPDF } from "jspdf";
 import { debounce } from "lodash";
 import { StrKey } from "stellar-sdk";
@@ -167,13 +174,13 @@ export default {
         title: "Farm ID",
         align: "center",
         key: "farmId",
-        sortable: false,
+        sortable: true,
       },
       {
         title: "Farm Name",
         align: "center",
         key: "name",
-        sortable: false,
+        sortable: true,
       },
       {
         title: "Linked Twin ID",
@@ -201,6 +208,8 @@ export default {
     const isAdding = ref(false);
     const network = process.env.NETWORK || (window as any).env.NETWORK;
     const refreshPublicIPs = ref(false);
+    const sortBy = ref(SortBy.FarmId);
+    const sortOrder = ref(SortOrder.Asc);
 
     const reloadFarms = debounce(getUserFarms, 20000);
     async function getUserFarms() {
@@ -211,6 +220,8 @@ export default {
           page: page.value,
           size: pageSize.value,
           nameContains: search.value,
+          sortBy: sortBy.value,
+          sortOrder: sortOrder.value,
         });
 
         farms.value = data as Farm[];
@@ -338,6 +349,9 @@ export default {
       isAdding,
       farmsCount,
       network,
+      sortBy,
+      SortBy,
+      sortOrder,
       getUserFarms,
       setStellarAddress,
       customStellarValidation,

@@ -16,6 +16,7 @@ export class ServiceUrlManager<N extends boolean = false> {
   private retries = 3;
   private silent: N = false as N;
   public services: Service[];
+  public timeout = 20;
 
   constructor(options: URLManagerOptions<N>) {
     Object.assign(this, options);
@@ -32,11 +33,26 @@ export class ServiceUrlManager<N extends boolean = false> {
    * @returns {Promise<{alive: boolean, error?: Error}>} - A promise that resolves with the liveness status of the service.
    */
   private async pingService(service: ILivenessChecker) {
-    const status = await service.isAlive();
-    if ("disconnect" in service) {
-      await (service as IDisconnectHandler).disconnect();
+    try {
+      const statusPromise = service.isAlive();
+
+      const timeoutPromise = new Promise((resolve, reject) => {
+        setTimeout(() => {
+          reject(new Error("Timeout"));
+        }, this.timeout * 1000);
+      });
+
+      const result = await Promise.race([statusPromise, timeoutPromise]);
+      if (result instanceof Error && result.message === "Timeout") {
+        throw result;
+      }
+      if ("disconnect" in service) {
+        await (service as IDisconnectHandler).disconnect();
+      }
+      return result;
+    } catch (e) {
+      return this.handleErrorsOnSilentMode((e as Error).message);
     }
-    return status;
   }
   /**
    * Handles errors based on the silent mode setting.
@@ -51,7 +67,7 @@ export class ServiceUrlManager<N extends boolean = false> {
    */
   private handleErrorsOnSilentMode(errorMsg: string) {
     if (this.silent) {
-      console.log(errorMsg);
+      monitorEvents.log(errorMsg, "red");
       return null;
     }
     throw new Error(errorMsg);
@@ -80,11 +96,11 @@ export class ServiceUrlManager<N extends boolean = false> {
       monitorEvents.log(`${service.name}: pinging ${service.url}`, "gray");
       for (let retry = 0; retry < this.retries; retry++) {
         const status = await this.pingService(service);
-        if (status.alive) {
+        if (status?.alive) {
           monitorEvents.log(`${service.name} on ${service.url} Success!`, "green");
           return service.url;
         }
-        error = status.error ?? "";
+        error = status?.error ?? "";
       }
       monitorEvents.log(
         `${service.name}: failed to ping ${service.url} after ${this.retries} retries; ${error}`,

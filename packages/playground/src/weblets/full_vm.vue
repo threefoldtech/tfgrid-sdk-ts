@@ -138,7 +138,7 @@
 </template>
 
 <script lang="ts" setup>
-import { type Ref, ref, watch } from "vue";
+import { computed, type Ref, ref, watch } from "vue";
 
 import { manual } from "@/utils/manual";
 
@@ -158,6 +158,11 @@ const tabs = ref();
 const profileManager = useProfileManager();
 const solution = ref() as Ref<SolutionFlavor>;
 const images: VmImage[] = [
+  {
+    name: "Ubuntu-24.04",
+    flist: "https://hub.grid.tf/tf-official-vms/ubuntu-24.04-full.flist",
+    entryPoint: "",
+  },
   {
     name: "Ubuntu-22.04",
     flist: "https://hub.grid.tf/tf-official-vms/ubuntu-22.04.flist",
@@ -193,7 +198,9 @@ const certified = ref(false);
 const disks = ref<Disk[]>([]);
 const network = ref();
 const hasGPU = ref(false);
-const rootFilesystemSize = 2;
+const rootFilesystemSize = computed(() =>
+  flist.value?.name === "Ubuntu-24.04" || flist.value?.name === "Other" ? solution.value?.disk : 2,
+);
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
 
@@ -246,13 +253,16 @@ async function deploy() {
           memory: solution.value.memory,
           flist: flist.value!.value,
           entryPoint: flist.value!.entryPoint,
-          disks: [{ size: solution?.value.disk, mountPoint: "/" }, ...disks.value],
+          disks:
+            flist.value?.name === "Ubuntu-24.04" || flist.value?.name === "Other"
+              ? [...disks.value]
+              : [{ size: solution?.value.disk, mountPoint: "/" }, ...disks.value],
           publicIpv4: ipv4.value,
           publicIpv6: ipv6.value,
           planetary: planetary.value,
           mycelium: mycelium.value,
           envs: [{ key: "SSH_KEY", value: selectedSSHKeys.value }],
-          rootFilesystemSize,
+          rootFilesystemSize: rootFilesystemSize.value,
           hasGPU: hasGPU.value,
           nodeId: selectionDetails.value?.node?.nodeId,
           gpus: hasGPU.value ? selectionDetails.value?.gpuCards.map(card => card.id) : undefined,
