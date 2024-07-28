@@ -32,11 +32,15 @@ export class ServiceUrlManager<N extends boolean = false> {
    * @returns {Promise<{alive: boolean, error?: Error}>} - A promise that resolves with the liveness status of the service.
    */
   private async pingService(service: ILivenessChecker) {
-    const status = await service.isAlive();
-    if ("disconnect" in service) {
-      await (service as IDisconnectHandler).disconnect();
+    try {
+      const status = await service.isAlive();
+      if ("disconnect" in service) {
+        await (service as IDisconnectHandler).disconnect();
+      }
+      return status;
+    } catch (e) {
+      return this.handleErrorsOnSilentMode((e as Error).message);
     }
-    return status;
   }
   /**
    * Handles errors based on the silent mode setting.
@@ -80,11 +84,11 @@ export class ServiceUrlManager<N extends boolean = false> {
       monitorEvents.log(`${service.name}: pinging ${service.url}`, "gray");
       for (let retry = 0; retry < this.retries; retry++) {
         const status = await this.pingService(service);
-        if (status.alive) {
+        if (status?.alive) {
           monitorEvents.log(`${service.name} on ${service.url} Success!`, "green");
           return service.url;
         }
-        error = status.error ?? "";
+        error = status?.error ?? "";
       }
       monitorEvents.log(
         `${service.name}: failed to ping ${service.url} after ${this.retries} retries; ${error}`,
