@@ -1,58 +1,45 @@
-import { Client as RMBClient } from "@threefold/rmb_direct_client";
+import { RequestError } from "@threefold/types";
 
-import { generateString, resolveServiceStatus } from "../helpers/utils";
-import { IDisconnectHandler, ILivenessChecker, RMBProps, ServiceStatus } from "../types";
+import { ILivenessChecker, ServiceStatus } from "../types";
 
-export class RMBMonitor implements ILivenessChecker, IDisconnectHandler {
+export class RMBMonitor implements ILivenessChecker {
   private _name = "RMB";
-  private _rmbClient: RMBClient;
-  constructor(private _rmbProps: RMBProps) {
-    if (_rmbProps) this.factory();
-  }
-
-  /*
-    Creates a new RMB Client instance
-  */
-  private factory() {
-    const { chainUrl, relayUrl, mnemonics, keypairType } = this._rmbProps;
-    if (relayUrl) {
-      this._rmbClient = new RMBClient(chainUrl, relayUrl, mnemonics, generateString(10), keypairType, 0);
-    }
-  }
-
-  private async setUp() {
-    if (!this._rmbClient) throw new Error("Can't setUp before initialization");
-    await this._rmbClient?.connect();
+  private _url: string;
+  constructor(gridProxyUrl?: string) {
+    if (gridProxyUrl) this.url = gridProxyUrl;
   }
   public get name() {
     return this._name;
   }
   public get url() {
-    return this._rmbProps?.relayUrl ?? "";
+    return this._url ?? "";
   }
   private set url(url: string) {
-    this._rmbProps.relayUrl = url;
+    this._url = url;
   }
-
-  public async update(param: { url: string }) {
-    if (this.url === param.url) return;
-    this.url = param.url;
-    if (this._rmbClient) {
-      await this.disconnect();
-      this._rmbClient.relayUrl = this.url;
-    } else this.factory();
+  public update(param: { url: string }): void {
+    this._url = param.url;
   }
-
-  public async isAlive(): Promise<ServiceStatus> {
+  async isAlive(): Promise<ServiceStatus> {
     if (!this.url) throw new Error("Can't access before initialization");
+    const splittedURL = this.url.split("relay");
+    const url = splittedURL[1] ? "https://gridproxy" + splittedURL[1] : this.url;
     try {
-      if (!this._rmbClient?.con?.OPEN) await this.setUp();
-      return resolveServiceStatus(this._rmbClient.ping(2));
-    } catch (error) {
-      return { alive: false, error };
+      const res = await fetch(url + "/health");
+      if (!res?.ok) throw Error(`HTTP Response Code: ${res?.status}`);
+      const rmb_conn = (await res.json())?.rmb_conn;
+      if (rmb_conn === "ok") {
+        return {
+          alive: true,
+        };
+      } else {
+        return {
+          alive: false,
+          error: new Error(`rmb_conn is ${rmb_conn}`),
+        };
+      }
+    } catch (e) {
+      throw new RequestError(`HTTP request failed due to  ${e}.`);
     }
-  }
-  public async disconnect() {
-    await this._rmbClient.disconnect();
   }
 }

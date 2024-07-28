@@ -56,13 +56,6 @@ export enum MonitorEvents {
   "serviceDown" = "MonitorServiceDown",
 }
 
-export type RMBProps = {
-  chainUrl: string;
-  relayUrl?: string;
-  mnemonics: string;
-  keypairType: KeypairType;
-};
-
 /**
  * Represents a service with its stacks and its ILivenessChecker instance.
  */
