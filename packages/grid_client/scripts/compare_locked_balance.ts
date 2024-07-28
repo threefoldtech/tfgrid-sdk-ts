@@ -9,52 +9,63 @@ interface Contract {
   state: string;
 }
 async function getUsersWithContracts(grid: GridClient) {
-  let users: any[] = [];
-  const usersWithContracts: any[] = [];
+  const users: any[] = [];
 
   const graphql = new TFGridGqlClient(grid.config.graphqlURL);
-  users = await graphql.twins({ twinID: true, accountID: true });
 
-  for (const user of users) {
-    const [nodeContracts, nameContracts, rentContracts] = await Promise.all([
-      graphql.nodeContracts(
-        { contractID: true, state: true },
-        {
-          where: {
-            twinID_eq: user.twinID,
-            state_in: [ContractState.Created, ContractState.GracePeriod],
-          },
+  const [nodeContracts, nameContracts, rentContracts] = await Promise.all([
+    graphql.nodeContracts(
+      { twinID: true, contractID: true, state: true },
+      {
+        where: {
+          state_in: [ContractState.Created, ContractState.GracePeriod],
         },
-      ),
-      graphql.nameContracts(
-        { contractID: true, state: true },
-        {
-          where: {
-            twinID_eq: user.twinID,
-            state_in: [ContractState.Created, ContractState.GracePeriod],
-          },
+      },
+    ),
+    graphql.nameContracts(
+      { twinID: true, contractID: true, state: true },
+      {
+        where: {
+          state_in: [ContractState.Created, ContractState.GracePeriod],
         },
-      ),
-      graphql.rentContracts(
-        { contractID: true, state: true },
-        {
-          where: {
-            twinID_eq: user.twinID,
-            state_in: [ContractState.Created, ContractState.GracePeriod],
-          },
+      },
+    ),
+    graphql.rentContracts(
+      { twinID: true, contractID: true, state: true },
+      {
+        where: {
+          state_in: [ContractState.Created, ContractState.GracePeriod],
         },
-      ),
-    ]);
+      },
+    ),
+  ]);
 
-    user.contracts = [nodeContracts, nameContracts, rentContracts].flat(3);
+  const contracts = [...nodeContracts, ...nameContracts, ...rentContracts];
 
-    if (user.contracts.length > 0) {
-      usersWithContracts.push(user);
+  for (const contract of contracts) {
+    const twin = await graphql.twins({ accountID: true }, { where: { twinID_eq: +contract.twinID } });
+    let user = users.find(user => user.twinID === contract.twinID);
+
+    if (!user) {
+      user = {
+        twinID: contract.twinID,
+        accountID: twin[0]?.accountID,
+        contracts: [],
+      };
+
+      // Some twins don't have account ID, that's why they're not included in the users arr
+      if (user.accountID) {
+        users.push(user);
+      }
     }
+
+    user.contracts.push({
+      contractID: contract.contractID,
+      state: contract.state,
+    });
   }
 
-  console.log("usersWithContracts", usersWithContracts);
-  return usersWithContracts;
+  return users;
 }
 
 async function getUserBalance(grid: GridClient, address: BalanceGetModel) {
@@ -92,13 +103,13 @@ async function getContractsLockedAmount(grid: GridClient, contracts: Contract[])
     // if frozen balance != locked balance, push to unmatched accounts
     if (balances.frozen != contractsLockedBalance) {
       unmatchedBalanceAccounts.push({
-        user,
+        ...user,
         lockedBalance: balances.frozen,
         lockedContractsBalance: contractsLockedBalance,
       });
     }
   }
 
-  console.log({ unmatchedBalanceAccounts });
+  console.dir(unmatchedBalanceAccounts, { depth: null, colors: true });
   await grid.disconnect();
 })();
