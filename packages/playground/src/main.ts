@@ -25,7 +25,7 @@ app.config.errorHandler = error => {
 
 Sentry.init({
   app,
-  dsn: "http://63b4783eac8cce864dca278b3c5a0ee1@185.206.122.50:9000/2",
+  dsn: "https://b9af6796f176d1f02837a06f0da3caee@dev.sentry.grid.tf/2",
   integrations: [Sentry.browserTracingIntegration(), Sentry.replayIntegration()],
   release: process.env.VERSION,
   // Performance Monitoring
