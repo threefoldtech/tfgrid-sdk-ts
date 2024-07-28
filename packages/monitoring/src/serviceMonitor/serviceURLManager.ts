@@ -16,6 +16,7 @@ export class ServiceUrlManager<N extends boolean = false> {
   private retries = 3;
   private silent: N = false as N;
   public services: Service[];
+  public timeout = 20;
 
   constructor(options: URLManagerOptions<N>) {
     Object.assign(this, options);
@@ -33,11 +34,22 @@ export class ServiceUrlManager<N extends boolean = false> {
    */
   private async pingService(service: ILivenessChecker) {
     try {
-      const status = await service.isAlive();
+      const statusPromise = service.isAlive();
+
+      const timeoutPromise = new Promise((resolve, reject) => {
+        setTimeout(() => {
+          reject(new Error("Timeout"));
+        }, this.timeout * 1000);
+      });
+
+      const result = await Promise.race([statusPromise, timeoutPromise]);
+      if (result instanceof Error && result.message === "Timeout") {
+        throw result;
+      }
       if ("disconnect" in service) {
         await (service as IDisconnectHandler).disconnect();
       }
-      return status;
+      return result;
     } catch (e) {
       return this.handleErrorsOnSilentMode((e as Error).message);
     }
@@ -55,7 +67,7 @@ export class ServiceUrlManager<N extends boolean = false> {
    */
   private handleErrorsOnSilentMode(errorMsg: string) {
     if (this.silent) {
-      console.log(errorMsg);
+      monitorEvents.log(errorMsg, "red");
       return null;
     }
     throw new Error(errorMsg);
