@@ -1,5 +1,5 @@
 import { monitorEvents } from "../helpers/events";
-import { IDisconnectHandler, ILivenessChecker, Service, ServiceUrl, URLManagerOptions } from "../types";
+import { IDisconnectHandler, ILivenessChecker, Service, ServiceStatus, ServiceUrl, URLManagerOptions } from "../types";
 
 /**
  * Manages service URLs, checking their availability and ensuring they are reachable.
@@ -16,7 +16,7 @@ export class ServiceUrlManager<N extends boolean = false> {
   private retries = 3;
   private silent: N = false as N;
   public services: Service[];
-  public timeout = 20;
+  public timeout = 2;
 
   constructor(options: URLManagerOptions<N>) {
     Object.assign(this, options);
@@ -32,14 +32,14 @@ export class ServiceUrlManager<N extends boolean = false> {
    *
    * @returns {Promise<{alive: boolean, error?: Error}>} - A promise that resolves with the liveness status of the service.
    */
-  private async pingService(service: ILivenessChecker) {
+  private async pingService(service: ILivenessChecker, _timeout: number): Promise<ServiceStatus> {
     try {
       const statusPromise = service.isAlive();
 
       const timeoutPromise = new Promise((resolve, reject) => {
         setTimeout(() => {
           reject(new Error("Timeout"));
-        }, this.timeout * 1000);
+        }, _timeout * 1000);
       });
 
       const result = await Promise.race([statusPromise, timeoutPromise]);
@@ -49,9 +49,9 @@ export class ServiceUrlManager<N extends boolean = false> {
       if ("disconnect" in service) {
         await (service as IDisconnectHandler).disconnect();
       }
-      return result;
+      return result as ServiceStatus;
     } catch (e) {
-      return this.handleErrorsOnSilentMode((e as Error).message);
+      return this.handleErrorsOnSilentMode((e as Error).message) as unknown as ServiceStatus;
     }
   }
   /**
@@ -95,7 +95,7 @@ export class ServiceUrlManager<N extends boolean = false> {
       await service.update({ url: urls[i] });
       monitorEvents.log(`${service.name}: pinging ${service.url}`, "gray");
       for (let retry = 0; retry < this.retries; retry++) {
-        const status = await this.pingService(service);
+        const status = await this.pingService(service, this.timeout + retry * this.timeout);
         if (status?.alive) {
           monitorEvents.log(`${service.name} on ${service.url} Success!`, "green");
           return service.url;
