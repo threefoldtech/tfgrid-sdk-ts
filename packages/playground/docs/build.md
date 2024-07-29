@@ -28,6 +28,7 @@ bash ../scripts/build-env.sh
   - STATS_URL
   - STELLAR_NETWORK
   - SENTRY_DSN
+  - ENABLE_TELEMETRY
 
 - The backend payments are done with stellar so you need to decide which network of stellar you want to connect to
 

@@ -7,7 +7,7 @@ TIMEOUT="${TIMEOUT:=10000}"
 PAGE_SIZE="${PAGE_SIZE:=20}"
 MINTING_URL="https://alpha.minting.tfchain.grid.tf"
 MANUAL_URL="${MANUAL_URL:-https://www.manual.grid.tf}"
-
+ENABLE_TELEMETRY=false
 STELLAR_ENV_Vars=(
     STELLAR_HORIZON_URL
     TFT_ASSET_ISSUER
@@ -99,6 +99,7 @@ window.env = {
   PAGE_SIZE: +'$PAGE_SIZE',
   MANUAL_URL: '$MANUAL_URL',
   SENTRY_DSN: '$SENTRY_DSN',
+  ENABLE_TELEMETRY: '$ENABLE_TELEMETRY'
 };
 "
 

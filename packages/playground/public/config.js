@@ -15,4 +15,5 @@ window.env = {
   PAGE_SIZE: +"20",
   MANUAL_URL: "https://www.manual.grid.tf",
   SENTRY_DSN: "https://b9af6796f176d1f02837a06f0da3caee@dev.sentry.grid.tf/2",
+  ENABLE_TELEMETRY: "false",
 };

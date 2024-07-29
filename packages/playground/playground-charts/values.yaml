@@ -29,6 +29,8 @@ image:
       value: ""
     - name: "SENTRY_DSN"
       value: ""
+    - name: "ENABLE_TELEMETRY"
+      value: false
 
 
 imagePullSecrets: []
