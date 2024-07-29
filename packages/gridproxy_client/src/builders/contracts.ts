@@ -1,5 +1,6 @@
 import { assertBoolean, assertId, assertIn, assertNatural, assertString } from "../utils";
 import { AbstractBuilder, BuilderMapper, BuilderMethods, BuilderValidator } from "./abstract_builder";
+import { SortOrder } from "./nodes";
 
 export enum ContractType {
   Node = "node",
@@ -21,11 +22,6 @@ export enum SortByContracts {
   State = "state",
 }
 
-export enum SortOrderContracts {
-  DESC = "desc",
-  ASC = "asc",
-}
-
 export interface ContractsQuery {
   page: number;
   size: number;
@@ -40,7 +36,7 @@ export interface ContractsQuery {
   deploymentHash: string;
   numberOfPublicIps: number;
   sortBy: SortByContracts;
-  sortOrder: SortOrderContracts;
+  sortOrder: SortOrder;
 }
 
 const CONTRACTS_MAPPER: BuilderMapper<ContractsQuery> = {
@@ -90,7 +86,7 @@ const CONTRACTS_VALIDATOR: BuilderValidator<ContractsQuery> = {
   },
   sortOrder(value) {
     assertString(value);
-    assertIn(value, Object.values(SortOrderContracts));
+    assertIn(value, Object.values(SortOrder));
   },
 };
 

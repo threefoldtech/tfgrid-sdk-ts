@@ -203,13 +203,7 @@
 
 <script lang="ts" setup>
 import type { GridClient, LockContracts } from "@threefold/grid_client";
-import {
-  type Contract,
-  ContractState,
-  NodeStatus,
-  SortByContracts,
-  SortOrderContracts,
-} from "@threefold/gridproxy_client";
+import { type Contract, ContractState, NodeStatus, SortByContracts, SortOrder } from "@threefold/gridproxy_client";
 import { Decimal } from "decimal.js";
 import { computed, defineComponent, onMounted, type Ref, ref } from "vue";
 
@@ -305,7 +299,7 @@ async function loadContractsByType(
       type: contractType,
       retCount: true,
       sortBy: options && options.sort.length ? (options?.sort[0].key as SortByContracts) : undefined,
-      sortOrder: options && options.sort.length ? (options?.sort[0].order as SortOrderContracts) : undefined,
+      sortOrder: options && options.sort.length ? (options?.sort[0].order as SortOrder) : undefined,
     });
 
     table.count.value = response.count ?? 0;
