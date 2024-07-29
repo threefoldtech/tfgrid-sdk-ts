@@ -99,7 +99,7 @@ async function getContractsLockedAmount(grid: GridClient, contracts: Contract[])
   const contractsLockedAmountPromises = users.map(user => getContractsLockedAmount(grid, user.contracts));
   const contractsLockedAmounts = await Promise.all(contractsLockedAmountPromises);
 
-  users.forEach((user, index) => {
+  for (const [index, user] of users.entries()) {
     const balance = balances[index];
     const contractsLockedAmount = contractsLockedAmounts[index];
 
@@ -110,8 +110,8 @@ async function getContractsLockedAmount(grid: GridClient, contracts: Contract[])
         lockedContractsBalance: contractsLockedAmount,
       });
     }
-  });
+  }
 
-  console.dir(unmatchedBalanceAccounts, { depth: null, colors: true });
+  console.dir({ unmatchedBalanceAccounts }, { depth: null, colors: true });
   await grid.disconnect();
 })();
