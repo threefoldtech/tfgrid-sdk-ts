@@ -51,7 +51,10 @@ export class ServiceUrlManager<N extends boolean = false> {
       }
       return result as ServiceStatus;
     } catch (e) {
-      return this.handleErrorsOnSilentMode((e as Error).message) as unknown as ServiceStatus;
+      return {
+        alive: false,
+        error: e,
+      };
     }
   }
   /**
