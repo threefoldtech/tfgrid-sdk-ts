@@ -1,20 +1,11 @@
-import { QueryClient } from "@threefold/tfchain_client";
+import { resolveServiceStatus, sendRequest } from "../helpers/utils";
+import { ILivenessChecker, ServiceStatus } from "../types";
 
-import { IDisconnectHandler, ILivenessChecker, ServiceStatus } from "../types";
-
-export class TFChainMonitor implements ILivenessChecker, IDisconnectHandler {
+export class TFChainMonitor implements ILivenessChecker {
   private _name = "TFChain";
   private _url: string;
-  private _tfClient: QueryClient;
-  constructor(tfChainUrl?: string) {
-    if (tfChainUrl) {
-      this._url = tfChainUrl;
-      this._tfClient = new QueryClient(this.url);
-    }
-  }
-  private async setUp() {
-    if (!this._tfClient) throw new Error("Can't setUp before initialization");
-    await this._tfClient?.connect();
+  constructor(tfchainUrl?: string) {
+    if (tfchainUrl) this.url = tfchainUrl;
   }
   public get name() {
     return this._name;
@@ -26,25 +17,13 @@ export class TFChainMonitor implements ILivenessChecker, IDisconnectHandler {
     this._url = url;
   }
   public update(param: { url: string }): void {
-    if (this.url === param.url) return;
-    this.url = param.url;
-    this._tfClient = new QueryClient(this.url);
+    this._url = param.url;
   }
-  public async isAlive(): Promise<ServiceStatus> {
-    if (!this.url) throw new Error("Can't access before initialization");
-    try {
-      if (!this._tfClient.api) await this.setUp();
-      return {
-        alive: true,
-      };
-    } catch (error) {
-      return {
-        alive: false,
-        error,
-      };
-    }
-  }
-  public async disconnect() {
-    await this._tfClient.disconnect();
+  async isAlive(url = this.url): Promise<ServiceStatus> {
+    if (!url) throw new Error("Can't access before initialization");
+    let _url = url.replace("wss", "https");
+    _url = _url.replace("/ws", "/health");
+    console.log("updated", _url);
+    return resolveServiceStatus(sendRequest(_url, { method: "Get" }));
   }
 }
