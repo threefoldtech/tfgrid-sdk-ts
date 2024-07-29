@@ -1,5 +1,6 @@
 import { assertBoolean, assertId, assertIn, assertNatural, assertString } from "../utils";
 import { AbstractBuilder, BuilderMapper, BuilderMethods, BuilderValidator } from "./abstract_builder";
+import { SortOrder } from "./nodes";
 
 export enum ContractType {
   Node = "node",
@@ -11,6 +12,14 @@ export enum ContractState {
   Created = "Created",
   GracePeriod = "GracePeriod",
   Deleted = "Deleted",
+}
+
+export enum SortByContracts {
+  CreatedAt = "created_at",
+  TwinId = "twin_id",
+  ContractId = "contract_id",
+  Type = "type",
+  State = "state",
 }
 
 export interface ContractsQuery {
@@ -26,6 +35,8 @@ export interface ContractsQuery {
   deploymentData: string;
   deploymentHash: string;
   numberOfPublicIps: number;
+  sortBy: SortByContracts;
+  sortOrder: SortOrder;
 }
 
 const CONTRACTS_MAPPER: BuilderMapper<ContractsQuery> = {
@@ -41,6 +52,8 @@ const CONTRACTS_MAPPER: BuilderMapper<ContractsQuery> = {
   deploymentData: "deployment_data",
   deploymentHash: "deployment_hash",
   numberOfPublicIps: "number_of_public_ips",
+  sortBy: "sort_by",
+  sortOrder: "sort_order",
 };
 
 const CONTRACTS_VALIDATOR: BuilderValidator<ContractsQuery> = {
@@ -67,6 +80,14 @@ const CONTRACTS_VALIDATOR: BuilderValidator<ContractsQuery> = {
   deploymentData: assertString,
   deploymentHash: assertString,
   numberOfPublicIps: assertNatural,
+  sortBy(value) {
+    assertString(value);
+    assertIn(value, Object.values(SortByContracts));
+  },
+  sortOrder(value) {
+    assertString(value);
+    assertIn(value, Object.values(SortOrder));
+  },
 };
 
 export class ContractsBuilder extends AbstractBuilder<ContractsQuery> {
