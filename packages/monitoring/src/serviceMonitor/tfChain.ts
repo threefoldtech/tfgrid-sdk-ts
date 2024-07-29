@@ -23,7 +23,6 @@ export class TFChainMonitor implements ILivenessChecker {
     if (!url) throw new Error("Can't access before initialization");
     let _url = url.replace("wss", "https");
     _url = _url.replace("/ws", "/health");
-    console.log("updated", _url);
     return resolveServiceStatus(sendRequest(_url, { method: "Get" }));
   }
 }
