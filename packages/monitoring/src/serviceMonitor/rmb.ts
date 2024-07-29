@@ -5,8 +5,8 @@ import { ILivenessChecker, ServiceStatus } from "../types";
 export class RMBMonitor implements ILivenessChecker {
   private _name = "RMB";
   private _url: string;
-  constructor(gridProxyUrl?: string) {
-    if (gridProxyUrl) this.url = gridProxyUrl;
+  constructor(RMBUrl?: string) {
+    if (RMBUrl) this.url = RMBUrl;
   }
   public get name() {
     return this._name;
@@ -22,10 +22,9 @@ export class RMBMonitor implements ILivenessChecker {
   }
   async isAlive(): Promise<ServiceStatus> {
     if (!this.url) throw new Error("Can't access before initialization");
-    const splittedURL = this.url.split("relay");
-    const url = splittedURL[1] ? "https://gridproxy" + splittedURL[1] : this.url;
+    const proxyUrl = this.url.replace("wss://relay", "https://gridproxy");
     try {
-      const res = await fetch(url + "/health");
+      const res = await fetch(proxyUrl + "/health");
       if (!res?.ok) throw Error(`HTTP Response Code: ${res?.status}`);
       const rmb_conn = (await res.json())?.rmb_conn;
       if (rmb_conn === "ok") {
