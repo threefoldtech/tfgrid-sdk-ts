@@ -26,11 +26,10 @@
           :value="name"
           :rules="[
             validators.required('Name is required.'),
-            validators.isLowercase('Name should consist of lowercase letters only.'),
-            validators.isAlphanumeric('Name should consist of alphabets & numbers only.'),
+            validators.IsAlphanumericExpectUnderscore('Name should consist of letters ,numbers and underscores only.'),
             name => validators.isAlpha('Name must start with alphabet char.')(name[0]),
             validators.minLength('Name must be at least 2 characters.', 2),
-            validators.maxLength('Name cannot exceed 15 characters.', 15),
+            validators.maxLength('Name cannot exceed 50 characters.', 50),
           ]"
           #="{ props }"
         >
@@ -132,7 +131,7 @@
               }),
               validators.minLength('Disk minLength is 2 chars.', 2),
               validators.isAlphanumeric('Disk name only accepts alphanumeric chars.'),
-              validators.maxLength('Disk maxLength is 15 chars.', 15),
+              validators.maxLength('Disk maxLength is 50 chars.', 50),
             ]"
             #="{ props }"
           >
@@ -195,6 +194,11 @@ const layout = useLayout();
 const tabs = ref();
 
 const images = [
+  {
+    name: "Ubuntu-24.04",
+    flist: "https://hub.grid.tf/tf-official-vms/ubuntu-24.04-latest.flist",
+    entryPoint: "/sbin/zinit init",
+  },
   {
     name: "Ubuntu-23.10",
     flist: "https://hub.grid.tf/tf-official-vms/ubuntu-23.10-mycelium.flist",

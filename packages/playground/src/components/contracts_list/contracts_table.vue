@@ -9,18 +9,18 @@
       :deleting="deleting"
       v-bind:onClick:row="loading || deleting ? undefined : onClickRow"
       :no-data-text="capitalize(`No ${props.contractsType} contracts found on your account.`)"
-      :items-per-page-options="[
-        { value: 5, title: '5' },
-        { value: 10, title: '10' },
-        { value: 15, title: '15' },
-        { value: 50, title: '50' },
-      ]"
       class="elevation-1 v-data-table-header"
       density="compact"
       :items-length="$props.count.value"
       :items-per-page="$props.size.value"
       :page="$props.page.value"
       :items="contracts.value"
+      :items-per-page-options="[
+        { value: 5, title: '5' },
+        { value: 10, title: '10' },
+        { value: 20, title: '20' },
+        { value: 50, title: '50' },
+      ]"
       return-object
       show-select
       @update:page="updatePage"
@@ -142,18 +142,16 @@
 
   <v-dialog width="800" v-model="contractStateDialog" attach="#modals">
     <v-card>
-      <v-toolbar color="primary" class="custom-toolbar">
-        <p class="mb-5">Contract lock Details</p>
-      </v-toolbar>
-      <v-card-text class="mt-4">
-        <v-row class="d-flex justify-center">
+      <v-card-title class="bg-primary"> Contract lock Details </v-card-title>
+      <v-card-text class="mt-5">
+        <p class="d-flex justify-center">
           Amount Locked:
           {{ getAmountLocked }}
           TFTs.
-        </v-row>
+        </p>
         <v-alert
           v-if="contractLocked?.amountLocked == 0 && isNodeInRentContracts"
-          class="ma-4"
+          class="my-4"
           type="warning"
           variant="tonal"
         >
@@ -161,39 +159,39 @@
           node is locked with zero TFTS and no billing rate.
         </v-alert>
 
-        <v-alert class="ma-4" type="info" variant="tonal"
+        <v-alert class="mt-4" type="info" variant="tonal"
           >The Contracts in Grace Period, which means that your workloads are suspended but not deleted; in order to
           resume your workloads and restore their functionality, Please fund your account with the amount mentioned
           above.</v-alert
         >
-
-        <v-card-actions class="justify-end mb-1 mr-2">
-          <v-btn color="anchor" class="mr-2 px-3" @click="contractStateDialog = false"> Close </v-btn>
-          <v-tooltip
-            :text="
-              freeBalance < getAmountLocked
-                ? `You don't have enough balance to unlock this contract`
-                : `Unlock this contract from the grace period state.`
-            "
-            location="top center"
-          >
-            <template #activator="{ props }">
-              <div v-bind="props">
-                <v-btn
-                  v-if="!isNodeInRentContracts"
-                  :disabled="freeBalance < getAmountLocked"
-                  color="warning"
-                  class="mr-2 px-3"
-                  @click="unlockContract([selectedItem.contract_id])"
-                  :loading="unlockContractLoading"
-                >
-                  Unlock Contract
-                </v-btn>
-              </div>
-            </template>
-          </v-tooltip>
-        </v-card-actions>
+        <v-divider class="mt-3" />
       </v-card-text>
+      <v-card-actions class="justify-end mb-1 mr-2">
+        <v-btn color="anchor" class="mr-2 px-3" @click="contractStateDialog = false"> Close </v-btn>
+        <v-tooltip
+          :text="
+            freeBalance < getAmountLocked
+              ? `You don't have enough balance to unlock this contract`
+              : `Unlock this contract from the grace period state.`
+          "
+          location="top center"
+        >
+          <template #activator="{ props }">
+            <div v-bind="props">
+              <v-btn
+                v-if="!isNodeInRentContracts"
+                :disabled="freeBalance < getAmountLocked"
+                color="warning"
+                class="mr-2 px-3"
+                @click="unlockContract([selectedItem.contract_id])"
+                :loading="unlockContractLoading"
+              >
+                Unlock Contract
+              </v-btn>
+            </div>
+          </template>
+        </v-tooltip>
+      </v-card-actions>
     </v-card>
   </v-dialog>
 
@@ -224,19 +222,17 @@
       <v-card-title class="bg-primary">
         Unlock the following Contract<span v-if="selectedContracts.length > 1">s</span>
       </v-card-title>
-      <v-card-text
-        class="d-flex flex-column justify-center align-center"
-        style="height: 20vh"
-        v-if="loadingShowDetails"
-      >
+      <v-card-text v-if="loadingShowDetails">
         <v-progress-circular indeterminate />
 
         <div class="text-subtitle-2">Loading contracts lock details</div>
+        <v-divider class="mt-3" />
       </v-card-text>
       <v-card-text v-else>
         <v-alert class="my-4" type="warning" variant="tonal">
           <div v-if="selectedLockedAmount < freeBalance">
-            You have enough balance to unlock your contract<span v-if="selectedContracts.length > 1">s</span>!
+            You have enough balance to unlock your contract<span v-if="selectedContracts.length > 1">s</span>; this will
+            cost you around {{ Math.ceil(selectedLockedAmount) }} TFTs.
           </div>
           <div v-else-if="selectedLockedAmount > 0">
             You need to fund your account with
@@ -247,34 +243,35 @@
         <v-chip class="ma-1" label v-for="c in selectedContracts" :key="c.contract_id">
           {{ c.contract_id }}
         </v-chip>
-        <v-card-actions class="justify-end mb-1 mr-2">
-          <v-btn color="anchor" @click="unlockDialog = false"> Cancel </v-btn>
-          <v-tooltip
-            :text="
-              freeBalance < selectedLockedAmount
-                ? `You don't have enough balance to unlock your contract${selectedContracts.length > 1 ? `s` : ``}`
-                : `Unlock your contract${selectedContracts.length > 1 ? `s` : ``} from the grace period state.`
-            "
-            location="top center"
-          >
-            <template #activator="{ props }">
-              <div v-bind="props">
-                <v-btn
-                  :disabled="selectedLockedAmount > freeBalance"
-                  color="warning"
-                  class="ml-2"
-                  :loading="unlockContractLoading"
-                  @click="
-                    unlockContract([...selectedContracts.map(contract => contract.contract_id), ...rentContractIds])
-                  "
-                >
-                  Unlock
-                </v-btn>
-              </div>
-            </template>
-          </v-tooltip>
-        </v-card-actions>
+        <v-divider class="mt-3" />
       </v-card-text>
+      <v-card-actions class="justify-end mb-1 mr-2">
+        <v-btn color="anchor" @click="unlockDialog = false"> Cancel </v-btn>
+        <v-tooltip
+          :text="
+            freeBalance < selectedLockedAmount
+              ? `You don't have enough balance to unlock your contract${selectedContracts.length > 1 ? `s` : ``}`
+              : `Unlock your contract${selectedContracts.length > 1 ? `s` : ``} from the grace period state.`
+          "
+          location="top center"
+        >
+          <template #activator="{ props }">
+            <div v-bind="props">
+              <v-btn
+                :disabled="selectedLockedAmount > freeBalance"
+                color="warning"
+                class="ml-2"
+                :loading="unlockContractLoading"
+                @click="
+                  unlockContract([...selectedContracts.map(contract => contract.contract_id), ...rentContractIds])
+                "
+              >
+                Unlock
+              </v-btn>
+            </div>
+          </template>
+        </v-tooltip>
+      </v-card-actions>
     </v-card>
   </v-dialog>
 </template>
@@ -386,7 +383,7 @@ const selectedContracts = ref<NormalizedContract[]>([]);
 const selectedItem = ref();
 const profileManagerController = useProfileManagerController();
 const balance = profileManagerController.balance;
-const freeBalance = computed(() => balance.value?.free ?? 0 - (balance.value?.locked ?? 0));
+const freeBalance = computed(() => (balance.value?.free ?? 0) - (balance.value?.locked ?? 0));
 const unlockContractLoading = ref(false);
 const unlockDialog = ref(false);
 const selectedLockedContracts = computed(() => {

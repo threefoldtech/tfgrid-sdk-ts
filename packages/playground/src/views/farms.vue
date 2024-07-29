@@ -89,13 +89,13 @@
         loading-text="Loading Farms..."
         :items="farms"
         :items-length="totalFarms"
+        :items-per-page="size"
         :items-per-page-options="[
           { value: 5, title: '5' },
           { value: 10, title: '10' },
-          { value: 15, title: '15' },
+          { value: 20, title: '20' },
           { value: 50, title: '50' },
         ]"
-        :items-per-page="size"
         @update:items-per-page="
           size = $event;
           loadFarms();
@@ -105,7 +105,14 @@
           page = $event;
           loadFarms();
         "
-        :disable-sort="true"
+        @update:sort-by="
+          if ($event[0]) {
+            sortBy = $event[0].key == 'farmId' ? SortBy.FarmId : $event[0].key;
+            sortOrder = $event[0].order;
+            loadFarms();
+          }
+        "
+        @update:options="loadFarms()"
         @click:row="openSheet"
       >
         <template #[`item.usedPublicIp`]="{ item }">
@@ -147,7 +154,7 @@
 </template>
 
 <script lang="ts" setup>
-import type { Farm } from "@threefold/gridproxy_client";
+import { type Farm, SortBy, SortOrder } from "@threefold/gridproxy_client";
 import { ref } from "vue";
 
 import type { VDataTableHeader } from "@/types";
@@ -157,6 +164,8 @@ const farms = ref<Farm[]>();
 
 const page = ref(1);
 const size = ref(window.env.PAGE_SIZE);
+const sortBy = ref(SortBy.FarmId);
+const sortOrder = ref(SortOrder.Asc);
 const filters = ref({
   farmId: "",
   farmName: "",
@@ -172,6 +181,7 @@ async function loadFarms(retCount = false) {
   loading.value = true;
   farms.value = [];
   if (retCount) page.value = 1;
+
   try {
     const { count, data } = await getAllFarms({
       retCount,
@@ -180,6 +190,8 @@ async function loadFarms(retCount = false) {
       nameContains: filters.value.farmName || undefined,
       page: page.value,
       size: size.value,
+      sortBy: sortBy.value,
+      sortOrder: sortOrder.value,
     });
 
     if (data) {
@@ -213,8 +225,8 @@ const openDialog = (item: Farm) => {
 };
 
 const headers: VDataTableHeader = [
-  { title: "ID", key: "farmId", sortable: false },
-  { title: "Name", key: "name", sortable: false },
+  { title: "ID", key: "farmId", sortable: true },
+  { title: "Name", key: "name", sortable: true },
   {
     title: "Public IPs",
     key: "publicIps",

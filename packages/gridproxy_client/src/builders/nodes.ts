@@ -2,6 +2,10 @@ import { assertBoolean, assertId, assertIn, assertInt, assertNatural, assertPatt
 import { AbstractBuilder, BuilderMapper, BuilderMethods, BuilderValidator } from "./abstract_builder";
 import { ID_PATTERN, UnifiedNodeStatus } from "./gateways";
 
+export enum SortOrder {
+  Desc = "desc",
+  Asc = "asc",
+}
 export enum SortBy {
   NodeId = "node_id",
   FarmId = "farm_id",
@@ -26,11 +30,6 @@ export enum SortBy {
   ExtraFee = "extra_fee",
   Status = "status",
   FreeCRU = "free_cru",
-}
-
-export enum SortOrder {
-  Desc = "desc",
-  Asc = "asc",
 }
 
 export interface NodesQuery {

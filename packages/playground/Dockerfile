@@ -21,7 +21,7 @@ RUN yarn install
 RUN yarn lerna run build --no-private && yarn workspace @threefold/playground build
 
 # install nginx
-FROM nginx:1.19-alpine
+FROM nginx:1.27-alpine
 
 # serve the build files using nginx
 COPY --from=build /app/packages/playground/dist /usr/share/nginx/html

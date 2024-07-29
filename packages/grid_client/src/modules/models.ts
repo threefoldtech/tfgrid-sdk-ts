@@ -20,10 +20,11 @@ import {
   ValidateNested,
 } from "class-validator";
 
+import { IsAlphanumericExpectUnderscore } from "../helpers";
 import { Deployment } from "../zos/deployment";
 import { ZdbModes } from "../zos/zdb";
 import { blockchainType } from "./blockchainInterface";
-const NameLength = 15;
+const NameLength = 50;
 const FarmNameLength = 40;
 
 enum ContractStates {
@@ -97,11 +98,11 @@ class MyceliumNetworkModel {
 }
 
 class BaseGetDeleteModel {
-  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
+  @Expose() @IsString() @IsNotEmpty() @IsAlphanumericExpectUnderscore() @MaxLength(NameLength) name: string;
 }
 
 class MachineModel {
-  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
+  @Expose() @IsString() @IsNotEmpty() @MaxLength(NameLength) @IsAlphanumericExpectUnderscore() name: string;
   @Expose() @IsInt() @Min(1) node_id: number;
   @Expose() @IsOptional() @Type(() => DiskModel) @ValidateNested({ each: true }) disks?: DiskModel[];
   @Expose() @IsOptional() @Type(() => QSFSDiskModel) @ValidateNested({ each: true }) qsfs_disks?: QSFSDiskModel[];
@@ -124,7 +125,7 @@ class MachineModel {
 }
 
 class MachinesModel {
-  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
+  @Expose() @IsString() @IsNotEmpty() @IsAlphanumericExpectUnderscore() @MaxLength(NameLength) name: string;
   @Expose() @Type(() => NetworkModel) @ValidateNested() network: NetworkModel;
   @Expose() @Type(() => MachineModel) @ValidateNested({ each: true }) machines: MachineModel[];
   @Expose() @IsString() @IsOptional() metadata?: string;
@@ -137,7 +138,7 @@ class AddMachineModel extends MachineModel {
 }
 
 class DeleteMachineModel {
-  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
+  @Expose() @IsString() @IsNotEmpty() @IsAlphanumericExpectUnderscore() @MaxLength(NameLength) name: string;
   @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) deployment_name: string;
 }
 
@@ -233,7 +234,7 @@ class QSFSZDBGetModel extends BaseGetDeleteModel {}
 class QSFSZDBDeleteModel extends BaseGetDeleteModel {}
 
 class BaseGatewayNameModel {
-  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength + 20) name: string;
+  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
 }
 
 class GatewayFQDNModel extends BaseGatewayNameModel {
@@ -340,7 +341,7 @@ class GetServiceContractModel {
   @Expose() @IsInt() @Min(1) serviceId: number;
 }
 class NameContractGetModel {
-  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength + 20) name: string;
+  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
 }
 
 class NodeContractUpdateModel {
