@@ -135,10 +135,10 @@
 </template>
 
 <script lang="ts">
+import { StrKey } from "@stellar/stellar-sdk";
 import { type Farm, SortBy, SortOrder } from "@threefold/gridproxy_client";
 import { jsPDF } from "jspdf";
 import { debounce } from "lodash";
-import { StrKey } from "stellar-sdk";
 import { ref } from "vue";
 
 import { gridProxyClient } from "@/clients";

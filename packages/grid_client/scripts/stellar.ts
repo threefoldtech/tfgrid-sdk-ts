@@ -2,7 +2,6 @@ import {
   BlockchainDeleteModel,
   BlockchainGetModel,
   BlockchainSignModel,
-  StellarWalletBalanceByAddressModel,
   StellarWalletCreateModel,
   StellarWalletInitModel,
   StellarWalletTransferModel,
@@ -126,11 +125,7 @@ async function main() {
   //Get account
   const test_account = await get(grid3, getAccount);
 
-  //Get balance by account address
-  const getBalance: StellarWalletBalanceByAddressModel = {
-    address: test_account.public_key,
-  };
-  await balanceByAddress(grid3, { address: getBalance });
+  await balanceByAddress(grid3, { address: test_account.public_key });
 
   //Get account assets
   await assets(grid3, getAccount);
