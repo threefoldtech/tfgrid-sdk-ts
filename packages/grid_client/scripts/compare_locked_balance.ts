@@ -72,11 +72,6 @@ async function getUsersWithContracts(grid: GridClient) {
   return users;
 }
 
-async function getUserBalance(grid: GridClient, address: BalanceGetModel) {
-  const balance = await grid.balance.get(address);
-  return balance;
-}
-
 async function getContractsLockedAmount(grid: GridClient, contracts: Contract[]) {
   const contractLockDetails = await Promise.all(
     contracts.map(contract => grid.contracts.contractLock({ id: +contract.contractID })),
@@ -93,7 +88,7 @@ async function getContractsLockedAmount(grid: GridClient, contracts: Contract[])
 
   const unmatchedBalanceAccounts: any[] = [];
 
-  const balancePromises = users.map(user => getUserBalance(grid, { address: user.accountID }));
+  const balancePromises = users.map(user => grid.balance.get({ address: user.accountID }));
   const balances = await Promise.all(balancePromises);
 
   const contractsLockedAmountPromises = users.map(user => getContractsLockedAmount(grid, user.contracts));
