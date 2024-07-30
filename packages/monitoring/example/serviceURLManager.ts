@@ -11,7 +11,6 @@ const gridproxy = ["http://www.nonexistentgridProxy.com", "http://www.gooogleTF.
 const rmb = ["https://graphql.dev.grid.tf", "wss://relay.dev.grid.tf"];
 const graphql = ["https://graphql.dev.grid.tf/graphql"];
 const tfChain = ["wss://tfchain.dev.grid.tf/ws", "wss://www.nonExistentChain.com"];
-const mnemonics = "<MNEMONIC>";
 
 async function checkStacksAvailability<N extends boolean>(services: URLManagerOptions<N>) {
   try {
@@ -25,7 +24,7 @@ async function checkStacksAvailability<N extends boolean>(services: URLManagerOp
 
 checkStacksAvailability({
   retries: 3,
-  silent: false,
+  silent: true,
   services: [
     { service: new GridProxyMonitor(), URLs: gridproxy },
     { service: new GraphQLMonitor(), URLs: graphql },
@@ -35,5 +34,5 @@ checkStacksAvailability({
     },
     { service: new TFChainMonitor(), URLs: tfChain },
   ],
-  timeout: 10,
+  timeout: 2,
 });
