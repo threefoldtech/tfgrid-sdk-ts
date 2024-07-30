@@ -20,9 +20,9 @@ export class RMBMonitor implements ILivenessChecker {
   public update(param: { url: string }): void {
     this._url = param.url;
   }
-  async isAlive(): Promise<ServiceStatus> {
-    if (!this.url) throw new Error("Can't access before initialization");
-    const proxyUrl = this.url.replace("wss://relay", "https://gridproxy");
+  async isAlive(url = this.url): Promise<ServiceStatus> {
+    if (!url) throw new Error("Can't access before initialization");
+    const proxyUrl = url.replace("wss://relay", "https://gridproxy");
     try {
       const res = await fetch(proxyUrl + "/health");
       if (!res?.ok) throw Error(`HTTP Response Code: ${res?.status}`);

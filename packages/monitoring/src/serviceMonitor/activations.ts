@@ -19,8 +19,8 @@ export class ActivationMonitor implements ILivenessChecker {
   public update(param: { url: string }): void {
     this.url = param.url;
   }
-  async isAlive(): Promise<ServiceStatus> {
-    if (!this.url) throw new Error("Can't access before initialization");
-    return resolveServiceStatus(sendRequest(this.url, { method: "Get" }));
+  async isAlive(url = this.url): Promise<ServiceStatus> {
+    if (!url) throw new Error("Can't access before initialization");
+    return resolveServiceStatus(sendRequest(url, { method: "Get" }));
   }
 }

@@ -41,7 +41,7 @@ export interface ILivenessChecker<P = { url: string }> extends IServiceBase<P> {
    * Checks if the service is alive.
    * @returns {Promise<ServiceStatus>} A promise that resolves with the current status of the service.
    */
-  isAlive: () => Promise<ServiceStatus>;
+  isAlive: (url?: string) => Promise<ServiceStatus>;
 }
 
 export type ServiceStatus = {
