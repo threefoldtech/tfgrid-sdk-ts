@@ -1,10 +1,12 @@
-# Description
+# Billing
+
+## Description
 
 A couple of examples explaining how the billing works on the threefold grid for node and rent contracts.
 
 Some of the used resources should be updated whenever you try to do these calculations, these resources are the TFT price and Cloud Units(SU, CU).
 
-### Current TFT Price
+## Current TFT Price
 
 TFT price can be retrieved either from the dashboard, through the price available in the header
 
@@ -12,7 +14,7 @@ TFT price can be retrieved either from the dashboard, through the price availabl
 
 or directly through [stellar](https://stellar.expert/explorer/public/asset/TFT-GBOVQKJYHXRR3DX6NOX2RRYFRCUMSADGDESTDNBDS6CDVLGVESRTAC47-1?asset[]=TFT-GBOVQKJYHXRR3DX6NOX2RRYFRCUMSADGDESTDNBDS6CDVLGVESRTAC47-1&filter=markets&market=USDC-GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN-1).
 
-### Current Cloud Units value
+## Current Cloud Units value
 
 These can be retrieved directly from the chain. Through the [polakdot UI](https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Ftfchain.grid.tf#/chainstate).
 Navigate to `Chain State` then select `tfgridModule` as the query and select `pricingPolicies(u32): Option<PalletTfgridPricingPolicy>`.
@@ -23,11 +25,11 @@ Enter the value of the default pricing policy which is `1` or enter the value of
 
 > Values on chain are expressed as "units USD per hour" where "1 unit usd" == 10.000.000 (1e7)
 
-# Node Contract
+## Node Contract
 
 Lets assume that the resources for this deployment are:
 
-```
+```sh
 Cru: 2
 Mru: 2
 Sru: 15
@@ -38,7 +40,7 @@ Hru: 0
 
 The current CU value is `10 mUSD/h`, make sure that this value is updated according to the details section.
 
-```
+```sh
 CU = min( max(MRU/4, CRU/2), max(MRU/8, CRU), max(MRU/2, CRU/4) )
    = min( max(2/4, 2/2), max(2/8, 2), max(2/2, 2/4) )
    = min( max(0.5, 1), max(0.25, 2), max(1, 0.5) )
@@ -53,7 +55,7 @@ CU cost/hour = CU * CU pricing
 
 The current SU value is `5 mUSD/h`, make sure that this value is updated according to the details section.
 
-```
+```sh
 SU = HRU/1200 + SRU/200
    = 0/1200 + 15/200
    = 0 + 0.075
@@ -67,7 +69,7 @@ SU cost/hour = SU * SU pricing
 
 The current TFT value is `0.011 USD`, make sure that this value is updated according to the details section.
 
-```
+```sh
 Contract cost/hour = CU cost/hour + SU cost/hour
                    = 10 mUSD/h + 0.375 mUSD/h
                    = 10.375 mUSD/h
@@ -84,12 +86,12 @@ Before assuming that the price above is the final price, check first if your twi
 
 For this example lets assume that this twin has 18 months worth of TFTs staked, so the user will be applicable for a Gold discount level (60% discount).
 
-```
+```sh
 Cost with 60% discount = 0.943180875 * 0.4
                        = 0.37727235000000003 TFT/hour
 ```
 
-# Rent Contract
+## Rent Contract
 
 ### Getting the resources
 
@@ -97,13 +99,13 @@ For this example we will use node `83` on devnet as an example. You can get the 
 
 - gridproxy
 
-  Using the [nodes endpoint](https://gridproxy.grid.tf/swagger/index.html#/GridProxy/get_nodes__node_id_),then enter the desired node id after it. https://gridproxy.dev.grid.tf/nodes/83
+  Using the [nodes endpoint](https://gridproxy.grid.tf/swagger/index.html#/GridProxy/get_nodes__node_id_),then enter the desired node id after it. <https://gridproxy.dev.grid.tf/nodes/83>
 
 - graphql
 
-  Navigate to https://graphql.dev.grid.tf/graphql, then use the following query and replace the node id with the desired node id.
+  Navigate to <https://graphql.dev.grid.tf/graphql>, then use the following query and replace the node id with the desired node id.
 
-  ```
+  ```sh
   query MyQuery {
   nodes(where: {nodeID_eq: 83}) {
    id
@@ -128,18 +130,18 @@ For this example we will use node `83` on devnet as an example. You can get the 
 
 These are the resources for node `83` which will be used for the calculations.
 
-```
+```sh
 CRU = 4
 SRU = 119.24
 HRU = 1863
 MRU = 15.55
 ```
 
-### Calculating the CU
+### Calculating CU
 
 The current CU value is `10 mUSD/h`, make sure that this value is updated according to the details section.
 
-```
+```sh
 CU = min( max(MRU/4, CRU/2), max(MRU/8, CRU), max(MRU/2, CRU/4) )
    = min( max(15.55/4, 4/2), max(15.55/8, 4), max(15.55/2, 4/4) )
    = min( max(3.8875, 2), max(1.94375, 4), max(7.775, 1) )
@@ -150,11 +152,11 @@ CU cost/hour = CU * CU pricing
              = 38.875 mUSD/h
 ```
 
-### Calculating the SU
+### Calculating SU
 
 The current SU value is `5 mUSD/h`, make sure that this value is updated according to the details section.
 
-```
+```sh
 SU = HRU/1200 + SRU/200
    = 1863/1200 + 119.24/200
    = 1.5525 + 0.5962
@@ -164,11 +166,11 @@ SU cost/hour = SU * SU pricing
              = 10.7435 mUSD/h
 ```
 
-### Calculating the Billing Rate for the contract
+### Calculating Billing Rate for the contract
 
 The current TFT value is `0.011 USD`, make sure that this value is updated according to the details section.
 
-```
+```sh
 Contract cost/hour = CU cost/hour + SU cost/hour
                    = 38.875  mUSD/h + 10.7435 mUSD/h
                    = 49.6185 mUSD/h
@@ -182,7 +184,7 @@ Contract cost/hour = CU cost/hour + SU cost/hour
 
 There's a default `50%` discount for renting a node, this discount is not related to the staking discount. for more info please check the [manual](https://manual.grid.tf/cloud/cloudunits_pricing.html#dedicated-nodes).
 
-```
+```sh
 Cost with 50% discount = 35.725319999999996 * 0.5
                        = 17.862659999999998 TFT/month
 ```
@@ -193,12 +195,12 @@ Before assuming that the price above is the final price, check first if your twi
 
 For this example lets assume that this twin has 18 months worth of TFTs staked, so the user will be applicable for a Gold discount level (60% discount).
 
-```
+```sh
 Cost with 60% discount = 17.862659999999998 * 0.4
                        = 7.145064 TFT/month
 ```
 
-# Name Contract
+## Name Contract
 
 To calculate the cost of name contracts you can get its current value from the Pricing Policy.
 
@@ -206,7 +208,7 @@ To calculate the cost of name contracts you can get its current value from the P
 
 This value can then be converted to USD.
 
-```
+```sh
 uniqueName in USD = 2500 / 10000000
                   = 0.00025 USD/hour
 
@@ -214,24 +216,24 @@ uniqueName in USD = 2500 / 10000000
 
 And since the current TFT conversion rate is `1 USD = 100 TFT`
 
-```
+```sh
 uniqueName in TFT = 0.00025 * 100
                   = 0.025 TFT/hour
 ```
 
-### Applying the Staking discount
+### Applying Staking discount
 
 Before assuming that the price above is the final price, check first if your twin is applicable for any of the available staking discount levels. to understand more about discount levels please check the [manual](https://manual.grid.tf/cloud/cloudunits_pricing.html#staking-discount).
 
 For this example lets assume that this twin has 18 months worth of TFTs staked, so the user will be applicable for a Gold discount level (60% discount).
 
-```
+```sh
 Cost with 60% discount = 0.025 * 0.4
                        = 0.01 TFT/hour
 
 ```
 
-# Public IP
+## Public IP
 
 To calculate the cost of public ips you can get its current value from the Pricing Policy.
 
@@ -239,7 +241,7 @@ To calculate the cost of public ips you can get its current value from the Prici
 
 This value can then be converted to USD.
 
-```
+```s
 Public IP in USD = 40000 / 10000000
                   = 0.004 USD/hour
 
@@ -247,18 +249,18 @@ Public IP in USD = 40000 / 10000000
 
 And since the current TFT conversion rate is `1 USD = 100 TFT`
 
-```
+```sh
 Public IP in TFT = 0.004 * 100
                   = 0.4 TFT/hour
 ```
 
-### Applying the Staking discount
+### Applying Staking discount with public IP
 
 Before assuming that the price above is the final price, check first if your twin is applicable for any of the available staking discount levels. to understand more about discount levels please check the [manual](https://manual.grid.tf/cloud/cloudunits_pricing.html#staking-discount).
 
 For this example lets assume that this twin has 18 months worth of TFTs staked, so the user will be applicable for a Gold discount level (60% discount).
 
-```
+```SH
 Cost with 60% discount = 0.4 * 0.4
                        = 0.160 TFT/hour
 
@@ -266,7 +268,7 @@ Cost with 60% discount = 0.4 * 0.4
 
 > Note: this value gets added to the billing rate of your deployment.
 
-# Network Usage
+## Network Usage
 
 Network Usage is calculated for deployments with public ips, it's reprted every hour and its cost can be calculated approximatly as the value of data(sent + recieved) \* the NU value.
 
@@ -280,7 +282,7 @@ After than we can get the NU value. you can get its current value from the Prici
 
 This value can then be converted to USD.
 
-```
+```sh
 NU price in USD = 15000 / 10000000
                   = 0.0015 USD/hour
 
@@ -288,18 +290,18 @@ NU price in USD = 15000 / 10000000
 
 And since the current TFT conversion rate is `1 USD = 100 TFT`
 
-```
+```sh
 NU price in TFT = 0.0015 * 100
                   = 0.15 TFT/hour
 ```
 
-### Applying the Staking discount
+### Applying Staking discount with NU
 
 Before assuming that the price above is the final price, check first if your twin is applicable for any of the available staking discount levels. to understand more about discount levels please check the [manual](https://manual.grid.tf/cloud/cloudunits_pricing.html#staking-discount).
 
 For this example lets assume that this twin has 18 months worth of TFTs staked, so the user will be applicable for a Gold discount level (60% discount).
 
-```
+```sh
 Cost with 60% discount = 0.15 * 0.4
                        = 0.06 TFT/hour
 
@@ -307,7 +309,7 @@ Cost with 60% discount = 0.15 * 0.4
 
 As an example lets assume that we used a total of 10GB in the last hour, so the next hour the billing rate should be updated to:
 
-```
+```sh
 Total network usage = 10GB * 0.06 TFT/hour
                     = 0.6 TFT/hour
 
@@ -319,7 +321,7 @@ Billing rate in the next hour should be: actual cost of the deployment + Total N
 
 And since the billing rate gets updated hourly, you can check the billing history from [graphql](https://graphql.dev.grid.tf/graphql) using the following query:
 
-```
+```sh
 query MyQuery {
   contractBillReports(where: {contractID_eq: ""}) {
     contractID
