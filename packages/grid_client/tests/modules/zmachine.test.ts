@@ -1,13 +1,14 @@
 import { ComputeCapacity, Mount, Zmachine, ZmachineNetwork } from "../../src";
 
 const zmachine = new Zmachine();
+const computeCapacity = new ComputeCapacity();
+const network = new ZmachineNetwork();
+const disks = new Mount();
 
 beforeAll(() => {
-  const computeCapacity = new ComputeCapacity();
   computeCapacity.cpu = 1;
-  computeCapacity.memory = 5;
+  computeCapacity.memory = 256 * 1024 ** 2;
 
-  const network = new ZmachineNetwork();
   network.planetary = true;
   network.public_ip = "10.249.0.0/16";
   network.interfaces = [
@@ -19,7 +20,6 @@ beforeAll(() => {
 
   const rootfs_size = 2;
 
-  const disks = new Mount();
   disks.name = "zdisk";
   disks.mountpoint = "/mnt/data";
 
@@ -41,15 +41,12 @@ describe("Zmachine Class Tests", () => {
 
   it("should correctly compute the challenge string", () => {
     const expectedChallenge =
-      "https://hub.grid.tf/tf-official-vms/ubuntu-22.04.flist" +
-      "10.249.0.0/16" +
-      "true" +
-      "znetwork" +
-      "10.20.2.22" +
-      "14748364815" +
-      "zdisk" +
-      "/mnt/data" +
-      "/sbin/zinit init";
+      zmachine.flist +
+      network.challenge() +
+      zmachine.size +
+      computeCapacity.challenge() +
+      zmachine.mounts[0].challenge() +
+      zmachine.entrypoint;
 
     expect(zmachine.challenge()).toBe(expectedChallenge);
   });
