@@ -338,7 +338,6 @@ export default {
     const discountTableItems = ref<discountItems[]>([]);
     const tftMarketPrice = ref<number>(0);
     const calculator = new Calculator(new QueryClient(window.env.SUBSTRATE_URL));
-    const inGracePeriod = ref<boolean>(false);
     const rentedByUser = computed(() => {
       return props.node?.rentedByTwinId === profileManager.profile?.twinId;
     });
@@ -356,22 +355,10 @@ export default {
       return imageUrl;
     });
 
-    async function checkContract() {
-      if (props.node && props.node?.rentContractId) {
-        const { state } = await gridStore.grid.contracts.get({
-          id: props.node?.rentContractId,
-        });
-        if (state.gracePeriod) {
-          inGracePeriod.value = true;
-        }
-      }
-    }
-
     onMounted(async () => {
       await getLastDeploymentTime();
       tftMarketPrice.value = await calculator.tftPrice();
       tftsNeeded();
-      await checkContract();
     });
 
     async function refreshStakingDiscount() {
@@ -651,7 +638,6 @@ export default {
       discountTableItems,
       lastDeploymentTime,
       loadingdiscountTableItems,
-      inGracePeriod,
       gridStore,
     };
   },
