@@ -98,7 +98,6 @@ export class ServiceUrlManager<N extends boolean = false> {
   async isAliveWithTimeout(url: string, service: ILivenessChecker, timeout: number): Promise<string> {
     const status = await this.pingService(service, timeout, url);
     if (status?.alive) {
-      monitorEvents.log(`${service.name} on ${url} Success!`, "green");
       return url;
     }
     if (status?.error) monitorEvents.log(`${service.name}: ${url} ${status.error}`, "gray");
@@ -129,7 +128,12 @@ export class ServiceUrlManager<N extends boolean = false> {
         requestPromises.push(this.isAliveWithTimeout(urls[i], service, timeout));
       }
       const result = await Promise.allSettled(requestPromises);
-      for (const url of result) if (url.status == "fulfilled") return url.value;
+      for (const url of result)
+        if (url.status == "fulfilled") {
+          monitorEvents.log(`${service.name} on ${url.value} Success!`, "green");
+
+          return url.value;
+        }
     }
 
     return this.handleErrorsOnSilentMode(`Failed to reach ${service.name} on all provided stacks`) as ServiceUrl<N>;
