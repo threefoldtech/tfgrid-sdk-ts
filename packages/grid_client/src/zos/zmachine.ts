@@ -2,17 +2,16 @@ import { Expose, Transform, Type } from "class-transformer";
 import {
   IsBoolean,
   IsDefined,
-  isDefined,
   IsInt,
   IsIP,
   IsNotEmpty,
   IsOptional,
   IsString,
   Max,
-  Min,
   ValidateNested,
 } from "class-validator";
 
+import { ValidateMembers } from "../helpers/validator";
 import { ComputeCapacity } from "./computecapacity";
 import { WorkloadData, WorkloadDataResult } from "./workload_base";
 
@@ -58,6 +57,7 @@ class Mount {
   }
 }
 
+@ValidateMembers()
 class Zmachine extends WorkloadData {
   @Expose() @IsString() @IsNotEmpty() flist: string;
   @Expose() @Type(() => ZmachineNetwork) @ValidateNested() network: ZmachineNetwork;
