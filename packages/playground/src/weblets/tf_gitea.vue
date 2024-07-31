@@ -10,7 +10,7 @@
     :valid-filters="selectionDetails?.validFilters"
     title-image="images/icons/gitea.png"
   >
-    <template #title>Deploy a Gitea Machine </template>
+    <template #title>Deploy a Gitea Instance</template>
 
     <d-tabs
       :tabs="[

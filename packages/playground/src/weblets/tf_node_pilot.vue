@@ -10,7 +10,7 @@
     :valid-filters="selectionDetails?.validFilters"
     title-image="images/icons/vm.png"
   >
-    <template #title>Deploy a Node Pilot</template>
+    <template #title>Deploy a Node Pilot Instance</template>
     <d-tabs :tabs="[{ title: 'Config', value: 'config' }]">
       <input-validator
         :value="name"

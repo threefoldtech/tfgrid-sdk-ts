@@ -163,10 +163,10 @@ async function deploy() {
     });
 
     layout.value.reloadDeploymentsList();
-    layout.value.setStatus("success", "Successfully deployed a caprover instance.");
+    layout.value.setStatus("success", "Successfully deployed a Caprover instance.");
     layout.value.openDialog(vm, deploymentListEnvironments.caprover);
   } catch (e) {
-    layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a caprover instance."));
+    layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Caprover instance."));
   }
 }
 
