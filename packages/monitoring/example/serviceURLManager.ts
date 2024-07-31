@@ -7,10 +7,10 @@ import {
   URLManagerOptions,
 } from "../src";
 
-const gridproxy = ["http://www.nonexistentgridProxy.com", "http://www.gooogleTF.com", "https://gridproxy.dev.grid.tf/"];
-const rmb = ["https://graphql.dev.grid.tf", "wss://relay.dev.grid.tf"];
+const gridproxy = ["https://gridproxy.dev.grid.tf/"];
+const rmb = ["https://graphql.dev.grid.tf", "wss://relay.dev.grid.tf", "wss://relay.02.dev.grid.tf"];
 const graphql = ["https://graphql.dev.grid.tf/graphql"];
-const tfChain = ["wss://tfchain.dev.grid.tf/ws", "wss://www.nonExistentChain.com"];
+const tfChain = ["wss://tfchain.dev.grid.tf/ws"];
 
 async function checkStacksAvailability<N extends boolean>(services: URLManagerOptions<N>) {
   try {
