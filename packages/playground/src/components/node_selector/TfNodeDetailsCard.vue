@@ -14,10 +14,11 @@
     :flat="flat"
     v-bind="{
       onClick: selectable
-        ? () => {
+        ? async () => {
             if (status === 'Init' && node) {
               $emit('node:select', (node as NodeInfo));
             }
+            await validateRentContract(gridStore, node as NodeInfo);
           }
         : undefined,
     }"
@@ -25,7 +26,6 @@
     <template #loader>
       <VProgressLinear indeterminate color="primary" height="2" v-if="status === 'Pending'" />
     </template>
-
     <template #prepend>
       <VTooltip :text="node?.location.country" :disabled="!node">
         <template #activator="{ props }">
@@ -309,6 +309,7 @@ import { calculator as Calculator } from "../../../../grid_client/dist/es6";
 import { useGrid, useProfileManager } from "../../stores";
 import formatResourceSize from "../../utils/format_resource_size";
 import { toGigaBytes } from "../../utils/helpers";
+import { validateRentContract } from "../../utils/nodeSelector";
 import { normalizePrice } from "../../utils/pricing_calculator";
 import ResourceDetails from "./node_details_internals/ResourceDetails.vue";
 
@@ -337,6 +338,7 @@ export default {
     const discountTableItems = ref<discountItems[]>([]);
     const tftMarketPrice = ref<number>(0);
     const calculator = new Calculator(new QueryClient(window.env.SUBSTRATE_URL));
+    const inGracePeriod = ref<boolean>(false);
     const rentedByUser = computed(() => {
       return props.node?.rentedByTwinId === profileManager.profile?.twinId;
     });
@@ -354,10 +356,22 @@ export default {
       return imageUrl;
     });
 
+    async function checkContract() {
+      if (props.node && props.node?.rentContractId) {
+        const { state } = await gridStore.grid.contracts.get({
+          id: props.node?.rentContractId,
+        });
+        if (state.gracePeriod) {
+          inGracePeriod.value = true;
+        }
+      }
+    }
+
     onMounted(async () => {
       await getLastDeploymentTime();
       tftMarketPrice.value = await calculator.tftPrice();
       tftsNeeded();
+      await checkContract();
     });
 
     async function refreshStakingDiscount() {
@@ -633,9 +647,12 @@ export default {
       formatSpeed,
       onReserveChange,
       getNodeStatusColor,
+      validateRentContract,
       discountTableItems,
       lastDeploymentTime,
       loadingdiscountTableItems,
+      inGracePeriod,
+      gridStore,
     };
   },
 };
