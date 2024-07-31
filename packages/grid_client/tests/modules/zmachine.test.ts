@@ -1,6 +1,8 @@
+import { plainToClass } from "class-transformer";
+
 import { ComputeCapacity, Mount, Zmachine, ZmachineNetwork } from "../../src";
 
-const zmachine = new Zmachine();
+let zmachine = new Zmachine();
 const computeCapacity = new ComputeCapacity();
 const network = new ZmachineNetwork();
 const disks = new Mount();
@@ -51,11 +53,32 @@ describe("Zmachine Class Tests", () => {
     expect(zmachine.challenge()).toBe(expectedChallenge);
   });
 
-  it("should fail validation for missing required fields", () => {
+  it("should fail validation for entering invalid data", () => {
     const result = () => {
       zmachine.flist = "";
       zmachine.entrypoint = "";
+      zmachine.network.public_ip = "";
     };
+    expect(result).toThrow();
+  });
+
+  it("should fail if zmachine is parsed to an invalid object", () => {
+    const invalidZmachine = `{
+      "flist": "",
+      "network": "invalid_network_object",
+      "size": "not_a_number",
+      "compute_capacity": {},
+      "mounts": "not_an_array",
+      "entrypoint": 123,
+      "env": "not_an_object",
+      "corex": "not_a_boolean",
+      "gpu": [123, "valid_string", false]
+    }`;
+
+    const result = () => {
+      zmachine = plainToClass(Zmachine, JSON.parse(invalidZmachine));
+    };
+
     expect(result).toThrow();
   });
 });
