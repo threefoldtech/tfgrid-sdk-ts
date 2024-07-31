@@ -81,54 +81,56 @@ export class ServiceUrlManager<N extends boolean = false> {
     throw new Error(errorMsg);
   }
   /**
-   * Checks if a service is alive with retries.
+   * Checks if a service is alive with a specified timeout for each attempt.
    *
-   * This method attempts to check the availability of a service at a given URL, retrying the check
-   * a specified number of times if the service is not reachable. If the service becomes reachable,
-   * the URL is returned. Otherwise, an error is thrown after the maximum number of retries.
+   * This method attempts to check the availability of a service at a given URL, using the provided
+   * pingService with a specified timeout for each attempt. If the service becomes reachable,
+   * the URL is returned. Otherwise, an error is thrown if the service cannot be reached.
    *
    * @param {string} url - The URL of the service to check.
    * @param {ILivenessChecker} service - An instance of ILivenessChecker used to check the service's liveness.
+   * @param {number} timeout - The timeout in seconds for each liveness check attempt.
    *
    * @returns {Promise<string>} - A promise that resolves with the URL if the service is reachable within the retries.
    *
    * @throws {ConnectionError} - Throws an error if the service cannot be reached after the maximum number of retries.
    */
-  async isAliveWithRetries(url: string, service: ILivenessChecker): Promise<string> {
-    for (let retry = 0; retry < this.retries; retry++) {
-      const status = await this.pingService(service, this.timeout + retry * this.timeout, url);
-      if (status?.alive) {
-        monitorEvents.log(`${service.name} on ${url} Success!`, "green");
-        return url;
-      }
-      if (status?.error) monitorEvents.log(`${service.name}: ${url} ${status.error}`, "gray");
+  async isAliveWithTimeout(url: string, service: ILivenessChecker, timeout: number): Promise<string> {
+    const status = await this.pingService(service, timeout, url);
+    if (status?.alive) {
+      monitorEvents.log(`${service.name} on ${url} Success!`, "green");
+      return url;
     }
-    throw new ConnectionError(`${service.name}: Can't reach ${url} after 3 retries`);
+    if (status?.error) monitorEvents.log(`${service.name}: ${url} ${status.error}`, "gray");
+    throw new ConnectionError(`${service.name}: Can't reach ${url}`);
   }
 
   /**
-   * Attempts to find a reachable service URL from a list of provided URLs.
+   * Attempts to find a reachable service URL from a list of provided URLs with retries.
    *
-   * This method iterates through the list of URLs, repeatedly pinging the service to
-   * check if it is alive. If a reachable URL is found, it is returned. If all URLs
-   * are exhausted without finding a reachable service, an error is thrown.
+   * This method checks the availability of each URL in the provided list using the specified
+   * liveness checker. It retries the check a specified number of times, increasing the timeout
+   * with each retry. It returns the first available URL in the list. If no URL is reachable after
+   * the maximum number of retries, an error is handled in silent mode.
    *
    * @param {string[]} urls - An array of service URLs to check for reachability.
-   * @param {ILivenessChecker} service - An instance of ILivenessChecker that provides methods
-   * to check the service's liveness and manage service URLs.
+   * @param {ILivenessChecker} service - An instance of ILivenessChecker used to check each service's liveness.
    *
-   * @returns {Promise<string>} - A promise that resolves with the reachable service URL.
+   * @returns {Promise<ServiceUrl<N>>} - A promise that resolves with the first available URL if any are reachable.
    *
-   * @throws {Error} - Throws an error if no reachable service URL is found after checking all URLs.
-   *
+   * @throws {Error} - Throws an error if none of the URLs are reachable after the maximum number of retries.
    */
+
   async getAvailableStack(urls: string[], service: ILivenessChecker): Promise<ServiceUrl<N>> {
-    const requestPromises: Promise<string>[] = [];
-    for (let i = 0; i < urls.length; i++) {
-      requestPromises.push(this.isAliveWithRetries(urls[i], service));
+    for (let retry = 0; retry < this.retries; retry++) {
+      const requestPromises: Promise<string>[] = [];
+      const timeout = this.timeout + this.timeout * retry;
+      for (let i = 0; i < urls.length; i++) {
+        requestPromises.push(this.isAliveWithTimeout(urls[i], service, timeout));
+      }
+      const result = await Promise.allSettled(requestPromises);
+      for (const url of result) if (url.status == "fulfilled") return url.value;
     }
-    const result = await Promise.allSettled(requestPromises);
-    for (const url of result) if (url.status == "fulfilled") return url.value;
 
     return this.handleErrorsOnSilentMode(`Failed to reach ${service.name} on all provided stacks`) as ServiceUrl<N>;
   }
