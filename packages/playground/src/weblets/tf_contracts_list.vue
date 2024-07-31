@@ -81,7 +81,7 @@
     </template>
   </v-card>
   <!-- locked amount Dialog -->
-  <v-dialog width="500" v-model="unlockDialog" v-if="lockedContracts?.totalAmountLocked" attach="#modals">
+  <v-dialog width="800" v-model="unlockDialog" v-if="lockedContracts?.totalAmountLocked" attach="#modals">
     <v-card>
       <v-card-title class="bg-primary">
         Unlock All Contracts
@@ -101,31 +101,30 @@
           </template>
         </v-tooltip>
       </v-card-title>
-      <v-card-text>
-        <v-container>
-          <v-row v-if="loadingLockDetails" class="d-flex flex-column justify-center align-center py-4">
-            <v-progress-circular indeterminate />
-            <div class="text-subtitle-2 pt-2">Loading contracts lock details</div>
-          </v-row>
-          <v-row class="d-flex" v-else>
-            <v-alert class="ma-4" type="warning" variant="tonal">
-              <div v-if="lockedContracts?.totalAmountLocked < freeBalance" class="font-weigh-black">
-                You have enough balance to unlock your contracts; this will cost you around
-                {{ Math.ceil(lockedContracts?.totalAmountLocked) }} TFTs.
-              </div>
-              <div v-else>
-                You need to fund your account with
-                <span class="font-weight-black">
-                  {{ Math.ceil(lockedContracts?.totalAmountLocked - freeBalance) }}
-                  TFTs
-                </span>
-                to resume your contracts
-              </div>
-            </v-alert>
-          </v-row>
-        </v-container>
+      <v-card-text v-if="loadingLockDetails">
+        <v-progress-circular indeterminate />
+
+        <div class="text-subtitle-2">Loading contracts lock details</div>
+        <v-divider class="mt-3" />
       </v-card-text>
-      <v-card-actions class="justify-end my-1 mr-2">
+      <v-card-text v-else>
+        <v-alert class="my-4" type="warning" variant="tonal">
+          <div v-if="lockedContracts?.totalAmountLocked < freeBalance">
+            You have enough balance to unlock your contracts, this will cost you around
+            <span class="font-weight-bold">{{ Math.ceil(lockedContracts?.totalAmountLocked) }}</span> TFTs.
+          </div>
+          <div v-else>
+            You need to fund your account with
+            <span class="font-weight-bold">
+              {{ Math.ceil(lockedContracts?.totalAmountLocked - freeBalance) }}
+              TFTs
+            </span>
+            to resume your contracts
+          </div>
+        </v-alert>
+        <v-divider class="mt-3" />
+      </v-card-text>
+      <v-card-actions class="justify-end mb-1 mr-2">
         <v-btn color="anchor" @click="unlockDialog = false"> Close </v-btn>
         <v-tooltip
           :text="
