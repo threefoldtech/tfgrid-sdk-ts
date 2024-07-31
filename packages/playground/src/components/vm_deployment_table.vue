@@ -89,14 +89,6 @@
         {{ item.publicIP?.ip?.split("/")?.[0] || item.publicIP?.ip || "-" }}
       </template>
 
-      <template #[`item.ipv6`]="{ item }">
-        {{ item.publicIP?.ip6.replace(/\/64$/, "") || "-" }}
-      </template>
-
-      <template #[`item.planetary`]="{ item }">
-        {{ item.planetary || "-" }}
-      </template>
-
       <template #[`item.mycelium`]="{ item }">
         {{ item.myceliumIP || "-" }}
       </template>
@@ -256,7 +248,7 @@ const filteredHeaders = computed(() => {
       sortable: false,
       children: [
         { title: "Public IPv4", key: "ipv4", sortable: false },
-        { title: "Planetary IP", key: "planetary", sortable: false },
+        { title: "Mycelium IP", key: "mycelium", sortable: false },
       ],
     },
     { title: "Flist", key: "flist" },
@@ -375,7 +367,11 @@ function updateItem(newItem: any) {
 }
 
 function renameFlist(url: string) {
-  return url.substring(url.lastIndexOf("/") + 1, url.lastIndexOf("."));
+  if (url.includes("tf-official")) {
+    return url.substring(url.lastIndexOf("/") + 1, url.lastIndexOf("."));
+  }
+
+  return url.length > 40 ? url.substring(0, 40) + "..." : url;
 }
 
 defineExpose({ loadDeployments });

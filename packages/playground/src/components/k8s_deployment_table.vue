@@ -78,7 +78,7 @@
           sortable: false,
           children: [
             { title: 'Public IPv4', key: 'ipv4', sortable: false },
-            { title: 'Planetary IP', key: 'planetary', sortable: false },
+            { title: 'Mycelium IP', key: 'mycelium', sortable: false },
           ],
         },
         { title: 'Workers', key: 'workersLength' },
