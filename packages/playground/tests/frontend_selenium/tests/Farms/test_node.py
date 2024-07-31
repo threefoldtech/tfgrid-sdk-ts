@@ -149,10 +149,10 @@ def test_config_validation(browser):
     assert node_page.add_config_input( "1.1.1.1/16", '1.1.1.2', '::2/16', '::1', 'tf.grid').is_enabled() == True
     for case in cases:
         node_page.add_config_input(case, 0, 0, 0, 0)
-        assert node_page.wait_for('IP is not valid.')
+        assert node_page.wait_for('IPv4 is not valid.')
         assert node_page.get_save_button().is_enabled()==False
     node_page.add_config_input( '255.0.0.1/32', 0, 0, 0, 0)
-    assert node_page.wait_for('IP is not public')
+    assert node_page.wait_for('Private IP addresses are not allowed.')
     assert node_page.get_save_button().is_enabled()==False
     assert node_page.add_config_input( "1.1.1.1/16", '1.1.1.2', '::2/16', '::1', 'tf.grid').is_enabled() == True
     cases = [generate_inavalid_gateway(), '1.0.0.',  '1:1:1:1', '522.255.255.255', '.239.35.78', '1.1.1.1/16', '239.15.35.78.5', ' ', '*.#.@.!|+-']
@@ -160,9 +160,6 @@ def test_config_validation(browser):
         node_page.add_config_input( 0, case, 0, 0, 0)
         assert node_page.wait_for('Gateway is not valid.')
         assert node_page.get_save_button().is_enabled()==False
-    node_page.add_config_input( 0, '255.0.0.1', 0, 0, 0)
-    assert node_page.wait_for('Gateway is not public')
-    assert node_page.get_save_button().is_enabled()==False
     assert node_page.add_config_input( "1.1.1.1/16", '1.1.1.2', '::2/16', '::1', 'tf.grid').is_enabled() == True
     cases = [' ', '::g', '::+', ':: /6  5', '1:2:3', ':a', '1:2:3:4:5:6:7:8:9', generate_string(), generate_leters()]
     for case in cases: #'::2/0',
@@ -170,7 +167,7 @@ def test_config_validation(browser):
         assert node_page.wait_for('IP is not valid.')
         assert node_page.get_save_button().is_enabled()==False
     node_page.add_config_input( 0, 0, 'fd12:3456:789a:1::/64', 0, 0)
-    assert node_page.wait_for('IP is not public')
+    assert node_page.wait_for('Private IP addresses are not allowed.')
     assert node_page.get_save_button().is_enabled()==False
     assert node_page.add_config_input( "1.1.1.1/16", '1.1.1.2', '::2/16', '::1', 'tf.grid').is_enabled() == True
     cases = [' ', '::g', '1:2:3', ':a', '1:2:3:4:5:6:7:8:9', generate_string(), generate_leters()]
@@ -178,9 +175,6 @@ def test_config_validation(browser):
         node_page.add_config_input( 0, 0, 0, case, 0)
         assert node_page.wait_for('Gateway is not valid.')
         assert node_page.get_save_button().is_enabled()==False
-    node_page.add_config_input( 0, 0, 0, 'fd12:3456:789a:1::1', 0)
-    assert node_page.wait_for('Gateway is not public')
-    assert node_page.get_save_button().is_enabled()==False
     assert node_page.add_config_input( "1.1.1.1/16", '1.1.1.2', '::2/16', '::1', 'tf.grid').is_enabled() == True
     cases = [generate_inavalid_ip(), generate_inavalid_gateway(), generate_string(), generate_leters(), '     ', '.', '/', 'q', '1', 'ww', 'ww/ww', '22.22']
     for case in cases:

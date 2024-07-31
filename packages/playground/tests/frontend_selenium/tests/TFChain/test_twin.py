@@ -48,7 +48,7 @@ def test_edit_twin_email(browser):
     """
     twin_page = before_test_setup(browser)
     email = generate_email()
-    twin_page.press_edit_btn()
+    assert twin_page.press_edit_btn() == get_email()
     twin_page.edit_twin_email(email)
     cases = [generate_string(), '123456', '!)$%&@#(+?', '1@c@vva.ca', '1f@test,com', '@test.com', 'test@.com', 'test@com']
     for case in cases:
