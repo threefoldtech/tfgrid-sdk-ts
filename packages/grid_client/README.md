@@ -45,7 +45,8 @@ git clone https://github.com/threefoldtech/tfgrid-sdk-ts.git
 yarn install
 ```
 
-**Note: If the used Python version is 3.12 or later, you need to install setuptools.**
+> **Note:** If the used Python version is 3.12 or later, you need to install setuptools.
+
 
 ```bash
 python3 -m pip install setuptools
