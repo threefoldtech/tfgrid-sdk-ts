@@ -126,8 +126,8 @@ const profileManager = useProfileManager();
 
 function finalize(deployment: any) {
   layout.value.reloadDeploymentsList();
-  layout.value.setStatus("success", "Successfully deployed a Node Pilot instance.");
-  layout.value.openDialog(deployment, deploymentListEnvironments.nodepilot);
+  layout.value.setStatus("success", "Successfully deployed a Gitea instance.");
+  layout.value.openDialog(deployment, deploymentListEnvironments.gitea);
 }
 
 async function deploy() {
