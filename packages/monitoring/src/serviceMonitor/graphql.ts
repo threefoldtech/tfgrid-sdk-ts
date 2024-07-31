@@ -20,10 +20,10 @@ export class GraphQLMonitor implements ILivenessChecker {
     this._url = param.url;
   }
 
-  async isAlive(): Promise<ServiceStatus> {
-    if (!this.url) throw new Error("Can't access before initialization");
+  async isAlive(url = this.url): Promise<ServiceStatus> {
+    if (!url) throw new Error("Can't access before initialization");
     return resolveServiceStatus(
-      sendRequest(this.url, {
+      sendRequest(url, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
