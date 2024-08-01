@@ -11,7 +11,7 @@
     :valid-filters="selectionDetails?.validFilters"
     title-image="images/icons/tfrobot.png"
   >
-    <template #title>Deploy a TFRobot Machine </template>
+    <template #title>Deploy a TFRobot Instance </template>
 
     <d-tabs
       :tabs="[
