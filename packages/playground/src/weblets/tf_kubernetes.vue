@@ -131,7 +131,7 @@ async function deploy() {
     layout.value.setStatus("success", "Successfully deployed a Kubernetes cluster.");
     layout.value.openDialog(k8s, deploymentListEnvironments.k8s);
   } catch (e) {
-    layout.value.setStatus("failed", normalizeError(e, "Failed to deploy Kubernetes cluster."));
+    layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Kubernetes cluster."));
   }
 }
 
