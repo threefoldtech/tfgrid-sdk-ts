@@ -11,6 +11,7 @@ import { ClientOptions, GridClientConfig, NetworkEnv } from "./config";
 import { migrateKeysEncryption, send, toHexSeed } from "./helpers";
 import { isExposed } from "./helpers/expose";
 import { formatErrorMessage, generateString } from "./helpers/utils";
+import { getAvailableURLs } from "./manageURLs";
 import * as modules from "./modules/index";
 import { appPath } from "./storage/backend";
 import { BackendStorageType } from "./storage/backend";
@@ -85,7 +86,16 @@ class GridClient {
       throw new GridClientError(`Unknown NETWORK selected! Acceptable networks are [dev | qa | test | main ]`);
     }
   }
+  /**
+   * Sets the missing service URLs by getting the available stacks using `ServiceURLManager` and updating them in the client options.
+   *
+   * @returns {Promise<void>} A promise that resolves when the client options got updated.
+   */
+  async setServiceURLs(): Promise<void> {
+    await getAvailableURLs(this.clientOptions);
+  }
   async connect(): Promise<void> {
+    await this.setServiceURLs();
     const urls = this.getDefaultUrls(this.clientOptions.network);
 
     this.tfclient = new TFClient(
