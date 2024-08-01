@@ -1,12 +1,15 @@
 import { Expose, Transform } from "class-transformer";
 import { IsBoolean, IsEnum, IsInt, IsNotEmpty, IsString, Min } from "class-validator";
 
+import { ValidateMembers } from "../helpers";
 import { WorkloadData, WorkloadDataResult } from "./workload_base";
 
 enum ZdbModes {
   seq = "seq",
   user = "user",
 }
+
+@ValidateMembers()
 class Zdb extends WorkloadData {
   @Expose() @IsInt() @Min(1) size: number; // in bytes
   @Expose() @Transform(({ value }) => ZdbModes[value]) @IsEnum(ZdbModes) mode: ZdbModes = ZdbModes.seq;

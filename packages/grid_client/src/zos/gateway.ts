@@ -1,8 +1,10 @@
 import { Expose } from "class-transformer";
 import { ArrayNotEmpty, IsBoolean, IsFQDN, IsNotEmpty, IsOptional, IsString, IsUrl } from "class-validator";
 
+import { ValidateMembers } from "../helpers";
 import { WorkloadData, WorkloadDataResult } from "./workload_base";
 
+@ValidateMembers()
 class GatewayFQDNProxy extends WorkloadData {
   @Expose() @IsFQDN() fqdn: string;
   @Expose() @IsBoolean() tls_passthrough: boolean;
@@ -20,7 +22,7 @@ class GatewayFQDNProxy extends WorkloadData {
     return out;
   }
 }
-
+@ValidateMembers()
 class GatewayNameProxy extends WorkloadData {
   @Expose() @IsString() @IsNotEmpty() name: string;
   @Expose() @IsBoolean() tls_passthrough: boolean;

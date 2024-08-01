@@ -136,7 +136,7 @@ const grid = gridStore.client as GridClient;
 
 function finalize(deployment: any) {
   layout.value.reloadDeploymentsList();
-  layout.value.setStatus("success", "Successfully deployed a peertube instance.");
+  layout.value.setStatus("success", "Successfully deployed a Peertube instance.");
   layout.value.openDialog(deployment, deploymentListEnvironments.peertube);
 }
 async function deploy() {
@@ -198,7 +198,7 @@ async function deploy() {
       ],
     });
   } catch (e) {
-    return layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a peertube instance."));
+    return layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Peertube instance."));
   }
 
   if (!selectionDetails.value?.domain?.enableSelectedDomain) {
@@ -222,7 +222,7 @@ async function deploy() {
     layout.value.setStatus("deploy", "Rollbacking back due to fail to deploy gateway...");
 
     await rollbackDeployment(grid!, name.value);
-    layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a peertube instance."));
+    layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Peertube instance."));
   }
 }
 

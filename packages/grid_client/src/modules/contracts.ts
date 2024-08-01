@@ -1,8 +1,14 @@
-import { Contract } from "@threefold/tfchain_client";
 import { DeploymentKeyDeletionError, InsufficientBalanceError } from "@threefold/types";
 import * as PATH from "path";
 
-import { GqlNameContract, GqlNodeContract, GqlRentContract, LockContracts } from "../clients/tf-grid";
+import {
+  GqlNameContract,
+  GqlNodeContract,
+  GqlRentContract,
+  ListContractByAddressOptions,
+  ListContractByTwinIdOptions,
+  LockContracts,
+} from "../clients/tf-grid";
 import { TFClient } from "../clients/tf-grid/client";
 import { GridClientConfig } from "../config";
 import { events } from "../helpers/events";
@@ -17,8 +23,6 @@ import {
   ContractGetByNodeIdAndHashModel,
   ContractGetModel,
   ContractLockModel,
-  ContractsByAddress,
-  ContractsByTwinId,
   ContractState,
   ContractStates,
   CreateServiceContractModel,
@@ -164,16 +168,21 @@ class Contracts {
 
   @expose
   @validateInput
-  async listContractsByTwinId(options: ContractsByTwinId) {
-    return this.client.contracts.listContractsByTwinId({ graphqlURL: this.config.graphqlURL, twinId: options.twinId });
+  async listContractsByTwinId(options: ListContractByTwinIdOptions) {
+    return this.client.contracts.listContractsByTwinId({
+      graphqlURL: this.config.graphqlURL,
+      twinId: options.twinId,
+      stateList: options.stateList,
+    });
   }
 
   @expose
   @validateInput
-  async listContractsByAddress(options: ContractsByAddress) {
+  async listContractsByAddress(options: ListContractByAddressOptions) {
     return this.client.contracts.listContractsByAddress({
       graphqlURL: this.config.graphqlURL,
-      accountId: options.address,
+      accountId: options.accountId,
+      stateList: options.stateList,
     });
   }
 

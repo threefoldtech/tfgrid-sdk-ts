@@ -120,7 +120,7 @@ const grid = gridStore.client as GridClient;
 
 function finalize(deployment: any) {
   layout.value.reloadDeploymentsList();
-  layout.value.setStatus("success", "Successfully deployed a mattermost instance.");
+  layout.value.setStatus("success", "Successfully deployed a Mattermost instance.");
   layout.value.openDialog(deployment, deploymentListEnvironments.mattermost);
 }
 
@@ -192,7 +192,7 @@ async function deploy() {
       ],
     });
   } catch (e) {
-    return layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a mattermost instance."));
+    return layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Mattermost instance."));
   }
 
   if (!selectionDetails.value?.domain?.enableSelectedDomain) {
@@ -215,7 +215,7 @@ async function deploy() {
   } catch (e) {
     layout.value.setStatus("deploy", "Rollbacking back due to fail to deploy gateway...");
     await rollbackDeployment(grid!, name.value);
-    layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a mattermost instance."));
+    layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Mattermost instance."));
   }
 }
 
