@@ -108,6 +108,9 @@ export async function getAvailableURLs(clientOptions: ClientOptions) {
     substrateURL: [`wss://tfchain.${base}/ws`, `wss://tfchain.02.${base}/ws`],
   };
   const missingServicesURLS = getServicesWithoutURLs(currentURLs);
+
+  if (missingServicesURLS.length == 0) return;
+
   const services = missingServicesURLS.reduce((acc, servicesName) => {
     acc.push(prepareServices(servicesName, URLS[servicesName]));
     return acc;
