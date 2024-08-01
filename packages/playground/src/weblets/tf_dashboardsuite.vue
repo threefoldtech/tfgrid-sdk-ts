@@ -159,7 +159,7 @@ async function deploy() {
           name: name.value,
           cpu: solution.value.cpu,
           memory: solution.value.memory,
-          disks: [{ size: solution?.value.disk, mountPoint: "/mnt/disk" }],
+          disks: [{ size: solution?.value.disk, mountPoint: "/storage" }],
           flist: flist.value,
           entryPoint: flist.entryPoint,
           publicIpv4: ipv4.value,
