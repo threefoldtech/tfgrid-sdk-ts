@@ -127,7 +127,7 @@ export class ServiceUrlManager<N extends boolean = false> {
       for (const url of result)
         if (url.status == "fulfilled") {
           monitorEvents.log(`${service.name} on ${url.value} Success!`, "green");
-
+          service.update({ url: url.value });
           return url.value;
         }
     }
