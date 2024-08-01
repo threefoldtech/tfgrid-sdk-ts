@@ -5,12 +5,7 @@ async function HealthCheck() {
       new GridProxyMonitor("<FakeURL>"),
       new GraphQLMonitor("https://graphql.dev.grid.tf/graphql"),
       new TFChainMonitor("wss://tfchain.dev.grid.tf/ws"),
-      new RMBMonitor({
-        relayUrl: "wss://relay.dev.grid.tf",
-        chainUrl: "wss://tfchain.dev.grid.tf/ws",
-        mnemonics: "mnemonic",
-        keypairType: "sr25519",
-      }),
+      new RMBMonitor("wss://relay.dev.grid.tf"),
     ];
     const serviceMonitor = new ServiceMonitor(services);
 
@@ -21,7 +16,7 @@ async function HealthCheck() {
     serviceMonitor.interval = 0.25;
     const monitor = serviceMonitor.monitorService();
     await new Promise(resolve => setTimeout(resolve, 0.5 * 60 * 1000));
-    await monitor.exitAndDisconnect();
+    await monitor.exit();
     process.exit(0);
   } catch (err) {
     console.log(err);

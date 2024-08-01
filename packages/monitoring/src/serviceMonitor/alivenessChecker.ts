@@ -1,5 +1,5 @@
 import { monitorEvents } from "../helpers/events";
-import { IDisconnectHandler, ILivenessChecker } from "../types";
+import { ILivenessChecker } from "../types";
 
 /**
  * Represents a service monitor that periodically checks the liveness of multiple services.
@@ -36,22 +36,10 @@ export class ServiceMonitor {
   }
 
   /**
-   * Disconnects services that implement the `IDisconnectHandler` interface.
-   * @returns A promise that resolves when all services are disconnected.
+   * Monitors the services at a regular interval and returns a function to exit the monitoring.
+   * @returns An object with a function `exit` to stop the monitoring services.
    */
-  public async disconnect(): Promise<void> {
-    for (const service of this.services) {
-      if ("disconnect" in service) {
-        await (service as IDisconnectHandler).disconnect();
-      }
-    }
-  }
-
-  /**
-   * Monitors the services at a regular interval and returns a function to exit and disconnect the monitoring.
-   * @returns An object with a function `exitAndDisconnect` to stop the monitoring and disconnect services.
-   */
-  public monitorService(): { exitAndDisconnect: () => Promise<void> } {
+  public monitorService(): { exit: () => Promise<void> } {
     if (this.services.length === 0) throw new Error("No services to monitor");
 
     monitorEvents.log(`Checking services status...`);
@@ -59,21 +47,19 @@ export class ServiceMonitor {
     const intervalId = setInterval(async () => await this.checkLivenessOnce(), this.interval * 60 * 1000);
 
     /**
-     * Stops the monitoring and disconnects the services.
-     * @returns A promise that resolves when the monitoring is stopped and services are disconnected.
+     * Stops the monitoring services.
+     * @returns A promise that resolves when the monitoring is stopped.
      */
-    const exitAndDisconnect = async (): Promise<void> => {
+    const exit = async (): Promise<void> => {
       clearInterval(intervalId);
-      await this.disconnect();
     };
-    return { exitAndDisconnect };
+    return { exit };
   }
 
   /**
-   * Checks the liveness of each service once and disconnects the services.
+   * Checks the liveness of each service once.
    */
   public async pingService(): Promise<void> {
     await this.checkLivenessOnce();
-    await this.disconnect();
   }
 }
