@@ -372,6 +372,7 @@ async function castVote() {
         showIcon: true,
         type: "success",
       });
+      openVDialog.value = false;
     } catch (err) {
       createToast(`Vote Failed!`, {
         position: "top-right",
