@@ -22,17 +22,6 @@ interface IServiceBase<P> {
 }
 
 /**
- * Represents a handler for disconnecting a service.
- */
-export interface IDisconnectHandler {
-  /**
-   * Performs the disconnection from the service.
-   * @returns {Promise<void>} A promise that resolves when the disconnection is successful.
-   */
-  disconnect: () => Promise<void>;
-}
-
-/**
  * Represents a service with liveness checking capability.
  * @template P - The type of the parameter object used for the update method. Defaults to {url:string}.
  */
