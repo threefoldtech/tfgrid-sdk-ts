@@ -162,7 +162,7 @@ def test_config_validation(browser):
         assert node_page.get_save_button().is_enabled()==False
     assert node_page.add_config_input( "1.1.1.1/16", '1.1.1.2', '::2/16', '::1', 'tf.grid').is_enabled() == True
     cases = [' ', '::g', '::+', ':: /6  5', '1:2:3', ':a', '1:2:3:4:5:6:7:8:9', generate_string(), generate_leters()]
-    for case in cases: #'::2/0',
+    for case in cases:
         node_page.add_config_input( 0, 0, case, 0, 0)
         assert node_page.wait_for('IP is not valid.')
         assert node_page.get_save_button().is_enabled()==False
