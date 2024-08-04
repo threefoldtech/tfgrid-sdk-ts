@@ -39,6 +39,7 @@
         v-if="lockedContracts?.totalAmountLocked && !isLoading"
         class="mr-2"
         color="warning"
+        prepend-icon="mdi-lock-open"
         @click="openUnlockDialog"
         :loading="unlockContractLoading"
       >
