@@ -23,6 +23,7 @@ import { validateMnemonic } from "bip39";
 
 import { Balances, QueryBalances } from "./balances";
 import { Contracts, QueryContracts } from "./contracts";
+import { Council, QueryCouncil } from "./council";
 import { Dao, QueryDao } from "./dao";
 import { Farms, QueryFarms } from "./farms";
 import { KVStore } from "./kvstore";
@@ -64,6 +65,7 @@ class QueryClient {
   pricingPolicies: QueryPricingPolicies = new QueryPricingPolicies(this);
   twins: QueryTwins = new QueryTwins(this);
   nodes: QueryNodes = new QueryNodes(this);
+  council: QueryCouncil = new QueryCouncil(this);
   __disconnectHandler = this.newProvider.bind(this);
 
   constructor(public url: string, public keepReconnecting: boolean = false) {}
@@ -263,6 +265,7 @@ class Client extends QueryClient {
   twins: Twins = new Twins(this);
   farms: Farms = new Farms(this);
   dao: Dao = new Dao(this);
+  council: Council = new Council(this);
   tftBridge: Bridge = new Bridge(this);
   declare url: string;
   mnemonicOrSecret?: string;
