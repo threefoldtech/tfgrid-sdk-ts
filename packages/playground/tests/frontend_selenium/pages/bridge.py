@@ -135,8 +135,8 @@ class BridgePage:
     def get_balance_withdraw(self, balance):
         new_balance = self.browser.find_element(*self.balance_text).text[:-4]
         self.browser.refresh()
-        alert = Alert(self.browser)
-        alert.accept()
+        # alert = Alert(self.browser)
+        # alert.accept()
         while(new_balance==balance):
             new_balance = self.browser.find_element(*self.balance_text).text[:-4]
         return new_balance

@@ -73,8 +73,8 @@ class TwinPage:
         self.browser.find_element(*self.submit_email_button).click()
         WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.edit_email_button))
         self.browser.refresh()
-        alert = Alert(self.browser)
-        alert.accept()
+        # alert = Alert(self.browser)
+        # alert.accept()
         self.browser.switch_to.window(self.browser.window_handles[0])
         WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.twin_details_label))
     

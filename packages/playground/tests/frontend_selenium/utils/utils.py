@@ -1,9 +1,9 @@
 import configparser
+import ipaddress
 import random
 import string
 import os
 import json
-
 
 def get_seed():
     config = configparser.ConfigParser()

@@ -169,14 +169,12 @@ def test_farmpayout_address(browser):
     farm_page.wait_for_button(farm_page.add_farmpayout_address(case)).click()
     assert farm_page.wait_for('This action will be reflected in a bit')
     assert farm_page.wait_for('Address Added successfully!')
-    farm_page.reopen_details()
     assert farm_page.farmpayout_address_value()[:-3] in case
     case = "GAK2AN6ZC4REV2GXZPTMJG2JKLRJQX746JNG7ACKNC4RSJE7ETAZSE7D"
     farm_page.wait_for_button(browser.find_element(*farm_page.add_v2_button)).click()
     farm_page.wait_for_button(farm_page.add_farmpayout_address(case)).click()
     assert farm_page.wait_for('This action will be reflected in a bit')
     assert farm_page.wait_for('Address Added successfully!')
-    farm_page.reopen_details()
     while (farm_page.farmpayout_address_value()[:-3] not in case):
         continue
     assert farm_page.farmpayout_address_value()[:-3] in case
@@ -388,7 +386,6 @@ def test_farm_details(browser):
     browser.find_element(*farm_page.add_v2_button).click()
     farm_page.wait_for_button(farm_page.add_farmpayout_address(case)).click()
     assert farm_page.wait_for('Address Added successfully!')
-    farm_page.reopen_details()
     browser.find_element(*farm_page.add_ip_button).click()
     regenerate = True 
     while(regenerate):

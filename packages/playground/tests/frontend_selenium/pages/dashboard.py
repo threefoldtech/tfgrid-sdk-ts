@@ -86,8 +86,8 @@ class DashboardPage:
         self.wait_for_button(self.browser.find_element(*self.logout_button)).click()
         WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.find_more_button))
         self.browser.refresh()
-        alert = Alert(self.browser)
-        alert.accept()
+        # alert = Alert(self.browser)
+        # alert.accept()
         self.browser.switch_to.window(self.browser.window_handles[0])
         WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.profile_load_label))
     
