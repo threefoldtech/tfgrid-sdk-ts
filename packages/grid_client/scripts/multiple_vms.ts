@@ -9,8 +9,8 @@ async function deploy(client: GridClient, vms: MachinesModel) {
   log("================= Deploying VM =================");
 }
 
-async function getDeployment(client: GridClient, vms: string) {
-  const res = await client.machines.getObj(vms);
+async function getDeployment(client: GridClient, name: string) {
+  const res = await client.machines.getObj(name);
   log("================= Getting deployment information =================");
   log(res);
   log("================= Getting deployment information =================");
