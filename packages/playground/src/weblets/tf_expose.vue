@@ -12,7 +12,6 @@
     <template #title>Deploy an Expose Instance </template>
 
     <d-tabs :tabs="[{ title: 'Config', value: 'config' }]">
-      {{ selectionDetails }}
       <input-validator
         :value="name"
         :rules="[
