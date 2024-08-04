@@ -364,6 +364,28 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
         },
       },
     },
+    {
+      path: DashboardRoutes.Applications.Expose,
+      component: () => import("../views/expose_view.vue"),
+      meta: {
+        title: "Expose",
+        info: { page: "info/static_website.md" },
+        navbarConfig: {
+          back: true,
+          path: [
+            { title: "Deploy" },
+            {
+              title: "Applications",
+              disabled: false,
+              to: DashboardRoutes.Deploy.Applications,
+            },
+            {
+              title: "Expose",
+            },
+          ],
+        },
+      },
+    },
     // Commented for now and will be user later.
     // {
     //   path: DashboardRoutes.Applications.Freeflow,
