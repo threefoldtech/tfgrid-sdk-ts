@@ -11,7 +11,7 @@ import {
   ValidateNested,
 } from "class-validator";
 
-import { ValidateMembers } from "../helpers/validator";
+import { ValidateMembers } from "../helpers";
 import { ComputeCapacity } from "./computecapacity";
 import { WorkloadData, WorkloadDataResult } from "./workload_base";
 

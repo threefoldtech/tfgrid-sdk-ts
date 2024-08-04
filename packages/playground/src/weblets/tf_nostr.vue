@@ -10,7 +10,7 @@
     :valid-filters="selectionDetails?.validFilters"
     title-image="images/icons/nostr.png"
   >
-    <template #title>Deploy a Nostr Machine </template>
+    <template #title>Deploy a Nostr Instance </template>
 
     <d-tabs :tabs="[{ title: 'Config', value: 'config' }]" ref="tabs">
       <template #config>
@@ -113,8 +113,8 @@ const profileManager = useProfileManager();
 
 function finalize(deployment: any) {
   layout.value.reloadDeploymentsList();
-  layout.value.setStatus("success", "Successfully deployed a Node Pilot instance.");
-  layout.value.openDialog(deployment, deploymentListEnvironments.nodepilot);
+  layout.value.setStatus("success", "Successfully deployed a Nostr instance.");
+  layout.value.openDialog(deployment, deploymentListEnvironments.nostr);
 }
 
 async function deploy() {
@@ -191,10 +191,10 @@ async function deploy() {
       layout.value.setStatus("deploy", "Rollbacking back due to fail to deploy gateway...");
 
       await rollbackDeployment(grid!, name.value);
-      layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Nostr macine instance."));
+      layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Nostr instance."));
     }
   } catch (e) {
-    layout.value.setStatus("failed", normalizeError(e, "Failed to deploy Nostr machine instance."));
+    layout.value.setStatus("failed", normalizeError(e, "Failed to deploy Nostr instance."));
   }
 }
 

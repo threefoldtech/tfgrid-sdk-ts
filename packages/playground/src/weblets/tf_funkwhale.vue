@@ -164,7 +164,7 @@ const selectedSSHKeys = ref("");
 
 function finalize(deployment: any) {
   layout.value.reloadDeploymentsList();
-  layout.value.setStatus("success", "Successfully deployed a funkwhale instance.");
+  layout.value.setStatus("success", "Successfully deployed a Funkwhale instance.");
   layout.value.openDialog(deployment, deploymentListEnvironments.funkwhale);
 }
 async function deploy() {
@@ -228,7 +228,7 @@ async function deploy() {
       ],
     });
   } catch (e) {
-    return layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a funkwhale instance."));
+    return layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Funkwhale instance."));
   }
 
   if (!selectionDetails.value?.domain?.enableSelectedDomain) {
@@ -252,7 +252,7 @@ async function deploy() {
     layout.value.setStatus("deploy", "Rollbacking back due to fail to deploy gateway...");
 
     await rollbackDeployment(grid!, name.value);
-    layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a funkwhale instance."));
+    layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Funkwhale instance."));
   }
 }
 

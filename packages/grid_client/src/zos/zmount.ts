@@ -1,8 +1,10 @@
 import { Expose } from "class-transformer";
 import { IsInt, Max, Min } from "class-validator";
 
+import { ValidateMembers } from "../helpers";
 import { WorkloadData, WorkloadDataResult } from "./workload_base";
 
+@ValidateMembers()
 class Zmount extends WorkloadData {
   @Expose() @IsInt() @Min(100 * 1024 ** 2) @Max(10 * 1024 ** 4) size: number; // in bytes
 

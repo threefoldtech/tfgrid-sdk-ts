@@ -10,7 +10,7 @@
     :valid-filters="selectionDetails?.validFilters"
     title-image="images/icons/algorand.png"
   >
-    <template #title>Deploy a Algorand Instance </template>
+    <template #title>Deploy an Algorand Instance</template>
     <d-tabs :tabs="[{ title: 'Config', value: 'config' }]">
       <input-validator
         :value="name"
@@ -189,10 +189,10 @@ async function deploy() {
     });
 
     layout.value.reloadDeploymentsList();
-    layout.value.setStatus("success", "Successfully deployed an alogrand node.");
+    layout.value.setStatus("success", "Successfully deployed an Algorand instance.");
     layout.value.openDialog(vm, deploymentListEnvironments.algorand);
   } catch (e) {
-    layout.value.setStatus("failed", normalizeError(e, "Failed to deploy an alogrand node."));
+    layout.value.setStatus("failed", normalizeError(e, "Failed to deploy an Algorand instance."));
   }
 }
 
