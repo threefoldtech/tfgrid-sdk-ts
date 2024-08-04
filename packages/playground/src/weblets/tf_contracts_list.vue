@@ -46,6 +46,16 @@
         Unlock All
       </v-btn>
       <v-btn
+        class="mr-2"
+        v-if="contracts.length > 0"
+        :loading="deleting"
+        prepend-icon="mdi-delete"
+        color="error"
+        @click="deleteDialog = true"
+      >
+        Delete All
+      </v-btn>
+      <v-btn
         prepend-icon="mdi-refresh"
         color="info"
         @click="
@@ -152,6 +162,23 @@
       </v-card-actions>
     </v-card>
   </v-dialog>
+
+  <!-- delete all dialog-->
+  <v-dialog width="800" v-model="deleteDialog" attach="#modals">
+    <v-card>
+      <v-card-title class="bg-primary"> Delete all your contracts </v-card-title>
+      <v-alert class="mx-4 mt-4" type="warning" variant="tonal"
+        >Deleting contracts may take a while to complete.</v-alert
+      >
+      <v-card-text class="pt-3">
+        You are about to permanently delete all contracts. This action cannot be reversed!
+      </v-card-text>
+      <v-card-actions class="justify-end mb-1 mr-2">
+        <v-btn color="anchor" @click="deleteDialog = false"> Cancel </v-btn>
+        <v-btn color="error" @click="deleteAll"> Delete </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
   <!-- Contracts Tables -->
   <v-expansion-panels v-model="panel" multiple>
     <v-expansion-panel class="mb-4" :elevation="3" v-for="(table, idx) of contractsTables" :key="idx">
@@ -204,6 +231,7 @@
 <script lang="ts" setup>
 import type { GridClient, LockContracts } from "@threefold/grid_client";
 import { type Contract, ContractState, NodeStatus, SortByContracts, SortOrder } from "@threefold/gridproxy_client";
+import { DeploymentKeyDeletionError } from "@threefold/types";
 import { Decimal } from "decimal.js";
 import { computed, defineComponent, onMounted, type Ref, ref } from "vue";
 
@@ -219,6 +247,7 @@ import {
   type NormalizedContract,
 } from "@/utils/contracts";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
+import { normalizeError } from "@/utils/helpers";
 import { manual } from "@/utils/manual";
 
 import { gridProxyClient, queryClient } from "../clients";
@@ -246,6 +275,8 @@ const totalCost = ref<number>();
 const totalCostUSD = ref<number>();
 const lockedContracts = ref<LockContracts>();
 const unlockDialog = ref<boolean>(false);
+const deleteDialog = ref<boolean>(false);
+const deleting = ref<boolean>(false);
 
 const panel = ref<number[]>([0, 1, 2]);
 const nodeInfo: Ref<{ [nodeId: number]: { status: NodeStatus; farmId: number } }> = ref({});
@@ -391,6 +422,27 @@ async function unlockAllContracts() {
   }
 }
 
+async function deleteAll() {
+  deleteDialog.value = false;
+  deleting.value = true;
+  try {
+    await grid.contracts.cancelMyContracts();
+    loadingTablesMessage.value =
+      "The contracts have been successfully deleted. Please note that all tables will be reloaded in 30 seconds.";
+    createCustomToast(loadingTablesMessage.value, ToastType.info);
+    setTimeout(() => {
+      loadContracts();
+      loadingTablesMessage.value = undefined;
+    }, 30000);
+  } catch (e) {
+    if (e instanceof DeploymentKeyDeletionError) {
+      createCustomToast("Failed to delete some keys, You don't have enough tokens", ToastType.danger);
+    } else {
+      createCustomToast(normalizeError(e, `Failed to delete some contracts.`), ToastType.danger);
+    }
+  }
+  deleting.value = false;
+}
 const nodeStatus = computed(() => {
   const statusObject: { [x: number]: NodeStatus } = {};
   for (const nodeId in nodeInfo.value) {
