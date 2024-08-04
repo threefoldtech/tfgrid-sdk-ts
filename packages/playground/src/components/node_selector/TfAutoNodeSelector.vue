@@ -284,14 +284,14 @@ export default {
       return reloadNodes();
     }
 
-    const nodeInputValidateTask = useAsync<true, string, [NodeInfo | undefined]>(
+    const nodeInputValidateTask = useAsync<boolean, string, [NodeInfo | undefined]>(
       async node => {
         if (node && node?.rentContractId !== 0) {
           const { state } = await gridStore.grid.contracts.get({
             id: node?.rentContractId,
           });
           if (state.gracePeriod) {
-            return false as true;
+            return false;
           }
         }
         const nodeCapacityValid = await checkNodeCapacityPool(gridStore, node, props.filters);
