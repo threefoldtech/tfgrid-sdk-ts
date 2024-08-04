@@ -1,7 +1,7 @@
 import { Contract, ExtrinsicResult } from "@threefold/tfchain_client";
+import { TFChainError } from "@threefold/tfchain_client";
 import { BaseError, GridClientError, GridClientErrors, TimeoutError, ValidationError } from "@threefold/types";
 
-import { TFChainError } from "../../../tfchain_client/src/errors";
 import { RMB } from "../clients";
 import { TFClient } from "../clients/tf-grid/client";
 import { GridClientConfig } from "../config";

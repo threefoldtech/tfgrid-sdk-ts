@@ -1,5 +1,6 @@
 import { Keyring } from "@polkadot/keyring";
 import { waitReady } from "@polkadot/wasm-crypto";
+import { TFChainError } from "@threefold/tfchain_client";
 import { BaseError, ValidationError } from "@threefold/types";
 import axios from "axios";
 import { generateMnemonic } from "bip39";
@@ -7,7 +8,6 @@ import { Buffer } from "buffer";
 import MD5 from "crypto-js/md5";
 import * as PATH from "path";
 
-import { TFChainError } from "../../../tfchain_client/src/errors";
 import { TFClient } from "../clients/tf-grid/client";
 import { GridClientConfig } from "../config";
 import { formatErrorMessage } from "../helpers";

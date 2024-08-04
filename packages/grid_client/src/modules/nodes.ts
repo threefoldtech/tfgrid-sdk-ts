@@ -1,6 +1,6 @@
+import { TFChainError } from "@threefold/tfchain_client";
 import { BaseError, GridClientErrors } from "@threefold/types";
 
-import { TFChainError } from "../../../tfchain_client/src/errors";
 import { TFClient } from "../clients";
 import { GridClientConfig } from "../config";
 import { events, validateInput } from "../helpers";
