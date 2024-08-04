@@ -85,7 +85,8 @@ class FarmPage:
             sleep(5)
             self.browser.find_element(*self.search_bar).send_keys(Keys.CONTROL + "a")
             self.browser.find_element(*self.search_bar).send_keys(Keys.DELETE)
-            self.browser.find_element(*self.search_bar).send_keys(farm_name)
+            for char in farm_name:
+                self.browser.find_element(*self.search_bar).send_keys(char)
             table = self.browser.find_element(*self.table).text
             tries -= 1
             sleep(5)

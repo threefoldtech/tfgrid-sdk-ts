@@ -15,7 +15,7 @@
 
 - In the root directory, run `yarn install`, then `yarn lerna run build`, and finally `make run project=playground`.
 - Change directory to frontend selenium by running `cd packages/playground/tests/frontend_selenium/` in the command line.
-- Install the recommended version of the pip package listed above for a stable run, Or you can just install Python 3 and use the command `pip install -r requirements.txt`.
+- Install the recommended version of the pip package listed above for a stable run, Or you can just install Python 3 and use the command `pip install -r requirements.txt --break-system-packages`.
 - Add your configuration either in [config.ini](../frontend_selenium/Config.ini) or by exporting `TFCHAIN_MNEMONICS`, `TFCHAIN_NODE_MNEMONICS`, `STELLAR_ADDRESS`, and `EMAIL`.
 - Description of config under `Base` section:
   - `port`: the port that the localhost is running on.
