@@ -52,7 +52,6 @@ Also, in some cases, we have an error that comes from one of the clients, but we
 
 #### Generic Errors
 
-0. TFChainError
 1. GridClientError
 2. ValidationError
 3. TimeoutError
@@ -92,14 +91,3 @@ For Errors that are related to workloads and deployments operations
 1. WorkloadDeployError
 2. WorkloadUpdateError
 3. WorkloadCreateError
-
-### TFChain Errors
-
-This section includes all errors in the used [TF Chain pallets](https://github.com/threefoldtech/tfchain/tree/development/substrate-node/pallets)
-
-- [Dao](./tfchain/dao.ts) `dao`
-- [TFKVStore](./tfchain/kvstore.ts) `tfkvStore`
-- [SmartContract](./tfchain/smart_contract.ts) `smartContractModule`
-- [TFGrid](./tfchain/tfgrid.ts) `tfgridModule`
-- [TFTBridge](./tfchain/tft_bridge.ts) `tfgridModule`
-- [TFTPrice](./tfchain/tft_price.ts) `tftPriceModule`
