@@ -27,6 +27,10 @@ image:
       value: ""
     - name: "STELLAR_NETWORK"
       value: ""
+    - name: "SENTRY_DSN"
+      value: ""
+    - name: "ENABLE_TELEMETRY"
+      value: false
 
 
 imagePullSecrets: []

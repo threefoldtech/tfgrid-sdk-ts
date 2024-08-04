@@ -2,6 +2,7 @@ import { Expose, Transform, Type } from "class-transformer";
 import {
   IsBoolean,
   IsDefined,
+  isDefined,
   IsInt,
   IsIP,
   IsNotEmpty,
@@ -12,6 +13,7 @@ import {
   ValidateNested,
 } from "class-validator";
 
+import { ValidateMembers } from "../helpers";
 import { ComputeCapacity } from "./computecapacity";
 import { WorkloadData, WorkloadDataResult } from "./workload_base";
 
@@ -57,13 +59,14 @@ class Mount {
   }
 }
 
+@ValidateMembers()
 class Zmachine extends WorkloadData {
   @Expose() @IsString() @IsNotEmpty() flist: string;
   @Expose() @Type(() => ZmachineNetwork) @ValidateNested() network: ZmachineNetwork;
   @Expose() @IsInt() @Max(10 * 1024 ** 4) size: number; // in bytes
   @Expose() @Type(() => ComputeCapacity) @ValidateNested() compute_capacity: ComputeCapacity;
   @Expose() @Type(() => Mount) @ValidateNested({ each: true }) mounts: Mount[];
-  @Expose() @IsString() @IsNotEmpty() entrypoint: string;
+  @Expose() @IsString() @IsDefined() entrypoint: string;
   @Expose() env: Record<string, unknown>;
   @Expose() @Transform(({ value }) => (value ? true : false)) @IsBoolean() corex: boolean;
   @Expose() @IsString({ each: true }) @IsOptional() gpu?: string[];

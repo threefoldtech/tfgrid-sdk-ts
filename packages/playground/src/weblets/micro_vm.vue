@@ -195,6 +195,11 @@ const tabs = ref();
 
 const images = [
   {
+    name: "Ubuntu-24.04",
+    flist: "https://hub.grid.tf/tf-official-vms/ubuntu-24.04-latest.flist",
+    entryPoint: "/sbin/zinit init",
+  },
+  {
     name: "Ubuntu-23.10",
     flist: "https://hub.grid.tf/tf-official-vms/ubuntu-23.10-mycelium.flist",
     entryPoint: "/sbin/zinit init",
@@ -305,7 +310,7 @@ async function deploy() {
     });
 
     layout.value.reloadDeploymentsList();
-    layout.value.setStatus("success", "Successfully deployed a micro virtual machine.");
+    layout.value.setStatus("success", "Successfully deployed a micro virtual machine instance.");
     layout.value.openDialog(vm, deploymentListEnvironments.vm);
   } catch (e) {
     layout.value.setStatus("failed", normalizeError(e, "Failed to deploy micro virtual machine instance."));

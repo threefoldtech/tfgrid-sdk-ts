@@ -469,9 +469,9 @@ class Nodes {
   async nodeHasResources(nodeId: number, options: FilterOptions): Promise<boolean> {
     const resources = await this.getNodeFreeResources(nodeId, "zos");
     if (
-      resources.mru < this._g2b(options.mru) ||
-      resources.sru < this._g2b(options.sru) ||
-      resources.hru < this._g2b(options.hru)
+      (options.mru && options.mru > 0 && resources.mru < this._g2b(options.mru)) ||
+      (options.sru && options.sru > 0 && resources.sru < this._g2b(options.sru)) ||
+      (options.hru && options.hru > 0 && resources.hru < this._g2b(options.hru))
     ) {
       return false;
     }

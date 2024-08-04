@@ -1,6 +1,6 @@
 import { assertBoolean, assertId, assertIn, assertNatural, assertString } from "../utils";
 import { AbstractBuilder, BuilderMapper, BuilderMethods, BuilderValidator } from "./abstract_builder";
-
+import { SortBy, SortOrder } from "./nodes";
 export enum CertificationType {
   Diy = "DIY",
   Certified = "Certified",
@@ -23,6 +23,8 @@ export interface FarmsQuery {
   dedicated: boolean;
   stellarAddress: string;
   nodeHasIPv6: boolean;
+  sortBy: SortBy;
+  sortOrder: SortOrder;
 }
 
 const FARMS_MAPPER: BuilderMapper<FarmsQuery> = {
@@ -41,6 +43,8 @@ const FARMS_MAPPER: BuilderMapper<FarmsQuery> = {
   totalIps: "total_ips",
   twinId: "twin_id",
   nodeHasIPv6: "node_has_ipv6",
+  sortBy: "sort_by",
+  sortOrder: "sort_order",
 };
 
 const FARMS_VALIDATOR: BuilderValidator<FarmsQuery> = {
@@ -61,6 +65,8 @@ const FARMS_VALIDATOR: BuilderValidator<FarmsQuery> = {
   dedicated: assertBoolean,
   stellarAddress: assertString,
   nodeHasIPv6: assertBoolean,
+  sortBy: assertString,
+  sortOrder: assertString,
 };
 
 export class FarmsBuilder extends AbstractBuilder<FarmsQuery> {

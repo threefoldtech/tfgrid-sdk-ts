@@ -1,19 +1,19 @@
-import axios from "axios";
+import { clean, gte } from "semver";
 import { setTimeout } from "timers/promises";
 
-import { FilterOptions, GatewayNameModel, generateString, GridClient, MachinesModel, randomChoice } from "../../../src";
+import { FilterOptions, generateString, GridClient, MachinesModel, randomChoice } from "../../../src";
 import { config, getClient } from "../../client_loader";
-import { bytesToGB, generateInt, getOnlineNode, log, splitIP } from "../../utils";
+import { bytesToGB, generateInt, getOnlineNode, log, RemoteRun, splitIP } from "../../utils";
 
-jest.setTimeout(1250000);
+jest.setTimeout(900000);
 
 let gridClient: GridClient;
 let deploymentName: string;
 
 beforeAll(async () => {
   gridClient = await getClient();
-  deploymentName = "cl" + generateString(10);
-  gridClient.clientOptions.projectName = `casperlabs/${deploymentName}`;
+  deploymentName = "pr" + generateString(10);
+  gridClient.clientOptions.projectName = `presearch/${deploymentName}`;
   gridClient._connect();
   return gridClient;
 });
@@ -21,55 +21,37 @@ beforeAll(async () => {
 //Private IP Regex
 const ipRegex = /(^127\.)|(^10\.)|(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1]\.)|(^192\.168\.)/;
 
-test("TC2683 - Applications: Deploy Casperlabs", async () => {
+test("TC2728 - Applications: Deploy Presearch", async () => {
   /**********************************************
      Test Suite: Grid3_Client_TS (Automated)
-     Test Cases: TC2683 - Applications: Deploy Casperlabs
+     Test Cases: TC2728 - Applications: Deploy Presearch
      Scenario:
-        - Generate Test Data/casperlabs Config/Gateway Config.
-        - Select a Node To Deploy the casperlabs on.
-        - Select a Gateway Node To Deploy the gateway on.
-        - Deploy the casperlabs solution.
+        - Generate Test Data/Presearch Config.
+        - Select a Node To Deploy the Presearch on.
+        - Deploy the Presearch solution.
         - Assert that the generated data matches
           the deployment details.
-        - Pass the IP of the Created casperlabs to the Gateway
-          Config.
-        - Deploy the Gateway.
-        - Assert that the generated data matches
-          the deployment details.
-        - Assert that the Gateway points at the IP
-          of the created casperlabs.
-        - Assert that the returned domain is working
+        - SSH into the VM.
+        - Assert that the Presearch is working
           and returns correct data.
     **********************************************/
 
   //Test Data
-  const name = "gw" + generateString(10).toLowerCase();
-  const tlsPassthrough = false;
-  const cpu = 2;
-  const memory = 4;
+  const cpu = 1;
+  const memory = 1;
   const rootfsSize = 2;
-  const diskSize = 100;
+  const diskSize = 10;
   const networkName = generateString(15);
   const vmName = generateString(15);
   const diskName = generateString(15);
-  const mountPoint = "/data";
+  const mountPoint = "/var/lib/docker";
   const publicIp = false;
   const ipRangeClassA = "10." + generateInt(1, 255) + ".0.0/16";
   const ipRangeClassB = "172." + generateInt(16, 31) + ".0.0/16";
   const ipRangeClassC = "192.168.0.0/16";
   const ipRange = randomChoice([ipRangeClassA, ipRangeClassB, ipRangeClassC]);
-  const metadata = "{'deploymentType': 'casperlabs'}";
-  const description = "test deploying Casperlabs via ts grid3 client";
-
-  //GatewayNode Selection
-  const gatewayNodes = await gridClient.capacity.filterNodes({
-    gateway: true,
-    farmId: 1,
-    availableFor: await gridClient.twins.get_my_twin_id(),
-  } as FilterOptions);
-  if (gatewayNodes.length == 0) throw new Error("no gateway nodes available to complete this test");
-  const GatewayNode = gatewayNodes[generateInt(0, gatewayNodes.length - 1)];
+  const metadata = "{'deploymentType': 'presearch'}";
+  const description = "test deploying Presearch via ts grid3 client";
 
   //Node Selection
   const nodes = await gridClient.capacity.filterNodes({
@@ -77,11 +59,11 @@ test("TC2683 - Applications: Deploy Casperlabs", async () => {
     mru: memory,
     sru: rootfsSize + diskSize,
     farmId: 1,
+    publicIPs: publicIp,
     availableFor: await gridClient.twins.get_my_twin_id(),
   } as FilterOptions);
   const nodeId = await getOnlineNode(nodes);
   if (nodeId == -1) throw new Error("no nodes available to complete this test");
-  const domain = name + "." + GatewayNode.publicConfig.domain;
 
   //VM Model
   const vms: MachinesModel = {
@@ -104,14 +86,14 @@ test("TC2683 - Applications: Deploy Casperlabs", async () => {
             mountpoint: mountPoint,
           },
         ],
-        flist: "https://hub.grid.tf/tf-official-apps/casperlabs-latest.flist",
+        flist: "https://hub.grid.tf/tf-official-apps/presearch-v2.3.flist",
         entrypoint: "/sbin/zinit init",
         public_ip: publicIp,
         planetary: true,
         mycelium: false,
         env: {
           SSH_KEY: config.ssh_key,
-          CASPERLABS_HOSTNAME: domain,
+          PRESEARCH_REGISTRATION_CODE: "130b4f9393d3c852b50a65f2996586b4",
         },
       },
     ],
@@ -150,70 +132,52 @@ test("TC2683 - Applications: Deploy Casperlabs", async () => {
   expect(result[0].planetary).toBeDefined();
   expect(result[0].publicIP).toBeNull();
   expect(result[0].description).toBe(description);
-  expect(result[0].rootfs_size).toBe(bytesToGB(rootfsSize));
   expect(result[0].mounts[0]["name"]).toBe(diskName);
   expect(result[0].mounts[0]["size"]).toBe(bytesToGB(diskSize));
   expect(result[0].mounts[0]["mountPoint"]).toBe(mountPoint);
   expect(result[0].mounts[0]["state"]).toBe("ok");
 
-  const backends = ["http://[" + result[0].planetary + "]:80"];
-  log(backends);
+  const host = result[0].planetary;
+  const user = "root";
 
-  //Name Gateway Model
-  const gw: GatewayNameModel = {
-    name: name,
-    node_id: GatewayNode.nodeId,
-    tls_passthrough: tlsPassthrough,
-    backends: backends,
-  };
+  //SSH to the Created VM
+  const ssh = await RemoteRun(host, user);
 
-  const gatewayRes = await gridClient.gateway.deploy_name(gw);
-  log(gatewayRes);
+  try {
+    let dockerContainer;
+    //Verify that presearch is wokring correctly.
+    for (let i = 0; i < 180; i++) {
+      const wait = await setTimeout(5000, "Waiting for Presearch to be ready");
+      log(wait);
 
-  //Contracts Assertions
-  expect(gatewayRes.contracts.created).toHaveLength(1);
-  expect(gatewayRes.contracts.updated).toHaveLength(0);
-  expect(gatewayRes.contracts.deleted).toHaveLength(0);
-  expect(gatewayRes.contracts.created[0].contractType.nodeContract.nodeId).toBe(GatewayNode.nodeId);
-
-  const gatewayResult = await gridClient.gateway.getObj(gw.name);
-  log(gatewayResult);
-
-  //Gateway Assertions
-  expect(gatewayResult[0].name).toBe(name);
-  expect(gatewayResult[0].status).toBe("ok");
-  expect(gatewayResult[0].type).toContain("name");
-  expect(gatewayResult[0].domain).toContain(name);
-  expect(gatewayResult[0].tls_passthrough).toBe(tlsPassthrough);
-  expect(gatewayResult[0].backends).toStrictEqual(backends);
-
-  const site = "https://" + gatewayResult[0].domain;
-  let reachable = false;
-
-  for (let i = 0; i <= 250; i++) {
-    const wait = await setTimeout(5000, "Waiting for gateway to be ready");
-    log(wait);
-
-    await axios
-      .get(site)
-      .then(res => {
-        log("gateway is reachable");
-        log(res.status);
-        log(res.statusText);
-        log(res.data);
-        expect(res.status).toBe(200);
-        expect(res.statusText).toBe("OK");
-        expect(res.data).toContain("Your Casper node is now running succesfully on the ThreeFold Grid.");
-        reachable = true;
-      })
-      .catch(() => {
-        log("gateway is not reachable");
+      await ssh.execCommand("docker ps").then(async function (result) {
+        log(result);
+        dockerContainer = result.stdout.split("\n");
       });
-    if (reachable) {
-      break;
-    } else if (i == 250) {
-      throw new Error("Gateway is unreachable after multiple retries");
+      if (dockerContainer.length > 1) break;
     }
+    for (let i = 0; i < dockerContainer.length; i++) {
+      if (dockerContainer[i].includes("presearch/node")) {
+        const containerID = dockerContainer[i].slice(0, 11);
+        let attemp = 180;
+        while (attemp > 0) {
+          await ssh.execCommand("docker logs " + containerID).then(async function (result) {
+            if (result.stdout != "") {
+              log(result);
+              const versionToCheck = clean(result.stdout.match(/v(\d+\.\d+\.\d+)/)?.[1]);
+              gte(versionToCheck, "1.2.33");
+              expect(result.stdout).toContain("presearch-node");
+              attemp = 0;
+            } else {
+              attemp -= 1;
+            }
+          });
+        }
+      }
+    }
+  } finally {
+    //Disconnect from the machine
+    await ssh.dispose();
   }
 });
 

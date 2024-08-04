@@ -1,15 +1,7 @@
 import { Expose, Type } from "class-transformer";
-import {
-  ArrayNotEmpty,
-  IsDefined,
-  IsInt,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  Length,
-  ValidateNested,
-} from "class-validator";
+import { ArrayNotEmpty, IsDefined, IsInt, IsNotEmpty, IsOptional, IsString, ValidateNested } from "class-validator";
 
+import { ValidateMembers } from "../helpers";
 import { WorkloadData } from "./workload_base";
 
 class Peer {
@@ -36,6 +28,7 @@ class Mycelium {
   @Expose() @IsOptional() @IsString({ each: true }) peers?: string[];
 }
 
+@ValidateMembers()
 class Znet extends WorkloadData {
   @Expose() @IsString() @IsNotEmpty() subnet: string;
   @Expose() @IsString() @IsNotEmpty() ip_range: string;

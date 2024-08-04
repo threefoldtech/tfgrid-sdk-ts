@@ -274,14 +274,7 @@ const filteredHeaders = computed(() => {
   ];
 
   const IPV6Solutions = [
-    ProjectName.VM,
-    ProjectName.Fullvm,
-    ProjectName.TFRobot,
-    ProjectName.Gitea,
-    ProjectName.Nostr,
-  ] as string[];
-
-  const IPV4Solutions = [
+    ProjectName.NodePilot,
     ProjectName.VM,
     ProjectName.Fullvm,
     ProjectName.Presearch,
@@ -297,6 +290,31 @@ const filteredHeaders = computed(() => {
     ProjectName.TFRobot,
     ProjectName.Gitea,
     ProjectName.Nostr,
+    ProjectName.Algorand,
+    ProjectName.Subsquid,
+    ProjectName.Peertube,
+  ] as string[];
+
+  const IPV4Solutions = [
+    ProjectName.NodePilot,
+    ProjectName.VM,
+    ProjectName.Fullvm,
+    ProjectName.Presearch,
+    ProjectName.Umbrel,
+    ProjectName.Nextcloud,
+    ProjectName.Funkwhale,
+    ProjectName.Casperlabs,
+    ProjectName.Mattermost,
+    ProjectName.Discourse,
+    ProjectName.Taiga,
+    ProjectName.StaticWebsite,
+    ProjectName.Wordpress,
+    ProjectName.TFRobot,
+    ProjectName.Gitea,
+    ProjectName.Nostr,
+    ProjectName.Algorand,
+    ProjectName.Subsquid,
+    ProjectName.Peertube,
   ] as string[];
 
   const WireguardSolutions = [ProjectName.VM, ProjectName.Fullvm, ProjectName.Umbrel, ProjectName.TFRobot] as string[];

@@ -81,7 +81,7 @@
     </template>
   </v-card>
   <!-- locked amount Dialog -->
-  <v-dialog width="500" v-model="unlockDialog" v-if="lockedContracts?.totalAmountLocked" attach="#modals">
+  <v-dialog width="800" v-model="unlockDialog" v-if="lockedContracts?.totalAmountLocked" attach="#modals">
     <v-card>
       <v-card-title class="bg-primary">
         Unlock All Contracts
@@ -101,31 +101,30 @@
           </template>
         </v-tooltip>
       </v-card-title>
-      <v-card-text>
-        <v-container>
-          <v-row v-if="loadingLockDetails" class="d-flex flex-column justify-center align-center py-4">
-            <v-progress-circular indeterminate />
-            <div class="text-subtitle-2 pt-2">Loading contracts lock details</div>
-          </v-row>
-          <v-row class="d-flex" v-else>
-            <v-alert class="ma-4" type="warning" variant="tonal">
-              <div v-if="lockedContracts?.totalAmountLocked < freeBalance" class="font-weigh-black">
-                You have enough balance to unlock your contracts; this will cost you around
-                {{ Math.ceil(lockedContracts?.totalAmountLocked) }} TFTs.
-              </div>
-              <div v-else>
-                You need to fund your account with
-                <span class="font-weight-black">
-                  {{ Math.ceil(lockedContracts?.totalAmountLocked - freeBalance) }}
-                  TFTs
-                </span>
-                to resume your contracts
-              </div>
-            </v-alert>
-          </v-row>
-        </v-container>
+      <v-card-text v-if="loadingLockDetails">
+        <v-progress-circular indeterminate />
+
+        <div class="text-subtitle-2">Loading contracts lock details</div>
+        <v-divider class="mt-3" />
       </v-card-text>
-      <v-card-actions class="justify-end my-1 mr-2">
+      <v-card-text v-else>
+        <v-alert class="my-4" type="warning" variant="tonal">
+          <div v-if="lockedContracts?.totalAmountLocked < freeBalance">
+            You have enough balance to unlock your contracts, this will cost you around
+            <span class="font-weight-bold">{{ Math.ceil(lockedContracts?.totalAmountLocked) }}</span> TFTs.
+          </div>
+          <div v-else>
+            You need to fund your account with
+            <span class="font-weight-bold">
+              {{ Math.ceil(lockedContracts?.totalAmountLocked - freeBalance) }}
+              TFTs
+            </span>
+            to resume your contracts
+          </div>
+        </v-alert>
+        <v-divider class="mt-3" />
+      </v-card-text>
+      <v-card-actions class="justify-end mb-1 mr-2">
         <v-btn color="anchor" @click="unlockDialog = false"> Close </v-btn>
         <v-tooltip
           :text="
@@ -203,7 +202,7 @@
 
 <script lang="ts" setup>
 import type { GridClient, LockContracts } from "@threefold/grid_client";
-import { type Contract, ContractState, NodeStatus } from "@threefold/gridproxy_client";
+import { type Contract, ContractState, NodeStatus, SortByContracts, SortOrder } from "@threefold/gridproxy_client";
 import { Decimal } from "decimal.js";
 import { computed, defineComponent, onMounted, type Ref, ref } from "vue";
 
@@ -298,15 +297,12 @@ async function loadContractsByType(
       page: table.page.value,
       type: contractType,
       retCount: true,
+      sortBy: options && options.sort.length ? (options?.sort[0].key as SortByContracts) : undefined,
+      sortOrder: options && options.sort.length ? (options?.sort[0].order as SortOrder) : undefined,
     });
 
     table.count.value = response.count ?? 0;
     const normalizedContracts = await _normalizeContracts(response.data, contractType);
-
-    if (options && options.sort.length) {
-      contractsRef.value = sortContracts(normalizedContracts, options.sort);
-    }
-
     contractsRef.value = normalizedContracts;
   } catch (error: any) {
     loadingErrorMessage.value = `Error while listing ${contractType} contracts: ${error.message}`;
@@ -314,21 +310,6 @@ async function loadContractsByType(
   } finally {
     table.loading.value = false;
   }
-}
-
-function sortContracts(
-  contracts: NormalizedContract[],
-  sort: { key: string; order: "asc" | "desc" }[],
-): NormalizedContract[] {
-  const sortKey = sort[0].key;
-  const sortOrder = sort[0].order;
-
-  contracts = contracts.sort((a, b) => {
-    const aValue = Reflect.get(a, sortKey) ?? Reflect.get(a.details, sortKey);
-    const bValue = Reflect.get(b, sortKey) ?? Reflect.get(b.details, sortKey);
-    return sortOrder === "desc" ? bValue - aValue : aValue - bValue;
-  });
-  return contracts;
 }
 
 async function loadContracts(type?: ContractType, options?: { sort: { key: string; order: "asc" | "desc" }[] }) {
@@ -463,10 +444,10 @@ async function getContractsLockDetails() {
 // Define base table headers for contracts tables
 const baseTableHeaders: VDataTableHeader = [
   { title: "PLACEHOLDER", key: "data-table-select" },
-  { title: "ID", key: "contract_id" },
+  { title: "ID", key: "contract_id", sortable: true },
   { title: "State", key: "state", sortable: false },
-  { title: "Billing Rate", key: "consumption" },
-  { title: "Created At", key: "created_at" },
+  { title: "Billing Rate", key: "consumption", sortable: false },
+  { title: "Created At", key: "created_at", sortable: true },
 ];
 
 // Define specific table headers for each contract type
@@ -482,14 +463,14 @@ const nodeTableHeaders: VDataTableHeader = [
     ],
   },
   { title: "Type", key: "deploymentType", sortable: false },
-  { title: "Expiration", key: "expiration" },
-  { title: "Farm ID", key: "farm_id" },
+  { title: "Expiration", key: "expiration", sortable: false },
+  { title: "Farm ID", key: "farm_id", sortable: false },
   {
     title: "Node",
     key: "node",
     sortable: false,
     children: [
-      { title: "ID", key: "nodeId" },
+      { title: "ID", key: "nodeId", sortable: false },
       { title: "Status", key: "nodeStatus", sortable: false },
     ],
   },
@@ -499,19 +480,19 @@ const nodeTableHeaders: VDataTableHeader = [
 const nameTableHeaders: VDataTableHeader = [
   ...baseTableHeaders,
   { title: "Solution Name", key: "solutionName", sortable: false },
-  { title: "Expiration", key: "expiration" },
+  { title: "Expiration", key: "expiration", sortable: false },
   { title: "Details", key: "actions", sortable: false },
 ];
 
 const RentTableHeaders: VDataTableHeader = [
   ...baseTableHeaders,
-  { title: "Farm ID", key: "farm_id" },
+  { title: "Farm ID", key: "farm_id", sortable: false },
   {
     title: "Node",
     key: "node",
     sortable: false,
     children: [
-      { title: "ID", key: "nodeId" },
+      { title: "ID", key: "nodeId", sortable: false },
       { title: "Status", key: "nodeStatus", sortable: false },
     ],
   },
