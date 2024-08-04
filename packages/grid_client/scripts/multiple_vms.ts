@@ -1,26 +1,32 @@
-import { FilterOptions, MachinesModel } from "../src";
+import { FilterOptions, GridClient, MachinesModel } from "../src";
 import { config, getClient } from "./client_loader";
 import { log } from "./utils";
 
-async function deploy(client, vms) {
+async function deploy(client: GridClient, vms: MachinesModel) {
   const res = await client.machines.deploy(vms);
   log("================= Deploying VM =================");
   log(res);
   log("================= Deploying VM =================");
 }
 
-async function getDeployment(client, vms) {
+async function getDeployment(client: GridClient, vms: string) {
   const res = await client.machines.getObj(vms);
   log("================= Getting deployment information =================");
   log(res);
   log("================= Getting deployment information =================");
 }
 
-async function cancel(client, vms) {
-  const res = await client.machines.delete(vms);
+async function cancel(client: GridClient, name: string) {
+  const res = await client.machines.delete({ name });
   log("================= Canceling the deployment =================");
   log(res);
   log("================= Canceling the deployment =================");
+}
+
+async function getNodeId(client: GridClient, options: FilterOptions) {
+  const nodes = await client.capacity.filterNodes(options);
+
+  return nodes[0]?.nodeId;
 }
 
 async function main() {
@@ -35,6 +41,8 @@ async function main() {
     farmId: 1,
   };
 
+  const nodeId = await getNodeId(grid3, vmQueryOptions);
+
   const vms: MachinesModel = {
     name,
     network: {
@@ -44,7 +52,7 @@ async function main() {
     machines: [
       {
         name: "testvm1",
-        node_id: +(await grid3.capacity.filterNodes(vmQueryOptions))[0].nodeId,
+        node_id: nodeId,
         disks: [
           {
             name: "newDisk1",
@@ -67,7 +75,7 @@ async function main() {
       },
       {
         name: "testvm2",
-        node_id: +(await grid3.capacity.filterNodes(vmQueryOptions))[1].nodeId,
+        node_id: nodeId,
         disks: [
           {
             name: "newDisk2",
@@ -100,7 +108,7 @@ async function main() {
   await getDeployment(grid3, name);
 
   // //Uncomment the line below to cancel the deployment
-  // await cancel(grid3, { name });
+  await cancel(grid3, name);
 
   await grid3.disconnect();
 }
