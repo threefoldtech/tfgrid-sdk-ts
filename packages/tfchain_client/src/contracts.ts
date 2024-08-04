@@ -290,6 +290,19 @@ class Contracts extends QueryContracts {
   }
 
   @checkConnection
+  async cancelCollective(options: CancelOptions) {
+    const contract = await this.get(options);
+    if (!contract) {
+      return;
+    }
+    const extrinsic = await this.client.api.tx.smartContractModule.cancelContractCollective(options.id);
+    return this.client.patchExtrinsic(extrinsic, {
+      map: () => options.id,
+      resultEvents: ["NodeContractCanceled", "NameContractCanceled", "RentContractCanceled", "ContractCanceled"],
+    });
+  }
+
+  @checkConnection
   async createService(options: CreateServiceOptions) {
     const extrinsic = await this.client.api.tx.smartContractModule.serviceContractCreate(
       options.serviceAccount,
