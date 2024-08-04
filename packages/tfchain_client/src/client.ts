@@ -288,7 +288,7 @@ class Client extends QueryClient {
       throw new ValidationError("mnemonicOrSecret or extension signer should be provided");
     }
     if (this.mnemonicOrSecret) {
-      if (this.mnemonicOrSecret === "//Alice") {
+      if (this.mnemonicOrSecret.startsWith("//")) {
         return;
       } else if (!validateMnemonic(this.mnemonicOrSecret)) {
         if (this.mnemonicOrSecret.includes(" "))
