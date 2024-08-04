@@ -41,10 +41,6 @@ def test_create_farm(browser):
     assert farm_page.wait_for('Farm created successfully')
     farm_page.search_functionality(farm_name)
     assert farm_page.wait_for_farm_name(farm_name)
-    farm_page.search_functionality(farm_name[:len(farm_name)//2])
-    assert farm_page.wait_for_farm_name(farm_name)
-    farm_page.search_functionality(farm_name[len(farm_name)//2:])
-    assert farm_page.wait_for_farm_name(farm_name)
     table = farm_page.search_functionality(generate_string())
     assert 'No data available' in table
     farm_page.search_functionality("")

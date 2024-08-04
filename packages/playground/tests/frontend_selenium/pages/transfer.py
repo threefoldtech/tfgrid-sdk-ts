@@ -82,7 +82,10 @@ class TransferPage:
         return twin_id
 
     def get_balance(self):
-        return self.browser.find_element(*self.balance_text).text[:-4]
+        balance = 'Loadin'
+        while(balance == 'Loadin'):
+            balance = self.browser.find_element(*self.balance_text).text[:-4]
+        return balance
 
     def get_balance_transfer(self, balance):
         new_balance = self.browser.find_element(*self.balance_text).text[:-4]

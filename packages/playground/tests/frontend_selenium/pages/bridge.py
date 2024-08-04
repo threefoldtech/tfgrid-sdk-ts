@@ -86,7 +86,9 @@ class BridgePage:
         self.browser.find_element(*self.amount_tft).send_keys(data)
     
     def setup_widthdraw_address(self, data):
-        balance = self.browser.find_element(*self.balance_text).text[:-4]
+        balance = 'Loadin'
+        while(balance == 'Loadin'):
+            balance = self.browser.find_element(*self.balance_text).text[:-4]
         self.browser.find_element(*self.withdraw).click()
         self.browser.find_element(*self.stellar_address).send_keys(Keys.CONTROL + "a")
         self.browser.find_element(*self.stellar_address).send_keys(Keys.DELETE)
