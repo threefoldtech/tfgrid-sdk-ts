@@ -39,6 +39,9 @@ class Utility {
    * Executes a batch operation for all provided extrinsics.
    * This method first checks the balance to ensure it is sufficient before applying the extrinsics.
    *
+   * if one of the extrinsics fails in the case of using batchAll, all the extrinsics will be rolled back. However,
+   * the extrinsics won't roll back in the case of using batch.
+   *
    * @param {BatchModel<T>} options - The options for the batch operation, including the extrinsics to be executed.
    * @returns {Promise<T[]>} A promise that resolves with the result of the batch operation.
    */

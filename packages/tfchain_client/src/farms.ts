@@ -1,5 +1,4 @@
 import { Client, QueryClient } from "./client";
-import type { ExtrinsicResult } from "./types";
 import { checkConnection } from "./utils";
 
 enum Certification {
@@ -88,12 +87,11 @@ class Farms extends QueryFarms {
   }
 
   /**
-   * Create a new farm.
-   *
+   * Create a new farm extrinsic.
    * @param options - The options for creating a new farm.
    * @param options.name - The name of the new farm.
    * @param options.publicIps - Optional array of public IPs for the new farm.
-   * @returns A promise that resolves to the created farm object.
+   * @returns A promise that resolves to the created farm extrinsic.
    */
   @checkConnection
   async create(options: CreateFarmOptions) {
@@ -108,7 +106,7 @@ class Farms extends QueryFarms {
    * @param options.farmId - The ID of the farm to add the public IP to.
    * @param options.ip - The IP address to add to the farm.
    * @param options.gw - The gateway for the IP address.
-   * @returns A promise that resolves to the updated farm object after adding the public IP.
+   * @returns A promise that resolves to the updated farm extrinsic after adding the public IP.
    */
   @checkConnection
   async addFarmIp(options: AddFarmIPOptions) {
@@ -122,7 +120,7 @@ class Farms extends QueryFarms {
    * @param options - The options for removing a public IP from a farm.
    * @param options.farmId - The ID of the farm from which to remove the public IP.
    * @param options.ip - The IP address to remove from the farm.
-   * @returns A promise that resolves to the updated farm object after removing the public IP.
+   * @returns A promise that resolves to the updated farm extrinsic after removing the public IP.
    */
   @checkConnection
   async removeFarmIp(options: RemoveFarmIPOptions) {
@@ -136,7 +134,7 @@ class Farms extends QueryFarms {
    * @param options - The options for adding a Stellar address.
    * @param options.farmId - The ID of the farm to add the Stellar address to.
    * @param options.stellarAddress - The Stellar address to add for payout.
-   * @returns A promise that resolves to the updated farm object after adding the Stellar address.
+   * @returns A promise that resolves to the updated farm extrinsic after adding the Stellar address.
    */
   @checkConnection
   async addStellarAddress(options: AddStellarOptions) {

@@ -38,7 +38,7 @@ class KVStore {
    * It then patches the extrinsic and returns the result of the deletion operation.
    *
    * @param options - An object containing the key to be deleted from the `key-value` store.
-   * @returns {Promise<ExtrinsicResult<KVStoreSetOptions>>} A promise that resolves once the key is successfully deleted.
+   * @returns {Promise<ExtrinsicResult<KVStoreSetOptions>>} A promise that resolves once the delete extrinsic is successfully created.
    */
   @checkConnection
   async delete(options: KVStoreGetOptions): Promise<ExtrinsicResult<KVStoreSetOptions>> {

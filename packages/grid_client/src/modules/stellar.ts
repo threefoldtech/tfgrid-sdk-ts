@@ -1,3 +1,4 @@
+import { ExtrinsicResult } from "@threefold/tfchain_client";
 import { GridClientError, RequestError, ValidationError } from "@threefold/types";
 import axios, { AxiosError } from "axios";
 import { Buffer } from "buffer";
@@ -63,7 +64,7 @@ class Stellar implements blockchainInterface {
    * @param {any[]} extrinsics - The extrinsics to be saved to the `key-value` store backend.
    * @returns {Promise<void>} - A promise that resolves once the extrinsics are saved to the backend.
    */
-  private async saveIfKVStoreBackend(extrinsics: any[]): Promise<void> {
+  private async saveIfKVStoreBackend(extrinsics: any[]) {
     if (this.config.backendStorageType === BackendStorageType.tfkvstore && extrinsics && extrinsics.length > 0) {
       extrinsics = extrinsics.filter(e => e !== undefined);
       if (extrinsics.length > 0) {
@@ -173,7 +174,7 @@ class Stellar implements blockchainInterface {
   }
 
   /**
-   * Verifies the provided content using the public key and signed content.
+   * Verifies the provided signed content using the public key and content.
    *
    * @param {StellarWalletVerifyModel} options - The options containing the public key, content, and signed content.
    * @returns {boolean} - A boolean indicating whether the content is successfully verified.
@@ -190,9 +191,9 @@ class Stellar implements blockchainInterface {
   }
 
   /**
-   * Initializes a new `Stellar wallet` with the provided `name` and `secret key`.
+   * Loads `Stellar wallet` based on the provided `name` and `secret key`.
    *
-   * This method generates a new `Stellar wallet` using the provided `secret key`, loads the account associated with the wallet's `public key`, and saves the wallet to the backend storage.
+   * This method loads the account associated with the wallet's `public key`, and saves the wallet to the backend storage.
    *
    * @param {StellarWalletInitModel} options - The options for initializing the `Stellar` wallet, including the name and `secret key`.
    * @returns {Promise<string>} A Promise that resolves the `public key` of the initialized `Stellar` wallet.
@@ -347,7 +348,7 @@ class Stellar implements blockchainInterface {
   }
 
   /**
-   * Retrieves the assets associated with a `Stellar wallet` by its `address` from the backend storage.
+   * Retrieves the assets associated with a `Stellar wallet` by its `address`.
    *
    * This method fetches the `balances` of the account associated with the provided `address` and returns the assets including the `asset code` and `balance`.
    *
@@ -445,7 +446,7 @@ class Stellar implements blockchainInterface {
    * Deletes a wallet with the provided `name` from the backend storage.
    *
    * This method checks if a wallet with the given `name` exists, deletes it from the backend storage,
-   * and saves the changes to the backend if the storage type is `tfkvstore`.
+   * and saves the changes to the backend storage.
    *
    * @param {BlockchainDeleteModel} options - The options containing the name of the wallet to delete.
    * @returns {Promise<string>} - A promise that resolves with a message indicating the deletion was successful.

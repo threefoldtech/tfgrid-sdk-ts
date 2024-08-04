@@ -138,7 +138,6 @@ class BaseModule {
    *
    * This method processes the created and deleted contracts, updates the existing contracts,
    * and handles the backend storage operations for storing the contracts data.
-   * It also applies extrinsics to the TFChain client for updating the contracts on the blockchain.
    *
    * @param {string} name - The name of the deployment to save contracts for.
    * @param {DeploymentResultContracts} contracts - The contracts data containing created and deleted contracts.
@@ -324,7 +323,7 @@ class BaseModule {
   }
 
   /**
-   * Lists all of the contracts based on the user secret.
+   * Lists the deployment names for the current user.
    *
    * @returns {Promise<any>} - A promise that resolves to the list of contract names.
    */
@@ -920,7 +919,7 @@ class BaseModule {
   }
 
   /**
-   * Add a new machine to the deployment.
+   * Add a new [ZDB or K8S worker] to the deployment.
    *
    * @param deployment_name The name of the deployment.
    * @param node_id The ID of the node where the machine will be added.
@@ -1014,10 +1013,10 @@ class BaseModule {
    * Finally, it saves the updated contracts and returns the result containing created, deleted, and updated contracts.
    *
    * @param {string} name - The name of the deployment to delete contracts for.
-   * @returns {Promise<{ created: Contract[]; deleted: Contract[]; updated: Contract[] }>} - A promise that resolves to an object containing the created, deleted, and updated contracts.
+   * @returns {Promise<DeploymentResultContracts>} - A promise that resolves to an object containing the created, deleted, and updated contracts.
    */
-  async _delete(name: string): Promise<{ created: Contract[]; deleted: Contract[]; updated: Contract[] }> {
-    const contracts: { created: Contract[]; deleted: Contract[]; updated: Contract[] } = {
+  async _delete(name: string): Promise<DeploymentResultContracts> {
+    const contracts: DeploymentResultContracts = {
       created: [],
       deleted: [],
       updated: [],

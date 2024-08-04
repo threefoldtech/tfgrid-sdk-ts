@@ -6,16 +6,24 @@ import { DeploymentResultContracts, Operations, TwinDeployment } from "../high_l
 import { TwinDeploymentHandler } from "../high_level/twinDeploymentHandler";
 import { DeploymentFactory } from "../primitives/deployment";
 import { Nodes } from "../primitives/nodes";
+import { Deployment } from "../zos";
 import { WorkloadTypes } from "../zos/workload";
 import {
   GPUCardInfo,
   NodeCPUTest,
+  NodeHealthCheck,
   NodeIPerf,
   NodeIPValidation,
   PingNodeOptionsModel,
   ZOSGetDeploymentModel,
   ZOSModel,
+  ZOSNetworkInterfaces,
+  ZOSNetworkPublicConfig,
   ZOSNodeModel,
+  ZOSNodePerfTestsResult,
+  ZOSNodeStatistics,
+  ZOSStoragePools,
+  ZOSVersionResultModel,
 } from "./models";
 import { checkBalance } from "./utils";
 
@@ -33,8 +41,13 @@ class Zos {
     this.capacity = new Nodes(this.config.graphqlURL, this.config.proxyURL, this.config.rmbClient);
   }
 
+  // Helper function to filter the test by name
+  private filterTest<T>(response: T[], testName: string): T | undefined {
+    return response.find((obj: T) => (obj as any).name === testName);
+  }
+
   /**
-   * Deploy a workload on a node.
+   * Deploy a deployment on a node.
    *
    * @param {ZOSModel} options - The options for the deployment.
    * @returns {Promise<DeploymentResultContracts>} - The result of the deployment.
@@ -77,7 +90,7 @@ class Zos {
    */
   @expose
   @validateInput
-  async pingNode(options: PingNodeOptionsModel): Promise<boolean> {
+  async pingNode(options: PingNodeOptionsModel): Promise<ZOSVersionResultModel> {
     const nodeTwinId = await this.capacity.getNodeTwinId(options.nodeId);
     return await this.rmb.request([nodeTwinId], "zos.system.version", "", 10, 1);
   }
@@ -86,14 +99,14 @@ class Zos {
    * Get deployment information based on the contract ID.
    *
    * @param {ZOSGetDeploymentModel} options - The options for getting deployment information.
-   * @returns {Promise<any>} - A promise that resolves with the deployment information.
+   * @returns {Promise<Deployment>} - A promise that resolves with the deployment information.
    * @decorators
    * - `@expose`: Exposes the method for external use.
    * - `@validateInput`: Validates the input options.
    */
   @expose
   @validateInput
-  async getDeployment(options: ZOSGetDeploymentModel): Promise<any> {
+  async getDeployment(options: ZOSGetDeploymentModel): Promise<Deployment> {
     const nodeId = await this.capacity.getNodeIdFromContractId(options.contractId, this.config.substrateURL);
     const nodeTwinId = await this.capacity.getNodeTwinId(nodeId);
     const payload = JSON.stringify({ contract_id: options.contractId });
@@ -104,14 +117,14 @@ class Zos {
    * Get statistics for a specific node.
    *
    * @param {ZOSNodeModel} options - The options for getting node statistics.
-   * @returns {Promise<any>} - A promise that resolves with the node statistics.
+   * @returns {Promise<ZOSNodeStatistics>} - A promise that resolves with the node statistics.
    * @decorators
    * - `@expose`: Exposes the method for external use.
    * - `@validateInput`: Validates the input options.
    */
   @expose
   @validateInput
-  async getNodeStatistics(options: ZOSNodeModel): Promise<any> {
+  async getNodeStatistics(options: ZOSNodeModel): Promise<ZOSNodeStatistics> {
     const nodeTwinId = await this.capacity.getNodeTwinId(options.nodeId);
     return await this.rmb.request([nodeTwinId], "zos.statistics.get", "");
   }
@@ -136,14 +149,14 @@ class Zos {
    * List network interfaces for a specific node.
    *
    * @param {ZOSNodeModel} options - The options containing the node ID.
-   * @returns {Promise<any>} - A promise that resolves with the network interfaces information.
+   * @returns {Promise<ZOSNetworkInterfaces>} - A promise that resolves with the network interfaces information.
    * @decorators
    * - `@expose`: Exposes the method for external use.
    * - `@validateInput`: Validates the input options.
    */
   @expose
   @validateInput
-  async listNetworkInterfaces(options: ZOSNodeModel): Promise<any> {
+  async listNetworkInterfaces(options: ZOSNodeModel): Promise<ZOSNetworkInterfaces> {
     const nodeTwinId = await this.capacity.getNodeTwinId(options.nodeId);
     return await this.rmb.request([nodeTwinId], "zos.network.interfaces", "");
   }
@@ -152,14 +165,14 @@ class Zos {
    * List the public IP addresses associated with a specific node.
    *
    * @param {ZOSNodeModel} options - The options containing the node ID.
-   * @returns {Promise<any>} - A promise that resolves with the list of public IP addresses.
+   * @returns {Promise<string[]>} - A promise that resolves with the list of public IP addresses.
    * @decorators
    * - `@expose`: Exposes the method for external use.
    * - `@validateInput`: Validates the input options.
    */
   @expose
   @validateInput
-  async listNetworkPublicIPs(options: ZOSNodeModel): Promise<any> {
+  async listNetworkPublicIPs(options: ZOSNodeModel): Promise<string[]> {
     const nodeTwinId = await this.capacity.getNodeTwinId(options.nodeId);
     return await this.rmb.request([nodeTwinId], "zos.network.list_public_ips", "");
   }
@@ -168,14 +181,14 @@ class Zos {
    * Get the public network configuration for a specific node.
    *
    * @param {ZOSNodeModel} options - The options containing the node ID.
-   * @returns {Promise<any>} - A promise that resolves with the public network configuration.
+   * @returns {Promise<ZOSNetworkPublicConfig>} - A promise that resolves with the public network configuration.
    * @decorators
    * - `@expose`: Exposes the method for external use.
    * - `@validateInput`: Validates the input options.
    */
   @expose
   @validateInput
-  async getNetworkPublicConfig(options: ZOSNodeModel): Promise<any> {
+  async getNetworkPublicConfig(options: ZOSNodeModel): Promise<ZOSNetworkPublicConfig> {
     const nodeTwinId = await this.capacity.getNodeTwinId(options.nodeId);
     return await this.rmb.request([nodeTwinId], "zos.network.public_config_get", "");
   }
@@ -184,14 +197,14 @@ class Zos {
    * Get the storage pools information for a specific node.
    *
    * @param {ZOSNodeModel} options - The options containing the node ID.
-   * @returns {Promise<any>} - A promise that resolves with the storage pools information.
+   * @returns {Promise<ZOSStoragePools[]>} - A promise that resolves with the storage pools information.
    * @decorators
    * - `@expose`: Exposes the method for external use.
    * - `@validateInput`: Validates the input options.
    */
   @expose
   @validateInput
-  async getStoragePools(options: ZOSNodeModel): Promise<any> {
+  async getStoragePools(options: ZOSNodeModel): Promise<ZOSStoragePools[]> {
     const nodeTwinId = await this.capacity.getNodeTwinId(options.nodeId);
     return await this.rmb.request([nodeTwinId], "zos.storage.pools", "");
   }
@@ -216,16 +229,22 @@ class Zos {
    * Get performance tests for a specific node.
    *
    * @param {ZOSNodeModel} options - The options containing the node ID.
-   * @returns {Promise<any>} - A promise that resolves with the performance test results.
+   * @returns {Promise<ZOSNodePerfTestsResult>} - A promise that resolves with the performance test results.
    * @decorators
    * - `@expose`: Exposes the method for external use.
    * - `@validateInput`: Validates the input options.
    */
   @expose
   @validateInput
-  async getNodePerfTests(options: ZOSNodeModel): Promise<any> {
+  async getNodePerfTests(options: ZOSNodeModel): Promise<ZOSNodePerfTestsResult> {
     const nodeTwinId = await this.capacity.getNodeTwinId(options.nodeId);
-    return await this.rmb.request([nodeTwinId], "zos.perf.get_all", "");
+    const result = new ZOSNodePerfTestsResult();
+    const response = await this.rmb.request([nodeTwinId], "zos.perf.get_all", "");
+    result.iperf = this.filterTest<NodeIPerf>(response, "iperf");
+    result.publicIPValidation = this.filterTest<NodeIPValidation>(response, "public-ip-validation");
+    result.healthCheck = this.filterTest<NodeHealthCheck>(response, "healthcheck");
+    result.cpuBenchmark = this.filterTest<NodeCPUTest>(response, "cpu-benchmark");
+    return result;
   }
 
   /**

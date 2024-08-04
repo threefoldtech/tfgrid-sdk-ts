@@ -22,11 +22,11 @@ class TFKVStore extends KVStore {
   }
 
   /**
-   * Sets a `key-value` pair in the `key-value` store.
+   * Prepares a set extrinsic for a `key-value` pair in the `key-value` store.
    * If encryption is enabled, the value will be encrypted before storing.
    *
    * @param {KVStoreSetOptions & { encrypt?: boolean }} options - The options for setting the `key-value` pair.
-   * @returns {Promise<ExtrinsicResult<KVStoreSetOptions>>} - A promise that resolves once the `key-value` pair is set.
+   * @returns {Promise<ExtrinsicResult<KVStoreSetOptions>>} - A promise that resolves once the `key-value` set extrinsic is created.
    */
   async set(options: KVStoreSetOptions & { encrypt?: boolean }): Promise<ExtrinsicResult<KVStoreSetOptions>> {
     if (options.encrypt === false) {

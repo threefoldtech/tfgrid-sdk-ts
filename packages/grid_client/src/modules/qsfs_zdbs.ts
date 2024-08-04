@@ -1,4 +1,3 @@
-import { Contract } from "@threefold/tfchain_client";
 import { ValidationError } from "@threefold/types";
 
 import { GridClientConfig } from "../config";
@@ -33,7 +32,7 @@ class QSFSZdbsModule extends BaseModule {
   }
 
   /**
-   * Creates multiple QSFS ZDB deployments based on the provided options.
+   * Creates QSFS ZDB deployment, this deployment contains multiple zdb instances.
    *
    * @param {QSFSZDBSModel} options - The options for creating the QSFS ZDB deployments.
    * @returns {Promise<TwinDeployment[]>} An array of TwinDeployment objects representing the created deployments.
@@ -76,7 +75,7 @@ class QSFSZdbsModule extends BaseModule {
   }
 
   /**
-   * Deploys multiple QSFS ZDB deployments based on the provided options.
+   * Deploys QSFS ZDB deployment based on the provided options.
    *
    * @param {QSFSZDBSModel} options - The options for deploying the QSFS ZDBs.
    * @returns {Promise<{ contracts: DeploymentResultContracts }>} An object containing the contracts of the deployed ZDBs.
@@ -141,11 +140,7 @@ class QSFSZdbsModule extends BaseModule {
   @expose
   @validateInput
   @checkBalance
-  async delete(options: QSFSZDBDeleteModel): Promise<{
-    created: Contract[];
-    deleted: Contract[];
-    updated: Contract[];
-  }> {
+  async delete(options: QSFSZDBDeleteModel): Promise<DeploymentResultContracts> {
     events.emit("logs", `Start deleting the QSFS ZDBs deployment with name ${options.name}`);
     return await this._delete(options.name);
   }

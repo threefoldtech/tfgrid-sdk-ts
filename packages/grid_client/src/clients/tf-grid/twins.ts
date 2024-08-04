@@ -13,10 +13,10 @@ interface TwinOptions {
  */
 class TFTwins extends Twins {
   /**
-   * Creates a new `twin` with the specified options.
+   * Prepare an extrinsic for creating a new `twin` with the specified options.
    *
    * @param options - The options for creating the `twin`, including the `relay` to connect to.
-   * @returns {Promise<ExtrinsicResult<Twin>>} A promise that resolves with the created `twin`.
+   * @returns {Promise<ExtrinsicResult<Twin>>} A promise that resolves with an extrinsic for `twin` creation.
    */
   async create(options: TwinOptions): Promise<ExtrinsicResult<Twin>> {
     const pk = generatePublicKey(this.client.mnemonicOrSecret!);
@@ -24,10 +24,10 @@ class TFTwins extends Twins {
   }
 
   /**
-   * Updates an existing `twin` with the specified options.
+   * Prepare an extrinsic for updating an existing `twin` with the specified options.
    *
    * @param options - The options for updating the `twin`, including the `relay` to connect to.
-   * @returns {Promise<ExtrinsicResult<Twin>>} A promise that resolves with the updated `twin`.
+   * @returns {Promise<ExtrinsicResult<Twin>>} A promise that resolves with an extrinsic for the `twin` update.
    */
   async update(options: TwinOptions): Promise<ExtrinsicResult<Twin>> {
     const pk = generatePublicKey(this.client.mnemonicOrSecret!);

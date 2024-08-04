@@ -76,10 +76,10 @@ class Twins extends QueryTwins {
   }
 
   /**
-   * Creates a new twin with the provided options.
+   * Creates a new twin extrinsic with the provided options.
    *
    * @param {TwinOptions} options - The options for creating the twin, including the relay and public key.
-   * @returns {Promise<ExtrinsicResult<Twin>>} A Promise that resolves to the created twin object.
+   * @returns {Promise<ExtrinsicResult<Twin>>} A Promise that resolves to the created twin extrinsic.
    */
   @checkConnection
   async create(options: TwinOptions): Promise<ExtrinsicResult<Twin>> {
@@ -91,7 +91,7 @@ class Twins extends QueryTwins {
    * Updates an existing twin with the provided options.
    *
    * @param {TwinOptions} options - The options for updating the twin, including the relay and public key.
-   * @returns {Promise<ExtrinsicResult<Twin>>} A Promise that resolves to the updated twin object.
+   * @returns {Promise<ExtrinsicResult<Twin>>} A Promise that resolves to the updated twin extrinsic.
    */
   @checkConnection
   async update(options: TwinOptions): Promise<ExtrinsicResult<Twin>> {

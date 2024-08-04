@@ -51,6 +51,8 @@ class NetworkModule extends BaseModule {
    *   description: "Example node",
    *   myceliumSeed: "seed123",
    * };
+   *
+   * const networkModule = new NetworkModule();
    * const result = await networkModule.addNode(nodeOptions);
    * console.log(result.contracts);
    *
@@ -85,6 +87,8 @@ class NetworkModule extends BaseModule {
    * @returns {Promise<string[]>} A promise that resolves to an array of network names.
    *
    * @example
+   *
+   * const networkModule = new NetworkModule();
    * const networkNames = await networkModule.list();
    * console.log(networkNames);
    *
@@ -115,6 +119,8 @@ class NetworkModule extends BaseModule {
    *   ipRange: "10.0.0.0/16",
    *   nodeId: 123
    * };
+   *
+   * const networkModule = new NetworkModule();
    * const doesNodeExist = await networkModule.hasNode(options);
    * console.log(doesNodeExist); // true or false
    *
@@ -145,6 +151,8 @@ class NetworkModule extends BaseModule {
    *   name: "exampleNetwork",
    *   ipRange: "10.0.0.0/16"
    * };
+   *
+   * const networkModule = new NetworkModule();
    * const wireGuardConfigs = await networkModule.getWireGuardConfigs(options);
    * console.log(wireGuardConfigs); // ["config1", "config2", ...]
    *

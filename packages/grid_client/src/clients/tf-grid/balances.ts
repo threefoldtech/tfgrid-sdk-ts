@@ -13,7 +13,7 @@ class TFBalances extends Balances {
   /**
    * Get the balance for a specific address.
    *
-   * This method retrieves the balance for a specific address by dividing the retrieved balances by 10^7.
+   * This method retrieves the balance for a specific address in TFT.
    *
    * @param {QueryBalancesGetOptions} options - The options for getting the balance, including the address.
    * @returns {Promise<Balance>} A promise that resolves with the balance object containing free, reserved, and frozen amounts.
@@ -28,10 +28,10 @@ class TFBalances extends Balances {
   }
 
   /**
-   * Transfer a specified amount of TFT (`ThreeFold Tokens`) to a given address.
+   * Prepare a Transfer extrinsic for a specified amount of TFT (`ThreeFold Tokens`) to a given address.
    *
    * @param {BalanceTransferOptions} options - The transfer options, including the destination address and the amount to transfer.
-   * @returns {Promise<ExtrinsicResult<number>>} A promise that resolves once the transfer is successfully completed.
+   * @returns {Promise<ExtrinsicResult<number>>} A promise that resolves once the transfer extrinsic is created.
    */
   async transfer(options: BalanceTransferOptions): Promise<ExtrinsicResult<number>> {
     const decimalAmount = new Decimal(options.amount);

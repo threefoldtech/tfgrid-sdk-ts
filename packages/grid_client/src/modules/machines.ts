@@ -123,7 +123,8 @@ class MachinesModule extends BaseModule {
    *   machines: [...],
    * };
    *
-   * const result = await MachinesModule.deploy(options);
+   * const machineModel = new MachinesModule()
+   * const result = await machineModel.deploy(options);
    * console.log(result.contracts);
    *
    * @decorators
@@ -152,7 +153,8 @@ class MachinesModule extends BaseModule {
    *
    * @example
    *
-   * const result = await MachinesModule.list();
+   * const machineModel = new MachinesModule()
+   * const result = await machineModel.list();
    * console.log(result);
    *
    * @decorators
@@ -171,8 +173,9 @@ class MachinesModule extends BaseModule {
    *
    * @example
    *
-   * const result = await MachinesModule.getObj("testName");
-   * console.log(result.contracts);
+   * const machineModel = new MachinesModule()
+   * const result = await machineModel.getObj("testName");
+   * console.log(result);
    *
    */
   async getObj(deploymentName: string): Promise<ZmachineData[]> {
@@ -192,11 +195,12 @@ class MachinesModule extends BaseModule {
    *
    * @example
    *
-   * const options: NetworkAddNodeModel = {
+   * const options: MachinesGetModel = {
    *   name: "test",
    * };
    *
-   * const result = await MachinesModule.get(options);
+   * const machineModel = new MachinesModule()
+   * const result = await machineModel.get(options);
    * console.log(result);
    *
    * @decorators
@@ -218,11 +222,12 @@ class MachinesModule extends BaseModule {
    *
    * @example
    *
-   * const options: NetworkAddNodeModel = {
+   * const options: MachinesDeleteModel = {
    *   name: "test",
    * };
    *
-   * const result = await MachinesModule.delete(options);
+   * const machineModel = new MachinesModule()
+   * const result = await machineModel.delete(options);
    * console.log(result);
    *
    * @decorators
@@ -255,7 +260,8 @@ class MachinesModule extends BaseModule {
    *   machines: [...],
    * };
    *
-   * const result = await MachinesModule.update(options);
+   * const machineModel = new MachinesModule()
+   * const result = await machineModel.update(options);
    * console.log(result);
    *
    * @decorators
@@ -298,7 +304,8 @@ class MachinesModule extends BaseModule {
    *   // Add other required options here
    * };
    *
-   * const result = await MachinesModule.add_machine(options);
+   * const machineModel = new MachinesModule()
+   * const result = await machineModel.add_machine(options);
    * console.log(result);
    *
    * @decorators
@@ -380,7 +387,8 @@ class MachinesModule extends BaseModule {
    *   deployment_name: "deploymentName",
    * };
    *
-   * const result = await MachinesModule.delete_machine(options);
+   * const machineModel = new MachinesModule()
+   * const result = await machineModel.delete_machine(options);
    * console.log(result);
    *
    * @decorators

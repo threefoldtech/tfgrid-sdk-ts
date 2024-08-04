@@ -305,10 +305,11 @@ class Contracts extends QueryContracts {
 
   /**
    * Creates a node contract.
-   *
-   * This method creates a node contract with the specified `nodeId`, `hash`, `data`, `numberOfPublicIps`, and `solutionProviderId`.
+   * This method creates a node contract extrinsic with the specified `nodeId`, `hash`, `data`, `numberOfPublicIps`, and `solutionProviderId`.
    *
    * @param {CreateNodeOptions} options - The options object containing the `nodeId`, `hash`, `data`, `numberOfPublicIps`, and `solutionProviderId` for creating the node contract.
+   * @returns {Promise<ExtrinsicResult<Contract>>} A promise that resolves to the created Contract extrinsic.
+
    * @returns {Promise<ExtrinsicResult<Contract>>} A promise that resolves to the created Contract object.
    */
   @checkConnection
@@ -329,7 +330,7 @@ class Contracts extends QueryContracts {
    * This method updates a node contract identified by the provided `id` with the new `hash` and `data`.
    *
    * @param {UpdateNodeOptions} options - The options object containing the `id`, `hash`, and `data` for updating the node contract.
-   * @returns {Promise<ExtrinsicResult<Contract>>} A promise that resolves to the updated Contract object.
+   * @returns {Promise<ExtrinsicResult<Contract>>} A promise that resolves to the updated Contract extrinsic.
    */
   @checkConnection
   async updateNode(options: UpdateNodeOptions): Promise<ExtrinsicResult<Contract>> {
@@ -342,12 +343,12 @@ class Contracts extends QueryContracts {
   }
 
   /**
-   * Creates a name contract.
+   * Creates a name contract extrinsic.
    *
    * This method creates a name contract with the specified `name`.
    *
    * @param {CreateNameOptions} options - The options object containing the `name` for creating the name contract.
-   * @returns {Promise<ExtrinsicResult<Contract>>} A promise that resolves to the created Contract object.
+   * @returns {Promise<ExtrinsicResult<Contract>>} A promise that resolves to the created Contract extrinsic.
    */
   @checkConnection
   async createName(options: CreateNameOptions): Promise<ExtrinsicResult<Contract>> {
@@ -356,12 +357,12 @@ class Contracts extends QueryContracts {
   }
 
   /**
-   * Creates a rent contract.
+   * Creates a rent contract extrinsic.
    *
    * This method creates a rent contract for the specified `nodeId` and `solutionProviderId`.
    *
    * @param {CreateRentOptions} options - The options object containing the `nodeId` and optional `solutionProviderId`.
-   * @returns {Promise<ExtrinsicResult<Contract>>} A promise that resolves to the created Contract object.
+   * @returns {Promise<ExtrinsicResult<Contract>>} A promise that resolves to the created Contract extrinsic.
    */
   @checkConnection
   async createRent(options: CreateRentOptions): Promise<ExtrinsicResult<Contract>> {
@@ -382,8 +383,8 @@ class Contracts extends QueryContracts {
    * result with the `contract ID` and specific result events related to contract cancellation.
    *
    * @param {CancelOptions} options - The options object containing the `ID` of the contract to be canceled.
-   * @returns {Promise<ExtrinsicResult<number> | undefined>} A promise that resolves to the updated `contract ID` after canceling the contract,
-   * or `undefined` if the contract does not exist.
+   * @returns {Promise<ExtrinsicResult<number> | undefined>} A promise that resolves with the contract cancelling extrinsic,
+   * * or `undefined` if the contract does not exist.
    */
   @checkConnection
   async cancel(options: CancelOptions): Promise<ExtrinsicResult<number> | undefined> {
@@ -399,12 +400,12 @@ class Contracts extends QueryContracts {
   }
 
   /**
-   * Creates a new service contract.
+   * Creates a new service contract extrinsic.
    *
-   * This method creates a new service contract with the provided `serviceAccount` and `consumerAccount`.
+   * This method creates a new service contract extrinsic with the provided `serviceAccount` and `consumerAccount`.
    *
    * @param {CreateServiceOptions} options - The options object containing the `serviceAccount` and `consumerAccount` for creating the service contract.
-   * @returns {Promise<ExtrinsicResult<ServiceContract>>} A promise that resolves to the created ServiceContract object.
+   * @returns {Promise<ExtrinsicResult<ServiceContract>>} A promise that resolves to the created ServiceContract extrinsic.
    */
   @checkConnection
   async createService(options: CreateServiceOptions): Promise<ExtrinsicResult<ServiceContract>> {
@@ -421,7 +422,7 @@ class Contracts extends QueryContracts {
    * This method either approves or rejects a service contract based on the provided `approve` flag in the `options` object.
    *
    * @param {ApproveServiceOptions} options - The options object containing the `serviceId` of the service contract and a boolean `approve` flag indicating whether to approve or reject the contract.
-   * @returns {Promise<ExtrinsicResult<ServiceContract>>} A promise that resolves to the updated ServiceContract object after approving or rejecting the service contract.
+   * @returns {Promise<ExtrinsicResult<ServiceContract>>} A promise that resolves to the updated ServiceContract extrinsic.
    */
   @checkConnection
   async approveService(options: ApproveServiceOptions): Promise<ExtrinsicResult<ServiceContract>> {
@@ -435,12 +436,12 @@ class Contracts extends QueryContracts {
   }
 
   /**
-   * Bills a service contract.
+   * Creates an extrinsic for Billing a service contract.
    *
    * This method bills a service contract identified by the provided `serviceId` with the specified `variableAmount` and `metadata`.
    *
    * @param {BillServiceOptions} options - The options object containing the `serviceId`, `variableAmount`, and `metadata` for billing the service contract.
-   * @returns {Promise<ExtrinsicResult<ServiceContract>>} A promise that resolves to the updated ServiceContract object after billing the service contract.
+   * @returns {Promise<ExtrinsicResult<ServiceContract>>} A promise that resolves to the extrinsic for billing the service contract.
    */
   @checkConnection
   async billService(options: BillServiceOptions): Promise<ExtrinsicResult<ServiceContract>> {
@@ -453,12 +454,12 @@ class Contracts extends QueryContracts {
   }
 
   /**
-   * Cancels a service contract.
+   * Creates an extrinsic for canceling a service contract.
    *
    * This method cancels a service contract identified by the provided `serviceId`.
    *
    * @param {CancelServiceOptions} options - The options object containing the `serviceId` of the service contract to be canceled.
-   * @returns {Promise<ExtrinsicResult<any>>} A promise that resolves to the updated ServiceContract object after canceling the service contract.
+   * @returns {Promise<ExtrinsicResult<any>>} A promise that resolves to the extrinsic for canceling the service contract.
    */
   @checkConnection
   async cancelService(options: CancelServiceOptions): Promise<ExtrinsicResult<any>> {
@@ -472,7 +473,7 @@ class Contracts extends QueryContracts {
    * This method sets the base fee and variable fee for a service contract identified by the provided `serviceId`.
    *
    * @param {SetServiceFeesOptions} options - The options object containing the `serviceId`, `baseFee`, and `variableFee` to be set.
-   * @returns {Promise<ExtrinsicResult<ServiceContract>>} A promise that resolves to the updated ServiceContract object after setting the fees.
+   * @returns {Promise<ExtrinsicResult<ServiceContract>>} A promise that resolves to the extrinsic for setting the fees.
    */
   @checkConnection
   async setServiceFees(options: SetServiceFeesOptions): Promise<ExtrinsicResult<ServiceContract>> {
@@ -490,7 +491,7 @@ class Contracts extends QueryContracts {
    * This method sets the extra fee for a dedicated node identified by the provided nodeId.
    *
    * @param {SetDedicatedNodeExtraFeesOptions} options - The options object containing the nodeId and extraFee to be set.
-   * @returns {Promise<any>} A promise that resolves to the result of setting the extra fee for the dedicated node.
+   * @returns {Promise<any>} A promise that resolves to the extrinsic for setting the extra fee for the dedicated node.
    */
   @checkConnection
   async setDedicatedNodeExtraFee(options: SetDedicatedNodeExtraFeesOptions): Promise<any> {
@@ -504,7 +505,7 @@ class Contracts extends QueryContracts {
    * This method sets the metadata for a service contract identified by the provided serviceId.
    *
    * @param {SetServiceMetadataOptions} options - The options object containing the serviceId and metadata to be set.
-   * @returns {Promise<ExtrinsicResult<ServiceContract>>} A promise that resolves to the updated ServiceContract object after setting the metadata.
+   * @returns {Promise<ExtrinsicResult<ServiceContract>>} A promise that resolves to the extrinsic for setting the metadata.
    */
   @checkConnection
   async setServiceMetadata(options: SetServiceMetadataOptions): Promise<ExtrinsicResult<ServiceContract>> {

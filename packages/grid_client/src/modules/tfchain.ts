@@ -119,9 +119,9 @@ class TFChain implements blockchainInterface {
   }
 
   /**
-   * Initializes a new TFChain wallet with the provided options.
+   * Loads the TFChain wallet with the provided options.
    *
-   * @param {TfchainWalletInitModel} options - The options for initializing the wallet, including name and secret.
+   * @param {TfchainWalletInitModel} options - The options for loading the wallet, including name and secret.
    * @returns {Promise<string>} A promise that resolves to the address of the initialized wallet.
    * @decorators
    * - `@expose`: Exposes the method for external use.
@@ -446,10 +446,10 @@ class TFChain implements blockchainInterface {
   }
 
   /**
-   * Creates a new account by generating a mnemonic, activating the account, and creating a twin.
+   * Activates an account for the given mnemonic and creates a twin.
    *
-   * @param relay The relay to use for the account creation.
-   * @param disconnect Flag indicating whether to disconnect after creating the account.
+   * @param relay The relay to use for the twin creation.
+   * @param disconnect Flag indicating whether to disconnect after activating the account.
    * @returns A promise that resolves to an object containing the public key, mnemonic, and twin ID of the created account.
    */
   async activateAccountAndCreateTwin(mnemonic: string, relay: string, disconnect = false) {

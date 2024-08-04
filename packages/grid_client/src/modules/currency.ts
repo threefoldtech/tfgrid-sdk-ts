@@ -33,7 +33,7 @@ class TFTUSDConversionService {
   /**
    * Convert the given amount from `USD` to `TFT` using the current conversion rate.
    *
-   * @param options - The currency model containing the amount in `USD` to convert.
+   * @param options - The currency model containing the amount in `USD`.
    * @returns A string representation of the converted amount in `TFT`.
    * @decorators
    * - `@expose`: Exposes the method for external use.
@@ -49,7 +49,7 @@ class TFTUSDConversionService {
   /**
    * Convert the given amount from `TFT` to `USD` using the current conversion rate.
    *
-   * @param options - The currency model containing the amount in `TFT` to convert.
+   * @param options - The currency model containing the amount in `TFT`.
    * @returns A string representation of the converted amount in `USD`.
    * @decorators
    * - `@expose`: Exposes the method for external use.
@@ -63,9 +63,9 @@ class TFTUSDConversionService {
   }
 
   /**
-   * Convert the given amount from `TFT` to `TFT` by multiplying with 24 hours.
+   * Changes the rate from hourly to daily.
    *
-   * @param options - The currency model containing the amount in `TFT` to convert.
+   * @param options - The currency model containing the amount in `TFT`.
    * @returns A string representation of the converted amount in `TFT`.
    * @decorators
    * - `@expose`: Exposes the method for external use.
@@ -79,9 +79,9 @@ class TFTUSDConversionService {
   }
 
   /**
-   * Convert the given amount from `TFT` to `TFT` by multiplying with 30 days.
+   * Changes the rate from hourly to monthly.
    *
-   * @param options - The currency model containing the amount in `TFT` to convert.
+   * @param options - The currency model containing the amount in `TFT`.
    * @returns A string representation of the converted amount in `TFT`.
    * @decorators
    * - `@expose`: Exposes the method for external use.
@@ -95,9 +95,9 @@ class TFTUSDConversionService {
   }
 
   /**
-   * Convert the given amount from TFT to TFT by multiplying with 12 months.
+   * Changes the rate from hourly to yearly.
    *
-   * @param options - The currency model containing the amount in TFT to convert.
+   * @param options - The currency model containing the amount in TFT.
    * @returns A string representation of the converted amount in TFT.
    * @decorators
    * - `@expose`: Exposes the method for external use.
@@ -111,9 +111,9 @@ class TFTUSDConversionService {
   }
 
   /**
-   * Convert the given amount from USD to USD by multiplying with 24 hours.
+   * Changes the rate from hourly to daily.
    *
-   * @param options - The currency model containing the amount in USD to convert.
+   * @param options - The currency model containing the amount in USD.
    * @returns A string representation of the converted amount in USD.
    * @decorators
    * - `@expose`: Exposes the method for external use.
@@ -127,9 +127,9 @@ class TFTUSDConversionService {
   }
 
   /**
-   * Convert the given amount from `USD` to `USD` by multiplying with 30 days.
+   * Changes the rate from hourly to monthly.
    *
-   * @param options - The currency model containing the amount in `USD` to convert.
+   * @param options - The currency model containing the amount in `USD`.
    * @returns A string representation of the converted amount in `USD`.
    * @decorators
    * - `@expose`: Exposes the method for external use.
@@ -143,9 +143,9 @@ class TFTUSDConversionService {
   }
 
   /**
-   * Convert the given amount from `USD` to `USD` by multiplying with `12 months`.
+   * Changes the rate from hourly to yearly.
    *
-   * @param options - The currency model containing the amount in `USD` to convert.
+   * @param options - The currency model containing the amount in `USD`.
    * @returns A string representation of the converted amount in `USD`.
    * @decorators
    * - `@expose`: Exposes the method for external use.

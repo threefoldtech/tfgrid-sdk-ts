@@ -211,7 +211,8 @@ class GridClient {
   }
 
   /**
-   * Gets the default URLs for the specified network environment.
+    * Gets the configured URLs (or the default URLs if not provided) for the specified network environment.  
+
    *
    * @param {NetworkEnv} network - The network environment.
    *

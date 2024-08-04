@@ -38,7 +38,7 @@ function setConfig() {
  * @example
  *
  * const deploymentName = 'testVM'
- * const projectName = 'vm' + deploymentName
+ * const projectName = 'vm/' + deploymentName
  * const gc = await getClient(projectName)
  * await gc.machines.deploy({...});
  * // When you deploy using this project name, you'll only be able to list your deployments using this same project name.

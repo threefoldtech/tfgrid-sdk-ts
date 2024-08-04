@@ -337,11 +337,7 @@ class K8sModule extends BaseModule {
   @expose
   @validateInput
   @checkBalance
-  async delete(options: K8SDeleteModel): Promise<{
-    created: Contract[];
-    deleted: Contract[];
-    updated: Contract[];
-  }> {
+  async delete(options: K8SDeleteModel): Promise<DeploymentResultContracts> {
     events.emit("logs", `Start deleting the cluster with name ${options.name}`);
     return await this._delete(options.name);
   }

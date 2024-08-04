@@ -116,7 +116,7 @@ class ZdbsModule extends BaseModule {
    *
    * This method fetches and returns a list of ZDB deployments.
    *
-   * @returns {Promise<string[]>} - A promise that resolves to an array of string representing the ZDB contract names.
+   * @returns {Promise<string[]>} - A promise that resolves to an array of string representing the ZDB deployment names.
    * @decorators
    * - `@expose`: Exposes the method for external use.
    */
@@ -191,11 +191,7 @@ class ZdbsModule extends BaseModule {
   @expose
   @validateInput
   @checkBalance
-  async delete(options: ZDBDeleteModel): Promise<{
-    created: Contract[];
-    deleted: Contract[];
-    updated: Contract[];
-  }> {
+  async delete(options: ZDBDeleteModel): Promise<DeploymentResultContracts> {
     events.emit("logs", `Start deleting the ZDB deployment with name ${options.name}`);
     return await this._delete(options.name);
   }

@@ -43,9 +43,9 @@ class GWModule extends BaseModule {
   }
 
   /**
-   * Deploys a gateway with FQDN.
+   * Deploys a gateway workload with FQDN.
    *
-   * This method deploys a gateway with the provided FQDN configuration.
+   * This method deploys a gateway workload with the provided FQDN configuration.
    *
    * It checks if another gateway deployment with the same name already exists,
    * emits a log event, creates the gateway deployment, handles the twin deployments,
@@ -90,9 +90,9 @@ class GWModule extends BaseModule {
   }
 
   /**
-   * Deploys a gateway with a given name.
+   * Deploys a gateway workload with a given name, this name will be used as a subdomain to the gateway's domain.
    *
-   * This method deploys a gateway with the provided name configuration.
+   * This method deploys a gateway workload with the provided name configuration.
    * It checks if another gateway deployment with the same name already exists,
    * emits a log event, creates the gateway deployment, handles the twin deployments,
    * saves the contracts, and returns the deployed contracts.
@@ -184,12 +184,8 @@ class GWModule extends BaseModule {
   @expose
   @validateInput
   @checkBalance
-  async delete_fqdn(options: GatewayFQDNDeleteModel): Promise<{
-    created: Contract[];
-    deleted: Contract[];
-    updated: Contract[];
-  }> {
-    events.emit("logs", `Start deleting the ZDB deployment with name ${options.name}`);
+  async delete_fqdn(options: GatewayFQDNDeleteModel): Promise<DeploymentResultContracts> {
+    events.emit("logs", `Start deleting the gateway deployment with name ${options.name}`);
     return await this._delete(options.name);
   }
 
@@ -226,12 +222,8 @@ class GWModule extends BaseModule {
   @expose
   @validateInput
   @checkBalance
-  async delete_name(options: GatewayNameDeleteModel): Promise<{
-    created: Contract[];
-    deleted: Contract[];
-    updated: Contract[];
-  }> {
-    events.emit("logs", `Start deleting the ZDB deployment with name ${options.name}`);
+  async delete_name(options: GatewayNameDeleteModel): Promise<DeploymentResultContracts> {
+    events.emit("logs", `Start deleting the gateway deployment with name ${options.name}`);
     return await this._delete(options.name);
   }
 

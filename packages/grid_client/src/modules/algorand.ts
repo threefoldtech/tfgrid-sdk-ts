@@ -210,7 +210,7 @@ class Algorand implements blockchainInterface {
   /**
    * Initializes a new account on the Algorand blockchain.
    *
-   * This method generates a new account using the provided secret key, saves the account under the specified name,
+   * This method loads an account using the provided secret key, saves the account under the specified name,
    * and returns the address of the created account.
    *
    * @param {AlgorandAccountInitModel} options - The options for initializing the account, including the name and secret key.

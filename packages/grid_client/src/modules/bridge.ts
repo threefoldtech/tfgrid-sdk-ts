@@ -7,7 +7,7 @@ class Bridge {
   client: TFClient;
 
   /**
-   * Class representing a Bridge for interacting with TFClient's TFTBridge functionality.
+   * Class representing a Bridge for interacting with TFChain's TFTBridge functionality.
    *
    * This class provides methods for listening to mint completion, getting withdrawal and deposit fees,
    * and swapping assets to Stellar network.

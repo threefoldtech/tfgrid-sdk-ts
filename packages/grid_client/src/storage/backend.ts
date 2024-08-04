@@ -93,10 +93,10 @@ class BackendStorage {
   }
 
   /**
-   * Retrieves a list of values stored under the specified key from the storage.
+   * Retrieves a list of keys starting with a specified key from the storage.
    *
-   * @param key The key of the values to be retrieved.
-   * @returns A promise that resolves with an array of strings representing the values stored under the key.
+   * @param key The starting part of the keys to be retrieved.
+   * @returns A promise that resolves with an array of strings representing the keys starting with the provided key.
    */
   list(key: string): Promise<string[]> {
     return this.storage.list(key);

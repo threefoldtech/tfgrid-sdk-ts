@@ -123,7 +123,7 @@ class Calculator {
   }
 
   /**
-   * Asynchronously retrieves the TFT price from the client.
+   * Asynchronously retrieves the TFT price from the TFChain.
    *
    * @returns {Promise<number>} A promise that resolves to the TFT price.
    * @decorators
@@ -138,7 +138,7 @@ class Calculator {
   }
 
   /**
-   * Asynchronously calculates the monthly cost in musd (millions of USD) based on the provided options.
+   * Asynchronously calculates the monthly cost in musd (milli USD) based on the provided options.
    *
    * @param {CalculatorModel} options - The calculator model options containing, sru, mru, and some other fields.
    * @returns {Promise<{ musd_month: number, dedicatedDiscount: number }>} A promise that resolves to an object containing the calculated monthly cost in musd and the discount for dedication nodes.
