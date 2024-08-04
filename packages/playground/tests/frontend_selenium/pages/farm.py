@@ -95,6 +95,16 @@ class FarmPage:
             if farm_name in table:
                 break
         return table
+    
+    def search_functionality_invalid_name(self, farm_name):
+        sleep(2)
+        self.browser.find_element(*self.search_bar).send_keys(Keys.CONTROL + "a")
+        self.browser.find_element(*self.search_bar).send_keys(Keys.DELETE)
+        for char in farm_name:
+            self.browser.find_element(*self.search_bar).send_keys(char)
+        table = self.browser.find_element(*self.table).text
+        sleep(3)
+        return table
 
     def display_all_farms(self):
         self.browser.execute_script("window.scrollTo(0,document.body.scrollHeight)")

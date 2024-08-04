@@ -41,9 +41,8 @@ def test_create_farm(browser):
     assert farm_page.wait_for('Farm created successfully')
     farm_page.search_functionality(farm_name)
     assert farm_page.wait_for_farm_name(farm_name)
-    table = farm_page.search_functionality(generate_string())
+    table = farm_page.search_functionality_invalid_name(generate_string())
     assert 'No data available' in table
-    farm_page.search_functionality("")
     farm_page.open_create()
     farm_page.create_farm_invalid_name(farm_name)
     assert farm_page.wait_for('Farm name already exists!')

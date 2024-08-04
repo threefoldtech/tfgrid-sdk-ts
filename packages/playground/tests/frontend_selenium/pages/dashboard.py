@@ -192,7 +192,9 @@ class DashboardPage:
 
     def navigate_to_learn_about_grid(self):
         WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.learn_about_grid_button))
+        webdriver.ActionChains(self.browser).send_keys(Keys.END).perform()
         webdriver.ActionChains(self.browser).send_keys(Keys.PAGE_DOWN).perform()
+        time.sleep(3)
         self.browser.find_element(*self.learn_about_grid_button).click()
         return self.get_link()
     

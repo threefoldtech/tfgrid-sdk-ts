@@ -84,15 +84,30 @@ class TransferPage:
     def get_balance(self):
         balance = 'Loadin'
         while(balance == 'Loadin'):
-            balance = self.browser.find_element(*self.balance_text).text[:-4]
+            while True:
+                try:
+                    balance = self.browser.find_element(*self.balance_text).text[:-4]
+                    break  # Exit the loop if interaction is successful
+                except StaleElementReferenceException:
+                    time.sleep(0.5)
         return balance
-
+    
     def get_balance_transfer(self, balance):
-        new_balance = self.browser.find_element(*self.balance_text).text[:-4]
+        while True:
+            try:
+                new_balance = self.browser.find_element(*self.balance_text).text[:-4]
+                break  # Exit the loop if interaction is successful
+            except StaleElementReferenceException:
+                time.sleep(0.5)
         WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.transfer_tft_title))
         while(new_balance == balance or 'Loadin' in new_balance):
             self.wait_for(' Balance: ')
-            new_balance = self.browser.find_element(*self.balance_text).text[:-4]
+            while True:
+                try:
+                    new_balance = self.browser.find_element(*self.balance_text).text[:-4]
+                    break  # Exit the loop if interaction is successful
+                except StaleElementReferenceException:
+                    time.sleep(0.5)
         return new_balance
 
     def get_address_submit(self):
