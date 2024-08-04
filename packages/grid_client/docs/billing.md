@@ -10,7 +10,7 @@ Some of the used resources should be updated whenever you try to do these calcul
 
 TFT price can be retrieved either from the dashboard, through the price available in the header
 
-![image](https://user-images.githubusercontent.com/101194226/252134103-e7cce566-311d-4293-8e73-358d45b616d1.png)
+![image](./assets/dashboard.png)
 
 or directly through [stellar](https://stellar.expert/explorer/public/asset/TFT-GBOVQKJYHXRR3DX6NOX2RRYFRCUMSADGDESTDNBDS6CDVLGVESRTAC47-1?asset[]=TFT-GBOVQKJYHXRR3DX6NOX2RRYFRCUMSADGDESTDNBDS6CDVLGVESRTAC47-1&filter=markets&market=USDC-GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN-1).
 
@@ -38,7 +38,7 @@ Hru: 0
 
 ### Calculating the CU
 
-The current CU value is `10 mUSD/h`, make sure that this value is updated according to the details section.
+The current CU value is `10 mUSD/h`, please note that prices could be subjected to change.
 
 ```sh
 CU = min( max(MRU/4, CRU/2), max(MRU/8, CRU), max(MRU/2, CRU/4) )
@@ -53,7 +53,7 @@ CU cost/hour = CU * CU pricing
 
 ### Calculating the SU
 
-The current SU value is `5 mUSD/h`, make sure that this value is updated according to the details section.
+The current SU value is `5 mUSD/h`, please note that prices could be subjected to change.
 
 ```sh
 SU = HRU/1200 + SRU/200
@@ -67,7 +67,7 @@ SU cost/hour = SU * SU pricing
 
 ### Calculating the Billing Rate for the contract
 
-The current TFT value is `0.011 USD`, make sure that this value is updated according to the details section.
+The current TFT value is `0.012 USD`, please note that prices could be subjected to change.
 
 ```sh
 Contract cost/hour = CU cost/hour + SU cost/hour
@@ -82,7 +82,7 @@ Contract cost/hour = CU cost/hour + SU cost/hour
 
 ### Applying the discounts
 
-Before assuming that the price above is the final price, check first if your twin is applicable for any of the available staking discount levels. to understand more about discount levels please check the [manual](https://manual.grid.tf/cloud/cloudunits_pricing.html#staking-discount).
+Before assuming that the price listed is the final price, please verify if you qualify for any of the available staking discount levels for additional savings. For more details on these discount levels, refer to the [manual](https://manual.grid.tf/cloud/cloudunits_pricing.html#staking-discount).
 
 For this example lets assume that this twin has 18 months worth of TFTs staked, so the user will be applicable for a Gold discount level (60% discount).
 
@@ -139,7 +139,7 @@ MRU = 15.55
 
 ### Calculating CU
 
-The current CU value is `10 mUSD/h`, make sure that this value is updated according to the details section.
+The current CU value is `10 mUSD/h`, please note that prices could be subjected to change.
 
 ```sh
 CU = min( max(MRU/4, CRU/2), max(MRU/8, CRU), max(MRU/2, CRU/4) )
@@ -154,7 +154,7 @@ CU cost/hour = CU * CU pricing
 
 ### Calculating SU
 
-The current SU value is `5 mUSD/h`, make sure that this value is updated according to the details section.
+The current SU value is `5 mUSD/h`, please note that prices could be subjected to change.
 
 ```sh
 SU = HRU/1200 + SRU/200
@@ -168,7 +168,7 @@ SU cost/hour = SU * SU pricing
 
 ### Calculating Billing Rate for the contract
 
-The current TFT value is `0.011 USD`, make sure that this value is updated according to the details section.
+The current TFT value is `0.012 USD`, please note that prices could be subjected to change.
 
 ```sh
 Contract cost/hour = CU cost/hour + SU cost/hour
@@ -191,7 +191,7 @@ Cost with 50% discount = 35.725319999999996 * 0.5
 
 ### Applying the Staking discount
 
-Before assuming that the price above is the final price, check first if your twin is applicable for any of the available staking discount levels. to understand more about discount levels please check the [manual](https://manual.grid.tf/cloud/cloudunits_pricing.html#staking-discount).
+Before assuming that the price listed is the final price, please verify if you qualify for any of the available staking discount levels for additional savings. For more details on these discount levels, refer to the [manual](https://manual.grid.tf/cloud/cloudunits_pricing.html#staking-discount).
 
 For this example lets assume that this twin has 18 months worth of TFTs staked, so the user will be applicable for a Gold discount level (60% discount).
 
@@ -223,7 +223,7 @@ uniqueName in TFT = 0.00025 * 100
 
 ### Applying Staking discount
 
-Before assuming that the price above is the final price, check first if your twin is applicable for any of the available staking discount levels. to understand more about discount levels please check the [manual](https://manual.grid.tf/cloud/cloudunits_pricing.html#staking-discount).
+Before assuming that the price listed is the final price, please verify if you qualify for any of the available staking discount levels for additional savings. For more details on these discount levels, refer to the [manual](https://manual.grid.tf/cloud/cloudunits_pricing.html#staking-discount).
 
 For this example lets assume that this twin has 18 months worth of TFTs staked, so the user will be applicable for a Gold discount level (60% discount).
 
@@ -256,7 +256,7 @@ Public IP in TFT = 0.004 * 100
 
 ### Applying Staking discount with public IP
 
-Before assuming that the price above is the final price, check first if your twin is applicable for any of the available staking discount levels. to understand more about discount levels please check the [manual](https://manual.grid.tf/cloud/cloudunits_pricing.html#staking-discount).
+Before assuming that the price listed is the final price, please verify if you qualify for any of the available staking discount levels for additional savings. For more details on these discount levels, refer to the [manual](https://manual.grid.tf/cloud/cloudunits_pricing.html#staking-discount).
 
 For this example lets assume that this twin has 18 months worth of TFTs staked, so the user will be applicable for a Gold discount level (60% discount).
 
@@ -297,7 +297,7 @@ NU price in TFT = 0.0015 * 100
 
 ### Applying Staking discount with NU
 
-Before assuming that the price above is the final price, check first if your twin is applicable for any of the available staking discount levels. to understand more about discount levels please check the [manual](https://manual.grid.tf/cloud/cloudunits_pricing.html#staking-discount).
+Before assuming that the price listed is the final price, please verify if you qualify for any of the available staking discount levels for additional savings. For more details on these discount levels, refer to the [manual](https://manual.grid.tf/cloud/cloudunits_pricing.html#staking-discount).
 
 For this example lets assume that this twin has 18 months worth of TFTs staked, so the user will be applicable for a Gold discount level (60% discount).
 
