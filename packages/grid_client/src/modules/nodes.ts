@@ -1,5 +1,6 @@
-import { BaseError, GridClientErrors, TFChainError } from "@threefold/types";
+import { BaseError, GridClientErrors } from "@threefold/types";
 
+import { TFChainError } from "../../../tfchain_client/src/errors";
 import { TFClient } from "../clients";
 import { GridClientConfig } from "../config";
 import { events, validateInput } from "../helpers";
@@ -42,7 +43,9 @@ class Nodes {
         e.message = `Failed to create rent contract on node ${options.nodeId} due to ${e.message}`;
         throw e;
       }
-      throw new TFChainError(`Failed to create rent contract on node ${options.nodeId} due to ${e}`);
+      throw new TFChainError({
+        message: `Failed to create rent contract on node ${options.nodeId} due to ${e}`,
+      });
     }
   }
 
@@ -64,7 +67,9 @@ class Nodes {
         e.message = `Failed to delete rent contract on node ${options.nodeId} due to ${e.message}`;
         throw e;
       }
-      throw new TFChainError(`Failed to delete rent contract on node ${options.nodeId} due to ${e}`);
+      throw new TFChainError({
+        message: `Failed to delete rent contract on node ${options.nodeId} due to ${e}`,
+      });
     }
   }
 
@@ -77,7 +82,9 @@ class Nodes {
         return res;
       })
       .catch(err => {
-        throw new TFChainError(`Error getting rent for node ${options.nodeId}: ${err}`);
+        throw new TFChainError({
+          message: `Error getting rent for node ${options.nodeId}: ${err}`,
+        });
       });
   }
 

@@ -1,12 +1,13 @@
 import { Keyring } from "@polkadot/keyring";
 import { waitReady } from "@polkadot/wasm-crypto";
-import { BaseError, TFChainError, ValidationError } from "@threefold/types";
+import { BaseError, ValidationError } from "@threefold/types";
 import axios from "axios";
 import { generateMnemonic } from "bip39";
 import { Buffer } from "buffer";
 import MD5 from "crypto-js/md5";
 import * as PATH from "path";
 
+import { TFChainError } from "../../../tfchain_client/src/errors";
 import { TFClient } from "../clients/tf-grid/client";
 import { GridClientConfig } from "../config";
 import { formatErrorMessage } from "../helpers";
@@ -148,7 +149,9 @@ class TFChain implements blockchainInterface {
         e.message = formatErrorMessage(`Could not update account mnemonics`, e);
         throw e;
       }
-      throw new TFChainError(`Could not update account mnemonics: ${e}`);
+      throw new TFChainError({
+        message: `Could not update account mnemonics: ${e}`,
+      });
     }
     return client.address;
   }
@@ -225,7 +228,9 @@ class TFChain implements blockchainInterface {
         e.message = formatErrorMessage(`Could not complete transfer transaction`, e);
         throw e;
       }
-      throw new TFChainError(`Could not complete transfer transaction: ${e}`);
+      throw new TFChainError({
+        message: `Could not complete transfer transaction: ${e}`,
+      });
     }
   }
   @expose
@@ -248,7 +253,9 @@ class TFChain implements blockchainInterface {
         e.message = formatErrorMessage(`Could not complete transfer transaction`, e);
         throw e;
       }
-      throw new TFChainError(`Could not complete transfer transaction: ${e}`);
+      throw new TFChainError({
+        message: `Could not complete transfer transaction: ${e}`,
+      });
     }
   }
 
@@ -301,7 +308,9 @@ class TFChain implements blockchainInterface {
       await new Promise(f => setTimeout(f, 1000));
     }
     if (balance.free <= 0) {
-      throw new TFChainError("Couldn't activate the newly created account.");
+      throw new TFChainError({
+        message: `Couldn't activate the newly created account.`,
+      });
     }
     await (
       await client.termsAndConditions.accept({ documentLink: "https://library.threefold.me/info/legal/#/" })

@@ -7,18 +7,18 @@ import { InsufficientBalanceError } from "@threefold/types";
 
 interface ITFChainError {
   message: string;
-  keyError: string;
+  keyError?: string;
   section?: string;
-  method: string;
-  args: AnyTuple;
+  method?: string;
+  args?: AnyTuple;
   docs?: string[];
 }
 
 class TFChainError extends Error implements ITFChainError {
-  args: AnyTuple;
-  keyError: string;
+  args?: AnyTuple;
+  keyError?: string;
   section?: string;
-  method: string;
+  method?: string;
   docs?: string[];
 
   constructor(options: ITFChainError) {
