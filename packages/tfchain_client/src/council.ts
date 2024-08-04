@@ -1,11 +1,15 @@
-import { SubmittableExtrinsic } from "@polkadot/api-base/types";
-import { ISubmittableResult } from "@polkadot/types/types";
-
 import { Client, QueryClient } from "./client";
+import { ExtrinsicResult } from "./types";
 import { checkConnection } from "./utils";
 
 export interface QueryGetProposalOptions {
-  hash: string;
+  proposalHash: string;
+}
+
+export interface Proposal {
+  section: string;
+  method: string;
+  args: unknown;
 }
 
 class QueryCouncil {
@@ -14,9 +18,9 @@ class QueryCouncil {
   }
 
   @checkConnection
-  async getProposal(options: QueryGetProposalOptions) {
-    const res = await this.client.api.query.council.proposalOf(options.hash);
-    return res;
+  async getProposal(options: QueryGetProposalOptions): Promise<Proposal> {
+    const res = await this.client.api.query.council.proposalOf(options.proposalHash);
+    return res.toHuman() as unknown as Proposal;
   }
 
   @checkConnection
@@ -32,8 +36,8 @@ class QueryCouncil {
   }
 }
 
-export interface CouncilProposeOptions {
-  proposal: SubmittableExtrinsic<"promise", ISubmittableResult>;
+export interface CouncilProposeOptions<T> {
+  proposal: ExtrinsicResult<T>;
   threshold: number;
 }
 
@@ -55,7 +59,7 @@ class Council extends QueryCouncil {
   }
 
   @checkConnection
-  async propose(options: CouncilProposeOptions) {
+  async propose<T>(options: CouncilProposeOptions<T>) {
     const extrinsic = await this.client.api.tx.council.propose(options.threshold, options.proposal, 1000);
     return this.client.patchExtrinsic(extrinsic);
   }
