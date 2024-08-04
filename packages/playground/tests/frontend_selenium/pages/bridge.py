@@ -4,7 +4,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.alert import Alert
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-
+import time
 class BridgePage:
 
     """
@@ -97,6 +97,7 @@ class BridgePage:
         self.browser.find_element(*self.stellar_address).send_keys(Keys.CONTROL + "a")
         self.browser.find_element(*self.stellar_address).send_keys(Keys.DELETE)
         self.browser.find_element(*self.stellar_address).send_keys(data)
+        time.sleep(2)
         return self.browser.find_element(*self.submit_button).is_enabled()
 
     def check_withdraw_tft_amount(self, data):
@@ -104,12 +105,14 @@ class BridgePage:
         self.browser.find_element(*self.amount_tft).send_keys(Keys.DELETE)
         self.browser.find_element(*self.amount_tft).send_keys(data)
         WebDriverWait(self.browser, 30).until(EC.element_to_be_clickable(self.submit_button))
+        time.sleep(2)
         return self.browser.find_element(*self.submit_button).is_enabled()
 
     def check_withdraw_invalid_tft_amount(self, data):
         self.browser.find_element(*self.amount_tft).send_keys(Keys.CONTROL + "a")
         self.browser.find_element(*self.amount_tft).send_keys(Keys.DELETE)
         self.browser.find_element(*self.amount_tft).send_keys(data)
+        time.sleep(2)
         return self.browser.find_element(*self.submit_button).is_enabled()
 
     def check_withdraw(self, address, amount):
