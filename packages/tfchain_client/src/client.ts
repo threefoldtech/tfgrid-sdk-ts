@@ -328,6 +328,7 @@ class Client extends QueryClient {
     extrinsic: SubmittableExtrinsic<"promise", ISubmittableResult>,
     resultSections: string[] = [],
     resultEvents: string[] = [],
+    map?: (value: unknown) => T,
   ): Promise<T> {
     const promise = new Promise(async (resolve, reject) => {
       function callback(res) {
@@ -353,7 +354,8 @@ class Client extends QueryClient {
               resultSections.includes(section) &&
               (resultEvents.length === 0 || (resultEvents.length > 0 && resultEvents.includes(method)))
             ) {
-              resultData.push(data.toPrimitive()[0]);
+              if (map) resultData.push(map(data.toPrimitive()));
+              else resultData.push(data.toPrimitive()[0]);
             } else if (section === SYSTEM && method === ExtrinsicState.ExtrinsicSuccess) {
               if (!(extrinsic.method.section === UTILITY && BATCH_METHODS.includes(extrinsic.method.method))) {
                 if (resultData.length > 0) resolve(resultData[0]);
@@ -397,12 +399,13 @@ class Client extends QueryClient {
     extrinsic: SubmittableExtrinsic<"promise", ISubmittableResult>,
     resultSections: string[] = [""],
     resultEvents: string[] = [],
-  ): Promise<T> {
+    map?: (value: unknown) => T,
+  ): Promise<T | T[]> {
     await Client.lock.acquireAsync();
     console.log("Lock acquired");
     let result;
     try {
-      result = await this._applyExtrinsic<T>(extrinsic, resultSections, resultEvents);
+      result = await this._applyExtrinsic<T | T[]>(extrinsic, resultSections, resultEvents, map);
     } finally {
       Client.lock.release();
       console.log("Lock released");
@@ -417,8 +420,7 @@ class Client extends QueryClient {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this;
     (<any>extrinsic).apply = async () => {
-      const res = await self.applyExtrinsic(extrinsic, options.resultSections, options.resultEvents);
-      if (options.map) return options.map(res);
+      const res = await self.applyExtrinsic(extrinsic, options.resultSections, options.resultEvents, options.map);
       return res;
     };
     (<any>extrinsic).resultEvents = options.resultEvents;
