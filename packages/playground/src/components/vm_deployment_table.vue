@@ -367,11 +367,9 @@ function updateItem(newItem: any) {
 }
 
 function renameFlist(url: string) {
-  if (url.includes("tf-official")) {
-    return url.substring(url.lastIndexOf("/") + 1, url.lastIndexOf("."));
-  }
+  const flist = url.substring(url.lastIndexOf("/") + 1, url.lastIndexOf("."));
 
-  return url.length > 40 ? url.substring(0, 40) + "..." : url;
+  return flist.length > 40 ? flist.substring(0, 40) + "..." : flist;
 }
 
 defineExpose({ loadDeployments });
