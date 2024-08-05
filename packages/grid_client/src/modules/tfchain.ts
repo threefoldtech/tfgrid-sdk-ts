@@ -237,7 +237,6 @@ class TFChain implements blockchainInterface {
     try {
       await (
         await sourceClient.dao.vote({
-          address: options.address,
           farmId: options.farmId,
           hash: options.hash,
           approve: options.approve,
