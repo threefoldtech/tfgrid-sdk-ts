@@ -39,7 +39,6 @@ export interface DaoProposals {
   inactive: DaoProposalDetails[];
 }
 export interface DaoVoteOptions {
-  address: string;
   farmId: number;
   hash: string;
   approve: boolean;
