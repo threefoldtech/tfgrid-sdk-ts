@@ -3,7 +3,7 @@ import moment from "moment";
 import { Client, QueryClient } from "./client";
 import { ExtrinsicResult } from "./types";
 import { checkConnection } from "./utils";
-export interface Proposal {
+export interface DaoProposalDetails {
   threshold: number;
   ayes: AyesAndNayes[];
   nayes: AyesAndNayes[];
@@ -20,23 +20,23 @@ interface AyesAndNayes {
   farmId: number;
   weight: number;
 }
-interface ProposalRemark {
+interface DaoProposalRemark {
   args: { remark: string };
 }
-interface DaoProposal {
+interface DaoProposalInfo {
   description: string;
   link: string;
 }
-interface ProposalVotes {
+interface DaoProposalVotes {
   ayes: AyesAndNayes[];
   nays: AyesAndNayes[];
   threshold: number;
   vetos: number;
   end: number;
 }
-export interface Proposals {
-  active: Proposal[];
-  inactive: Proposal[];
+export interface DaoProposals {
+  active: DaoProposalDetails[];
+  inactive: DaoProposalDetails[];
 }
 export interface DaoVoteOptions {
   address: string;
@@ -51,11 +51,11 @@ class QueryDao {
   }
 
   @checkConnection
-  async get(): Promise<Proposals> {
+  async get(): Promise<DaoProposals> {
     const hashesJson = await this.client.api.query.dao.proposalList();
     const hashes = hashesJson.toPrimitive() as string[];
-    const activeProposals: Proposal[] = [];
-    const inactiveProposals: Proposal[] = [];
+    const activeProposals: DaoProposalDetails[] = [];
+    const inactiveProposals: DaoProposalDetails[] = [];
     for await (const hash of hashes) {
       const daoProposal = await this.getDaoProposal(hash);
       const proposal = await this.getProposal(hash);
@@ -115,26 +115,26 @@ class QueryDao {
     return 0;
   }
   @checkConnection
-  private async getDaoProposal(hash: string): Promise<DaoProposal> {
+  private async getDaoProposal(hash: string): Promise<DaoProposalInfo> {
     const proposalJson = await this.client.api.query.dao.proposals(hash);
-    const proposal: DaoProposal = proposalJson.toPrimitive() as unknown as DaoProposal;
+    const proposal: DaoProposalInfo = proposalJson.toPrimitive() as unknown as DaoProposalInfo;
     return proposal;
   }
 
   @checkConnection
-  private async getProposal(hash: string): Promise<ProposalRemark | undefined> {
+  private async getProposal(hash: string): Promise<DaoProposalRemark | undefined> {
     try {
       const proposalJson = await this.client.api.query.dao.proposalOf(hash);
-      const proposalRemark: ProposalRemark = proposalJson.toPrimitive() as unknown as ProposalRemark;
+      const proposalRemark: DaoProposalRemark = proposalJson.toPrimitive() as unknown as DaoProposalRemark;
       return proposalRemark;
     } catch (error) {
       console.warn("Couldn't decode a proposal");
     }
   }
   @checkConnection
-  private async getProposalVotes(hash: string): Promise<ProposalVotes> {
+  private async getProposalVotes(hash: string): Promise<DaoProposalVotes> {
     const votesJson = await this.client.api.query.dao.voting(hash);
-    const proposalVotes: ProposalVotes = votesJson.toPrimitive() as unknown as ProposalVotes;
+    const proposalVotes: DaoProposalVotes = votesJson.toPrimitive() as unknown as DaoProposalVotes;
     return proposalVotes;
   }
 }
@@ -145,6 +145,13 @@ export interface DaoProposeOptions<T> {
   description: string;
   link: string;
   duration: number | null;
+}
+
+export interface DaoProposal {
+  address: string;
+  index: number;
+  hash: string;
+  threshold: number;
 }
 
 class Dao extends QueryDao {
@@ -162,7 +169,17 @@ class Dao extends QueryDao {
       options.link,
       options.duration,
     );
-    return this.client.patchExtrinsic(extrinsic);
+    return this.client.patchExtrinsic(extrinsic, {
+      map: res => {
+        const result: DaoProposal = {
+          address: res?.[0],
+          index: res?.[1],
+          hash: res?.[2],
+          threshold: res?.[3],
+        };
+        return result;
+      },
+    });
   }
 
   @checkConnection
