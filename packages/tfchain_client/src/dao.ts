@@ -44,6 +44,11 @@ export interface DaoVoteOptions {
   approve: boolean;
 }
 
+export interface DaoCloseOptions {
+  hash: string;
+  index: number;
+}
+
 class QueryDao {
   constructor(public client: QueryClient) {
     this.client = client;
@@ -184,6 +189,12 @@ class Dao extends QueryDao {
   @checkConnection
   async vote(options: DaoVoteOptions) {
     const extrinsic = this.client.api.tx.dao.vote(options.farmId, options.hash, options.approve);
+    return this.client.patchExtrinsic(extrinsic);
+  }
+
+  @checkConnection
+  async close(options: DaoCloseOptions) {
+    const extrinsic = this.client.api.tx.dao.close(options.hash, options.index);
     return this.client.patchExtrinsic(extrinsic);
   }
 }
