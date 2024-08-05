@@ -425,6 +425,7 @@ class Client extends QueryClient {
     };
     (<any>extrinsic).resultEvents = options.resultEvents;
     (<any>extrinsic).resultSections = options.resultSections;
+    (<any>extrinsic).map = options.map;
 
     return extrinsic as ExtrinsicResult<R>;
   }
