@@ -6,7 +6,7 @@ export interface QueryGetProposalOptions {
   proposalHash: string;
 }
 
-export interface Proposal {
+export interface ProposalDetails {
   section: string;
   method: string;
   args: unknown;
@@ -18,9 +18,9 @@ class QueryCouncil {
   }
 
   @checkConnection
-  async getProposal(options: QueryGetProposalOptions): Promise<Proposal> {
+  async getProposal(options: QueryGetProposalOptions): Promise<ProposalDetails> {
     const res = await this.client.api.query.council.proposalOf(options.proposalHash);
-    return res.toHuman() as unknown as Proposal;
+    return res.toHuman() as unknown as ProposalDetails;
   }
 
   @checkConnection
@@ -52,6 +52,13 @@ export interface CouncilVoteOptions {
   approve: boolean;
 }
 
+export interface Proposal {
+  address: string;
+  index: number;
+  proposalHash: string;
+  threshold: number;
+}
+
 class Council extends QueryCouncil {
   constructor(public client: Client) {
     super(client);
@@ -61,7 +68,17 @@ class Council extends QueryCouncil {
   @checkConnection
   async propose<T>(options: CouncilProposeOptions<T>) {
     const extrinsic = await this.client.api.tx.council.propose(options.threshold, options.proposal, 1000);
-    return this.client.patchExtrinsic(extrinsic);
+    return this.client.patchExtrinsic<Proposal>(extrinsic, {
+      map: res => {
+        const result: Proposal = {
+          address: res?.[0],
+          index: res?.[1],
+          proposalHash: res?.[2],
+          threshold: res?.[3],
+        };
+        return result;
+      },
+    });
   }
 
   @checkConnection
