@@ -11,12 +11,12 @@ interface ITFChainError {
   keyError?: string;
   section?: string;
   method?: string;
-  args?: AnyTuple;
+  args?: AnyTuple | string[];
   docs?: string[];
 }
 
 class TFChainError extends Error implements ITFChainError {
-  args?: AnyTuple;
+  args?: AnyTuple | string[];
   keyError?: string;
   section?: string;
   method?: string;
@@ -63,74 +63,82 @@ class TFChainErrorWrapper {
    * @returns {TFChainError} The specific TFChainError thrown based on the encountered error type.
    */
   throw(): TFChainError {
-    const args = this.extrinsic.method.args;
-    const method = this.extrinsic.method.method;
+    const extrinsicArgs = this.extrinsic.method.args;
+    const extrinsicMethod = this.extrinsic.method.method;
+    const extrinsicSection = this.extrinsic.method.section;
+    const errorMessage = `Failed to apply '${extrinsicMethod}' on section '${extrinsicSection}' with args '${extrinsicArgs}.`;
 
     if (this.isDispatchError(this.error)) {
       if (this.error.isModule) {
         const decoded = this.api.registry.findMetaError(this.error.asModule);
         const { section, name, docs } = decoded;
         throw new TFChainError({
-          message: `Module error:`,
+          message: `Module Error: ${errorMessage}'`,
           keyError: name,
           section,
-          args,
-          method,
+          method: extrinsicMethod,
+          args: extrinsicArgs,
           docs,
         });
       } else if (this.error.isToken) {
         const tokenError = this.error.asToken.toHuman();
+        console.log({ tokenError });
         throw new TFChainError({
-          message: `Token error:`,
+          message: `Token Error: ${errorMessage}`,
           keyError: JSON.stringify(tokenError),
-          args,
-          method,
+          args: extrinsicArgs,
+          method: extrinsicMethod,
+          section: extrinsicSection,
           docs: [],
         });
       } else if (this.error.isArithmetic) {
         const tokenError = this.error.asArithmetic.toHuman();
         throw new TFChainError({
-          message: `Arithmetic error:`,
+          message: `Arithmetic Error: ${errorMessage}`,
           keyError: JSON.stringify(tokenError),
-          args,
-          method,
+          args: extrinsicArgs,
+          method: extrinsicMethod,
+          section: extrinsicSection,
           docs: [],
         });
       } else if (this.error.isBadOrigin) {
         throw new TFChainError({
-          message: `Bad origin error:`,
+          message: `Bad Origin Error: ${errorMessage}`,
           keyError: "BadOriginError",
-          args,
-          method,
+          args: extrinsicArgs,
+          method: extrinsicMethod,
+          section: extrinsicSection,
           docs: [],
         });
       } else {
         throw new TFChainError({
-          message: `Unknown dispatch error:`,
+          message: `Unknown Dispatch Error: ${errorMessage}`,
           keyError: "UnknownDispatchError",
-          args,
-          method,
+          args: extrinsicArgs,
+          method: extrinsicMethod,
+          section: extrinsicSection,
           docs: [],
         });
       }
     } else if (this.error instanceof Error) {
       if (this.error.message.includes("Inability to pay some fees")) {
-        throw new InsufficientBalanceError(`Insufficient balance error:`);
+        throw new InsufficientBalanceError(`Insufficient Balance Error: ${errorMessage}`);
       } else {
         throw new TFChainError({
-          message: `Generic error:`,
+          message: `Generic Error: ${errorMessage}`,
           keyError: "GenericError",
-          args,
-          method,
+          args: extrinsicArgs,
+          method: extrinsicMethod,
+          section: extrinsicSection,
           docs: [],
         });
       }
     } else {
       throw new TFChainError({
-        message: `Unknown error:`,
+        message: `Unknown Error: ${errorMessage}`,
         keyError: "UnknownError",
-        args,
-        method,
+        args: undefined,
+        method: undefined,
         docs: [],
       });
     }
