@@ -35,6 +35,12 @@ export interface BalanceTransferOptions {
   amount: number;
 }
 
+export interface BalanceForceTransferOptions {
+  source: string;
+  dest: string;
+  amount: number;
+}
+
 class Balances extends QueryBalances {
   constructor(public client: Client) {
     super(client);
@@ -48,6 +54,16 @@ class Balances extends QueryBalances {
     }
 
     const extrinsic = await this.client.api.tx.balances.transfer(options.address, options.amount);
+    return this.client.patchExtrinsic(extrinsic, { map: () => options.amount });
+  }
+
+  @checkConnection
+  async forceTransfer(options: BalanceForceTransferOptions) {
+    if (isNaN(options.amount) || options.amount <= 0) {
+      throw new ValidationError("Amount must be a positive numeric value");
+    }
+
+    const extrinsic = await this.client.api.tx.balances.forceTransfer(options.source, options.dest, options.amount);
     return this.client.patchExtrinsic(extrinsic, { map: () => options.amount });
   }
 
