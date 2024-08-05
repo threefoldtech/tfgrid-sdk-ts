@@ -504,7 +504,7 @@ async function onDelete() {
     if (e instanceof DeploymentKeyDeletionError) {
       selectedContracts.value = [];
       createCustomToast("Failed to delete some keys, You don't have enough tokens", ToastType.danger);
-    } else if (e instanceof TFChainError) {
+    } else if (e instanceof TFChainError && e.keyError === "NodeHasActiveContracts") {
       layout.value.setStatus(
         "failed",
         "Some of the chosen rent contracts could not be deleted as there are active contracts linked to the rented node. Please ensure that any active contracts associated with a rented node are removed before attempting to delete its rent contract.",

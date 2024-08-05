@@ -310,7 +310,7 @@ export default {
         createCustomToast("IP is added successfully.", ToastType.success);
         showDialogue.value = false;
       } catch (error) {
-        if (error instanceof TFChainError) {
+        if (error instanceof TFChainError && error.keyError === "IpExists") {
           console.log(error);
           createCustomToast(`IP already exists.`, ToastType.danger);
         } else {
