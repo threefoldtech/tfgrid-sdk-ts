@@ -22,7 +22,8 @@ beforeAll(async () => {
 //Private IP Regex
 const ipRegex = /(^127\.)|(^10\.)|(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1]\.)|(^192\.168\.)/;
 
-test("TC2701 - Applications: Deploy Nodepilot", async () => {
+//Skip test until a dedicated resources is assigned to run it
+test.skip("TC2701 - Applications: Deploy Nodepilot", async () => {
   /**********************************************
      Test Suite: Grid3_Client_TS (Automated)
      Test Cases: TC2701 - Applications: Deploy Nodepilot
@@ -156,7 +157,7 @@ test("TC2701 - Applications: Deploy Nodepilot", async () => {
 
   const axiosInstance = axios.create({
     httpsAgent: new https.Agent({
-      rejectUnauthorized: false,
+      //rejectUnauthorized: false,
     }),
   });
 
