@@ -221,7 +221,7 @@ def test_ip(browser):
     farm_page.setup_gateway(gateway, gateway, farm_name, False)
     assert farm_page.wait_for('IPs cannot be the same.')
     farm_page.close_ip()
-    regenerate = True 
+    regenerate = True
     while(regenerate):
         ip = generate_ip()
         gateway, regenerate = generate_gateway_from_ip(ip)

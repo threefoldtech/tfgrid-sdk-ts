@@ -1,3 +1,4 @@
+from random import SystemRandom
 import configparser
 import ipaddress
 import random
@@ -68,17 +69,16 @@ def generate_email():
     return email
 
 def generate_ip():
+    cryptogen = SystemRandom()
     while True:
-        ip = [random.randint(0, 255) for _ in range(4)]
-        
+        ip = [cryptogen.randrange(256) for _ in range(4)]
         # Check if the generated IP is within private ranges
         if (ip[0] == 10 or
             (ip[0] == 172 and 16 <= ip[1] <= 31) or
             (240 <= ip[0] <= 255) or
             (ip[0] == 192 and ip[1] == 168)):
             continue
-        
-        port = random.randint(0, 32)
+        port = cryptogen.randrange(33)
         return f"{'.'.join(map(str, ip))}/{port}"
 
 def generate_gateway():
@@ -100,14 +100,12 @@ def generate_gateway():
 def generate_gateway_from_ip(ipv4):
     ip, mask = ipv4.split('/')
     network = ipaddress.ip_network(f"{ip}/{mask}", strict=False)
-    
     if network.num_addresses <= 2:
         return 0, True
     while True:
         # Generate a random IP within the network range, different from the original IP
-        new_ip = network.network_address + random.randint(1, network.num_addresses - 2)
+        new_ip = network.network_address + cryptogen.randrange(1, network.num_addresses - 1)
         new_ip_address = ipaddress.ip_address(new_ip)
-
         return str(new_ip_address), False
 
 def increment_ip(ipv4):
