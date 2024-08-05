@@ -3,7 +3,8 @@ import { SubmittableExtrinsic } from "@polkadot/api/types";
 import type { DispatchError } from "@polkadot/types/interfaces";
 import { ISubmittableResult } from "@polkadot/types/types";
 import { AnyTuple } from "@polkadot/types-codec/types";
-import { InsufficientBalanceError } from "@threefold/types";
+
+import { InsufficientBalanceError } from "../base_error";
 
 interface ITFChainError {
   message: string;
@@ -47,6 +48,20 @@ class TFChainErrorWrapper {
     this.api = api;
   }
 
+  /**
+   * Throws a TFChainError based on the type of error encountered:
+   * - If the error is a dispatch error:
+   *   - If it is a module error, throws a TFChainError with module details.
+   *   - If it is a token error, throws a TFChainError with token details.
+   *   - If it is an arithmetic error, throws a TFChainError with arithmetic details.
+   *   - If it is a bad origin error, throws a TFChainError for bad origin.
+   *   - If it is an unknown dispatch error, throws a TFChainError for unknown dispatch error.
+   * - If the error is an instance of Error:
+   *   - If the message includes "Inability to pay some fees", throws an InsufficientBalanceError.
+   *   - Otherwise, throws a TFChainError for a generic error.
+   * - If the error is not a dispatch error or an instance of Error, throws a TFChainError for an unknown error.
+   * @returns {TFChainError} The specific TFChainError thrown based on the encountered error type.
+   */
   throw(): TFChainError {
     const args = this.extrinsic.method.args;
     const method = this.extrinsic.method.method;

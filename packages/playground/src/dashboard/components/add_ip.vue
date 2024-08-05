@@ -102,7 +102,7 @@
 </template>
 
 <script lang="ts">
-import { TFChainError } from "@threefold/tfchain_client";
+import { TFChainError } from "@threefold/types";
 import { contains } from "cidr-tools";
 import { getIPRange } from "get-ip-range";
 import { default as PrivateIp } from "private-ip";

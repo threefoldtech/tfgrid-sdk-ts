@@ -1,5 +1,6 @@
+import { TFChainError } from "@threefold/types";
+
 import { Client, QueryClient } from "./client";
-import { TFChainError } from "./errors";
 import { PublicIp } from "./types";
 import { checkConnection } from "./utils";
 

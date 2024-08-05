@@ -1,6 +1,6 @@
 import { Keyring } from "@polkadot/keyring";
 import { waitReady } from "@polkadot/wasm-crypto";
-import { TFChainError } from "@threefold/tfchain_client";
+import { TFChainError } from "@threefold/types";
 import { BaseError, ValidationError } from "@threefold/types";
 import axios from "axios";
 import { generateMnemonic } from "bip39";

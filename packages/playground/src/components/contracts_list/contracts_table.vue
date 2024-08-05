@@ -281,7 +281,7 @@
 import { ContractStates, type GridClient, type LockDetails } from "@threefold/grid_client";
 import type { NodeStatus } from "@threefold/gridproxy_client";
 import type { ContractLock } from "@threefold/tfchain_client";
-import { TFChainError } from "@threefold/tfchain_client";
+import { TFChainError } from "@threefold/types";
 import { DeploymentKeyDeletionError } from "@threefold/types";
 import { capitalize, computed, defineComponent, type PropType, type Ref, ref, watch } from "vue";
 

@@ -1,7 +1,7 @@
 import { SortBy, SortOrder } from "@threefold/gridproxy_client";
 import { Client as RMBClient } from "@threefold/rmb_direct_client";
 import { QueryClient } from "@threefold/tfchain_client";
-import { TFChainError } from "@threefold/tfchain_client";
+import { TFChainError } from "@threefold/types";
 import { BaseError, GridClientError, GridClientErrors, RequestError, ValidationError } from "@threefold/types";
 import { default as PrivateIp } from "private-ip";
 import urlJoin from "url-join";
