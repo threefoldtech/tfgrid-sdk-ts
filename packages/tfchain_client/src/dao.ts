@@ -1,6 +1,7 @@
 import moment from "moment";
 
 import { Client, QueryClient } from "./client";
+import { ExtrinsicResult } from "./types";
 import { checkConnection } from "./utils";
 export interface Proposal {
   threshold: number;
@@ -137,11 +138,33 @@ class QueryDao {
     return proposalVotes;
   }
 }
+
+export interface DaoProposeOptions<T> {
+  proposal: ExtrinsicResult<T>;
+  threshold: number;
+  description: string;
+  link: string;
+  duration: number | null;
+}
+
 class Dao extends QueryDao {
   constructor(public client: Client) {
     super(client);
     this.client = client;
   }
+
+  @checkConnection
+  async propose<T>(options: DaoProposeOptions<T>) {
+    const extrinsic = await this.client.api.tx.dao.propose(
+      options.threshold,
+      options.proposal,
+      options.description,
+      options.link,
+      options.duration,
+    );
+    return this.client.patchExtrinsic(extrinsic);
+  }
+
   @checkConnection
   async vote(options: DaoVoteOptions) {
     const extrinsic = this.client.api.tx.dao.vote(options.farmId, options.hash, options.approve);
