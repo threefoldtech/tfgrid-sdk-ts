@@ -342,7 +342,7 @@ def test_range_ips(browser):
         farm_page.add_range_ips(0, 0, case).is_enabled()
         assert farm_page.wait_for('Gateway is not valid.')
         assert browser.find_element(*farm_page.save_button).is_enabled()==False
-    regenerate = True 
+    regenerate = True
     while(regenerate):
         ip1 = generate_ip()
         ip2 = increment_ip(ip1)
@@ -382,7 +382,7 @@ def test_farm_details(browser):
     farm_page.wait_for_button(farm_page.add_farmpayout_address(case)).click()
     assert farm_page.wait_for('Address Added successfully!')
     browser.find_element(*farm_page.add_ip_button).click()
-    regenerate = True 
+    regenerate = True
     while(regenerate):
         ip = generate_ip()
         gateway, regenerate = generate_gateway_from_ip(ip)
