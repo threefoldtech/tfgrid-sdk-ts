@@ -3,7 +3,7 @@ import { ExtrinsicResult } from "./types";
 import { checkConnection } from "./utils";
 
 export interface QueryGetProposalOptions {
-  proposalHash: string;
+  hash: string;
 }
 
 export interface ProposalDetails {
@@ -19,7 +19,7 @@ class QueryCouncil {
 
   @checkConnection
   async getProposal(options: QueryGetProposalOptions): Promise<ProposalDetails> {
-    const res = await this.client.api.query.council.proposalOf(options.proposalHash);
+    const res = await this.client.api.query.council.proposalOf(options.hash);
     return res.toHuman() as unknown as ProposalDetails;
   }
 
@@ -42,12 +42,12 @@ export interface CouncilProposeOptions<T> {
 }
 
 export interface CouncilCloseProposalOptions {
-  proposalHash: string;
+  hash: string;
   index: number;
 }
 
 export interface CouncilVoteOptions {
-  proposalHash: string;
+  hash: string;
   index: number;
   approve: boolean;
 }
@@ -55,7 +55,7 @@ export interface CouncilVoteOptions {
 export interface Proposal {
   address: string;
   index: number;
-  proposalHash: string;
+  hash: string;
   threshold: number;
 }
 
@@ -73,7 +73,7 @@ class Council extends QueryCouncil {
         const result: Proposal = {
           address: res?.[0],
           index: res?.[1],
-          proposalHash: res?.[2],
+          hash: res?.[2],
           threshold: res?.[3],
         };
         return result;
@@ -85,7 +85,7 @@ class Council extends QueryCouncil {
   async close(options: CouncilCloseProposalOptions) {
     const now = Math.floor(new Date().getTime() / 1000);
     const extrinsic = await this.client.api.tx.council.close(
-      options.proposalHash,
+      options.hash,
       options.index,
       { refTime: +now, proofSize: 100000 },
       1000,
@@ -95,7 +95,7 @@ class Council extends QueryCouncil {
 
   @checkConnection
   async vote(options: CouncilVoteOptions) {
-    const extrinsic = await this.client.api.tx.council.vote(options.proposalHash, options.index, options.approve);
+    const extrinsic = await this.client.api.tx.council.vote(options.hash, options.index, options.approve);
     return this.client.patchExtrinsic(extrinsic);
   }
 }
