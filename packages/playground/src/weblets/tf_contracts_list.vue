@@ -167,13 +167,14 @@
   <v-dialog width="800" v-model="deleteDialog" attach="#modals">
     <v-card>
       <v-card-title class="bg-primary"> Delete all your contracts </v-card-title>
-      <v-alert class="mx-4 mt-4" type="warning" variant="tonal"
-        >Deleting contracts may take a while to complete.</v-alert
-      >
-      <v-card-text class="pt-3">
-        You are about to permanently delete all contracts. This action cannot be reversed!
-      </v-card-text>
-      <v-card-actions class="justify-end mb-1 mr-2">
+      <v-alert class="mx-4 mt-4" type="warning" variant="tonal">
+        <template v-slot:prepend>
+          <v-icon class="pt-4" icon="$warning"></v-icon>
+        </template>
+        <div>You are about to permanently delete all contracts. This action cannot be reversed!</div>
+        <div>Deleting contracts may take a while to complete.</div>
+      </v-alert>
+      <v-card-actions class="justify-end my-1 mr-2">
         <v-btn color="anchor" @click="deleteDialog = false"> Cancel </v-btn>
         <v-btn color="error" @click="deleteAll"> Delete </v-btn>
       </v-card-actions>
