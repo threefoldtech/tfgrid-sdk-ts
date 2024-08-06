@@ -60,7 +60,7 @@ class TFChainErrorWrapper {
    *   - If the message includes "Inability to pay some fees", throws an InsufficientBalanceError.
    *   - Otherwise, throws a TFChainError for a generic error.
    * - If the error is not a dispatch error or an instance of Error, throws a TFChainError for an unknown error.
-   * @returns {TFChainError} The specific TFChainError thrown based on the encountered error type.
+   * @throw {TFChainError} The specific TFChainError thrown based on the encountered error type.
    */
   throw(): TFChainError {
     const extrinsicArgs = this.extrinsic.method.args;
@@ -82,7 +82,6 @@ class TFChainErrorWrapper {
         });
       } else if (this.error.isToken) {
         const tokenError = this.error.asToken.toHuman();
-        console.log({ tokenError });
         throw new TFChainError({
           message: `Token Error: ${errorMessage}`,
           keyError: JSON.stringify(tokenError),
@@ -127,19 +126,12 @@ class TFChainErrorWrapper {
         throw new TFChainError({
           message: `Generic Error: ${errorMessage}`,
           keyError: "GenericError",
-          args: extrinsicArgs,
-          method: extrinsicMethod,
-          section: extrinsicSection,
-          docs: [],
         });
       }
     } else {
       throw new TFChainError({
         message: `Unknown Error: ${errorMessage}`,
         keyError: "UnknownError",
-        args: undefined,
-        method: undefined,
-        docs: [],
       });
     }
   }
