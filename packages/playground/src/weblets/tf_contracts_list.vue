@@ -233,7 +233,7 @@ const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
 
 const contracts = ref<NormalizedContract[]>([]);
-
+const failedContracts = ref<number[]>([]);
 const nameContracts = ref<NormalizedContract[]>([]);
 const nodeContracts = ref<NormalizedContract[]>([]);
 const rentContracts = ref<NormalizedContract[]>([]);
@@ -269,8 +269,7 @@ async function _normalizeContracts(
       try {
         return await normalizeContract(grid, contract, contractType);
       } catch (error) {
-        loadingErrorMessage.value = `Error normalizing contract: ${error}`;
-        throw new Error(loadingErrorMessage.value);
+        failedContracts.value.push(contract.contract_id);
       }
     }),
   );
@@ -320,7 +319,7 @@ async function loadContracts(type?: ContractType, options?: { sort: { key: strin
   nodeInfo.value = {};
   contracts.value = [];
   cachedNodeIDs.value = [];
-
+  failedContracts.value = [];
   try {
     if (type) {
       switch (type) {
@@ -341,6 +340,11 @@ async function loadContracts(type?: ContractType, options?: { sort: { key: strin
         loadContractsByType(ContractType.Rent, rentContracts, options),
       ]);
     }
+    const failedContractsLength = failedContracts.value.length;
+    if (failedContractsLength > 0)
+      loadingErrorMessage.value = `Failed to load details of the following contract${
+        failedContractsLength > 1 ? "s" : ""
+      }: ${failedContracts.value.join(", ")}.`;
     await getContractsLockDetails();
     contracts.value = [...nodeContracts.value, ...nameContracts.value, ...rentContracts.value];
 
