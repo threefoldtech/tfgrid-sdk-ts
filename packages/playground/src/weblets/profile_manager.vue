@@ -129,6 +129,7 @@
                             validateMnemonic(v) ||
                             ((v.length === 64 || v.length === 66) && isAddress(v.length === 66 ? v : `0x${v}`))
                           ) {
+                            getEmail();
                             return;
                           }
                           return {
