@@ -1,6 +1,6 @@
 import { FilterOptions, GridClient, MachinesModel } from "../src";
 import { config, getClient } from "./client_loader";
-import { log } from "./utils";
+import { log, pingNodes } from "./utils";
 
 async function deploy(client: GridClient, vms: MachinesModel) {
   const res = await client.machines.deploy(vms);
@@ -25,14 +25,8 @@ async function cancel(client: GridClient, name: string) {
 
 async function getNodeId(client: GridClient, options: FilterOptions) {
   const nodes = await client.capacity.filterNodes(options);
-
-  for (const node of nodes) {
-    const isAlive = await client.zos.pingNode({ nodeId: node.nodeId });
-
-    if (isAlive) {
-      return node.nodeId;
-    }
-  }
+  const nodeId = await pingNodes(client, nodes);
+  return nodeId;
 }
 
 async function main() {
