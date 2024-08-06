@@ -129,7 +129,7 @@
             </copy-input-wrapper>
 
             <v-select label="Supported IPs" :items="networks" v-model="selectedIPAddress" />
-            <copy-input-wrapper #="{ props }" :data="selectedIPAddress">
+            <copy-input-wrapper #="{ props }" :data="(selectedIPAddress as any)">
               <v-text-field :readonly="true" label="Selected IP Address" v-model="selectedIPAddress" v-bind="props" />
             </copy-input-wrapper>
           </form-validator>
