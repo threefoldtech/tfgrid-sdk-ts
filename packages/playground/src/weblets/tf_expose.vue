@@ -7,7 +7,7 @@
     :dedicated="dedicated"
     :SelectedNode="selectionDetails?.node"
     :valid-filters="selectionDetails?.validFilters"
-    title-image="images/icons/subsquid.png"
+    title-image="images/icons/expose.png"
   >
     <template #title>Deploy an Expose Instance </template>
 
@@ -84,7 +84,11 @@
       <input-tooltip
         tooltip="User's machine's public IP , It could be Mycelium IP, Yggdrasil IP, or a public IP (IPv4 or IPv6)."
       >
-        <input-validator :value="ip" :rules="[validators.required('Public IP is required.')]" #="{ props }">
+        <input-validator
+          :value="ip"
+          :rules="[validators.required('Public IP is required.'), validators.isIP('Public IP is not valid.')]"
+          #="{ props }"
+        >
           <v-text-field label="Public IP" v-model="ip" v-bind="props" />
         </input-validator>
       </input-tooltip>

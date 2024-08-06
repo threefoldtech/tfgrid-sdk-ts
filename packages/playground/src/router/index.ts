@@ -369,7 +369,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
       component: () => import("../views/expose_view.vue"),
       meta: {
         title: "Expose",
-        info: { page: "info/static_website.md" },
+        info: { page: "info/expose.md" },
         navbarConfig: {
           back: true,
           path: [

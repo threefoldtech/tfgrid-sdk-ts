@@ -148,7 +148,7 @@ export default {
         title: "Expose",
         excerpt:
           "Expose application allows users to securely expose servers hosted on local machines or VMs to the public internet.",
-        icon: "wordpress.png",
+        icon: "expose.png",
         route: DashboardRoutes.Applications.Expose,
       },
     ];
