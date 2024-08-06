@@ -132,6 +132,7 @@
                             getEmail();
                             return;
                           }
+                          email = '';
                           return {
                             message: 'Mnemonic or Hex Seed doesn\'t seem to be valid.',
                           };
@@ -156,8 +157,6 @@
                               :disabled="creatingAccount || activatingAccount || activating"
                               @click:append="reloadValidation"
                               readonly
-                              @input="getEmail"
-                              :loading="loadEmail"
                               ref="mnemonicRef"
                               @focus="handleFocus(mnemonicRef)"
                             >
