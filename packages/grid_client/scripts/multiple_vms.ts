@@ -26,7 +26,13 @@ async function cancel(client: GridClient, name: string) {
 async function getNodeId(client: GridClient, options: FilterOptions) {
   const nodes = await client.capacity.filterNodes(options);
 
-  return nodes[0]?.nodeId;
+  for (const node of nodes) {
+    const isAlive = await client.zos.pingNode({ nodeId: node.nodeId });
+
+    if (isAlive) {
+      return node.nodeId;
+    }
+  }
 }
 
 async function main() {
@@ -52,7 +58,7 @@ async function main() {
     machines: [
       {
         name: "testvm1",
-        node_id: nodeId,
+        node_id: nodeId!,
         disks: [
           {
             name: "newDisk1",
@@ -75,7 +81,7 @@ async function main() {
       },
       {
         name: "testvm2",
-        node_id: nodeId,
+        node_id: nodeId!,
         disks: [
           {
             name: "newDisk2",
