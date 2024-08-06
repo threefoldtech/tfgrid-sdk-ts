@@ -62,7 +62,7 @@
           v-model:planetary="planetary"
           v-model:ipv4="ipv4"
           v-model:ipv6="ipv6"
-          :isDiscourse="true"
+          enableIpv4
         />
 
         <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
