@@ -31,7 +31,7 @@ jobs:
       SSH_KEY: ${{ secrets.SSH_KEY }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
         if: ${{ env.NETWORK == 'dev' }} || ${{ env.NETWORK == 'qa' }} || ${{ env.NETWORK == 'test' }} || ${{ env.NETWORK == 'main' }}
         with:
           ref: refs/tags/v2.5.2
@@ -94,7 +94,6 @@ jobs:
           yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/delete_all_contracts.ts
 
       - name: Run check up - List all contracts
-        id: command_step
         run: |
           sleep 15
           yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/list_all_contracts.ts > output.txt
