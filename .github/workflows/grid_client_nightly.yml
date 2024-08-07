@@ -134,8 +134,21 @@ jobs:
           steps.deleteall.outcome != 'success'
         run: exit 1
 
+      - name: Check for Existing Issues
+        id: check_issues
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { data: issues } = await github.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open'
+            });
+            const issueExists = issues.some(issue => issue.title.includes(`${{ github.workflow }} failed during ${{ github.event_name }} on network ${{ env.NETWORK }}`));
+            return issueExists ? 'true' : 'false';
+
       - name: Create GitHub Issue on Failure
-        if: failure() && '$(date +%u)' != '5' && '$(date +%u)' != '6'
+        if: failure() && steps.check_issues.outputs.result == 'false' && '$(date +%u)' != '5' && '$(date +%u)' != '6'
         uses: dacbd/create-issue-action@main
         with:
           token: ${{ github.token }}
