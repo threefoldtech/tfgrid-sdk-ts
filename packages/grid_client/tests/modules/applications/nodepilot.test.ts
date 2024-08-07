@@ -12,6 +12,7 @@ let gridClient: GridClient;
 let deploymentName: string;
 
 beforeAll(async () => {
+  process.env.NODE_ENV = "test";
   config.network = "main"; //Change network to mainnet, the only network with enough resources
   gridClient = await getClient();
   deploymentName = "np" + generateString(10);
@@ -67,6 +68,7 @@ test("TC2701 - Applications: Deploy Nodepilot", async () => {
     farmId: 1,
     publicIPs: publicIp,
     availableFor: await gridClient.twins.get_my_twin_id(),
+    status: "up",
   } as FilterOptions);
   const nodeId = await getOnlineNode(nodes);
   if (nodeId == -1) throw new Error("no nodes available to complete this test");
