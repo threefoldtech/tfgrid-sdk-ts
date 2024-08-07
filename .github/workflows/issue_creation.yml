@@ -19,6 +19,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
+          update_existing: false
           search_existing: open
           filename: .github/issue_template.md
           
