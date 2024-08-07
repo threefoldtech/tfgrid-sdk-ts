@@ -21,7 +21,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        network: ["dev", "qa", "test", "main"]
+        network: ["dev"]
     env:
       NETWORK: ${{ matrix.network }}
       RMB_PROXY: true
@@ -44,7 +44,7 @@ jobs:
       - name: Install deps
         run: |
           sudo apt-get update
-          sudo apt-get install -y git libtool tmux redis net-tools jq gh
+          sudo apt-get install -y git libtool tmux redis net-tools
 
       - name: Install
         run: |
@@ -135,37 +135,13 @@ jobs:
       - name: Checkout repository again
         uses: actions/checkout@v3
 
-      - name: Search for Existing Issues
-        id: search_issues
-        run: |
-          ISSUE_TITLE="Grid Nightly failed during schedule on ${{ env.NETWORK }}"
-          REPO="${{ github.repository }}"
-          SEARCH_RESULT=$(gh issue list --repo "$REPO" --search "$ISSUE_TITLE" --json title --jq '.[] | select(.title == "'$ISSUE_TITLE'") | .title')
-          if [ -n "$SEARCH_RESULT" ]; then
-            echo "issue_exists=true" >> $GITHUB_ENV
-          else
-            echo "issue_exists=false" >> $GITHUB_ENV
-          fi
+      - name: Create GitHub Issue on Failure
+        uses: JasonEtco/create-an-issue@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_ID: ${{ github.run_id }}
 
-      - name: Create GitHub Issue on Failure
-        if: failure() && ${{ env.issue_exists == 'false' }}
-        uses: dacbd/create-issue-action@main
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          title: Grid Nightly failed during schedule on ${{ env.NETWORK }}
-          body: |
-            ## Failure Report
-
-            **Details on failed run**: [View Run Details](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
-
-            - **Dynamic Single Vm**: ${{ steps.single_vm.outcome }}
-            - **Multiple Vm**: ${{ steps.multiple_vm.outcome }}
-            - **Kubernetes**: ${{ steps.k8s.outcome }}
-            - **Vmq QSFS**: ${{ steps.vmqsfs.outcome }}
-            - **Kubernetes QSFS**: ${{ steps.k8sqsfs.outcome }}
-            - **Kvstore**: ${{ steps.kvstore.outcome }}
-            - **Zdb**: ${{ steps.zdb.outcome }}
-            - **Delete all contracts**: ${{ steps.delete_all.outcome }}
-          labels: type_bug, grid_client
+          update_existing: false
+          search_existing: open
+          filename: .github/issue_template.md
