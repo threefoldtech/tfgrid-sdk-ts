@@ -439,7 +439,14 @@ import { useProfileManagerController } from "../components/profile_manager_contr
 import { useOnline } from "../hooks";
 import { useInputRef } from "../hooks/input_validator";
 import { useProfileManager } from "../stores";
-import { activateAccountAndCreateTwin, createAccount, getGrid, loadBalance, loadProfile } from "../utils/grid";
+import {
+  activateAccountAndCreateTwin,
+  createAccount,
+  getGrid,
+  getMetadata,
+  loadBalance,
+  loadProfile,
+} from "../utils/grid";
 import { readEmail, storeEmail } from "../utils/grid";
 import { normalizeBalance, normalizeError } from "../utils/helpers";
 
@@ -803,7 +810,10 @@ async function login() {
         : KeypairType.sr25519;
 
       await activate(mnemonic, keypairType as KeypairType);
-      if (!credentials.emailHash) {
+      const grid = await getGrid({ mnemonic: mnemonic, keypairType: keypairType as KeypairType });
+
+      const email = await getMetadata(grid!);
+      if (!email) {
         createCustomToast("Email is Missing! Please enter your Email.", ToastType.warning);
         router.push({ path: "/tf-chain/your-profile" });
       }
