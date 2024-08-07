@@ -1,5 +1,6 @@
 name: Create Issue if Not Exists
 
+# .github/workflows/issue-on-push.yml
 on: 
   push:
     branches:
@@ -10,50 +11,20 @@ permissions:
   issues: write
 
 jobs:
-  create_issue:
+  stuff:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out the repository
-        uses: actions/checkout@v3
-
-      - name: Generate Dynamic Issue Title and Content
-        id: generate_issue
+      - name: 'Create env file'
         run: |
-          ISSUE_TITLE="Issue from push: $(date +'%Y-%m-%d %H:%M:%S')"
-          ISSUE_BODY="This issue was automatically created based on a push to the development_issue_creation branch.\n\nTimestamp: $(date +'%Y-%m-%d %H:%M:%S')"
-          echo "::set-output name=title::$ISSUE_TITLE"
-          echo "::set-output name=body::$ISSUE_BODY"
+          touch .env
+          echo ISSUE_TITLE="Title from Github workflow" >> .env
+          cat .env
 
-      - name: Check for existing issues
-        id: check_issue
-        uses: actions/github-script@v6
+      - uses: actions/checkout@v3
+      - uses: JasonEtco/create-an-issue@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          script: |
-            const title = "${{ steps.generate_issue.outputs.title }}";
-            const { data: issues } = await github.rest.issues.listForRepo({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              state: 'open'
-            });
-
-            const issueExists = issues.some(issue => issue.title === title);
-            return { issueExists: issueExists };
-
-      - name: Create a new issue if not exists
-        if: steps.check_issue.outputs.issueExists == 'false'
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const title = "${{ steps.generate_issue.outputs.title }}";
-            const body = "${{ steps.generate_issue.outputs.body }}";
-
-            await github.rest.issues.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              title: title,
-              body: body
-            });
-
-      - name: Issue already exists
-        if: steps.check_issue.outputs.issueExists == 'true'
-        run: echo "Issue with title '${{ steps.generate_issue.outputs.title }}' already exists."
+          update_existing: false
+          search_existing: open
+          filename: .github/issue_template.md
