@@ -4,6 +4,7 @@ import { Expose, Transform, Type } from "class-transformer";
 import {
   ArrayNotEmpty,
   IsAlphanumeric,
+  IsArray,
   IsBoolean,
   IsDefined,
   IsEnum,
@@ -687,6 +688,11 @@ class NodeCPUTest {
   @Expose() result: CPUBenchmark | {};
 }
 
+class NodeHealthCheck {
+  @Expose() @IsArray() cache: [];
+  @Expose() @IsArray() network: [];
+}
+
 class NodeIPValidation {
   @Expose() @IsNotEmpty() @IsString() name: string;
   @Expose() @IsNotEmpty() @IsString() description: string;
@@ -844,6 +850,58 @@ interface GPUCardInfo {
   vendor: string;
 }
 
+class ZOSVersionResultModel {
+  @Expose() @IsString() @IsNotEmpty() zos: string;
+  @Expose() @IsString() @IsNotEmpty() zinit: string;
+}
+
+class ZOSResources {
+  @Expose() @IsNumber() @IsNotEmpty() cru: number;
+  @Expose() @IsNumber() @IsNotEmpty() sru: number;
+  @Expose() @IsNumber() @IsNotEmpty() hru: number;
+  @Expose() @IsNumber() @IsNotEmpty() mru: number;
+  @Expose() @IsNumber() @IsNotEmpty() ipv4u: number;
+}
+
+class ZOSNodeStatistics {
+  system: ZOSResources;
+  total: ZOSResources;
+  used: ZOSResources;
+  users: {
+    deployments: number;
+    workloads: number;
+    last_deployment_timestamp: number;
+  };
+}
+
+class ZOSNetworkInterfaces {
+  @Expose() @IsArray() ygg: string[];
+  @Expose() @IsArray() zos: string[];
+}
+
+class ZOSNetworkPublicConfig {
+  @Expose() @IsString() type: string;
+  @Expose() @IsString() ipv4: string;
+  @Expose() @IsString() ipv6: string;
+  @Expose() @IsString() gw4: string;
+  @Expose() @IsString() gw6: string;
+  @Expose() @IsString() domain: string;
+}
+
+class ZOSStoragePools {
+  @Expose() @IsString() @IsNotEmpty() name: string;
+  @Expose() @IsString() @IsNotEmpty() type: string;
+  @Expose() @IsNumber() size: number;
+  @Expose() @IsNumber() used: number;
+}
+
+class ZOSNodePerfTestsResult {
+  @Expose() iperf?: NodeIPerf;
+  @Expose() publicIPValidation?: NodeIPValidation;
+  @Expose() healthCheck?: NodeHealthCheck;
+  @Expose() cpuBenchmark?: NodeCPUTest;
+}
+
 export {
   AlgorandAccountCreateModel,
   AlgorandAccountInitModel,
@@ -982,5 +1040,12 @@ export {
   NodeCPUTest,
   NodeIPValidation,
   NodeIPerf,
+  NodeHealthCheck,
   CurrencyModel,
+  ZOSVersionResultModel,
+  ZOSNodeStatistics,
+  ZOSNetworkInterfaces,
+  ZOSNetworkPublicConfig,
+  ZOSStoragePools,
+  ZOSNodePerfTestsResult,
 };

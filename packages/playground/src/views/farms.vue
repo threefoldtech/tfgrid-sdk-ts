@@ -105,14 +105,17 @@
           page = $event;
           loadFarms();
         "
-        @update:sort-by="
-          if ($event[0]) {
-            sortBy = $event[0].key == 'farmId' ? SortBy.FarmId : $event[0].key;
-            sortOrder = $event[0].order;
-            loadFarms();
+        @update:options="
+          if (!$event.sortBy.length) {
+            sortBy = SortBy.FarmId;
+            sortOrder = SortOrder.Asc;
+          } else if ($event.sortBy[0]) {
+            sortBy = $event.sortBy[0].key == 'farmId' ? SortBy.FarmId : $event.sortBy[0].key;
+            sortOrder = $event.sortBy[0].order;
           }
+
+          loadFarms();
         "
-        @update:options="loadFarms()"
         @click:row="openSheet"
       >
         <template #[`item.usedPublicIp`]="{ item }">

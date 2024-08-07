@@ -25,6 +25,7 @@
                 color="primary"
                 inset
                 label="Public IPv4"
+                :disabled="enableIpv4"
                 :model-value="$props.ipv4"
                 @update:model-value="$emit('update:ipv4', $event ?? undefined)"
               />
@@ -130,6 +131,10 @@ export default {
       default: () => null,
     },
     disabled: { type: Boolean },
+    enableIpv4: {
+      type: Boolean,
+      default: () => true,
+    },
   },
   emits: {
     "update:ipv4": (value?: boolean) => value,
