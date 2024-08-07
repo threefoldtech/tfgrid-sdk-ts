@@ -6,7 +6,7 @@ on:
     branches:
       - development_issue_creation
 
-      
+
 permissions:
   contents: read
   issues: write 
@@ -19,6 +19,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          search_existing: all
+          search_existing: open
           filename: .github/issue_template.md
           
