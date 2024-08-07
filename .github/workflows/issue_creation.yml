@@ -1,32 +1,25 @@
-name: Create Issue if Not Exists
+# name: Create Issue if Not Exists
 
+# # .github/workflows/issue-on-push.yml
+# on: 
+#   push:
+#     branches:
+#       - development_issue_creation
 
-# .github/workflows/issue-on-push.yml
-on: 
-  push:
-    branches:
-      - development_issue_creation
+# permissions:
+#   contents: read
+#   issues: write
 
-permissions:
-  contents: read
-  issues: write
-
-jobs:
-  stuff:
-    runs-on: ubuntu-latest
-    steps:
-      - name: 'Create env file'
-        run: |
-          touch .env
-          echo ISSUE_TITLE="Title from Github workflow" >> .env
-          cat .env
-
-      - uses: actions/checkout@v3
-      - uses: JasonEtco/create-an-issue@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ISSUE_TITLE: nenene
-        with:
-          update_existing: false
-          search_existing: open
-          filename: .github/issue_template.md
+# jobs:
+#   stuff:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v3
+#       - uses: JasonEtco/create-an-issue@v2
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#           ISSUE_TITLE: nenene
+#         with:
+#           update_existing: false
+#           search_existing: open
+#           filename: .github/issue_template.md

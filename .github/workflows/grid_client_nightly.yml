@@ -2,10 +2,20 @@
 
 name: Grid Client Nightly
 
-on:
-  schedule:
-    - cron: "0 4 * * *"
-  workflow_dispatch:
+# on:
+#   schedule:
+#     - cron: "0 4 * * *"
+#   workflow_dispatch:
+on: 
+  push:
+    branches:
+      - development_issue_creation
+
+permissions:
+  contents: read
+  issues: write
+
+
 jobs:
   deployment-scripts:
     runs-on: ubuntu-latest
@@ -22,17 +32,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-        if: ${{ env.NETWORK == 'dev' }}
-      - uses: actions/checkout@v4
-        if: ${{ env.NETWORK == 'qa' }}
-        with:
-          ref: refs/tags/v2.5.2
-      - uses: actions/checkout@v4
-        if: ${{ env.NETWORK == 'test' }}
-        with:
-          ref: refs/tags/v2.5.2
-      - uses: actions/checkout@v4
-        if: ${{ env.NETWORK == 'main' }}
+        if: ${{ env.NETWORK == 'dev' }} || ${{ env.NETWORK == 'qa' }} || ${{ env.NETWORK == 'test' }} || ${{ env.NETWORK == 'main' }}
         with:
           ref: refs/tags/v2.5.2
 
@@ -50,46 +50,46 @@ jobs:
       - name: Install
         run: |
           yarn
-          lerna run build --no-private
+          make build
 
       - name: Run test dynamic single vm
-        id: dynamicsinglevm
-        continue-on-error: true
+        id: single_vm
+        if: always()
         run: |
           yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/dynamic_single_vm.ts
       - name: Run test multiple vms
-        id: multiplevm
-        continue-on-error: true
+        id: multiple_vm
+        if: always()
         run: |
           yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/multiple_vms.ts
       - name: Run test kubernetes
-        id: kubernetes
-        continue-on-error: true
+        id: k8s
+        if: always()
         run: |
           yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/orchestrators/kubernetes_leader.ts
       - name: Run test vm with qsfs
         id: vmqsfs
-        continue-on-error: true
+        if: always()
         run: |
           yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/vm_with_qsfs.ts
       - name: Run test kubernetes with qsfs
-        id: kubernetesqsfs
-        continue-on-error: true
+        id: k8sqsfs
+        if: always()
         run: |
           yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/orchestrators/kubernetes_with_qsfs.ts
       - name: Run test kvstore
         id: kvstore
-        continue-on-error: true
+        if: always()
         run: |
           yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/kvstore_example.ts
       - name: Run test zdb
         id: zdb
-        continue-on-error: true
+        if: always()
         run: |
           yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/zdb.ts
 
       - name: Cleanup - Delete all contracts
-        id: deleteall
+        id: delete_all
         run: |
           yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/delete_all_contracts.ts
 
@@ -113,51 +113,41 @@ jobs:
 
       - name: Test Results
         run: |
-          echo Dynamic Single Vm: ${{ steps.dynamicsinglevm.outcome }}
-          echo Multiple Vm: ${{ steps.multiplevm.outcome }}
-          echo Kubernetes: ${{ steps.kubernetes.outcome }}
+          echo Dynamic Single Vm: ${{ steps.single_vm.outcome }}
+          echo Multiple Vm: ${{ steps.multiple_vm.outcome }}
+          echo Kubernetes: ${{ steps.k8s.outcome }}
           echo Vmq Qsfs: ${{ steps.vmqsfs.outcome }}
-          echo Kubernetes Qsfs: ${{ steps.kubernetesqsfs.outcome }}
+          echo Kubernetes Qsfs: ${{ steps.k8sqsfs.outcome }}
           echo Kvstore: ${{ steps.kvstore.outcome }}
           echo Zdb: ${{ steps.zdb.outcome }}
-          echo Delete all contracts: ${{ steps.deleteall.outcome }}
+          echo Delete all contracts: ${{ steps.delete_all.outcome }}
 
       - name: Check test script status
         if: |
-          steps.dynamicsinglevm.outcome != 'success' ||
-          steps.multiplevm.outcome != 'success' ||
-          steps.kubernetes.outcome != 'success' ||
+          steps.single_vm.outcome != 'success' ||
+          steps.multiple_vm.outcome != 'success' ||
+          steps.k8s.outcome != 'success' ||
           steps.vmqsfs.outcome != 'success' ||
-          steps.kubernetesqsfs.outcome != 'success' ||
+          steps.k8sqsfs.outcome != 'success' ||
           steps.kvstore.outcome != 'success' ||
           steps.zdb.outcome != 'success' ||
-          steps.deleteall.outcome != 'success'
+          steps.delete_all.outcome != 'success'
         run: exit 1
 
       - name: Create GitHub Issue on Failure
-        if: failure() && '$(date +%u)' != '5' && '$(date +%u)' != '6'
-        uses: dacbd/create-issue-action@main
+        uses: JasonEtco/create-an-issue@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_ID: ${{ github.run_id }}
+          SINGLE_VM: ${{ steps.single_vm.outcome }}
+          MULTIPLE_VM: ${{ steps.multiple_vm.outcome }}
+          K8S: ${{ steps.k8s.outcome }}
+          VM_QSFS: ${{ steps.vmqsfs.outcome }}
+          K8S_QSFS: ${{ steps.k8sqsfs.outcome }}
+          KV_STORE: ${{ steps.kvstore.outcome }}
+          ZDB: ${{ steps.zdb.outcome }}
+          DELETE_ALL: ${{ steps.delete_all.outcome }}
         with:
-          token: ${{ github.token }}
-          title: |
-            ${{ github.workflow }} failed during ${{ github.event_name }} on network ${{ env.NETWORK }}
-          body: |
-            ## Failure Report:
-            
-            > [!IMPORTANT]
-            > Details on failed run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-    
-            - Author: @${{ github.triggering_actor }}
-            - Branch: `${{ github.ref }}`
-            - Commit: ${{ github.sha }}
-            - Network: `${{ env.NETWORK }}`
-  
-            Dynamic Single Vm: ${{ steps.dynamicsinglevm.outcome }}
-            Multiple Vm: ${{ steps.multiplevm.outcome }}
-            Kubernetes: ${{ steps.kubernetes.outcome }}
-            Vmq Qsfs: ${{ steps.vmqsfs.outcome }}
-            Kubernetes Qsfs: ${{ steps.kubernetesqsfs.outcome }}
-            Kvstore: ${{ steps.kvstore.outcome }}
-            Zdb: ${{ steps.zdb.outcome }}
-            Delete all contracts: ${{ steps.deleteall.outcome }}
-          labels: type_bug, grid_client
+          update_existing: false
+          search_existing: open
+          filename: .github/issue_template.md
