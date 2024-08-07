@@ -102,7 +102,7 @@
 </template>
 
 <script lang="ts">
-import { TFChainErrors } from "@threefold/types";
+import { TFChainError } from "@threefold/tfchain_client";
 import { contains } from "cidr-tools";
 import { getIPRange } from "get-ip-range";
 import { default as PrivateIp } from "private-ip";
@@ -310,7 +310,7 @@ export default {
         createCustomToast("IP is added successfully.", ToastType.success);
         showDialogue.value = false;
       } catch (error) {
-        if (error instanceof TFChainErrors.tfgridModule.IpExists) {
+        if (error instanceof TFChainError && error.keyError === "IpExists") {
           console.log(error);
           createCustomToast(`IP already exists.`, ToastType.danger);
         } else {

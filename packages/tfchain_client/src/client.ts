@@ -10,14 +10,7 @@ import { DispatchError } from "@polkadot/types/interfaces";
 import { ISubmittableResult } from "@polkadot/types/types";
 import { KeypairType } from "@polkadot/util-crypto/types";
 import { waitReady } from "@polkadot/wasm-crypto";
-import {
-  BaseError,
-  InsufficientBalanceError,
-  TFChainError,
-  TFChainErrors,
-  TimeoutError,
-  ValidationError,
-} from "@threefold/types";
+import { BaseError, TimeoutError, ValidationError } from "@threefold/types";
 import AwaitLock from "await-lock";
 import { validateMnemonic } from "bip39";
 
@@ -25,6 +18,7 @@ import { Balances, QueryBalances } from "./balances";
 import { Contracts, QueryContracts } from "./contracts";
 import { Council, QueryCouncil } from "./council";
 import { Dao, QueryDao } from "./dao";
+import { TFChainError, TFChainErrorWrapper } from "./errors";
 import { Farms, QueryFarms } from "./farms";
 import { KVStore } from "./kvstore";
 import { Nodes, QueryNodes } from "./nodes";
@@ -109,7 +103,9 @@ class QueryClient {
         e.message = message + e.message;
         throw e;
       }
-      throw new TFChainError(message);
+      throw new TFChainError({
+        message,
+      });
     } finally {
       QueryClient.connectingLock.release();
     }
@@ -378,21 +374,8 @@ class Client extends QueryClient {
     });
     return promise
       .then((res: any) => res as T)
-      .catch(async e => {
-        const errorMsg = `Failed to apply ${JSON.stringify(extrinsic.method.toHuman())} due to error:`;
-        if ((e as DispatchError).isModule) {
-          const { section, name } = this.api.registry.findMetaError((e as DispatchError).asModule);
-          if (TFChainErrors[section]?.Errors[name]) {
-            throw new TFChainErrors[section][name](`Failed to apply ${JSON.stringify(extrinsic.method.toHuman())}`);
-          } else {
-            throw new TFChainError(`${errorMsg} '${section}-${name}'`);
-          }
-        } else {
-          if ((e as Error).message.includes("Inability to pay some fees")) {
-            throw new InsufficientBalanceError(errorMsg + e);
-          }
-          throw new TFChainError(`Failed to apply ${JSON.stringify(extrinsic.method.toHuman())} due to error: ${e}`);
-        }
+      .catch(async (error: DispatchError) => {
+        throw new TFChainErrorWrapper(error, extrinsic, this.api).throw();
       });
   }
   async applyExtrinsic<T>(
