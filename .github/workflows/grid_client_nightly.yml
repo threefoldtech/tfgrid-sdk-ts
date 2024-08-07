@@ -31,7 +31,7 @@ jobs:
       SSH_KEY: ${{ secrets.SSH_KEY }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         if: ${{ env.NETWORK == 'dev' }} || ${{ env.NETWORK == 'qa' }} || ${{ env.NETWORK == 'test' }} || ${{ env.NETWORK == 'main' }}
         with:
           ref: refs/tags/v2.5.2
@@ -132,6 +132,9 @@ jobs:
           steps.zdb.outcome != 'success' ||
           steps.delete_all.outcome != 'success'
         run: exit 1
+
+      - name: Checkout repository again
+        uses: actions/checkout@v3
 
       - name: Create GitHub Issue on Failure
         uses: JasonEtco/create-an-issue@v2
