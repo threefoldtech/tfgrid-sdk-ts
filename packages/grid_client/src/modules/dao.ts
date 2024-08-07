@@ -1,4 +1,4 @@
-import { Proposals } from "@threefold/tfchain_client";
+import { DaoProposals } from "@threefold/tfchain_client";
 
 import { TFClient } from "../clients/tf-grid/client";
 import { GridClientConfig } from "../config";
@@ -28,7 +28,7 @@ class Dao {
    */
   @expose
   @validateInput
-  async get(): Promise<Proposals> {
+  async get(): Promise<DaoProposals> {
     return await this.client.dao.get();
   }
 
