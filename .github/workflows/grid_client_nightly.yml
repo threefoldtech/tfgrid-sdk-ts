@@ -134,6 +134,39 @@ jobs:
           steps.deleteall.outcome != 'success'
         run: exit 1
 
+      - name: Check test script status
+        run: |
+          failures=""
+          if [[ "${{ steps.dynamicsinglevm.outcome }}" != "success" ]]; then
+            failures="${failures} dynamicsinglevm"
+          fi
+          if [[ "${{ steps.multiplevm.outcome }}" != "success" ]]; then
+            failures="${failures} multiplevm"
+          fi
+          if [[ "${{ steps.kubernetes.outcome }}" != "success" ]]; then
+            failures="${failures} kubernetes"
+          fi
+          if [[ "${{ steps.vmqsfs.outcome }}" != "success" ]]; then
+            failures="${failures} vmqsfs"
+          fi
+          if [[ "${{ steps.kubernetesqsfs.outcome }}" != "success" ]]; then
+            failures="${failures} kubernetesqsfs"
+          fi
+          if [[ "${{ steps.kvstore.outcome }}" != "success" ]]; then
+            failures="${failures} kvstore"
+          fi
+          if [[ "${{ steps.zdb.outcome }}" != "success" ]]; then
+            failures="${failures} zdb"
+          fi
+          if [[ "${{ steps.deleteall.outcome }}" != "success" ]]; then
+            failures="${failures} deleteall"
+          fi
+
+          if [[ -n "$failures" ]]; then
+            echo "Failing tests:${failures}"
+            exit 1
+          fi
+
       - name: Check for Existing Issues
         id: check_issues
         uses: actions/github-script@v6
@@ -148,12 +181,12 @@ jobs:
             return issueExists ? 'true' : 'false';
 
       - name: Create GitHub Issue on Failure
-        if: failure() && steps.check_issues.outputs.result == 'false' && '$(date +%u)' != '5' && '$(date +%u)' != '6'
+        if: failure() && steps.check_issues.outputs.result == 'true' && '$(date +%u)' != '5' && '$(date +%u)' != '6'
         uses: dacbd/create-issue-action@main
         with:
           token: ${{ github.token }}
           title: |
-            ${{ github.workflow }} failed during ${{ github.event_name }} on network ${{ env.NETWORK }}
+           ${{ github.workflow }} failed during ${{ github.event_name }} on network ${{ env.NETWORK }}, failing tests: ${{ steps.check_status.outputs.failures }}
           body: |
             ## Failure Report:
             
