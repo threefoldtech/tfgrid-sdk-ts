@@ -1,0 +1,55 @@
+name: Create Issue if Not Exists
+
+on:
+  push:
+    branches:
+      - development_issue_creation
+
+jobs:
+  create_issue:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v3
+
+      - name: Set issue title and body
+        id: set_issue
+        run: |
+          ISSUE_TITLE="New Issue Title"
+          ISSUE_BODY="This is the body of the new issue."
+          echo "::set-output name=issue_title::$ISSUE_TITLE"
+          echo "::set-output name=issue_body::$ISSUE_BODY"
+
+      - name: Check for existing issues
+        id: check_issue
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const title = process.env.ISSUE_TITLE;
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open'
+            });
+
+            const issueExists = issues.some(issue => issue.title === title);
+            return { issueExists: issueExists };
+
+      - name: Create a new issue if not exists
+        if: steps.check_issue.outputs.issueExists == 'false'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const title = process.env.ISSUE_TITLE;
+            const body = process.env.ISSUE_BODY;
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: title,
+              body: body
+            });
+
+      - name: Issue already exists
+        if: steps.check_issue.outputs.issueExists == 'true'
+        run: echo "Issue with title '${{ steps.set_issue.outputs.issue_title }}' already exists."
