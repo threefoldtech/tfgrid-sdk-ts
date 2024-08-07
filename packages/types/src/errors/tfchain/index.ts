@@ -15,21 +15,25 @@ interface ITFChainError {
   docs?: string[];
 }
 
-class TFChainError extends Error implements ITFChainError {
-  args?: AnyTuple | string[];
+interface TFChainError {
+  message: string;
   keyError?: string;
   section?: string;
   method?: string;
+  args?: AnyTuple | string[];
   docs?: string[];
+}
 
+class TFChainError extends Error {
   constructor(options: ITFChainError) {
     super(options.message);
     this.name = "TFChainError";
-    this.keyError = options.keyError;
-    this.section = options.section;
-    this.args = options.args;
-    this.method = options.method;
-    this.docs = options.docs;
+    this.keyError = options.keyError || "GenericError";
+    options.keyError && Object.defineProperty(this, "keyError", options.keyError);
+    options.section && Object.defineProperty(this, "section", options.section);
+    options.args && Object.defineProperty(this, "args", options.args);
+    options.method && Object.defineProperty(this, "method", options.method);
+    options.docs && Object.defineProperty(this, "docs", options.docs);
   }
 }
 
