@@ -24,6 +24,7 @@ jobs:
       - uses: JasonEtco/create-an-issue@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_TITLE: nenene
         with:
           update_existing: false
           search_existing: open
