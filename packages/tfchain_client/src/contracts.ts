@@ -401,7 +401,29 @@ class Contracts extends QueryContracts {
   }
 
   /**
-   * Creates a new service contract extrinsic.
+   * Cancels a contract.
+   *
+   * This method cancels a contract identified by the provided `ID` for any user.
+   * It's a council call that can't be executed by a normal user.
+   *
+   * @param {CancelOptions} options - The options object containing the `ID` of the contract to be canceled.
+   * @returns {Promise<ExtrinsicResult<number> | undefined>} A promise that resolves with the contract cancelling extrinsic,
+   * * or `undefined` if the contract does not exist.
+   */
+  @checkConnection
+  async cancelCollective(options: CancelOptions) {
+    const contract = await this.get(options);
+    if (!contract) {
+      return;
+    }
+    const extrinsic = await this.client.api.tx.smartContractModule.cancelContractCollective(options.id);
+    return this.client.patchExtrinsic(extrinsic, {
+      map: () => options.id,
+      resultEvents: ["NodeContractCanceled", "NameContractCanceled", "RentContractCanceled", "ContractCanceled"],
+    });
+  }
+
+  /** Creates a new service contract extrinsic.
    *
    * This method creates a new service contract extrinsic with the provided `serviceAccount` and `consumerAccount`.
    *
