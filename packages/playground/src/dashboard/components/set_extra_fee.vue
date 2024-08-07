@@ -66,7 +66,7 @@
 </template>
 
 <script lang="ts">
-import { TFChainError } from "@threefold/types";
+import { TFChainError } from "@threefold/tfchain_client";
 import { onMounted, ref, watch } from "vue";
 
 import { useGrid } from "../../stores";

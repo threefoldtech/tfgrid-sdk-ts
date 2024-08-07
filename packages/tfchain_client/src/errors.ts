@@ -3,8 +3,7 @@ import { SubmittableExtrinsic } from "@polkadot/api/types";
 import type { DispatchError } from "@polkadot/types/interfaces";
 import { ISubmittableResult } from "@polkadot/types/types";
 import { AnyTuple } from "@polkadot/types-codec/types";
-
-import { InsufficientBalanceError } from "../base_error";
+import { InsufficientBalanceError } from "@threefold/types";
 
 interface ITFChainError {
   message: string;

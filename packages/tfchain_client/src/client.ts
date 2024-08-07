@@ -11,13 +11,13 @@ import { ISubmittableResult } from "@polkadot/types/types";
 import { KeypairType } from "@polkadot/util-crypto/types";
 import { waitReady } from "@polkadot/wasm-crypto";
 import { BaseError, TimeoutError, ValidationError } from "@threefold/types";
-import { TFChainError, TFChainErrorWrapper } from "@threefold/types";
 import AwaitLock from "await-lock";
 import { validateMnemonic } from "bip39";
 
 import { Balances, QueryBalances } from "./balances";
 import { Contracts, QueryContracts } from "./contracts";
 import { Dao, QueryDao } from "./dao";
+import { TFChainError, TFChainErrorWrapper } from "./errors";
 import { Farms, QueryFarms } from "./farms";
 import { KVStore } from "./kvstore";
 import { Nodes, QueryNodes } from "./nodes";
