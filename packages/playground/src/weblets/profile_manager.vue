@@ -804,7 +804,7 @@ async function login() {
 
       await activate(mnemonic, keypairType as KeypairType);
       if (!credentials.emailHash) {
-        createCustomToast("Please Enter Email!", ToastType.warning);
+        createCustomToast("Email is Missing! Please enter your Email.", ToastType.warning);
         router.push({ path: "/tf-chain/your-profile" });
       }
     }
