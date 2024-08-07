@@ -801,7 +801,12 @@ async function login() {
       const keypairType = credentials.keypairTypeHash
         ? cryptr.decrypt(credentials.keypairTypeHash)
         : KeypairType.sr25519;
+
       await activate(mnemonic, keypairType as KeypairType);
+      if (!credentials.emailHash) {
+        createCustomToast("Please Enter Email!", ToastType.warning);
+        router.push({ path: "/tf-chain/your-profile" });
+      }
     }
   }
 }
