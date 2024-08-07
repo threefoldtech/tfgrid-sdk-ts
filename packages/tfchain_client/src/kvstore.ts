@@ -23,12 +23,12 @@ class KVStore {
    * It then patches the extrinsic and returns the options that were set.
    *
    * @param options - An object containing the key and value to be set in the `key-value` store.
-   * @returns {Promise<ExtrinsicResult<KVStoreSetOptions>>} A promise that resolves to the options that were set in the store.
+   * @returns {Promise<ExtrinsicResult<string>>} A promise that resolves to the address of the connected account.
    */
   @checkConnection
-  async set(options: KVStoreSetOptions): Promise<ExtrinsicResult<KVStoreSetOptions>> {
+  async set(options: KVStoreSetOptions): Promise<ExtrinsicResult<string>> {
     const extrinsic = await this.client.api.tx.tfkvStore.set(options.key, options.value);
-    return this.client.patchExtrinsic<KVStoreSetOptions>(extrinsic);
+    return this.client.patchExtrinsic<string>(extrinsic);
   }
 
   /**
@@ -38,12 +38,12 @@ class KVStore {
    * It then patches the extrinsic and returns the result of the deletion operation.
    *
    * @param options - An object containing the key to be deleted from the `key-value` store.
-   * @returns {Promise<ExtrinsicResult<KVStoreSetOptions>>} A promise that resolves once the delete extrinsic is successfully created.
+   * @returns {Promise<ExtrinsicResult<string>>} A promise that resolves to the address of the connected account.
    */
   @checkConnection
-  async delete(options: KVStoreGetOptions): Promise<ExtrinsicResult<KVStoreSetOptions>> {
+  async delete(options: KVStoreGetOptions): Promise<ExtrinsicResult<string>> {
     const extrinsic = await this.client.api.tx.tfkvStore.delete(options.key);
-    return this.client.patchExtrinsic<KVStoreSetOptions>(extrinsic);
+    return this.client.patchExtrinsic<string>(extrinsic);
   }
 
   /**
@@ -91,11 +91,11 @@ class KVStore {
    */
   async deleteAll(): Promise<string[]> {
     const keys: string[] = await this.list();
-    const extrinsics: ExtrinsicResult<KVStoreGetOptions>[] = [];
+    const extrinsics: ExtrinsicResult<string>[] = [];
     for (const key of keys) {
       extrinsics.push(await this.delete({ key }));
     }
-    await this.client.applyAllExtrinsics<KVStoreGetOptions>(extrinsics);
+    await this.client.applyAllExtrinsics<string>(extrinsics);
     return keys;
   }
 }

@@ -14,7 +14,7 @@ interface BackendStorageInterface {
   list(key: string);
 
   // This method currently only implemented in tfkvstore
-  moveValue?(fromKey: string, toKey: string): Promise<ExtrinsicResult<KVStoreSetOptions>[]>;
+  moveValue?(fromKey: string, toKey: string): Promise<ExtrinsicResult<string>[]>;
 }
 
 export default BackendStorageInterface;

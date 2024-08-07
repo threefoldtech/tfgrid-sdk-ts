@@ -26,9 +26,9 @@ class TFKVStore extends KVStore {
    * If encryption is enabled, the value will be encrypted before storing.
    *
    * @param {KVStoreSetOptions & { encrypt?: boolean }} options - The options for setting the `key-value` pair.
-   * @returns {Promise<ExtrinsicResult<KVStoreSetOptions>>} - A promise that resolves once the `key-value` set extrinsic is created.
+   * @returns {Promise<ExtrinsicResult<string>>} - A promise that resolves to the address of the connected account.
    */
-  async set(options: KVStoreSetOptions & { encrypt?: boolean }): Promise<ExtrinsicResult<KVStoreSetOptions>> {
+  async set(options: KVStoreSetOptions & { encrypt?: boolean }): Promise<ExtrinsicResult<string>> {
     if (options.encrypt === false) {
       return super.set({ key: options.key, value: options.value });
     }
@@ -69,11 +69,11 @@ class TFKVStore extends KVStore {
    * @returns {Promise<string[]>} - A promise that resolves with an array of keys that were removed.
    */
   async batchRemove(options: KVStoreBatchRemoveOptions): Promise<string[]> {
-    const extrinsics: ExtrinsicResult<KVStoreSetOptions>[] = [];
+    const extrinsics: ExtrinsicResult<string>[] = [];
     for (const key of options.keys) {
       extrinsics.push(await this.delete({ key }));
     }
-    await this.client.applyAllExtrinsics<KVStoreSetOptions>(extrinsics);
+    await this.client.applyAllExtrinsics<string>(extrinsics);
     return options.keys;
   }
 

@@ -1,5 +1,3 @@
-import { KVStoreSetOptions } from "@threefold/tfchain_client";
-
 import { TFClient } from "../clients/tf-grid/client";
 import { GridClientConfig } from "../config";
 import { expose } from "../helpers/expose";
@@ -39,7 +37,7 @@ class KVStore {
   @expose
   @validateInput
   @checkBalance
-  async set(options: KVStoreSetModel): Promise<KVStoreSetOptions> {
+  async set(options: KVStoreSetModel): Promise<string> {
     return (await this.client.kvStore.set(options)).apply();
   }
 
@@ -92,7 +90,7 @@ class KVStore {
   @expose
   @validateInput
   @checkBalance
-  async remove(options: KVStoreRemoveModel): Promise<KVStoreSetOptions> {
+  async remove(options: KVStoreRemoveModel): Promise<string> {
     return (await this.client.kvStore.delete(options)).apply();
   }
 

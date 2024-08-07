@@ -1,4 +1,5 @@
 import { Client, QueryClient } from "./client";
+import { ExtrinsicResult } from "./types";
 import { checkConnection } from "./utils";
 
 enum Certification {
@@ -134,12 +135,12 @@ class Farms extends QueryFarms {
    * @param options - The options for adding a Stellar address.
    * @param options.farmId - The ID of the farm to add the Stellar address to.
    * @param options.stellarAddress - The Stellar address to add for payout.
-   * @returns A promise that resolves to the updated farm extrinsic after adding the Stellar address.
+   * @returns A promise that resolves to the farm ID extrinsic after adding the Stellar address.
    */
   @checkConnection
-  async addStellarAddress(options: AddStellarOptions) {
+  async addStellarAddress(options: AddStellarOptions): Promise<ExtrinsicResult<number>> {
     const extrinsic = this.client.api.tx.tfgridModule.addStellarPayoutV2address(options.farmId, options.stellarAddress);
-    return this.client.patchExtrinsic<Farm>(extrinsic);
+    return this.client.patchExtrinsic<number>(extrinsic);
   }
 }
 

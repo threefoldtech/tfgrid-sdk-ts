@@ -61,10 +61,10 @@ class Stellar implements blockchainInterface {
   /**
    * Saves the extrinsics to the `key-value` store backend if the backend storage type is `tfkvstore` and extrinsics are provided.
    *
-   * @param {any[]} extrinsics - The extrinsics to be saved to the `key-value` store backend.
+   * @param {ExtrinsicResult[]} extrinsics - The extrinsics to be saved to the `key-value` store backend.
    * @returns {Promise<void>} - A promise that resolves once the extrinsics are saved to the backend.
    */
-  private async saveIfKVStoreBackend(extrinsics: any[]) {
+  private async saveIfKVStoreBackend(extrinsics: ExtrinsicResult<string>[]) {
     if (this.config.backendStorageType === BackendStorageType.tfkvstore && extrinsics && extrinsics.length > 0) {
       extrinsics = extrinsics.filter(e => e !== undefined);
       if (extrinsics.length > 0) {

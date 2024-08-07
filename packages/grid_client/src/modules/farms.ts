@@ -110,7 +110,7 @@ class Farms {
    * It then adds the `Stellar` address to the specified farm.
    *
    * @param {AddStellarAddressToFarmModel} options - The options for adding the `Stellar` address to the farm, including the `farm ID` and `Stellar address`.
-   * @returns {Promise<Farm>} A promise that resolves when the `Stellar` address is successfully added to the farm.
+   * @returns {Promise<number>} A promise that resolves number as the `Farm ID` after the `Stellar` address is successfully added to the farm.
    * @decorators
    * - `@expose`: Exposes the method for external use.
    * - `@validateInput`: Validates the input options.
@@ -119,7 +119,7 @@ class Farms {
   @expose
   @validateInput
   @checkBalance
-  async addStellarAddress(options: AddStellarAddressToFarmModel): Promise<Farm> {
+  async addStellarAddress(options: AddStellarAddressToFarmModel): Promise<number> {
     return (await this.client.farms.addStellarAddress(options)).apply();
   }
 

@@ -919,7 +919,7 @@ class BaseModule {
   }
 
   /**
-   * Add a new [ZDB or K8S worker] to the deployment.
+   * Add a new [machine, ZDB, or K8S worker] to the deployment.
    *
    * @param deployment_name The name of the deployment.
    * @param node_id The ID of the node where the machine will be added.

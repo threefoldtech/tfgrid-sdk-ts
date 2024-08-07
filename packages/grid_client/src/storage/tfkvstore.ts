@@ -106,11 +106,11 @@ class TFKVStoreBackend implements BackendStorageInterface {
     return splits;
   }
 
-  public async moveValue(fromKey: string, toKey: string): Promise<ExtrinsicResult<KVStoreSetOptions>[]> {
+  public async moveValue(fromKey: string, toKey: string): Promise<ExtrinsicResult<string>[]> {
     fromKey = cropKey(fromKey);
     toKey = cropKey(toKey);
 
-    const exts: ExtrinsicResult<KVStoreSetOptions>[] = [];
+    const exts: ExtrinsicResult<string>[] = [];
 
     for (let i = 0; ; i++) {
       const key = i === 0 ? fromKey : fromKey + "." + i;

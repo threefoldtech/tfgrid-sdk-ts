@@ -459,10 +459,10 @@ class Contracts extends QueryContracts {
    * This method cancels a service contract identified by the provided `serviceId`.
    *
    * @param {CancelServiceOptions} options - The options object containing the `serviceId` of the service contract to be canceled.
-   * @returns {Promise<ExtrinsicResult<any>>} A promise that resolves to the extrinsic for canceling the service contract.
+   * @returns {Promise<ExtrinsicResult<any>>} A promise that resolves to the extrinsic of the `service ID` for canceling the service contract.
    */
   @checkConnection
-  async cancelService(options: CancelServiceOptions): Promise<ExtrinsicResult<any>> {
+  async cancelService(options: CancelServiceOptions): Promise<ExtrinsicResult<number>> {
     const extrinsic = await this.client.api.tx.smartContractModule.serviceContractCancel(options.serviceId);
     return this.client.patchExtrinsic(extrinsic, { map: () => options.serviceId });
   }
@@ -491,12 +491,12 @@ class Contracts extends QueryContracts {
    * This method sets the extra fee for a dedicated node identified by the provided nodeId.
    *
    * @param {SetDedicatedNodeExtraFeesOptions} options - The options object containing the nodeId and extraFee to be set.
-   * @returns {Promise<any>} A promise that resolves to the extrinsic for setting the extra fee for the dedicated node.
+   * @returns {Promise<number>} A promise that resolves to the extrinsic `node ID` for setting the extra fee for the dedicated node.
    */
   @checkConnection
-  async setDedicatedNodeExtraFee(options: SetDedicatedNodeExtraFeesOptions): Promise<any> {
+  async setDedicatedNodeExtraFee(options: SetDedicatedNodeExtraFeesOptions): Promise<ExtrinsicResult<number>> {
     const extrinsic = this.client.api.tx.smartContractModule.setDedicatedNodeExtraFee(options.nodeId, options.extraFee);
-    return this.client.patchExtrinsic(extrinsic);
+    return this.client.patchExtrinsic<number>(extrinsic);
   }
 
   /**
@@ -520,8 +520,8 @@ class Contracts extends QueryContracts {
    * unlocks a smart contract by triggering the billing of a contract on this block.
    *
    *
-   * @param {number} contractId - Contract id to be unlocked.
-   * @returns {Promise<ExtrinsicResult<number>>} A promise that resolves to a `ExtrinsicResult<number>`
+   * @param {number} contractId - Contract ID to be unlocked.
+   * @returns {Promise<ExtrinsicResult<number>>} A promise that resolves to a `ExtrinsicResult<number>` as the `contract ID`.
    * @note This call doesn't guarantee that the contract will be resumed, it just triggers the billing of it,
    * if the accounts has enough funds the contract will be resumed
    *
