@@ -164,6 +164,17 @@ class Dao extends QueryDao {
     this.client = client;
   }
 
+  /**
+   * Create a new dao proposal extrinsic.
+   *
+   * @param options - The options for creating a new proposal.
+   * @param options.proposal - The proposed extrinsic call.
+   * @param options.threshold - The minimum number of the farmers to vote on the proposal.
+   * @param options.description - The proposal description.
+   * @param options.link - The link to the proposal details.
+   * @param options.duration - The duration for allowing the farmers to vote on the proposal.
+   * @returns A promise that resolves to the created proposal extrinsic.
+   */
   @checkConnection
   async propose<T>(options: DaoProposeOptions<T>) {
     const extrinsic = await this.client.api.tx.dao.propose(
@@ -186,12 +197,29 @@ class Dao extends QueryDao {
     });
   }
 
+  /**
+   * Create a vote extrinsic on a dao proposal.
+   *
+   * @param options - The options for voting on a proposal.
+   * @param options.hash - The proposal hash to vote on.
+   * @param options.farmId - The farm id to vote on the proposal. This farm should has at least one node.
+   * @param options.approve - A boolean to vote (with yes or no) on the proposal.
+   * @returns A promise that resolves to an extrinsic for voting on a dao proposal.
+   */
   @checkConnection
   async vote(options: DaoVoteOptions) {
     const extrinsic = this.client.api.tx.dao.vote(options.farmId, options.hash, options.approve);
     return this.client.patchExtrinsic(extrinsic);
   }
 
+  /**
+   * Create a close dao proposal extrinsic.
+   *
+   * @param options - The options for closing a proposal.
+   * @param options.hash - The proposal hash to be closed.
+   * @param options.index - The proposal index to be closed.
+   * @returns A promise that resolves to an extrinsic for closing a dao proposal.
+   */
   @checkConnection
   async close(options: DaoCloseOptions) {
     const extrinsic = this.client.api.tx.dao.close(options.hash, options.index);
