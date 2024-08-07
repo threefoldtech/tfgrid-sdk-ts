@@ -6,6 +6,7 @@ on:
     branches:
       - development_issue_creation
 
+      
 permissions:
   contents: read
   issues: write 
