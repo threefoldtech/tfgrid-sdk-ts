@@ -52,44 +52,43 @@ jobs:
 
       - name: Run test dynamic single vm
         id: single_vm
-        continue-on-error: true
+        if: always()
         run: |
           yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/dynamic_single_vm.ts
           exit 1
       - name: Run test multiple vms
         id: multiple_vm
-        continue-on-error: true
+        if: always()
         run: |
           yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/multiple_vms.ts
       - name: Run test kubernetes
         id: k8s
-        continue-on-error: true
+        if: always()
         run: |
           yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/orchestrators/kubernetes_leader.ts
       - name: Run test vm with qsfs
         id: vmqsfs
-        continue-on-error: true
+        if: always()
         run: |
           yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/vm_with_qsfs.ts
       - name: Run test kubernetes with qsfs
         id: k8sqsfs
-        continue-on-error: true
+        if: always()
         run: |
           yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/orchestrators/kubernetes_with_qsfs.ts
       - name: Run test kvstore
         id: kvstore
-        continue-on-error: true
+        if: always()
         run: |
           yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/kvstore_example.ts
       - name: Run test zdb
         id: zdb
-        continue-on-error: true
+        if: always()
         run: |
           yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/zdb.ts
 
       - name: Cleanup - Delete all contracts
         if: always()
-        continue-on-error: true
         id: delete_all
         run: |
           yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/delete_all_contracts.ts
