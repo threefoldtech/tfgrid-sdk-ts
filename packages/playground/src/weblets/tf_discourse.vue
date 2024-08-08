@@ -142,7 +142,7 @@ const grid = gridStore.client as GridClient;
 
 function finalize(deployment: any) {
   layout.value.reloadDeploymentsList();
-  layout.value.setStatus("success", "Successfully deployed a discourse instance.");
+  layout.value.setStatus("success", "Successfully deployed a Discourse instance.");
   layout.value.openDialog(deployment, deploymentListEnvironments.discourse);
 }
 
@@ -206,7 +206,7 @@ async function deploy() {
       ],
     });
   } catch (e) {
-    return layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a discourse instance."));
+    return layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Discourse instance."));
   }
 
   if (!selectionDetails.value?.domain?.enableSelectedDomain) {
@@ -229,7 +229,7 @@ async function deploy() {
   } catch (e) {
     layout.value.setStatus("deploy", "Rollbacking back due to fail to deploy gateway...");
     await rollbackDeployment(grid!, name.value);
-    layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a discourse instance."));
+    layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Discourse instance."));
   }
 }
 

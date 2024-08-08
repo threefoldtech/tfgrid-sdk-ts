@@ -38,12 +38,16 @@ async function RemoteRun(host, user) {
   const { NodeSSH } = require("node-ssh");
   const ssh = new NodeSSH();
 
-  await ssh.connect({
-    host: host,
-    username: user,
-    privateKeyPath: os.homedir() + "/.ssh/id_ed25519",
-    readyTimeout: 60000,
-  });
+  await ssh
+    .connect({
+      host: host,
+      username: user,
+      privateKeyPath: os.homedir() + "/.ssh/id_ed25519",
+      readyTimeout: 60000,
+    })
+    .then(() => {
+      console.log("Connection established");
+    });
 
   return ssh;
 }
