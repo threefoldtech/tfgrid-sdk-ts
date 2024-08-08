@@ -88,16 +88,19 @@ jobs:
           yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/zdb.ts
 
       - name: Cleanup - Delete all contracts
+        if: always()
         id: delete_all
         run: |
           yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/delete_all_contracts.ts
 
       - name: Run check up - List all contracts
+        if: always()
         run: |
           sleep 15
           yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/list_all_contracts.ts > output.txt
 
       - name: Check if contracts are Empty
+        if: always()
         run: |
           # print the file content
           cat output.txt
@@ -110,6 +113,7 @@ jobs:
           fi
 
       - name: Test Results
+        if: always()
         run: |
           echo Dynamic Single Vm: ${{ steps.single_vm.outcome }}
           echo Multiple Vm: ${{ steps.multiple_vm.outcome }}
@@ -133,6 +137,7 @@ jobs:
         run: exit 1
 
       - name: Find issues
+        if: always()
         id: find-issues
         env:
           GH_TOKEN: ${{ github.token }}
@@ -153,7 +158,7 @@ jobs:
             ## Failure Report
           
             > [!IMPORTANT]
-            > **Details on failed run**: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/job/${{github.job}}
+            > **Details on failed run**: https://github.com/threefoldtech/${{ github.repository }}/actions/runs/${{ github.run_id }}
           
             - **Dynamic Single Vm**: ${{ steps.single_vm.outcome }}
             - **Multiple Vm**: ${{ steps.multiple_vm.outcome }}
