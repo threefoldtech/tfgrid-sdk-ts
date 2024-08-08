@@ -55,32 +55,37 @@ jobs:
         if: always()
         run: |
           yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/dynamic_single_vm.ts
-          exit 1
+
       - name: Run test multiple vms
         id: multiple_vm
         if: always()
         run: |
           yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/multiple_vms.ts
+
       - name: Run test kubernetes
         id: k8s
         if: always()
         run: |
           yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/orchestrators/kubernetes_leader.ts
+
       - name: Run test vm with qsfs
         id: vmqsfs
         if: always()
         run: |
           yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/vm_with_qsfs.ts
+
       - name: Run test kubernetes with qsfs
         id: k8sqsfs
         if: always()
         run: |
           yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/orchestrators/kubernetes_with_qsfs.ts
+
       - name: Run test kvstore
         id: kvstore
         if: always()
         run: |
           yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/kvstore_example.ts
+
       - name: Run test zdb
         id: zdb
         if: always()
@@ -129,7 +134,7 @@ jobs:
             ## Failure Report
           
             > [!IMPORTANT]
-            > **Details on failed run**: https://github.com/threefoldtech/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            > **Details on failed run**: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
           
             - **Dynamic Single Vm**: ${{ steps.single_vm.outcome }}
             - **Multiple Vm**: ${{ steps.multiple_vm.outcome }}
