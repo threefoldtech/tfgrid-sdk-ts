@@ -1,7 +1,7 @@
 /**
  * Represents a basic service interface.
  */
-interface IServiceBase {
+export interface IServiceBase {
   /**
    * The name of the service.
    */
@@ -16,7 +16,7 @@ interface IServiceBase {
 /**
  * Represents a service with liveness checking capability.
  */
-export interface ILivenessChecker<P = { url: string }> extends IServiceBase {
+export interface ILivenessChecker extends IServiceBase {
   /**
    * Checks if the service is alive.
    * @returns {Promise<ServiceStatus>} A promise that resolves with the current status of the service.

@@ -1,20 +1,10 @@
 import { resolveServiceStatus, sendRequest } from "../helpers/utils";
 import { ILivenessChecker, ServiceStatus } from "../types";
-
-export class TFChainMonitor implements ILivenessChecker {
-  private _name = "TFChain";
-  private _url: string;
-  constructor(tfchainUrl?: string) {
-    if (tfchainUrl) this.url = tfchainUrl;
-  }
-  public get name() {
-    return this._name;
-  }
-  public get url() {
-    return this._url ?? "";
-  }
-  public set url(url: string) {
-    this._url = url;
+import { ServiceBase } from "./serviceBase";
+export class TFChainMonitor extends ServiceBase implements ILivenessChecker {
+  constructor(ServiceUrl?: string) {
+    super("TFChain");
+    if (ServiceUrl) this.url = ServiceUrl;
   }
   async isAlive(url = this.url): Promise<ServiceStatus> {
     if (!url) throw new Error("Can't access before initialization");

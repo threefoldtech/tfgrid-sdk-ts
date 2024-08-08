@@ -1,22 +1,12 @@
 import { resolveServiceStatus, sendRequest } from "../helpers/utils";
 import { ILivenessChecker, ServiceStatus } from "../types";
+import { ServiceBase } from "./serviceBase";
 
-export class GraphQLMonitor implements ILivenessChecker {
-  private readonly _name = "GraphQl";
-  private _url: string;
-  constructor(graphQlUrl?: string) {
-    if (graphQlUrl) this._url = graphQlUrl;
+export class GraphQLMonitor extends ServiceBase implements ILivenessChecker {
+  constructor(ServiceUrl?: string) {
+    super("GraphQl");
+    if (ServiceUrl) this.url = ServiceUrl;
   }
-  public get name() {
-    return this._name;
-  }
-  public get url() {
-    return this._url ?? "";
-  }
-  public set url(url: string) {
-    this._url = url;
-  }
-
   async isAlive(url = this.url): Promise<ServiceStatus> {
     if (!url) throw new Error("Can't access before initialization");
     return resolveServiceStatus(
