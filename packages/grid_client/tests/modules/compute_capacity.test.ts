@@ -10,7 +10,6 @@ describe("Compute Capacity module", () => {
     expect(computeCapacity).toBeInstanceOf(ComputeCapacity);
   });
 
-  // The following tests are skipped as there's an issue w input validation. Should be returned once validation is fixed here: https://github.com/threefoldtech/tfgrid-sdk-ts/issues/2821
   test("Min values for cpu & memory.", () => {
     const cpu = 0;
     const mem = 255 * 1024 ** 2;
