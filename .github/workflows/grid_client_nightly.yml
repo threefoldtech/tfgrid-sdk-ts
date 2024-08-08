@@ -153,7 +153,7 @@ jobs:
             ## Failure Report
           
             > [!IMPORTANT]
-            > **Details on failed run**: [View Run Details](https://github.com/tfgrid-sdk-ts/actions/runs/${{ github.run_id }})
+            > **Details on failed run**: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/job/${{github.job}}
           
             - **Dynamic Single Vm**: ${{ steps.single_vm.outcome }}
             - **Multiple Vm**: ${{ steps.multiple_vm.outcome }}
