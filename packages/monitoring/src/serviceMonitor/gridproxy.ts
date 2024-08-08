@@ -1,20 +1,11 @@
 import { resolveServiceStatus, sendRequest } from "../helpers/utils";
 import { ILivenessChecker, ServiceStatus } from "../types";
+import { ServiceBase } from "./serviceBase";
 
-export class GridProxyMonitor implements ILivenessChecker {
-  private readonly _name = "GridProxy";
-  private _url: string;
-  constructor(gridProxyUrl?: string) {
-    if (gridProxyUrl) this.url = gridProxyUrl;
-  }
-  public get name() {
-    return this._name;
-  }
-  public get url() {
-    return this._url ?? "";
-  }
-  public set url(url: string) {
-    this._url = url;
+export class GridProxyMonitor extends ServiceBase implements ILivenessChecker {
+  constructor(ServiceUrl?: string) {
+    super("GridProxy");
+    if (ServiceUrl) this.url = ServiceUrl;
   }
   async isAlive(url = this.url): Promise<ServiceStatus> {
     if (!url) throw new Error("Can't access before initialization");

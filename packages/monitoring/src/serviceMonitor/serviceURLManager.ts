@@ -3,6 +3,8 @@ import { ConnectionError } from "@threefold/types";
 import { monitorEvents } from "../helpers/events";
 import { ILivenessChecker, Service, ServiceStatus, ServiceUrl, URLManagerOptions } from "../types";
 
+const TIME_OUT = "Timeout";
+
 /**
  * Manages service URLs, checking their availability and ensuring they are reachable.
  *
@@ -39,14 +41,14 @@ export class ServiceUrlManager<N extends boolean = false> {
     try {
       const statusPromise = service.isAlive(url);
 
-      const timeoutPromise = new Promise((resolve, reject) => {
+      const timeoutPromise = new Promise((_, reject) => {
         setTimeout(() => {
-          reject(new Error("Timeout"));
+          reject(new Error(TIME_OUT));
         }, _timeout * 1000);
       });
 
       const result = await Promise.race([statusPromise, timeoutPromise]);
-      if (result instanceof Error && result.message === "Timeout") {
+      if (result instanceof Error && result.message === TIME_OUT) {
         throw result;
       }
       return result as ServiceStatus;

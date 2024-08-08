@@ -1,21 +1,11 @@
 import { RequestError } from "@threefold/types";
 
 import { ILivenessChecker, ServiceStatus } from "../types";
-
-export class RMBMonitor implements ILivenessChecker {
-  private _name = "RMB";
-  private _url: string;
-  constructor(RMBUrl?: string) {
-    if (RMBUrl) this.url = RMBUrl;
-  }
-  public get name() {
-    return this._name;
-  }
-  public get url() {
-    return this._url ?? "";
-  }
-  public set url(url: string) {
-    this._url = url;
+import { ServiceBase } from "./serviceBase";
+export class RMBMonitor extends ServiceBase implements ILivenessChecker {
+  constructor(ServiceUrl?: string) {
+    super("RMB");
+    if (ServiceUrl) this.url = ServiceUrl;
   }
   async isAlive(url = this.url): Promise<ServiceStatus> {
     if (!url) throw new Error("Can't access before initialization");
