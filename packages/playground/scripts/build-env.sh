@@ -88,7 +88,7 @@ parss_array(){
   quoted_string=${quoted_string// /,}
 
   # remove trailing comma
-  echo "$quoted_string" | sed 's/.$//'
+  echo "${quoted_string%?}"
 
 }
 
