@@ -14,6 +14,7 @@ import { formatErrorMessage, generateString } from "./helpers/utils";
 import * as modules from "./modules/index";
 import { appPath } from "./storage/backend";
 import { BackendStorageType } from "./storage/backend";
+import { availableURLS } from "./urlManager";
 import { KeypairType } from "./zos/deployment";
 
 class GridClient {
@@ -86,7 +87,7 @@ class GridClient {
     }
   }
   async connect(): Promise<void> {
-    const urls = this.getDefaultUrls(this.clientOptions.network);
+    const urls = await this.getDefaultUrls(this.clientOptions.network);
 
     this.tfclient = new TFClient(
       urls.substrate,
@@ -114,13 +115,12 @@ class GridClient {
     }
 
     await this.testConnectionUrls(urls);
-    this._connect();
+    this._connect(urls);
     await this.rmbClient.connect();
     await migrateKeysEncryption.apply(this, [GridClient]);
   }
 
-  _connect(): void {
-    const urls = this.getDefaultUrls(this.clientOptions.network);
+  async _connect(urls: { [key: string]: string }): Promise<void> {
     const storePath = PATH.join(appPath, this.clientOptions.network, String(this.twinId));
     this.config = {
       network: this.clientOptions.network,
@@ -169,19 +169,32 @@ class GridClient {
       throw err;
     }
   }
-
-  getDefaultUrls(network: NetworkEnv): Record<string, string> {
-    const base = network === NetworkEnv.main ? "grid.tf" : `${network}.grid.tf`;
+  getServicesWithoutURLs(urls: { [key: string]: string | undefined }) {
+    return Object.entries(urls).reduce((acc, [service, url]) => {
+      if (!url) {
+        acc.push(service);
+      }
+      return acc;
+    }, [] as string[]);
+  }
+  async getDefaultUrls(network: NetworkEnv): Promise<Record<string, string>> {
     const { proxyURL, relayURL, substrateURL, graphqlURL, activationURL } = this.clientOptions;
     const urls = {
-      rmbProxy: proxyURL || `https://gridproxy.${base}`,
-      relay: relayURL || `wss://relay.${base}`,
-      substrate: substrateURL || `wss://tfchain.${base}/ws`,
-      graphql: graphqlURL || `https://graphql.${base}/graphql`,
-      activation: activationURL || `https://activation.${base}/activation/activate`,
+      rmbProxy: proxyURL,
+      relay: relayURL,
+      substrate: substrateURL,
+      graphql: graphqlURL,
+      activation: activationURL,
     };
 
-    return urls;
+    const missingServicesURLS = this.getServicesWithoutURLs(urls);
+
+    if (missingServicesURLS.length > 0) {
+      const pickedURL = await availableURLS(missingServicesURLS, network);
+      missingServicesURLS.forEach(service => (urls[service] = pickedURL[service]));
+    }
+
+    return urls as Record<string, string>;
   }
 
   async disconnect(): Promise<void> {

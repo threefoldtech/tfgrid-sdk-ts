@@ -17,6 +17,7 @@
     "@threefold/gridproxy_client": "2.5.0",
     "@threefold/rmb_direct_client": "2.5.0",
     "@threefold/tfchain_client": "2.5.0",
+    "@threefold/monitoring": "2.5.0",
     "@threefold/types": "2.5.0",
     "algosdk": "^1.19.0",
     "appdata-path": "^1.0.0",
