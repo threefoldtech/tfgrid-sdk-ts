@@ -27,7 +27,7 @@ export interface DeployGatewayConfig {
   subdomain: string;
   ip: string;
   port: number;
-  network: string;
+  network?: string;
   tlsPassthrough?: boolean;
 }
 
