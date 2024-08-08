@@ -1,6 +1,6 @@
 {
   "network": "main",
-  "mnemonic": "search vague feature catch correct drama involve hello swallow lend orchard resemble",
+  "mnemonic": "",
   "storeSecret": "",
-  "ssh_key": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILQAnlkJXG4moU66L70wJ8HtY72RP8+/6c3SSrjjTCNi harby@harby-ubuntu"
+  "ssh_key": ""
 }
