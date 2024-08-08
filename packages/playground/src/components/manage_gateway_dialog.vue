@@ -124,7 +124,7 @@
               </input-tooltip>
             </div>
 
-            <copy-input-wrapper #="{ props }" :data="networkName">
+            <copy-input-wrapper #="{ props }" :data="networkName" v-if="isWireGuard">
               <v-text-field label="Network name" v-model="networkName" readonly v-bind="props" />
             </copy-input-wrapper>
 
@@ -186,7 +186,7 @@ import { onMounted, type PropType, ref, watch } from "vue";
 import { useGrid } from "../stores";
 import { ProjectName } from "../types";
 import type { SelectionDetails } from "../types/nodeSelector";
-import { deployGatewayName, type GridGateway, loadDeploymentGateways } from "../utils/gateway";
+import { DeployGatewayConfig, deployGatewayName, type GridGateway, loadDeploymentGateways } from "../utils/gateway";
 import { updateGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
 import { generateName } from "../utils/strings";
@@ -201,6 +201,14 @@ type VMNetwork = {
   value: string;
 };
 
+enum NetworkIP {
+  IPV6 = "IPV6",
+  IPV4 = "IPV4",
+  PlanetaryIP = "Planetary IP",
+  MyceliumIP = "Mycelium IP",
+  WireGuardIP = "WireGuard IP",
+}
+
 export default {
   name: "ManageGatewayDialog",
   components: { ListTable, IconActionBtn },
@@ -211,6 +219,7 @@ export default {
     const layout = useLayout();
     const gatewayTab = ref(0);
     const dialogVisible = ref(true);
+    const isWireGuard = ref(false);
 
     const oldPrefix = ref("");
     const prefix = ref("");
@@ -277,10 +286,17 @@ export default {
     async function deployGateway() {
       layout.value.setStatus("deploy");
       try {
-        let IP = selectedIPAddress.value as unknown as string;
-        const isWireGuard = networks.value.find(net => net.value === IP)?.title === "WireGuard IP";
+        const IP = selectedIPAddress.value as unknown as string;
 
-        if (isWireGuard) {
+        const gwConfig: DeployGatewayConfig = {
+          subdomain: subdomain.value,
+          ip: IP,
+          port: port.value,
+          tlsPassthrough: passThrough.value,
+        };
+
+        if (isWireGuard.value) {
+          gwConfig.network = networkName;
           const [x, y] = IP.split(".");
           const data = {
             name: networkName,
@@ -296,17 +312,7 @@ export default {
           }
         }
 
-        if (IP.includes("/")) {
-          IP = IP.split("/")[0];
-        }
-
-        await deployGatewayName(grid, selectionDetails.value!.domain, {
-          subdomain: subdomain.value,
-          ip: IP,
-          port: port.value,
-          network: networkName,
-          tlsPassthrough: passThrough.value,
-        });
+        await deployGatewayName(grid, selectionDetails.value!.domain, gwConfig);
         layout.value.setStatus("success", "Successfully deployed gateway.");
       } catch (error) {
         layout.value.setStatus("failed", normalizeError(error, "Something went wrong."));
@@ -343,11 +349,11 @@ export default {
     function getSupportedNetworks() {
       const { publicIP, planetary, myceliumIP, interfaces } = props.vm;
 
-      addNetwork("IPV6", publicIP?.ip6);
-      addNetwork("IPV4", publicIP?.ip);
-      addNetwork("Planetary IP", planetary);
-      addNetwork("Mycelium IP", myceliumIP);
-      addNetwork("WireGuard IP", interfaces?.[0]?.ip);
+      addNetwork(NetworkIP.WireGuardIP, interfaces?.[0]?.ip);
+      addNetwork(NetworkIP.PlanetaryIP, planetary);
+      addNetwork(NetworkIP.MyceliumIP, myceliumIP);
+      addNetwork(NetworkIP.IPV6, publicIP?.ip6.split("/")[0]);
+      addNetwork(NetworkIP.IPV4, publicIP?.ip.split("/")[0]);
       selectedIPAddress.value = networks.value[0];
     }
 
@@ -357,6 +363,9 @@ export default {
         if (selectedIPAddress.value?.value) {
           selectedIPAddress.value = selectedIPAddress.value.value as unknown as VMNetwork;
         }
+
+        const IP = selectedIPAddress.value as unknown as string;
+        isWireGuard.value = networks.value.find(net => net.value === IP)?.title === NetworkIP.WireGuardIP;
       },
       { deep: true },
     );
@@ -419,6 +428,7 @@ export default {
       tableHeaders,
       subdomainRules,
       portRules,
+      isWireGuard,
     };
   },
 };
