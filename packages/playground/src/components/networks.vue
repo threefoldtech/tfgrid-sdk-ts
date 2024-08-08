@@ -133,7 +133,7 @@ export default {
     disabled: { type: Boolean },
     enableIpv4: {
       type: Boolean,
-      default: () => true,
+      default: () => null,
     },
   },
   emits: {
