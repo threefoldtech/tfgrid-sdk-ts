@@ -21,7 +21,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        network: ["dev"]
+        network: ["dev", "qa", "test"]
     env:
       NETWORK: ${{ matrix.network }}
       RMB_PROXY: true
@@ -134,6 +134,8 @@ jobs:
 
       - name: Find issues
         id: find-issues
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           ISSUE_COUNT=$(gh issue list --search "${{github.workflow}} failed during schedule on ${{ env.NETWORK }}" --json title --jq '. | length')
           echo "issue_count=$ISSUE_COUNT" >> $GITHUB_ENV
