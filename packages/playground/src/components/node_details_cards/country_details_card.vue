@@ -35,6 +35,8 @@ export default {
     onMounted(mount);
 
     const getNodeDetailsCard = (): NodeDetailsCard[] => {
+      const x = getCountryFlagSrc();
+      console.log("x ", x);
       return [
         { name: "Flag", imgSrc: getCountryFlagSrc(), hint: props.node.location.country },
         { name: "Name", value: props.node.country },
@@ -48,6 +50,9 @@ export default {
     const getCountryFlagSrc = () => {
       const conuntryCode = getCountryCode(props.node);
 
+      if (conuntryCode.length > 2) {
+        return "";
+      }
       return conuntryCode.toLocaleLowerCase() != "ch"
         ? `https://www.worldatlas.com/r/w425/img/flag/${conuntryCode?.toLocaleLowerCase()}-flag.jpg`
         : `https://www.worldatlas.com/r/w425/img/flag/${conuntryCode?.toLocaleLowerCase()}-flag.png`;
