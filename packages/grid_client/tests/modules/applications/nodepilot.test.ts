@@ -13,6 +13,7 @@ let deploymentName: string;
 
 beforeAll(async () => {
   process.env.NODE_ENV = "test";
+  process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "1";
   config.network = "main"; //Change network to mainnet, the only network with enough resources
   gridClient = await getClient();
   deploymentName = "np" + generateString(10);
