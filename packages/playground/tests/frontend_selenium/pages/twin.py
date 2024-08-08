@@ -22,7 +22,7 @@ class TwinPage:
     twin_address_text = (By.XPATH, '/html/body/div[1]/div/div/main/div/div[2]/div/div/div/div[2]/div[2]/div[1]/div/div[3]/div[2]/div/div/div/div[1]/span')
     twin_relay_text = (By.XPATH, '/html/body/div[1]/div/div/main/div/div[2]/div/div/div/div[2]/div[2]/div[1]/div/div[4]/div[2]/div/div/div')
     edit_email_button = (By.XPATH, '/html/body/div[1]/div/div/main/div/div[2]/div/div/div/div[2]/div[2]/div[1]/div/div[2]/div[2]/div/div/div/i')
-    edit_email_input = (By.XPATH, '/html/body/div[1]/div/div/main/div/div[2]/div/div/div/div[2]/div[2]/div[1]/div/div[2]/div[2]/div/div/form/div/div[1]/div/div[3]/input')
+    edit_email_input = (By.XPATH, "//input[@placeholder='email@example.com']")
     submit_email_button= (By.XPATH, '/html/body/div[1]/div/div/main/div/div[2]/div/div/div/div[2]/div[2]/div[1]/div/div[2]/div[2]/div/div/form/button')
     connect_manual_button = (By.XPATH, '/html/body/div[1]/div/div/main/div/div[2]/div/div/div/div[2]/div[2]/div[2]/div[1]/p/a')
     connect_google_button = (By.XPATH, '/html/body/div[1]/div/div/main/div/div[2]/div/div/div/div[2]/div[2]/div[2]/div[3]/a[1]')
@@ -60,7 +60,8 @@ class TwinPage:
     def press_edit_btn(self):
         email = self.browser.find_element(*self.twin_email_label).text
         self.browser.find_element(*self.edit_email_button).click()
-        self.wait_for(email)
+        WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.edit_email_input))
+        return self.browser.find_element(*self.edit_email_input).get_attribute('value')
 
     def edit_twin_email(self, email):
         WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.edit_email_input))
@@ -72,8 +73,8 @@ class TwinPage:
         self.browser.find_element(*self.submit_email_button).click()
         WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.edit_email_button))
         self.browser.refresh()
-        alert = Alert(self.browser)
-        alert.accept()
+        # alert = Alert(self.browser)
+        # alert.accept()
         self.browser.switch_to.window(self.browser.window_handles[0])
         WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.twin_details_label))
     
