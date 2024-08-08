@@ -801,7 +801,15 @@ async function login() {
       const keypairType = credentials.keypairTypeHash
         ? cryptr.decrypt(credentials.keypairTypeHash)
         : KeypairType.sr25519;
+
       await activate(mnemonic, keypairType as KeypairType);
+      const grid = await getGrid({ mnemonic: mnemonic, keypairType: keypairType as KeypairType });
+
+      const email = await readEmail(grid!);
+      if (!email) {
+        createCustomToast("Email is Missing! Please enter your Email.", ToastType.warning);
+        router.push({ path: "/tf-chain/your-profile" });
+      }
     }
   }
 }
