@@ -144,6 +144,13 @@ export default {
         icon: "wordpress.png",
         route: DashboardRoutes.Applications.Wordpress,
       },
+      {
+        title: "Expose",
+        excerpt:
+          "Expose allows users to securely expose servers hosted on local machines or VMs to the public internet.",
+        icon: "expose.png",
+        route: DashboardRoutes.Applications.Expose,
+      },
     ];
     cards = cards.sort((a, b) => a.title.localeCompare(b.title));
 
