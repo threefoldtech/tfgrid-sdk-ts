@@ -87,8 +87,8 @@ Before assuming that the price listed is the final price, please verify if you q
 For this example lets assume that this twin has 18 months worth of TFTs staked, so the user will be applicable for a Gold discount level (60% discount).
 
 ```sh
-Cost with 60% discount = 0.943180875 * 0.4
-                       = 0.37727235000000003 TFT/hour
+Cost with 60% discount = 0.943 * 0.4
+                       = 0.377 TFT/hour
 ```
 
 ## Rent Contract
@@ -173,11 +173,11 @@ The current TFT value is `0.012 USD`, please note that prices could be subjected
 ```sh
 Contract cost/hour = CU cost/hour + SU cost/hour
                    = 38.875  mUSD/h + 10.7435 mUSD/h
-                   = 49.6185 mUSD/h
-                   = 0.049618499999999996 USD/h
-                   = (0.049618499999999996 * 24 * 30)
-                   = 35.725319999999996 USD/month
-                   = 3247.7531158799993 TFT/month
+                   = 49.618 mUSD/h
+                   = 0.0496 USD/h
+                   = (0.0496 * 24 * 30)
+                   = 35.725 USD/month
+                   = 3247.753 TFT/month
 ```
 
 ### Applying the Dedicated Node Discount
@@ -185,8 +185,8 @@ Contract cost/hour = CU cost/hour + SU cost/hour
 There's a default `50%` discount for renting a node, this discount is not related to the staking discount. for more info please check the [manual](https://manual.grid.tf/cloud/cloudunits_pricing.html#dedicated-nodes).
 
 ```sh
-Cost with 50% discount = 35.725319999999996 * 0.5
-                       = 17.862659999999998 TFT/month
+Cost with 50% discount = 35.725 * 0.5
+                       = 17.862 TFT/month
 ```
 
 ### Applying the Staking discount
@@ -196,8 +196,8 @@ Before assuming that the price listed is the final price, please verify if you q
 For this example lets assume that this twin has 18 months worth of TFTs staked, so the user will be applicable for a Gold discount level (60% discount).
 
 ```sh
-Cost with 60% discount = 17.862659999999998 * 0.4
-                       = 7.145064 TFT/month
+Cost with 60% discount = 17.862 * 0.4
+                       = 7.145 TFT/month
 ```
 
 ## Name Contract
