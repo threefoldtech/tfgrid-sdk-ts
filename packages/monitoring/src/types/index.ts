@@ -1,29 +1,16 @@
 /**
  * Represents a basic service interface.
  */
-interface IServiceBase {
+export interface IServiceBase {
   /**
-   * Returns the name of the service.
-   * @returns {string} The service name.
+   * The name of the service.
    */
-  serviceName: () => string;
+  name: string;
 
   /**
-   * Returns the URL of the service.
-   * @returns {string} The service URL.
+   * The URL of the service.
    */
-  serviceUrl: () => string;
-}
-
-/**
- * Represents a handler for disconnecting a service.
- */
-export interface IDisconnectHandler {
-  /**
-   * Performs the disconnection from the service.
-   * @returns {Promise<void>} A promise that resolves when the disconnection is successful.
-   */
-  disconnect: () => Promise<void>;
+  url: string;
 }
 
 /**
@@ -34,7 +21,7 @@ export interface ILivenessChecker extends IServiceBase {
    * Checks if the service is alive.
    * @returns {Promise<ServiceStatus>} A promise that resolves with the current status of the service.
    */
-  isAlive: () => Promise<ServiceStatus>;
+  isAlive: (url?: string) => Promise<ServiceStatus>;
 }
 
 export type ServiceStatus = {
@@ -48,3 +35,42 @@ export enum MonitorEvents {
   "storeStatus" = "MonitorStoreStatus",
   "serviceDown" = "MonitorServiceDown",
 }
+
+/**
+ * Represents a service with its stacks and its ILivenessChecker instance.
+ */
+export type Service = {
+  /**
+   * An array of URLs <Stacks> associated with the service.
+   */
+  URLs: string[];
+  /**
+   * An instance of a liveness checker for the service.
+   */
+  service: ILivenessChecker;
+};
+
+/**
+ * Options for configuring the URL manager.
+ * @template N - A boolean type that defaults to false, represents silent property type This will effect the result type as well.
+ */
+export type URLManagerOptions<N extends boolean = false> = {
+  /**
+   * An array of services to be managed by the stack manager.
+   */
+  services: Service[];
+  /**
+   * Optional. The number of retries for failed service checks for each stack.
+   */
+  retries?: number;
+  /**
+   * Optional. Determines if the stack manager should operate silently without throwing any errors and just return null as result.
+   */
+  silent?: N;
+  /**
+   * Optional. timeout for each request in secondes;
+   */
+  timeout?: number;
+};
+
+export type ServiceUrl<N extends boolean> = N extends false ? string : string | null;

@@ -1,31 +1,31 @@
-import { KeypairType } from "@polkadot/util-crypto/types";
-import { Client as RMBClient } from "@threefold/rmb_direct_client";
+import { RequestError } from "@threefold/types";
 
-import { generateString, resolveServiceStatus } from "../helpers/utils";
-import { IDisconnectHandler, ILivenessChecker, ServiceStatus } from "../types";
-
-export class RMBMonitor implements ILivenessChecker, IDisconnectHandler {
-  private name = "RMB";
-  private url: string;
-  private rmbClient: RMBClient;
-  constructor(relayUrl: string, chainUrl: string, mnemonic: string, keypairType: KeypairType) {
-    this.url = relayUrl;
-    this.rmbClient = new RMBClient(chainUrl, relayUrl, mnemonic, generateString(10), keypairType, 0);
+import { ILivenessChecker, ServiceStatus } from "../types";
+import { ServiceBase } from "./serviceBase";
+export class RMBMonitor extends ServiceBase implements ILivenessChecker {
+  constructor(ServiceUrl?: string) {
+    super("RMB");
+    if (ServiceUrl) this.url = ServiceUrl;
   }
-  private async setUp() {
-    await this.rmbClient.connect();
-  }
-  public serviceName() {
-    return this.name;
-  }
-  public serviceUrl() {
-    return this.url;
-  }
-  public async isAlive(): Promise<ServiceStatus> {
-    if (!this.rmbClient?.con?.OPEN) await this.setUp();
-    return resolveServiceStatus(this.rmbClient.ping(2));
-  }
-  public async disconnect() {
-    await this.rmbClient.disconnect();
+  async isAlive(url = this.url): Promise<ServiceStatus> {
+    if (!url) throw new Error("Can't access before initialization");
+    const proxyUrl = url.replace("wss://relay", "https://gridproxy");
+    try {
+      const res = await fetch(proxyUrl + "/health");
+      if (!res?.ok) throw Error(`HTTP Response Code: ${res?.status}`);
+      const rmb_conn = (await res.json())?.rmb_conn;
+      if (rmb_conn === "ok") {
+        return {
+          alive: true,
+        };
+      } else {
+        return {
+          alive: false,
+          error: new Error(`rmb_conn is ${rmb_conn}`),
+        };
+      }
+    } catch (e) {
+      throw new RequestError(`HTTP request failed due to  ${e}.`);
+    }
   }
 }
