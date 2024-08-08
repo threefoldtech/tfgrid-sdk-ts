@@ -2,14 +2,10 @@
 
 name: Grid Client Nightly
 
-# on:
-#   schedule:
-#     - cron: "0 4 * * *"
-#   workflow_dispatch:
-on: 
-  push:
-    branches:
-      - development_issue_creation
+on:
+  schedule:
+    - cron: "0 4 * * *"
+  workflow_dispatch:
 
 permissions:
   contents: read
