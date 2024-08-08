@@ -249,7 +249,7 @@ export default {
         (props.vm.projectName.toLowerCase().includes(ProjectName.Fullvm.toLowerCase()) ? "fvm" : "vm") +
         grid.config.twinId;
       prefix.value = oldPrefix.value + props.vm.name;
-      subdomain.value = generateName({ prefix: prefix.value }, 4);
+      subdomain.value = generateName({ prefix: prefix.value }, 4).toLowerCase();
       await loadGateways();
       getSupportedNetworks();
     });
