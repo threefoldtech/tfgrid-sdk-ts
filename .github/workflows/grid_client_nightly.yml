@@ -44,7 +44,7 @@ jobs:
       - name: Install deps
         run: |
           sudo apt-get update
-          sudo apt-get install -y git libtool tmux redis net-tools
+          sudo apt-get install -y git libtool tmux redis net-tools gh jq
 
       - name: Install
         run: |
@@ -132,16 +132,33 @@ jobs:
           steps.delete_all.outcome != 'success'
         run: exit 1
 
+      - name: Find issues
+        id: find-issues
+        run: |
+          ISSUE_COUNT=$(gh issue list --search "${{github.workflow}} failed during schedule on ${{ env.NETWORK }}" --json title --jq '. | length')
+          echo "issue_count=$ISSUE_COUNT" >> $GITHUB_ENV
+
       - name: Checkout repository again
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Create GitHub Issue on Failure
-        uses: JasonEtco/create-an-issue@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RUN_ID: ${{ github.run_id }}
-
+        if: failure() && env.issue_count == '0'
+        uses: dacbd/create-issue-action@main
         with:
-          update_existing: false
-          search_existing: open
-          filename: .github/issue_template.md
+          token: ${{ github.token }}
+          title: ${{github.workflow}} failed during schedule on ${{ env.NETWORK }}
+          body: |
+            ## Failure Report
+          
+            > [!IMPORTANT]
+            > **Details on failed run**: [View Run Details](https://github.com/tfgrid-sdk-ts/actions/runs/${{ github.run_id }})
+          
+            - **Dynamic Single Vm**: ${{ steps.single_vm.outcome }}
+            - **Multiple Vm**: ${{ steps.multiple_vm.outcome }}
+            - **Kubernetes**: ${{ steps.k8s.outcome }}
+            - **Vmq QSFS**: ${{ steps.vmqsfs.outcome }}
+            - **Kubernetes QSFS**: ${{ steps.k8sqsfs.outcome }}
+            - **Kvstore**: ${{ steps.kvstore.outcome }}
+            - **Zdb**: ${{ steps.zdb.outcome }}
+            - **Delete all contracts**: ${{ steps.delete_all.outcome }}
+          labels: type_bug, grid_client
