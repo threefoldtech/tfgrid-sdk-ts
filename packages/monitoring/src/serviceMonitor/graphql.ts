@@ -13,11 +13,8 @@ export class GraphQLMonitor implements ILivenessChecker {
   public get url() {
     return this._url ?? "";
   }
-  private set url(url: string) {
+  public set url(url: string) {
     this._url = url;
-  }
-  public update(param: { url: string }) {
-    this._url = param.url;
   }
 
   async isAlive(url = this.url): Promise<ServiceStatus> {

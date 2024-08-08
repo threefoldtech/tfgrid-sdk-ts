@@ -13,11 +13,8 @@ export class TFChainMonitor implements ILivenessChecker {
   public get url() {
     return this._url ?? "";
   }
-  private set url(url: string) {
+  public set url(url: string) {
     this._url = url;
-  }
-  public update(param: { url: string }): void {
-    this._url = param.url;
   }
   async isAlive(url = this.url): Promise<ServiceStatus> {
     if (!url) throw new Error("Can't access before initialization");
