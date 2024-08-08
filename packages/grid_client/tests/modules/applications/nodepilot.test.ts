@@ -209,6 +209,7 @@ afterAll(async () => {
     expect(res.updated).toHaveLength(0);
     expect(res.deleted).toBeDefined();
   }
-
+  process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "0";
+  config.network = "dev"; //Change network to mainnet, the only network with enough resources
   return await gridClient.disconnect();
 }, 130000);
