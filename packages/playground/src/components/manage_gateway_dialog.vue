@@ -186,7 +186,12 @@ import { onMounted, type PropType, ref, watch } from "vue";
 import { useGrid } from "../stores";
 import { ProjectName } from "../types";
 import type { SelectionDetails } from "../types/nodeSelector";
-import { DeployGatewayConfig, deployGatewayName, type GridGateway, loadDeploymentGateways } from "../utils/gateway";
+import {
+  type DeployGatewayConfig,
+  deployGatewayName,
+  type GridGateway,
+  loadDeploymentGateways,
+} from "../utils/gateway";
 import { updateGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
 import { generateName } from "../utils/strings";
