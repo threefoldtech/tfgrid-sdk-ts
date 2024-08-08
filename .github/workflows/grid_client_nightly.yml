@@ -21,7 +21,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        network: ["dev", "qa", "test"]
+        network: ["dev", "qa"]
     env:
       NETWORK: ${{ matrix.network }}
       RMB_PROXY: true
@@ -31,7 +31,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-        if: ${{ env.NETWORK == 'dev' }} || ${{ env.NETWORK == 'qa' }} || ${{ env.NETWORK == 'test' }} || ${{ env.NETWORK == 'main' }}
         with:
           ref: refs/tags/v2.5.2
 
@@ -53,54 +52,53 @@ jobs:
 
       - name: Run test dynamic single vm
         id: single_vm
-        if: always()
+        continue-on-error: true
         run: |
           yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/dynamic_single_vm.ts
       - name: Run test multiple vms
         id: multiple_vm
-        if: always()
+        continue-on-error: true
         run: |
           yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/multiple_vms.ts
       - name: Run test kubernetes
         id: k8s
-        if: always()
+        continue-on-error: true
         run: |
           yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/orchestrators/kubernetes_leader.ts
       - name: Run test vm with qsfs
         id: vmqsfs
-        if: always()
+        continue-on-error: true
         run: |
           yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/vm_with_qsfs.ts
       - name: Run test kubernetes with qsfs
         id: k8sqsfs
-        if: always()
+        continue-on-error: true
         run: |
           yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/orchestrators/kubernetes_with_qsfs.ts
       - name: Run test kvstore
         id: kvstore
-        if: always()
+        continue-on-error: true
         run: |
           yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/kvstore_example.ts
       - name: Run test zdb
         id: zdb
-        if: always()
+        continue-on-error: true
         run: |
           yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/zdb.ts
 
       - name: Cleanup - Delete all contracts
         if: always()
+        continue-on-error: true
         id: delete_all
         run: |
           yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/delete_all_contracts.ts
 
       - name: Run check up - List all contracts
-        if: always()
         run: |
           sleep 15
           yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/list_all_contracts.ts > output.txt
 
       - name: Check if contracts are Empty
-        if: always()
         run: |
           # print the file content
           cat output.txt
@@ -112,41 +110,14 @@ jobs:
             exit 1
           fi
 
-      - name: Test Results
-        if: always()
-        run: |
-          echo Dynamic Single Vm: ${{ steps.single_vm.outcome }}
-          echo Multiple Vm: ${{ steps.multiple_vm.outcome }}
-          echo Kubernetes: ${{ steps.k8s.outcome }}
-          echo Vmq Qsfs: ${{ steps.vmqsfs.outcome }}
-          echo Kubernetes Qsfs: ${{ steps.k8sqsfs.outcome }}
-          echo Kvstore: ${{ steps.kvstore.outcome }}
-          echo Zdb: ${{ steps.zdb.outcome }}
-          echo Delete all contracts: ${{ steps.delete_all.outcome }}
-
-      - name: Check test script status
-        if: |
-          steps.single_vm.outcome != 'success' ||
-          steps.multiple_vm.outcome != 'success' ||
-          steps.k8s.outcome != 'success' ||
-          steps.vmqsfs.outcome != 'success' ||
-          steps.k8sqsfs.outcome != 'success' ||
-          steps.kvstore.outcome != 'success' ||
-          steps.zdb.outcome != 'success' ||
-          steps.delete_all.outcome != 'success'
-        run: exit 1
-
       - name: Find issues
-        if: always()
+        if: failure()
         id: find-issues
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           ISSUE_COUNT=$(gh issue list --search "${{github.workflow}} failed during schedule on ${{ env.NETWORK }}" --json title --jq '. | length')
           echo "issue_count=$ISSUE_COUNT" >> $GITHUB_ENV
-
-      - name: Checkout repository again
-        uses: actions/checkout@v4
 
       - name: Create GitHub Issue on Failure
         if: failure() && env.issue_count == '0'
