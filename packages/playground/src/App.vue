@@ -411,6 +411,17 @@ const routes: AppRoute[] = [
       },
     ],
   },
+  {
+    title: "Settings",
+    items: [
+      {
+        title: "Settings",
+        icon: "mdi-cog-outline",
+        route: DashboardRoutes.Other.Settings,
+        tooltip: "Application Settings.",
+      },
+    ],
+  },
 ];
 
 const baseUrl = import.meta.env.BASE_URL;
