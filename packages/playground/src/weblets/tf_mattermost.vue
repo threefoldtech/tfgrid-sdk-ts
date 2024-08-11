@@ -41,7 +41,13 @@
           :medium="{ cpu: 2, memory: 4, disk: 50 }"
           :large="{ cpu: 4, memory: 16, disk: 100 }"
         />
-        <Networks v-model:mycelium="mycelium" v-model:planetary="planetary" v-model:ipv4="ipv4" v-model:ipv6="ipv6" />
+        <Networks
+          v-model:mycelium="mycelium"
+          v-model:planetary="planetary"
+          v-model:ipv4="ipv4"
+          v-model:ipv6="ipv6"
+          v-model:wireguard="wireguard"
+        />
 
         <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
           <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
@@ -107,6 +113,7 @@ const dedicated = ref(false);
 const certified = ref(false);
 const ipv4 = ref(false);
 const ipv6 = ref(false);
+const wireguard = ref(false);
 const planetary = ref(true);
 const smtp = ref(createSMTPServer());
 const rootFilesystemSize = computed(() =>

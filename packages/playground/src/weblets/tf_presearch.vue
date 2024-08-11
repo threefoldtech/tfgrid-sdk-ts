@@ -62,6 +62,7 @@
           v-model:planetary="planetary"
           v-model:mycelium="mycelium"
           v-model:ipv6="ipv6"
+          v-model:wireguard="wireguard"
           ref="network"
         />
 
@@ -130,6 +131,7 @@ const name = ref(generateName({ prefix: "ps" }));
 const code = ref("");
 const ipv4 = ref(false);
 const ipv6 = ref(false);
+const wireguard = ref(false);
 const planetary = ref(true);
 const cpu = 1;
 const memory = 512;

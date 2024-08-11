@@ -40,6 +40,7 @@
         v-model:ipv6="ipv6"
         v-model:planetary="planetary"
         v-model:mycelium="mycelium"
+        v-model:wireguard="wireguard"
       />
 
       <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
@@ -93,6 +94,7 @@ const flist: Flist = {
 };
 const ipv4 = ref(false);
 const ipv6 = ref(false);
+const wireguard = ref(false);
 const planetary = ref(true);
 const mycelium = ref(true);
 const dedicated = ref(false);

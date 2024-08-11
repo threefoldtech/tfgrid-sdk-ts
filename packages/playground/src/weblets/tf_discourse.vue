@@ -62,6 +62,7 @@
           v-model:planetary="planetary"
           v-model:ipv4="ipv4"
           v-model:ipv6="ipv6"
+          v-model:wireguard="wireguard"
           enableIpv4
         />
 
@@ -129,6 +130,7 @@ const email = ref(profileManager.profile?.email || "");
 const solution = ref() as Ref<SolutionFlavor>;
 const ipv4 = ref(true);
 const ipv6 = ref(false);
+const wireguard = ref(false);
 const mycelium = ref(true);
 const planetary = ref(true);
 const smtp = ref(createSMTPServer());

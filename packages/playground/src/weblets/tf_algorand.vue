@@ -27,7 +27,13 @@
           <v-text-field label="Name" v-model="name" v-bind="props" />
         </input-tooltip>
       </input-validator>
-      <Networks v-model:mycelium="mycelium" v-model:planetary="planetary" v-model:ipv4="ipv4" v-model:ipv6="ipv6" />
+      <Networks
+        v-model:mycelium="mycelium"
+        v-model:planetary="planetary"
+        v-model:ipv4="ipv4"
+        v-model:ipv6="ipv6"
+        v-model:wireguard="wireguard"
+      />
       <AlgorandCapacity
         :network="network"
         :type="type"
@@ -122,6 +128,7 @@ const flist: Flist = {
 const name = ref(generateName({ prefix: "al" }));
 const ipv4 = ref(false);
 const ipv6 = ref(false);
+const wireguard = ref(false);
 const planetary = ref(true);
 const mycelium = ref(true);
 const cpu = ref() as Ref<number>;
