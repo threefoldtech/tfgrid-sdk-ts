@@ -42,6 +42,8 @@ async function main() {
   const grid3 = await getClient(`kubernetes/${name}`);
 
   const qsfs_name = "testQsfsK8sq1";
+  const disk_size = 1;
+  const count = 8;
 
   const options: FilterOptions = {
     cru: 2,
@@ -58,13 +60,23 @@ async function main() {
   };
 
   const qsfsNodes: number[] = [];
+  let usedResources = 0;
 
-  const allNodes = await grid3.capacity.filterNodes(qsfsQueryOptions);
+  const nodes = await grid3.capacity.filterNodes(qsfsQueryOptions);
 
-  if (allNodes.length >= 2) {
-    qsfsNodes.push(+allNodes[0].nodeId, +allNodes[1].nodeId);
-  } else {
-    throw Error("Couldn't find nodes for qsfs");
+  // Loop over filtered nodes and push in qsfsNodes until they have the required resources
+  for (const node of nodes) {
+    const freeResources = await grid3.capacity.nodes.getNodeFreeResources(node.nodeId);
+    const freeHRU = freeResources.hru / 1024 ** 3;
+
+    if (freeHRU >= disk_size && usedResources <= disk_size * count) {
+      qsfsNodes.push(node.nodeId);
+      usedResources += freeHRU;
+    }
+
+    if (usedResources >= disk_size * count) {
+      break;
+    }
   }
 
   async function getNodeId(client: GridClient, options: FilterOptions) {
@@ -76,10 +88,10 @@ async function main() {
   //create qsfs object
   const qsfs: QSFSZDBSModel = {
     name: qsfs_name,
-    count: 8,
+    count,
     node_ids: qsfsNodes,
     password: "mypassword1",
-    disk_size: 1,
+    disk_size,
     description: "my qsfs test",
     metadata: "",
   };
