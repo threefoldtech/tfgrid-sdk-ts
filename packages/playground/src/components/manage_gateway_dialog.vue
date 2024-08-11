@@ -249,12 +249,7 @@ export default {
 
     onMounted(async () => {
       updateGrid(grid, { projectName: "" });
-
-      oldPrefix.value =
-        (props.vm.projectName.toLowerCase().includes(ProjectName.Fullvm.toLowerCase()) ? "fvm" : "vm") +
-        grid.config.twinId;
-      prefix.value = oldPrefix.value + props.vm.name;
-      subdomain.value = generateName({ prefix: prefix.value }, 4).toLowerCase();
+      suggestName();
       await loadGateways();
       getSupportedNetworks();
     });
@@ -388,6 +383,14 @@ export default {
     function onBack() {
       gatewayTab.value = 0;
       loadGateways();
+    }
+
+    function suggestName() {
+      oldPrefix.value =
+        (props.vm.projectName.toLowerCase().includes(ProjectName.Fullvm.toLowerCase()) ? "fvm" : "vm") +
+        grid.config.twinId;
+      prefix.value = oldPrefix.value + props.vm.name.includes("_") ? props.vm.name.replace("_", "") : props.vm.name;
+      subdomain.value = generateName({ prefix: prefix.value }, 4).toLowerCase();
     }
 
     const subdomainRules = [
