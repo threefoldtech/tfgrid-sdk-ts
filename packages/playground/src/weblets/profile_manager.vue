@@ -440,7 +440,7 @@ import { useOnline } from "../hooks";
 import { useInputRef } from "../hooks/input_validator";
 import { useProfileManager } from "../stores";
 import type { Credentials } from "../utils/credentials";
-import { getCredentials } from "../utils/credentials";
+import { getCredentials, setCredentials } from "../utils/credentials";
 import { activateAccountAndCreateTwin, createAccount, getGrid, loadBalance, loadProfile } from "../utils/grid";
 import { readEmail, storeEmail } from "../utils/grid";
 import { normalizeBalance, normalizeError } from "../utils/helpers";
@@ -550,22 +550,6 @@ async function mounted() {
     activeTab.value = 1;
     return;
   }
-}
-
-function setCredentials(
-  passwordHash: string,
-  mnemonicHash: string,
-  keypairTypeHash: string,
-  emailHash: string,
-): Credentials {
-  const credentials: Credentials = {
-    passwordHash,
-    mnemonicHash,
-    keypairTypeHash,
-    emailHash,
-  };
-  localStorage.setItem(WALLET_KEY, JSON.stringify(credentials));
-  return credentials;
 }
 
 function isStoredCredentials() {

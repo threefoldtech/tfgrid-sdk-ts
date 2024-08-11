@@ -97,7 +97,9 @@ import md5 from "md5";
 import { ref, watch } from "vue";
 import { useTheme } from "vuetify";
 
-import { getCredentials } from "../utils/credentials";
+import { createCustomToast, ToastType } from "@/utils/custom_toast";
+
+import { getCredentials, updateCredentials } from "../utils/credentials";
 export default {
   name: "Settings",
   setup() {
@@ -140,8 +142,10 @@ export default {
         return { message: "Passwords should match." };
       }
     }
-    function UpdatePassword() {
-      console.log("updating");
+    /** Updates user credentials with the hashes produced by the new password  */
+    async function UpdatePassword() {
+      await updateCredentials(currentPassword.value, newPassword.value);
+      createCustomToast("Password Updated!", ToastType.success);
     }
 
     return {
