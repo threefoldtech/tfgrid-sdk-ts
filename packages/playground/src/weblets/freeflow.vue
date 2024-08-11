@@ -46,7 +46,14 @@
         :large="{ cpu: 4, memory: 32, disk: 1000 }"
       />
 
-      <Networks v-model:ipv4="ipv4" v-model:ipv6="ipv6"></Networks>
+      <Network
+        required
+        v-model:ipv4="ipv4"
+        v-model:ipv6="ipv6"
+        v-model:planetary="planetary"
+        v-model:mycelium="mycelium"
+        v-model:wireguard="wireguard"
+      />
 
       <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
         <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
@@ -105,6 +112,9 @@ const dedicated = ref(false);
 const certified = ref(false);
 const ipv4 = ref(false);
 const ipv6 = ref(false);
+const wireguard = ref(false);
+const planetary = ref(false);
+const mycelium = ref(false);
 const rootFilesystemSize = computed(() =>
   calculateRootFileSystem({ CPUCores: solution.value?.cpu ?? 0, RAMInMegaBytes: solution.value?.memory ?? 0 }),
 );
@@ -165,6 +175,8 @@ async function deploy() {
           entryPoint: flist.value!.entryPoint,
           publicIpv4: ipv4.value,
           publicIpv6: ipv6.value,
+          planetary: planetary.value,
+          mycelium: mycelium.value,
           envs: [
             { key: "SSH_KEY", value: selectedSSHKeys.value },
             { key: "USER_ID", value: threebotName.value },
@@ -213,7 +225,7 @@ function updateSSHkeyEnv(selectedKeys: string) {
 </script>
 
 <script lang="ts">
-import Networks from "../components/networks.vue";
+import Network from "../components/networks.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";
@@ -222,6 +234,6 @@ import { updateGrid } from "../utils/grid";
 
 export default {
   name: "TFFreeflow",
-  components: { SelectSolutionFlavor, Networks, ManageSshDeployemnt },
+  components: { SelectSolutionFlavor, Network, ManageSshDeployemnt },
 };
 </script>
