@@ -1,9 +1,10 @@
+from random import SystemRandom
 import configparser
+import ipaddress
 import random
 import string
 import os
 import json
-
 
 def get_seed():
     config = configparser.ConfigParser()
@@ -68,19 +69,17 @@ def generate_email():
     return email
 
 def generate_ip():
-    first = ['2']
-    second = ['', '0', '1', '2', '3', '4', '5']
-    port = ['16', '17', '18', '19', '20', '21', '22', '23',
-        '24', '25', '26', '27', '28', '29', '30', '31', '32']
-    ip = ''.join(random.choice(first))+''.join(random.choice(second))+'.'
-    ip += ''.join(random.choice(first))+''.join(random.choice(second)
-                  ) + ''.join(random.choice(second))+'.'
-    ip += ''.join(random.choice(first))+''.join(random.choice(second)
-                  )+''.join(random.choice(second))+'.'
-    ip += ''.join(random.choice(first))+''.join(random.choice(second)
-                  )+''.join(random.choice(second))+'/'
-    ip += ''.join(random.choice(port))
-    return ip
+    cryptogen = SystemRandom()
+    while True:
+        ip = [cryptogen.randrange(256) for _ in range(4)]
+        # Check if the generated IP is within private ranges
+        if (ip[0] == 10 or
+            (ip[0] == 172 and 16 <= ip[1] <= 31) or
+            (240 <= ip[0] <= 255) or
+            (ip[0] == 192 and ip[1] == 168)):
+            continue
+        port = cryptogen.randrange(33)
+        return f"{'.'.join(map(str, ip))}/{port}"
 
 def generate_gateway():
     first = ['1', '2']
@@ -97,6 +96,24 @@ def generate_gateway():
                        ''.join(random.choice(second)) + \
                                ''.join(random.choice(second))
     return gateway
+
+def generate_gateway_from_ip(ipv4):
+    ip, mask = ipv4.split('/')
+    network = ipaddress.ip_network(f"{ip}/{mask}", strict=False)
+    if network.num_addresses <= 2:
+        return 0, True
+    while True:
+        # Generate a random IP within the network range, different from the original IP
+        new_ip = network.network_address + cryptogen.randrange(1, network.num_addresses - 1)
+        new_ip_address = ipaddress.ip_address(new_ip)
+        return str(new_ip_address), False
+
+def increment_ip(ipv4):
+    ip, port = ipv4.split('/')
+    ip_obj = ipaddress.ip_address(ip)
+    incremented_ip_obj = ip_obj + 1
+    incremented_ip = str(incremented_ip_obj)
+    return f"{incremented_ip}/{port}"
 
 def generate_inavalid_ip():
     first = ['6', '7', '8', '9']
