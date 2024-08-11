@@ -439,6 +439,7 @@ import { useProfileManagerController } from "../components/profile_manager_contr
 import { useOnline } from "../hooks";
 import { useInputRef } from "../hooks/input_validator";
 import { useProfileManager } from "../stores";
+import type { Credentials } from "../utils/grid";
 import { activateAccountAndCreateTwin, createAccount, getGrid, loadBalance, loadProfile } from "../utils/grid";
 import { readEmail, storeEmail } from "../utils/grid";
 import { normalizeBalance, normalizeError } from "../utils/helpers";
@@ -449,12 +450,7 @@ const selectedName = ref("");
 const selectedItem = ref(items.value[0]);
 const depositFee = ref(0);
 const loadEmail = ref<boolean>(false);
-interface Credentials {
-  passwordHash?: string;
-  mnemonicHash?: string;
-  keypairTypeHash?: string;
-  emailHash?: string;
-}
+
 const keyType = ["sr25519", "ed25519"];
 const keypairType = ref(KeypairType.sr25519);
 const enableReload = ref(true);

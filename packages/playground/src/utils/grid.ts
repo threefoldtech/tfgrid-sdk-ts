@@ -142,3 +142,9 @@ export async function storeEmail(grid: GridClient, newEmail: string): Promise<vo
 
   await grid.tfclient.applyAllExtrinsics(ext);
 }
+export interface Credentials {
+  passwordHash?: string;
+  mnemonicHash?: string;
+  keypairTypeHash?: string;
+  emailHash?: string;
+}
