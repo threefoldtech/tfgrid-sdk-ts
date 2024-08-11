@@ -10,10 +10,9 @@ jest.setTimeout(1250000);
 
 let gridClient: GridClient;
 let deploymentName: string;
+const network_temp = config.network;
 
 beforeAll(async () => {
-  process.env.NODE_ENV = "test";
-  process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "1";
   config.network = "main"; //Change network to mainnet, the only network with enough resources
   gridClient = await getClient();
   deploymentName = "np" + generateString(10);
@@ -158,17 +157,11 @@ test("TC2701 - Applications: Deploy Nodepilot", async () => {
   let reachable = false;
   log(site);
 
-  const axiosInstance = axios.create({
-    httpsAgent: new https.Agent({
-      rejectUnauthorized: false,
-    }),
-  });
-
   for (let i = 0; i <= 250; i++) {
     const wait = await setTimeout(5000, "Waiting for gateway to be ready");
     log(wait);
 
-    await axiosInstance
+    await axios
       .get(site)
       .then(res => {
         log("gateway is reachable");
@@ -209,7 +202,6 @@ afterAll(async () => {
     expect(res.updated).toHaveLength(0);
     expect(res.deleted).toBeDefined();
   }
-  process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "0";
-  config.network = "dev"; //Change network to mainnet, the only network with enough resources
+  config.network = network_temp; //Change network back as before.
   return await gridClient.disconnect();
 }, 130000);
