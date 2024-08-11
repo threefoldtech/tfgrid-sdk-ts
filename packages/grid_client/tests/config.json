@@ -1,6 +1,6 @@
 {
-  "network": "main",
-  "mnemonic": "search vague feature catch correct drama involve hello swallow lend orchard resemble",
+  "network": "dev",
+  "mnemonic": "",
   "storeSecret": "",
-  "ssh_key": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCoorcaeDgAJ24YMNgIbDlDDTDdurGgyLoOP8UMRG9tX5M7P2Bgy4c/YpDlXrDYcNDZZjGbpjQYhvxhhs5O8qUNhERxNs6ZAvhRkkEWwPwGsxwmJs2Jpfd1CT9P/zaXFQ0YVz+fAcOy6TULJvarqAYrxdMZXRiOdr0SGy3E7H5EjqmjxTgG8rrYHXv39a1GLvILKt3KSB4nrC/vkXqSvwIKFwVh5RbIc+GnlgjUk41XAzmvkds4rUCEav4tTzexMgjKBDH1damhb/JDBQKgc/wI+UGSyaB2hGzWd0FmwHcxJUT1cL/XMOROGI17GnAJXw7+9dCJpiV1m9tnCkwQXv/SDz/u9/CeIzPimCJhgD1bJQ8Dut8rxybZqkeiok4azJB5Q7+p5g9sZ+BYfMZvDj9MQYBBWt1WpDDUdHX7/dDQnymbSuZvEw2/KLGgYCryTLsyng0wVZ9f/vXAM+U+jfFKTzlbwwej/sB8GqNnM9qp4F59pmVFpI5vi43afkCZAJ8= harby@harby-ubuntu"
+  "ssh_key": ""
 }
