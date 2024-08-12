@@ -131,7 +131,7 @@ export default {
     const currentPassword = ref("");
     const newPassword = ref("");
     const confirmPassword = ref("");
-    const selectedTimeout = ref(0);
+    const selectedTimeout = ref(window.env.TIMEOUT / 1000);
 
     function UpdateTheme() {
       if (selectedTheme.value.split(" ")[0].toLowerCase() != currentTheme) {
@@ -164,7 +164,7 @@ export default {
     }
     function UpdateTimeout() {
       window.env.TIMEOUT = selectedTimeout.value * 1000;
-      selectedTimeout.value = 0;
+      selectedTimeout.value = window.env.TIMEOUT / 1000;
     }
 
     return {
