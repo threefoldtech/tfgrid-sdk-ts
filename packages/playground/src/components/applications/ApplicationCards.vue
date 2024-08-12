@@ -1,6 +1,14 @@
 <template>
   <v-row>
-    <v-col v-for="card in cards" :key="card.title" cols="12" sm="12" md="12" lg="6" :xl="cards.length > 3 ? 4 : 6">
+    <v-col
+      v-for="card in filteredCards"
+      :key="card.title"
+      cols="12"
+      sm="12"
+      md="12"
+      lg="6"
+      :xl="filteredCards.length > 3 ? 4 : 6"
+    >
       <router-link :to="card.route">
         <v-hover>
           <template v-slot:default="{ isHovering, props }">
@@ -20,8 +28,11 @@
                 <v-chip v-for="tag in card.tags" :key="tag" class="ml-2 pulse-animation">
                   {{ tag }}
                 </v-chip>
+                <v-chip v-if="card.isNew" class="scale_beat ml-2 text-white" color="secondary"> New </v-chip>
               </v-card-title>
-              <v-card-text class="mt-2" v-bind="props"> {{ card.excerpt }} </v-card-text>
+              <v-card-text class="mt-2" v-bind="props">
+                {{ card.excerpt }}
+              </v-card-text>
             </v-card>
           </template></v-hover
         >
@@ -31,7 +42,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, type PropType } from "vue";
+import { defineComponent, onMounted, type PropType, ref } from "vue";
 
 import type { ApplicationCard } from "@/utils/types";
 
@@ -43,10 +54,23 @@ export default defineComponent({
       required: true,
     },
   },
-  setup() {
+  setup(props) {
     const baseURL = import.meta.env.BASE_URL;
+    const filteredCards = ref(props.cards);
+    const createdAt = 1723471170046; // Update time now in milliseconds ex: 1723468996310 is 'Mon Aug 12 2024 16:23:16'
+
+    onMounted(() => {
+      const next30DaysInMs = 30 * 24 * 60 * 60 * 1000;
+      const next30DaysFromNow = createdAt + next30DaysInMs;
+      filteredCards.value.forEach(card => {
+        if (card.isNew === true) {
+          card.isNew = Date.now() < next30DaysFromNow;
+        }
+      });
+    });
     return {
       baseURL,
+      filteredCards,
     };
   },
 });
@@ -59,5 +83,18 @@ a {
 
 .card-opacity {
   background-color: rgba(125, 227, 200, 0.12);
+}
+
+.scale_beat {
+  animation: crescendo 0.5s alternate infinite ease-in;
+}
+
+@keyframes crescendo {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.2);
+  }
 }
 </style>

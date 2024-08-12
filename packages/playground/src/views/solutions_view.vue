@@ -30,6 +30,7 @@ export default {
           "Nostr is a simple, open protocol that enables global, decentralized, and censorship-resistant social media.",
         icon: "nostr.png",
         route: DashboardRoutes.Applications.Nostr,
+        // isNew: true, for new apps
       },
       {
         title: "Gitea",
