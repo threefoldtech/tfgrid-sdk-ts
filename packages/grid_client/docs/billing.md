@@ -12,11 +12,11 @@ TFT price can be retrieved either from the dashboard, through the price availabl
 
 ![image](./assets/dashboard.png)
 
-or directly through [stellar](https://stellar.expert/explorer/public/asset/TFT-GBOVQKJYHXRR3DX6NOX2RRYFRCUMSADGDESTDNBDS6CDVLGVESRTAC47-1?asset[]=TFT-GBOVQKJYHXRR3DX6NOX2RRYFRCUMSADGDESTDNBDS6CDVLGVESRTAC47-1&filter=markets&market=USDC-GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN-1).
+or directly through [Stellar](https://stellar.expert/explorer/public/asset/TFT-GBOVQKJYHXRR3DX6NOX2RRYFRCUMSADGDESTDNBDS6CDVLGVESRTAC47-1?asset[]=TFT-GBOVQKJYHXRR3DX6NOX2RRYFRCUMSADGDESTDNBDS6CDVLGVESRTAC47-1&filter=markets&market=USDC-GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN-1).
 
 ## Current Cloud Units value
 
-These can be retrieved directly from the chain. Through the [polakdot UI](https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Ftfchain.grid.tf#/chainstate).
+These can be retrieved directly from the chain. Through the [Polakdot UI](https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Ftfchain.grid.tf#/chainstate).
 Navigate to `Chain State` then select `tfgridModule` as the query and select `pricingPolicies(u32): Option<PalletTfgridPricingPolicy>`.
 
 Enter the value of the default pricing policy which is `1` or enter the value of any other policy if you need to use a custom one.
@@ -27,7 +27,7 @@ Enter the value of the default pricing policy which is `1` or enter the value of
 
 ## Node Contract
 
-Lets assume that the resources for this deployment are:
+Let's assume that the resources for this deployment are:
 
 ```sh
 Cru: 2
@@ -67,7 +67,7 @@ SU cost/hour = SU * SU pricing
 
 ### Calculating the Billing Rate for the contract
 
-The current TFT value is `0.012 USD`, please note that prices could be subjected to change.
+The current TFT value is `0.012 USD`. Please note that prices could be subjected to change.
 
 ```sh
 Contract cost/hour = CU cost/hour + SU cost/hour
@@ -139,7 +139,7 @@ MRU = 15.55
 
 ### Calculating CU
 
-The current CU value is `10 mUSD/h`, please note that prices could be subjected to change.
+The current CU value is `10 mUSD/h`. Please note that prices could be subjected to change.
 
 ```sh
 CU = min( max(MRU/4, CRU/2), max(MRU/8, CRU), max(MRU/2, CRU/4) )
@@ -154,7 +154,7 @@ CU cost/hour = CU * CU pricing
 
 ### Calculating SU
 
-The current SU value is `5 mUSD/h`, please note that prices could be subjected to change.
+The current SU value is `5 mUSD/h`. Please note that prices could be subjected to change.
 
 ```sh
 SU = HRU/1200 + SRU/200
@@ -168,7 +168,7 @@ SU cost/hour = SU * SU pricing
 
 ### Calculating Billing Rate for the contract
 
-The current TFT value is `0.012 USD`, please note that prices could be subjected to change.
+The current TFT value is `0.012 USD`. Please note that prices could be subjected to change.
 
 ```sh
 Contract cost/hour = CU cost/hour + SU cost/hour
@@ -270,13 +270,13 @@ Cost with 60% discount = 0.4 * 0.4
 
 ## Network Usage
 
-Network Usage is calculated for deployments with public ips, it's reprted every hour and its cost can be calculated approximatly as the value of data(sent + recieved) \* the NU value.
+Network Usage is calculated for deployments with public IPs, it's reported every hour and its cost can be calculated approximately as the value of data(sent + received) \* the NU value.
 
 So firstly lets calculate the data usage. This can be tracked with network tool like `nload` where it can show the total of the sent and recived.
 
 ![image](https://user-images.githubusercontent.com/101194226/253294544-d4691e9a-84af-4f85-a6cc-6cd3f3902448.png)
 
-After than we can get the NU value. you can get its current value from the Pricing Policy.
+After then we can get the NU value. you can get its current value from the Pricing Policy.
 
 ![image](https://user-images.githubusercontent.com/101194226/253295258-e8df88b7-1745-4a51-8694-45adfcd73a96.png)
 
@@ -313,8 +313,7 @@ As an example lets assume that we used a total of 10GB in the last hour, so the 
 Total network usage = 10GB * 0.06 TFT/hour
                     = 0.6 TFT/hour
 
-Billing rate in the next hour should be: actual cost of the deployment + Total Netowrk Usage.
-
+The billing rate in the next hour should be: the actual cost of the deployment + Total Network Usage.
 ```
 
 > Note: The calculated value will always be an approximation since it's not possible to manually calculate the exact value of data used.
