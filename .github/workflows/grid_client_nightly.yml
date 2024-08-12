@@ -3,10 +3,9 @@
 name: Grid Client Nightly
 
 on:
-  push:
-    branches: 
-      - development_issue_creation
-
+  schedule:
+    - cron: "0 4 * * *"
+  workflow_dispatch:
 permissions:
   contents: read
   issues: write
@@ -51,7 +50,6 @@ jobs:
         if: always()
         run: |
           yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/dynamic_single_vm.ts
-          exit 1
 
       - name: Run test multiple vms
         id: multiple_vm
