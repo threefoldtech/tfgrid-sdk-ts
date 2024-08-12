@@ -1,6 +1,6 @@
 import { SubmittableExtrinsic } from "@polkadot/api-base/types";
 import { ISubmittableResult } from "@polkadot/types/types";
-import { ExtrinsicResult } from "@threefold/tfchain_client";
+import { ExtrinsicResult, KVStoreSetOptions } from "@threefold/tfchain_client";
 
 import { TFClient } from "../clients/tf-grid/client";
 import { KeypairType } from "../zos/deployment";
@@ -106,11 +106,11 @@ class TFKVStoreBackend implements BackendStorageInterface {
     return splits;
   }
 
-  public async moveValue(fromKey: string, toKey: string): Promise<ExtrinsicResult<void>[]> {
+  public async moveValue(fromKey: string, toKey: string): Promise<ExtrinsicResult<string>[]> {
     fromKey = cropKey(fromKey);
     toKey = cropKey(toKey);
 
-    const exts: ExtrinsicResult<void>[] = [];
+    const exts: ExtrinsicResult<string>[] = [];
 
     for (let i = 0; ; i++) {
       const key = i === 0 ? fromKey : fromKey + "." + i;

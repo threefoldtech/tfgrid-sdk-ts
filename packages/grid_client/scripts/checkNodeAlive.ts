@@ -1,9 +1,9 @@
-import { PingNodeOptionsModel } from "../src";
+import { GridClient, PingNodeOptionsModel } from "../src";
 import { getClient } from "./client_loader";
 import { log } from "./utils";
 
-async function pingNode(client, nodeId) {
-  const res = await client.zos.pingNode(nodeId);
+async function pingNode(client: GridClient, node: PingNodeOptionsModel) {
+  const res = await client.zos.pingNode(node);
   log("================= Ping result =================");
   log(res);
   log("================= Ping result =================");

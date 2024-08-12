@@ -146,6 +146,7 @@ test("TC1231 - Kubernetes: Deploy a Kubernetes Cluster", async () => {
     network: {
       name: networkName,
       ip_range: ipRange,
+      addAccess: true,
     },
     masters: [
       {
@@ -411,6 +412,7 @@ test("TC1232 - Kubernetes: Add Worker", async () => {
     network: {
       name: networkName,
       ip_range: ipRange,
+      addAccess: true,
     },
     masters: [
       {

@@ -86,6 +86,7 @@ class Client {
       } else {
         this.con = new WebSocket(this.updateUrl()) as unknown as WSConnection;
       }
+      if (this.con && this.con.on) this.con.on("error", () => console.error);
       this.con.onmessage = async (e: any) => {
         let data: Uint8Array = e.data;
         if (!this.isEnvNode()) {
@@ -207,7 +208,7 @@ class Client {
     if (this.con?.readyState !== undefined && this.con?.readyState === this.con?.CONNECTING)
       await this.waitForOpenConnection();
     if (this.__pingPongTimeout) clearTimeout(this.__pingPongTimeout);
-    if (this.con) this.con.removeAllListeners();
+    if (this.con && this.con.removeAllListeners) this.con.removeAllListeners();
     await this.waitForResponses();
     await this.tfclient.disconnect();
     if (this.con?.readyState !== this.con?.CLOSED) this.con.close();
