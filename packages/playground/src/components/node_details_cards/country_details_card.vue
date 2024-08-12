@@ -35,8 +35,6 @@ export default {
     onMounted(mount);
 
     const getNodeDetailsCard = (): NodeDetailsCard[] => {
-      const x = getCountryFlagSrc();
-      console.log("x ", x);
       return [
         { name: "Flag", imgSrc: getCountryFlagSrc(), hint: props.node.location.country },
         { name: "Name", value: props.node.country },
