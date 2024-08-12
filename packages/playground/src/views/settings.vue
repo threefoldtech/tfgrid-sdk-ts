@@ -6,88 +6,95 @@
     </v-card>
     <v-card class="my-5"
       ><v-card-title>Theme</v-card-title> <v-card-text>Pick an application theme!</v-card-text>
-      <v-select class="pa-3" :items="themes" v-model="selectedTheme" />
-      <v-card-actions class="justify-end">
-        <v-btn @click="UpdateTheme" class="justify-end ml-auto">Update</v-btn></v-card-actions
+      <form-validator v-model="isValidTheme">
+        <input-validator :rules="[validateTheme]" #="{ props }" ref="themeInput" :value="selectedTheme">
+          <v-select class="pa-3" :items="themes" v-model="selectedTheme" v-bind="props" />
+        </input-validator>
+      </form-validator>
+      <v-card-actions class="justify-end" :disabled="!isValidTheme">
+        <v-btn :disabled="!isValidTheme" @click="UpdateTheme" class="justify-end ml-auto">Update</v-btn></v-card-actions
       >
     </v-card>
     <v-card class="my-5"
       ><v-card-title>Password</v-card-title> <v-card-text>Change your password</v-card-text>
+      <form-validator v-model="isValidPassword">
+        <PasswordInputWrapper #="{ props: passwordInputProps }">
+          <InputValidator
+            :value="currentPassword"
+            :rules="[
+              validators.required('Password is required.'),
+              validators.minLength('Password must be at least 6 characters.', 6),
+              validateCurrentPassword,
+            ]"
+            #="{ props: validationProps }"
+            ref="currentpasswordInput"
+          >
+            <v-tooltip location="top right" text="Please enter your current password.">
+              <template #activator="{ props: tooltipProps }">
+                <div v-bind="tooltipProps">
+                  <VTextField
+                    label="Current Password"
+                    v-model="currentPassword"
+                    v-bind="{ ...passwordInputProps, ...validationProps }"
+                    autocomplete="off"
+                    class="pa-3"
+                  />
+                </div>
+              </template>
+            </v-tooltip>
+          </InputValidator>
+        </PasswordInputWrapper>
 
-      <PasswordInputWrapper #="{ props: passwordInputProps }">
-        <InputValidator
-          :value="currentPassword"
-          :rules="[
-            validators.required('Password is required.'),
-            validators.minLength('Password must be at least 6 characters.', 6),
-            validateCurrentPassword,
-          ]"
-          #="{ props: validationProps }"
-          ref="currentpasswordInput"
-        >
-          <v-tooltip location="top right" text="Please enter your current password.">
-            <template #activator="{ props: tooltipProps }">
-              <div v-bind="tooltipProps">
-                <VTextField
-                  label="Current Password"
-                  v-model="currentPassword"
-                  v-bind="{ ...passwordInputProps, ...validationProps }"
-                  autocomplete="off"
-                  class="pa-3"
-                />
-              </div>
-            </template>
-          </v-tooltip>
-        </InputValidator>
-      </PasswordInputWrapper>
-
-      <PasswordInputWrapper #="{ props: passwordInputProps }">
-        <InputValidator
-          :value="newPassword"
-          :rules="[
-            validators.required('Password is required.'),
-            validators.minLength('Password must be at least 6 characters.', 6),
-            validateNewPassword,
-          ]"
-          #="{ props: validationProps }"
-          ref="newPasswordInput"
-        >
-          <v-tooltip location="top right" text="Please enter your current password.">
-            <template #activator="{ props: tooltipProps }">
-              <div v-bind="tooltipProps">
-                <VTextField
-                  label="New Password"
-                  v-model="newPassword"
-                  v-bind="{ ...passwordInputProps, ...validationProps }"
-                  autocomplete="off"
-                  class="pa-3"
-                />
-              </div>
-            </template>
-          </v-tooltip>
-        </InputValidator>
-      </PasswordInputWrapper>
-      <PasswordInputWrapper #="{ props: confirmPasswordInputProps }">
-        <InputValidator
-          :value="confirmPassword"
-          :rules="[validators.required('A confirmation password is required.'), validateConfirmPassword]"
-          #="{ props: validationProps }"
-          ref="confirmPasswordInput"
-        >
-          <VTextField
-            label="Confirm Password"
-            v-model="confirmPassword"
-            v-bind="{
-              ...confirmPasswordInputProps,
-              ...validationProps,
-            }"
-            autocomplete="off"
-            class="pa-3"
-          />
-        </InputValidator>
-      </PasswordInputWrapper>
+        <PasswordInputWrapper #="{ props: passwordInputProps }">
+          <InputValidator
+            :value="newPassword"
+            :rules="[
+              validators.required('Password is required.'),
+              validators.minLength('Password must be at least 6 characters.', 6),
+              validateNewPassword,
+            ]"
+            #="{ props: validationProps }"
+            ref="newPasswordInput"
+          >
+            <v-tooltip location="top right" text="Please enter your current password.">
+              <template #activator="{ props: tooltipProps }">
+                <div v-bind="tooltipProps">
+                  <VTextField
+                    label="New Password"
+                    v-model="newPassword"
+                    v-bind="{ ...passwordInputProps, ...validationProps }"
+                    autocomplete="off"
+                    class="pa-3"
+                  />
+                </div>
+              </template>
+            </v-tooltip>
+          </InputValidator>
+        </PasswordInputWrapper>
+        <PasswordInputWrapper #="{ props: confirmPasswordInputProps }">
+          <InputValidator
+            :value="confirmPassword"
+            :rules="[validators.required('A confirmation password is required.'), validateConfirmPassword]"
+            #="{ props: validationProps }"
+            ref="confirmPasswordInput"
+          >
+            <VTextField
+              label="Confirm Password"
+              v-model="confirmPassword"
+              v-bind="{
+                ...confirmPasswordInputProps,
+                ...validationProps,
+              }"
+              autocomplete="off"
+              class="pa-3"
+            />
+          </InputValidator>
+        </PasswordInputWrapper>
+      </form-validator>
       <v-card-actions class="justify-end">
-        <v-btn @click="UpdatePassword" class="justify-end ml-auto">Update</v-btn></v-card-actions
+        <v-btn :disabled="!isValidPassword" @click="UpdatePassword" class="justify-end ml-auto"
+          >Update</v-btn
+        ></v-card-actions
       >
     </v-card>
     <v-card class="my-5"
@@ -98,11 +105,31 @@
           <v-card-text v-bind="props">Adjust Timeout <v-icon icon="mdi-information-outline" /></v-card-text>
         </template>
       </v-tooltip>
-
-      <v-text-field label="Enter timeout (sec)" class="pa-5" v-model="selectedTimeout"></v-text-field>
-      <v-card-actions class="justify-end">
-        <v-btn @click="UpdateTimeout" class="justify-end ml-auto">Update</v-btn></v-card-actions
-      >
+      <form-validator v-model="isValidTimeout" valid-on-init>
+        <input-validator
+          :value="selectedTimeout"
+          :rules="[
+            validators.required('Timeout is required.'),
+            validators.isInt('Timeout must be a valid integer.'),
+            validateTimeout,
+          ]"
+          #="{ props }"
+          ref="timeoutInput"
+        >
+          <v-text-field
+            label="Enter timeout (sec)"
+            class="pa-5"
+            v-bind="props"
+            type="number"
+            v-model="selectedTimeout"
+          ></v-text-field>
+        </input-validator>
+        <v-card-actions class="justify-end">
+          <v-btn :disabled="!isValidTimeout" @click="UpdateTimeout" class="justify-end ml-auto"
+            >Update</v-btn
+          ></v-card-actions
+        >
+      </form-validator>
     </v-card>
   </view-layout>
 </template>
@@ -132,12 +159,18 @@ export default {
     const newPassword = ref("");
     const confirmPassword = ref("");
     const selectedTimeout = ref(window.env.TIMEOUT / 1000);
+    const isValidTimeout = ref(false);
+    const isValidPassword = ref(false);
+    const isValidTheme = ref(false);
+    function validateTheme() {
+      if (selectedTheme.value.split(" ")[0].toLowerCase() == currentTheme) {
+        return { message: "Select a different theme from the current one." };
+      }
+    }
 
     function UpdateTheme() {
-      if (selectedTheme.value.split(" ")[0].toLowerCase() != currentTheme) {
-        localStorage.setItem(KEY, selectedTheme.value == "Light Mode" ? "light" : "dark");
-        theme.global.name.value = selectedTheme.value == "Light Mode" ? "light" : "dark";
-      }
+      localStorage.setItem(KEY, selectedTheme.value == "Light Mode" ? "light" : "dark");
+      theme.global.name.value = selectedTheme.value == "Light Mode" ? "light" : "dark";
     }
     function validateCurrentPassword() {
       if (getCredentials().passwordHash !== md5(currentPassword.value)) {
@@ -160,11 +193,32 @@ export default {
     /** Updates user credentials with the hashes produced by the new password  */
     async function UpdatePassword() {
       await updateCredentials(currentPassword.value, newPassword.value);
+
       createCustomToast("Password Updated!", ToastType.success);
+      // reset input fields
+      currentPassword.value = "";
+      newPassword.value = "";
+      confirmPassword.value = "";
+      isValidPassword.value = false;
     }
     function UpdateTimeout() {
-      window.env.TIMEOUT = selectedTimeout.value * 1000;
-      selectedTimeout.value = window.env.TIMEOUT / 1000;
+      try {
+        window.env.TIMEOUT = selectedTimeout.value * 1000;
+        createCustomToast("Session Timeout Updated", ToastType.success);
+        selectedTimeout.value = window.env.TIMEOUT / 1000;
+        isValidTimeout.value = false;
+      } catch (err) {
+        createCustomToast("Could not update timeout", ToastType.danger);
+        console.log(err);
+      }
+    }
+    function validateTimeout() {
+      if (selectedTimeout.value == window.env.TIMEOUT / 1000) {
+        return { message: "Enter a different timeout than the current one." };
+      }
+      if (selectedTimeout.value < 1) {
+        return { message: "Timeout should be at least 1 second." };
+      }
     }
 
     return {
@@ -174,12 +228,17 @@ export default {
       newPassword,
       confirmPassword,
       selectedTimeout,
+      isValidTimeout,
+      isValidPassword,
+      isValidTheme,
       UpdateTheme,
       UpdatePassword,
       UpdateTimeout,
       validateCurrentPassword,
       validateNewPassword,
       validateConfirmPassword,
+      validateTimeout,
+      validateTheme,
     };
   },
 };
