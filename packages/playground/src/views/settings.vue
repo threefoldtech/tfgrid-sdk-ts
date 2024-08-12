@@ -164,6 +164,7 @@ export default {
     }
     function UpdateTimeout() {
       window.env.TIMEOUT = selectedTimeout.value * 1000;
+      selectedTimeout.value = 0;
     }
 
     return {
