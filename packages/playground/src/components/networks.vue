@@ -68,7 +68,7 @@
                 hide-details
                 color="primary"
                 inset
-                label="mycelium"
+                label="Mycelium"
                 :modelValue="$props.mycelium"
                 @update:modelValue="$emit('update:mycelium', $event ?? undefined)"
               />
