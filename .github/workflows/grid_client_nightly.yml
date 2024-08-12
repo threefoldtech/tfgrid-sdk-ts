@@ -51,6 +51,7 @@ jobs:
         if: always()
         run: |
           yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/dynamic_single_vm.ts
+          exit 1
 
       - name: Run test multiple vms
         id: multiple_vm
