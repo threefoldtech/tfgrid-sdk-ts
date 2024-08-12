@@ -90,6 +90,20 @@
         <v-btn @click="UpdatePassword" class="justify-end ml-auto">Update</v-btn></v-card-actions
       >
     </v-card>
+    <v-card class="my-5"
+      ><v-card-title>Timeout</v-card-title>
+
+      <v-tooltip text="Set desired session timeout in seconds">
+        <template v-slot:activator="{ props }">
+          <v-card-text v-bind="props">Adjust Timeout <v-icon icon="mdi-information-outline" /></v-card-text>
+        </template>
+      </v-tooltip>
+
+      <v-text-field label="Enter timeout (sec)" class="pa-5" v-model="selectedTimeout"></v-text-field>
+      <v-card-actions class="justify-end">
+        <v-btn @click="UpdateTimeout" class="justify-end ml-auto">Update</v-btn></v-card-actions
+      >
+    </v-card>
   </view-layout>
 </template>
 <script lang="ts">
@@ -117,6 +131,7 @@ export default {
     const currentPassword = ref("");
     const newPassword = ref("");
     const confirmPassword = ref("");
+    const selectedTimeout = ref(0);
 
     function UpdateTheme() {
       if (selectedTheme.value.split(" ")[0].toLowerCase() != currentTheme) {
@@ -147,6 +162,9 @@ export default {
       await updateCredentials(currentPassword.value, newPassword.value);
       createCustomToast("Password Updated!", ToastType.success);
     }
+    function UpdateTimeout() {
+      window.env.TIMEOUT = selectedTimeout.value * 1000;
+    }
 
     return {
       themes,
@@ -154,8 +172,10 @@ export default {
       currentPassword,
       newPassword,
       confirmPassword,
+      selectedTimeout,
       UpdateTheme,
       UpdatePassword,
+      UpdateTimeout,
       validateCurrentPassword,
       validateNewPassword,
       validateConfirmPassword,
