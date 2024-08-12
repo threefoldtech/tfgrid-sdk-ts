@@ -27,7 +27,7 @@
           :rules="[
             validators.required('Name is required.'),
             validators.IsAlphanumericExpectUnderscore('Name should consist of letters ,numbers and underscores only.'),
-            name => validators.isAlpha('Name must start with alphabet char.')(name[0]),
+            (name: string) => validators.isAlpha('Name must start with alphabet char.')(name[0]),
             validators.minLength('Name must be at least 2 characters.', 2),
             validators.maxLength('Name cannot exceed 50 characters.', 50),
           ]"
@@ -91,7 +91,7 @@
             :value="envs[index].key"
             :rules="[
               validators.required('Key name is required.'),
-              key => validators.isAlpha('Key must start with alphabet char.')(key[0]),
+              (key: string) => validators.isAlpha('Key must start with alphabet char.')(key[0]),
               validators.pattern('Invalid key format.', { pattern: /^[^0-9_\s][a-zA-Z0-9_]+$/ }),
               validators.maxLength('Key max length is 128 chars.', 128),
             ]"
@@ -240,7 +240,7 @@ const name = ref(generateName({ prefix: "vm" }));
 const flist = ref<Flist>();
 const ipv4 = ref(false);
 const ipv6 = ref(false);
-const planetary = ref(true);
+const planetary = ref(false);
 const mycelium = ref(true);
 const wireguard = ref(false);
 const envs = ref<Env[]>([]);

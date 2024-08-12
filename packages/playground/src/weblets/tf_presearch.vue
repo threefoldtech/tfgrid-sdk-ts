@@ -30,7 +30,7 @@
           :rules="[
             validators.required('Name is required.'),
             validators.IsAlphanumericExpectUnderscore('Name should consist of letters ,numbers and underscores only.'),
-            name => validators.isAlpha('Name must start with alphabet char.')(name[0]),
+            (name: string) => validators.isAlpha('Name must start with alphabet char.')(name[0]),
             validators.minLength('Name must be at least 2 characters.', 2),
             validators.maxLength('Name cannot exceed 50 characters.', 50),
           ]"
@@ -132,7 +132,8 @@ const code = ref("");
 const ipv4 = ref(false);
 const ipv6 = ref(false);
 const wireguard = ref(false);
-const planetary = ref(true);
+const planetary = ref(false);
+const mycelium = ref(true);
 const cpu = 1;
 const memory = 512;
 const rootFilesystemSize = calculateRootFileSystem({ CPUCores: cpu, RAMInMegaBytes: memory });
@@ -147,7 +148,6 @@ const flist: Flist = {
 const dedicated = ref(false);
 const certified = ref(false);
 const selectionDetails = ref<SelectionDetails>();
-const mycelium = ref(true);
 const selectedSSHKeys = ref("");
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
@@ -164,6 +164,7 @@ async function deploy() {
 
     const vm = await deployVM(grid!, {
       name: name.value,
+      network: { addAccess: wireguard.value },
       machines: [
         {
           name: name.value,

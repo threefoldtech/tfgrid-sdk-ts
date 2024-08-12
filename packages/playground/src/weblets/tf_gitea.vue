@@ -26,7 +26,7 @@
             validators.required('Name is required.'),
             validators.isLowercase('Name should consist of lowercase letters only.'),
             validators.isAlphanumeric('Name should consist of alphabets & numbers only.'),
-            name => validators.isAlpha('Name must start with alphabet char.')(name[0]),
+            (name: string) => validators.isAlpha('Name must start with alphabet char.')(name[0]),
             validators.minLength('Name must be at least 2 characters.', 2),
             validators.maxLength('Name cannot exceed 15 characters.', 15),
           ]"
@@ -111,7 +111,7 @@ const name = ref(generateName({ prefix: "gt" }));
 const ipv4 = ref(false);
 const ipv6 = ref(false);
 const wireguard = ref(false);
-const planetary = ref(true);
+const planetary = ref(false);
 const mycelium = ref(true);
 const disks = ref<Disk[]>([]);
 const dedicated = ref(false);
@@ -168,7 +168,7 @@ async function deploy() {
     vm = await deployVM(grid!, {
       name: name.value,
       network: {
-        addAccess: selectionDetails.value!.domain!.enableSelectedDomain,
+        addAccess: wireguard.value || selectionDetails.value!.domain!.enableSelectedDomain,
         accessNodeId: selectionDetails.value!.domain?.selectedDomain?.nodeId,
       },
       machines: [

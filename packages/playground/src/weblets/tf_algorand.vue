@@ -17,7 +17,7 @@
         :rules="[
           validators.required('Name is required.'),
           validators.IsAlphanumericExpectUnderscore('Name should consist of letters ,numbers and underscores only.'),
-          name => validators.isAlpha('Name must start with alphabet char.')(name[0]),
+          (name: string) => validators.isAlpha('Name must start with alphabet char.')(name[0]),
           validators.minLength('Name must be at least 2 characters.', 2),
           validators.maxLength('Name cannot exceed 50 characters.', 50),
         ]"
@@ -129,7 +129,7 @@ const name = ref(generateName({ prefix: "al" }));
 const ipv4 = ref(false);
 const ipv6 = ref(false);
 const wireguard = ref(false);
-const planetary = ref(true);
+const planetary = ref(false);
 const mycelium = ref(true);
 const cpu = ref() as Ref<number>;
 const memory = ref() as Ref<number>;
@@ -161,6 +161,9 @@ async function deploy() {
 
     const vm = await deployVM(grid!, {
       name: name.value,
+      network: {
+        addAccess: wireguard.value,
+      },
       machines: [
         {
           name: name.value,

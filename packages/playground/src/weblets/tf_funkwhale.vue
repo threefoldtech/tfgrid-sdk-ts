@@ -18,7 +18,7 @@
         :rules="[
           validators.required('Name is required.'),
           validators.IsAlphanumericExpectUnderscore('Name should consist of letters ,numbers and underscores only.'),
-          name => validators.isAlpha('Name must start with alphabet char.')(name[0]),
+          (name: string) => validators.isAlpha('Name must start with alphabet char.')(name[0]),
           validators.minLength('Name must be at least 2 characters.', 2),
           validators.maxLength('Name cannot exceed 50 characters.', 50),
         ]"
@@ -35,7 +35,7 @@
           validators.required('Username is required.'),
           validators.isLowercase('Username should consist of lowercase letters only.'),
           validators.isAlphanumeric('Username should consist of letters and numbers only.'),
-          username => validators.isAlpha('Username must start with alphabet char.')(username[0]),
+          (username: string) => validators.isAlpha('Username must start with alphabet char.')(username[0]),
           validators.minLength('Username must be at least 2 characters.', 2),
           validators.maxLength('Username cannot exceed 50 characters.', 50),
         ]"
@@ -200,7 +200,7 @@ async function deploy() {
     vm = await deployVM(grid!, {
       name: name.value,
       network: {
-        addAccess: selectionDetails.value!.domain!.enableSelectedDomain,
+        addAccess: wireguard.value || selectionDetails.value!.domain!.enableSelectedDomain,
         accessNodeId: selectionDetails.value?.domain?.selectedDomain?.nodeId,
       },
       machines: [

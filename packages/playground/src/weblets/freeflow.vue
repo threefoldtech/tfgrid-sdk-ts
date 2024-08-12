@@ -114,7 +114,7 @@ const ipv4 = ref(false);
 const ipv6 = ref(false);
 const wireguard = ref(false);
 const planetary = ref(false);
-const mycelium = ref(false);
+const mycelium = ref(true);
 const rootFilesystemSize = computed(() =>
   calculateRootFileSystem({ CPUCores: solution.value?.cpu ?? 0, RAMInMegaBytes: solution.value?.memory ?? 0 }),
 );
@@ -162,7 +162,7 @@ async function deploy() {
     vm = await deployVM(grid!, {
       name: threebotName.value,
       network: {
-        addAccess: selectionDetails.value!.domain!.enableSelectedDomain,
+        addAccess: wireguard.value || selectionDetails.value!.domain!.enableSelectedDomain,
         accessNodeId: selectionDetails.value!.domain!.selectedDomain?.nodeId,
       },
       machines: [

@@ -25,7 +25,7 @@
           :rules="[
             validators.required('Name is required.'),
             validators.IsAlphanumericExpectUnderscore('Name should consist of letters ,numbers and underscores only.'),
-            name => validators.isAlpha('Name must start with alphabet char.')(name[0]),
+            (name: string) => validators.isAlpha('Name must start with alphabet char.')(name[0]),
             validators.minLength('Name must be at least 2 characters.', 2),
             validators.maxLength('Name cannot exceed 50 characters.', 50),
           ]"
@@ -102,7 +102,7 @@
             :value="disks[index].name"
             :rules="[
               validators.required('Disk name is required.'),
-              name => validators.isAlpha('Name must start with alphabet char.')(name[0]),
+              (name: string) => validators.isAlpha('Name must start with alphabet char.')(name[0]),
               validators.minLength('Disk minLength is 2 chars.', 2),
               validators.isAlphanumeric('Disk name only accepts alphanumeric chars.'),
               validators.maxLength('Disk maxLength is 50 chars.', 50),
@@ -190,7 +190,7 @@ const name = ref(generateName({ prefix: "vm" }));
 const flist = ref<Flist>();
 const ipv4 = ref(false);
 const ipv6 = ref(false);
-const planetary = ref(true);
+const planetary = ref(false);
 const mycelium = ref(true);
 const wireguard = ref(false);
 const dedicated = ref(false);
