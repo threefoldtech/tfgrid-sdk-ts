@@ -47,6 +47,7 @@
           v-model:ipv4="ipv4"
           v-model:ipv6="ipv6"
           v-model:wireguard="wireguard"
+          :readOnlyWireGuard="!selectionDetails?.domain?.enabledCustomDomain"
         />
 
         <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
@@ -102,6 +103,7 @@ import { generateName, generatePassword } from "../utils/strings";
 const layout = useLayout();
 const tabs = ref();
 const profileManager = useProfileManager();
+const selectionDetails = ref<SelectionDetails>();
 
 const name = ref(generateName({ prefix: "mm" }));
 const solution = ref() as Ref<SolutionFlavor>;
@@ -113,14 +115,13 @@ const dedicated = ref(false);
 const certified = ref(false);
 const ipv4 = ref(false);
 const ipv6 = ref(false);
-const wireguard = ref(false);
+const wireguard = ref(!selectionDetails.value?.domain?.enabledCustomDomain);
 const planetary = ref(false);
 const mycelium = ref(true);
 const smtp = ref(createSMTPServer());
 const rootFilesystemSize = computed(() =>
   calculateRootFileSystem({ CPUCores: solution.value?.cpu ?? 0, RAMInMegaBytes: solution.value?.memory ?? 0 }),
 );
-const selectionDetails = ref<SelectionDetails>();
 const selectedSSHKeys = ref("");
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
@@ -245,6 +246,14 @@ watch(
       smtp.value.enabled = false;
     }
   },
+);
+
+watch(
+  () => selectionDetails.value?.domain?.enabledCustomDomain,
+  (value: boolean | undefined) => {
+    wireguard.value = !value;
+  },
+  { deep: true },
 );
 </script>
 

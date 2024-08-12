@@ -68,6 +68,7 @@
         v-model:planetary="planetary"
         v-model:ipv6="ipv6"
         v-model:wireguard="wireguard"
+        :readOnlyWireGuard="!selectionDetails?.domain?.enabledCustomDomain"
       />
 
       <input-tooltip
@@ -107,7 +108,7 @@
 
 <script lang="ts" setup>
 import { calculateRootFileSystem, type GridClient } from "@threefold/grid_client";
-import { computed, type Ref, ref } from "vue";
+import { computed, type Ref, ref, watch } from "vue";
 
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
@@ -121,6 +122,8 @@ import { generateName } from "../utils/strings";
 
 const layout = useLayout();
 const profileManager = useProfileManager();
+const selectionDetails = ref<SelectionDetails>();
+
 const name = ref(generateName({ prefix: "sw" }));
 const gitUrl = ref("");
 const gitBranch = ref("");
@@ -129,7 +132,7 @@ const domain = ref();
 
 const ipv4 = ref(false);
 const ipv6 = ref(false);
-const wireguard = ref(false);
+const wireguard = ref(!selectionDetails.value?.domain?.enabledCustomDomain);
 const mycelium = ref(true);
 const planetary = ref(false);
 const solution = ref() as Ref<SolutionFlavor>;
@@ -143,7 +146,6 @@ const certified = ref(false);
 const rootFilesystemSize = computed(() =>
   calculateRootFileSystem({ CPUCores: solution.value?.cpu ?? 0, RAMInMegaBytes: solution.value?.memory ?? 0 }),
 );
-const selectionDetails = ref<SelectionDetails>();
 const selectedSSHKeys = ref("");
 function updateSSHkeyEnv(selectedKeys: string) {
   selectedSSHKeys.value = selectedKeys;
@@ -265,6 +267,14 @@ async function isGithubRepoExist(gitUrl: string) {
     }
   }
 }
+
+watch(
+  () => selectionDetails.value?.domain?.enabledCustomDomain,
+  (value: boolean | undefined) => {
+    wireguard.value = !value;
+  },
+  { deep: true },
+);
 </script>
 
 <script lang="ts">

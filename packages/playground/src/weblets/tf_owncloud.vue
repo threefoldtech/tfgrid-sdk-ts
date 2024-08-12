@@ -84,6 +84,7 @@
           v-model:ipv6="ipv6"
           v-model:wireguard="wireguard"
           v-model:planetary="planetary"
+          :readOnlyWireGuard="!selectionDetails?.domain?.enabledCustomDomain"
         />
         <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
           <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
@@ -156,7 +157,7 @@ const dedicated = ref(false);
 const certified = ref(false);
 const ipv4 = ref(false);
 const ipv6 = ref(false);
-const wireguard = ref(false);
+const wireguard = ref(!selectionDetails.value?.domain?.enabledCustomDomain);
 const planetary = ref(false);
 const mycelium = ref(true);
 const smtp = ref(createSMTPServer());
@@ -275,6 +276,7 @@ async function deploy() {
 function updateSSHkeyEnv(selectedKeys: string) {
   selectedSSHKeys.value = selectedKeys;
 }
+
 watch(
   () => smtp.value.enabled,
   newValue => {
@@ -283,6 +285,7 @@ watch(
     }
   },
 );
+
 watch(
   () => ipv4.value,
   newValue => {
@@ -290,6 +293,14 @@ watch(
       smtp.value.enabled = false;
     }
   },
+);
+
+watch(
+  () => selectionDetails.value?.domain?.enabledCustomDomain,
+  (value: boolean | undefined) => {
+    wireguard.value = !value;
+  },
+  { deep: true },
 );
 </script>
 

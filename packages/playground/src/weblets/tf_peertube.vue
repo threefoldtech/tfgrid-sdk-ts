@@ -68,6 +68,7 @@
         v-model:ipv6="ipv6"
         v-model:ipv4="ipv4"
         v-model:wireguard="wireguard"
+        :readOnlyWireGuard="!selectionDetails?.domain?.enabledCustomDomain"
       />
 
       <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
@@ -104,7 +105,7 @@
 
 <script lang="ts" setup>
 import { calculateRootFileSystem, type GridClient } from "@threefold/grid_client";
-import { computed, type Ref, ref } from "vue";
+import { computed, type Ref, ref, watch } from "vue";
 
 import { manual } from "@/utils/manual";
 
@@ -118,6 +119,8 @@ import { generateName, generatePassword } from "../utils/strings";
 
 const layout = useLayout();
 const profileManager = useProfileManager();
+const selectionDetails = ref<SelectionDetails>();
+
 const name = ref(generateName({ prefix: "pt" }));
 const email = ref(profileManager.profile?.email || "");
 const password = ref(generatePassword());
@@ -130,11 +133,10 @@ const dedicated = ref(false);
 const certified = ref(false);
 const ipv4 = ref(false);
 const ipv6 = ref(false);
-const wireguard = ref(false);
+const wireguard = ref(!selectionDetails.value?.domain?.enabledCustomDomain);
 const rootFilesystemSize = computed(() =>
   calculateRootFileSystem({ CPUCores: solution.value?.cpu ?? 0, RAMInMegaBytes: solution.value?.memory ?? 0 }),
 );
-const selectionDetails = ref<SelectionDetails>();
 const mycelium = ref(true);
 const planetary = ref(false);
 const selectedSSHKeys = ref("");
@@ -236,6 +238,14 @@ async function deploy() {
 function updateSSHkeyEnv(selectedKeys: string) {
   selectedSSHKeys.value = selectedKeys;
 }
+
+watch(
+  () => selectionDetails.value?.domain?.enabledCustomDomain,
+  (value: boolean | undefined) => {
+    wireguard.value = !value;
+  },
+  { deep: true },
+);
 </script>
 
 <script lang="ts">

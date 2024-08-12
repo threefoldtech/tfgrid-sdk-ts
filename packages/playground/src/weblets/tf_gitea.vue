@@ -51,7 +51,9 @@
           v-model:planetary="planetary"
           v-model:mycelium="mycelium"
           v-model:wireguard="wireguard"
+          :readOnlyWireGuard="!selectionDetails?.domain?.enabledCustomDomain"
         />
+
         <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
           <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
         </input-tooltip>
@@ -107,17 +109,17 @@ import { generateName } from "../utils/strings";
 const layout = useLayout();
 const tabs = ref();
 
+const selectionDetails = ref<SelectionDetails>();
 const name = ref(generateName({ prefix: "gt" }));
 const ipv4 = ref(false);
 const ipv6 = ref(false);
-const wireguard = ref(false);
+const wireguard = ref(!selectionDetails.value?.domain?.enabledCustomDomain);
 const planetary = ref(false);
 const mycelium = ref(true);
 const disks = ref<Disk[]>([]);
 const dedicated = ref(false);
 const certified = ref(false);
 const rootFilesystemSize = computed(() => solution.value?.disk);
-const selectionDetails = ref<SelectionDetails>();
 const selectedSSHKeys = ref("");
 const smtp = ref(createSMTPServer());
 const gridStore = useGrid();
@@ -136,6 +138,14 @@ watch(
   newIPv4 => {
     smtp.value.enabled = newIPv4;
   },
+);
+
+watch(
+  () => selectionDetails.value?.domain?.enabledCustomDomain,
+  (value: boolean | undefined) => {
+    wireguard.value = !value;
+  },
+  { deep: true },
 );
 
 function finalize(deployment: any) {

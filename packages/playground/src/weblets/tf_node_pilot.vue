@@ -41,6 +41,7 @@
         v-model:planetary="planetary"
         v-model:mycelium="mycelium"
         v-model:wireguard="wireguard"
+        :readOnlyWireGuard="!selectionDetails?.domain?.enabledCustomDomain"
       />
 
       <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
@@ -75,7 +76,7 @@
 </template>
 
 <script lang="ts" setup>
-import { type Ref, ref } from "vue";
+import { type Ref, ref, watch } from "vue";
 
 import { manual } from "@/utils/manual";
 
@@ -87,6 +88,8 @@ import { deployVM } from "../utils/deploy_vm";
 import { generateName } from "../utils/strings";
 const layout = useLayout();
 const name = ref(generateName({ prefix: "np" }));
+const selectionDetails = ref<SelectionDetails>();
+
 const solution = ref() as Ref<SolutionFlavor>;
 const flist: Flist = {
   value: "https://hub.grid.tf/tf-official-vms/node-pilot-zdbfs.flist",
@@ -94,13 +97,12 @@ const flist: Flist = {
 };
 const ipv4 = ref(false);
 const ipv6 = ref(false);
-const wireguard = ref(false);
+const wireguard = ref(!selectionDetails.value?.domain?.enabledCustomDomain);
 const planetary = ref(false);
 const mycelium = ref(true);
 const dedicated = ref(false);
 const certified = ref(false);
 const rootFilesystemSize = 2;
-const selectionDetails = ref<SelectionDetails>();
 const selectedSSHKeys = ref("");
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
@@ -197,6 +199,14 @@ async function deploy() {
 function updateSSHkeyEnv(selectedKeys: string) {
   selectedSSHKeys.value = selectedKeys;
 }
+
+watch(
+  () => selectionDetails.value?.domain?.enabledCustomDomain,
+  (value: boolean | undefined) => {
+    wireguard.value = !value;
+  },
+  { deep: true },
+);
 </script>
 
 <script lang="ts">

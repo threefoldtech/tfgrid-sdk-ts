@@ -73,6 +73,7 @@
         v-model:wireguard="wireguard"
         v-model:mycelium="mycelium"
         v-model:ipv6="ipv6"
+        :readOnlyWireGuard="!selectionDetails?.domain?.enabledCustomDomain"
       />
 
       <SelectSolutionFlavor
@@ -118,7 +119,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, type Ref, ref } from "vue";
+import { computed, type Ref, ref, watch } from "vue";
 
 import { manual } from "@/utils/manual";
 
@@ -132,6 +133,8 @@ import { normalizeError } from "../utils/helpers";
 import { generateName, generatePassword } from "../utils/strings";
 
 const layout = useLayout();
+const selectionDetails = ref<SelectionDetails>();
+
 const name = ref(generateName({ prefix: "um" }));
 const username = ref("admin");
 const password = ref(generatePassword());
@@ -139,7 +142,7 @@ const ipv4 = ref(false);
 const ipv6 = ref(false);
 const planetary = ref(false);
 const mycelium = ref(true);
-const wireguard = ref(false);
+const wireguard = ref(!selectionDetails.value?.domain?.enabledCustomDomain);
 const network = ref();
 const solution = ref() as Ref<SolutionFlavor>;
 const flist: Flist = {
@@ -151,7 +154,6 @@ const certified = ref(false);
 const rootFilesystemSize = computed(() =>
   calculateRootFileSystem({ CPUCores: solution.value?.cpu ?? 0, RAMInMegaBytes: solution.value?.memory ?? 0 }),
 );
-const selectionDetails = ref<SelectionDetails>();
 const selectedSSHKeys = ref("");
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
@@ -218,6 +220,14 @@ async function deploy() {
 function updateSSHkeyEnv(selectedKeys: string) {
   selectedSSHKeys.value = selectedKeys;
 }
+
+watch(
+  () => selectionDetails.value?.domain?.enabledCustomDomain,
+  (value: boolean | undefined) => {
+    wireguard.value = !value;
+  },
+  { deep: true },
+);
 </script>
 
 <script lang="ts">

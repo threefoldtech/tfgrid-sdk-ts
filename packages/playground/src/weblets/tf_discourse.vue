@@ -64,6 +64,7 @@
           v-model:ipv6="ipv6"
           v-model:wireguard="wireguard"
           enableIpv4
+          :readOnlyWireGuard="!selectionDetails?.domain?.enabledCustomDomain"
         />
 
         <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
@@ -124,13 +125,14 @@ import { generateName, generatePassword } from "../utils/strings";
 
 const layout = useLayout();
 const tabs = ref();
+const selectionDetails = ref<SelectionDetails>();
 const profileManager = useProfileManager();
 const name = ref(generateName({ prefix: "dc" }));
 const email = ref(profileManager.profile?.email || "");
 const solution = ref() as Ref<SolutionFlavor>;
 const ipv4 = ref(true);
 const ipv6 = ref(false);
-const wireguard = ref(false);
+const wireguard = ref(!selectionDetails.value?.domain?.enabledCustomDomain);
 const mycelium = ref(true);
 const planetary = ref(false);
 const smtp = ref(createSMTPServer());
@@ -139,7 +141,6 @@ const certified = ref(false);
 const rootFilesystemSize = computed(() =>
   calculateRootFileSystem({ CPUCores: solution.value?.cpu ?? 0, RAMInMegaBytes: solution.value?.memory ?? 0 }),
 );
-const selectionDetails = ref<SelectionDetails>();
 const flist: Flist = {
   value: "https://hub.grid.tf/tf-official-apps/forum-docker-v3.1.2.flist",
   entryPoint: "/sbin/zinit init",
@@ -265,6 +266,14 @@ watch(
       smtp.value.enabled = false;
     }
   },
+);
+
+watch(
+  () => selectionDetails.value?.domain?.enabledCustomDomain,
+  (value: boolean | undefined) => {
+    wireguard.value = !value;
+  },
+  { deep: true },
 );
 </script>
 

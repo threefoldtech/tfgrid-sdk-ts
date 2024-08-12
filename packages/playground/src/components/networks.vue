@@ -84,6 +84,8 @@
                 inset
                 label="Add Wireguard Access"
                 :modelValue="$props.wireguard"
+                :readonly="readOnlyWireGuard"
+                :style="readOnlyWireGuard ? 'opacity: .5' : 'opacity: 1'"
                 @update:modelValue="$emit('update:wireguard', $event ?? undefined)"
               />
             </input-tooltip>
@@ -133,6 +135,10 @@ export default {
     },
     disabled: { type: Boolean },
     enableIpv4: {
+      type: Boolean,
+      default: () => null,
+    },
+    readOnlyWireGuard: {
       type: Boolean,
       default: () => null,
     },
