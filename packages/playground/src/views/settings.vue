@@ -6,7 +6,7 @@
     </v-card>
     <v-card class="my-5"
       ><v-card-title>Theme</v-card-title> <v-card-text>Pick an application theme!</v-card-text>
-      <form-validator v-model="isValidTheme">
+      <form-validator v-model="isValidTheme" valid-on-init>
         <input-validator :rules="[validateTheme]" #="{ props }" ref="themeInput" :value="selectedTheme">
           <v-select class="pa-3" :items="themes" v-model="selectedTheme" v-bind="props" />
         </input-validator>
@@ -164,7 +164,7 @@ export default {
     const isValidTheme = ref(false);
     function validateTheme() {
       if (selectedTheme.value.split(" ")[0].toLowerCase() == currentTheme) {
-        return { message: "Select a different theme from the current one." };
+        return { message: "Select a theme different from the current one." };
       }
     }
 
@@ -214,7 +214,7 @@ export default {
     }
     function validateTimeout() {
       if (selectedTimeout.value == window.env.TIMEOUT / 1000) {
-        return { message: "Enter a different timeout than the current one." };
+        return { message: "Enter a timeout different from the current one." };
       }
       if (selectedTimeout.value < 1) {
         return { message: "Timeout should be at least 1 second." };
