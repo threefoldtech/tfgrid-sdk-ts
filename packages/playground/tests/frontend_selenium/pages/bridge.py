@@ -46,6 +46,7 @@ class BridgePage:
     
     def twin_address(self):
         self.browser.find_element(*self.deposit_close_button).click()
+        WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.twin_page))
         self.browser.find_element(*self.twin_page).click()
         return self.browser.find_element(*self.twin_address_text).text 
 
