@@ -105,7 +105,7 @@
           <v-card-text v-bind="props">Adjust Timeout <v-icon icon="mdi-information-outline" /></v-card-text>
         </template>
       </v-tooltip>
-      <form-validator v-model="isValidTimeout" valid-on-init>
+      <form-validator v-model="isValidTimeout">
         <input-validator
           :value="selectedTimeout"
           :rules="[
@@ -125,7 +125,10 @@
           ></v-text-field>
         </input-validator>
         <v-card-actions class="justify-end">
-          <v-btn :disabled="!isValidTimeout" @click="UpdateTimeout" class="justify-end ml-auto"
+          <v-btn
+            :disabled="!isValidTimeout || currentTimeout == selectedTimeout"
+            @click="UpdateTimeout"
+            class="justify-end ml-auto"
             >Update</v-btn
           ></v-card-actions
         >
@@ -158,10 +161,12 @@ export default {
     const currentPassword = ref("");
     const newPassword = ref("");
     const confirmPassword = ref("");
+    const currentTimeout = ref(window.env.TIMEOUT / 1000);
     const selectedTimeout = ref(window.env.TIMEOUT / 1000);
     const isValidTimeout = ref(false);
     const isValidPassword = ref(false);
     const isValidTheme = ref(false);
+
     function validateTheme() {
       // check if system mode is the same as current theme
       if (selectedTheme.value.split(" ")[0].toLowerCase() == "system") {
@@ -235,9 +240,6 @@ export default {
       }
     }
     function validateTimeout() {
-      if (selectedTimeout.value == window.env.TIMEOUT / 1000) {
-        return { message: "Enter a timeout different from the current one." };
-      }
       if (selectedTimeout.value < 1) {
         return { message: "Timeout should be at least 1 second." };
       }
@@ -250,6 +252,7 @@ export default {
       newPassword,
       confirmPassword,
       selectedTimeout,
+      currentTimeout,
       isValidTimeout,
       isValidPassword,
       isValidTheme,
