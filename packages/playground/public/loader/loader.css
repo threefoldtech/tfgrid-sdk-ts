@@ -32,14 +32,15 @@
   border-radius: 5px;
   padding: 5px 25px;
 }
+
 .app-monitor-container.active {
   display: flex;
 }
+
 .app-monitor-status {
   text-align: left;
   color: #fff;
   margin: 0;
-
   font-family: sans-serif;
   max-width: 500px;
   line-height: 1;
@@ -48,7 +49,7 @@
 .service-name {
   color: #fff;
   width: 100px;
-  padding: 2px 0px;
+  padding: 2px 0;
   font-family: sans-serif;
   line-height: 1;
   font-weight: bold;
@@ -62,11 +63,12 @@
   font-weight: bold;
   font-size: x-large;
 }
+
 .service-reachable {
   color: rgb(var(--v-theme-success, "76, 175, 80"));
 }
 .service-unreachable {
-  color: rgb(207, 102, 121);
+  color: rgba(207, 102, 121, 1);
 }
 .app-loader-logo {
   max-width: 100%;
@@ -142,6 +144,7 @@
   line-height: 1;
   text-align: center;
 }
+
 .app-monitor-msg {
   display: none;
 }

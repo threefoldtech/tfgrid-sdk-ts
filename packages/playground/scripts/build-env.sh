@@ -79,7 +79,7 @@ esac
 
 parss_array(){
   local service_urls=$1
-  toString=($(echo $service_urls | tr ',' "\n"))
+  toString=($(echo "$service_urls" | tr ',' "\n"))
   for item in "${toString[@]}"; do
     quoted_string+="'$item' "
   done 
@@ -88,24 +88,24 @@ parss_array(){
   quoted_string=${quoted_string// /,}
 
   # remove trailing comma
-  echo "$quoted_string" | sed 's/.$//'
+  echo "${quoted_string%?}"
 
 }
 
 configs="
 window.env = {
   NETWORK: '$MODE',
-  GRAPHQL_STACKS: "[$(parss_array $GRAPHQL_URL)]",
-  GRIDPROXY_STACKS: "[$(parss_array $GRIDPROXY_URL)]",
-  SUBSTRATE_STACKS: "[$(parss_array $SUBSTRATE_URL)]",
-  ACTIVATION_SERVICE_STACKS:  "[$(parss_array $ACTIVATION_SERVICE_URL)]",
-  RELAY_STACKS:  "[$(parss_array $RELAY_DOMAIN)]",
+  GRAPHQL_STACKS: "[$(parss_array "$GRAPHQL_URL")]",
+  GRIDPROXY_STACKS: "[$(parss_array "$GRIDPROXY_URL")]",
+  SUBSTRATE_STACKS: "[$(parss_array "$SUBSTRATE_URL")]",
+  ACTIVATION_SERVICE_STACKS:  "[$(parss_array "$ACTIVATION_SERVICE_URL")]",
+  RELAY_STACKS:  "[$(parss_array "$RELAY_DOMAIN")]",
   BRIDGE_TFT_ADDRESS: '$BRIDGE_TFT_ADDRESS',
   STELLAR_NETWORK: '$STELLAR_NETWORK',
   STELLAR_HORIZON_URL: '$STELLAR_HORIZON_URL',
   TFT_ASSET_ISSUER: '$TFT_ASSET_ISSUER',
   MINTING_URL: '$MINTING_URL',
-  STATS_STACKS: "[$(parss_array $STATS_URL)]",
+  STATS_STACKS: "[$(parss_array "$STATS_URL")]",
   TIMEOUT: +'$TIMEOUT',
   PAGE_SIZE: +'$PAGE_SIZE',
   MANUAL_URL: '$MANUAL_URL'
