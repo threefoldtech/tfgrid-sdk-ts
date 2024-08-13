@@ -1,6 +1,7 @@
 import { Expose, Transform, Type } from "class-transformer";
 import { IsDefined, IsEnum, IsInt, IsNotEmpty, IsString, Min, ValidateNested } from "class-validator";
 
+import { ValidateMembers } from "../helpers";
 import { GatewayFQDNProxy, GatewayNameProxy, GatewayResult } from "./gateway";
 import { PublicIPv4, PublicIPv4Result } from "./ipv4"; // TODO: remove deprecated
 import { PublicIP, PublicIPResult } from "./public_ip";
@@ -69,6 +70,7 @@ class DeploymentResult {
     | ZlogsResult;
 }
 
+@ValidateMembers()
 class Workload {
   @Expose() @IsInt() @Min(0) version: number;
   @Expose() @IsString() @IsNotEmpty() name: string;

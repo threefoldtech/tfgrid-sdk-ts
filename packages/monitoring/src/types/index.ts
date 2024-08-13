@@ -1,9 +1,7 @@
-import { KeypairType } from "@polkadot/util-crypto/types";
 /**
  * Represents a basic service interface.
- * @template P - The type of the parameter object used for the update method.
  */
-interface IServiceBase<P> {
+export interface IServiceBase {
   /**
    * The name of the service.
    */
@@ -13,30 +11,12 @@ interface IServiceBase<P> {
    * The URL of the service.
    */
   url: string;
-
-  /**
-   * Updates the service with the provided parameters.
-   * @param {P} param - The parameter object with specific keys, should be specified on class.
-   */
-  update(param: P): void;
-}
-
-/**
- * Represents a handler for disconnecting a service.
- */
-export interface IDisconnectHandler {
-  /**
-   * Performs the disconnection from the service.
-   * @returns {Promise<void>} A promise that resolves when the disconnection is successful.
-   */
-  disconnect: () => Promise<void>;
 }
 
 /**
  * Represents a service with liveness checking capability.
- * @template P - The type of the parameter object used for the update method. Defaults to {url:string}.
  */
-export interface ILivenessChecker<P = { url: string }> extends IServiceBase<P> {
+export interface ILivenessChecker extends IServiceBase {
   /**
    * Checks if the service is alive.
    * @returns {Promise<ServiceStatus>} A promise that resolves with the current status of the service.

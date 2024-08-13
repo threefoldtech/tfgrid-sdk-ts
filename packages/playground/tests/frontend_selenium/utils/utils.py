@@ -44,14 +44,14 @@ def get_stellar_address():
 def get_email():
     config = configparser.ConfigParser()
     config.read('Config.ini')
-    hex_seed = config['Utils']['email']
-    if (hex_seed == ''):
+    email = config['Utils']['email']
+    if (email == ''):
         try:
-            hex_seed = json.loads(os.environ["EMAIL"])
+            email = os.environ["EMAIL"]
         except:
             print(
                 "You must add account Email either in Config.ini or by exporting EMAIL.")
-    return str(hex_seed)
+    return str(email)
 
 def generate_string():
     chars = string.ascii_uppercase + string.digits

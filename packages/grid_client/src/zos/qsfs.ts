@@ -1,6 +1,7 @@
 import { Expose, Type } from "class-transformer";
 import { IsInt, IsNotEmpty, IsString, Min, ValidateNested } from "class-validator";
 
+import { ValidateMembers } from "../helpers";
 import { WorkloadData, WorkloadDataResult } from "./workload_base";
 
 class Encryption {
@@ -105,6 +106,7 @@ class QuantumSafeFSConfig {
   }
 }
 
+@ValidateMembers()
 class QuantumSafeFS extends WorkloadData {
   @Expose() @IsInt() @Min(250 * 1024 ** 2) cache: number;
   @Expose() @Type(() => QuantumSafeFSConfig) @ValidateNested() config: QuantumSafeFSConfig;

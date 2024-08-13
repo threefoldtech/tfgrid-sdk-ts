@@ -19,6 +19,7 @@ export interface ContractLockOptions {
 }
 
 export interface ContractLock {
+  extraAmountLocked: number;
   amountLocked: number;
   lockUpdated: number;
   cycles: number;

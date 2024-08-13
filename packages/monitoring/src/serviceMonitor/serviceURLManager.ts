@@ -1,7 +1,9 @@
 import { ConnectionError } from "@threefold/types";
 
 import { monitorEvents } from "../helpers/events";
-import { IDisconnectHandler, ILivenessChecker, Service, ServiceStatus, ServiceUrl, URLManagerOptions } from "../types";
+import { ILivenessChecker, Service, ServiceStatus, ServiceUrl, URLManagerOptions } from "../types";
+
+const TIME_OUT = "Timeout";
 
 /**
  * Manages service URLs, checking their availability and ensuring they are reachable.
@@ -28,7 +30,6 @@ export class ServiceUrlManager<N extends boolean = false> {
    * Pings the given service to check if it is alive.
    *
    * This method checks the liveness of the provided service by calling its `isAlive` method.
-   * If the service supports disconnection (implements IDisconnectHandler), it calls the `disconnect` method after the liveness check.
    *
    * @param {ILivenessChecker} service - An instance of ILivenessChecker that provides methods to check the service's liveness.
    * @param {number} _timeout - The timeout duration for the ping request.
@@ -40,18 +41,15 @@ export class ServiceUrlManager<N extends boolean = false> {
     try {
       const statusPromise = service.isAlive(url);
 
-      const timeoutPromise = new Promise((resolve, reject) => {
+      const timeoutPromise = new Promise((_, reject) => {
         setTimeout(() => {
-          reject(new Error("Timeout"));
+          reject(new Error(TIME_OUT));
         }, _timeout * 1000);
       });
 
       const result = await Promise.race([statusPromise, timeoutPromise]);
-      if (result instanceof Error && result.message === "Timeout") {
+      if (result instanceof Error && result.message === TIME_OUT) {
         throw result;
-      }
-      if ("disconnect" in service) {
-        await (service as IDisconnectHandler).disconnect();
       }
       return result as ServiceStatus;
     } catch (e) {
@@ -131,8 +129,8 @@ export class ServiceUrlManager<N extends boolean = false> {
       for (const url of result)
         if (url.status == "fulfilled") {
           monitorEvents.log(`${service.name} on ${url.value} Success!`, "green");
-
-          return url.value;
+          service.url = url.value;
+          return service.url;
         }
     }
 
