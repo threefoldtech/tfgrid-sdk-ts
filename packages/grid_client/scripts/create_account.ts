@@ -6,7 +6,7 @@ import { NetworkEnv } from "../src/config";
 import config from "./config.json";
 import { log } from "./utils";
 
-async function createAccount(client, relay) {
+async function createAccount(client: GridClient, relay: string) {
   const res = await client.tfchain.createAccount(relay, true);
   log("================= Creating account =================");
   log(res);

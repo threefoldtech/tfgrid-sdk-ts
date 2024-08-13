@@ -281,7 +281,8 @@
 import { ContractStates, type GridClient, type LockDetails } from "@threefold/grid_client";
 import type { NodeStatus } from "@threefold/gridproxy_client";
 import type { ContractLock } from "@threefold/tfchain_client";
-import { DeploymentKeyDeletionError, TFChainErrors } from "@threefold/types";
+import { TFChainError } from "@threefold/tfchain_client";
+import { DeploymentKeyDeletionError } from "@threefold/types";
 import { capitalize, computed, defineComponent, type PropType, type Ref, ref, watch } from "vue";
 
 import { useProfileManagerController } from "@/components/profile_manager_controller.vue";
@@ -503,7 +504,7 @@ async function onDelete() {
     if (e instanceof DeploymentKeyDeletionError) {
       selectedContracts.value = [];
       createCustomToast("Failed to delete some keys, You don't have enough tokens", ToastType.danger);
-    } else if (e instanceof TFChainErrors.smartContractModule.NodeHasActiveContracts) {
+    } else if (e instanceof TFChainError && e.keyError === "NodeHasActiveContracts") {
       layout.value.setStatus(
         "failed",
         "Some of the chosen rent contracts could not be deleted as there are active contracts linked to the rented node. Please ensure that any active contracts associated with a rented node are removed before attempting to delete its rent contract.",

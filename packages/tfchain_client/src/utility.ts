@@ -17,9 +17,9 @@ class Utility {
       let result: T[] = [];
       for (let i = 0; i < extrinsics.length; i += BATCH_SIZE) {
         const batch = extrinsics.slice(i, i + BATCH_SIZE);
-        const { resultSections, resultEvents } = this.extractResultSectionsAndEvents(batch);
+        const { resultSections, resultEvents, map } = this.extractResultSectionsAndEvents(batch);
         const batchExtrinsic = await this.client.api.tx.utility.batch(batch);
-        const res = await this.client.applyExtrinsic<T[]>(batchExtrinsic, resultSections, resultEvents);
+        const res = await this.client.applyExtrinsic<T>(batchExtrinsic, resultSections, resultEvents, map);
         result = result.concat(res);
       }
 
@@ -35,9 +35,9 @@ class Utility {
       let result: T[] = [];
       for (let i = 0; i < extrinsics.length; i += BATCH_SIZE) {
         const batch = extrinsics.slice(i, i + BATCH_SIZE);
-        const { resultSections, resultEvents } = this.extractResultSectionsAndEvents(batch);
+        const { resultSections, resultEvents, map } = this.extractResultSectionsAndEvents(batch);
         const batchAllExtrinsic = await this.client.api.tx.utility.batchAll(batch);
-        const res = await this.client.applyExtrinsic<T[]>(batchAllExtrinsic, resultSections, resultEvents);
+        const res = await this.client.applyExtrinsic<T>(batchAllExtrinsic, resultSections, resultEvents, map);
         result = result.concat(res);
       }
 
@@ -49,15 +49,17 @@ class Utility {
   private extractResultSectionsAndEvents<T>(extrinsics: ExtrinsicResult<T>[]) {
     let resultEvents: string[] = [];
     let resultSections: string[] = [];
+    let map: ((value: unknown) => T) | undefined = undefined;
     for (const extrinsic of extrinsics) {
       if (extrinsic.resultSections && extrinsic.resultSections.length > 0)
         resultSections = resultSections.concat(extrinsic.resultSections);
       resultSections.push(extrinsic.method.section);
       if (extrinsic.resultEvents && extrinsic.resultEvents.length > 0)
         resultEvents = resultEvents.concat(extrinsic.resultEvents);
+      if (extrinsic.map) map = extrinsic.map;
     }
 
-    return { resultSections, resultEvents };
+    return { resultSections, resultEvents, map };
   }
 }
 

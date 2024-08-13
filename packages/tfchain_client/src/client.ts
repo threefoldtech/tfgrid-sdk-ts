@@ -10,20 +10,15 @@ import { DispatchError } from "@polkadot/types/interfaces";
 import { ISubmittableResult } from "@polkadot/types/types";
 import { KeypairType } from "@polkadot/util-crypto/types";
 import { waitReady } from "@polkadot/wasm-crypto";
-import {
-  BaseError,
-  InsufficientBalanceError,
-  TFChainError,
-  TFChainErrors,
-  TimeoutError,
-  ValidationError,
-} from "@threefold/types";
+import { BaseError, TimeoutError, ValidationError } from "@threefold/types";
 import AwaitLock from "await-lock";
 import { validateMnemonic } from "bip39";
 
 import { Balances, QueryBalances } from "./balances";
 import { Contracts, QueryContracts } from "./contracts";
+import { Council, QueryCouncil } from "./council";
 import { Dao, QueryDao } from "./dao";
+import { TFChainError, TFChainErrorWrapper } from "./errors";
 import { Farms, QueryFarms } from "./farms";
 import { KVStore } from "./kvstore";
 import { Nodes, QueryNodes } from "./nodes";
@@ -64,6 +59,7 @@ class QueryClient {
   pricingPolicies: QueryPricingPolicies = new QueryPricingPolicies(this);
   twins: QueryTwins = new QueryTwins(this);
   nodes: QueryNodes = new QueryNodes(this);
+  council: QueryCouncil = new QueryCouncil(this);
   __disconnectHandler = this.newProvider.bind(this);
 
   constructor(public url: string, public keepReconnecting: boolean = false) {}
@@ -107,7 +103,9 @@ class QueryClient {
         e.message = message + e.message;
         throw e;
       }
-      throw new TFChainError(message);
+      throw new TFChainError({
+        message,
+      });
     } finally {
       QueryClient.connectingLock.release();
     }
@@ -263,6 +261,7 @@ class Client extends QueryClient {
   twins: Twins = new Twins(this);
   farms: Farms = new Farms(this);
   dao: Dao = new Dao(this);
+  council: Council = new Council(this);
   tftBridge: Bridge = new Bridge(this);
   declare url: string;
   mnemonicOrSecret?: string;
@@ -288,7 +287,7 @@ class Client extends QueryClient {
       throw new ValidationError("mnemonicOrSecret or extension signer should be provided");
     }
     if (this.mnemonicOrSecret) {
-      if (this.mnemonicOrSecret === "//Alice") {
+      if (this.mnemonicOrSecret.startsWith("//")) {
         return;
       } else if (!validateMnemonic(this.mnemonicOrSecret)) {
         if (this.mnemonicOrSecret.includes(" "))
@@ -325,6 +324,7 @@ class Client extends QueryClient {
     extrinsic: SubmittableExtrinsic<"promise", ISubmittableResult>,
     resultSections: string[] = [],
     resultEvents: string[] = [],
+    map?: (value: unknown) => T,
   ): Promise<T> {
     const promise = new Promise(async (resolve, reject) => {
       function callback(res) {
@@ -350,7 +350,8 @@ class Client extends QueryClient {
               resultSections.includes(section) &&
               (resultEvents.length === 0 || (resultEvents.length > 0 && resultEvents.includes(method)))
             ) {
-              resultData.push(data.toPrimitive()[0]);
+              if (map) resultData.push(map(data.toPrimitive()));
+              else resultData.push(data.toPrimitive()[0]);
             } else if (section === SYSTEM && method === ExtrinsicState.ExtrinsicSuccess) {
               if (!(extrinsic.method.section === UTILITY && BATCH_METHODS.includes(extrinsic.method.method))) {
                 if (resultData.length > 0) resolve(resultData[0]);
@@ -373,33 +374,21 @@ class Client extends QueryClient {
     });
     return promise
       .then((res: any) => res as T)
-      .catch(async e => {
-        const errorMsg = `Failed to apply ${JSON.stringify(extrinsic.method.toHuman())} due to error:`;
-        if ((e as DispatchError).isModule) {
-          const { section, name } = this.api.registry.findMetaError((e as DispatchError).asModule);
-          if (TFChainErrors[section]?.Errors[name]) {
-            throw new TFChainErrors[section][name](`Failed to apply ${JSON.stringify(extrinsic.method.toHuman())}`);
-          } else {
-            throw new TFChainError(`${errorMsg} '${section}-${name}'`);
-          }
-        } else {
-          if ((e as Error).message.includes("Inability to pay some fees")) {
-            throw new InsufficientBalanceError(errorMsg + e);
-          }
-          throw new TFChainError(`Failed to apply ${JSON.stringify(extrinsic.method.toHuman())} due to error: ${e}`);
-        }
+      .catch(async (error: DispatchError) => {
+        throw new TFChainErrorWrapper(error, extrinsic, this.api).throw();
       });
   }
   async applyExtrinsic<T>(
     extrinsic: SubmittableExtrinsic<"promise", ISubmittableResult>,
     resultSections: string[] = [""],
     resultEvents: string[] = [],
-  ): Promise<T> {
+    map?: (value: unknown) => T,
+  ): Promise<T | T[]> {
     await Client.lock.acquireAsync();
     console.log("Lock acquired");
     let result;
     try {
-      result = await this._applyExtrinsic<T>(extrinsic, resultSections, resultEvents);
+      result = await this._applyExtrinsic<T | T[]>(extrinsic, resultSections, resultEvents, map);
     } finally {
       Client.lock.release();
       console.log("Lock released");
@@ -414,12 +403,12 @@ class Client extends QueryClient {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this;
     (<any>extrinsic).apply = async () => {
-      const res = await self.applyExtrinsic(extrinsic, options.resultSections, options.resultEvents);
-      if (options.map) return options.map(res);
+      const res = await self.applyExtrinsic(extrinsic, options.resultSections, options.resultEvents, options.map);
       return res;
     };
     (<any>extrinsic).resultEvents = options.resultEvents;
     (<any>extrinsic).resultSections = options.resultSections;
+    (<any>extrinsic).map = options.map;
 
     return extrinsic as ExtrinsicResult<R>;
   }

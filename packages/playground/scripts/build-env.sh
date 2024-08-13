@@ -7,7 +7,7 @@ TIMEOUT="${TIMEOUT:=10000}"
 PAGE_SIZE="${PAGE_SIZE:=20}"
 MINTING_URL="https://alpha.minting.tfchain.grid.tf"
 MANUAL_URL="${MANUAL_URL:-https://www.manual.grid.tf}"
-
+ENABLE_TELEMETRY=false
 STELLAR_ENV_Vars=(
     STELLAR_HORIZON_URL
     TFT_ASSET_ISSUER
@@ -23,6 +23,7 @@ case $MODE in
         BRIDGE_TFT_ADDRESS="${BRIDGE_TFT_ADDRESS:-GDHJP6TF3UXYXTNEZ2P36J5FH7W4BJJQ4AYYAXC66I2Q2AH5B6O6BCFG}"
         STATS_URL="${STATS_URL:-https://stats.dev.grid.tf}"
         STELLAR_NETWORK="${STELLAR_NETWORK:-test}"
+        SENTRY_DSN="https://b9af6796f176d1f02837a06f0da3caee@dev.sentry.grid.tf/2"
     ;;
     "qa")
         GRAPHQL_URL="${GRAPHQL_URL:-https://graphql.qa.grid.tf/graphql}"
@@ -33,6 +34,7 @@ case $MODE in
         BRIDGE_TFT_ADDRESS="${BRIDGE_TFT_ADDRESS:-GAQH7XXFBRWXT2SBK6AHPOLXDCLXVFAKFSOJIRMRNCDINWKHGI6UYVKM}"
         STATS_URL="${STATS_URL:-https://stats.qa.grid.tf}"
         STELLAR_NETWORK="${STELLAR_NETWORK:-test}"
+        SENTRY_DSN="https://b9af6796f176d1f02837a06f0da3caee@dev.sentry.grid.tf/2"
     ;;
     "test")
         GRAPHQL_URL="${GRAPHQL_URL:-https://graphql.test.grid.tf/graphql}"
@@ -43,6 +45,7 @@ case $MODE in
         BRIDGE_TFT_ADDRESS="${BRIDGE_TFT_ADDRESS:-GA2CWNBUHX7NZ3B5GR4I23FMU7VY5RPA77IUJTIXTTTGKYSKDSV6LUA4}"
         STATS_URL="${STATS_URL:-https://stats.test.grid.tf}"
         STELLAR_NETWORK="${STELLAR_NETWORK:-main}"
+        SENTRY_DSN="https://b9af6796f176d1f02837a06f0da3caee@dev.sentry.grid.tf/2"
     ;;
     "main")
         GRAPHQL_URL="${GRAPHQL_URL:-https://graphql.grid.tf/graphql}"
@@ -53,6 +56,7 @@ case $MODE in
         BRIDGE_TFT_ADDRESS="${BRIDGE_TFT_ADDRESS:-GBNOTAYUMXVO5QDYWYO2SOCOYIJ3XFIP65GKOQN7H65ZZSO6BK4SLWSC}"
         STATS_URL="${STATS_URL:-https://stats.grid.tf}"
         STELLAR_NETWORK="${STELLAR_NETWORK:-main}"
+        SENTRY_DSN="https://598bcc658bd99042ab429166035f8278@sentry.grid.tf/2"
     ;;
     *)
         echo "Unknown 'MODE' selected! Acceptable modes are [dev | qa | test | main ]"
@@ -93,7 +97,9 @@ window.env = {
   STATS_URL: '$STATS_URL',
   TIMEOUT: +'$TIMEOUT',
   PAGE_SIZE: +'$PAGE_SIZE',
-  MANUAL_URL: '$MANUAL_URL'
+  MANUAL_URL: '$MANUAL_URL',
+  SENTRY_DSN: '$SENTRY_DSN',
+  ENABLE_TELEMETRY: '$ENABLE_TELEMETRY'
 };
 "
 

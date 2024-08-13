@@ -1,15 +1,13 @@
 import { RequestError } from "@threefold/types";
-import axios, { AxiosError, AxiosRequestConfig } from "axios";
-import { ServiceStatus } from "src/types";
 
-export async function sendGetRequest(url: string, options: AxiosRequestConfig = {}) {
+import { ServiceStatus } from "../types";
+
+export async function sendRequest(url: string, options: RequestInit) {
   try {
-    return await axios.get(url, options);
+    const res = await fetch(url, options);
+    if (!res?.ok) throw Error(`HTTP Response Code: ${res?.status}`);
   } catch (e) {
-    const { response } = e as AxiosError;
-    const errorMessage = (response?.data as { error: string })?.error || (e as Error).message;
-
-    throw new RequestError(`HTTP request failed ${errorMessage ? "due to " + errorMessage : ""}.`);
+    throw new RequestError(`HTTP request failed due to  ${e}.`);
   }
 }
 
