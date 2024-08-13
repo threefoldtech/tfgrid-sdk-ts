@@ -74,6 +74,12 @@ function mergeNodeDistribution(stats: Stats["nodesDistribution"][]) {
     stats.forEach(country => {
       res[key] += country[key] ?? 0;
     });
+
+    if (key === "The Netherlands" && res["The Netherlands"]) {
+      res["Netherlands"] = res["The Netherlands"];
+      delete res["The Netherlands"];
+    }
+
     return res;
   }, {} as { [key: string]: number });
 }

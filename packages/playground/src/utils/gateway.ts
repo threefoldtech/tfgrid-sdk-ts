@@ -1,4 +1,5 @@
 import { type FilterOptions, GatewayFQDNModel, GatewayNameModel, type GridClient } from "@threefold/grid_client";
+import validator from "validator";
 
 import { SolutionCode } from "@/types";
 import type { DomainInfo } from "@/types/nodeSelector";
@@ -26,7 +27,7 @@ export interface DeployGatewayConfig {
   subdomain: string;
   ip: string;
   port: number;
-  network: string;
+  network?: string;
   tlsPassthrough?: boolean;
 }
 
@@ -52,9 +53,14 @@ export async function deployGatewayName(
   gw.name = config.subdomain;
   gw.node_id = domain.selectedDomain.nodeId;
   gw.tls_passthrough = config.tlsPassthrough || false;
-  gw.backends = [`${config.tlsPassthrough ? "" : "http://"}${config.ip}:${config.port}`];
   gw.network = config.network;
   gw.solutionProviderId = id ? +id : undefined;
+
+  if (validator.isIP(config.ip, "6")) {
+    gw.backends = [`${config.tlsPassthrough ? "" : "http://"}[${config.ip}]:${config.port}`];
+  } else {
+    gw.backends = [`${config.tlsPassthrough ? "" : "http://"}${config.ip}:${config.port}`];
+  }
 
   if (domain.useFQDN) {
     (gw as GatewayFQDNModel).fqdn = domain.customDomain;

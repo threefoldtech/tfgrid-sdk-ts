@@ -129,8 +129,10 @@
                             validateMnemonic(v) ||
                             ((v.length === 64 || v.length === 66) && isAddress(v.length === 66 ? v : `0x${v}`))
                           ) {
+                            getEmail();
                             return;
                           }
+                          email = '';
                           return {
                             message: 'Mnemonic or Hex Seed doesn\'t seem to be valid.',
                           };
@@ -260,7 +262,8 @@
                   placeholder="email@example.com"
                   v-model="email"
                   v-bind="props"
-                  :disabled="creatingAccount || activatingAccount || activating"
+                  :loading="loadEmail"
+                  :disabled="creatingAccount || activatingAccount || activating || loadEmail"
                   readonly
                   ref="emailRef"
                   @focus="handleFocus(emailRef)"
@@ -437,7 +440,7 @@ import { useOnline } from "../hooks";
 import { useInputRef } from "../hooks/input_validator";
 import { useProfileManager } from "../stores";
 import { activateAccountAndCreateTwin, createAccount, getGrid, loadBalance, loadProfile } from "../utils/grid";
-import { storeEmail } from "../utils/grid";
+import { readEmail, storeEmail } from "../utils/grid";
 import { normalizeBalance, normalizeError } from "../utils/helpers";
 
 const items = ref([{ id: 1, name: "stellar" }]);
@@ -445,6 +448,7 @@ const depositWallet = ref("");
 const selectedName = ref("");
 const selectedItem = ref(items.value[0]);
 const depositFee = ref(0);
+const loadEmail = ref<boolean>(false);
 interface Credentials {
   passwordHash?: string;
   mnemonicHash?: string;
@@ -797,7 +801,15 @@ async function login() {
       const keypairType = credentials.keypairTypeHash
         ? cryptr.decrypt(credentials.keypairTypeHash)
         : KeypairType.sr25519;
+
       await activate(mnemonic, keypairType as KeypairType);
+      const grid = await getGrid({ mnemonic: mnemonic, keypairType: keypairType as KeypairType });
+
+      const email = await readEmail(grid!);
+      if (!email) {
+        createCustomToast("Email is Missing! Please enter your Email.", ToastType.warning);
+        router.push({ path: "/tf-chain/your-profile" });
+      }
     }
   }
 }
@@ -887,6 +899,13 @@ watch(openAcceptTerms, async () => {
     }
   }
 });
+
+async function getEmail() {
+  loadEmail.value = true;
+  const grid = await getGrid({ mnemonic: mnemonic.value, keypairType: keypairType.value });
+  email.value = await readEmail(grid!);
+  loadEmail.value = false;
+}
 </script>
 
 <script lang="ts">
