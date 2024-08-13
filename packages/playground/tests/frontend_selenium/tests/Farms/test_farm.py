@@ -77,7 +77,7 @@ def test_create_farm_invalid_name(browser):
     for case in cases:
         farm_page.create_farm_invalid_name(case)
         assert farm_page.wait_for("Farm name can only contain alphabetic letters, numbers,")
-    farm_page.create_farm_invalid_name(generate_string()+generate_string()+'_'+generate_string()+generate_string())
+    farm_page.create_farm_invalid_name('f'+generate_string()+generate_string()+'_'+generate_string()+generate_string())
     assert farm_page.wait_for('Farm name maximum length is 40 chars')
 
 
