@@ -124,13 +124,13 @@
               </input-tooltip>
             </div>
 
-            <copy-input-wrapper #="{ props }" :data="networkName" v-if="isWireGuard">
-              <v-text-field label="Network name" v-model="networkName" readonly v-bind="props" />
-            </copy-input-wrapper>
-
-            <v-select label="Supported IPs" :items="networks" v-model="selectedIPAddress" />
+            <v-select label="Supported Interfaces" class="mt-4" :items="networks" v-model="selectedIPAddress" />
             <copy-input-wrapper #="{ props }" :data="(selectedIPAddress as any)">
               <v-text-field :readonly="true" label="Selected IP Address" v-model="selectedIPAddress" v-bind="props" />
+            </copy-input-wrapper>
+
+            <copy-input-wrapper #="{ props }" :data="networkName" v-if="isWireGuard">
+              <v-text-field label="Network name" v-model="networkName" readonly v-bind="props" />
             </copy-input-wrapper>
           </form-validator>
         </div>
@@ -206,12 +206,12 @@ type VMNetwork = {
   value: string;
 };
 
-enum NetworkIP {
-  IPV6 = "IPV6",
-  IPV4 = "IPV4",
-  PlanetaryIP = "Planetary IP",
-  MyceliumIP = "Mycelium IP",
-  WireGuardIP = "WireGuard IP",
+enum NetworkInterfaces {
+  PublicIPV4 = "Public IPv4",
+  PublicIPV6 = "Public IPv6",
+  Planetary = "Planetary",
+  Mycelium = "Mycelium",
+  WireGuard = "WireGuard",
 }
 
 export default {
@@ -350,11 +350,11 @@ export default {
     function getSupportedNetworks() {
       const { publicIP, planetary, myceliumIP, interfaces } = props.vm;
 
-      addNetwork(NetworkIP.WireGuardIP, interfaces?.[0]?.ip);
-      addNetwork(NetworkIP.PlanetaryIP, planetary);
-      addNetwork(NetworkIP.MyceliumIP, myceliumIP);
-      addNetwork(NetworkIP.IPV6, publicIP?.ip6.split("/")[0]);
-      addNetwork(NetworkIP.IPV4, publicIP?.ip.split("/")[0]);
+      addNetwork(NetworkInterfaces.WireGuard, interfaces?.[0]?.ip);
+      addNetwork(NetworkInterfaces.Planetary, planetary);
+      addNetwork(NetworkInterfaces.Mycelium, myceliumIP);
+      addNetwork(NetworkInterfaces.PublicIPV6, publicIP?.ip6.split("/")[0]);
+      addNetwork(NetworkInterfaces.PublicIPV4, publicIP?.ip.split("/")[0]);
       selectedIPAddress.value = networks.value[0];
     }
 
@@ -366,7 +366,7 @@ export default {
         }
 
         const IP = selectedIPAddress.value as unknown as string;
-        isWireGuard.value = networks.value.find(net => net.value === IP)?.title === NetworkIP.WireGuardIP;
+        isWireGuard.value = networks.value.find(net => net.value === IP)?.title === NetworkInterfaces.WireGuard;
       },
       { deep: true },
     );
