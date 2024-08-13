@@ -313,6 +313,7 @@ export default {
         }
 
         await deployGatewayName(grid, selectionDetails.value!.domain, gwConfig);
+        suggestName();
         layout.value.setStatus("success", "Successfully deployed gateway.");
       } catch (error) {
         layout.value.setStatus("failed", normalizeError(error, "Something went wrong."));
