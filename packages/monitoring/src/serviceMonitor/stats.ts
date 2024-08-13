@@ -1,23 +1,10 @@
 import { resolveServiceStatus, sendRequest } from "../helpers/utils";
 import { ILivenessChecker, ServiceStatus } from "../types";
-
-export class StatsMonitor implements ILivenessChecker {
-  private readonly _name = "Stats";
-  private _url: string;
-  constructor(statusUrl?: string) {
-    if (statusUrl) this.url = statusUrl;
-  }
-  public get name() {
-    return this._name;
-  }
-  public get url() {
-    return this._url ?? "";
-  }
-  private set url(url: string) {
-    this._url = url;
-  }
-  public update(param: { url: string }): void {
-    this.url = param.url;
+import { ServiceBase } from "./serviceBase";
+export class StatsMonitor extends ServiceBase implements ILivenessChecker {
+  constructor(ServiceUrl?: string) {
+    super("Stats");
+    if (ServiceUrl) this.url = ServiceUrl;
   }
   async isAlive(url = this.url): Promise<ServiceStatus> {
     if (!url) throw new Error("Can't access before initialization");
