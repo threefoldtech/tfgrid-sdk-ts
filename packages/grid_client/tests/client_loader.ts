@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import { env } from "process";
 
-import { BackendStorageType, GridClient, KeypairType } from "../src";
+import { GridClient } from "../src";
 
 const os = require("os");
 

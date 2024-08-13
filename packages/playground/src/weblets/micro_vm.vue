@@ -310,7 +310,7 @@ async function deploy() {
     });
 
     layout.value.reloadDeploymentsList();
-    layout.value.setStatus("success", "Successfully deployed a micro virtual machine.");
+    layout.value.setStatus("success", "Successfully deployed a micro virtual machine instance.");
     layout.value.openDialog(vm, deploymentListEnvironments.vm);
   } catch (e) {
     layout.value.setStatus("failed", normalizeError(e, "Failed to deploy micro virtual machine instance."));
