@@ -122,7 +122,7 @@ export default {
         await getExtraFee();
       } catch (e) {
         let msg = "Failed to set additional fees.";
-        if (e instanceof TFChainError && e.keyError === "NodeHasActiveContracts") msg += " Node has active contracts.";
+        if ((e as any).toString().includes("NodeHasActiveContracts")) msg += " Node has active contracts.";
         createCustomToast(msg, ToastType.danger);
       } finally {
         isSetting.value = false;
