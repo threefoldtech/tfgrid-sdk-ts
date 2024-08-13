@@ -75,7 +75,16 @@ function defineGlobalProps(app: App<Element>) {
   app.config.globalProperties.validators = validators;
   app.config.globalProperties.MANUAL_URL = window.env.MANUAL_URL;
 }
-
+/**
+ * Configures global environment variables based on available service URLs.
+ *
+ * This asynchronous function initializes a `ServiceUrlManager` with a set of predefined services and their URLs.
+ * It then retrieves the available service stacks and updates the global `window.env` object with the URLs for each service.
+ * If any service URLs are not available, an error is displayed and the function returns `false`.
+ * If all service URLs are successfully retrieved and set, the function returns `true`.
+ *
+ * @returns A promise that resolves to `true` if all service URLs are successfully set, or `false` if any service URL is missing.
+ */
 export async function setGlobalEnv() {
   const { GRIDPROXY_STACKS, GRAPHQL_STACKS, STATS_STACKS, RELAY_STACKS, SUBSTRATE_STACKS, ACTIVATION_SERVICE_STACKS } =
     window.env;
@@ -104,8 +113,5 @@ export async function setGlobalEnv() {
   window.env.SUBSTRATE_URL = TFChain!;
   window.env.ACTIVATION_SERVICE_URL = Activation!;
   window.env.RELAY_DOMAIN = RMB!;
-
-  await new Promise(r => setTimeout(r, 3000));
-
   return true;
 }
