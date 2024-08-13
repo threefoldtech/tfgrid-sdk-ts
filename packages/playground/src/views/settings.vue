@@ -100,7 +100,7 @@
     <v-card class="my-5"
       ><v-card-title>Timeout</v-card-title>
 
-      <v-tooltip text="Set desired session timeout in seconds">
+      <v-tooltip text="Set desired session timeout in seconds" location="top right">
         <template v-slot:activator="{ props }">
           <v-card-text v-bind="props">Adjust Timeout <v-icon icon="mdi-information-outline" /></v-card-text>
         </template>
