@@ -76,7 +76,8 @@ class FarmPage:
     def create_farm_invalid_name(self, data):
         self.browser.find_element(*self.farm_name_text_field).send_keys(Keys.CONTROL + "a")
         self.browser.find_element(*self.farm_name_text_field).send_keys(Keys.DELETE)
-        self.browser.find_element(*self.farm_name_text_field).send_keys(data)
+        for char in data:
+            self.browser.find_element(*self.farm_name_text_field).send_keys(char)
 
     def search_functionality(self, farm_name):
         tries = 3
