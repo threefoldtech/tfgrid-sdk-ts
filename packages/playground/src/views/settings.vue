@@ -147,7 +147,7 @@ export default {
     const theme = useTheme();
     const KEY = "APP_CURRENT_THEME";
 
-    const themes = ["Dark Mode", "Light Mode"];
+    const themes = ["System Mode", "Dark Mode", "Light Mode"];
 
     const currentTheme = localStorage.getItem(KEY);
 
@@ -163,12 +163,34 @@ export default {
     const isValidPassword = ref(false);
     const isValidTheme = ref(false);
     function validateTheme() {
+      // check if system mode is the same as current theme
+      if (selectedTheme.value.split(" ")[0].toLowerCase() == "system") {
+        if (
+          (window.matchMedia("(prefers-color-scheme: dark)").matches && currentTheme == "dark") ||
+          (window.matchMedia("(prefers-color-scheme: light)").matches && currentTheme == "light")
+        ) {
+          return { message: "System mode is already applied." };
+        }
+      }
+      // check is selected mode is same as current
       if (selectedTheme.value.split(" ")[0].toLowerCase() == currentTheme) {
         return { message: "Select a theme different from the current one." };
       }
     }
 
     function UpdateTheme() {
+      if (selectedTheme.value == "System Mode") {
+        if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+          localStorage.setItem(KEY, "dark");
+          theme.global.name.value = "dark";
+          return;
+        }
+        if (window.matchMedia("(prefers-color-scheme: light)").matches) {
+          localStorage.setItem(KEY, "light");
+          theme.global.name.value = "light";
+          return;
+        }
+      }
       localStorage.setItem(KEY, selectedTheme.value == "Light Mode" ? "light" : "dark");
       theme.global.name.value = selectedTheme.value == "Light Mode" ? "light" : "dark";
     }
