@@ -169,7 +169,13 @@ export const deploymentListEnvironments = {
 
   gitea: {
     SSH_KEY: _ssh,
-    GITEA_HOSTNAME: "Gitea Hostname",
+    GITEA__HOSTNAME: "Gitea Hostname",
+    GITEA__mailer__HOST: "Email Host",
+    GITEA__mailer__PORT: "Email Port",
+    GITEA__mailer__USER: "Email Host User",
+    GITEA__mailer__FROM: "Send Email As",
+    GITEA__mailer__ENABLED: "Email Host Enabled",
+    GITEA__mailer__PASSWD: { label: "Email Host Password", type: "password" },
   },
   nostr: {
     SSH_KEY: _ssh,

@@ -45,6 +45,12 @@ git clone https://github.com/threefoldtech/tfgrid-sdk-ts.git
 yarn install
 ```
 
+> **Note:** If the used Python version is 3.12 or later, you need to install setuptools.
+
+```bash
+python3 -m pip install setuptools
+```
+
 ## Getting started
 
 ### Client configuration
@@ -167,4 +173,4 @@ gridClient.disconnect();
 ## Related Documentations
 
 - [Contribution Guide](./docs/contribution.md)
-- [Grid Client documentation](https://manual.grid.tf/javascript/grid3_javascript_readme.html)
+- [Grid Client documentation](https://manual.grid.tf/documentation/developers/javascript/grid3_javascript_readme.html)

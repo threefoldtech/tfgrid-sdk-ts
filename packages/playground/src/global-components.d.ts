@@ -61,6 +61,8 @@ declare global {
       TIMEOUT: number;
       PAGE_SIZE: number;
       MANUAL_URL: string;
+      SENTRY_DSN: string;
+      ENABLE_TELEMETRY: boolean;
     };
   }
 }

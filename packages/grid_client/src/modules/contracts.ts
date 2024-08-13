@@ -1,7 +1,9 @@
+import { Contract, ContractLock, ServiceContract } from "@threefold/tfchain_client";
 import { DeploymentKeyDeletionError, InsufficientBalanceError } from "@threefold/types";
 import * as PATH from "path";
 
 import {
+  GqlContracts,
   GqlNameContract,
   GqlNodeContract,
   GqlRentContract,
@@ -47,6 +49,12 @@ import { checkBalance } from "./utils";
 class Contracts {
   client: TFClient;
   nodes: Nodes;
+
+  /**
+   * Contracts class handles the creation, management, and retrieval of contracts.
+   *
+   * @param {GridClientConfig} config - The configuration object for the GridClient.
+   */
   constructor(public config: GridClientConfig) {
     this.client = config.tfclient;
     this.nodes = new Nodes(config.graphqlURL, config.proxyURL, config.rmbClient);
@@ -76,96 +84,230 @@ class Contracts {
     }
   }
 
+  /**
+   * Creates a new node contract.
+   *
+   * @param {NodeContractCreateModel} options - The options for creating the node contract.
+   * @returns {Promise<Contract> } A promise that resolves to the result of creating the node contract.
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   * - `@checkBalance`: Checks the balance before proceeding.
+   */
   @expose
   @validateInput
   @checkBalance
-  async create_node(options: NodeContractCreateModel) {
+  async create_node(options: NodeContractCreateModel): Promise<Contract> {
     return (
       await this.client.contracts.createNode({
         nodeId: options.node_id,
         hash: options.hash,
         data: options.data,
         numberOfPublicIps: options.public_ip,
-        solutionProviderId: options.solutionProviderId,
+        solutionProviderId: options.solutionProviderId as number,
       })
     ).apply();
   }
+
+  /**
+   * Creates a new name contract.
+   *
+   * @param {NameContractCreateModel} options - The options for creating the name contract.
+   * @returns {Promise<Contract>} A promise that resolves to the result of creating the name contract.
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   * - `@checkBalance`: Checks the balance before proceeding.
+   */
   @expose
   @validateInput
   @checkBalance
-  async create_name(options: NameContractCreateModel) {
+  async create_name(options: NameContractCreateModel): Promise<Contract> {
     return (await this.client.contracts.createName(options)).apply();
   }
 
+  /**
+   * Creates a new rent contract.
+   *
+   * @param {RentContractCreateModel} options - The options for creating the rent contract.
+   * @returns {Promise<Contract>} A promise that resolves to the result of creating the rent contract.
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   * - `@checkBalance`: Checks the balance before proceeding.
+   */
   @expose
   @validateInput
   @checkBalance
-  async createRent(options: RentContractCreateModel) {
+  async createRent(options: RentContractCreateModel): Promise<Contract> {
     return (await this.client.contracts.createRent(options)).apply();
   }
 
+  /**
+   * Retrieves a contract based on the provided options.
+   *
+   * @param {ContractGetModel} options - The options to retrieve the contract.
+   * @returns {Promise<Contract>} A promise that resolves to the retrieved contract.
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   */
   @expose
   @validateInput
-  async get(options: ContractGetModel) {
+  async get(options: ContractGetModel): Promise<Contract> {
     return this.client.contracts.get(options);
   }
+
+  /**
+   * Retrieves the contract ID based on the provided node ID and hash.
+   *
+   * @param {ContractGetByNodeIdAndHashModel} options - The options containing the node ID and hash.
+   * @returns {Promise<number>} A promise that resolves to the contract ID.
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   */
   @expose
   @validateInput
-  async get_contract_id_by_node_id_and_hash(options: ContractGetByNodeIdAndHashModel) {
+  async get_contract_id_by_node_id_and_hash(options: ContractGetByNodeIdAndHashModel): Promise<number> {
     return this.client.contracts.getContractIdByNodeIdAndHash({ nodeId: options.node_id, hash: options.hash });
   }
 
+  /**
+   * Retrieves a `name contract ID` based on the provided options.
+   *
+   * @param {NameContractGetModel} options - The options to retrieve the name contract.
+   * @returns {Promise<number>} A promise that resolves to the retrieved `name contract ID`.
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   */
   @expose
   @validateInput
-  async get_name_contract(options: NameContractGetModel) {
+  async get_name_contract(options: NameContractGetModel): Promise<number> {
     return this.client.contracts.getContractIdByName(options);
   }
 
+  /**
+   * Retrieves the extra fee for a dedicated node based on the provided options.
+   *
+   * @param {GetDedicatedNodePriceModel} options - The options to retrieve the extra fee for a dedicated node.
+   * @returns {Promise<number>} A promise that resolves to the extra fee for the dedicated node.
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   */
   @expose
   @validateInput
-  async getDedicatedNodeExtraFee(options: GetDedicatedNodePriceModel) {
+  async getDedicatedNodeExtraFee(options: GetDedicatedNodePriceModel): Promise<number> {
     return await this.client.contracts.getDedicatedNodeExtraFee(options);
   }
 
+  /**
+   * Retrieves active `contract IDs` based on the provided node ID.
+   *
+   * @param {GetActiveContractsModel} options - The options containing the node ID.
+   * @returns {Promise<number[]>} A promise that resolves to the active `contract IDs`.
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   */
   @expose
   @validateInput
-  async getActiveContracts(options: GetActiveContractsModel) {
+  async getActiveContracts(options: GetActiveContractsModel): Promise<number[]> {
     return await this.client.contracts.getActiveContracts(options);
   }
 
+  /**
+   * Retrieves the active rent `contract ID` for a specific node based on the provided options.
+   *
+   * @param {RentContractGetModel} options - The options to retrieve the active rent contract for a node.
+   * @returns {Promise<number>} A promise that resolves to the active rent `contract ID`.
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   */
   @expose
   @validateInput
-  async activeRentContractForNode(options: RentContractGetModel) {
+  async activeRentContractForNode(options: RentContractGetModel): Promise<number> {
     return this.client.contracts.getContractIdByActiveRentForNode(options);
   }
 
+  /**
+   * Returns the lock details of the contract.
+   *
+   * @param {ContractLockModel} options - The options for locking the contract.
+   * @returns {Promise<ContractLock>} A promise that resolves when the contract is successfully locked.
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   */
   @expose
   @validateInput
-  async contractLock(options: ContractLockModel) {
+  async contractLock(options: ContractLockModel): Promise<ContractLock> {
     return this.client.contracts.contractLock(options);
   }
 
+  /**
+   * Updates a node contract.
+   *
+   * @param {NodeContractUpdateModel} options - The options for updating the node contract.
+   * @returns {Promise<Contract>} A promise that resolves to the result of updating the node contract.
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   * - `@checkBalance`: Checks the balance before proceeding.
+   */
   @expose
   @validateInput
   @checkBalance
-  async update_node(options: NodeContractUpdateModel) {
+  async update_node(options: NodeContractUpdateModel): Promise<Contract> {
     return (await this.client.contracts.updateNode(options)).apply();
   }
+
+  /**
+   * Cancels a contract based on the provided options.
+   *
+   * @param {ContractCancelModel} options - The options for canceling the contract.
+   * @returns {Promise<number>} A promise that resolves to the deleted `contract ID`.
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   * - `@checkBalance`: Checks the balance before proceeding.
+   */
   @expose
   @validateInput
   @checkBalance
-  async cancel(options: ContractCancelModel) {
+  async cancel(options: ContractCancelModel): Promise<number> {
     const deletedContract = await (await this.client.contracts.cancel(options)).apply();
     await this.invalidateDeployment(options.id);
     return deletedContract;
   }
 
+  /**
+   * Retrieves a list of `contracts` associated with the current user.
+   *
+   * @param {ContractState} [options] - The state of the contracts to filter by.
+   * @returns {Promise<(GqlContracts<MGqlNameContract | GqlRentContract | GqlNodeContract>)[]>} A promise that resolves to an array of `contracts`.
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   */
   @expose
   @validateInput
-  async listMyContracts(options?: ContractState) {
+  async listMyContracts(options?: ContractState): Promise<GqlContracts> {
     return this.client.contracts.listMyContracts({ graphqlURL: this.config.graphqlURL, stateList: options?.state });
   }
 
+  /**
+   * Retrieves a list of `contracts` associated with a specific twin ID.
+   *
+   * @param {ContractsByTwinId} options - The options containing the twin ID.
+   * @returns {Promise<GqlContracts> } A promise that resolves to the list of `contracts` associated with the specified twin ID.
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   */
   @expose
   @validateInput
   async listContractsByTwinId(options: ListContractByTwinIdOptions) {
@@ -176,6 +318,15 @@ class Contracts {
     });
   }
 
+  /**
+   * Retrieves a list of `contracts` associated with a specific address.
+   *
+   * @param {ContractsByAddress} options - The options containing the address to retrieve `contracts` for.
+   * @returns {Promise<GqlContracts> } A promise that resolves to the list of `contracts` associated with the specified address.
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   */
   @expose
   @validateInput
   async listContractsByAddress(options: ListContractByAddressOptions) {
@@ -186,55 +337,134 @@ class Contracts {
     });
   }
 
+  /**
+   * Creates a new `service contract`.
+   *
+   * @param {CreateServiceContractModel} options - The options for creating the `service contract`.
+   * @returns {Promise<ServiceContract>} A promise that resolves to the result of creating the `service contract`.
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   * - `@checkBalance`: Checks the balance before proceeding.
+   */
   @expose
   @validateInput
   @checkBalance
-  async createServiceContract(options: CreateServiceContractModel) {
+  async createServiceContract(options: CreateServiceContractModel): Promise<ServiceContract> {
     return (await this.client.contracts.createService(options)).apply();
   }
+
+  /**
+   * Approves a `service contract`.
+   *
+   * @param {ServiceContractApproveModel} options - The options for approving the `service contract`.
+   * @returns {Promise<ServiceContract>} A promise that resolves to the approved `service contract`.
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   * - `@checkBalance`: Checks the balance before proceeding.
+   */
   @expose
   @validateInput
   @checkBalance
-  async approveServiceContract(options: ServiceContractApproveModel) {
+  async approveServiceContract(options: ServiceContractApproveModel): Promise<ServiceContract> {
     return (await this.client.contracts.approveService(options)).apply();
   }
 
+  /**
+   * Bills a `service contract` based on the provided options.
+   *
+   * @param {ServiceContractBillModel} options - The options for billing the `service contract`.
+   * @returns {Promise<ServiceContract>} A promise that resolves to the result of billing the `service contract`.
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   * - `@checkBalance`: Checks the balance before proceeding.
+   */
   @expose
   @validateInput
   @checkBalance
-  async billServiceContract(options: ServiceContractBillModel) {
+  async billServiceContract(options: ServiceContractBillModel): Promise<ServiceContract> {
     return (await this.client.contracts.billService(options)).apply();
   }
 
+  /**
+   * Cancels a `service contract` based on the provided options.
+   *
+   * @param {ServiceContractCancelModel} options - The options for canceling the `service contract`.
+   * @returns {Promise<number>} A promise that resolves to the canceled `service contract ID`.
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   * - `@checkBalance`: Checks the balance before proceeding.
+   */
   @expose
   @validateInput
   @checkBalance
-  async cancelServiceContract(options: ServiceContractCancelModel) {
+  async cancelServiceContract(options: ServiceContractCancelModel): Promise<number> {
     return (await this.client.contracts.cancelService(options)).apply();
   }
 
+  /**
+   * Sets the fees for a `service contract`.
+   *
+   * @param {SetServiceContractFeesModel} options - The options for setting the fees for the `service contract`.
+   * @returns {Promise<ServiceContract>} A promise that resolves to the result of setting the fees for the `service contract`.
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   * - `@checkBalance`: Checks the balance before proceeding.
+   */
   @expose
   @validateInput
   @checkBalance
-  async setFeesServiceContract(options: SetServiceContractFeesModel) {
+  async setFeesServiceContract(options: SetServiceContractFeesModel): Promise<ServiceContract> {
     return (await this.client.contracts.setServiceFees(options)).apply();
   }
 
+  /**
+   * Sets the metadata for a `service contract`.
+   *
+   * @param {SetServiceContractMetadataModel} options - The options for setting the metadata for the `service contract`.
+   * @returns {Promise<ServiceContract>} A promise that resolves to the result of setting the metadata for the `service contract`.
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   * - `@checkBalance`: Checks the balance before proceeding.
+   */
   @expose
   @validateInput
   @checkBalance
-  async setMetadataServiceContract(options: SetServiceContractMetadataModel) {
+  async setMetadataServiceContract(options: SetServiceContractMetadataModel): Promise<ServiceContract> {
     return (await this.client.contracts.setServiceMetadata(options)).apply();
   }
 
+  /**
+   * Retrieves a `service contract` based on the provided options.
+   *
+   * @param {GetServiceContractModel} options - The options to retrieve the `service contract`.
+   * @returns {Promise<ServiceContract>} A Promise that resolves to the retrieved `service contract`.
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   */
   @expose
   @validateInput
-  async getServiceContract(options: GetServiceContractModel) {
+  async getServiceContract(options: GetServiceContractModel): Promise<ServiceContract> {
     return this.client.contracts.getService(options);
   }
+
   /**
-   * WARNING: Please be careful when executing this method, it will delete all your contracts.
-   * @returns Promise
+   * ### WARNING:
+   * - `Please be careful when executing this method, it will delete all your contracts.`
+   *
+   * This method cancels all contracts associated with the current user.
+   *
+   * @returns {Promise<(GqlNameContract | GqlRentContract | GqlNodeContract)[]>} A promise that resolves to an array of canceled contracts.
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   * - `@checkBalance`: Checks the balance before proceeding.
    */
   @expose
   @validateInput
@@ -247,6 +477,16 @@ class Contracts {
     return contracts;
   }
 
+  /**
+   * Cancels multiple contracts in batch.
+   *
+   * @param {BatchCancelContractsModel} options - The options for batch canceling contracts.
+   * @returns {Promise<number[]>} A promise that resolves to an array of canceled `contract IDs`.
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   * - `@checkBalance`: Checks the balance before proceeding.
+   */
   @expose
   @validateInput
   @checkBalance
@@ -258,6 +498,16 @@ class Contracts {
     return contracts;
   }
 
+  /**
+   * Sets the extra fee for a `dedicated node`.
+   *
+   * @param {SetDedicatedNodeExtraFeesModel} options - The options for setting the extra fee for the `dedicated node`.
+   * @returns A promise that resolves to the result of setting the extra fee for the `dedicated node`.
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   * - `@checkBalance`: Checks the balance before proceeding.
+   */
   @expose
   @validateInput
   @checkBalance
@@ -270,6 +520,9 @@ class Contracts {
    *
    * @param  {ContractConsumption} options
    * @returns {Promise<number>}
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
    */
   @expose
   @validateInput
@@ -277,14 +530,27 @@ class Contracts {
     return this.client.contracts.getConsumption({ id: options.id, graphqlURL: this.config.graphqlURL });
   }
 
+  /**
+   * Retrieves the deletion time of a contract based on the provided options.
+   *
+   * @param {ContractGetModel} options - The options to retrieve the deletion time of the contract.
+   * @returns {Promise<number>} A promise that resolves to the deletion time of the contract.
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   */
   @expose
   @validateInput
-  async getDeletionTime(options: ContractGetModel): Promise<string | number> {
+  async getDeletionTime(options: ContractGetModel): Promise<number> {
     return this.client.contracts.getDeletionTime(options);
   }
+
   /**
    * Retrieves lock details of contracts.
-   * @returns A Promise that resolves to an object of type LockContracts containing details of locked contracts.
+   * @returns {Promise<LockContracts>} A Promise that resolves to an object of type LockContracts containing details of locked contracts.
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
    */
   @expose
   @validateInput
@@ -316,6 +582,9 @@ class Contracts {
    * Unlocks multiple contracts.
    * @param ids An array of contract IDs to be unlocked.
    * @returns A Promise that resolves to an array of billed contracts representing the result of batch unlocking.
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
    */
   @expose
   @validateInput
@@ -325,6 +594,9 @@ class Contracts {
   /**
    * Unlocks contracts associated with the current user.
    * @returns A Promise that resolves to an array of billed contracts.
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
    */
   @expose
   @validateInput

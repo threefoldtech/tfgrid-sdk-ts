@@ -13,5 +13,10 @@ export interface PatchExtrinsicOptions<T> {
   resultEvents?: string[];
 }
 export type Extrinsic = SubmittableExtrinsic<"promise", ISubmittableResult>;
-export type ExtrinsicResult<T> = Extrinsic & { apply(): Promise<T>; resultEvents: string[]; resultSections: string[] };
+export type ExtrinsicResult<T> = Extrinsic & {
+  apply(): Promise<T>;
+  resultEvents: string[];
+  resultSections: string[];
+  map?: (value: unknown) => T;
+};
 export type validatorFunctionType = (eventData: unknown) => boolean;

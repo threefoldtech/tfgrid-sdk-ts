@@ -39,10 +39,21 @@
         v-if="lockedContracts?.totalAmountLocked && !isLoading"
         class="mr-2"
         color="warning"
+        prepend-icon="mdi-lock-open"
         @click="openUnlockDialog"
         :loading="unlockContractLoading"
       >
         Unlock All
+      </v-btn>
+      <v-btn
+        class="mr-2"
+        v-if="contracts.length > 0"
+        :loading="deleting"
+        prepend-icon="mdi-delete"
+        color="error"
+        @click="deleteDialog = true"
+      >
+        Delete All
       </v-btn>
       <v-btn
         prepend-icon="mdi-refresh"
@@ -81,7 +92,7 @@
     </template>
   </v-card>
   <!-- locked amount Dialog -->
-  <v-dialog width="500" v-model="unlockDialog" v-if="lockedContracts?.totalAmountLocked" attach="#modals">
+  <v-dialog width="800" v-model="unlockDialog" v-if="lockedContracts?.totalAmountLocked" attach="#modals">
     <v-card>
       <v-card-title class="bg-primary">
         Unlock All Contracts
@@ -101,31 +112,30 @@
           </template>
         </v-tooltip>
       </v-card-title>
-      <v-card-text>
-        <v-container>
-          <v-row v-if="loadingLockDetails" class="d-flex flex-column justify-center align-center py-4">
-            <v-progress-circular indeterminate />
-            <div class="text-subtitle-2 pt-2">Loading contracts lock details</div>
-          </v-row>
-          <v-row class="d-flex" v-else>
-            <v-alert class="ma-4" type="warning" variant="tonal">
-              <div v-if="lockedContracts?.totalAmountLocked < freeBalance" class="font-weigh-black">
-                You have enough balance to unlock your contracts; this will cost you around
-                {{ Math.ceil(lockedContracts?.totalAmountLocked) }} TFTs.
-              </div>
-              <div v-else>
-                You need to fund your account with
-                <span class="font-weight-black">
-                  {{ Math.ceil(lockedContracts?.totalAmountLocked - freeBalance) }}
-                  TFTs
-                </span>
-                to resume your contracts
-              </div>
-            </v-alert>
-          </v-row>
-        </v-container>
+      <v-card-text v-if="loadingLockDetails">
+        <v-progress-circular indeterminate />
+
+        <div class="text-subtitle-2">Loading contracts lock details</div>
+        <v-divider class="mt-3" />
       </v-card-text>
-      <v-card-actions class="justify-end my-1 mr-2">
+      <v-card-text v-else>
+        <v-alert class="my-4" type="warning" variant="tonal">
+          <div v-if="lockedContracts?.totalAmountLocked < freeBalance">
+            You have enough balance to unlock your contracts, this will cost you around
+            <span class="font-weight-bold">{{ Math.ceil(lockedContracts?.totalAmountLocked) }}</span> TFTs.
+          </div>
+          <div v-else>
+            You need to fund your account with
+            <span class="font-weight-bold">
+              {{ Math.ceil(lockedContracts?.totalAmountLocked - freeBalance) }}
+              TFTs
+            </span>
+            to resume your contracts
+          </div>
+        </v-alert>
+        <v-divider class="mt-3" />
+      </v-card-text>
+      <v-card-actions class="justify-end mb-1 mr-2">
         <v-btn color="anchor" @click="unlockDialog = false"> Close </v-btn>
         <v-tooltip
           :text="
@@ -149,6 +159,24 @@
             </div>
           </template>
         </v-tooltip>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
+  <!-- delete all dialog-->
+  <v-dialog width="800" v-model="deleteDialog" attach="#modals">
+    <v-card>
+      <v-card-title class="bg-primary"> Delete all your contracts </v-card-title>
+      <v-alert class="mx-4 mt-4" type="warning" variant="tonal">
+        <template v-slot:prepend>
+          <v-icon class="pt-4" icon="$warning"></v-icon>
+        </template>
+        <div>You are about to permanently delete all contracts. This action cannot be reversed!</div>
+        <div>Deleting contracts may take a while to complete.</div>
+      </v-alert>
+      <v-card-actions class="justify-end my-1 mr-2">
+        <v-btn color="anchor" @click="deleteDialog = false"> Cancel </v-btn>
+        <v-btn color="error" @click="deleteAll"> Delete </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -204,6 +232,7 @@
 <script lang="ts" setup>
 import type { GridClient, LockContracts } from "@threefold/grid_client";
 import { type Contract, ContractState, NodeStatus, SortByContracts, SortOrder } from "@threefold/gridproxy_client";
+import { DeploymentKeyDeletionError } from "@threefold/types";
 import { Decimal } from "decimal.js";
 import { computed, defineComponent, onMounted, type Ref, ref } from "vue";
 
@@ -219,6 +248,7 @@ import {
   type NormalizedContract,
 } from "@/utils/contracts";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
+import { normalizeError } from "@/utils/helpers";
 import { manual } from "@/utils/manual";
 
 import { gridProxyClient, queryClient } from "../clients";
@@ -234,7 +264,7 @@ const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
 
 const contracts = ref<NormalizedContract[]>([]);
-
+const failedContracts = ref<number[]>([]);
 const nameContracts = ref<NormalizedContract[]>([]);
 const nodeContracts = ref<NormalizedContract[]>([]);
 const rentContracts = ref<NormalizedContract[]>([]);
@@ -246,6 +276,8 @@ const totalCost = ref<number>();
 const totalCostUSD = ref<number>();
 const lockedContracts = ref<LockContracts>();
 const unlockDialog = ref<boolean>(false);
+const deleteDialog = ref<boolean>(false);
+const deleting = ref<boolean>(false);
 
 const panel = ref<number[]>([0, 1, 2]);
 const nodeInfo: Ref<{ [nodeId: number]: { status: NodeStatus; farmId: number } }> = ref({});
@@ -270,8 +302,7 @@ async function _normalizeContracts(
       try {
         return await normalizeContract(grid, contract, contractType);
       } catch (error) {
-        loadingErrorMessage.value = `Error normalizing contract: ${error}`;
-        throw new Error(loadingErrorMessage.value);
+        failedContracts.value.push(contract.contract_id);
       }
     }),
   );
@@ -321,7 +352,7 @@ async function loadContracts(type?: ContractType, options?: { sort: { key: strin
   nodeInfo.value = {};
   contracts.value = [];
   cachedNodeIDs.value = [];
-
+  failedContracts.value = [];
   try {
     if (type) {
       switch (type) {
@@ -342,6 +373,11 @@ async function loadContracts(type?: ContractType, options?: { sort: { key: strin
         loadContractsByType(ContractType.Rent, rentContracts, options),
       ]);
     }
+    const failedContractsLength = failedContracts.value.length;
+    if (failedContractsLength > 0)
+      loadingErrorMessage.value = `Failed to load details of the following contract${
+        failedContractsLength > 1 ? "s" : ""
+      }: ${failedContracts.value.join(", ")}.`;
     await getContractsLockDetails();
     contracts.value = [...nodeContracts.value, ...nameContracts.value, ...rentContracts.value];
 
@@ -391,6 +427,27 @@ async function unlockAllContracts() {
   }
 }
 
+async function deleteAll() {
+  deleteDialog.value = false;
+  deleting.value = true;
+  try {
+    await grid.contracts.cancelMyContracts();
+    loadingTablesMessage.value =
+      "The contracts have been successfully deleted. Please note that all tables will be reloaded in 30 seconds.";
+    createCustomToast(loadingTablesMessage.value, ToastType.info);
+    setTimeout(() => {
+      loadContracts();
+      loadingTablesMessage.value = undefined;
+    }, 30000);
+  } catch (e) {
+    if (e instanceof DeploymentKeyDeletionError) {
+      createCustomToast("Failed to delete some keys, You don't have enough tokens", ToastType.danger);
+    } else {
+      createCustomToast(normalizeError(e, `Failed to delete some contracts.`), ToastType.danger);
+    }
+  }
+  deleting.value = false;
+}
 const nodeStatus = computed(() => {
   const statusObject: { [x: number]: NodeStatus } = {};
   for (const nodeId in nodeInfo.value) {
