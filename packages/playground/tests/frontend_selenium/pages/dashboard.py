@@ -4,6 +4,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.alert import Alert
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import StaleElementReferenceException
 from utils.base import Base
 import time
 
@@ -85,7 +86,12 @@ class DashboardPage:
 
     def logout_account(self):
         time.sleep(3)
-        self.wait_for_button(self.browser.find_element(*self.logout_button)).click()
+        while True:
+            try:
+                self.wait_for_button(self.browser.find_element(*self.logout_button)).click()
+                break  # Exit the loop if interaction is successful
+            except StaleElementReferenceException:
+                time.sleep(0.5)
         WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.find_more_button))
         self.browser.refresh()
         # alert = Alert(self.browser)
