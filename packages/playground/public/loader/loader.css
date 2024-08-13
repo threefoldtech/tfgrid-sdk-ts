@@ -67,8 +67,9 @@
 .service-reachable {
   color: rgb(var(--v-theme-success, "76, 175, 80"));
 }
+
 .service-unreachable {
-  color: rgba(207, 102, 121, 1);
+  color: rgb(207, 102, 121);
 }
 .app-loader-logo {
   max-width: 100%;
@@ -148,6 +149,7 @@
 .app-monitor-msg {
   display: none;
 }
+
 .app-loader-msg.active,
 .app-monitor-msg.active {
   display: block;
