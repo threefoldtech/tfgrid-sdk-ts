@@ -167,7 +167,6 @@ export default {
     const isValidTimeout = ref(false);
     const isValidPassword = ref(false);
     onMounted(() => {
-      console.log(localStorage.getItem(TIMEOUT_KEY));
       if (!localStorage.getItem(TIMEOUT_KEY)) {
         localStorage.setItem(TIMEOUT_KEY, `${window.env.TIMEOUT / 1000}`);
       }
