@@ -9,7 +9,7 @@
 
       <v-select class="pa-3" :items="themes" v-model="selectedTheme" />
 
-      <v-card-actions class="justify-end">
+      <v-card-actions class="justify-end mb-3 mx-3">
         <v-btn :disabled="isCurrentTheme()" @click="UpdateTheme" class="justify-end ml-auto"
           >Update</v-btn
         ></v-card-actions
@@ -91,7 +91,7 @@
           </InputValidator>
         </PasswordInputWrapper>
       </form-validator>
-      <v-card-actions class="justify-end">
+      <v-card-actions class="justify-end mb-3 mx-3">
         <v-btn :disabled="!isValidPassword" @click="UpdatePassword" class="justify-end ml-auto"
           >Update</v-btn
         ></v-card-actions
@@ -124,7 +124,7 @@
             v-model="selectedTimeout"
           ></v-text-field>
         </input-validator>
-        <v-card-actions class="justify-end">
+        <v-card-actions class="justify-end mb-3 mx-3">
           <v-btn :disabled="!isValidTimeout || isCurrentTimeout()" @click="UpdateTimeout" class="justify-end ml-auto"
             >Update</v-btn
           ></v-card-actions
@@ -232,6 +232,7 @@ export default {
         window.env.TIMEOUT = selectedTimeout.value * 1000;
         createCustomToast("Session Timeout Updated", ToastType.success);
         selectedTimeout.value = window.env.TIMEOUT / 1000;
+        window.setTimeout(window.env.TIMEOUT);
         isValidTimeout.value = false;
         currentTimeout.value = selectedTimeout.value;
       } catch (err) {
