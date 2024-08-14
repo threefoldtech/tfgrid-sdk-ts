@@ -1,6 +1,6 @@
 import { plainToClass } from "class-transformer";
 
-import { ComputeCapacity, Mount, Zmachine, ZmachineNetwork } from "../../src";
+import { ComputeCapacity, Mount, Zmachine, ZmachineNetwork, ZNetworkInterface } from "../../src";
 
 let zmachine = new Zmachine();
 const computeCapacity = new ComputeCapacity();
@@ -111,7 +111,7 @@ describe("Zmachine Class Tests", () => {
 
   it("should throw error if network public_ip is invalid", () => {
     const invalidNetwork = new ZmachineNetwork();
-    invalidNetwork.public_ip = "invalid_ip";
+    invalidNetwork.public_ip = undefined as any;
     invalidNetwork.planetary = true;
     invalidNetwork.interfaces = [{ network: "znetwork", ip: "10.20.2.2" }];
 
@@ -122,11 +122,13 @@ describe("Zmachine Class Tests", () => {
     expect(result).toThrow();
   });
 
-  it("should throw error if network interfaces are empty", () => {
+  it("should throw error if network interfaces values are invalid", () => {
     const invalidNetwork = new ZmachineNetwork();
     invalidNetwork.public_ip = "10.249.0.0/16";
     invalidNetwork.planetary = true;
-    invalidNetwork.interfaces = [];
+    invalidNetwork.interfaces = [new ZNetworkInterface()];
+    invalidNetwork.interfaces[0].network = "";
+    invalidNetwork.interfaces[0].ip = "";
 
     const result = () => {
       zmachine.network = invalidNetwork;
