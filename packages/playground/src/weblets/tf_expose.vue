@@ -60,8 +60,6 @@ import { ref } from "vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useGrid } from "../stores";
 import { ProjectName } from "../types";
-import { createNetwork } from "../utils/deploy_helpers";
-import { deployVM } from "../utils/deploy_vm";
 import { deployGatewayName, rollbackDeployment } from "../utils/gateway";
 import { normalizeError } from "../utils/helpers";
 import { generateName } from "../utils/strings";
@@ -69,7 +67,7 @@ import { generateName } from "../utils/strings";
 const layout = useLayout();
 const ip = ref();
 const name = ref(generateName({ prefix: "ex" }));
-const subdomain = ref("");
+const subdomain = ref(generateName({ prefix: "ex" }));
 const port = ref(80);
 const selectionDetails = ref<SelectionDetails>();
 const gridStore = useGrid();
@@ -95,22 +93,18 @@ async function deploy() {
     await layout.value.validateBalance(grid!);
 
     layout.value.setStatus("deploy", "Preparing to deploy gateway...");
-    const network = createNetwork();
-    console.log("network", network);
-    let gateway: any;
 
-    await deployGatewayName(grid, selectionDetails.value?.domain, {
+    const gateway = await deployGatewayName(grid, selectionDetails.value?.domain, {
       subdomain: subdomain.value,
       ip: ip.value,
       port: port.value,
-      network: network.name,
     });
     console.log("gateway", gateway);
-    // finalize(gateway);
+    finalize(gateway);
   } catch (e) {
     layout.value.setStatus("deploy", "Rollbacking back due to fail to deploy gateway...");
 
-    // await rollbackDeployment(grid!, name.value);
+    // await rollbackDeployment(grid!, subdomain.value);
     layout.value.setStatus("failed", normalizeError(e, "Failed to deploy am expose instance."));
   }
 }
