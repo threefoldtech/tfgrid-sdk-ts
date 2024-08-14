@@ -125,10 +125,7 @@
           ></v-text-field>
         </input-validator>
         <v-card-actions class="justify-end">
-          <v-btn
-            :disabled="!isValidTimeout || currentTimeout == selectedTimeout"
-            @click="UpdateTimeout"
-            class="justify-end ml-auto"
+          <v-btn :disabled="!isValidTimeout || isCurrentTimeout()" @click="UpdateTimeout" class="justify-end ml-auto"
             >Update</v-btn
           ></v-card-actions
         >
@@ -227,12 +224,16 @@ export default {
       confirmPassword.value = "";
       isValidPassword.value = false;
     }
+    function isCurrentTimeout() {
+      return currentTimeout.value == selectedTimeout.value;
+    }
     function UpdateTimeout() {
       try {
         window.env.TIMEOUT = selectedTimeout.value * 1000;
         createCustomToast("Session Timeout Updated", ToastType.success);
         selectedTimeout.value = window.env.TIMEOUT / 1000;
         isValidTimeout.value = false;
+        currentTimeout.value = selectedTimeout.value;
       } catch (err) {
         createCustomToast("Could not update timeout", ToastType.danger);
         console.log(err);
@@ -263,6 +264,7 @@ export default {
       validateConfirmPassword,
       validateTimeout,
       isCurrentTheme,
+      isCurrentTimeout,
     };
   },
 };
