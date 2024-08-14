@@ -6,13 +6,13 @@
     </v-card>
     <v-card class="my-5"
       ><v-card-title>Theme</v-card-title> <v-card-text>Pick an application theme!</v-card-text>
-      <form-validator v-model="isValidTheme" valid-on-init>
-        <input-validator :rules="[validateTheme]" #="{ props }" ref="themeInput" :value="selectedTheme">
-          <v-select class="pa-3" :items="themes" v-model="selectedTheme" v-bind="props" />
-        </input-validator>
-      </form-validator>
-      <v-card-actions class="justify-end" :disabled="!isValidTheme">
-        <v-btn :disabled="!isValidTheme" @click="UpdateTheme" class="justify-end ml-auto">Update</v-btn></v-card-actions
+
+      <v-select class="pa-3" :items="themes" v-model="selectedTheme" />
+
+      <v-card-actions class="justify-end">
+        <v-btn :disabled="isCurrentTheme()" @click="UpdateTheme" class="justify-end ml-auto"
+          >Update</v-btn
+        ></v-card-actions
       >
     </v-card>
     <v-card class="my-5"
@@ -152,11 +152,14 @@ export default {
 
     const themes = ["System Mode", "Dark Mode", "Light Mode"];
 
-    const currentTheme = localStorage.getItem(KEY);
+    const currentTheme = ref(localStorage.getItem(KEY));
 
-    watch(theme.global.name, theme => localStorage.setItem(KEY, theme));
+    watch(theme.global.name, theme => {
+      localStorage.setItem(KEY, theme);
+      currentTheme.value = localStorage.getItem(KEY);
+    });
 
-    const selectedTheme = ref(currentTheme == "light" ? "Light Mode" : "Dark Mode");
+    const selectedTheme = ref(currentTheme.value == "light" ? "Light Mode" : "Dark Mode");
 
     const currentPassword = ref("");
     const newPassword = ref("");
@@ -165,34 +168,30 @@ export default {
     const selectedTimeout = ref(window.env.TIMEOUT / 1000);
     const isValidTimeout = ref(false);
     const isValidPassword = ref(false);
-    const isValidTheme = ref(false);
 
-    function validateTheme() {
-      // check if system mode is the same as current theme
+    function isCurrentTheme() {
       if (selectedTheme.value.split(" ")[0].toLowerCase() == "system") {
-        if (
-          (window.matchMedia("(prefers-color-scheme: dark)").matches && currentTheme == "dark") ||
-          (window.matchMedia("(prefers-color-scheme: light)").matches && currentTheme == "light")
-        ) {
-          return { message: "System mode is already applied." };
-        }
+        return (
+          (window.matchMedia("(prefers-color-scheme: dark)").matches && currentTheme.value == "dark") ||
+          (window.matchMedia("(prefers-color-scheme: light)").matches && currentTheme.value == "light")
+        );
       }
-      // check is selected mode is same as current
-      if (selectedTheme.value.split(" ")[0].toLowerCase() == currentTheme) {
-        return { message: "Select a theme different from the current one." };
+      if (currentTheme.value) {
+        return selectedTheme.value.split(" ")[0].toLowerCase() == currentTheme.value;
       }
     }
-
     function UpdateTheme() {
       if (selectedTheme.value == "System Mode") {
         if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
           localStorage.setItem(KEY, "dark");
           theme.global.name.value = "dark";
+
           return;
         }
         if (window.matchMedia("(prefers-color-scheme: light)").matches) {
           localStorage.setItem(KEY, "light");
           theme.global.name.value = "light";
+
           return;
         }
       }
@@ -248,6 +247,7 @@ export default {
     return {
       themes,
       selectedTheme,
+      currentTheme,
       currentPassword,
       newPassword,
       confirmPassword,
@@ -255,7 +255,6 @@ export default {
       currentTimeout,
       isValidTimeout,
       isValidPassword,
-      isValidTheme,
       UpdateTheme,
       UpdatePassword,
       UpdateTimeout,
@@ -263,7 +262,7 @@ export default {
       validateNewPassword,
       validateConfirmPassword,
       validateTimeout,
-      validateTheme,
+      isCurrentTheme,
     };
   },
 };
