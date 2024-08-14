@@ -48,6 +48,9 @@ export default {
     const getCountryFlagSrc = () => {
       const conuntryCode = getCountryCode(props.node);
 
+      if (conuntryCode.length > 2) {
+        return "";
+      }
       return conuntryCode.toLocaleLowerCase() != "ch"
         ? `https://www.worldatlas.com/r/w425/img/flag/${conuntryCode?.toLocaleLowerCase()}-flag.jpg`
         : `https://www.worldatlas.com/r/w425/img/flag/${conuntryCode?.toLocaleLowerCase()}-flag.png`;
