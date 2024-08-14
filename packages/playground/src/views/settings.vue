@@ -135,7 +135,7 @@
 </template>
 <script lang="ts">
 import md5 from "md5";
-import { ref, watch } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { useTheme } from "vuetify";
 
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
@@ -145,15 +145,16 @@ export default {
   name: "Settings",
   setup() {
     const theme = useTheme();
-    const KEY = "APP_CURRENT_THEME";
+    const THEME_KEY = "APP_CURRENT_THEME";
+    const TIMEOUT_KEY = "APP_CURRENT_TIMEOUT";
 
     const themes = ["System Mode", "Dark Mode", "Light Mode"];
 
-    const currentTheme = ref(localStorage.getItem(KEY));
+    const currentTheme = ref(localStorage.getItem(THEME_KEY));
 
     watch(theme.global.name, theme => {
-      localStorage.setItem(KEY, theme);
-      currentTheme.value = localStorage.getItem(KEY);
+      localStorage.setItem(THEME_KEY, theme);
+      currentTheme.value = localStorage.getItem(THEME_KEY);
     });
 
     const selectedTheme = ref(currentTheme.value == "light" ? "Light Mode" : "Dark Mode");
@@ -161,10 +162,18 @@ export default {
     const currentPassword = ref("");
     const newPassword = ref("");
     const confirmPassword = ref("");
-    const currentTimeout = ref(window.env.TIMEOUT / 1000);
-    const selectedTimeout = ref(window.env.TIMEOUT / 1000);
+    const currentTimeout = ref(0);
+    const selectedTimeout = ref(0);
     const isValidTimeout = ref(false);
     const isValidPassword = ref(false);
+    onMounted(() => {
+      console.log(localStorage.getItem(TIMEOUT_KEY));
+      if (!localStorage.getItem(TIMEOUT_KEY)) {
+        localStorage.setItem(TIMEOUT_KEY, `${window.env.TIMEOUT / 1000}`);
+      }
+      currentTimeout.value = +localStorage.getItem(TIMEOUT_KEY)!;
+      selectedTimeout.value = currentTimeout.value;
+    });
 
     function isCurrentTheme() {
       if (selectedTheme.value.split(" ")[0].toLowerCase() == "system") {
@@ -180,19 +189,19 @@ export default {
     function UpdateTheme() {
       if (selectedTheme.value == "System Mode") {
         if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-          localStorage.setItem(KEY, "dark");
+          localStorage.setItem(THEME_KEY, "dark");
           theme.global.name.value = "dark";
 
           return;
         }
         if (window.matchMedia("(prefers-color-scheme: light)").matches) {
-          localStorage.setItem(KEY, "light");
+          localStorage.setItem(THEME_KEY, "light");
           theme.global.name.value = "light";
 
           return;
         }
       }
-      localStorage.setItem(KEY, selectedTheme.value == "Light Mode" ? "light" : "dark");
+      localStorage.setItem(THEME_KEY, selectedTheme.value == "Light Mode" ? "light" : "dark");
       theme.global.name.value = selectedTheme.value == "Light Mode" ? "light" : "dark";
     }
     function validateCurrentPassword() {
@@ -229,12 +238,14 @@ export default {
     }
     function UpdateTimeout() {
       try {
-        window.env.TIMEOUT = selectedTimeout.value * 1000;
+        localStorage.setItem(TIMEOUT_KEY, `${selectedTimeout.value}`);
+
         createCustomToast("Session Timeout Updated", ToastType.success);
-        selectedTimeout.value = window.env.TIMEOUT / 1000;
-        window.setTimeout(window.env.TIMEOUT);
+        currentTimeout.value = +localStorage.getItem(TIMEOUT_KEY)!;
+
+        selectedTimeout.value = currentTimeout.value;
+
         isValidTimeout.value = false;
-        currentTimeout.value = selectedTimeout.value;
       } catch (err) {
         createCustomToast("Could not update timeout", ToastType.danger);
         console.log(err);
