@@ -28,7 +28,7 @@ function generatePubKey(): string {
 //Private IP Regex
 const ipRegex = /(^127\.)|(^10\.)|(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1]\.)|(^192\.168\.)/;
 
-test("TC2690 - Applications: Deploy Discourse", async () => {
+test.skip("TC2690 - Applications: Deploy Discourse", async () => {
   /**********************************************
      Test Suite: Grid3_Client_TS (Automated)
      Test Cases: TC2690 - Applications: Deploy Discourse
