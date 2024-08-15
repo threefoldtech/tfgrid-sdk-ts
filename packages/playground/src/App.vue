@@ -217,7 +217,8 @@ const openProfile = ref(true);
 const hasActiveProfile = computed(() => !!profileManager.profile);
 const theme = useTheme();
 const navbarConfig = ref();
-const TIMEOUT_QUERY_KEY = "APP_CURRENT_TIMEOUT";
+const TIMEOUT_QUERY_KEY = "APP_QUERY_TIMEOUT";
+const TIMEOUT_DEPLOYMENT_KEY = "APP_DEPLOYMENT_TIMEOUT";
 
 const hasGrid = computed(() => !!gridStore.grid);
 
@@ -255,7 +256,16 @@ onMounted(() => {
   if (!localStorage.getItem(TIMEOUT_QUERY_KEY)) {
     localStorage.setItem(TIMEOUT_QUERY_KEY, `${window.env.TIMEOUT}`);
   } else {
-    window.env.TIMEOUT = localStorage.getItem(TIMEOUT_QUERY_KEY);
+    window.env.TIMEOUT = +localStorage.getItem(TIMEOUT_QUERY_KEY)!;
+  }
+
+  if (!localStorage.getItem(TIMEOUT_DEPLOYMENT_KEY)) {
+    localStorage.setItem(TIMEOUT_DEPLOYMENT_KEY, `${gridStore.client.clientOptions.deploymentTimeoutMinutes}`);
+  } else {
+    const client = gridStore.client as GridClient;
+    if (client) {
+      client.clientOptions.deploymentTimeoutMinutes = +localStorage.getItem(TIMEOUT_DEPLOYMENT_KEY)!;
+    }
   }
 });
 
@@ -445,6 +455,8 @@ function clickHandler({ route, url }: AppRouteItem): void {
 </script>
 
 <script lang="ts">
+import { GridClient } from "@threefold/grid_client";
+
 import { DashboardRoutes } from "@/router/routes";
 import { AppThemeSelection } from "@/utils/app_theme";
 

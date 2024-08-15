@@ -100,12 +100,12 @@
     <v-card class="my-5"
       ><v-card-title>Timeout</v-card-title>
 
-      <v-tooltip text="Set desired session timeout in seconds" location="top right">
-        <template v-slot:activator="{ props }">
-          <v-card-text v-bind="props">Adjust Timeout <v-icon icon="mdi-information-outline" /></v-card-text>
-        </template>
-      </v-tooltip>
       <form-validator v-model="isValidTimeout">
+        <v-tooltip text="Set desired queries timeout in seconds" location="top right">
+          <template v-slot:activator="{ props }">
+            <v-card-text v-bind="props">Adjust Query Timeout <v-icon icon="mdi-information-outline" /></v-card-text>
+          </template>
+        </v-tooltip>
         <input-validator
           :value="selectedQueryTimeout"
           :rules="[
@@ -124,6 +124,13 @@
             v-model="selectedQueryTimeout"
           ></v-text-field>
         </input-validator>
+        <v-tooltip text="Set the desired timeout for deployments" location="top right">
+          <template v-slot:activator="{ props }">
+            <v-card-text v-bind="props"
+              >Adjust Deployment Timeout <v-icon icon="mdi-information-outline"
+            /></v-card-text>
+          </template>
+        </v-tooltip>
         <input-validator
           :value="selectedDeploymentTimeout"
           :rules="[
@@ -143,10 +150,7 @@
           ></v-text-field>
         </input-validator>
         <v-card-actions class="justify-end mb-3 mx-3">
-          <v-btn
-            :disabled="!isValidTimeout || iscurrentQueryTimeout()"
-            @click="UpdateTimeout"
-            class="justify-end ml-auto"
+          <v-btn :disabled="!isValidTimeout || isCurrentTimeout()" @click="UpdateTimeout" class="justify-end ml-auto"
             >Update</v-btn
           ></v-card-actions
         >
@@ -162,12 +166,14 @@ import { useTheme } from "vuetify";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
 
 import { getCredentials, updateCredentials } from "../utils/credentials";
+
 export default {
   name: "Settings",
   setup() {
     const theme = useTheme();
     const THEME_KEY = "APP_CURRENT_THEME";
-    const TIMEOUT_QUERY_KEY = "APP_CURRENT_TIMEOUT";
+    const TIMEOUT_QUERY_KEY = "APP_QUERY_TIMEOUT";
+    const TIMEOUT_DEPLOYMENT_KEY = "APP_DEPLOYMENT_TIMEOUT";
 
     const themes = ["System Mode", "Dark Mode", "Light Mode"];
 
@@ -184,13 +190,17 @@ export default {
     const newPassword = ref("");
     const confirmPassword = ref("");
     const currentQueryTimeout = ref(0);
+    const currentDeploymentTimeout = ref(0);
     const selectedQueryTimeout = ref(0);
     const selectedDeploymentTimeout = ref(0);
     const isValidTimeout = ref(false);
     const isValidPassword = ref(false);
-    onMounted(() => {
+    onMounted(async () => {
       currentQueryTimeout.value = +localStorage.getItem(TIMEOUT_QUERY_KEY)!;
       selectedQueryTimeout.value = currentQueryTimeout.value;
+
+      currentDeploymentTimeout.value = +localStorage.getItem(TIMEOUT_DEPLOYMENT_KEY)!;
+      selectedDeploymentTimeout.value = currentDeploymentTimeout.value;
     });
 
     function isCurrentTheme() {
@@ -251,17 +261,27 @@ export default {
       confirmPassword.value = "";
       isValidPassword.value = false;
     }
-    function iscurrentQueryTimeout() {
-      return currentQueryTimeout.value == selectedQueryTimeout.value;
+    function isCurrentTimeout() {
+      return (
+        currentQueryTimeout.value == selectedQueryTimeout.value &&
+        currentDeploymentTimeout.value == selectedDeploymentTimeout.value
+      );
     }
     function UpdateTimeout() {
       try {
-        localStorage.setItem(TIMEOUT_QUERY_KEY, `${selectedQueryTimeout.value}`);
+        if (selectedQueryTimeout.value != currentQueryTimeout.value) {
+          localStorage.setItem(TIMEOUT_QUERY_KEY, `${selectedQueryTimeout.value}`);
+          currentQueryTimeout.value = +localStorage.getItem(TIMEOUT_QUERY_KEY)!;
+          selectedQueryTimeout.value = currentQueryTimeout.value;
+        }
+
+        if (selectedDeploymentTimeout.value != currentDeploymentTimeout.value) {
+          localStorage.setItem(TIMEOUT_DEPLOYMENT_KEY, `${selectedDeploymentTimeout.value}`);
+          currentDeploymentTimeout.value = +localStorage.getItem(TIMEOUT_DEPLOYMENT_KEY)!;
+          selectedDeploymentTimeout.value = currentDeploymentTimeout.value;
+        }
 
         createCustomToast("Session Timeout Updated", ToastType.success);
-        currentQueryTimeout.value = +localStorage.getItem(TIMEOUT_QUERY_KEY)!;
-
-        selectedQueryTimeout.value = currentQueryTimeout.value;
 
         isValidTimeout.value = false;
       } catch (err) {
@@ -295,7 +315,7 @@ export default {
       validateConfirmPassword,
       validateTimeout,
       isCurrentTheme,
-      iscurrentQueryTimeout,
+      isCurrentTimeout,
     };
   },
 };
