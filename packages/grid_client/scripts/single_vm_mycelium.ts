@@ -1,23 +1,23 @@
-import { MachinesModel } from "../src";
+import { generateRandomHexSeed, GridClient, MachinesDeleteModel, MachinesModel } from "../src";
 import { config, getClient } from "./client_loader";
 import { log } from "./utils";
 
-async function deploy(client, vms) {
+async function deploy(client: GridClient, vms: MachinesModel) {
   const res = await client.machines.deploy(vms);
   log("================= Deploying VM =================");
   log(res);
   log("================= Deploying VM =================");
 }
 
-async function getDeployment(client, vms) {
-  const res = await client.machines.getObj(vms);
+async function getDeployment(client: GridClient, name: string) {
+  const res = await client.machines.getObj(name);
   log("================= Getting deployment information =================");
   log(res);
   log("================= Getting deployment information =================");
 }
 
-async function cancel(client, vms) {
-  const res = await client.machines.delete(vms);
+async function cancel(client: GridClient, options: MachinesDeleteModel) {
+  const res = await client.machines.delete(options);
   log("================= Canceling the deployment =================");
   log(res);
   log("================= Canceling the deployment =================");
@@ -32,12 +32,18 @@ async function main() {
     network: {
       name: "hellotest",
       ip_range: "10.249.0.0/16",
-      // myceliumSeeds: [
-      //   {
-      //     nodeId: 168,
-      //     seed: "050d109829d8492d48bfb33b711056080571c69e46bfde6b4294c4c5bf468a76", //(HexSeed of length 32)
-      //   },
-      // ],
+      myceliumSeeds: [
+        {
+          nodeId: 168,
+          /**
+           * ### Mycelium Network Seed:
+           * - The `seed` is an optional field used to provide a specific seed for the Mycelium network.
+           * - If not provided, the `GridClient` will generate a seed automatically when the `mycelium` flag is enabled.
+           * - **Use Case:** If you need the new machine to have the same IP address as a previously deleted machine, you can reuse the old seed by setting the `myceliumSeed` field.
+           */
+          seed: generateRandomHexSeed(32),
+        },
+      ],
     },
     machines: [
       {
@@ -53,8 +59,21 @@ async function main() {
         public_ip: false,
         public_ip6: false,
         planetary: true,
+        /**
+         * ### Mycelium Flag Behavior:
+         * - When the `mycelium` flag is enabled, there’s no need to manually provide the `myceliumSeed` flag.
+         * - The `GridClient` will automatically generate the necessary seed for you.
+         * - **However**, if you have **an existing seed** from a previously deleted machine and wish to deploy a new machine that retains the same IP address,
+         * - **you can simply pass in the old seed during deployment instead of calling the `generateRandomHexSeed()` function**.
+         */
         mycelium: true,
-        // myceliumSeed: "1e1404279b3d", //(HexSeed of length 6)
+        /**
+         * ### Mycelium Seed:
+         * - The `myceliumSeed` is an optional field used to provide a specific seed for the Mycelium network.
+         * - If not provided, the `GridClient` will generate a seed automatically when the `mycelium` flag is enabled.
+         * - **Use Case:** If you need the new machine to have the same IP address as a previously deleted machine, you can reuse the old seed by setting the `myceliumSeed` field.
+         */
+        myceliumSeed: generateRandomHexSeed(3), // (HexSeed of length 6)
         cpu: 1,
         memory: 1024 * 2,
         rootfs_size: 0,
