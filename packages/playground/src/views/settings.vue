@@ -107,25 +107,46 @@
       </v-tooltip>
       <form-validator v-model="isValidTimeout">
         <input-validator
-          :value="selectedTimeout"
+          :value="selectedQueryTimeout"
           :rules="[
-            validators.required('Timeout is required.'),
+            validators.required('Query timeout is required.'),
             validators.isInt('Timeout must be a valid integer.'),
             validateTimeout,
           ]"
           #="{ props }"
-          ref="timeoutInput"
+          ref="timeoutQueryInput"
         >
           <v-text-field
-            label="Enter timeout (sec)"
+            label="Enter Query timeout (sec)"
             class="pa-5"
             v-bind="props"
             type="number"
-            v-model="selectedTimeout"
+            v-model="selectedQueryTimeout"
           ></v-text-field>
         </input-validator>
+        <!-- <input-validator
+          :value="selectedQueryTimeout"
+          :rules="[
+            validators.required('Deployment timeout is required.'),
+            validators.isInt('Timeout must be a valid integer.'),
+            validateTimeout(selectedDeploymentTimeout),
+          ]"
+          #="{ props }"
+          ref="timeoutDeploymentInput"
+        >
+          <v-text-field
+            label="Enter Deployment timeout (sec)"
+            class="pa-5"
+            v-bind="props"
+            type="number"
+            v-model="selectedDeploymentTimeout"
+          ></v-text-field>
+        </input-validator> -->
         <v-card-actions class="justify-end mb-3 mx-3">
-          <v-btn :disabled="!isValidTimeout || isCurrentTimeout()" @click="UpdateTimeout" class="justify-end ml-auto"
+          <v-btn
+            :disabled="!isValidTimeout || iscurrentQueryTimeout()"
+            @click="UpdateTimeout"
+            class="justify-end ml-auto"
             >Update</v-btn
           ></v-card-actions
         >
@@ -146,7 +167,7 @@ export default {
   setup() {
     const theme = useTheme();
     const THEME_KEY = "APP_CURRENT_THEME";
-    const TIMEOUT_KEY = "APP_CURRENT_TIMEOUT";
+    const TIMEOUT_QUERY_KEY = "APP_CURRENT_TIMEOUT";
 
     const themes = ["System Mode", "Dark Mode", "Light Mode"];
 
@@ -162,16 +183,14 @@ export default {
     const currentPassword = ref("");
     const newPassword = ref("");
     const confirmPassword = ref("");
-    const currentTimeout = ref(0);
-    const selectedTimeout = ref(0);
+    const currentQueryTimeout = ref(0);
+    const selectedQueryTimeout = ref(0);
+    const selectedDeploymentTimeout = ref(0);
     const isValidTimeout = ref(false);
     const isValidPassword = ref(false);
     onMounted(() => {
-      if (!localStorage.getItem(TIMEOUT_KEY)) {
-        localStorage.setItem(TIMEOUT_KEY, `${window.env.TIMEOUT / 1000}`);
-      }
-      currentTimeout.value = +localStorage.getItem(TIMEOUT_KEY)!;
-      selectedTimeout.value = currentTimeout.value;
+      currentQueryTimeout.value = +localStorage.getItem(TIMEOUT_QUERY_KEY)!;
+      selectedQueryTimeout.value = currentQueryTimeout.value;
     });
 
     function isCurrentTheme() {
@@ -232,17 +251,17 @@ export default {
       confirmPassword.value = "";
       isValidPassword.value = false;
     }
-    function isCurrentTimeout() {
-      return currentTimeout.value == selectedTimeout.value;
+    function iscurrentQueryTimeout() {
+      return currentQueryTimeout.value == selectedQueryTimeout.value;
     }
     function UpdateTimeout() {
       try {
-        localStorage.setItem(TIMEOUT_KEY, `${selectedTimeout.value}`);
+        localStorage.setItem(TIMEOUT_QUERY_KEY, `${selectedQueryTimeout.value}`);
 
         createCustomToast("Session Timeout Updated", ToastType.success);
-        currentTimeout.value = +localStorage.getItem(TIMEOUT_KEY)!;
+        currentQueryTimeout.value = +localStorage.getItem(TIMEOUT_QUERY_KEY)!;
 
-        selectedTimeout.value = currentTimeout.value;
+        selectedQueryTimeout.value = currentQueryTimeout.value;
 
         isValidTimeout.value = false;
       } catch (err) {
@@ -250,8 +269,8 @@ export default {
         console.log(err);
       }
     }
-    function validateTimeout() {
-      if (selectedTimeout.value < 1) {
+    function validateTimeout(timeout: number) {
+      if (timeout < 1) {
         return { message: "Timeout should be at least 1 second." };
       }
     }
@@ -263,8 +282,9 @@ export default {
       currentPassword,
       newPassword,
       confirmPassword,
-      selectedTimeout,
-      currentTimeout,
+      selectedQueryTimeout,
+      selectedDeploymentTimeout,
+      currentQueryTimeout,
       isValidTimeout,
       isValidPassword,
       UpdateTheme,
@@ -275,7 +295,7 @@ export default {
       validateConfirmPassword,
       validateTimeout,
       isCurrentTheme,
-      isCurrentTimeout,
+      iscurrentQueryTimeout,
     };
   },
 };

@@ -217,6 +217,7 @@ const openProfile = ref(true);
 const hasActiveProfile = computed(() => !!profileManager.profile);
 const theme = useTheme();
 const navbarConfig = ref();
+const TIMEOUT_QUERY_KEY = "APP_CURRENT_TIMEOUT";
 
 const hasGrid = computed(() => !!gridStore.grid);
 
@@ -249,6 +250,16 @@ function navigateToHome() {
 }
 
 onMounted(window.$$appLoader || noop);
+
+onMounted(() => {
+  if (!localStorage.getItem(TIMEOUT_QUERY_KEY)) {
+    localStorage.setItem(TIMEOUT_QUERY_KEY, `${window.env.TIMEOUT}`);
+  } else {
+    window.env.TIMEOUT = localStorage.getItem(TIMEOUT_QUERY_KEY);
+  }
+
+  console.log(window.env.TIMEOUT);
+});
 
 // eslint-disable-next-line no-undef
 const version = process.env.VERSION as any;
