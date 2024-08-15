@@ -455,7 +455,7 @@ function clickHandler({ route, url }: AppRouteItem): void {
 </script>
 
 <script lang="ts">
-import { GridClient } from "@threefold/grid_client";
+import type { GridClient } from "@threefold/grid_client";
 
 import { DashboardRoutes } from "@/router/routes";
 import { AppThemeSelection } from "@/utils/app_theme";
