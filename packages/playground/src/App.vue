@@ -257,8 +257,6 @@ onMounted(() => {
   } else {
     window.env.TIMEOUT = localStorage.getItem(TIMEOUT_QUERY_KEY);
   }
-
-  console.log(window.env.TIMEOUT);
 });
 
 // eslint-disable-next-line no-undef

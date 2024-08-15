@@ -124,12 +124,12 @@
             v-model="selectedQueryTimeout"
           ></v-text-field>
         </input-validator>
-        <!-- <input-validator
-          :value="selectedQueryTimeout"
+        <input-validator
+          :value="selectedDeploymentTimeout"
           :rules="[
             validators.required('Deployment timeout is required.'),
             validators.isInt('Timeout must be a valid integer.'),
-            validateTimeout(selectedDeploymentTimeout),
+            validateTimeout,
           ]"
           #="{ props }"
           ref="timeoutDeploymentInput"
@@ -141,7 +141,7 @@
             type="number"
             v-model="selectedDeploymentTimeout"
           ></v-text-field>
-        </input-validator> -->
+        </input-validator>
         <v-card-actions class="justify-end mb-3 mx-3">
           <v-btn
             :disabled="!isValidTimeout || iscurrentQueryTimeout()"
