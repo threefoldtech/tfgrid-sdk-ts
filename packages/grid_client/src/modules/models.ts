@@ -94,6 +94,12 @@ class NetworkModel {
 }
 
 class MyceliumNetworkModel {
+  /**
+   * ### Mycelium Network Seed:
+   * - The `seed` is an optional field used to provide a specific seed for the Mycelium network.
+   * - If not provided, the `GridClient` will generate a seed automatically when the `mycelium` flag is enabled.
+   * - **Use Case:** If you need the new machine to have the same IP address as a previously deleted machine, you can reuse the old seed by setting the `myceliumSeed` field.
+   */
   @Expose() @IsString() @Length(32) seed?: string;
   @Expose() @IsInt() @Min(1) nodeId: number;
 }
@@ -110,7 +116,20 @@ class MachineModel {
   @Expose() @IsBoolean() public_ip: boolean;
   @Expose() @IsOptional() @IsBoolean() public_ip6?: boolean;
   @Expose() @IsBoolean() planetary: boolean;
+  /**
+   * ### Mycelium Flag Behavior:
+   * - When the `mycelium` flag is enabled, there’s no need to manually provide the `myceliumSeed` flag.
+   * - The `GridClient` will automatically generate the necessary seed for you.
+   * - **However**, if you have **an existing seed** from a previously deleted machine and wish to deploy a new machine that retains the same IP address,
+   * - **you can simply pass in the old seed during deployment instead of calling the `generateRandomHexSeed()` function**.
+   */
   @Expose() @IsBoolean() mycelium: boolean;
+  /**
+   * ### Mycelium Seed:
+   * - The `myceliumSeed` is an optional field used to provide a specific seed for the Mycelium network.
+   * - If not provided, the `GridClient` will generate a seed automatically when the `mycelium` flag is enabled.
+   * - **Use Case:** If you need the new machine to have the same IP address as a previously deleted machine, you can reuse the old seed by setting the `myceliumSeed` field.
+   */
   @Expose() @IsOptional() @IsString() @Length(6) myceliumSeed?: string;
   @Expose() @IsInt() @Min(1) cpu: number;
   @Expose() @Min(256) memory: number; // in MB
