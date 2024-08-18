@@ -236,7 +236,9 @@ export default {
     const selectionDetails = ref<SelectionDetails>();
     const networks = ref<VMNetwork[]>([]);
     const selectedIPAddress = ref<VMNetwork | null>(null);
-    const networkName = props.vm ? (props.vm.interfaces[0].network as string) : "";
+    const networkName = props.vm
+      ? (props.vm.interfaces[0].network as string)
+      : (props.k8s.masters[0].interfaces[0].network as string);
     const gridStore = useGrid();
     const grid = gridStore.client as GridClient;
 
