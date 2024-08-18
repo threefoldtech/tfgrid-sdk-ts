@@ -56,7 +56,7 @@
 <script lang="ts" setup>
 import type { GridClient } from "@threefold/grid_client";
 import type Contract from "@threefold/gridproxy_client";
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 
 import { useLayout } from "../components/weblet_layout.vue";
 import { useGrid } from "../stores";

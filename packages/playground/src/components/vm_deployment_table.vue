@@ -87,6 +87,10 @@
       @click:row="$attrs['onClick:row']"
       :sort-by="sortBy"
     >
+      <template #[`item.domains-name`]="{ item }">
+        {{ item[0].workloads[0] }}
+      </template>
+
       <template #[`item.name`]="{ item }">
         {{ item.name }}
       </template>
@@ -190,7 +194,22 @@ const failedDeployments = ref<
 
 onMounted(loadDeployments);
 
+async function loadDomains() {
+  try {
+    loading.value = true;
+    const grid = await getGrid(profileManager.profile!, props.projectName.toLowerCase());
+    const gateways = await grid!.gateway.list();
+    items.value = await Promise.all(gateways.map(name => grid!.gateway.get_name({ name })));
+  } catch {
+    loading.value = false;
+  }
+}
+
 async function loadDeployments() {
+  if (props.projectName.toLowerCase() === ProjectName.Domains.toLowerCase()) {
+    return loadDomains();
+  }
+
   const migrateGateways = props.projectName.toLowerCase() !== "fullvm" && props.projectName.toLowerCase() !== "vm";
 
   items.value = [];
@@ -245,6 +264,16 @@ async function loadDeployments() {
 }
 
 const filteredHeaders = computed(() => {
+  if (props.projectName.toLowerCase() === ProjectName.Domains.toLowerCase()) {
+    return [
+      { title: "Name", key: "0.workloads.0.data.name" },
+      { title: "Backends", key: "0.workloads.0.data.backends" },
+      { title: "FQDN", key: "0.workloads.0.result.data.fqdn" },
+      { title: "Health", key: "0.workloads.0.result.state", sortable: false },
+      { title: "Actions", key: "actions", sortable: false },
+    ];
+  }
+
   let headers = [
     { title: "PLACEHOLDER", key: "data-table-select" },
     { title: "Name", key: "name" },

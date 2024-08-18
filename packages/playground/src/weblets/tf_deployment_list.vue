@@ -223,11 +223,12 @@
             icon="mdi-eye-outline"
             @click="openDialog(tabs[activeTab].value, item)"
           />
+
           <IconActionBtn
             tooltip="Visit"
             icon="mdi-web"
             color="anchor"
-            :href="'https://' + item.env.Domains_WEBSERVER_HOSTNAME"
+            :href="'https://' + item[0].workloads[0].result.data.fqdn"
           />
         </template>
 
