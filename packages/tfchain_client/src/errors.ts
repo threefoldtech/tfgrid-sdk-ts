@@ -27,12 +27,19 @@ class TFChainError extends Error {
   constructor(options: ITFChainError) {
     super(options.message);
     this.name = "TFChainError";
-    this.keyError = options.keyError || "GenericError";
-    options.keyError && Object.defineProperty(this, "keyError", options.keyError);
-    options.section && Object.defineProperty(this, "section", options.section);
-    options.args && Object.defineProperty(this, "args", options.args);
-    options.method && Object.defineProperty(this, "method", options.method);
-    options.docs && Object.defineProperty(this, "docs", options.docs);
+
+    if (!options.keyError) {
+      options.keyError = "GenericError";
+    }
+
+    Object.keys(options).forEach(key => {
+      if (options[key as keyof ITFChainError]) {
+        Object.defineProperty(this, key, {
+          value: options[key as keyof ITFChainError],
+          enumerable: true,
+        });
+      }
+    });
   }
 }
 

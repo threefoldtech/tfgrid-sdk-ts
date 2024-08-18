@@ -4,6 +4,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.alert import Alert
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import StaleElementReferenceException
 from utils.base import Base
 import time
 
@@ -64,10 +65,12 @@ class DashboardPage:
     def press_esc_key(self):
         webdriver.ActionChains(self.browser).send_keys(Keys.ESCAPE).perform()
     
-    def import_account(self, seed):
+    def import_account(self, seed, validation=True):
         self.browser.find_element(*self.mnemonic_input).send_keys(Keys.CONTROL + "a")
         self.browser.find_element(*self.mnemonic_input).send_keys(Keys.DELETE)
         self.browser.find_element(*self.mnemonic_input).send_keys(seed)
+        if(validation):
+            WebDriverWait(self.browser, 30).until(EC.element_to_be_clickable(self.email_input))
 
     def connect_your_wallet(self, email, password):
         self.browser.find_element(*self.email_input).send_keys(Keys.CONTROL + "a")
@@ -83,7 +86,12 @@ class DashboardPage:
 
     def logout_account(self):
         time.sleep(3)
-        self.wait_for_button(self.browser.find_element(*self.logout_button)).click()
+        while True:
+            try:
+                self.wait_for_button(self.browser.find_element(*self.logout_button)).click()
+                break  # Exit the loop if interaction is successful
+            except StaleElementReferenceException:
+                time.sleep(0.5)
         WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.find_more_button))
         self.browser.refresh()
         # alert = Alert(self.browser)
