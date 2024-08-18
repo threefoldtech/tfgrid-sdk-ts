@@ -179,8 +179,7 @@ export default {
 
     const currentTheme = ref(localStorage.getItem(THEME_KEY));
 
-    watch(theme.global.name, theme => {
-      localStorage.setItem(THEME_KEY, theme);
+    watch(theme.global.name, () => {
       currentTheme.value = localStorage.getItem(THEME_KEY);
     });
 
@@ -195,6 +194,7 @@ export default {
     const selectedDeploymentTimeout = ref(0);
     const isValidTimeout = ref(false);
     const isValidPassword = ref(false);
+
     onMounted(async () => {
       currentQueryTimeout.value = +localStorage.getItem(TIMEOUT_QUERY_KEY)!;
       selectedQueryTimeout.value = currentQueryTimeout.value;

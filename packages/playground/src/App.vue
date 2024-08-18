@@ -219,6 +219,8 @@ const theme = useTheme();
 const navbarConfig = ref();
 const TIMEOUT_QUERY_KEY = "APP_QUERY_TIMEOUT";
 const TIMEOUT_DEPLOYMENT_KEY = "APP_DEPLOYMENT_TIMEOUT";
+const THEME_KEY = "APP_CURRENT_THEME";
+const getCurrentTheme = ref(window.matchMedia("(prefers-color-scheme: dark)").matches);
 
 const hasGrid = computed(() => !!gridStore.grid);
 
@@ -236,6 +238,17 @@ function setSidebarOnResize() {
 }
 
 window.addEventListener("resize", setSidebarOnResize);
+const themeMatcher = window.matchMedia("(prefers-color-scheme: dark)");
+themeMatcher.addEventListener("change", updateTheme);
+function updateTheme() {
+  if (themeMatcher.matches) {
+    localStorage.setItem(THEME_KEY, "dark");
+    theme.global.name.value = "dark";
+  } else {
+    localStorage.setItem(THEME_KEY, "light");
+    theme.global.name.value = "light";
+  }
+}
 
 watch(
   () => $route.meta,
@@ -249,7 +262,6 @@ watch(
 function navigateToHome() {
   return $router.push(DashboardRoutes.Other.HomePage);
 }
-
 onMounted(window.$$appLoader || noop);
 
 onMounted(() => {
