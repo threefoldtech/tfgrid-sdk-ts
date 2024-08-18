@@ -111,7 +111,7 @@
           :rules="[
             validators.required('Query timeout is required.'),
             validators.isInt('Timeout must be a valid integer.'),
-            validators.min(`Query timeout should be at least 1 second.`, 1),
+            validators.min(`Query timeout should be at least 3 second.`, 3),
           ]"
           #="{ props }"
           ref="timeoutQueryInput"
@@ -136,7 +136,7 @@
           :rules="[
             validators.required('Deployment timeout is required.'),
             validators.isInt('Timeout must be a valid integer.'),
-            validators.min(`Deployment timeout should be at least 1 second.`, 1),
+            validators.min(`Deployment timeout should be at least 3 second.`, 3),
           ]"
           #="{ props }"
           ref="timeoutDeploymentInput"
@@ -163,7 +163,6 @@ import md5 from "md5";
 import { onMounted, ref, watch } from "vue";
 import { useTheme } from "vuetify";
 
-import type { Validators } from "@/types";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
 
 import { getCredentials, updateCredentials } from "../utils/credentials";
