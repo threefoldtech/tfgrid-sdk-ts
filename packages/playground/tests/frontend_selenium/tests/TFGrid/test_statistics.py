@@ -3,8 +3,7 @@ from utils.utils import byte_converter,convert_to_scaled_float
 from pages.statistics import StatisticsPage
 from utils.grid_proxy import GridProxy
 from pages.dashboard import DashboardPage
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.action_chains import ActionChains
+
 
 
 def before_test_setup(browser):
