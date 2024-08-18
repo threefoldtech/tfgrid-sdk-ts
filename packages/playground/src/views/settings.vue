@@ -29,19 +29,13 @@
             #="{ props: validationProps }"
             ref="currentpasswordInput"
           >
-            <v-tooltip location="top right" text="Please enter your current password.">
-              <template #activator="{ props: tooltipProps }">
-                <div v-bind="tooltipProps">
-                  <VTextField
-                    label="Current Password"
-                    v-model="currentPassword"
-                    v-bind="{ ...passwordInputProps, ...validationProps }"
-                    autocomplete="off"
-                    class="pa-3"
-                  />
-                </div>
-              </template>
-            </v-tooltip>
+            <VTextField
+              label="Current Password"
+              v-model="currentPassword"
+              v-bind="{ ...passwordInputProps, ...validationProps }"
+              autocomplete="off"
+              class="pa-3"
+            />
           </InputValidator>
         </PasswordInputWrapper>
 
@@ -56,19 +50,13 @@
             #="{ props: validationProps }"
             ref="newPasswordInput"
           >
-            <v-tooltip location="top right" text="Please enter your current password.">
-              <template #activator="{ props: tooltipProps }">
-                <div v-bind="tooltipProps">
-                  <VTextField
-                    label="New Password"
-                    v-model="newPassword"
-                    v-bind="{ ...passwordInputProps, ...validationProps }"
-                    autocomplete="off"
-                    class="pa-3"
-                  />
-                </div>
-              </template>
-            </v-tooltip>
+            <VTextField
+              label="New Password"
+              v-model="newPassword"
+              v-bind="{ ...passwordInputProps, ...validationProps }"
+              autocomplete="off"
+              class="pa-3"
+            />
           </InputValidator>
         </PasswordInputWrapper>
         <PasswordInputWrapper #="{ props: confirmPasswordInputProps }">
