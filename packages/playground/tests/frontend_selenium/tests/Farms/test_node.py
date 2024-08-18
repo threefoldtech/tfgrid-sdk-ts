@@ -145,7 +145,7 @@ def test_config_validation(browser):
     nodes = grid_proxy.get_twin_node(str(node_page.twin_id))
     node_id = nodes[random.randint(0,len(nodes)-1)]['nodeId']
     node_page.setup_config(node_id)
-    cases = [generate_inavalid_ip(), '1.0.0.0/66', '239.255.255/17', '239.15.35.78.5/25', '239.15.35.78.5', ' ', '*.#.@.!|+-']
+    cases = [generate_string(), '1.0.0.0/66', '239.255.255/17', '239.15.35.78.5/25', '239.15.35.78.5', ' ', '*.#.@.!|+-']
     assert node_page.add_config_input( "1.1.1.1/16", '1.1.1.2', '::2/16', '::1', 'tf.grid').is_enabled() == True
     for case in cases:
         node_page.add_config_input(case, 0, 0, 0, 0)
