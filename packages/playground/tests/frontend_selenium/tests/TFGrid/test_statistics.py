@@ -40,6 +40,8 @@ def test_statistics_details(browser):
     assert grid_statistics_details['publicIps'] == statistics_details_converted[12]
     assert grid_statistics_details['contracts'] == statistics_details_converted[13]
     assert grid_statistics_details['workloads_number'] == statistics_details_converted[14]
+    assert statistics_page.grid_status_link() == 'https://status.grid.tf/status/threefold/'
+    assert statistics_page.node_monitoring_link() == 'https://metrics.grid.tf/d/rYdddlPWkfqwf/zos-host-metrics?orgId=2&refresh=30s/'
 
 
     

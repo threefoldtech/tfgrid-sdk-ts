@@ -11,6 +11,8 @@ class StatisticsPage:
 
     logout_button = (By.XPATH, "//button[.//span[text()=' Logout ']]")
     tfgrid_button = (By.XPATH, "//span[text()='TFGrid']")
+    grid_status_button = (By.XPATH, "//span[text()='Grid Status']")
+    node_monitoring_button = (By.XPATH, "//span[text()='Node Monitoring']")
     statistics_button = (By.XPATH, "//span[text()='Node Statistics']")
     statistics_label = (By.XPATH, "//*[contains(text(), 'Statistics')]")
     map= (By.XPATH, "/html/body/div[1]/div/div/main/div/div[2]/div/div/div/div[3]/div[2]")
@@ -78,3 +80,19 @@ class StatisticsPage:
             print(f"TimeoutException: {e}")
         
         return details
+    
+    def get_link(self):
+        WebDriverWait(self.browser, 30).until(EC.number_of_windows_to_be(2))
+        self.browser.switch_to.window(self.browser.window_handles[1])
+        url = self.browser.current_url
+        self.browser.close()
+        self.browser.switch_to.window(self.browser.window_handles[0])
+        return url
+    
+    def grid_status_link(self):
+        self.browser.find_element(*self.grid_status_button).click()
+        return self.get_link()
+    
+    def node_monitoring_link(self):
+        self.browser.find_element(*self.node_monitoring_button).click()
+        return self.get_link()
