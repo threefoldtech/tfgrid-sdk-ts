@@ -200,7 +200,9 @@ async function loadDomains() {
     const grid = await getGrid(profileManager.profile!, props.projectName.toLowerCase());
     const gateways = await grid!.gateway.list();
     items.value = await Promise.all(gateways.map(name => grid!.gateway.get_name({ name })));
-  } catch {
+  } catch (e) {
+    errorMessage.value = `Failed to load Deployments: ${e}`;
+  } finally {
     loading.value = false;
   }
 }

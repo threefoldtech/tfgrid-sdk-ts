@@ -191,4 +191,8 @@ export const deploymentListEnvironments = {
     SSH_KEY: _ssh,
     NODE_PILOT_HOSTNAME: "Node Pilot Hostname",
   },
+  domains: {
+    SSH_KEY: _ssh,
+    FQDN: "Site URL",
+  },
 };

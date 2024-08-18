@@ -28,7 +28,7 @@
         </v-card-title>
         <v-card-text>
           <template v-if="showType === 0">
-            <v-form readonly v-if="contract">
+            <v-form readonly v-if="contract && data.type !== 'gateway-name-proxy'">
               <v-alert class="my-4" variant="tonal" v-if="contract.customDomain" type="info">
                 Make sure to create an A record on your name provider with
                 <span class="font-weight-bold">{{ contract.customDomain }}</span>
@@ -101,6 +101,11 @@
               </template>
               <CopyReadonlyInput label="GPU Cards" :data="gpuInfo" :loading="loadingCard" v-if="showGpuCard" />
               <CopyReadonlyInput label="Monitoring URL" :data="grafanaURL" :loading="isLoading" />
+            </v-form>
+            <v-form readonly v-else>
+              <CopyReadonlyInput label="Name" :data="data.name" />
+              <CopyReadonlyInput label="IP" :data="data.data.backends" />
+              <CopyReadonlyInput label="Domain" :data="data.result.data.fqdn" />
             </v-form>
           </template>
           <template v-else>

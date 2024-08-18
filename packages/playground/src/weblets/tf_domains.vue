@@ -45,6 +45,7 @@
           <v-text-field label="IP" v-model="ip" v-bind="props" />
         </input-validator>
       </input-tooltip>
+      <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
     </d-tabs>
 
     <template #footer-actions="{ validateBeforeDeploy }">
@@ -56,12 +57,12 @@
 <script lang="ts" setup>
 import type { GridClient } from "@threefold/grid_client";
 import type Contract from "@threefold/gridproxy_client";
-import { onMounted, ref } from "vue";
+import { ref } from "vue";
 
 import { useLayout } from "../components/weblet_layout.vue";
 import { useGrid } from "../stores";
 import { ProjectName } from "../types";
-import { deployGatewayName, type GridGateway, loadDeploymentGateways, rollbackDeployment } from "../utils/gateway";
+import { deployGatewayName, rollbackContract } from "../utils/gateway";
 import { normalizeError } from "../utils/helpers";
 import { generateName } from "../utils/strings";
 
@@ -72,19 +73,24 @@ const name = ref(generateName({ prefix: "dm" }));
 const subdomain = ref(generateName({ prefix: "dm" }));
 const port = ref(80);
 const selectionDetails = ref<SelectionDetails>();
+const selectedSSHKeys = ref("");
+
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
 
 function finalize(deployment: any) {
-  // layout.value.reloadDeploymentsList();
+  layout.value.reloadDeploymentsList();
   layout.value.setStatus("success", "Successfully deployed a Domains instance.");
-  layout.value.openDialog(deployment, false, true);
+  layout.value.openDialog(deployment, deploymentListEnvironments.domains);
 }
 
 async function deploy() {
   layout.value.setStatus("deploy");
 
   const projectName = ProjectName.Domains.toLowerCase() + "/" + name.value;
+  const domain = selectionDetails.value?.domain?.enabledCustomDomain
+    ? selectionDetails.value.domain.customDomain
+    : subdomain.value + "." + selectionDetails.value?.domain?.selectedDomain?.publicConfig.domain;
 
   try {
     updateGrid(grid, { projectName });
@@ -99,20 +105,30 @@ async function deploy() {
     });
 
     contractId.value = gateway.contracts.created[0].contractId;
-    const contract = await grid.contracts.get({ id: contractId.value });
-    finalize(contract);
+    const gw = await grid.gateway.get_name({ name: subdomain.value });
+    const workload = gw[0].workloads[0];
+
+    finalize(workload);
   } catch (e) {
     layout.value.setStatus("deploy", "Rollbacking back due to fail to deploy gateway...");
-    await rollbackDeployment(grid!, contractId.value);
+    await rollbackContract(grid!, contractId.value);
     layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Domains instance."));
   }
+}
+function updateSSHkeyEnv(selectedKeys: string) {
+  selectedSSHKeys.value = selectedKeys;
 }
 </script>
 
 <script lang="ts">
+import { deploymentListEnvironments } from "@/constants";
+
+import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import type { SelectionDetails } from "../types/nodeSelector";
 import { updateGrid } from "../utils/grid";
+
 export default {
   name: "TfDomains",
+  components: { ManageSshDeployemnt },
 };
 </script>

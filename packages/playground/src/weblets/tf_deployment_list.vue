@@ -221,7 +221,7 @@
           <IconActionBtn
             tooltip="Show Details"
             icon="mdi-eye-outline"
-            @click="openDialog(tabs[activeTab].value, item)"
+            @click="openDialog(tabs[activeTab].value, item[0].workloads[0])"
           />
 
           <IconActionBtn
