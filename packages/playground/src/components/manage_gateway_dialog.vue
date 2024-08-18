@@ -8,7 +8,7 @@
       attach="#modals"
     >
       <weblet-layout ref="layout" @back="onBack">
-        <template #title>Manage Domains ({{ vm.name }})</template>
+        <template #title>Manage Domains ({{ vm ? vm.name : k8s.masters[0].name }})</template>
 
         <v-tabs align-tabs="center" color="secondary" class="mb-6" v-model="gatewayTab" :disabled="deleting">
           <v-tab>Domains List</v-tab>
@@ -218,7 +218,8 @@ export default {
   name: "ManageGatewayDialog",
   components: { ListTable, IconActionBtn },
   props: {
-    vm: { type: Object as PropType<any>, required: true },
+    vm: { type: Object as PropType<any>, required: false },
+    k8s: { type: Object as PropType<any>, required: false },
   },
   setup(props) {
     const layout = useLayout();
@@ -235,7 +236,7 @@ export default {
     const selectionDetails = ref<SelectionDetails>();
     const networks = ref<VMNetwork[]>([]);
     const selectedIPAddress = ref<VMNetwork | null>(null);
-    const networkName = props.vm.interfaces[0].network as string;
+    const networkName = props.vm ? (props.vm.interfaces[0].network as string) : "";
     const gridStore = useGrid();
     const grid = gridStore.client as GridClient;
 
@@ -269,7 +270,7 @@ export default {
         gateways.value = [];
         gatewaysToDelete.value = [];
         loadingGateways.value = true;
-        updateGrid(grid, { projectName: props.vm.projectName });
+        updateGrid(grid, { projectName: props.vm ? props.vm.projectName : props.k8s.projectName });
 
         const { gateways: gws, failedToList } = await loadDeploymentGateways(grid, {
           filter: gw => true,
@@ -348,7 +349,20 @@ export default {
     }
 
     function getSupportedNetworks() {
-      const { publicIP, planetary, myceliumIP, interfaces } = props.vm;
+      let publicIP, planetary, myceliumIP, interfaces;
+      if (props.vm) {
+        const VM = props.vm;
+        publicIP = VM.publicIP;
+        planetary = VM.planetary;
+        myceliumIP = VM.myceliumIP;
+        interfaces = VM.interfaces;
+      } else if (props.k8s) {
+        const master = props.k8s.masters[0];
+        publicIP = master.publicIP;
+        planetary = master.planetary;
+        myceliumIP = master.myceliumIP;
+        interfaces = master.interfaces;
+      }
 
       addNetwork(NetworkInterfaces.WireGuard, interfaces?.[0]?.ip);
       addNetwork(NetworkInterfaces.Planetary, planetary);
@@ -387,10 +401,17 @@ export default {
     }
 
     function suggestName() {
-      oldPrefix.value =
-        (props.vm.projectName.toLowerCase().includes(ProjectName.Fullvm.toLowerCase()) ? "fvm" : "vm") +
-        grid.config.twinId;
-      prefix.value = oldPrefix.value + props.vm.name.includes("_") ? props.vm.name.replace("_", "") : props.vm.name;
+      if (props.k8s) {
+        oldPrefix.value = props.k8s.projectName.toLowerCase().includes(ProjectName.Fullvm.toLowerCase())
+          ? "k8s"
+          : "k8s" + grid.config.twinId;
+        prefix.value = oldPrefix.value + props.k8s.masters[0].name;
+      } else {
+        oldPrefix.value =
+          (props.vm.projectName.toLowerCase().includes(ProjectName.Fullvm.toLowerCase()) ? "fvm" : "vm") +
+          grid.config.twinId;
+        prefix.value = oldPrefix.value + props.vm.name;
+      }
       subdomain.value = generateName({ prefix: prefix.value }, 4).toLowerCase();
     }
 
