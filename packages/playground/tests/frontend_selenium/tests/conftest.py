@@ -13,7 +13,7 @@ def browser():
 
     # Virtual display for the browser, allowing it to run in headless mode
     display = Display(visible=0, size=(1920, 1080))
-    display.start()
+    #display.start()
 
     # Initialize the ChromeDriver instance with options
     options = webdriver.ChromeOptions()
@@ -30,4 +30,4 @@ def browser():
     # Quit the WebDriver instance for the cleanup
     driver.quit()
     # Ending virtual display for the browser
-    display.stop()
+    #display.stop()

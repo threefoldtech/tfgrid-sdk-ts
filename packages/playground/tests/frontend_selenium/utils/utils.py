@@ -175,16 +175,29 @@ def randomize_public_ipv4():
     ip_subnet = ip + '/' + random.choice(['26', '27', '28', '29'])
     return ip_subnet, ip
 
+
+def convert_to_scaled_float(number):
+    str_number = str(number)
+    if '.' in str_number:
+        decimal_index = str_number.index('.')
+    else:
+        decimal_index = len(str_number)
+    divisor = 10 ** decimal_index
+    scaled_number = number / divisor
+    return scaled_number
+
+
+
 def byte_converter(value):
     if value != '0':
         if value[-2] == 'P':
-            return float(value[:-3])*(1024*2)
+            return float(value[:-3]) * (1024 ** 5)
         elif value[-2] == 'T':
-            return float(value[:-3])*1024
-        else:
+            return float(value[:-3]) * (1024 ** 4)
+        elif value[-2] == 'G':
             return float(value[:-3])
-    else:
-        return float(value)
+    return float(value)
+
 
 def get_min(nodes, resource):
     min = nodes[0][resource]
