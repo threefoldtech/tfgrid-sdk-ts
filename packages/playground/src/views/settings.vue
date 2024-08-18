@@ -89,11 +89,16 @@
       ><v-card-title>Timeout</v-card-title>
 
       <form-validator v-model="isValidTimeout">
-        <v-tooltip text="Set desired queries timeout in seconds" location="top right">
-          <template v-slot:activator="{ props }">
-            <v-card-text v-bind="props">Adjust Query Timeout <v-icon icon="mdi-information-outline" /></v-card-text>
-          </template>
-        </v-tooltip>
+        <v-card-text>
+          Adjust Query Timeout
+          <v-tooltip location="end">
+            <template #activator="{ props: tooltipProps }">
+              <v-icon v-bind="tooltipProps"> mdi-information-outline </v-icon>
+            </template>
+            <span>Set desired queries timeout in seconds</span>
+          </v-tooltip>
+        </v-card-text>
+
         <input-validator
           :value="selectedQueryTimeout"
           :rules="[
@@ -112,13 +117,16 @@
             v-model="selectedQueryTimeout"
           ></v-text-field>
         </input-validator>
-        <v-tooltip text="Set the desired timeout for deployments" location="top right">
-          <template v-slot:activator="{ props }">
-            <v-card-text v-bind="props"
-              >Adjust Deployment Timeout <v-icon icon="mdi-information-outline"
-            /></v-card-text>
-          </template>
-        </v-tooltip>
+
+        <v-card-text>
+          Adjust Deployment Timeout
+          <v-tooltip location="end">
+            <template #activator="{ props: tooltipProps }">
+              <v-icon v-bind="tooltipProps"> mdi-information-outline </v-icon>
+            </template>
+            <span>Set desired deployment timeout in seconds</span>
+          </v-tooltip>
+        </v-card-text>
         <input-validator
           :value="selectedDeploymentTimeout"
           :rules="[
