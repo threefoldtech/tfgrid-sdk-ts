@@ -163,7 +163,7 @@ import md5 from "md5";
 import { onMounted, ref, watch } from "vue";
 import { useTheme } from "vuetify";
 
-import { Validators } from "@/types";
+import type { Validators } from "@/types";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
 
 import { getCredentials, updateCredentials } from "../utils/credentials";
