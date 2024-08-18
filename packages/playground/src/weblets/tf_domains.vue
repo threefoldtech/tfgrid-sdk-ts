@@ -1,6 +1,6 @@
 <template>
-  <weblet-layout ref="layout" title-image="images/icons/expose.png">
-    <template #title>Deploy an Expose Instance </template>
+  <weblet-layout ref="layout" title-image="images/icons/domains.png">
+    <template #title>Deploy a Domains Instance </template>
 
     <d-tabs :tabs="[{ title: 'Config', value: 'config' }]">
       <input-tooltip tooltip="Selecting custom domain sets subdomain as gateway name.">
@@ -35,14 +35,14 @@
       </input-tooltip>
 
       <input-tooltip
-        tooltip="User's machine's public IP , It could be Mycelium IP, Yggdrasil IP, or a public IP (IPv4 or IPv6)."
+        tooltip="User's machine's IP , It could be Mycelium IP, Yggdrasil IP, or a public IP (IPv4 or IPv6)."
       >
         <input-validator
           :value="ip"
-          :rules="[validators.required('Public IP is required.'), validators.isIP('Public IP is not valid.')]"
+          :rules="[validators.required('IP is required.'), validators.isIP('Public IP is not valid.')]"
           #="{ props }"
         >
-          <v-text-field label="Public IP" v-model="ip" v-bind="props" />
+          <v-text-field label="IP" v-model="ip" v-bind="props" />
         </input-validator>
       </input-tooltip>
     </d-tabs>
@@ -55,38 +55,36 @@
 
 <script lang="ts" setup>
 import type { GridClient } from "@threefold/grid_client";
+import type Contract from "@threefold/gridproxy_client";
 import { ref } from "vue";
 
 import { useLayout } from "../components/weblet_layout.vue";
 import { useGrid } from "../stores";
 import { ProjectName } from "../types";
-import { deployGatewayName, rollbackDeployment } from "../utils/gateway";
+import { deployGatewayName, type GridGateway, loadDeploymentGateways, rollbackDeployment } from "../utils/gateway";
 import { normalizeError } from "../utils/helpers";
 import { generateName } from "../utils/strings";
 
 const layout = useLayout();
 const ip = ref();
-const name = ref(generateName({ prefix: "ex" }));
-const subdomain = ref(generateName({ prefix: "ex" }));
+const contractId = ref();
+const name = ref(generateName({ prefix: "dm" }));
+const subdomain = ref(generateName({ prefix: "dm" }));
 const port = ref(80);
 const selectionDetails = ref<SelectionDetails>();
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
 
 function finalize(deployment: any) {
-  layout.value.reloadDeploymentsList();
-  layout.value.setStatus("success", "Successfully deployed an Expose instance.");
-  layout.value.openDialog(deployment, deploymentListEnvironments.expose);
+  // layout.value.reloadDeploymentsList();
+  layout.value.setStatus("success", "Successfully deployed a Domains instance.");
+  layout.value.openDialog(deployment, false, true);
 }
 
 async function deploy() {
   layout.value.setStatus("deploy");
 
-  const projectName = ProjectName.Expose.toLowerCase() + "/" + name.value;
-  // console.log(projectName);
-  // const domain = selectionDetails.value?.domain?.enabledCustomDomain
-  //   ? selectionDetails.value.domain.customDomain
-  //   : subdomain.value + "." + selectionDetails.value?.domain?.selectedDomain?.publicConfig.domain;
+  const projectName = ProjectName.Domains.toLowerCase() + "/" + name.value;
 
   try {
     updateGrid(grid, { projectName });
@@ -94,31 +92,27 @@ async function deploy() {
 
     layout.value.setStatus("deploy", "Preparing to deploy gateway...");
 
-    const gateway = await deployGatewayName(grid, selectionDetails.value?.domain, {
+    const gateway: any = await deployGatewayName(grid, selectionDetails.value?.domain, {
       subdomain: subdomain.value,
       ip: ip.value,
       port: port.value,
     });
-    console.log("gateway", gateway);
-    finalize(gateway);
+
+    contractId.value = gateway.contracts.created[0].contractId;
+    const contract = await grid.contracts.get({ id: contractId.value });
+    finalize(contract);
   } catch (e) {
     layout.value.setStatus("deploy", "Rollbacking back due to fail to deploy gateway...");
-
-    // await rollbackDeployment(grid!, subdomain.value);
-    layout.value.setStatus("failed", normalizeError(e, "Failed to deploy am expose instance."));
+    await rollbackDeployment(grid!, contractId.value);
+    layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Domains instance."));
   }
 }
-
-// function updateSSHkeyEnv(selectedKeys: string) {
-//   selectedSSHKeys.value = selectedKeys;
-// }
 </script>
 
 <script lang="ts">
-import { deploymentListEnvironments } from "../constants";
 import type { SelectionDetails } from "../types/nodeSelector";
 import { updateGrid } from "../utils/grid";
 export default {
-  name: "TfExpose",
+  name: "TfDomains",
 };
 </script>

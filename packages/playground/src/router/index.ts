@@ -365,11 +365,11 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
       },
     },
     {
-      path: DashboardRoutes.Applications.Expose,
-      component: () => import("../views/expose_view.vue"),
+      path: DashboardRoutes.Applications.Domains,
+      component: () => import("../views/domains_view.vue"),
       meta: {
-        title: "Expose",
-        info: { page: "info/expose.md" },
+        title: "Domains",
+        info: { page: "info/domains.md" },
         navbarConfig: {
           back: true,
           path: [
@@ -380,7 +380,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
               to: DashboardRoutes.Deploy.Applications,
             },
             {
-              title: "Expose",
+              title: "Domains",
             },
           ],
         },

@@ -217,7 +217,7 @@
           />
         </template>
 
-        <template #Expose-actions="{ item }">
+        <template #Domains-actions="{ item }">
           <IconActionBtn
             tooltip="Show Details"
             icon="mdi-eye-outline"
@@ -227,7 +227,7 @@
             tooltip="Visit"
             icon="mdi-web"
             color="anchor"
-            :href="'https://' + item.env.EXPOSE_WEBSERVER_HOSTNAME"
+            :href="'https://' + item.env.Domains_WEBSERVER_HOSTNAME"
           />
         </template>
 
@@ -433,7 +433,7 @@ const tabs: Tab[] = [
   { title: "TFRobot", value: "TFRobot", imgPath: "images/icons/tfrobot.png" },
   { title: "Gitea", value: "Gitea", imgPath: "images/icons/gitea.png" },
   { title: "Nostr", value: "Nostr", imgPath: "images/icons/nostr.png" },
-  { title: "Expose", value: "Expose", imgPath: "images/icons/expose.png" },
+  { title: "Domains", value: "Domains", imgPath: "images/icons/domains.png" },
 ];
 
 const layout = useLayout();

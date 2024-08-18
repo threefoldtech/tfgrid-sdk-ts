@@ -1,9 +1,9 @@
 <template>
   <view-layout>
-    <TfExpose />
+    <TfDomains />
 
     <template #list>
-      <TfDeploymentList title="Expose" :project-name="name" />
+      <TfDeploymentList title="Domains" :project-name="name" />
     </template>
   </view-layout>
 </template>
@@ -11,16 +11,16 @@
 <script lang="ts">
 import { ProjectName } from "../types";
 import TfDeploymentList from "../weblets/tf_deployment_list.vue";
-import TfExpose from "../weblets/tf_expose.vue";
+import TfDomains from "../weblets/tf_domains.vue";
 
 export default {
-  name: "ExposeView",
+  name: "DomainsView",
   components: {
-    TfExpose,
+    TfDomains,
     TfDeploymentList,
   },
   setup() {
-    return { name: ProjectName.Expose };
+    return { name: ProjectName.Domains };
   },
 };
 </script>

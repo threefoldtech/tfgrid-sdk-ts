@@ -145,11 +145,11 @@ export default {
         route: DashboardRoutes.Applications.Wordpress,
       },
       {
-        title: "Expose",
+        title: "Domains",
         excerpt:
-          "Expose allows users to securely expose servers hosted on local machines or VMs to the public internet.",
-        icon: "expose.png",
-        route: DashboardRoutes.Applications.Expose,
+          "Domains allow users to securely expose servers hosted on local machines or VMs to the public internet.",
+        icon: "domains.png",
+        route: DashboardRoutes.Applications.Domains,
       },
     ];
     cards = cards.sort((a, b) => a.title.localeCompare(b.title));
