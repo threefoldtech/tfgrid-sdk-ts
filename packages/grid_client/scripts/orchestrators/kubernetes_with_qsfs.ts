@@ -54,7 +54,7 @@ async function main() {
   };
 
   const qsfsQueryOptions: FilterOptions = {
-    hru: 15,
+    hru: count * disk_size,
     availableFor: grid3.twinId,
     farmId: 1,
   };
@@ -66,8 +66,7 @@ async function main() {
 
   // Loop over filtered nodes and push in qsfsNodes until they have the required resources
   for (const node of nodes) {
-    const freeResources = await grid3.capacity.nodes.getNodeFreeResources(node.nodeId);
-    const freeHRU = freeResources.hru / 1024 ** 3;
+    const freeHRU = (node.total_resources.hru - node.used_resources.hru) / 1024 ** 3;
 
     if (freeHRU >= disk_size && usedResources <= disk_size * count) {
       qsfsNodes.push(node.nodeId);
@@ -158,8 +157,8 @@ async function main() {
   await getDeployment(grid3, name);
 
   // //Uncomment the line below to cancel the deployment
-  await cancel(grid3, k.name);
-  await deleteQsfs(grid3, qsfs_name);
+  // await cancel(grid3, k.name);
+  // await deleteQsfs(grid3, qsfs_name);
 
   await grid3.disconnect();
 }
