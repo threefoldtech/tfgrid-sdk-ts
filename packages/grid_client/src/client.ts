@@ -106,8 +106,16 @@ class GridClient {
    *
    * @returns {Promise<void>} A promise that resolves when the client options got updated.
    */
-  async setServiceURLs(): Promise<void> {
-    await getAvailableURLs(this.clientOptions);
+  private async setServiceURLs(): Promise<void> {
+    const { proxyURL, relayURL, substrateURL, graphqlURL, activationURL } = await getAvailableURLs(this.clientOptions);
+    this.clientOptions = {
+      ...this.clientOptions,
+      proxyURL,
+      relayURL,
+      substrateURL,
+      graphqlURL,
+      activationURL,
+    };
   }
 
   /**

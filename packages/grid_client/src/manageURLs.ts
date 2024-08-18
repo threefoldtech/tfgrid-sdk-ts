@@ -18,7 +18,13 @@ enum MapServiceNames {
   activationURL = "Activation",
   graphqlURL = "GraphQl",
 }
-
+type serviceURLs = {
+  proxyURL: string;
+  relayURL: string;
+  substrateURL: string;
+  graphqlURL: string;
+  activationURL: string;
+};
 /**
  * Retrieves a list of services that do not have associated URLs.
  *
@@ -87,11 +93,10 @@ function mapResult(result: { [key: string]: string | null }, services: string[])
  *
  * This function checks which service URLs are missing in the provided client options,
  * prepares the services with predefined URLs, and uses a `ServiceUrlManager` to
- * retrieve available service URLs. The retrieved URLs are then assigned back to the
- * client options.
+ * retrieve available service URLs.
  *
  * @param {ClientOptions} clientOptions - The client options containing service URLs and network environment.
- * @returns {Promise<void>} A promise that resolves when the URLs have been retrieved and assigned.
+ * @returns {Promise<serviceURLs>} A promise that resolves to an object containing the updated service URLs.
  */
 export async function getAvailableURLs(clientOptions: ClientOptions) {
   const { proxyURL, relayURL, substrateURL, graphqlURL, activationURL, network } = clientOptions;
@@ -109,7 +114,7 @@ export async function getAvailableURLs(clientOptions: ClientOptions) {
   };
   const missingServicesURLS = getServicesWithoutURLs(currentURLs);
 
-  if (missingServicesURLS.length == 0) return;
+  if (missingServicesURLS.length == 0) return currentURLs as serviceURLs;
 
   const services = missingServicesURLS.reduce((acc, servicesName) => {
     acc.push(prepareServices(servicesName, URLS[servicesName]));
@@ -117,7 +122,6 @@ export async function getAvailableURLs(clientOptions: ClientOptions) {
   }, [] as Service[]);
   const result = await new ServiceUrlManager({
     services: services,
-    silent: true,
   }).getAvailableServicesStack();
-  Object.assign(clientOptions, mapResult(result, missingServicesURLS));
+  return Object.assign(currentURLs, mapResult(result, missingServicesURLS)) as serviceURLs;
 }
