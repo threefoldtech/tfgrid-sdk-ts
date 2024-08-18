@@ -124,13 +124,13 @@
               </input-tooltip>
             </div>
 
-            <copy-input-wrapper #="{ props }" :data="networkName">
-              <v-text-field label="Network name" v-model="networkName" readonly v-bind="props" />
-            </copy-input-wrapper>
-
-            <v-select label="Supported IPs" :items="networks" v-model="selectedIPAddress" />
+            <v-select label="Supported Interfaces" class="mt-4" :items="networks" v-model="selectedIPAddress" />
             <copy-input-wrapper #="{ props }" :data="(selectedIPAddress as any)">
               <v-text-field :readonly="true" label="Selected IP Address" v-model="selectedIPAddress" v-bind="props" />
+            </copy-input-wrapper>
+
+            <copy-input-wrapper #="{ props }" :data="networkName" v-if="isWireGuard">
+              <v-text-field label="Network name" v-model="networkName" readonly v-bind="props" />
             </copy-input-wrapper>
           </form-validator>
         </div>
@@ -186,7 +186,12 @@ import { onMounted, type PropType, ref, watch } from "vue";
 import { useGrid } from "../stores";
 import { ProjectName } from "../types";
 import type { SelectionDetails } from "../types/nodeSelector";
-import { deployGatewayName, type GridGateway, loadDeploymentGateways } from "../utils/gateway";
+import {
+  type DeployGatewayConfig,
+  deployGatewayName,
+  type GridGateway,
+  loadDeploymentGateways,
+} from "../utils/gateway";
 import { updateGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
 import { generateName } from "../utils/strings";
@@ -201,6 +206,14 @@ type VMNetwork = {
   value: string;
 };
 
+enum NetworkInterfaces {
+  PublicIPV4 = "Public IPv4",
+  PublicIPV6 = "Public IPv6",
+  Planetary = "Planetary",
+  Mycelium = "Mycelium",
+  WireGuard = "WireGuard",
+}
+
 export default {
   name: "ManageGatewayDialog",
   components: { ListTable, IconActionBtn },
@@ -211,6 +224,7 @@ export default {
     const layout = useLayout();
     const gatewayTab = ref(0);
     const dialogVisible = ref(true);
+    const isWireGuard = ref(false);
 
     const oldPrefix = ref("");
     const prefix = ref("");
@@ -235,12 +249,7 @@ export default {
 
     onMounted(async () => {
       updateGrid(grid, { projectName: "" });
-
-      oldPrefix.value =
-        (props.vm.projectName.toLowerCase().includes(ProjectName.Fullvm.toLowerCase()) ? "fvm" : "vm") +
-        grid.config.twinId;
-      prefix.value = oldPrefix.value + props.vm.name;
-      subdomain.value = generateName({ prefix: prefix.value }, 4);
+      suggestName();
       await loadGateways();
       getSupportedNetworks();
     });
@@ -277,10 +286,17 @@ export default {
     async function deployGateway() {
       layout.value.setStatus("deploy");
       try {
-        let IP = selectedIPAddress.value as unknown as string;
-        const isWireGuard = networks.value.find(net => net.value === IP)?.title === "WireGuard IP";
+        const IP = selectedIPAddress.value as unknown as string;
 
-        if (isWireGuard) {
+        const gwConfig: DeployGatewayConfig = {
+          subdomain: subdomain.value,
+          ip: IP,
+          port: port.value,
+          tlsPassthrough: passThrough.value,
+        };
+
+        if (isWireGuard.value) {
+          gwConfig.network = networkName;
           const [x, y] = IP.split(".");
           const data = {
             name: networkName,
@@ -296,17 +312,8 @@ export default {
           }
         }
 
-        if (IP.includes("/")) {
-          IP = IP.split("/")[0];
-        }
-
-        await deployGatewayName(grid, selectionDetails.value!.domain, {
-          subdomain: subdomain.value,
-          ip: IP,
-          port: port.value,
-          network: networkName,
-          tlsPassthrough: passThrough.value,
-        });
+        await deployGatewayName(grid, selectionDetails.value!.domain, gwConfig);
+        suggestName();
         layout.value.setStatus("success", "Successfully deployed gateway.");
       } catch (error) {
         layout.value.setStatus("failed", normalizeError(error, "Something went wrong."));
@@ -343,11 +350,11 @@ export default {
     function getSupportedNetworks() {
       const { publicIP, planetary, myceliumIP, interfaces } = props.vm;
 
-      addNetwork("IPV6", publicIP?.ip6);
-      addNetwork("IPV4", publicIP?.ip);
-      addNetwork("Planetary IP", planetary);
-      addNetwork("Mycelium IP", myceliumIP);
-      addNetwork("WireGuard IP", interfaces?.[0]?.ip);
+      addNetwork(NetworkInterfaces.WireGuard, interfaces?.[0]?.ip);
+      addNetwork(NetworkInterfaces.Planetary, planetary);
+      addNetwork(NetworkInterfaces.Mycelium, myceliumIP);
+      addNetwork(NetworkInterfaces.PublicIPV6, publicIP?.ip6.split("/")[0]);
+      addNetwork(NetworkInterfaces.PublicIPV4, publicIP?.ip.split("/")[0]);
       selectedIPAddress.value = networks.value[0];
     }
 
@@ -357,6 +364,9 @@ export default {
         if (selectedIPAddress.value?.value) {
           selectedIPAddress.value = selectedIPAddress.value.value as unknown as VMNetwork;
         }
+
+        const IP = selectedIPAddress.value as unknown as string;
+        isWireGuard.value = networks.value.find(net => net.value === IP)?.title === NetworkInterfaces.WireGuard;
       },
       { deep: true },
     );
@@ -374,6 +384,14 @@ export default {
     function onBack() {
       gatewayTab.value = 0;
       loadGateways();
+    }
+
+    function suggestName() {
+      oldPrefix.value =
+        (props.vm.projectName.toLowerCase().includes(ProjectName.Fullvm.toLowerCase()) ? "fvm" : "vm") +
+        grid.config.twinId;
+      prefix.value = oldPrefix.value + props.vm.name.includes("_") ? props.vm.name.replace("_", "") : props.vm.name;
+      subdomain.value = generateName({ prefix: prefix.value }, 4).toLowerCase();
     }
 
     const subdomainRules = [
@@ -419,6 +437,7 @@ export default {
       tableHeaders,
       subdomainRules,
       portRules,
+      isWireGuard,
     };
   },
 };
