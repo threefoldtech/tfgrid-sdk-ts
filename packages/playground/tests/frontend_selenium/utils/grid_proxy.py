@@ -64,8 +64,8 @@ class GridProxy:
     
 
     def get_stats(self):
-        up = requests.get(Base.gridproxy_url + 'stats?status=up', timeout=5).json()
-        standby = requests.get(Base.gridproxy_url + 'stats?status=standby', timeout=5).json()
+        up = requests.get(Base.gridproxy_url + 'stats?status=up', timeout=10).json()
+        standby = requests.get(Base.gridproxy_url + 'stats?status=standby', timeout=10).json()
 
         # Initialize a dictionary to store the merged data
         merged_data = {}
