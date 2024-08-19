@@ -14,6 +14,7 @@
             validators.minLength('Subdomain must be at least 4 characters.', 4),
             subdomain => validators.maxLength('Subdomain cannot exceed 50 characters.', 50)(subdomain),
           ]"
+          :async-rules="[validateSubdomain]"
           #="{ props }"
         >
           <v-text-field label="Subdomain" v-model.trim="subdomain" v-bind="props" />
@@ -111,6 +112,10 @@ async function deploy() {
     layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Domains instance."));
   }
 }
+async function validateSubdomain() {
+  return await isAvailableName(grid, subdomain.value);
+}
+
 function updateSSHkeyEnv(selectedKeys: string) {
   selectedSSHKeys.value = selectedKeys;
 }
@@ -118,6 +123,7 @@ function updateSSHkeyEnv(selectedKeys: string) {
 
 <script lang="ts">
 import { deploymentListEnvironments } from "@/constants";
+import { isAvailableName } from "@/utils/validators";
 
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import type { SelectionDetails } from "../types/nodeSelector";

@@ -402,7 +402,7 @@ import type { Tab } from "../components/dynamic_tabs.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { deploymentListEnvironments } from "../constants/deployment_list";
 import { useGrid } from "../stores";
-import { deleteDeployment, deleteGatewayContract } from "../utils/delete_deployment";
+import { deleteDeployment, deleteGatewayDeployment } from "../utils/delete_deployment";
 import { updateGrid } from "../utils/grid";
 
 const props = defineProps<{
@@ -457,7 +457,7 @@ async function onDelete(k8s = false) {
     for (const item of selectedItems.value) {
       try {
         if (props.projectName?.toLowerCase() === ProjectName.Domains.toLowerCase()) {
-          await deleteGatewayContract(
+          await deleteGatewayDeployment(
             updateGrid(grid, { projectName: props.projectName.toLocaleLowerCase() }),
             item[0].workloads[0].name as string,
           );

@@ -21,7 +21,7 @@
               <v-tooltip location="bottom" :text="getTooltipText(item, index)" :disabled="!hasMaster(item)">
                 <template #activator="{ props }">
                   <span v-bind="props" class="text-lowercase">{{
-                    contracts && contracts.length === 1 && "name" in contracts ? contracts.name : item.name
+                    contracts && contracts.length === 1 && "name" in contracts ? (contracts as any).name : item.name
                   }}</span>
                 </template>
               </v-tooltip>
