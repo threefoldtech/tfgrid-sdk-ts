@@ -17,7 +17,7 @@ class StatisticsPage:
     statistics_label = (By.XPATH, "//*[contains(text(), 'Statistics')]")
     map= (By.XPATH,"//button[contains(@class, 'btn-main-container')]")
     nodes_online = (By.XPATH, "//span[text()='Nodes Online']/ancestor::div/following-sibling::div[@class='v-card-text card-body']")
-    dedicated_machines = (By.XPATH, "//span[text()='Dedicated Machines']/ancestor::div/following-sibling::div[@class='v-card-text card-body']") 
+    dedicated_machines = (By.XPATH, "//span[text()='Dedicated Machines']/ancestor::div/following-sibling::div[@class='v-card-text card-body']")
     farms = (By.XPATH, "//span[text()='Farms']/ancestor::div/following-sibling::div[@class='v-card-text card-body']")
     countries = (By.XPATH, "//span[text()='Countries']/ancestor::div/following-sibling::div[@class='v-card-text card-body']")
     cpus = (By.XPATH, "//span[text()='CPUs']/ancestor::div/following-sibling::div[@class='v-card-text card-body']")
@@ -71,8 +71,7 @@ class StatisticsPage:
                     print(f"{name} fetched: {element_text}")
                 except TimeoutException:
                     print(f"{name} not found within the specified time.")
-                    details.append(None)  # Add None or some default value to maintain list consistency
-            
+                    details.append(None)# Add None or some default value to maintain list consistency
         except TimeoutException as e:
             print(f"TimeoutException: {e}")
         
