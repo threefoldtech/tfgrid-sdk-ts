@@ -4,15 +4,12 @@ from pages.statistics import StatisticsPage
 from utils.grid_proxy import GridProxy
 from pages.dashboard import DashboardPage
 
-
-
 def before_test_setup(browser):
     statistics_page = StatisticsPage(browser)
     dashboard_page = DashboardPage(browser)
     dashboard_page.open_and_load()
     statistics_page.navigate()
     return statistics_page
-
 
 def test_statistics_details(browser):
     statistics_page = before_test_setup(browser)
@@ -40,7 +37,3 @@ def test_statistics_details(browser):
     assert grid_statistics_details['workloads_number'] == statistics_details_converted[14]
     assert statistics_page.grid_status_link() == 'https://status.grid.tf/status/threefold/'
     assert statistics_page.node_monitoring_link() == 'https://metrics.grid.tf/d/rYdddlPWkfqwf/zos-host-metrics?orgId=2&refresh=30s/'
-
-
-    
-    

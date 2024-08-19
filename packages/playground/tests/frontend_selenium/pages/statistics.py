@@ -62,7 +62,6 @@ class StatisticsPage:
             ("Contracts", self.conracts),
             ("Number of workloads", self.number_of_workloads)
         ]
-
         try:
             for name, locator in elements_to_fetch:
                 try:
@@ -74,7 +73,6 @@ class StatisticsPage:
                     details.append(None)# Add None or some default value to maintain list consistency
         except TimeoutException as e:
             print(f"TimeoutException: {e}")
-        
         return details
     
     def get_link(self):
