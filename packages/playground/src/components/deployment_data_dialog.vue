@@ -20,7 +20,9 @@
             >
               <v-tooltip location="bottom" :text="getTooltipText(item, index)" :disabled="!hasMaster(item)">
                 <template #activator="{ props }">
-                  <span v-bind="props" class="text-lowercase">{{ item.name }}</span>
+                  <span v-bind="props" class="text-lowercase">{{
+                    contracts && contracts.length === 1 && "name" in contracts ? contracts.name : item.name
+                  }}</span>
                 </template>
               </v-tooltip>
             </v-tab>
@@ -28,7 +30,7 @@
         </v-card-title>
         <v-card-text>
           <template v-if="showType === 0">
-            <v-form readonly v-if="contract && data.type !== 'gateway-name-proxy'">
+            <v-form readonly v-if="contract && data?.[0]?.workloads?.[0]?.type !== 'gateway-name-proxy'">
               <v-alert class="my-4" variant="tonal" v-if="contract.customDomain" type="info">
                 Make sure to create an A record on your name provider with
                 <span class="font-weight-bold">{{ contract.customDomain }}</span>
@@ -103,9 +105,15 @@
               <CopyReadonlyInput label="Monitoring URL" :data="grafanaURL" :loading="isLoading" />
             </v-form>
             <v-form readonly v-else>
-              <!-- <CopyReadonlyInput label="Name" :data="data.name" />
-              <CopyReadonlyInput label="IP" :data="data.data.backends" />
-              <CopyReadonlyInput label="Domain" :data="data.result.data.fqdn" /> -->
+              <CopyReadonlyInput label="Name" :data="data.name" />
+              <CopyReadonlyInput label="IP" :data="data[0].workloads[0].data.backends.join(', ')" />
+              <CopyReadonlyInput label="Domain" :data="data[0].workloads[0].result.data.fqdn" />
+              <v-switch
+                inset
+                color="primary"
+                :model-value="data[0].workloads[0].data.tls_passthrough"
+                label="TLS Passthrough"
+              />
             </v-form>
           </template>
           <template v-else>
