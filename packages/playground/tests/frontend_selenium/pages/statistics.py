@@ -74,7 +74,6 @@ class StatisticsPage:
         except TimeoutException as e:
             print(f"TimeoutException: {e}")
         return details
-    
     def get_link(self):
         WebDriverWait(self.browser, 30).until(EC.number_of_windows_to_be(2))
         self.browser.switch_to.window(self.browser.window_handles[1])
