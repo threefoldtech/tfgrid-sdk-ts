@@ -15,7 +15,6 @@ class StatisticsPage:
     node_monitoring_button = (By.XPATH, "//span[text()='Node Monitoring']")
     statistics_button = (By.XPATH, "//span[text()='Node Statistics']")
     statistics_label = (By.XPATH, "//*[contains(text(), 'Statistics')]")
-    map= (By.XPATH, "/html/body/div[1]/div/div/main/div/div[2]/div/div/div/div[3]/div[2]")
     map= (By.XPATH,"//button[contains(@class, 'btn-main-container')]")
     nodes_online = (By.XPATH, "//span[text()='Nodes Online']/ancestor::div/following-sibling::div[@class='v-card-text card-body']")
     dedicated_machines = (By.XPATH, "//span[text()='Dedicated Machines']/ancestor::div/following-sibling::div[@class='v-card-text card-body']") 
@@ -38,7 +37,6 @@ class StatisticsPage:
         self.browser = browser
 
     def navigate(self):
-        #WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.logout_button))
         webdriver.ActionChains(self.browser).send_keys(Keys.ESCAPE).perform()
         self.browser.find_element(*self.tfgrid_button).click()
         self.browser.find_element(*self.statistics_button).click()
@@ -47,7 +45,6 @@ class StatisticsPage:
     def statistics_detials(self):
         details = []
         wait = WebDriverWait(self.browser, 60)  # Increased wait time to 60 seconds
-        
         elements_to_fetch = [
             ("Nodes Online", self.nodes_online),
             ("Dedicated Machines", self.dedicated_machines),
