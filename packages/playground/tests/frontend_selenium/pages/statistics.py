@@ -35,13 +35,11 @@ class StatisticsPage:
 
     def __init__(self, browser):
         self.browser = browser
-
     def navigate(self):
         webdriver.ActionChains(self.browser).send_keys(Keys.ESCAPE).perform()
         self.browser.find_element(*self.tfgrid_button).click()
         self.browser.find_element(*self.statistics_button).click()
         WebDriverWait(self.browser, 60).until(EC.visibility_of_element_located(self.statistics_label))
-
     def statistics_detials(self):
         details = []
         wait = WebDriverWait(self.browser, 60)  # Increased wait time to 60 seconds
@@ -81,11 +79,9 @@ class StatisticsPage:
         self.browser.close()
         self.browser.switch_to.window(self.browser.window_handles[0])
         return url
-    
     def grid_status_link(self):
         self.browser.find_element(*self.grid_status_button).click()
         return self.get_link()
-    
     def node_monitoring_link(self):
         self.browser.find_element(*self.node_monitoring_button).click()
         return self.get_link()
