@@ -56,19 +56,17 @@
 
 <script lang="ts" setup>
 import type { GridClient } from "@threefold/grid_client";
-import type Contract from "@threefold/gridproxy_client";
 import { ref } from "vue";
 
 import { useLayout } from "../components/weblet_layout.vue";
 import { useGrid } from "../stores";
 import { ProjectName } from "../types";
-import { deployGatewayName, rollbackContract } from "../utils/gateway";
+import { deployGatewayName, rollbackGateway } from "../utils/gateway";
 import { normalizeError } from "../utils/helpers";
 import { generateName } from "../utils/strings";
 
 const layout = useLayout();
 const ip = ref();
-const contractId = ref();
 const name = ref(generateName({ prefix: "dm" }));
 const subdomain = ref(generateName({ prefix: "dm" }));
 const port = ref(80);
@@ -103,15 +101,13 @@ async function deploy() {
       ip: ip.value,
       port: port.value,
     });
-
-    contractId.value = gateway.contracts.created[0].contractId;
     const gw = await grid.gateway.get_name({ name: subdomain.value });
     const workload = gw[0].workloads[0];
 
     finalize(workload);
   } catch (e) {
     layout.value.setStatus("deploy", "Rollbacking back due to fail to deploy gateway...");
-    await rollbackContract(grid!, contractId.value);
+    await rollbackGateway(grid!, subdomain.value);
     layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Domains instance."));
   }
 }

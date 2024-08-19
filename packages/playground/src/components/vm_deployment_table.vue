@@ -87,10 +87,6 @@
       @click:row="$attrs['onClick:row']"
       :sort-by="sortBy"
     >
-      <template #[`item.domains-name`]="{ item }">
-        {{ item[0].workloads[0] }}
-      </template>
-
       <template #[`item.name`]="{ item }">
         {{ item.name }}
       </template>
@@ -199,7 +195,11 @@ async function loadDomains() {
     loading.value = true;
     const grid = await getGrid(profileManager.profile!, props.projectName.toLowerCase());
     const gateways = await grid!.gateway.list();
-    items.value = await Promise.all(gateways.map(name => grid!.gateway.get_name({ name })));
+    const gws = await Promise.all(gateways.map(name => grid!.gateway.get_name({ name })));
+    items.value = gws.map(gw => {
+      (gw as any).name = gw[0].workloads[0].name;
+      return gw;
+    });
   } catch (e) {
     errorMessage.value = `Failed to load Deployments: ${e}`;
   } finally {
@@ -269,8 +269,14 @@ const filteredHeaders = computed(() => {
   if (props.projectName.toLowerCase() === ProjectName.Domains.toLowerCase()) {
     return [
       { title: "Name", key: "0.workloads.0.data.name" },
-      { title: "Backends", key: "0.workloads.0.data.backends" },
-      { title: "FQDN", key: "0.workloads.0.result.data.fqdn" },
+      {
+        title: "Backends",
+        key: "0.workloads.0.data.backends",
+        value: (item: any) => {
+          return item[0].workloads[0].data.backends.join(", ");
+        },
+      },
+      { title: "Domain", key: "0.workloads.0.result.data.fqdn" },
       { title: "Health", key: "0.workloads.0.result.state", sortable: false },
       { title: "Actions", key: "actions", sortable: false },
     ];

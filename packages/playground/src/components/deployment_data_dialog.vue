@@ -103,9 +103,9 @@
               <CopyReadonlyInput label="Monitoring URL" :data="grafanaURL" :loading="isLoading" />
             </v-form>
             <v-form readonly v-else>
-              <CopyReadonlyInput label="Name" :data="data.name" />
+              <!-- <CopyReadonlyInput label="Name" :data="data.name" />
               <CopyReadonlyInput label="IP" :data="data.data.backends" />
-              <CopyReadonlyInput label="Domain" :data="data.result.data.fqdn" />
+              <CopyReadonlyInput label="Domain" :data="data.result.data.fqdn" /> -->
             </v-form>
           </template>
           <template v-else>

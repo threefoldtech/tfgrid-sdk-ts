@@ -221,7 +221,7 @@
           <IconActionBtn
             tooltip="Show Details"
             icon="mdi-eye-outline"
-            @click="openDialog(tabs[activeTab].value, item[0].workloads[0])"
+            @click="openDialog(tabs[activeTab].value, item)"
           />
 
           <IconActionBtn
@@ -402,7 +402,7 @@ import type { Tab } from "../components/dynamic_tabs.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { deploymentListEnvironments } from "../constants/deployment_list";
 import { useGrid } from "../stores";
-import { deleteDeployment } from "../utils/delete_deployment";
+import { deleteDeployment, deleteGatewayContract } from "../utils/delete_deployment";
 import { updateGrid } from "../utils/grid";
 
 const props = defineProps<{
@@ -456,13 +456,20 @@ async function onDelete(k8s = false) {
   try {
     for (const item of selectedItems.value) {
       try {
-        await deleteDeployment(updateGrid(grid!, { projectName: item.projectName }), {
-          deploymentName: item.deploymentName,
-          name: k8s ? item.deploymentName : item.name,
-          projectName: item.projectName,
-          ip: item.interfaces?.[0]?.ip,
-          k8s,
-        });
+        if (props.projectName?.toLowerCase() === ProjectName.Domains.toLowerCase()) {
+          await deleteGatewayContract(
+            updateGrid(grid, { projectName: props.projectName.toLocaleLowerCase() }),
+            item[0].workloads[0].name as string,
+          );
+        } else {
+          await deleteDeployment(updateGrid(grid!, { projectName: item.projectName }), {
+            deploymentName: item.deploymentName,
+            name: k8s ? item.deploymentName : item.name,
+            projectName: item.projectName,
+            ip: item.interfaces?.[0]?.ip,
+            k8s,
+          });
+        }
       } catch (e: any) {
         createCustomToast(`Failed to delete deployment with name: ${item.name}`, ToastType.danger);
         console.log("Error while deleting deployment", e.message);

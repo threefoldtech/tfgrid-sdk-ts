@@ -79,9 +79,8 @@ export async function rollbackDeployment(grid: GridClient, name: string) {
 
   return result;
 }
-export async function rollbackContract(grid: GridClient, id: number) {
-  const result = await grid.contracts.cancel({ id });
-
+export async function rollbackGateway(grid: GridClient, name: string) {
+  const result = await grid.gateway.delete_name({ name });
   return result;
 }
 
