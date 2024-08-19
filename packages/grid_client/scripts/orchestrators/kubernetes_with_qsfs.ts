@@ -68,7 +68,7 @@ async function main() {
   for (const node of nodes) {
     const freeHRU = (node.total_resources.hru - node.used_resources.hru) / 1024 ** 3;
 
-    if (freeHRU >= disk_size && usedResources <= disk_size * count) {
+    if (freeHRU >= disk_size) {
       qsfsNodes.push(node.nodeId);
       usedResources += freeHRU;
     }
