@@ -288,7 +288,7 @@
 </template>
 <script lang="ts" setup>
 import type { GridClient } from "@threefold/grid_client";
-import type { DaoProposalDetails, DaoProposals } from "@threefold/tfchain_client";
+import { DaoProposalDetails, DaoProposals, TFChainError } from "@threefold/tfchain_client";
 import type moment from "moment";
 import { createToast } from "mosha-vue-toastify";
 import { onMounted, ref } from "vue";
@@ -373,7 +373,14 @@ async function castVote() {
       });
       openVDialog.value = false;
     } catch (err) {
-      createToast(`Vote Failed!`, {
+      let errMsg = `Vote Failed!`;
+
+      if (err instanceof TFChainError && err.keyError == "DuplicateVote") {
+        errMsg = `Failed to vote; Already voted`;
+      }
+      console.error(errMsg, err);
+
+      createToast(errMsg, {
         position: "top-right",
         hideProgressBar: true,
         toastBackgroundColor: "#FF5252",
