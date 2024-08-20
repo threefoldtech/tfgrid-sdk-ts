@@ -155,7 +155,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, ref } from "vue";
+import { capitalize, computed, onMounted, ref } from "vue";
 
 import { getNodeHealthColor, NodeHealth } from "@/utils/get_nodes";
 
@@ -272,12 +272,19 @@ const filteredHeaders = computed(() => {
       {
         title: "Backends",
         key: "0.workloads.0.data.backends",
-        value: (item: any) => {
+        value(item: any) {
           return item[0].workloads[0].data.backends.join(", ");
         },
       },
       { title: "Domain", key: "0.workloads.0.result.data.fqdn" },
-      { title: "Health", key: "0.workloads.0.result.state", sortable: false },
+      {
+        title: "Health",
+        key: "health",
+        value(item: any) {
+          return capitalize(item[0].workloads[0].result.state);
+        },
+        sortable: false,
+      },
       { title: "Actions", key: "actions", sortable: false },
     ];
   }
