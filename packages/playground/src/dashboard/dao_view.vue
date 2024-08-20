@@ -288,7 +288,7 @@
 </template>
 <script lang="ts" setup>
 import type { GridClient } from "@threefold/grid_client";
-import { DaoProposalDetails, DaoProposals, TFChainError } from "@threefold/tfchain_client";
+import { type DaoProposalDetails, type DaoProposals, TFChainError } from "@threefold/tfchain_client";
 import type moment from "moment";
 import { createToast } from "mosha-vue-toastify";
 import { onMounted, ref } from "vue";
