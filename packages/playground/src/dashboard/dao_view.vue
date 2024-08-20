@@ -288,7 +288,7 @@
 </template>
 <script lang="ts" setup>
 import type { GridClient } from "@threefold/grid_client";
-import type { Proposal, Proposals } from "@threefold/tfchain_client";
+import type { DaoProposalDetails, DaoProposals } from "@threefold/tfchain_client";
 import type moment from "moment";
 import { createToast } from "mosha-vue-toastify";
 import { onMounted, ref } from "vue";
@@ -302,9 +302,9 @@ import { updateGrid } from "../utils/grid";
 
 const loadingProposals = ref(true);
 const activeTab = ref(0);
-const activeProposals = ref<Proposal[]>();
-const inactiveProposals = ref<Proposal[]>();
-const proposals = ref<Proposals>();
+const activeProposals = ref<DaoProposalDetails[]>();
+const inactiveProposals = ref<DaoProposalDetails[]>();
+const proposals = ref<DaoProposals>();
 const searchTerm = ref("");
 const openInfoModal = ref(false);
 const openVDialog = ref(false);
@@ -345,7 +345,7 @@ function openVoteDialog(hash: any, vote: boolean) {
   castedVote.value = vote;
   selectedProposal.value = hash;
 }
-function filteredProposals(proposals: Proposal[] | undefined) {
+function filteredProposals(proposals: DaoProposalDetails[] | undefined) {
   if (searchTerm.value.length) {
     if (proposals) {
       return proposals.filter(proposal => proposal.description.toLowerCase().includes(searchTerm.value.toLowerCase()));
@@ -359,7 +359,6 @@ async function castVote() {
   if (grid) {
     try {
       await grid.dao.vote({
-        address: profile.value.address,
         farmId: selectedFarm.value,
         approve: castedVote.value,
         hash: selectedProposal.value,
@@ -372,6 +371,7 @@ async function castVote() {
         showIcon: true,
         type: "success",
       });
+      openVDialog.value = false;
     } catch (err) {
       createToast(`Vote Failed!`, {
         position: "top-right",

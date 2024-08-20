@@ -6,13 +6,11 @@ on:
   push:
     branches: 
       - development
-      - development_2.6
     paths:
       - "packages/playground/**"
   pull_request:
     branches: 
       - development
-      - development_2.6
     paths:
       - "packages/playground/**"
 

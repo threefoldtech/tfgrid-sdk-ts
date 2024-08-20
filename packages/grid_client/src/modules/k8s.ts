@@ -1,13 +1,16 @@
+import { Contract } from "@threefold/tfchain_client";
 import { GridClientErrors, ValidationError } from "@threefold/types";
 import { Addr } from "netaddr";
 
 import { GridClientConfig } from "../config";
+import { ZmachineData } from "../helpers";
 import { events } from "../helpers/events";
 import { expose } from "../helpers/expose";
 import { validateInput } from "../helpers/validator";
 import { KubernetesHL } from "../high_level/kubernetes";
-import { TwinDeployment } from "../high_level/models";
+import { DeploymentResultContracts, TwinDeployment } from "../high_level/models";
 import { Network } from "../primitives/network";
+import { Deployment } from "../zos";
 import { Workload, WorkloadTypes } from "../zos/workload";
 import { BaseModule } from "./base";
 import { AddWorkerModel, DeleteWorkerModel, K8SDeleteModel, K8SGetModel, K8SModel } from "./models";
@@ -26,40 +29,65 @@ class K8sModule extends BaseModule {
   ]; // TODO: remove deprecated
   kubernetes: KubernetesHL;
 
+  /**
+   * Class representing a Kubernetes Module.
+   * Extends the BaseModule class.
+   *
+   * This class provides methods for managing Kubernetes deployments, including creating, updating, listing, and deleting deployments.
+   * @class K8sModule
+   * @param {GridClientConfig} config - The configuration object for initializing the client.
+   */
   constructor(public config: GridClientConfig) {
     super(config);
     this.kubernetes = new KubernetesHL(config);
   }
 
-  async _getMastersWorkload(deploymentName: string, deployments): Promise<Workload[]> {
+  /**
+   * Get the master workloads for a specific deployment.
+   *
+   * This method iterates through the deployments and retrieves the workloads that are of type `zmachine` and have an empty `K3S_URL` environment variable.
+   * It assigns the `contract ID` and `node ID` to each workload and adds it to the list of master workloads.
+   *
+   * @param {string} deploymentName - The name of the deployment to get master workloads for.
+   * @param {(Deployment | TwinDeployment)[]} deployments - The list of deployments to search for master workloads.
+   * @returns {Promise<Workload[]>} - A list of master workloads that match the criteria.
+   */
+  async _getMastersWorkload(deploymentName: string, deployments: (Deployment | TwinDeployment)[]): Promise<Workload[]> {
     const workloads: Workload[] = [];
+
     for (const deployment of deployments) {
-      let d = deployment;
-      if (deployment instanceof TwinDeployment) {
-        d = deployment.deployment;
-      }
+      const d = deployment instanceof TwinDeployment ? deployment.deployment : deployment;
+
       for (const workload of d.workloads) {
         if (workload.type === WorkloadTypes.zmachine && workload.data["env"]["K3S_URL"] === "") {
-          workload["contractId"] = deployment.contract_id;
-          workload["nodeId"] = await this._getNodeIdFromContractId(deploymentName, deployment.contract_id);
+          workload["contractId"] = d.contract_id;
+          workload["nodeId"] = await this._getNodeIdFromContractId(deploymentName, d.contract_id);
           workloads.push(workload);
         }
       }
     }
+
     return workloads;
   }
 
-  async _getWorkersWorkload(deploymentName: string, deployments): Promise<Workload[]> {
+  /**
+   * Get the worker workloads for a specific deployment.
+   *
+   * This method iterates through the deployments and retrieves the workloads that are of type `zmachine` and have a non-empty `K3S_URL` environment variable.
+   * It assigns the `contract ID` and `node ID` to each workload and adds it to the list of worker workloads.
+   *
+   * @param {string} deploymentName - The name of the deployment to get worker workloads for.
+   * @param {(Deployment | TwinDeployment)[]} deployments - The list of deployments to search for worker workloads.
+   * @returns {Promise<Workload[]>} - A list of worker workloads that match the criteria.
+   */
+  async _getWorkersWorkload(deploymentName: string, deployments: (Deployment | TwinDeployment)[]): Promise<Workload[]> {
     const workloads: Workload[] = [];
     for (const deployment of deployments) {
-      let d = deployment;
-      if (deployment instanceof TwinDeployment) {
-        d = deployment.deployment;
-      }
+      const d = deployment instanceof TwinDeployment ? deployment.deployment : deployment;
       for (const workload of d.workloads) {
         if (workload.type === WorkloadTypes.zmachine && workload.data["env"]["K3S_URL"] !== "") {
-          workload["contractId"] = deployment.contract_id;
-          workload["nodeId"] = await this._getNodeIdFromContractId(deploymentName, deployment.contract_id);
+          workload["contractId"] = d.contract_id;
+          workload["nodeId"] = await this._getNodeIdFromContractId(deploymentName, d.contract_id);
           workloads.push(workload);
         }
       }
@@ -67,7 +95,17 @@ class K8sModule extends BaseModule {
     return workloads;
   }
 
-  async _getMastersIp(deploymentName: string, deployments): Promise<string[]> {
+  /**
+   * Get the `IP addresses` of master workloads for a specific deployment.
+   *
+   * This method retrieves the `IP addresses` of master workloads associated with the specified deployment.
+   * It first fetches the master workloads using the `_getMastersWorkload` method and then extracts the `IP addresses` from the network interfaces data.
+   *
+   * @param {string} deploymentName - The name of the deployment to get master IPs for.
+   * @param {(Deployment | TwinDeployment)[]} deployments - The list of deployments to search for master workloads.
+   * @returns {Promise<string[]>} A list of `IP addresses` of master workloads.
+   */
+  async _getMastersIp(deploymentName: string, deployments: (Deployment | TwinDeployment)[]): Promise<string[]> {
     const ips: string[] = [];
     const workloads = await this._getMastersWorkload(deploymentName, deployments);
     for (const workload of workloads) {
@@ -76,6 +114,17 @@ class K8sModule extends BaseModule {
     return ips;
   }
 
+  /**
+   * Create a deployment for `Kubernetes`.
+   *
+   * This method creates a deployment for `Kubernetes` based on the provided options.
+   *
+   * It adds master nodes and worker nodes to the deployment, along with network configuration.
+   *
+   * @param {K8SModel} options - The options for creating the `Kubernetes` deployment.
+   * @param {string[]} masterIps - The IP addresses of the master nodes.
+   * @returns {Promise<[TwinDeployment[], Network, string]>} A tuple containing the created deployments, network configuration, and Wireguard configuration.
+   */
   async _createDeployment(options: K8SModel, masterIps: string[] = []): Promise<[TwinDeployment[], Network, string]> {
     const network = new Network(options.network.name, options.network.ip_range, this.config);
     await network.load();
@@ -178,10 +227,24 @@ class K8sModule extends BaseModule {
     return [deployments, network, wireguardConfig];
   }
 
+  /**
+   * Deploy a `Kubernetes cluster` based on the provided options.
+   *
+   * This method deploys a `Kubernetes cluster` by creating `master` and `worker` nodes, along with `network configuration`.
+   * It checks if multiple masters are specified and if a deployment with the same name already exists.
+   * It emits a log event to indicate the start of cluster creation.
+   *
+   * @param {K8SModel} options - The options for deploying the `Kubernetes cluster`.
+   * @returns {Promise<{ contracts: string[], wireguard_config: string }>} A promise that resolves to an object containing the contracts created and the Wireguard configuration.
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   * - `@checkBalance`: Checks the balance to ensure there are enough funds available.
+   */
   @expose
   @validateInput
   @checkBalance
-  async deploy(options: K8SModel) {
+  async deploy(options: K8SModel): Promise<{ contracts: DeploymentResultContracts; wireguard_config: string }> {
     if (options.masters.length > 1) {
       throw new ValidationError("Multiple masters are not supported");
     }
@@ -197,43 +260,106 @@ class K8sModule extends BaseModule {
     return { contracts: contracts, wireguard_config: wireguardConfig };
   }
 
+  /**
+   * List all Kubernetes deployments.
+   *
+   * This method retrieves a list of all Kubernetes deployments.
+   *
+   * @returns {Promise<string[]>} A promise that resolves to a list of all Kubernetes deployments.
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   */
   @expose
-  async list() {
+  async list(): Promise<string[]> {
     return await this._list();
   }
 
-  async getObj(deploymentName: string) {
-    const k = { masters: [], workers: [] };
+  /**
+   * Retrieve information about the master and worker workloads of a specific deployment.
+   *
+   * This method fetches the master and worker workloads associated with the specified deployment.
+   * It first retrieves all deployments using the `_get` method, then gets the master workloads using `_getMastersWorkload`,
+   * and the worker workloads using `_getWorkersWorkload`. Finally, it fetches detailed information about each workload using `_getZmachineData`.
+   *
+   * @param {string} deploymentName - The name of the deployment to retrieve information for.
+   * @returns {Promise<{ masters: ZmachineData[], workers: ZmachineData[] }>} A promise that resolves to an object containing information about the master and worker workloads.
+   */
+  async getObj(deploymentName: string): Promise<{ masters: ZmachineData[]; workers: ZmachineData[] }> {
+    const k8s: { masters: ZmachineData[]; workers: ZmachineData[] } = { masters: [], workers: [] };
+
     const deployments = await this._get(deploymentName);
     const masters = await this._getMastersWorkload(deploymentName, deployments);
     const workers = await this._getWorkersWorkload(deploymentName, deployments);
+
     for (const master of masters) {
-      k.masters.push(await this._getZmachineData(deploymentName, deployments, master));
+      const masterMachine = await this._getZmachineData(deploymentName, deployments, master);
+      k8s.masters.push(masterMachine);
     }
+
     for (const worker of workers) {
-      k.workers.push(await this._getZmachineData(deploymentName, deployments, worker));
+      const workerMachine = await this._getZmachineData(deploymentName, deployments, worker);
+      k8s.workers.push(workerMachine);
     }
-    return k;
+    return k8s;
   }
 
+  /**
+   * Retrieve a specific Kubernetes deployment.
+   *
+   * This method fetches detailed information about a specific Kubernetes deployment based on the provided deployment name.
+   * It retrieves all deployments using the `_get` method and then filters out the deployment matching the specified name.
+   *
+   * @param {K8SGetModel} options - The options containing the name of the deployment to retrieve.
+   * @returns {Promise<Deployment[]>} A promise that resolves to the deployment matching the specified name.
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   */
   @expose
   @validateInput
-  async get(options: K8SGetModel) {
+  async get(options: K8SGetModel): Promise<Deployment[]> {
     return await this._get(options.name);
   }
 
+  /**
+   * Delete a Kubernetes deployment.
+   *
+   * This method deletes a Kubernetes deployment with the specified name.
+   * It emits a log event to indicate the start of the deletion process.
+   *
+   * @param {K8SDeleteModel} options - The options containing the name of the deployment to delete.
+   * @returns {Promise<{created: Contract[];deleted: Contract[];updated: Contract[];}>} A promise that resolves once the deployment is successfully deleted.
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   * - `@checkBalance`: Checks the balance to ensure there are enough funds available.
+   */
   @expose
   @validateInput
   @checkBalance
-  async delete(options: K8SDeleteModel) {
+  async delete(options: K8SDeleteModel): Promise<DeploymentResultContracts> {
     events.emit("logs", `Start deleting the cluster with name ${options.name}`);
     return await this._delete(options.name);
   }
 
+  /**
+   * Update a `Kubernetes deployment` based on the provided options.
+   *
+   * This method updates a `Kubernetes deployment` by checking if the deployment exists,
+   * ensuring only one master is specified, and retrieving the necessary information about the existing deployment.
+   * It then validates the network name and IP range, creates new deployments based on the updated options, and updates the deployment using the `_update` method.
+   *
+   * @param {K8SModel} options - The options for updating the `Kubernetes deployment`.
+   * @returns {Promise<{ contracts: DeploymentResultContracts }>} A promise that resolves once the deployment is successfully updated.
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   * - `@checkBalance`: Checks the balance to ensure there are enough funds available.
+   */
   @expose
   @validateInput
   @checkBalance
-  async update(options: K8SModel) {
+  async update(options: K8SModel): Promise<{ contracts: DeploymentResultContracts }> {
     if (!(await this.exists(options.name))) {
       throw new ValidationError(`There is no k8s deployment with the name: ${options.name}.`);
     }
@@ -262,10 +388,26 @@ class K8sModule extends BaseModule {
     return await this._update(this.kubernetes, options.name, oldDeployments, twinDeployments, network);
   }
 
+  /**
+   * Add a worker to a Kubernetes deployment.
+   *
+   * This method adds a worker node to the specified Kubernetes deployment based on the provided options.
+   *
+   * It checks if the deployment exists, ensures that there is no worker with the same name in the cluster,
+   * and retrieves the necessary information about the master node.
+   * It then creates a new worker node using the 'add_worker' method from the Kubernetes class and adds it to the deployment.
+   *
+   * @param {AddWorkerModel} options - The options for adding the worker node to the deployment.
+   * @returns {Promise<{ contracts: DeploymentResultContracts }>} A promise that resolves once the worker node is successfully added to the deployment.
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   * - `@checkBalance`: Checks the balance to ensure there are enough funds available.
+   */
   @expose
   @validateInput
   @checkBalance
-  async add_worker(options: AddWorkerModel) {
+  async add_worker(options: AddWorkerModel): Promise<{ contracts: DeploymentResultContracts }> {
     if (!(await this.exists(options.deployment_name))) {
       throw new ValidationError(`There is no k8s deployment with the name: ${options.deployment_name}.`);
     }
@@ -324,10 +466,23 @@ class K8sModule extends BaseModule {
     return await this._add(options.deployment_name, options.node_id, oldDeployments, twinDeployments, network);
   }
 
+  /**
+   * Delete a worker from a Kubernetes deployment.
+   *
+   * This method deletes a worker node from the specified Kubernetes deployment based on the provided options.
+   * It first checks if the deployment exists, then emits a log event indicating the start of the deletion process.
+   *
+   * @param {DeleteWorkerModel} options - The options for deleting the worker node from the deployment.
+   * @returns {Promise<DeploymentResultContracts>} A promise that resolves once the worker node is successfully deleted from the deployment.
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   * - `@checkBalance`: Checks the balance to ensure there are enough funds available.
+   */
   @expose
   @validateInput
   @checkBalance
-  async delete_worker(options: DeleteWorkerModel) {
+  async delete_worker(options: DeleteWorkerModel): Promise<DeploymentResultContracts> {
     if (!(await this.exists(options.deployment_name))) {
       throw new ValidationError(`There is no k8s deployment with the name: ${options.deployment_name}.`);
     }

@@ -21,7 +21,7 @@ interface BaseMountData {
   mountPoint: string;
 }
 
-interface ExtendedMountData extends BaseMountData {
+interface ExtendedMountData extends Partial<BaseMountData> {
   /** The size of the mount (optional) */
   size?: number;
   /** The state of the mount result (optional) */
@@ -97,4 +97,19 @@ interface VM extends ZmachineData {
   wireguard: string;
 }
 
-export { ZmachineData, VM };
+interface GatewayDeploymentData {
+  version: number;
+  contractId: number;
+  name: string;
+  created: number;
+  status: string;
+  message: string;
+  type: string;
+  domain: string;
+  tls_passthrough: boolean;
+  backends: string[];
+  metadata: string;
+  description: string;
+}
+
+export { ZmachineData, VM, ExtendedMountData, GatewayDeploymentData };

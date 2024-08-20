@@ -1,38 +1,15 @@
-import { QueryClient } from "@threefold/tfchain_client";
-
-import { IDisconnectHandler, ILivenessChecker, ServiceStatus } from "../types";
-
-export class TFChainMonitor implements ILivenessChecker, IDisconnectHandler {
-  private name = "TFChain";
-  private url: string;
-  private tfClient: QueryClient;
-  constructor(tfChainUrl: string) {
-    this.url = tfChainUrl;
-    this.tfClient = new QueryClient(this.url);
+import { resolveServiceStatus, sendRequest } from "../helpers/utils";
+import { ILivenessChecker, ServiceStatus } from "../types";
+import { ServiceBase } from "./serviceBase";
+export class TFChainMonitor extends ServiceBase implements ILivenessChecker {
+  constructor(ServiceUrl?: string) {
+    super("TFChain");
+    if (ServiceUrl) this.url = ServiceUrl;
   }
-  private async setUp() {
-    await this.tfClient?.connect();
-  }
-  serviceName() {
-    return this.name;
-  }
-  serviceUrl() {
-    return this.url;
-  }
-  public async isAlive(): Promise<ServiceStatus> {
-    try {
-      if (!this.tfClient.api) await this.setUp();
-      return {
-        alive: true,
-      };
-    } catch (error) {
-      return {
-        alive: false,
-        error,
-      };
-    }
-  }
-  public async disconnect() {
-    await this.tfClient.disconnect();
+  async isAlive(url = this.url): Promise<ServiceStatus> {
+    if (!url) throw new Error("Can't access before initialization");
+    let _url = url.replace("wss", "https");
+    _url = _url.replace("/ws", "/health");
+    return resolveServiceStatus(sendRequest(_url, { method: "Get" }));
   }
 }

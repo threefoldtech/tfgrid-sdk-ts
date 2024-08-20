@@ -27,6 +27,10 @@ bash ../scripts/build-env.sh
   - BRIDGE_TFT_ADDRESS
   - STATS_URL
   - STELLAR_NETWORK
+  - SENTRY_DSN
+  - ENABLE_TELEMETRY
+
+- The use can provide a single URL or multiple URLs separated with a comma, for `GRAPHQL_URL, GRIDPROXY_URL, SUBSTRATE_URL, ACTIVATION_SERVICE_URL, RELAY_DOMAIN, STATS_URL`, If the user provides multiple URLs, it will be considered as a priority list, which means the dashboard will try to connect over the first URL in the list; if it fails, it will move to the next one, and so on.
 
 - The backend payments are done with stellar so you need to decide which network of stellar you want to connect to
 

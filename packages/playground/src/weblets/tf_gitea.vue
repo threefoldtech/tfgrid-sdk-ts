@@ -10,7 +10,7 @@
     :valid-filters="selectionDetails?.validFilters"
     title-image="images/icons/gitea.png"
   >
-    <template #title>Deploy a Gitea Machine </template>
+    <template #title>Deploy a Gitea Instance</template>
 
     <d-tabs
       :tabs="[
@@ -79,7 +79,7 @@
         <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
       </template>
       <template #mail>
-        <SmtpServer v-model="smtp" :persistent="true" :tls="true">
+        <SmtpServer v-model="smtp" email tls ssl>
           Gitea needs SMTP service so please configure these settings properly.
         </SmtpServer>
       </template>
@@ -92,7 +92,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, type Ref, ref } from "vue";
+import { computed, type Ref, ref, watch } from "vue";
 
 import { manual } from "@/utils/manual";
 
@@ -124,10 +124,24 @@ const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
 const profileManager = useProfileManager();
 
+watch(
+  () => smtp.value.enabled,
+  newSMTP => {
+    ipv4.value = newSMTP;
+  },
+);
+
+watch(
+  () => ipv4.value,
+  newIPv4 => {
+    smtp.value.enabled = newIPv4;
+  },
+);
+
 function finalize(deployment: any) {
   layout.value.reloadDeploymentsList();
-  layout.value.setStatus("success", "Successfully deployed a Node Pilot instance.");
-  layout.value.openDialog(deployment, deploymentListEnvironments.nodepilot);
+  layout.value.setStatus("success", "Successfully deployed a Gitea instance.");
+  layout.value.openDialog(deployment, deploymentListEnvironments.gitea);
 }
 
 async function deploy() {
@@ -171,9 +185,16 @@ async function deploy() {
               value: selectedSSHKeys.value,
             },
             {
-              key: "GITEA_HOSTNAME",
+              key: "GITEA__HOSTNAME",
               value: domain,
             },
+            { key: "GITEA__mailer__PROTOCOL", value: "smtp" },
+            { key: "GITEA__mailer__ENABLED", value: smtp.value?.enabled.toString() },
+            { key: "GITEA__mailer__HOST", value: smtp.value?.hostname },
+            { key: "GITEA__mailer__FROM", value: smtp.value?.email },
+            { key: "GITEA__mailer__PORT", value: smtp.value?.port.toString() },
+            { key: "GITEA__mailer__USER", value: smtp.value?.username },
+            { key: "GITEA__mailer__PASSWD", value: smtp.value?.password },
           ],
           planetary: planetary.value,
           mycelium: mycelium.value,

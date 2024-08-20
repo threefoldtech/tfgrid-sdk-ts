@@ -77,6 +77,12 @@
       :loading="loading"
       :deleting="deleting"
       :model-value="$props.modelValue"
+      :items-per-page-options="[
+        { value: 5, title: '5' },
+        { value: 10, title: '10' },
+        { value: 20, title: '20' },
+        { value: 50, title: '50' },
+      ]"
       @update:model-value="$emit('update:model-value', $event)"
       @click:row="$attrs['onClick:row']"
       :sort-by="sortBy"
@@ -89,27 +95,15 @@
         {{ item.publicIP?.ip?.split("/")?.[0] || item.publicIP?.ip || "-" }}
       </template>
 
-      <template #[`item.ipv6`]="{ item }">
-        {{ item.publicIP?.ip6.replace(/\/64$/, "") || "-" }}
-      </template>
-
-      <template #[`item.planetary`]="{ item }">
-        {{ item.planetary || "-" }}
-      </template>
-
       <template #[`item.mycelium`]="{ item }">
         {{ item.myceliumIP || "-" }}
-      </template>
-
-      <template #[`item.wireguard`]="{ item }">
-        {{ item.interfaces?.[0]?.ip || "-" }}
       </template>
 
       <template #[`item.flist`]="{ item }">
         <v-tooltip :text="item.flist" location="bottom right">
           <template #activator="{ props }">
             <p v-bind="props">
-              {{ item.flist.replace("https://hub.grid.tf/", "").replace(".flist", "") }}
+              {{ renameFlist(item.flist) }}
             </p>
           </template>
         </v-tooltip>
@@ -260,10 +254,7 @@ const filteredHeaders = computed(() => {
       sortable: false,
       children: [
         { title: "Public IPv4", key: "ipv4", sortable: false },
-        { title: "Public IPv6", key: "ipv6", sortable: false },
-        { title: "Planetary IP", key: "planetary", sortable: false },
         { title: "Mycelium IP", key: "mycelium", sortable: false },
-        { title: "WireGuard", key: "wireguard", sortable: false },
       ],
     },
     { title: "Flist", key: "flist" },
@@ -379,6 +370,12 @@ function updateItem(newItem: any) {
   if (index > -1) {
     items.value[index] = newItem;
   }
+}
+
+function renameFlist(url: string) {
+  const flist = url.substring(url.lastIndexOf("/") + 1, url.lastIndexOf("."));
+
+  return flist.length > 40 ? flist.substring(0, 40) + "..." : flist;
 }
 
 defineExpose({ loadDeployments });

@@ -24,8 +24,8 @@ export interface ContractBilling {
 }
 
 export interface Contract {
-  contractId: number;
-  twinId: number;
+  contract_id: number;
+  twin_id: number;
   state: ContractState;
   created_at: number;
   type: ContractType;

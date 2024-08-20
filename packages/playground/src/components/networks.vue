@@ -25,8 +25,10 @@
                 color="primary"
                 inset
                 label="Public IPv4"
+                :readonly="enableIpv4"
                 :model-value="$props.ipv4"
                 @update:model-value="$emit('update:ipv4', $event ?? undefined)"
+                :style="enableIpv4 ? 'opacity: .5' : 'opacity: 1'"
               />
             </input-tooltip>
             <input-tooltip
@@ -130,6 +132,10 @@ export default {
       default: () => null,
     },
     disabled: { type: Boolean },
+    enableIpv4: {
+      type: Boolean,
+      default: () => null,
+    },
   },
   emits: {
     "update:ipv4": (value?: boolean) => value,

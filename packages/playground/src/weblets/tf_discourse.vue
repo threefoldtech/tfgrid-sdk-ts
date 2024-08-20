@@ -57,7 +57,13 @@
           :medium="{ cpu: 2, memory: 4, disk: 50 }"
           :large="{ cpu: 4, memory: 16, disk: 100 }"
         />
-        <Networks v-model:mycelium="mycelium" v-model:planetary="planetary" v-model:ipv4="ipv4" v-model:ipv6="ipv6" />
+        <Networks
+          v-model:mycelium="mycelium"
+          v-model:planetary="planetary"
+          v-model:ipv4="ipv4"
+          v-model:ipv6="ipv6"
+          enableIpv4
+        />
 
         <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
           <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
@@ -121,7 +127,7 @@ const profileManager = useProfileManager();
 const name = ref(generateName({ prefix: "dc" }));
 const email = ref(profileManager.profile?.email || "");
 const solution = ref() as Ref<SolutionFlavor>;
-const ipv4 = ref(false);
+const ipv4 = ref(true);
 const ipv6 = ref(false);
 const mycelium = ref(true);
 const planetary = ref(true);
@@ -142,7 +148,7 @@ const grid = gridStore.client as GridClient;
 
 function finalize(deployment: any) {
   layout.value.reloadDeploymentsList();
-  layout.value.setStatus("success", "Successfully deployed a discourse instance.");
+  layout.value.setStatus("success", "Successfully deployed a Discourse instance.");
   layout.value.openDialog(deployment, deploymentListEnvironments.discourse);
 }
 
@@ -206,7 +212,7 @@ async function deploy() {
       ],
     });
   } catch (e) {
-    return layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a discourse instance."));
+    return layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Discourse instance."));
   }
 
   if (!selectionDetails.value?.domain?.enableSelectedDomain) {
@@ -229,7 +235,7 @@ async function deploy() {
   } catch (e) {
     layout.value.setStatus("deploy", "Rollbacking back due to fail to deploy gateway...");
     await rollbackDeployment(grid!, name.value);
-    layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a discourse instance."));
+    layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Discourse instance."));
   }
 }
 

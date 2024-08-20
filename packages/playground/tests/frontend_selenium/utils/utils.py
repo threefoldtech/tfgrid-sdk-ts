@@ -98,6 +98,7 @@ def generate_gateway():
     return gateway
 
 def generate_gateway_from_ip(ipv4):
+    cryptogen = SystemRandom()
     ip, mask = ipv4.split('/')
     network = ipaddress.ip_network(f"{ip}/{mask}", strict=False)
     if network.num_addresses <= 2:

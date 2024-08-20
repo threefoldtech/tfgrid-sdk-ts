@@ -1,6 +1,6 @@
 <template>
   <VBottomNavigation class="border" :height="debugOpened === 0 ? openHeight : undefined">
-    <v-expansion-panels :model-value="debugOpened" @update:model-value="bindDebugOpened" :multiple="false">
+    <v-expansion-panels :model-value="debugOpened" ref="panel" @update:model-value="bindDebugOpened" :multiple="false">
       <v-expansion-panel eager>
         <v-expansion-panel-title :class="{ 'text-error': !!connectDB.error }">
           <span class="text-subtitle-1"> <VIcon icon="mdi-cog" /> Dashboard Logs ({{ logs.length }}) </span>
@@ -75,7 +75,6 @@
       </v-expansion-panel>
     </v-expansion-panels>
   </VBottomNavigation>
-
   <v-dialog max-width="400px" v-model="clearDialog" attach="#modals">
     <v-card>
       <VCardTitle v-text="'Clear Logs'" />
@@ -92,7 +91,7 @@
 import "vue3-virtual-scroller/dist/vue3-virtual-scroller.css";
 
 import { type LoggerInstance as LI, LoggerInterceptor } from "logger-interceptor";
-import { ref } from "vue";
+import { onBeforeUnmount, onMounted, ref } from "vue";
 import { DynamicScroller, DynamicScrollerItem } from "vue3-virtual-scroller";
 
 import { type Indexed, IndexedDBClient } from "@/clients";
@@ -114,6 +113,8 @@ export default {
   setup() {
     const scroller = ref();
     const debugOpened = ref<number>();
+    const panel = ref();
+
     function bindDebugOpened(value?: any): void {
       debugOpened.value = value;
 
@@ -202,7 +203,7 @@ export default {
     let _interceptorQueue: LI[] = [];
 
     async function interceptMessage(instance: LI) {
-      if (connectDB.value.error) {
+      if (connectDB.value.error ) {
         _interceptorQueue.push(instance);
         return;
       }
@@ -252,6 +253,20 @@ export default {
       downloadAsFile("dashboard.log", formatedLogs);
     }
 
+    onMounted(() => {
+      document.addEventListener("click", handleClickOutside);
+    });
+
+    onBeforeUnmount(() => {
+      document.removeEventListener("click", handleClickOutside);
+    });
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (panel.value && !panel.value.$el.contains(event.target)) {
+        debugOpened.value = undefined;
+      }
+    };
+
     return {
       connectDB,
       scroller,
@@ -266,6 +281,7 @@ export default {
       loadLogs,
       clearLogs,
       downloadLogs,
+      panel,
     };
   },
 };

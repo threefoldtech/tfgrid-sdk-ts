@@ -1,43 +1,43 @@
-import { CalculatorModel, CUModel, SUModel } from "../src";
+import { CalculatorModel, CUModel, GridClient, SUModel } from "../src";
 import { getClient } from "./client_loader";
 import { log } from "./utils";
 
-async function calculateCU(client, CUModel) {
+async function calculateCU(client: GridClient, CUModel: CUModel) {
   const res = await client.calculator.calCU(CUModel);
   log("================= Calculating CU =================");
   log(res);
   log("================= Calculating CU =================");
 }
 
-async function calculateSU(client, SUModel) {
+async function calculateSU(client: GridClient, SUModel: SUModel) {
   const res = await client.calculator.calSU(SUModel);
   log("================= Calculating SU =================");
   log(res);
   log("================= Calculating SU =================");
 }
 
-async function getTFTPrice(client) {
+async function getTFTPrice(client: GridClient) {
   const res = await client.calculator.tftPrice();
   log("================= TFT Price =================");
   log(res);
   log("================= TFT Price =================");
 }
 
-async function getPricingPolicy(client) {
+async function getPricingPolicy(client: GridClient) {
   const res = await client.calculator.getPrices();
   log("================= Pricing Policy =================");
   log(res);
   log("================= Pricing Policy =================");
 }
 
-async function calculateDeployment(client, CalculatorModel) {
+async function calculateDeployment(client: GridClient, CalculatorModel: CalculatorModel) {
   const res = await client.calculator.calculate(CalculatorModel);
   log("================= Deployment Cost =================");
   log(res);
   log("================= Deployment Cost =================");
 }
 
-async function calculateDeploymentWithCurrentBalance(client, CalculatorModel) {
+async function calculateDeploymentWithCurrentBalance(client: GridClient, CalculatorModel: CalculatorModel) {
   const res = await client.calculator.calculateWithMyBalance(CalculatorModel);
   log("================= Deployment Cost with current balance =================");
   log(res);
@@ -45,7 +45,7 @@ async function calculateDeploymentWithCurrentBalance(client, CalculatorModel) {
 }
 
 async function main() {
-  const grid3 = await getClient();
+  const grid3: GridClient = await getClient();
   const CalculatorModel: CalculatorModel = {
     cru: 16,
     mru: 8, // GB

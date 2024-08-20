@@ -288,7 +288,7 @@
             icon="mdi-eye-outline"
             @click="openDialog(tabs[activeTab].value, item)"
           />
-          <IconActionBtn tooltip="Visit" icon="mdi-web" color="anchor" :href="'https://' + item.env.GITEA_HOSTNAME" />
+          <IconActionBtn tooltip="Visit" icon="mdi-web" color="anchor" :href="'https://' + item.env.GITEA__HOSTNAME" />
         </template>
 
         <template #Nostr-actions="{ item }">

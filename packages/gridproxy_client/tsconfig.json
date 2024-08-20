@@ -3,8 +3,9 @@
     "target": "ES2017",
     "module": "ES2015",
     "moduleResolution": "node",
+    "types": ["node"],
     "baseUrl": "./src",
-    "outDir": "./dist",
+    "outDir": "./dist/es6",
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
@@ -13,7 +14,7 @@
     "strict": true,
     "skipLibCheck": true,
     "noImplicitAny": false,
-    "lib": ["es2019", "DOM"]
+    "resolveJsonModule": true
   },
   "include": ["src"],
   "exclude": ["node_modules", "tests"]
