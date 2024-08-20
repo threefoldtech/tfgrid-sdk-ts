@@ -75,8 +75,10 @@ export interface SelectionDetails {
 }
 
 export interface SelectedMachine {
+  farmId: number;
   nodeId: number;
   cpu: number;
   memory: number;
   disk: number;
+  publicIp: boolean;
 }
