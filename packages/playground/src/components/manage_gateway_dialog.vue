@@ -230,7 +230,7 @@ export default {
     const oldPrefix = ref("");
     const prefix = ref("");
     const subdomain = ref("");
-    const port = ref(80);
+    const port = ref(props.vm ? 80 : 443);
     const passThrough = ref(false);
     const valid = ref(false);
     const selectionDetails = ref<SelectionDetails>();
