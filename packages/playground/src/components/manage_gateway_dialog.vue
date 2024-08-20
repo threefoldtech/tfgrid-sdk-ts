@@ -124,6 +124,13 @@
               </input-tooltip>
             </div>
 
+            <v-select
+              label="Select node"
+              class="mt-4"
+              :items="availableK8SNodesNames"
+              v-model="selectedK8SNodeName"
+              v-if="k8s"
+            />
             <v-select label="Supported Interfaces" class="mt-4" :items="networks" v-model="selectedIPAddress" />
             <copy-input-wrapper #="{ props }" :data="(selectedIPAddress as any)">
               <v-text-field :readonly="true" label="Selected IP Address" v-model="selectedIPAddress" v-bind="props" />
@@ -249,6 +256,12 @@ export default {
     const requestDelete = ref(false);
     const gatewaysToDelete = ref<GridGateway[]>([]);
     const deleting = ref(false);
+    const availableK8SNodes = props.k8s ? [...props.k8s.masters, ...props.k8s.workers] : [];
+    const availableK8SNodesNames = availableK8SNodes.map(node => node.name);
+    const selectedK8SNodeName = ref(availableK8SNodesNames[0]);
+    const selectedNode = ref();
+
+    watch(selectedK8SNodeName, getSupportedNetworks, { deep: true });
 
     onMounted(async () => {
       updateGrid(grid, { projectName: "" });
@@ -351,21 +364,11 @@ export default {
     }
 
     function getSupportedNetworks() {
-      let publicIP, planetary, myceliumIP, interfaces;
-      if (props.vm) {
-        const VM = props.vm;
-        publicIP = VM.publicIP;
-        planetary = VM.planetary;
-        myceliumIP = VM.myceliumIP;
-        interfaces = VM.interfaces;
-      } else if (props.k8s) {
-        const master = props.k8s.masters[0];
-        publicIP = master.publicIP;
-        planetary = master.planetary;
-        myceliumIP = master.myceliumIP;
-        interfaces = master.interfaces;
-      }
-
+      (selectedNode.value = props.vm
+        ? props.vm
+        : availableK8SNodes.filter(node => node.name === selectedK8SNodeName.value)[0]),
+        (networks.value = []);
+      const { publicIP, planetary, myceliumIP, interfaces } = selectedNode.value;
       addNetwork(NetworkInterfaces.WireGuard, interfaces?.[0]?.ip);
       addNetwork(NetworkInterfaces.Planetary, planetary);
       addNetwork(NetworkInterfaces.Mycelium, myceliumIP);
@@ -461,6 +464,8 @@ export default {
       subdomainRules,
       portRules,
       isWireGuard,
+      availableK8SNodesNames,
+      selectedK8SNodeName,
     };
   },
 };
