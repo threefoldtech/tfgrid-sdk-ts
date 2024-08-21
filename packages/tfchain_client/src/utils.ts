@@ -19,7 +19,7 @@ export function requireCouncil(target: any, propertyKey: string | symbol, descri
   descriptor.value = async function (...args) {
     const members = await this.client.council.members();
     if (!members.includes(this.client.address)) {
-      throw new ValidationError("You need to be a council member to create this extrinsic");
+      throw new ValidationError("You have to be a council member to create this extrinsic");
     }
     return originalMethod.apply(this, args);
   };

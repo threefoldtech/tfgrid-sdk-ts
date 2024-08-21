@@ -92,7 +92,7 @@ class Balances extends QueryBalances {
     if (isNaN(options.amount) || options.amount < 0) {
       throw new ValidationError("The amount must be a positive numeric value");
     }
-    if (isAddress(options.address)) {
+    if (!isAddress(options.address)) {
       throw new ValidationError("The address is invalid");
     }
 
