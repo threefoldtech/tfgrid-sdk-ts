@@ -1,29 +1,29 @@
-import { FilterOptions, GatewayNameModel, MachinesModel } from "../../src";
+import { FilterOptions, GatewayNameModel, GridClient, MachinesModel, NodeInfo } from "../../src";
 import { config, getClient } from "../client_loader";
 import { log, pingNodes } from "../utils";
 
-async function deploy(client, vms, subdomain, gatewayNode) {
+async function deploy(client: GridClient, vms: MachinesModel, subdomain: string, gatewayNode: NodeInfo) {
+  // Deploying VM
   const resultVM = await client.machines.deploy(vms);
   log("================= Deploying VM =================");
   log(resultVM);
   log("================= Deploying VM =================");
-
-  const vmPlanetary = (await client.machines.getObj(vms.name))[0].planetary;
   //Name Gateway Model
+  const vmPlanetary = (await client.machines.getObj(vms.name))[0].planetary;
   const gw: GatewayNameModel = {
     name: subdomain,
     node_id: gatewayNode.nodeId,
     tls_passthrough: false,
     backends: ["http://[" + vmPlanetary + "]:9000"],
   };
-
+  // Deploying Gateway
   const resultGateway = await client.gateway.deploy_name(gw);
   log("================= Deploying name gateway =================");
   log(resultGateway);
   log("================= Deploying name gateway =================");
 }
 
-async function getDeployment(client, vms, gw) {
+async function getDeployment(client: GridClient, vms: MachinesModel, gw: string) {
   const resultVM = await client.machines.getObj(vms.name);
   const resultGateway = await client.gateway.getObj(gw);
   log("================= Getting deployment information =================");
@@ -33,9 +33,9 @@ async function getDeployment(client, vms, gw) {
   log("================= Getting deployment information =================");
 }
 
-async function cancel(client, vms, gw) {
-  const resultVM = await client.machines.delete(vms);
-  const resultGateway = await client.gateway.delete_name(gw);
+async function cancel(client: GridClient, vms: string, gw: string) {
+  const resultVM = await client.machines.delete({ name: vms });
+  const resultGateway = await client.gateway.delete_name({ name: gw });
   log("================= Canceling the deployment =================");
   log(resultVM);
   log(resultGateway);
@@ -113,7 +113,7 @@ async function main() {
   await getDeployment(grid3, vms, subdomain);
 
   // Uncomment the line below to cancel the deployment
-  // await cancel(grid3, { name }, { name: subdomain });
+  await cancel(grid3, name, subdomain);
 
   await grid3.disconnect();
 }
