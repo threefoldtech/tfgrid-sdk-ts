@@ -1,8 +1,9 @@
+import { isAddress } from "@polkadot/util-crypto";
 import { ValidationError } from "@threefold/types";
 
 import { Client, QueryClient } from "./client";
 import { ExtrinsicResult } from "./types";
-import { checkConnection } from "./utils";
+import { checkConnection, requireCouncil } from "./utils";
 
 interface Balance {
   free: number;
@@ -88,6 +89,9 @@ class Balances extends QueryBalances {
   async forceSetBalance(options: BalanceForceSetBalanceOptions): Promise<ExtrinsicResult<number>> {
     if (isNaN(options.amount) || options.amount < 0) {
       throw new ValidationError("The amount must be a positive numeric value");
+    }
+    if (isAddress(options.address)) {
+      throw new ValidationError("The address is invalid");
     }
 
     const extrinsic = await this.client.api.tx.balances.forceSetBalance(options.address, options.amount);
