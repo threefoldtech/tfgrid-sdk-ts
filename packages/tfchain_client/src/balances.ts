@@ -69,6 +69,7 @@ class Balances extends QueryBalances {
    * @returns {Promise<ExtrinsicResult<number>>} A promise that resolves once the transfer extrinsic is created.
    */
   @checkConnection
+  @requireCouncil
   async forceTransfer(options: BalanceForceTransferOptions): Promise<ExtrinsicResult<number>> {
     if (isNaN(options.amount) || options.amount <= 0) {
       throw new ValidationError("The amount must be a positive numeric value");
@@ -86,6 +87,7 @@ class Balances extends QueryBalances {
    * @returns {Promise<ExtrinsicResult<number>>} A promise that resolves once the set balance extrinsic is created.
    */
   @checkConnection
+  @requireCouncil
   async forceSetBalance(options: BalanceForceSetBalanceOptions): Promise<ExtrinsicResult<number>> {
     if (isNaN(options.amount) || options.amount < 0) {
       throw new ValidationError("The amount must be a positive numeric value");

@@ -1,6 +1,6 @@
 import { Client, QueryClient } from "./client";
 import { ExtrinsicResult } from "./types";
-import { checkConnection } from "./utils";
+import { checkConnection, requireCouncil } from "./utils";
 
 export interface CouncilGetProposalOptions {
   hash: string;
@@ -100,6 +100,7 @@ class Council extends QueryCouncil {
    * @returns A promise that resolves to the created proposal extrinsic.
    */
   @checkConnection
+  @requireCouncil
   async propose<T>(options: CouncilProposeOptions<T>): Promise<ExtrinsicResult<CouncilProposal>> {
     const extrinsic = await this.client.api.tx.council.propose(options.threshold, options.proposal, 1000);
     return this.client.patchExtrinsic<CouncilProposal>(extrinsic, {
@@ -124,6 +125,7 @@ class Council extends QueryCouncil {
    * @returns A promise that resolves to an extrinsic for closing a council proposal.
    */
   @checkConnection
+  @requireCouncil
   async close(options: CouncilCloseProposalOptions): Promise<ExtrinsicResult<void>> {
     const now = Math.floor(new Date().getTime() / 1000);
     const extrinsic = await this.client.api.tx.council.close(
@@ -145,6 +147,7 @@ class Council extends QueryCouncil {
    * @returns A promise that resolves to an extrinsic for voting on a council proposal.
    */
   @checkConnection
+  @requireCouncil
   async vote(options: CouncilVoteOptions) {
     const extrinsic = await this.client.api.tx.council.vote(options.hash, options.index, options.approve);
     return this.client.patchExtrinsic(extrinsic);
