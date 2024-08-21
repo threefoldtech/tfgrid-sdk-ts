@@ -49,6 +49,17 @@ class QueryCouncil {
     const res = await this.client.api.query.council.proposalCount();
     return res.toPrimitive() as number;
   }
+
+  /**
+   * Retrieves all council members.
+   *
+   * @returns A Promise that resolves to all council members.
+   */
+  @checkConnection
+  async members(): Promise<string[]> {
+    const res = await this.client.api.query.council.members();
+    return res.toPrimitive() as string[];
+  }
 }
 
 export interface CouncilProposeOptions<T> {
