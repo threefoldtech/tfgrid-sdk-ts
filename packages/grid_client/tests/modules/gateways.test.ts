@@ -18,6 +18,22 @@ beforeAll(async () => {
   return gridClient;
 });
 
+async function waitForGateway(domain: string) {
+  for (let i = 0; i < 30; i++) {
+    try {
+      await axios.get(domain);
+      log("gateway is reachable");
+      return true;
+    } catch (error) {
+      log("gateway is not reachable");
+    }
+
+    const wait = await setTimeout(5000, "Waiting for gateway to be ready");
+    log(wait);
+  }
+  return false;
+}
+
 //Private IP Regex
 const ipRegex = /(^127\.)|(^10\.)|(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1]\.)|(^192\.168\.)/;
 
@@ -200,26 +216,8 @@ test("TC1237 - Gateways: Expose a VM Over Gateway", async () => {
   expect(gatewayResult[0].backends).toStrictEqual(backends);
 
   let domain = "https://" + gatewayResult[0].domain;
-  let reachable = false;
 
-  for (let i = 0; i < 30; i++) {
-    axios
-      .get(domain)
-      .then(() => {
-        log("gateway is reachable");
-        reachable = true;
-      })
-      .catch(() => {
-        log("gateway is not reachable");
-      });
-    if (reachable) {
-      break;
-    }
-    const wait = await setTimeout(5000, "Waiting for gateway to be ready");
-    log(wait);
-  }
-
-  if (reachable) {
+  if (await waitForGateway(domain)) {
     axios.get(domain).then(res => {
       log(res.status);
       log(res.statusText);
@@ -268,26 +266,8 @@ test("TC1237 - Gateways: Expose a VM Over Gateway", async () => {
   expect(gatewayResult[0].backends).toStrictEqual(backends);
 
   domain = "https://" + gatewayResult[0].domain;
-  reachable = false;
 
-  for (let i = 0; i < 30; i++) {
-    axios
-      .get(domain)
-      .then(() => {
-        log("gateway is reachable");
-        reachable = true;
-      })
-      .catch(() => {
-        log("gateway is not reachable");
-      });
-    if (reachable) {
-      break;
-    }
-    const wait = await setTimeout(5000, "Waiting for gateway to be ready");
-    log(wait);
-  }
-
-  if (reachable) {
+  if (await waitForGateway(domain)) {
     axios.get(domain).then(res => {
       log(res.status);
       log(res.statusText);
@@ -336,26 +316,8 @@ test("TC1237 - Gateways: Expose a VM Over Gateway", async () => {
   expect(gatewayResult[0].backends).toStrictEqual(backends);
 
   domain = "https://" + gatewayResult[0].domain;
-  reachable = false;
 
-  for (let i = 0; i < 30; i++) {
-    axios
-      .get(domain)
-      .then(() => {
-        log("gateway is reachable");
-        reachable = true;
-      })
-      .catch(() => {
-        log("gateway is not reachable");
-      });
-    if (reachable) {
-      break;
-    }
-    const wait = await setTimeout(5000, "Waiting for gateway to be ready");
-    log(wait);
-  }
-
-  if (reachable) {
+  if (await waitForGateway(domain)) {
     axios.get(domain).then(res => {
       log(res.status);
       log(res.statusText);
@@ -404,26 +366,8 @@ test("TC1237 - Gateways: Expose a VM Over Gateway", async () => {
   expect(gatewayResult[0].backends).toStrictEqual(backends);
 
   domain = "https://" + gatewayResult[0].domain;
-  reachable = false;
 
-  for (let i = 0; i < 30; i++) {
-    axios
-      .get(domain)
-      .then(() => {
-        log("gateway is reachable");
-        reachable = true;
-      })
-      .catch(() => {
-        log("gateway is not reachable");
-      });
-    if (reachable) {
-      break;
-    }
-    const wait = await setTimeout(5000, "Waiting for gateway to be ready");
-    log(wait);
-  }
-
-  if (reachable) {
+  if (await waitForGateway(domain)) {
     axios.get(domain).then(res => {
       log(res.status);
       log(res.statusText);
@@ -489,26 +433,8 @@ test("TC1237 - Gateways: Expose a VM Over Gateway", async () => {
   expect(gatewayResult[0].backends).toStrictEqual(backends);
 
   domain = "https://" + gatewayResult[0].domain;
-  reachable = false;
 
-  for (let i = 0; i < 30; i++) {
-    axios
-      .get(domain)
-      .then(() => {
-        log("gateway is reachable");
-        reachable = true;
-      })
-      .catch(() => {
-        log("gateway is not reachable");
-      });
-    if (reachable) {
-      break;
-    }
-    const wait = await setTimeout(5000, "Waiting for gateway to be ready");
-    log(wait);
-  }
-
-  if (reachable) {
+  if (await waitForGateway(domain)) {
     axios.get(domain).then(res => {
       log(res.status);
       log(res.statusText);
@@ -525,7 +451,7 @@ test("TC1237 - Gateways: Expose a VM Over Gateway", async () => {
   }
 });
 
-afterEach(async () => {
+afterAll(async () => {
   const vmNames = await gridClient.machines.list();
   for (const name of vmNames) {
     const res = await gridClient.machines.delete({ name });
@@ -543,8 +469,6 @@ afterEach(async () => {
     expect(res.updated).toHaveLength(0);
     expect(res.deleted).toBeDefined();
   }
-});
 
-afterAll(async () => {
   return await gridClient.disconnect();
 }, 130000);
