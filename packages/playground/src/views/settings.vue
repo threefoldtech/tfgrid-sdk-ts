@@ -174,12 +174,12 @@ export default {
     const themes = ["System Mode", "Dark Mode", "Light Mode"];
 
     const currentTheme = ref(localStorage.getItem(THEME_KEY));
+    const selectedTheme = ref(currentTheme.value == "light" ? "Light Mode" : "Dark Mode");
 
     watch(theme.global.name, () => {
       currentTheme.value = localStorage.getItem(THEME_KEY);
+      selectedTheme.value = currentTheme.value == "light" ? "Light Mode" : "Dark Mode";
     });
-
-    const selectedTheme = ref(currentTheme.value == "light" ? "Light Mode" : "Dark Mode");
 
     const currentPassword = ref("");
     const newPassword = ref("");
