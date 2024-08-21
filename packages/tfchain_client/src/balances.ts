@@ -42,6 +42,8 @@ export interface BalanceForceTransferOptions {
   amount: number;
 }
 
+export type BalanceForceSetBalanceOptions = BalanceTransferOptions;
+
 class Balances extends QueryBalances {
   constructor(public client: Client) {
     super(client);
@@ -72,6 +74,23 @@ class Balances extends QueryBalances {
     }
 
     const extrinsic = await this.client.api.tx.balances.forceTransfer(options.source, options.dest, options.amount);
+    return this.client.patchExtrinsic<number>(extrinsic, { map: () => options.amount });
+  }
+
+  /**
+   * Prepare a force set balance extrinsic to a specified amount of TFT (`ThreeFold Tokens`).
+   * It's a council call that can't be executed by a normal user.
+   *
+   * @param {BalanceForceSetBalanceOptions} options - The set balance options, including the account address and the amount to set.
+   * @returns {Promise<ExtrinsicResult<number>>} A promise that resolves once the set balance extrinsic is created.
+   */
+  @checkConnection
+  async forceSetBalance(options: BalanceForceSetBalanceOptions): Promise<ExtrinsicResult<number>> {
+    if (isNaN(options.amount) || options.amount < 0) {
+      throw new ValidationError("The amount must be a positive numeric value");
+    }
+
+    const extrinsic = await this.client.api.tx.balances.forceSetBalance(options.address, options.amount);
     return this.client.patchExtrinsic<number>(extrinsic, { map: () => options.amount });
   }
 
