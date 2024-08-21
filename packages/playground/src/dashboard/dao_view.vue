@@ -376,7 +376,7 @@ async function castVote() {
       let errMsg = `Vote Failed!`;
 
       if (err instanceof TFChainError && err.keyError == "DuplicateVote") {
-        errMsg = `Failed to vote; Already voted`;
+        errMsg = "Failed to vote. You have already voted.";
       }
       console.error(errMsg, err);
 
