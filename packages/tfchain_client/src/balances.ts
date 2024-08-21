@@ -79,7 +79,7 @@ class Balances extends QueryBalances {
 
   /**
    * Prepare a force set balance extrinsic to a specified amount of TFT (`ThreeFold Tokens`).
-   * It's a council call that can't be executed by a normal user.
+   * It's a council call that can't be executed by a normal user. It should be called in a proposal.
    *
    * @param {BalanceForceSetBalanceOptions} options - The set balance options, including the account address and the amount to set.
    * @returns {Promise<ExtrinsicResult<number>>} A promise that resolves once the set balance extrinsic is created.
