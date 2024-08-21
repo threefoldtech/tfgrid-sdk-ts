@@ -4,7 +4,7 @@
 
     <d-tabs :tabs="[{ title: 'Config', value: 'config' }]">
       <template #config>
-        <input-tooltip tooltip="Selecting custom domain sets subdomain as gateway name.">
+        <input-tooltip tooltip="Selecting Custom Domain sets the subdomain as the gateway name.">
           <input-validator
             :value="subdomain"
             :rules="[
@@ -26,7 +26,7 @@
           <TfSelectionDetails disable-node-selection require-domain use-fqdn v-model="selectionDetails" />
         </div>
 
-        <input-tooltip tooltip="Port used to access the machine.">
+        <input-tooltip tooltip="The port used to access the machine.">
           <input-validator
             :value="port"
             :rules="[validators.required('Port is required.'), validators.isPort('Please provide a valid port.')]"
@@ -37,7 +37,7 @@
         </input-tooltip>
 
         <input-tooltip
-          tooltip="User's machine's IP , It could be Mycelium IP, Yggdrasil IP, or a public IP (IPv4 or IPv6)."
+          tooltip="User's machine's IP: It could be Mycelium IP, Yggdrasil IP, or a public IP (IPv4 or IPv6)."
         >
           <input-validator
             :value="ip"
