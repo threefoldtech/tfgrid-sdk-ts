@@ -369,11 +369,15 @@ export default {
         : availableK8SNodes.filter(node => node.name === selectedK8SNodeName.value)[0]),
         (networks.value = []);
       const { publicIP, planetary, myceliumIP, interfaces } = selectedNode.value;
+
       addNetwork(NetworkInterfaces.WireGuard, interfaces?.[0]?.ip);
-      addNetwork(NetworkInterfaces.Planetary, planetary);
-      addNetwork(NetworkInterfaces.Mycelium, myceliumIP);
-      addNetwork(NetworkInterfaces.PublicIPV6, publicIP?.ip6.split("/")[0]);
       addNetwork(NetworkInterfaces.PublicIPV4, publicIP?.ip.split("/")[0]);
+
+      if (props.vm) {
+        addNetwork(NetworkInterfaces.Planetary, planetary);
+        addNetwork(NetworkInterfaces.Mycelium, myceliumIP);
+        addNetwork(NetworkInterfaces.PublicIPV6, publicIP?.ip6.split("/")[0]);
+      }
       selectedIPAddress.value = networks.value[0];
     }
 
