@@ -132,7 +132,7 @@ const email = ref(profileManager.profile?.email || "");
 const solution = ref() as Ref<SolutionFlavor>;
 const ipv4 = ref(true);
 const ipv6 = ref(false);
-const wireguard = ref(!selectionDetails.value?.domain?.enabledCustomDomain);
+const wireguard = ref(!selectionDetails.value?.domain?.enabledCustomDomain && ipv4.value);
 const mycelium = ref(true);
 const planetary = ref(false);
 const smtp = ref(createSMTPServer());
@@ -270,8 +270,12 @@ watch(
 
 watch(
   () => selectionDetails.value?.domain?.enabledCustomDomain,
-  (value: boolean | undefined) => {
-    wireguard.value = !value;
+  () => {
+    if (selectionDetails.value?.domain?.enabledCustomDomain && ipv4.value) {
+      wireguard.value = false;
+    } else {
+      wireguard.value = true;
+    }
   },
   { deep: true },
 );

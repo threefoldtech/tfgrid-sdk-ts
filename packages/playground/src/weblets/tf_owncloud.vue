@@ -157,7 +157,7 @@ const dedicated = ref(false);
 const certified = ref(false);
 const ipv4 = ref(false);
 const ipv6 = ref(false);
-const wireguard = ref(!selectionDetails.value?.domain?.enabledCustomDomain);
+const wireguard = ref(!selectionDetails.value?.domain?.enabledCustomDomain && ipv4.value);
 const planetary = ref(false);
 const mycelium = ref(true);
 const smtp = ref(createSMTPServer());
@@ -297,8 +297,12 @@ watch(
 
 watch(
   () => selectionDetails.value?.domain?.enabledCustomDomain,
-  (value: boolean | undefined) => {
-    wireguard.value = !value;
+  () => {
+    if (selectionDetails.value?.domain?.enabledCustomDomain && ipv4.value) {
+      wireguard.value = false;
+    } else {
+      wireguard.value = true;
+    }
   },
   { deep: true },
 );
