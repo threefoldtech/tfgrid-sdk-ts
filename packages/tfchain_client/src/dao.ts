@@ -2,7 +2,7 @@ import moment from "moment";
 
 import { Client, QueryClient } from "./client";
 import { ExtrinsicResult } from "./types";
-import { checkConnection } from "./utils";
+import { checkConnection, requireCouncil } from "./utils";
 export interface DaoProposalDetails {
   threshold: number;
   ayes: AyesAndNayes[];
@@ -176,6 +176,7 @@ class Dao extends QueryDao {
    * @returns A promise that resolves to the created proposal extrinsic.
    */
   @checkConnection
+  @requireCouncil
   async propose<T>(options: DaoProposeOptions<T>) {
     const extrinsic = await this.client.api.tx.dao.propose(
       options.threshold,
@@ -221,6 +222,7 @@ class Dao extends QueryDao {
    * @returns A promise that resolves to an extrinsic for closing a dao proposal.
    */
   @checkConnection
+  @requireCouncil
   async close(options: DaoCloseOptions) {
     const extrinsic = this.client.api.tx.dao.close(options.hash, options.index);
     return this.client.patchExtrinsic(extrinsic);
