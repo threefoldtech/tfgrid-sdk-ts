@@ -13,7 +13,12 @@ export function checkConnection(target: any, propertyKey: string | symbol, descr
     return originalMethod.apply(this, args);
   };
 }
-
+/**
+ * A decorate that should be added to a method that requires a council member to call it.
+ *
+ * @returns The original method call.
+ * @throws {ValidationError} - If the caller is not a council member.
+ */
 export function requireCouncil(target: any, propertyKey: string | symbol, descriptor: PropertyDescriptor) {
   const originalMethod = descriptor.value;
   descriptor.value = async function (...args) {
