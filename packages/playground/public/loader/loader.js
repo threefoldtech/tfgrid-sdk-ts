@@ -47,22 +47,27 @@ refreshBtn &&
   );
 
 window.$$appLoader = () => {
-  refreshBtn && refreshBtn.classList.remove("active");
-  t1 && clearTimeout(t1);
-  t2 && clearTimeout(t2);
+  return new Promise(res => {
+    refreshBtn && refreshBtn.classList.remove("active");
+    t1 && clearTimeout(t1);
+    t2 && clearTimeout(t2);
 
-  refreshBtn && refreshBtn.classList.remove("active");
-  loader && loader.classList.remove("active");
-  if (msgElement) {
-    msgElement.textContent = "Dashboard loaded. Welcome!";
-  }
-
-  setTimeout(() => {
-    if (appLoaderContainer) {
-      appLoaderContainer.classList.remove("active");
-      setTimeout(() => appLoaderContainer.remove(), appLoaderContainerTime);
+    refreshBtn && refreshBtn.classList.remove("active");
+    loader && loader.classList.remove("active");
+    if (msgElement) {
+      msgElement.textContent = "Dashboard loaded. Welcome!";
     }
-  }, welcomeMsgTime);
+
+    setTimeout(() => {
+      if (appLoaderContainer) {
+        appLoaderContainer.classList.remove("active");
+        setTimeout(() => {
+          appLoaderContainer.remove();
+          res();
+        }, appLoaderContainerTime);
+      }
+    }, welcomeMsgTime);
+  });
 };
 window.$$showMonitorError = urls => {
   if (msgElement) msgElement.classList.remove("active");

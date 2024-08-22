@@ -37,7 +37,7 @@ declare module "@vue/runtime-core" {
 
 declare global {
   interface Window {
-    $$appLoader: () => void;
+    $$appLoader: () => Promise<void>;
     $$showMonitorError: (urls: { [key: string]: string | null }) => void;
     env: {
       GRAPHQL_STACKS: string[];
