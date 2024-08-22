@@ -198,15 +198,13 @@ async function deploy() {
               key: "GITEA__HOSTNAME",
               value: domain,
             },
-            ...(smtp.value.enabled
-              ? [
-                  { key: "GITEA__mailer__PROTOCOL", value: "smtp" },
-                  { key: "GITEA__mailer__HOST", value: smtp.value.hostname },
-                  { key: "GITEA__mailer__PORT", value: smtp.value.port.toString() },
-                  { key: "GITEA__mailer__USER", value: smtp.value.username },
-                  { key: "GITEA__mailer__PASSWD", value: smtp.value.password },
-                ]
-              : []),
+            { key: "GITEA__mailer__PROTOCOL", value: "smtp" },
+            { key: "GITEA__mailer__ENABLED", value: smtp.value?.enabled.toString() },
+            { key: "GITEA__mailer__HOST", value: smtp.value?.hostname },
+            { key: "GITEA__mailer__FROM", value: smtp.value?.email },
+            { key: "GITEA__mailer__PORT", value: smtp.value?.port.toString() },
+            { key: "GITEA__mailer__USER", value: smtp.value?.username },
+            { key: "GITEA__mailer__PASSWD", value: smtp.value?.password },
           ],
           planetary: planetary.value,
           mycelium: mycelium.value,

@@ -61,6 +61,8 @@ jobs:
           lerna run build --no-private
       - name: Run tests
         run: yarn workspace @threefold/grid_client test --runInBand --ci --coverage --colors --forceExit
+        env:
+          NODE_TLS_REJECT_UNAUTHORIZED: '0'  # Disable TLS/SSL certificate validation
       - name: Cleanup
         continue-on-error: true
         run: yarn run ts-node --project tsconfig-node.json packages/grid_client/tests/global_teardown.ts

@@ -48,7 +48,7 @@ def test_edit_twin_email(browser):
     """
     twin_page = before_test_setup(browser)
     email = generate_email()
-    twin_page.press_edit_btn()
+    assert twin_page.press_edit_btn() == get_email()
     twin_page.edit_twin_email(email)
     cases = [generate_string(), '123456', '!)$%&@#(+?', '1@c@vva.ca', '1f@test,com', '@test.com', 'test@.com', 'test@com']
     for case in cases:
@@ -73,8 +73,8 @@ def test_get_tft(browser):
       Result: Assert that it should go to the correct link. 
     """
     twin_page = before_test_setup(browser)
-    twin_page.get_tft()
-    assert '/html' in browser.page_source
+    # twin_page.get_tft() # Get TFT button was removed from dashboard
+    # assert '/html' in browser.page_source
     # NO checking as devnet don't direct to TF Connect page https://gettft.com/auth/login?next_url=/gettft/shop/#/buy
     assert twin_page.press_locked_info() == 'https://www.manual.grid.tf/documentation/developers/tfchain/tfchain.html#contract-locking'
 

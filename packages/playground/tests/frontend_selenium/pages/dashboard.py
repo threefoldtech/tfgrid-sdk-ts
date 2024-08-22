@@ -4,6 +4,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.alert import Alert
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import StaleElementReferenceException
 from utils.base import Base
 import time
 
@@ -23,8 +24,8 @@ class DashboardPage:
     usd_price_label = (By.XPATH, '/html/body/div[1]/div/div/main/header/div/div[2]/div/div/div/span[2]')
     tft_swap_button = (By.XPATH, '/html/body/div[1]/div/div/main/header/div/div[2]/div/div/div/button/span[3]/i')
     tft_info_button = (By.XPATH, '/html/body/div[1]/div/div/main/header/div/div[2]/div/div/div/a/span[3]/i')
-    stellar_tft_price_label = (By.XPATH, '/html/body/div[2]/div/div[3]/div/div/div[3]/div[1]/div[1]/dl/dd[9]/span')
-    stellar_tft_price_change_label = (By.XPATH, '/html/body/div[2]/div/div[3]/div/div/div[3]/div[1]/div[1]/dl/dd[9]/span/span[1]')
+    stellar_tft_price_label = (By.XPATH, "//dt[text()='Current price:']/following-sibling::dd/span[1]")
+    stellar_tft_price_change_label = (By.XPATH, "//span[contains(@class, 'price-change') and @aria-label]")
     mnemonic_input = (By.XPATH, "//input[@placeholder='Please insert your Mnemonic or Hex Seed']")
     email_input = (By.XPATH, "//input[@placeholder='email@example.com']")
     password_input = (By.XPATH, "(//input[@size='1' and @type='password'])[2]")
@@ -36,10 +37,10 @@ class DashboardPage:
     login_password_input = (By.XPATH, "//label[text()='Password']/following-sibling::input")
     accept_terms_condition_button = (By.XPATH, "//button[.//span[text()='Accept terms and conditions']]")
     connect_manual_button = (By.XPATH, "//p[@class='mb-4 text-center']/a")
-    connect_google_button = (By.XPATH, '/html/body/div[2]/div[30]/div[2]/div[2]/div[2]/div[2]/div[2]/section/div/a[1]')
-    connect_apple_button = (By.XPATH, '/html/body/div[2]/div[30]/div[2]/div[2]/div[2]/div[2]/div[2]/section/div/a[2]')
+    connect_google_button = (By.XPATH, "//a[@title='play-store']")
+    connect_apple_button = (By.XPATH, "//a[@title='app-store']")
     iframe_load_label = (By.XPATH, "//*[contains(text(), 'THESE TERMS AND CONDITIONS')]")
-    mnemonic_input_reveal_button = (By.XPATH, '/html/body/div[2]/div[30]/div[2]/div[2]/div[2]/div[2]/div[1]/div[1]/div[1]/div/div[4]/i')
+    mnemonic_input_reveal_button = (By.XPATH, "//i[@aria-label='Your Mnemonic appended action']")
     mnemonic_login_label = (By.XPATH, "//label[text()='Your Mnemonic']/following-sibling::input")
     email_login_label = (By.XPATH, "//label[text()='Email']/following-sibling::input")
     id_login_label = (By.XPATH, "//label[text()='Twin ID']/following-sibling::input")
@@ -64,10 +65,12 @@ class DashboardPage:
     def press_esc_key(self):
         webdriver.ActionChains(self.browser).send_keys(Keys.ESCAPE).perform()
     
-    def import_account(self, seed):
+    def import_account(self, seed, validation=True):
         self.browser.find_element(*self.mnemonic_input).send_keys(Keys.CONTROL + "a")
         self.browser.find_element(*self.mnemonic_input).send_keys(Keys.DELETE)
         self.browser.find_element(*self.mnemonic_input).send_keys(seed)
+        if(validation):
+            WebDriverWait(self.browser, 30).until(EC.element_to_be_clickable(self.email_input))
 
     def connect_your_wallet(self, email, password):
         self.browser.find_element(*self.email_input).send_keys(Keys.CONTROL + "a")
@@ -82,10 +85,17 @@ class DashboardPage:
         return self.browser.find_element(*self.connect_button)
 
     def logout_account(self):
-        self.wait_for_button(self.browser.find_element(*self.logout_button)).click()
+        time.sleep(3)
+        while True:
+            try:
+                self.wait_for_button(self.browser.find_element(*self.logout_button)).click()
+                break  # Exit the loop if interaction is successful
+            except StaleElementReferenceException:
+                time.sleep(0.5)
+        WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.find_more_button))
         self.browser.refresh()
-        alert = Alert(self.browser)
-        alert.accept()
+        # alert = Alert(self.browser)
+        # alert.accept()
         self.browser.switch_to.window(self.browser.window_handles[0])
         WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.profile_load_label))
     
@@ -190,7 +200,9 @@ class DashboardPage:
 
     def navigate_to_learn_about_grid(self):
         WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.learn_about_grid_button))
-        self.browser.execute_script("window.scrollTo(0,document.body.scrollHeight)")
+        webdriver.ActionChains(self.browser).send_keys(Keys.END).perform()
+        webdriver.ActionChains(self.browser).send_keys(Keys.PAGE_DOWN).perform()
+        time.sleep(3)
         self.browser.find_element(*self.learn_about_grid_button).click()
         return self.get_link()
     
