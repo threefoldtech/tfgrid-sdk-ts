@@ -155,12 +155,14 @@
   </view-layout>
 </template>
 <script lang="ts">
+import type { GridClient } from "@threefold/grid_client";
 import md5 from "md5";
 import { onMounted, ref, watch } from "vue";
 import { useTheme } from "vuetify";
 
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
 
+import { useGrid } from "../stores";
 import { getCredentials, updateCredentials } from "../utils/credentials";
 
 export default {
@@ -190,7 +192,7 @@ export default {
     const selectedDeploymentTimeout = ref(0);
     const isValidTimeout = ref(false);
     const isValidPassword = ref(false);
-
+    const gridStore = useGrid();
     onMounted(async () => {
       currentQueryTimeout.value = +localStorage.getItem(TIMEOUT_QUERY_KEY)!;
       selectedQueryTimeout.value = currentQueryTimeout.value;
@@ -263,8 +265,10 @@ export default {
         currentDeploymentTimeout.value == selectedDeploymentTimeout.value
       );
     }
-    function UpdateTimeout() {
+    async function UpdateTimeout() {
       try {
+        const client = gridStore.client as GridClient;
+
         if (selectedQueryTimeout.value != currentQueryTimeout.value) {
           localStorage.setItem(TIMEOUT_QUERY_KEY, `${selectedQueryTimeout.value}`);
           currentQueryTimeout.value = +localStorage.getItem(TIMEOUT_QUERY_KEY)!;
@@ -275,6 +279,10 @@ export default {
           localStorage.setItem(TIMEOUT_DEPLOYMENT_KEY, `${selectedDeploymentTimeout.value}`);
           currentDeploymentTimeout.value = +localStorage.getItem(TIMEOUT_DEPLOYMENT_KEY)!;
           selectedDeploymentTimeout.value = currentDeploymentTimeout.value;
+          if (client) {
+            client.clientOptions.deploymentTimeoutMinutes = +localStorage.getItem(TIMEOUT_DEPLOYMENT_KEY)! / 60;
+            await client._connect;
+          }
         }
 
         createCustomToast("Session Timeout Updated", ToastType.success);

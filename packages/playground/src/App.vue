@@ -220,7 +220,6 @@ const navbarConfig = ref();
 const TIMEOUT_QUERY_KEY = "APP_QUERY_TIMEOUT";
 const TIMEOUT_DEPLOYMENT_KEY = "APP_DEPLOYMENT_TIMEOUT";
 const THEME_KEY = "APP_CURRENT_THEME";
-const getCurrentTheme = ref(window.matchMedia("(prefers-color-scheme: dark)").matches);
 
 const hasGrid = computed(() => !!gridStore.grid);
 
@@ -264,7 +263,7 @@ function navigateToHome() {
 }
 onMounted(window.$$appLoader || noop);
 
-onMounted(() => {
+onMounted(async () => {
   if (!localStorage.getItem(TIMEOUT_QUERY_KEY)) {
     localStorage.setItem(TIMEOUT_QUERY_KEY, `${window.env.TIMEOUT}`);
   } else {
@@ -276,7 +275,8 @@ onMounted(() => {
   } else {
     const client = gridStore.client as GridClient;
     if (client) {
-      client.clientOptions.deploymentTimeoutMinutes = +localStorage.getItem(TIMEOUT_DEPLOYMENT_KEY)!;
+      client.clientOptions.deploymentTimeoutMinutes = +localStorage.getItem(TIMEOUT_DEPLOYMENT_KEY)! / 60;
+      await client._connect;
     }
   }
 });
