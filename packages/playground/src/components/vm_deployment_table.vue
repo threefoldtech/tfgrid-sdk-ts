@@ -268,7 +268,14 @@ async function loadDeployments() {
 const filteredHeaders = computed(() => {
   if (props.projectName.toLowerCase() === ProjectName.Domains.toLowerCase()) {
     return [
-      { title: "Name", key: "0.workloads.0.data.name" },
+      {
+        title: "Name",
+        key: "domain-name",
+        value(item: any) {
+          const [workload] = item[0].workloads;
+          return workload.data.name || workload.name;
+        },
+      },
       {
         title: "Backends",
         key: "0.workloads.0.data.backends",
@@ -276,7 +283,14 @@ const filteredHeaders = computed(() => {
           return item[0].workloads[0].data.backends.join(", ");
         },
       },
-      { title: "Domain", key: "0.workloads.0.result.data.fqdn" },
+      {
+        title: "Domain",
+        key: "fqdn",
+        value(item: any) {
+          const [workload] = item[0].workloads;
+          return workload.result.data.fqdn || workload.data.fqdn;
+        },
+      },
       {
         title: "Health",
         key: "health",

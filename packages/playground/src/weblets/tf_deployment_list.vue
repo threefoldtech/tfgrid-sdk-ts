@@ -228,7 +228,7 @@
             tooltip="Visit"
             icon="mdi-web"
             color="anchor"
-            :href="'https://' + item[0].workloads[0].result.data.fqdn"
+            :href="'https://' + (item[0].workloads[0].result.data.fqdn || item[0].workloads[0].data.fqdn)"
           />
         </template>
 
