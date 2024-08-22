@@ -73,7 +73,7 @@ async function main() {
          * - If not provided, the `GridClient` will generate a seed automatically when the `mycelium` flag is enabled.
          * - **Use Case:** If you need the new machine to have the same IP address as a previously deleted machine, you can reuse the old seed by setting the `myceliumSeed` field.
          */
-        myceliumSeed: generateRandomHexSeed(3), // (HexSeed of length 6)
+        myceliumSeed: generateRandomHexSeed(6), // (HexSeed of length 6)
         cpu: 1,
         memory: 1024 * 2,
         rootfs_size: 0,
