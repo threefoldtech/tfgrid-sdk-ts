@@ -39,7 +39,7 @@ async function main() {
            * ### Mycelium Network Seed:
            * - The `seed` is an optional field used to provide a specific seed for the Mycelium network.
            * - If not provided, the `GridClient` will generate a seed automatically when the `mycelium` flag is enabled.
-           * - **Use Case:** If you need the new machine to have the same IP address as a previously deleted machine, you can reuse the old seed by setting the `myceliumSeed` field.
+           * - **Use Case:** If you need the new machine to have the same IP address as a previously deleted machine, set the `seed` field to the old seed value.
            */
           seed: generateRandomHexSeed(32),
         },
@@ -71,8 +71,7 @@ async function main() {
          * ### Mycelium Seed:
          * - The `myceliumSeed` is an optional field used to provide a specific seed for the Mycelium network.
          * - If not provided, the `GridClient` will generate a seed automatically when the `mycelium` flag is enabled.
-         * - **Use Case:** If you need the new machine to have the same IP address as a previously deleted machine, you can reuse the old seed by setting the `myceliumSeed` field.
-         */
+         * - **Use Case:** If you need the new machine to have the same IP address as a previously deleted machine, set the `seed` field to the old seed value.         */
         myceliumSeed: generateRandomHexSeed(6), // (HexSeed of length 6)
         cpu: 1,
         memory: 1024 * 2,
