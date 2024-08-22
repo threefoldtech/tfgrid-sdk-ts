@@ -271,6 +271,7 @@ export default {
 
         if (selectedQueryTimeout.value != currentQueryTimeout.value) {
           localStorage.setItem(TIMEOUT_QUERY_KEY, `${selectedQueryTimeout.value}`);
+          window.env.TIMEOUT = +localStorage.getItem(TIMEOUT_QUERY_KEY)! * 1000;
           currentQueryTimeout.value = +localStorage.getItem(TIMEOUT_QUERY_KEY)!;
           selectedQueryTimeout.value = currentQueryTimeout.value;
         }

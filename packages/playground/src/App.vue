@@ -267,7 +267,7 @@ onMounted(async () => {
   if (!localStorage.getItem(TIMEOUT_QUERY_KEY)) {
     localStorage.setItem(TIMEOUT_QUERY_KEY, `${window.env.TIMEOUT}`);
   } else {
-    window.env.TIMEOUT = +localStorage.getItem(TIMEOUT_QUERY_KEY)!;
+    window.env.TIMEOUT = +localStorage.getItem(TIMEOUT_QUERY_KEY)! * 1000;
   }
 
   if (!localStorage.getItem(TIMEOUT_DEPLOYMENT_KEY)) {
