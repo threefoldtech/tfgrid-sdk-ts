@@ -76,7 +76,7 @@
             <input-tooltip
               v-if="wireguard !== null"
               inline
-              tooltip="Enabling WireGuard Access allows you to establish private, secure, and encrypted connections to your instance."
+              tooltip="Enabling WireGuard Access allows you to establish private, secure, and encrypted connections to your instance. Please note that Unless you use the custom domain with an IPV4, this field will be read-only."
             >
               <v-switch
                 hide-details
