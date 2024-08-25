@@ -473,7 +473,6 @@ async function onDelete(k8s = false) {
 
 const VMS: string[] = [ProjectName.Fullvm, ProjectName.VM, ProjectName.NodePilot];
 function openDialog(project: string, item?: any): void {
-  console.log({ item });
   const key: keyof typeof deploymentListEnvironments = VMS.includes(project)
     ? "vm"
     : project === ProjectName.Kubernetes
