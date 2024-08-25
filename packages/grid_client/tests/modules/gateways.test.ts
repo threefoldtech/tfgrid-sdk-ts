@@ -1,7 +1,15 @@
 import axios from "axios";
 import { setTimeout } from "timers/promises";
 
-import { FilterOptions, GatewayNameModel, generateString, GridClient, MachinesModel, randomChoice } from "../../src";
+import {
+  FilterOptions,
+  GatewayDeploymentData,
+  GatewayNameModel,
+  generateString,
+  GridClient,
+  MachinesModel,
+  randomChoice,
+} from "../../src";
 import { config, getClient } from "../client_loader";
 import { generateInt, getOnlineNode, log, splitIP } from "../utils";
 
@@ -32,6 +40,26 @@ async function waitForGateway(domain: string) {
     log(wait);
   }
   return false;
+}
+
+async function gatewayAsseration(gatewayResult: GatewayDeploymentData[]) {
+  const domain = "https://" + gatewayResult[0].domain;
+
+  if (await waitForGateway(domain)) {
+    axios.get(domain).then(res => {
+      log(res.status);
+      log(res.statusText);
+      log(res.data);
+      expect(res.status).toBe(200);
+      expect(res.statusText).toBe("OK");
+      expect(res.data).toContain("Directory listing for /");
+      expect(res.data).toContain("bin/");
+      expect(res.data).toContain("dev/");
+      expect(res.data).toContain("etc/");
+    });
+  } else {
+    throw new Error("Gateway is unreachable after multiple retries");
+  }
 }
 
 //Private IP Regex
@@ -143,7 +171,7 @@ test("TC1237 - Gateways: Expose a VM Over Gateway", async () => {
           SSH_KEY: config.ssh_key,
           Test_KEY: envVarValue,
         },
-        solutionProviderId: null,
+        solutionProviderId: undefined,
       },
     ],
     metadata: metadata,
@@ -180,7 +208,8 @@ test("TC1237 - Gateways: Expose a VM Over Gateway", async () => {
   expect(result[0].capacity["memory"]).toBe(memory);
   expect(result[0].planetary).toBeDefined();
   expect(result[0].myceliumIP).toBeDefined();
-  expect(result[0].publicIP).toBeDefined();
+  expect(result[0].publicIP["ip"]).toBeDefined();
+  expect(result[0].publicIP["ip6"]).toBeDefined();
   expect(result[0].description).toBe(description);
 
   //--------------------Planetary--------------------
@@ -189,7 +218,7 @@ test("TC1237 - Gateways: Expose a VM Over Gateway", async () => {
 
   //Name Gateway Model
   const gw: GatewayNameModel = {
-    name: name + "p",
+    name: name + "planetary",
     node_id: gatewayNodeId,
     tls_passthrough: tlsPassthrough,
     backends: backends,
@@ -208,30 +237,14 @@ test("TC1237 - Gateways: Expose a VM Over Gateway", async () => {
   log(gatewayResult);
 
   //Gateway Assertions
-  expect(gatewayResult[0].name).toBe(name + "p");
+  expect(gatewayResult[0].name).toBe(name + "planetary");
   expect(gatewayResult[0].status).toBe("ok");
   expect(gatewayResult[0].type).toContain("name");
   expect(gatewayResult[0].domain).toContain(name);
   expect(gatewayResult[0].tls_passthrough).toBe(tlsPassthrough);
   expect(gatewayResult[0].backends).toStrictEqual(backends);
 
-  let domain = "https://" + gatewayResult[0].domain;
-
-  if (await waitForGateway(domain)) {
-    axios.get(domain).then(res => {
-      log(res.status);
-      log(res.statusText);
-      log(res.data);
-      expect(res.status).toBe(200);
-      expect(res.statusText).toBe("OK");
-      expect(res.data).toContain("Directory listing for /");
-      expect(res.data).toContain("bin/");
-      expect(res.data).toContain("dev/");
-      expect(res.data).toContain("etc/");
-    });
-  } else {
-    throw new Error("Gateway is unreachable after multiple retries");
-  }
+  gatewayAsseration(gatewayResult);
 
   //--------------------Mycelium--------------------
   backends = ["http://[" + result[0].myceliumIP + "]:8000"];
@@ -239,7 +252,7 @@ test("TC1237 - Gateways: Expose a VM Over Gateway", async () => {
 
   //Name Gateway Model
   const gw1: GatewayNameModel = {
-    name: name + "c",
+    name: name + "mycelium",
     node_id: gatewayNodeId,
     tls_passthrough: tlsPassthrough,
     backends: backends,
@@ -258,30 +271,14 @@ test("TC1237 - Gateways: Expose a VM Over Gateway", async () => {
   log(gatewayResult);
 
   //Gateway Assertions
-  expect(gatewayResult[0].name).toBe(name + "c");
+  expect(gatewayResult[0].name).toBe(name + "mycelium");
   expect(gatewayResult[0].status).toBe("ok");
   expect(gatewayResult[0].type).toContain("name");
   expect(gatewayResult[0].domain).toContain(name);
   expect(gatewayResult[0].tls_passthrough).toBe(tlsPassthrough);
   expect(gatewayResult[0].backends).toStrictEqual(backends);
 
-  domain = "https://" + gatewayResult[0].domain;
-
-  if (await waitForGateway(domain)) {
-    axios.get(domain).then(res => {
-      log(res.status);
-      log(res.statusText);
-      log(res.data);
-      expect(res.status).toBe(200);
-      expect(res.statusText).toBe("OK");
-      expect(res.data).toContain("Directory listing for /");
-      expect(res.data).toContain("bin/");
-      expect(res.data).toContain("dev/");
-      expect(res.data).toContain("etc/");
-    });
-  } else {
-    throw new Error("Gateway is unreachable after multiple retries");
-  }
+  gatewayAsseration(gatewayResult);
 
   //--------------------IPv6--------------------
   backends = ["http://[" + result[0].publicIP["ip6"].split("/")[0] + "]:8000"];
@@ -289,7 +286,7 @@ test("TC1237 - Gateways: Expose a VM Over Gateway", async () => {
 
   //Name Gateway Model
   const gw2: GatewayNameModel = {
-    name: name + "6",
+    name: name + "ipv6",
     node_id: gatewayNodeId,
     tls_passthrough: tlsPassthrough,
     backends: backends,
@@ -308,30 +305,14 @@ test("TC1237 - Gateways: Expose a VM Over Gateway", async () => {
   log(gatewayResult);
 
   //Gateway Assertions
-  expect(gatewayResult[0].name).toBe(name + "6");
+  expect(gatewayResult[0].name).toBe(name + "ipv6");
   expect(gatewayResult[0].status).toBe("ok");
   expect(gatewayResult[0].type).toContain("name");
   expect(gatewayResult[0].domain).toContain(name);
   expect(gatewayResult[0].tls_passthrough).toBe(tlsPassthrough);
   expect(gatewayResult[0].backends).toStrictEqual(backends);
 
-  domain = "https://" + gatewayResult[0].domain;
-
-  if (await waitForGateway(domain)) {
-    axios.get(domain).then(res => {
-      log(res.status);
-      log(res.statusText);
-      log(res.data);
-      expect(res.status).toBe(200);
-      expect(res.statusText).toBe("OK");
-      expect(res.data).toContain("Directory listing for /");
-      expect(res.data).toContain("bin/");
-      expect(res.data).toContain("dev/");
-      expect(res.data).toContain("etc/");
-    });
-  } else {
-    throw new Error("Gateway is unreachable after multiple retries");
-  }
+  gatewayAsseration(gatewayResult);
 
   //--------------------IPv4--------------------
   backends = ["http://" + result[0].publicIP["ip"].split("/")[0] + ":8000"];
@@ -339,7 +320,7 @@ test("TC1237 - Gateways: Expose a VM Over Gateway", async () => {
 
   //Name Gateway Model
   const gw3: GatewayNameModel = {
-    name: name + "4",
+    name: name + "ipv4",
     node_id: gatewayNodeId,
     tls_passthrough: tlsPassthrough,
     backends: backends,
@@ -358,30 +339,14 @@ test("TC1237 - Gateways: Expose a VM Over Gateway", async () => {
   log(gatewayResult);
 
   //Gateway Assertions
-  expect(gatewayResult[0].name).toBe(name + "4");
+  expect(gatewayResult[0].name).toBe(name + "ipv4");
   expect(gatewayResult[0].status).toBe("ok");
   expect(gatewayResult[0].type).toContain("name");
   expect(gatewayResult[0].domain).toContain(name);
   expect(gatewayResult[0].tls_passthrough).toBe(tlsPassthrough);
   expect(gatewayResult[0].backends).toStrictEqual(backends);
 
-  domain = "https://" + gatewayResult[0].domain;
-
-  if (await waitForGateway(domain)) {
-    axios.get(domain).then(res => {
-      log(res.status);
-      log(res.statusText);
-      log(res.data);
-      expect(res.status).toBe(200);
-      expect(res.statusText).toBe("OK");
-      expect(res.data).toContain("Directory listing for /");
-      expect(res.data).toContain("bin/");
-      expect(res.data).toContain("dev/");
-      expect(res.data).toContain("etc/");
-    });
-  } else {
-    throw new Error("Gateway is unreachable after multiple retries");
-  }
+  gatewayAsseration(gatewayResult);
 
   //--------------------Wireguard--------------------
   const IP = result[0].interfaces[0].ip;
@@ -391,7 +356,7 @@ test("TC1237 - Gateways: Expose a VM Over Gateway", async () => {
 
   //Name Gateway Model
   const gw4: GatewayNameModel = {
-    name: name + "w",
+    name: name + "wireguard",
     node_id: gatewayNodeId,
     tls_passthrough: tlsPassthrough,
     backends: backends,
@@ -425,30 +390,14 @@ test("TC1237 - Gateways: Expose a VM Over Gateway", async () => {
   log(gatewayResult);
 
   //Gateway Assertions
-  expect(gatewayResult[0].name).toBe(name + "w");
+  expect(gatewayResult[0].name).toBe(name + "wireguard");
   expect(gatewayResult[0].status).toBe("ok");
   expect(gatewayResult[0].type).toContain("name");
   expect(gatewayResult[0].domain).toContain(name);
   expect(gatewayResult[0].tls_passthrough).toBe(tlsPassthrough);
   expect(gatewayResult[0].backends).toStrictEqual(backends);
 
-  domain = "https://" + gatewayResult[0].domain;
-
-  if (await waitForGateway(domain)) {
-    axios.get(domain).then(res => {
-      log(res.status);
-      log(res.statusText);
-      log(res.data);
-      expect(res.status).toBe(200);
-      expect(res.statusText).toBe("OK");
-      expect(res.data).toContain("Directory listing for /");
-      expect(res.data).toContain("bin/");
-      expect(res.data).toContain("dev/");
-      expect(res.data).toContain("etc/");
-    });
-  } else {
-    throw new Error("Gateway is unreachable after multiple retries");
-  }
+  gatewayAsseration(gatewayResult);
 });
 
 afterAll(async () => {
