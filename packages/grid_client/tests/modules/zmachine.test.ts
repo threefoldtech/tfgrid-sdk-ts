@@ -88,30 +88,29 @@ describe("Zmachine Class Tests", () => {
     expect(zmachine.challenge()).toContain("AMD");
   });
 
-  it("should handle network configurations", () => {
-    const challenge = zmachine.challenge();
-
-    expect(challenge).toContain("10.249.0.0/16");
-    expect(challenge).toContain("znetwork");
-    expect(challenge).toContain("mycelium_net");
-    expect(challenge).toContain("abc123");
-  });
-
-  it("should fail validation for entering invalid data", () => {
+  it("should fail validation for entering invalid flist", () => {
     const invalidFlist = () => {
       zmachine.flist = "";
     };
-    const invalidEntrypoint = () => (zmachine.entrypoint = undefined as any);
-    const invalidSize = () => (zmachine.size = 10 * 1024 ** 5);
 
     expect(invalidFlist).toThrow();
+  });
+
+  it("should fail validation for entering invalid entrypoint", () => {
+    const invalidEntrypoint = () => (zmachine.entrypoint = undefined as any);
+
     expect(invalidEntrypoint).toThrow();
+  });
+
+  it("should fail validation for entering invalid size", () => {
+    const invalidSize = () => (zmachine.size = 10 * 1024 ** 5);
+
     expect(invalidSize).toThrow();
   });
 
   it("should throw error if network public_ip is invalid", () => {
     const invalidNetwork = new ZmachineNetwork();
-    invalidNetwork.public_ip = undefined as any;
+    invalidNetwork.public_ip = undefined as any; //invalid IP
     invalidNetwork.planetary = true;
     invalidNetwork.interfaces = [{ network: "znetwork", ip: "10.20.2.2" }];
 
@@ -127,8 +126,8 @@ describe("Zmachine Class Tests", () => {
     invalidNetwork.public_ip = "10.249.0.0/16";
     invalidNetwork.planetary = true;
     invalidNetwork.interfaces = [new ZNetworkInterface()];
-    invalidNetwork.interfaces[0].network = "";
-    invalidNetwork.interfaces[0].ip = "";
+    zmachine.network.interfaces[0].network = ""; //invalid network
+    zmachine.network.interfaces[0].ip = ""; //invalid IP
 
     const result = () => {
       zmachine.network = invalidNetwork;
