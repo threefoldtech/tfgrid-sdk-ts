@@ -12,7 +12,12 @@
       <router-link :to="card.route">
         <v-hover>
           <template v-slot:default="{ isHovering, props }">
-            <v-card :height="200" class="pa-3 pt-6" v-bind="props" :class="isHovering ? 'card-opacity' : undefined">
+            <v-card
+              :height="200"
+              class="ribben pa-3 pt-6"
+              v-bind="props"
+              :class="isHovering ? 'card-opacity' : undefined"
+            >
               <v-img
                 class="d-inline-block ml-3 mb-2"
                 width="35"
@@ -77,6 +82,45 @@ export default defineComponent({
 </script>
 
 <style scoped>
+.ribben {
+  overflow: hidden;
+  position: relative;
+  display: inline-block;
+}
+
+.ribben:before {
+  content: "NEW";
+  animation-name: new;
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease;
+  position: absolute;
+  top: -11px;
+  right: -37px;
+  width: 110px;
+  text-align: center;
+  transform: rotate(45deg);
+  background: #1aa18f;
+  padding-top: 28px;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  padding-bottom: 9px;
+  letter-spacing: 2px;
+}
+
+@keyframes new {
+  0% {
+    background: #1aa18f;
+  }
+  50% {
+    background: rgb(22, 129, 114);
+  }
+  100% {
+    background: #1aa18f;
+  }
+}
+
 a {
   text-decoration: none !important;
 }
