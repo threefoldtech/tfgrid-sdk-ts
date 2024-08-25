@@ -58,21 +58,13 @@ async function main() {
     farmId: 1,
   };
 
-  const qsfsNodes: number[] = [];
-  const [node1, node2] = await grid3.capacity.filterNodes(qsfsQueryOptions);
-
-  if (node1 && node2) {
-    qsfsNodes.push(node1.nodeId, node2.nodeId);
-  } else {
-    throw Error("Couldn't find nodes for qsfs");
-  }
-
   async function getNodeId(client: GridClient, options: FilterOptions) {
     const nodes = await client.capacity.filterNodes(options);
     const nodeId = await pingNodes(client, nodes);
     return nodeId;
   }
 
+  const qsfsNode = await getNodeId(grid3, qsfsQueryOptions);
   const masterNode = await getNodeId(grid3, options);
   const workerNode = await getNodeId(grid3, { ...options, nodeExclude: [masterNode] });
 
@@ -80,7 +72,7 @@ async function main() {
   const qsfs: QSFSZDBSModel = {
     name: qsfs_name,
     count,
-    node_ids: qsfsNodes,
+    node_ids: [qsfsNode],
     password: "mypassword1",
     disk_size,
     description: "my qsfs test",
