@@ -68,6 +68,7 @@ enum ApplicationRoutes {
   Umbrel = "/deploy/applications/umbrel/",
   Freeflow = "/deploy/applications/freeflow/",
   TFRobot = "/deploy/applications/tfrobot/",
+  Jenkins = "/deploy/applications/jenkins/",
   Gitea = "/deploy/applications/gitea/",
   Nostr = "/deploy/applications/nostr/",
 }

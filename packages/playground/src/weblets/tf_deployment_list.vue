@@ -419,6 +419,7 @@ const tabs: Tab[] = [
   { title: "TFRobot", value: "TFRobot", imgPath: "images/icons/tfrobot.png" },
   { title: "Gitea", value: "Gitea", imgPath: "images/icons/gitea.png" },
   { title: "Nostr", value: "Nostr", imgPath: "images/icons/nostr.png" },
+  { title: "Jenkins", value: "Jenkins", imgPath: "images/icons/jenkins.png" },
 ];
 
 const layout = useLayout();

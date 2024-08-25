@@ -98,6 +98,7 @@ export type VDataTableHeader = {
 }[];
 
 export enum ProjectName {
+  Jenkins = "Jenkins",
   Kubernetes = "Kubernetes",
   Caprover = "CapRover",
   Discourse = "Discourse",
@@ -129,6 +130,7 @@ export enum ProjectName {
 }
 
 export enum SolutionCode {
+  jenkins = "jk",
   peertube = "pt",
   funkwhale = "fw",
   taiga = "tg",
@@ -158,6 +160,7 @@ export enum SolutionCode {
 }
 
 export const solutionType: { [key: string]: string } = {
+  jenkins: "Jenkins",
   algorand: "Algorand",
   caprover: "CapRover",
   casperlabs: "Casperlabs",

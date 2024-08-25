@@ -167,6 +167,10 @@ export const deploymentListEnvironments = {
     SSH_KEY: _ssh,
   },
 
+  jenkins: {
+    SSH_KEY: _ssh,
+  },
+
   gitea: {
     SSH_KEY: _ssh,
     GITEA__HOSTNAME: "Gitea Hostname",
