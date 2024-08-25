@@ -89,11 +89,11 @@ describe("Zmachine Class Tests", () => {
   });
 
   it("should fail validation for entering invalid flist", () => {
-    const invalidFlist = () => {
-      zmachine.flist = "";
-    };
+    const emptyFlist = () => (zmachine.flist = "");
+    const invalidURL = () => (zmachine.flist = "www.invalid-url");
 
-    expect(invalidFlist).toThrow();
+    expect(emptyFlist).toThrow();
+    expect(invalidURL).toThrow();
   });
 
   it("should fail validation for entering invalid entrypoint", () => {
@@ -103,9 +103,13 @@ describe("Zmachine Class Tests", () => {
   });
 
   it("should fail validation for entering invalid size", () => {
-    const invalidSize = () => (zmachine.size = 10 * 1024 ** 5);
+    const maxSize = () => (zmachine.size = 10 * 1024 ** 5);
+    const decimalSize = () => (zmachine.size = 1.2);
+    const negativeSize = () => (zmachine.size = -1);
 
-    expect(invalidSize).toThrow();
+    expect(maxSize).toThrow();
+    expect(decimalSize).toThrow();
+    expect(negativeSize).toThrow();
   });
 
   it("should throw error if network public_ip is invalid", () => {
