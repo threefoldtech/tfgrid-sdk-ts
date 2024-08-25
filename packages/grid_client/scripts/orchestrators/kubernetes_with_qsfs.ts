@@ -44,7 +44,6 @@ async function main() {
   const qsfs_name = "testQsfsK8sq1";
   const disk_size = 1;
   const count = 8;
-  let masteNodeId: number;
   const options: FilterOptions = {
     cru: 2,
     mru: 2, // GB
@@ -59,26 +58,21 @@ async function main() {
     farmId: 1,
   };
 
-  const qsfsNodes: number[] = [];
-  const allNodes = await grid3.capacity.filterNodes(qsfsQueryOptions);
-  if (allNodes.length >= 2) {
-    qsfsNodes.push(+allNodes[0].nodeId, +allNodes[1].nodeId);
-  } else {
-    throw Error("Couldn't find nodes for qsfs");
-  }
-
   async function getNodeId(client: GridClient, options: FilterOptions) {
     const nodes = await client.capacity.filterNodes(options);
     const nodeId = await pingNodes(client, nodes);
-    masteNodeId = nodeId;
     return nodeId;
   }
+
+  const qsfsNode = await getNodeId(grid3, qsfsQueryOptions);
+  const masterNode = await getNodeId(grid3, options);
+  const workerNode = await getNodeId(grid3, { ...options, nodeExclude: [masterNode] });
 
   //create qsfs object
   const qsfs: QSFSZDBSModel = {
     name: qsfs_name,
     count,
-    node_ids: qsfsNodes,
+    node_ids: [qsfsNode],
     password: "mypassword1",
     disk_size,
     description: "my qsfs test",
@@ -95,7 +89,7 @@ async function main() {
     masters: [
       {
         name: "master",
-        node_id: await getNodeId(grid3, options),
+        node_id: masterNode,
         cpu: 1,
         memory: 1024,
         rootfs_size: 0,
@@ -121,7 +115,7 @@ async function main() {
     workers: [
       {
         name: "worker",
-        node_id: await getNodeId(grid3, { ...options, nodeExclude: [masteNodeId!] }),
+        node_id: workerNode,
         cpu: 1,
         memory: 1024,
         rootfs_size: 0,
