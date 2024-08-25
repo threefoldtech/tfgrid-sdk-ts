@@ -46,7 +46,7 @@ export default {
         route: DashboardRoutes.Applications.TFRobot,
       },
       {
-      title: "Jenkins",
+        title: "Jenkins",
         excerpt:
           "Jenkins is a popular open-source automation server that enables developers to build, test, and deploy their applications continuously.",
         icon: "jenkins.png",
