@@ -15,7 +15,6 @@ def test_statistics_details(browser):
     statistics_page = before_test_setup(browser)
     grid_proxy = GridProxy(browser)
     statistics_details = statistics_page.statistics_detials()
-    print("Statistics Details:", statistics_details)
     grid_statistics_details = grid_proxy.get_stats()
     # Convert necessary values from string to integer before comparing
     statistics_details_converted = [int(detail.replace(',', '')) if detail is not None and detail.isdigit() else detail for detail in statistics_details]

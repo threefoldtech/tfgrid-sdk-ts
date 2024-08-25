@@ -15,7 +15,7 @@ class StatisticsPage:
     node_monitoring_button = (By.XPATH, "//span[text()='Node Monitoring']")
     statistics_button = (By.XPATH, "//span[text()='Node Statistics']")
     statistics_label = (By.XPATH, "//*[contains(text(), 'Statistics')]")
-    map= (By.XPATH,"//button[contains(@class, 'btn-main-container')]")
+    map = (By.XPATH,"//button[contains(@class, 'btn-main-container')]")
     nodes_online = (By.XPATH, "//span[text()='Nodes Online']/ancestor::div/following-sibling::div[@class='v-card-text card-body']")
     dedicated_machines = (By.XPATH, "//span[text()='Dedicated Machines']/ancestor::div/following-sibling::div[@class='v-card-text card-body']")
     farms = (By.XPATH, "//span[text()='Farms']/ancestor::div/following-sibling::div[@class='v-card-text card-body']")
@@ -35,11 +35,13 @@ class StatisticsPage:
 
     def __init__(self, browser):
         self.browser = browser
+
     def navigate(self):
         webdriver.ActionChains(self.browser).send_keys(Keys.ESCAPE).perform()
         self.browser.find_element(*self.tfgrid_button).click()
         self.browser.find_element(*self.statistics_button).click()
         WebDriverWait(self.browser, 60).until(EC.visibility_of_element_located(self.statistics_label))
+
     def statistics_detials(self):
         details = []
         wait = WebDriverWait(self.browser, 60)  # Increased wait time to 60 seconds
@@ -60,18 +62,14 @@ class StatisticsPage:
             ("Contracts", self.conracts),
             ("Number of workloads", self.number_of_workloads)
         ]
-        try:
-            for name, locator in elements_to_fetch:
-                try:
-                    element_text = wait.until(EC.visibility_of_element_located(locator)).text
-                    details.append(element_text)
-                    print(f"{name} fetched: {element_text}")
-                except TimeoutException:
-                    print(f"{name} not found within the specified time.")
-                    details.append(None)# Add None or some default value to maintain list consistency
-        except TimeoutException as e:
-            print(f"TimeoutException: {e}")
+        for name, locator in elements_to_fetch:
+            try:
+                element_text = wait.until(EC.visibility_of_element_located(locator)).text
+                details.append(element_text)
+            except TimeoutException:
+                details.append(None) # Add None or some default value to maintain list consistency
         return details
+
     def get_link(self):
         WebDriverWait(self.browser, 30).until(EC.number_of_windows_to_be(2))
         self.browser.switch_to.window(self.browser.window_handles[1])
@@ -79,9 +77,11 @@ class StatisticsPage:
         self.browser.close()
         self.browser.switch_to.window(self.browser.window_handles[0])
         return url
+
     def grid_status_link(self):
         self.browser.find_element(*self.grid_status_button).click()
         return self.get_link()
+
     def node_monitoring_link(self):
         self.browser.find_element(*self.node_monitoring_button).click()
         return self.get_link()
