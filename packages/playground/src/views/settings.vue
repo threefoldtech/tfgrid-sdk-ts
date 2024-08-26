@@ -27,7 +27,7 @@
               validateCurrentPassword,
             ]"
             #="{ props: validationProps }"
-            ref="currentpasswordInput"
+            ref="currentPasswordInput"
           >
             <VTextField
               label="Current Password"
@@ -193,6 +193,7 @@ export default {
     const isValidTimeout = ref(false);
     const isValidPassword = ref(false);
     const gridStore = useGrid();
+
     onMounted(async () => {
       currentQueryTimeout.value = +localStorage.getItem(TIMEOUT_QUERY_KEY)!;
       selectedQueryTimeout.value = currentQueryTimeout.value;
@@ -250,14 +251,20 @@ export default {
     }
     /** Updates user credentials with the hashes produced by the new password  */
     async function UpdatePassword() {
-      await updateCredentials(currentPassword.value, newPassword.value);
+      try {
+        await updateCredentials(currentPassword.value, newPassword.value);
 
-      createCustomToast("Password Updated!", ToastType.success);
-      // reset input fields
-      currentPassword.value = "";
-      newPassword.value = "";
-      confirmPassword.value = "";
-      isValidPassword.value = false;
+        // reset input fields
+        currentPassword.value = "";
+        newPassword.value = "";
+        confirmPassword.value = "";
+        isValidPassword.value = false;
+
+        createCustomToast("Password Updated!", ToastType.success);
+      } catch (err) {
+        console.log(err);
+        createCustomToast("Password Update Failed", ToastType.danger);
+      }
     }
     function isCurrentTimeout() {
       return (
