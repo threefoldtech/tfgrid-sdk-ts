@@ -233,7 +233,7 @@ export default {
       theme.global.name.value = selectedTheme.value == "Light Mode" ? "light" : "dark";
     }
     function validateCurrentPassword() {
-      if (getCredentials().passwordHash !== md5(currentPassword.value)) {
+      if (sessionStorage.getItem("password") != currentPassword.value) {
         return { message: "Incorrect Password." };
       }
     }
@@ -257,6 +257,8 @@ export default {
       try {
         await updateCredentials(currentPassword.value, newPassword.value);
         passFormRef.value.reset();
+        sessionStorage.setItem("password", newPassword.value);
+
         createCustomToast("Password Updated!", ToastType.success);
       } catch (err) {
         console.log(err);
