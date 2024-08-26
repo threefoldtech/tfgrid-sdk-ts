@@ -61,18 +61,23 @@
           </input-tooltip>
         </input-validator>
       </password-input-wrapper>
+
       <SelectSolutionFlavor
+        :small="{ cpu: 2, memory: 4, disk: 50 }"
+        :medium="{ cpu: 4, memory: 8, disk: 500 }"
+        :large="{ cpu: 4, memory: 16, disk: 1000 }"
         v-model="solution"
-        :small="{ cpu: 1, memory: 2, disk: 50 }"
-        :medium="{ cpu: 2, memory: 4, disk: 100 }"
       />
       <Networks v-model:ipv4="ipv4" v-model:planetary="planetary" v-model:mycelium="mycelium" v-model:ipv6="ipv6" />
+
       <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
         <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
       </input-tooltip>
+
       <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
         <v-switch color="primary" inset label="Certified" v-model="certified" hide-details />
       </input-tooltip>
+
       <TfSelectionDetails
         :filters="{
           ipv4,
@@ -87,13 +92,16 @@
         require-domain
         v-model="selectionDetails"
       />
+
       <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
     </d-tabs>
+
     <template #footer-actions="{ validateBeforeDeploy }">
       <v-btn color="secondary" @click="validateBeforeDeploy(deploy)" text="Deploy" />
     </template>
   </weblet-layout>
 </template>
+
 <script lang="ts" setup>
 import { calculateRootFileSystem, type GridClient } from "@threefold/grid_client";
 import { computed, type Ref, ref } from "vue";
@@ -108,11 +116,13 @@ import { deployVM } from "../utils/deploy_vm";
 import { deployGatewayName, getSubdomain, rollbackDeployment } from "../utils/gateway";
 import { normalizeError } from "../utils/helpers";
 import { generateName, generatePassword } from "../utils/strings";
+
 const layout = useLayout();
 const profileManager = useProfileManager();
-const name = ref(generateName({ prefix: "fw" }));
-const username = ref("");
-const password = ref("");
+
+const name = ref(generateName({ prefix: "jk" }));
+const username = ref("admin");
+const password = ref(generatePassword(12));
 const solution = ref() as Ref<SolutionFlavor>;
 const rootFilesystemSize = computed(() =>
   calculateRootFileSystem({ CPUCores: solution.value?.cpu ?? 0, RAMInMegaBytes: solution.value?.memory ?? 0 }),
@@ -126,11 +136,12 @@ const certified = ref(false);
 const ipv4 = ref(false);
 const ipv6 = ref(false);
 const mycelium = ref(true);
-const planetary = ref(false);
+const planetary = ref(true);
 const selectionDetails = ref<SelectionDetails>();
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
 const selectedSSHKeys = ref("");
+
 function finalize(deployment: any) {
   layout.value.reloadDeploymentsList();
   layout.value.setStatus("success", "Successfully deployed a Jenkins instance.");
@@ -138,20 +149,27 @@ function finalize(deployment: any) {
 }
 async function deploy() {
   layout.value.setStatus("deploy");
+
   const projectName = ProjectName.Jenkins.toLowerCase() + "/" + name.value;
+
   const subdomain = getSubdomain({
     deploymentName: name.value,
     projectName,
     twinId: profileManager.profile!.twinId,
   });
+
   const domain = selectionDetails.value?.domain?.enabledCustomDomain
     ? selectionDetails.value.domain.customDomain
     : subdomain + "." + selectionDetails.value?.domain?.selectedDomain?.publicConfig.domain;
+
   let vm: any;
+
   try {
     layout.value?.validateSSH();
     updateGrid(grid, { projectName });
+
     await layout.value.validateBalance(grid!);
+
     vm = await deployVM(grid!, {
       name: name.value,
       network: {
@@ -196,25 +214,31 @@ async function deploy() {
     finalize(vm);
     return;
   }
+
   try {
     layout.value.setStatus("deploy", "Preparing to deploy gateway...");
+
     await deployGatewayName(grid, selectionDetails.value.domain, {
       subdomain,
       ip: vm[0].interfaces[0].ip,
       port: 80,
       network: vm[0].interfaces[0].network,
     });
+
     finalize(vm);
   } catch (e) {
-    layout.value.setStatus("deploy", "Rollbacking back due to fail to deploy gateway...");
+    layout.value.setStatus("deploy", "Rolling back due to failure to deploy the gateway...");
+
     await rollbackDeployment(grid!, name.value);
     layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Jenkins instance."));
   }
 }
+
 function updateSSHkeyEnv(selectedKeys: string) {
   selectedSSHKeys.value = selectedKeys;
 }
 </script>
+
 <script lang="ts">
 import Networks from "../components/networks.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
@@ -222,6 +246,7 @@ import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue"
 import { deploymentListEnvironments } from "../constants";
 import type { SelectionDetails } from "../types/nodeSelector";
 import { updateGrid } from "../utils/grid";
+
 export default {
   name: "Jenkins",
   components: { SelectSolutionFlavor, Networks },

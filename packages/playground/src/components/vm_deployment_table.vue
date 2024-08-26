@@ -284,6 +284,7 @@ const filteredHeaders = computed(() => {
     ProjectName.Algorand,
     ProjectName.Subsquid,
     ProjectName.Peertube,
+    ProjectName.Jenkins,
   ] as string[];
 
   const IPV4Solutions = [
@@ -306,6 +307,7 @@ const filteredHeaders = computed(() => {
     ProjectName.Algorand,
     ProjectName.Subsquid,
     ProjectName.Peertube,
+    ProjectName.Jenkins,
   ] as string[];
 
   const WireguardSolutions = [ProjectName.VM, ProjectName.Fullvm, ProjectName.Umbrel, ProjectName.TFRobot] as string[];
