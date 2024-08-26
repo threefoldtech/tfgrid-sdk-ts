@@ -17,17 +17,17 @@
     </v-card>
     <v-card class="my-5"
       ><v-card-title>Password</v-card-title> <v-card-text>Change your password</v-card-text>
-      <form-validator v-model="isValidPassword">
+      <form-validator ref="passFormRef" v-model="isValidPassword">
         <PasswordInputWrapper #="{ props: passwordInputProps }">
           <InputValidator
-            :value="currentPassword"
+            default-value=""
+            v-model:value="currentPassword"
             :rules="[
               validators.required('Password is required.'),
               validators.minLength('Password must be at least 6 characters.', 6),
               validateCurrentPassword,
             ]"
             #="{ props: validationProps }"
-            ref="currentPasswordInput"
           >
             <VTextField
               label="Current Password"
@@ -41,14 +41,14 @@
 
         <PasswordInputWrapper #="{ props: passwordInputProps }">
           <InputValidator
-            :value="newPassword"
+            default-value=""
+            v-model:value="newPassword"
             :rules="[
               validators.required('Password is required.'),
               validators.minLength('Password must be at least 6 characters.', 6),
               validateNewPassword,
             ]"
             #="{ props: validationProps }"
-            ref="newPasswordInput"
           >
             <VTextField
               label="New Password"
@@ -61,10 +61,10 @@
         </PasswordInputWrapper>
         <PasswordInputWrapper #="{ props: confirmPasswordInputProps }">
           <InputValidator
-            :value="confirmPassword"
+            default-value=""
+            v-model:value="confirmPassword"
             :rules="[validators.required('A confirmation password is required.'), validateConfirmPassword]"
             #="{ props: validationProps }"
-            ref="confirmPasswordInput"
           >
             <VTextField
               label="Confirm Password"
@@ -160,6 +160,7 @@ import md5 from "md5";
 import { onMounted, ref, watch } from "vue";
 import { useTheme } from "vuetify";
 
+import { useFormRef } from "@/hooks/form_validator";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
 
 import { useGrid } from "../stores";
@@ -249,17 +250,13 @@ export default {
         return { message: "Passwords should match." };
       }
     }
+
     /** Updates user credentials with the hashes produced by the new password  */
+    const passFormRef = useFormRef();
     async function UpdatePassword() {
       try {
         await updateCredentials(currentPassword.value, newPassword.value);
-
-        // reset input fields
-        currentPassword.value = "";
-        newPassword.value = "";
-        confirmPassword.value = "";
-        isValidPassword.value = false;
-
+        passFormRef.value.reset();
         createCustomToast("Password Updated!", ToastType.success);
       } catch (err) {
         console.log(err);
@@ -315,6 +312,7 @@ export default {
       isValidTimeout,
       isValidPassword,
       UpdateTheme,
+      passFormRef,
       UpdatePassword,
       UpdateTimeout,
       validateCurrentPassword,
