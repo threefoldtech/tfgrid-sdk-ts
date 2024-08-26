@@ -193,11 +193,7 @@
                           color="secondary"
                           variant="outlined"
                           :disabled="
-                            (isValidForm ||
-                              !!mnemonic ||
-                              shouldActivateAccount ||
-                              keypairType === KeypairType.ed25519) &&
-                            !shouldCreateNewAccount
+                            isValidForm || !!mnemonic || shouldActivateAccount || keypairType === KeypairType.ed25519
                           "
                           :loading="creatingAccount"
                           @click="openAcceptTerms = termsLoading = true"
@@ -267,7 +263,7 @@
                   v-model="email"
                   v-bind="props"
                   :loading="loadEmail"
-                  :disabled="creatingAccount || activatingAccount || activating || loadEmail || shouldCreateNewAccount"
+                  :disabled="creatingAccount || activatingAccount || activating || loadEmail"
                   readonly
                   ref="emailRef"
                   @focus="handleFocus(emailRef)"
@@ -296,7 +292,7 @@
                           label="Password"
                           v-model="password"
                           v-bind="{ ...passwordInputProps, ...validationProps }"
-                          :disabled="creatingAccount || activatingAccount || activating || shouldCreateNewAccount"
+                          :disabled="creatingAccount || activatingAccount || activating"
                           autocomplete="off"
                         />
                       </div>
@@ -319,7 +315,7 @@
                       ...confirmPasswordInputProps,
                       ...validationProps,
                     }"
-                    :disabled="creatingAccount || activatingAccount || activating || shouldCreateNewAccount"
+                    :disabled="creatingAccount || activatingAccount || activating"
                     autocomplete="off"
                   />
                 </InputValidator>
@@ -341,7 +337,6 @@
                   !isValidForm ||
                   creatingAccount ||
                   activatingAccount ||
-                  shouldCreateNewAccount ||
                   (activeTab === 1 && isValidConnectConfirmationPassword)
                 "
               >
@@ -611,7 +606,6 @@ const isValidForm = ref(false);
 const mnemonicInput = useInputRef();
 
 const isNonActiveMnemonic = ref(false);
-const shouldCreateNewAccount = ref(false);
 const shouldActivateAccount = computed(() => {
   if (!mnemonic.value) return false;
   return isNonActiveMnemonic.value;
@@ -698,10 +692,17 @@ function reloadValidation() {
 async function hasTwinId() {
   try {
     await getGrid({ mnemonic: mnemonic.value, keypairType: keypairType.value });
-    shouldCreateNewAccount.value = false;
     await getEmail();
   } catch (e) {
-    shouldCreateNewAccount.value = true;
+    if (e instanceof TwinNotExistError) {
+      isNonActiveMnemonic.value = true;
+      openAcceptTerms.value = true;
+      termsLoading.value = true;
+    }
+    enableReload.value = false;
+    return {
+      message: normalizeError(e, "Something went wrong. please try again."),
+    };
   }
 }
 
