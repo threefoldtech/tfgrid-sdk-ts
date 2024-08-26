@@ -33,7 +33,6 @@
                 <v-chip v-for="tag in card.tags" :key="tag" class="ml-2 pulse-animation">
                   {{ tag }}
                 </v-chip>
-                <v-chip v-if="card.isNew" class="scale_beat ml-2 text-white" color="secondary"> New </v-chip>
               </v-card-title>
               <v-card-text class="mt-2" v-bind="props">
                 {{ card.excerpt }}
