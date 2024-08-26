@@ -51,7 +51,13 @@
             <v-text-field label="IP" v-model="ip" v-bind="props" />
           </input-validator>
         </input-tooltip>
-        <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
+
+        <input-tooltip
+          tooltip="When enabled, the backend service will terminate the TLS traffic, otherwise the gateway service will do the TLS traffic termination."
+          inline
+        >
+          <v-switch label="TLS Passthrough" hide-details inset variant="tonal" color="primary" v-model="passThrough" />
+        </input-tooltip>
       </template>
     </d-tabs>
 
@@ -77,8 +83,8 @@ const ip = ref();
 const name = ref(generateName({ prefix: "dm" }));
 const subdomain = ref(generateName({ prefix: "dm" }));
 const port = ref(80);
+const passThrough = ref(false);
 const selectionDetails = ref<SelectionDetails>();
-const selectedSSHKeys = ref("");
 
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
@@ -107,6 +113,7 @@ async function deploy() {
       subdomain: subdomain.value,
       ip: ip.value,
       port: port.value,
+      tlsPassthrough: passThrough.value,
     });
     const gw = await grid.gateway.get_name({ name: subdomain.value });
     (gw as any).name = gw[0].workloads[0].name;
@@ -121,22 +128,16 @@ async function deploy() {
 async function validateSubdomain() {
   return await isAvailableName(grid, subdomain.value);
 }
-
-function updateSSHkeyEnv(selectedKeys: string) {
-  selectedSSHKeys.value = selectedKeys;
-}
 </script>
 
 <script lang="ts">
 import { deploymentListEnvironments } from "@/constants";
 import { isAvailableName } from "@/utils/validators";
 
-import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import type { SelectionDetails } from "../types/nodeSelector";
 import { updateGrid } from "../utils/grid";
 
 export default {
   name: "TfDomains",
-  components: { ManageSshDeployemnt },
 };
 </script>
