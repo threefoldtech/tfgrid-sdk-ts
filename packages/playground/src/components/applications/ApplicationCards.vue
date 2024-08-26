@@ -14,9 +14,9 @@
           <template v-slot:default="{ isHovering, props }">
             <v-card
               :height="200"
-              class="ribben pa-3 pt-6"
+              class="pa-3 pt-6"
               v-bind="props"
-              :class="isHovering ? 'card-opacity' : undefined"
+              :class="[isHovering ? 'card-opacity' : undefined, card.isNew ? 'ribben' : '']"
             >
               <v-img
                 class="d-inline-block ml-3 mb-2"
