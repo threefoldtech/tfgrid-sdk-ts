@@ -188,12 +188,14 @@ export default {
     const newPassword = ref("");
     const confirmPassword = ref("");
     const currentQueryTimeout = ref(0);
-    const currentDeploymentTimeout = ref(0);
-    const selectedQueryTimeout = ref(0);
-    const selectedDeploymentTimeout = ref(0);
+    const currentDeploymentTimeout = ref();
+    const selectedQueryTimeout = ref(window.env.TIMEOUT / 1000);
+    const gridStore = useGrid();
+
+    const deploymentTimeoutdefaultMinutes = gridStore!.client.clientOptions.deploymentTimeoutMinutes;
+    const selectedDeploymentTimeout = ref(deploymentTimeoutdefaultMinutes! * 60);
     const isValidTimeout = ref(false);
     const isValidPassword = ref(false);
-    const gridStore = useGrid();
 
     onMounted(async () => {
       currentQueryTimeout.value = +localStorage.getItem(TIMEOUT_QUERY_KEY)!;
