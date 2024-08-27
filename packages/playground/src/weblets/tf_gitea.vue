@@ -140,18 +140,6 @@ watch(
   },
 );
 
-watch(
-  () => selectionDetails.value?.domain?.enabledCustomDomain,
-  () => {
-    if (selectionDetails.value?.domain?.enabledCustomDomain && ipv4.value) {
-      wireguard.value = false;
-    } else {
-      wireguard.value = true;
-    }
-  },
-  { deep: true },
-);
-
 function finalize(deployment: any) {
   layout.value.reloadDeploymentsList();
   layout.value.setStatus("success", "Successfully deployed a Gitea instance.");

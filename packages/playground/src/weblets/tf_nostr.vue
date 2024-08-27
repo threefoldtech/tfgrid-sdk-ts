@@ -202,18 +202,6 @@ async function deploy() {
 function updateSSHkeyEnv(selectedKeys: string) {
   selectedSSHKeys.value = selectedKeys;
 }
-
-watch(
-  () => selectionDetails.value?.domain?.enabledCustomDomain,
-  () => {
-    if (selectionDetails.value?.domain?.enabledCustomDomain && ipv4.value) {
-      wireguard.value = false;
-    } else {
-      wireguard.value = true;
-    }
-  },
-  { deep: true },
-);
 </script>
 
 <script lang="ts">
