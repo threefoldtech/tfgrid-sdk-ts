@@ -128,7 +128,7 @@ const rootFilesystemSize = computed(() =>
   calculateRootFileSystem({ CPUCores: solution.value?.cpu ?? 0, RAMInMegaBytes: solution.value?.memory ?? 0 }),
 );
 const flist: Flist = {
-  value: "https://hub.grid.tf/amryassir.3bot/amryassir-jenkinsv2-latest.flist",
+  value: "https://hub.grid.tf/amryassir.3bot/amryassir-jenkinsv3-latest.flist",
   entryPoint: "/sbin/zinit init",
 };
 const dedicated = ref(false);
