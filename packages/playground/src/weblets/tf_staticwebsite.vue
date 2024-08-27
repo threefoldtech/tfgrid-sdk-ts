@@ -68,7 +68,7 @@
         v-model:planetary="planetary"
         v-model:ipv6="ipv6"
         v-model:wireguard="wireguard"
-        :readOnlyWireGuard="!selectionDetails?.domain?.enabledCustomDomain"
+        :enabledCustomDomain="!selectionDetails?.domain?.enabledCustomDomain"
       />
 
       <input-tooltip
@@ -132,7 +132,7 @@ const domain = ref();
 
 const ipv4 = ref(false);
 const ipv6 = ref(false);
-const wireguard = ref(!selectionDetails.value?.domain?.enabledCustomDomain && ipv4.value);
+const wireguard = ref(false);
 const mycelium = ref(true);
 const planetary = ref(false);
 const solution = ref() as Ref<SolutionFlavor>;

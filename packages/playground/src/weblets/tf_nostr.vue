@@ -44,7 +44,7 @@
           v-model:planetary="planetary"
           v-model:mycelium="mycelium"
           v-model:wireguard="wireguard"
-          :readOnlyWireGuard="!selectionDetails?.domain?.enabledCustomDomain"
+          :enabledCustomDomain="!selectionDetails?.domain?.enabledCustomDomain"
         />
         <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
           <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
@@ -100,7 +100,7 @@ const selectionDetails = ref<SelectionDetails>();
 const name = ref(generateName({ prefix: "nt" }));
 const ipv4 = ref(false);
 const ipv6 = ref(false);
-const wireguard = ref(!selectionDetails.value?.domain?.enabledCustomDomain && ipv4.value);
+const wireguard = ref(false);
 const planetary = ref(false);
 const mycelium = ref(true);
 const disks = ref<Disk[]>([]);

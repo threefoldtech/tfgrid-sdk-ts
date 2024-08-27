@@ -64,7 +64,7 @@
           v-model:ipv6="ipv6"
           v-model:wireguard="wireguard"
           enableIpv4
-          :readOnlyWireGuard="!selectionDetails?.domain?.enabledCustomDomain"
+          :enabledCustomDomain="!selectionDetails?.domain?.enabledCustomDomain"
         />
 
         <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
@@ -132,7 +132,7 @@ const email = ref(profileManager.profile?.email || "");
 const solution = ref() as Ref<SolutionFlavor>;
 const ipv4 = ref(true);
 const ipv6 = ref(false);
-const wireguard = ref(!selectionDetails.value?.domain?.enabledCustomDomain && ipv4.value);
+const wireguard = ref(false);
 const mycelium = ref(true);
 const planetary = ref(false);
 const smtp = ref(createSMTPServer());

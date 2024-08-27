@@ -94,7 +94,7 @@
         v-model:mycelium="mycelium"
         v-model:ipv6="ipv6"
         v-model:wireguard="wireguard"
-        :readOnlyWireGuard="!selectionDetails?.domain?.enabledCustomDomain"
+        :enabledCustomDomain="!selectionDetails?.domain?.enabledCustomDomain"
       />
 
       <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
@@ -164,7 +164,7 @@ const dedicated = ref(false);
 const certified = ref(false);
 const ipv4 = ref(false);
 const ipv6 = ref(false);
-const wireguard = ref(!selectionDetails.value?.domain?.enabledCustomDomain && ipv4.value);
+const wireguard = ref(false);
 const mycelium = ref(true);
 const planetary = ref(false);
 const gridStore = useGrid();

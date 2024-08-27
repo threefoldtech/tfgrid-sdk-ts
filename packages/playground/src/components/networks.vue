@@ -138,9 +138,9 @@ export default {
       type: Boolean,
       default: () => null,
     },
-    readOnlyWireGuard: {
+    enabledCustomDomain: {
       type: Boolean,
-      default: () => null,
+      default: () => false,
     },
   },
   emits: {
@@ -152,6 +152,7 @@ export default {
   },
   setup(props, { expose }) {
     const input = ref();
+    const readOnlyWireGuard = computed(() => !props.ipv4 || !props.enabledCustomDomain);
 
     if (
       props.ipv4 === null &&
@@ -194,6 +195,7 @@ export default {
     return {
       error,
       input,
+      readOnlyWireGuard,
     };
   },
 };

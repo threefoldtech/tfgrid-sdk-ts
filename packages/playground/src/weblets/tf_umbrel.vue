@@ -73,7 +73,7 @@
         v-model:wireguard="wireguard"
         v-model:mycelium="mycelium"
         v-model:ipv6="ipv6"
-        :readOnlyWireGuard="!selectionDetails?.domain?.enabledCustomDomain"
+        :enabledCustomDomain="!selectionDetails?.domain?.enabledCustomDomain"
       />
 
       <SelectSolutionFlavor
@@ -142,7 +142,7 @@ const ipv4 = ref(false);
 const ipv6 = ref(false);
 const planetary = ref(false);
 const mycelium = ref(true);
-const wireguard = ref(!selectionDetails.value?.domain?.enabledCustomDomain && ipv4.value);
+const wireguard = ref(false);
 const network = ref();
 const solution = ref() as Ref<SolutionFlavor>;
 const flist: Flist = {
