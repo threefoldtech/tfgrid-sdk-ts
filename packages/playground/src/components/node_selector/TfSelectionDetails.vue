@@ -29,6 +29,8 @@
             :farm="farm"
             v-model="node"
             v-model:status="nodeStatus"
+            :load-farm="loadFarm"
+            :get-farm="getFarm"
           />
         </template>
 
@@ -39,6 +41,8 @@
           :filters="filters"
           v-model="node"
           v-model:status="nodeStatus"
+          :load-farm="loadFarm"
+          :get-farm="getFarm"
           v-else
         />
       </div>
@@ -70,12 +74,13 @@
 
 <script lang="ts">
 import type { FarmInfo, GPUCardInfo, NodeInfo } from "@threefold/grid_client";
-import { NodeStatus } from "@threefold/gridproxy_client";
+import { type Farm, NodeStatus } from "@threefold/gridproxy_client";
 import type AwaitLock from "await-lock";
 import noop from "lodash/fp/noop.js";
 import type { DeepPartial } from "utility-types";
 import { computed, getCurrentInstance, onMounted, onUnmounted, type PropType, ref, watch } from "vue";
 
+import { gridProxyClient } from "../../clients";
 import { useWatchDeep } from "../../hooks";
 import { useForm, ValidatorStatus } from "../../hooks/form_validator";
 import type { InputValidatorService } from "../../hooks/input_validator";
@@ -139,6 +144,21 @@ export default {
 
     const domain = ref<DomainInfo>();
     const domainStatus = ref<ValidatorStatus>();
+
+    const loadedFarms = new Map<number, Farm>();
+    async function loadFarm(farmId: number) {
+      if (loadedFarms.has(farmId)) {
+        return loadedFarms.get(farmId)!;
+      }
+
+      const [farm] = (await gridProxyClient.farms.list({ farmId })).data;
+      loadedFarms.set(farmId, farm);
+      return farm;
+    }
+
+    function getFarm(farmId: number) {
+      return loadedFarms.get(farmId);
+    }
 
     const selectionDetails = computed(() => {
       return {
@@ -235,6 +255,8 @@ export default {
       domainStatus,
       selectionDetails,
       NodeStatus,
+      loadFarm,
+      getFarm,
     };
   },
 };

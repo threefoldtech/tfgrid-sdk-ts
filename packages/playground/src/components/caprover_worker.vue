@@ -92,6 +92,8 @@ function toMachine(rootFilesystemSize: number, worker?: CaproverWorker): Selecte
     cpu: worker.solution?.cpu ?? 0,
     memory: worker.solution?.memory ?? 0,
     disk: (worker.solution?.disk ?? 0) + (rootFilesystemSize ?? 0),
+    farmId: worker.selectionDetails.node.farmId,
+    publicIp: true,
   };
 }
 

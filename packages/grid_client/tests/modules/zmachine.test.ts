@@ -1,13 +1,16 @@
-import { ComputeCapacity, Mount, Zmachine, ZmachineNetwork } from "../../src";
+import { plainToClass } from "class-transformer";
 
-const zmachine = new Zmachine();
+import { ComputeCapacity, Mount, Zmachine, ZmachineNetwork, ZNetworkInterface } from "../../src";
 
-beforeAll(() => {
-  const computeCapacity = new ComputeCapacity();
+let zmachine = new Zmachine();
+const computeCapacity = new ComputeCapacity();
+const network = new ZmachineNetwork();
+const disks = new Mount();
+
+beforeEach(() => {
   computeCapacity.cpu = 1;
-  computeCapacity.memory = 5;
+  computeCapacity.memory = 256 * 1024 ** 2;
 
-  const network = new ZmachineNetwork();
   network.planetary = true;
   network.public_ip = "10.249.0.0/16";
   network.interfaces = [
@@ -16,10 +19,13 @@ beforeAll(() => {
       ip: "10.20.2.2",
     },
   ];
+  network.mycelium = {
+    network: "mycelium_net",
+    hex_seed: "abc123",
+  };
 
   const rootfs_size = 2;
 
-  const disks = new Mount();
   disks.name = "zdisk";
   disks.mountpoint = "/mnt/data";
 
@@ -29,9 +35,9 @@ beforeAll(() => {
   zmachine.mounts = [disks];
   zmachine.entrypoint = "/sbin/zinit init";
   zmachine.compute_capacity = computeCapacity;
-  zmachine.env = {};
+  zmachine.env = { key: "value" };
   zmachine.corex = false;
-  zmachine.gpu = [];
+  zmachine.gpu = ["AMD", "NIVIDIA"];
 });
 
 describe("Zmachine Class Tests", () => {
@@ -39,26 +45,130 @@ describe("Zmachine Class Tests", () => {
     expect(zmachine).toBeInstanceOf(Zmachine);
   });
 
-  it("should correctly compute the challenge string", () => {
-    const expectedChallenge =
-      "https://hub.grid.tf/tf-official-vms/ubuntu-22.04.flist" +
-      "10.249.0.0/16" +
-      "true" +
-      "znetwork" +
-      "10.20.2.22" +
-      "14748364815" +
-      "zdisk" +
-      "/mnt/data" +
-      "/sbin/zinit init";
+  it("should correctly serialize and deserialize a Zmachine instance", () => {
+    const serialized = JSON.stringify(zmachine);
+    const deserialized = plainToClass(Zmachine, JSON.parse(serialized));
 
-    expect(zmachine.challenge()).toBe(expectedChallenge);
+    expect(deserialized).toBeInstanceOf(Zmachine);
+    expect(deserialized.challenge()).toBe(zmachine.challenge());
+  });
+  it("should correctly handle env vars", () => {
+    const challenge = zmachine.challenge();
+
+    expect(challenge).toContain("key=value");
   });
 
-  it("should fail validation for missing required fields", () => {
+  it("should correctly compute the challenge string", () => {
+    const expectedChallenge =
+      zmachine.flist +
+      network.challenge() +
+      zmachine.size +
+      computeCapacity.challenge() +
+      zmachine.mounts[0].challenge() +
+      zmachine.entrypoint +
+      JSON.stringify(zmachine.env)
+        .replace(/[{"}"]/g, "")
+        .replace(":", "=") +
+      zmachine.gpu?.toString().replace(",", "");
+
+    expect(zmachine.challenge()).toBe(expectedChallenge);
+    expect(zmachine.challenge()).toContain("key=value");
+  });
+
+  it("should correctly handle the gpu array", () => {
+    expect(zmachine.gpu).toContain("NIVIDIA");
+
+    zmachine.gpu = [];
+
+    expect(zmachine.challenge()).not.toContain("NIVIDIA");
+
+    zmachine.gpu = ["NIVIDIA", "AMD"];
+
+    expect(zmachine.challenge()).toContain("NIVIDIA");
+    expect(zmachine.challenge()).toContain("AMD");
+  });
+
+  it("should fail validation for entering invalid flist", () => {
+    const emptyFlist = () => (zmachine.flist = "");
+    const invalidURL = () => (zmachine.flist = "www.invalid-url");
+
+    expect(emptyFlist).toThrow();
+    expect(invalidURL).toThrow();
+  });
+
+  it("should fail validation for entering invalid entrypoint", () => {
+    const invalidEntrypoint = () => (zmachine.entrypoint = undefined as any);
+
+    expect(invalidEntrypoint).toThrow();
+  });
+
+  it("should fail validation for entering invalid size", () => {
+    const maxSize = () => (zmachine.size = 10 * 1024 ** 5);
+    const decimalSize = () => (zmachine.size = 1.2);
+    const negativeSize = () => (zmachine.size = -1);
+
+    expect(maxSize).toThrow();
+    expect(decimalSize).toThrow();
+    expect(negativeSize).toThrow();
+  });
+
+  it("should throw error if network public_ip is invalid", () => {
+    const invalidNetwork = new ZmachineNetwork();
+    invalidNetwork.public_ip = undefined as any; //invalid IP
+    invalidNetwork.planetary = true;
+    invalidNetwork.interfaces = [{ network: "znetwork", ip: "10.20.2.2" }];
+
     const result = () => {
-      zmachine.flist = "";
-      zmachine.entrypoint = "";
+      zmachine.network = invalidNetwork;
     };
+
+    expect(result).toThrow();
+  });
+
+  it("should throw error if network interfaces values are invalid", () => {
+    const invalidNetwork = new ZmachineNetwork();
+    invalidNetwork.public_ip = "10.249.0.0/16";
+    invalidNetwork.planetary = true;
+    invalidNetwork.interfaces = [new ZNetworkInterface()];
+    zmachine.network.interfaces[0].network = ""; //invalid network
+    zmachine.network.interfaces[0].ip = ""; //invalid IP
+
+    const result = () => {
+      zmachine.network = invalidNetwork;
+    };
+
+    expect(result).toThrow();
+  });
+
+  it("should throw an error if mount name is empty", () => {
+    const invalidMount = new Mount();
+    invalidMount.name = "";
+    invalidMount.mountpoint = "/mnt/data";
+
+    const result = () => {
+      zmachine.mounts = [invalidMount];
+    };
+
+    expect(result).toThrow();
+  });
+
+  it("should fail if zmachine is parsed to an invalid object", () => {
+    const invalidZmachine = `{
+      "flist": "",
+      "network": "invalid_network_object",
+      "size": "not_a_number",
+      "compute_capacity": {},
+      "mounts": "not_an_array",
+      "entrypoint": 123,
+      "env": "not_an_object",
+      "corex": "not_a_boolean",
+      "gpu": [123, "valid_string", false]
+    }`;
+
+    const result = () => {
+      zmachine = plainToClass(Zmachine, JSON.parse(invalidZmachine));
+    };
+
     expect(result).toThrow();
   });
 });

@@ -1,5 +1,5 @@
 import type { FarmFilterOptions, FarmInfo, FilterOptions, NodeInfo } from "@threefold/grid_client";
-import type { NodeStatus } from "@threefold/gridproxy_client";
+import type { Farm, NodeStatus } from "@threefold/gridproxy_client";
 import { GridClientErrors } from "@threefold/types";
 import type AwaitLock from "await-lock";
 import shuffle from "lodash/fp/shuffle.js";
@@ -290,7 +290,13 @@ async function _loadValidNodes(
   return [];
 }
 
-export function isNodeValid(node: NodeInfo, machines: SelectedMachine[], filters: FilterOptions): boolean {
+type GetFarmFn = (farmId: number) => Farm | undefined;
+export function isNodeValid(
+  getFarm: GetFarmFn,
+  node: NodeInfo,
+  machines: SelectedMachine[],
+  filters: FilterOptions,
+): boolean {
   const machinesWithSameNode = machines.filter(m => m.nodeId === node.nodeId);
   const requiredMru = (filters.mru ?? 0) * 1e9;
   const requiredSru = (filters.sru ?? 0) * 1e9;
@@ -302,10 +308,23 @@ export function isNodeValid(node: NodeInfo, machines: SelectedMachine[], filters
     sru -= machine.disk * 1e9;
   }
 
-  return mru >= requiredMru && sru >= requiredSru;
+  let valid = mru >= requiredMru && sru >= requiredSru;
+
+  if (valid && filters.publicIPs) {
+    const ipsCount = machines.filter(m => m.publicIp && m.farmId === node.farmId).length + 1;
+    if (ipsCount > 1) {
+      const farm = getFarm(node.farmId);
+      if (farm) {
+        valid &&= farm.publicIps.filter(ip => ip.contract_id === 0).length >= ipsCount;
+      }
+    }
+  }
+
+  return valid;
 }
 
 export async function selectValidNode(
+  getFarm: GetFarmFn,
   nodes: NodeInfo[],
   selectedMachines: SelectedMachine[],
   filters: FilterOptions,
@@ -321,7 +340,7 @@ export async function selectValidNode(
   if (oldSelectedNodeId) {
     const node = nodes.find(n => n.nodeId === oldSelectedNodeId);
 
-    if (node && isNodeValid(node, selectedMachines, filters)) {
+    if (node && isNodeValid(getFarm, node, selectedMachines, filters)) {
       if (nodesLock && !locked) {
         release(nodesLock);
       }
@@ -330,7 +349,7 @@ export async function selectValidNode(
   }
 
   for (const node of shuffle(nodes)) {
-    if (isNodeValid(node, selectedMachines, filters)) {
+    if (isNodeValid(getFarm, node, selectedMachines, filters)) {
       if (nodesLock && !locked) {
         release(nodesLock);
       }
