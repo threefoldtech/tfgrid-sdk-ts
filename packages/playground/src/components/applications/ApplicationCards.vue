@@ -61,13 +61,20 @@ export default defineComponent({
   setup(props) {
     const baseURL = import.meta.env.BASE_URL;
     const filteredCards = ref(props.cards);
-    const createdAt = 1723471170046; // Update time now in milliseconds ex: 1723468996310 is 'Mon Aug 12 2024 16:23:16'
 
+    function isCreatedToday(timestamp: number) {
+      const today = new Date();
+      const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999);
+
+      return timestamp >= startOfDay.getTime() && timestamp <= endOfDay.getTime();
+    }
     onMounted(() => {
-      const next30DaysInMs = 30 * 24 * 60 * 60 * 1000;
-      const next30DaysFromNow = createdAt + next30DaysInMs;
       filteredCards.value.forEach(card => {
-        if (card.isNew === true) {
+        const next30DaysInMs = 30 * 24 * 60 * 60 * 1000;
+        const next30DaysFromNow = card.createdAt ? card.createdAt + next30DaysInMs : 0;
+
+        if (isCreatedToday(card.createdAt ?? 0)) {
           card.isNew = Date.now() < next30DaysFromNow;
         }
       });

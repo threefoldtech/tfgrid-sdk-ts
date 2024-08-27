@@ -57,6 +57,7 @@
                           <span v-bind="props">
                             {{ item.title }}
                           </span>
+                          <v-badge dot inline color="primary" v-if="item.hasUpdate"></v-badge>
                         </template>
                       </v-tooltip>
                     </v-list-item-title>
@@ -88,6 +89,7 @@
                         <span v-bind="props">
                           {{ item.title }}
                         </span>
+                        <v-badge dot inline color="primary" v-if="item.hasUpdate"></v-badge>
                       </template>
                     </v-tooltip>
                   </v-list-item-title>
@@ -248,7 +250,20 @@ function navigateToHome() {
   return $router.push(DashboardRoutes.Other.HomePage);
 }
 
-onMounted(window.$$appLoader || noop);
+onMounted(() => {
+  window.$$appLoader || noop();
+  routes.map(route => {
+    route.items.map(item => {
+      const next30DaysInMs = 30 * 24 * 60 * 60 * 1000;
+      const timestamp = 1724769030739; // Update with the time of creation
+      const next30DaysFromNow = timestamp + next30DaysInMs;
+
+      if (item.hasUpdate == true) {
+        item.hasUpdate = Date.now() < next30DaysFromNow;
+      }
+    });
+  });
+});
 
 // eslint-disable-next-line no-undef
 const version = process.env.VERSION as any;
@@ -313,6 +328,7 @@ const routes: AppRoute[] = [
         icon: "mdi-lightbulb-on-outline",
         route: DashboardRoutes.Deploy.Applications,
         tooltip: "Deploy ready applications on the ThreeFold grid.",
+        hasUpdate: false, // Change to true and update the timestamp in onMounted hook
       },
       {
         title: "Your Contracts",
@@ -454,6 +470,7 @@ interface AppRouteItem {
   url?: string;
   icon?: string;
   tooltip?: string;
+  hasUpdate?: boolean;
 }
 
 export default {

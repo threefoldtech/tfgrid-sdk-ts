@@ -22,4 +22,5 @@ export interface ApplicationCard {
   route: string;
   tags?: string[];
   isNew?: boolean;
+  createdAt?: number;
 }
