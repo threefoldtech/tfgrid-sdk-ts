@@ -92,7 +92,7 @@ const grid = gridStore.client as GridClient;
 function finalize(deployment: any) {
   layout.value.reloadDeploymentsList();
   layout.value.setStatus("success", "Successfully deployed a Domains instance.");
-  layout.value.openDialog(deployment, deploymentListEnvironments.domains);
+  layout.value.openDialog(deployment);
 }
 
 async function deploy() {
