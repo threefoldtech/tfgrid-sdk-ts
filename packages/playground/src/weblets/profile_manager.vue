@@ -125,10 +125,7 @@
                         validators.required('Mnemonic or Hex Seed is required.'),
                         v => {
                           clearError();
-                          if (
-                            validateMnemonic(v) ||
-                            ((v.length === 64 || v.length === 66) && isAddress(v.length === 66 ? v : `0x${v}`))
-                          ) {
+                          if (validateMnemonic(v) || isAddress(v.length >= 66 ? v : `0x${v}`)) {
                             hasTwinId();
                             return;
                           }
@@ -193,7 +190,11 @@
                           color="secondary"
                           variant="outlined"
                           :disabled="
-                            isValidForm || !!mnemonic || shouldActivateAccount || keypairType === KeypairType.ed25519
+                            (isValidForm ||
+                              !!mnemonic ||
+                              shouldActivateAccount ||
+                              keypairType === KeypairType.ed25519) &&
+                            !shouldCreateAccount
                           "
                           :loading="creatingAccount"
                           @click="openAcceptTerms = termsLoading = true"
@@ -263,7 +264,7 @@
                   v-model="email"
                   v-bind="props"
                   :loading="loadEmail"
-                  :disabled="creatingAccount || activatingAccount || activating || loadEmail"
+                  :disabled="creatingAccount || activatingAccount || activating || loadEmail || shouldCreateAccount"
                   readonly
                   ref="emailRef"
                   @focus="handleFocus(emailRef)"
@@ -292,7 +293,7 @@
                           label="Password"
                           v-model="password"
                           v-bind="{ ...passwordInputProps, ...validationProps }"
-                          :disabled="creatingAccount || activatingAccount || activating"
+                          :disabled="creatingAccount || activatingAccount || activating || shouldCreateAccount"
                           autocomplete="off"
                         />
                       </div>
@@ -315,7 +316,7 @@
                       ...confirmPasswordInputProps,
                       ...validationProps,
                     }"
-                    :disabled="creatingAccount || activatingAccount || activating"
+                    :disabled="creatingAccount || activatingAccount || activating || shouldCreateAccount"
                     autocomplete="off"
                   />
                 </InputValidator>
@@ -455,6 +456,7 @@ interface Credentials {
   keypairTypeHash?: string;
   emailHash?: string;
 }
+const shouldCreateAccount = ref(false);
 const keyType = ["sr25519", "ed25519"];
 const keypairType = ref(KeypairType.sr25519);
 const enableReload = ref(true);
@@ -693,16 +695,15 @@ async function hasTwinId() {
   try {
     await getGrid({ mnemonic: mnemonic.value, keypairType: keypairType.value });
     await getEmail();
+    shouldCreateAccount.value = false;
   } catch (e) {
     if (e instanceof TwinNotExistError) {
-      isNonActiveMnemonic.value = true;
-      openAcceptTerms.value = true;
-      termsLoading.value = true;
+      shouldCreateAccount.value = true;
+    } else {
+      return {
+        message: normalizeError(e, "Something went wrong. please try again."),
+      };
     }
-    enableReload.value = false;
-    return {
-      message: normalizeError(e, "Something went wrong. please try again."),
-    };
   }
 }
 
