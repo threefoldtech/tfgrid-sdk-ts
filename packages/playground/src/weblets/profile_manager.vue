@@ -21,13 +21,13 @@
             <p>
               Balance:
               <strong :class="theme.name.value === AppThemeSelection.light ? 'text-primary' : 'text-info'">
-                {{ normalizeBalance(balance.free, true) }} TFT
+                {{ normalizeBalance(balance.free + balance.reserved, true) }} TFT
               </strong>
             </p>
             <p>
               Locked:
               <strong :class="theme.name.value === AppThemeSelection.light ? 'text-primary' : 'text-info'">
-                {{ normalizeBalance(balance.locked, true) || 0 }} TFT
+                {{ normalizeBalance(balance.reserved, true) || 0 }} TFT
               </strong>
               <v-tooltip text="Locked balance documentation" location="bottom right">
                 <template #activator="{ props }">
@@ -619,7 +619,7 @@ const isValidConnectConfirmationPassword = computed(() =>
 const profileManagerController = useProfileManagerController();
 
 const balance = profileManagerController.balance;
-let freeBalance = balance.value?.free ?? 0;
+const freeBalance = computed(() => balance.value?.free ?? 0);
 
 const email = ref("");
 
@@ -773,8 +773,7 @@ async function __loadBalance(profile?: Profile, tries = 1) {
     loadingBalance.value = true;
     const grid = await getGrid(profile);
     balance.value = await loadBalance(grid!);
-    freeBalance = balance.value.free ?? 0;
-    if (!BalanceWarningRaised && balance.value?.free) {
+    if (!BalanceWarningRaised && freeBalance.value) {
       if (balance.value?.free < 0.01) {
         createCustomToast("Your balance is too low, Please fund your account.", ToastType.warning);
         BalanceWarningRaised = true;

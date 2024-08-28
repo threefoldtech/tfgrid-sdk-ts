@@ -276,6 +276,7 @@ export default {
           ipv4u: resources.value.ipv4,
           certified: resources.value.certified,
           balance:
+            //TODO check if we need to use the total balance
             userBalance.value && resources.value.useCurrentBalance ? userBalance.value.free : +resources.value.balance,
           nu: +resources.value.nu,
         });
