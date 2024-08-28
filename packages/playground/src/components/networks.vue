@@ -1,100 +1,64 @@
 <template>
-  <div ref="input">
-    <input-tooltip tooltip="Enable the network options to be able access your deployment">
-      <v-expansion-panels variant="inset" class="mb-4">
-        <v-expansion-panel expand-icon="mdi-menu-down" collapse-icon="mdi-menu-up" :disabled="$props.disabled">
-          <template v-slot:title>
-            <span class="text-h6">Network</span>
-            <v-chip v-if="error" variant="text">
-              <v-icon color="warning" icon="mdi-alert-circle" />
-            </v-chip>
-            <v-chip v-if="ipv4" variant="outlined" class="ml-2"> IPV4 </v-chip>
-            <v-chip v-if="ipv6" variant="outlined" class="ml-2"> IPV6 </v-chip>
-            <v-chip v-if="planetary" variant="outlined" class="ml-2"> Planetary </v-chip>
-            <v-chip v-if="mycelium" variant="outlined" class="ml-2"> Mycelium </v-chip>
-            <v-chip v-if="wireguard" variant="outlined" class="ml-2"> Wireguard </v-chip>
-          </template>
-          <v-expansion-panel-text>
-            <input-tooltip
-              v-if="ipv4 !== null"
-              inline
-              tooltip="An Internet Protocol version 4 address that is globally unique and accessible over the internet."
-            >
-              <v-switch
-                hide-details
-                color="primary"
-                inset
-                label="Public IPv4"
-                :readonly="enableIpv4"
-                :model-value="$props.ipv4"
-                @update:model-value="$emit('update:ipv4', $event ?? undefined)"
-                :style="enableIpv4 ? 'opacity: .5' : 'opacity: 1'"
-              />
-            </input-tooltip>
-            <input-tooltip
-              v-if="ipv6 !== null"
-              inline
-              tooltip="Public IPv6 is the next-generation Internet Protocol that offers an expanded address space to connect a vast number of devices."
-            >
-              <v-switch
-                hide-details
-                color="primary"
-                inset
-                label="Public IPv6"
-                :modelValue="$props.ipv6"
-                @update:modelValue="$emit('update:ipv6', $event ?? undefined)"
-              />
-            </input-tooltip>
-            <input-tooltip
-              v-if="planetary !== null"
-              inline
-              tooltip="The Planetary Network is a distributed network infrastructure that spans across multiple regions and countries, providing global connectivity."
-            >
-              <v-switch
-                hide-details
-                color="primary"
-                inset
-                label="Planetary Network"
-                :modelValue="$props.planetary"
-                @update:modelValue="$emit('update:planetary', $event ?? undefined)"
-              />
-            </input-tooltip>
-            <input-tooltip
-              v-if="mycelium !== null"
-              inline
-              tooltip="Mycelium is an IPv6 overlay network. Each node that joins the overlay network will receive an overlay network IP."
-            >
-              <v-switch
-                hide-details
-                color="primary"
-                inset
-                label="mycelium"
-                :modelValue="$props.mycelium"
-                @update:modelValue="$emit('update:mycelium', $event ?? undefined)"
-              />
-            </input-tooltip>
-            <input-tooltip
-              v-if="wireguard !== null"
-              inline
-              tooltip="Enabling WireGuard Access allows you to establish private, secure, and encrypted connections to your instance."
-            >
-              <v-switch
-                hide-details
-                color="primary"
-                inset
-                label="Add Wireguard Access"
-                :modelValue="$props.wireguard"
-                @update:modelValue="$emit('update:wireguard', $event ?? undefined)"
-              />
-            </input-tooltip>
-            <v-alert v-show="error" class="mb-2" type="warning" variant="tonal">
-              You must enable at least one of network options.
-            </v-alert>
-          </v-expansion-panel-text>
-        </v-expansion-panel>
-      </v-expansion-panels>
-    </input-tooltip>
-  </div>
+  <input-tooltip ref="input" tooltip="Enable the network options to be able access your deployment">
+    <v-expansion-panels variant="inset" class="mb-4">
+      <v-expansion-panel expand-icon="mdi-menu-down" collapse-icon="mdi-menu-up" :disabled="$props.disabled">
+        <v-expansion-panel-title>
+          <v-card-title class="py-0" v-text="'Network'" />
+          <v-icon v-if="error" color="warning" icon="mdi-alert-circle" class="ml-2" size="small" />
+          <v-chip v-if="ipv4" variant="outlined" class="ml-2" text="IPV4" />
+          <v-chip v-if="ipv6" variant="outlined" class="ml-2" text="IPV6" />
+          <v-chip v-if="planetary" variant="outlined" class="ml-2" text="Planetary" />
+          <v-chip v-if="mycelium" variant="outlined" class="ml-2" text="Mycelium" />
+          <v-chip v-if="wireguard" variant="outlined" class="ml-2" text="Wireguard" />
+        </v-expansion-panel-title>
+
+        <v-expansion-panel-text>
+          <NetworkItem
+            tooltip-text="An Internet Protocol version 4 address that is globally unique and accessible over the internet."
+            label="Public IPv4"
+            :value="$props.ipv4"
+            :emit-function="$attrs['onUpdate:ipv4']"
+          />
+
+          <NetworkItem
+            tooltip-text="Public IPv6 is the next-generation Internet Protocol that offers an expanded address space to connect a vast number of devices."
+            label="Public IPv6"
+            :value="$props.ipv6"
+            :emit-function="$attrs['onUpdate:ipv6']"
+          />
+
+          <NetworkItem
+            tooltip-text="The Planetary Network is a distributed network infrastructure that spans across multiple regions and countries, providing global connectivity."
+            label="Planetary Network"
+            :value="$props.planetary"
+            :emit-function="$attrs['onUpdate:planetary']"
+          />
+
+          <NetworkItem
+            tooltip-text="Mycelium is an IPv6 overlay network. Each node that joins the overlay network will receive an overlay network IP."
+            label="Mycelium"
+            :value="$props.mycelium"
+            :emit-function="$attrs['onUpdate:mycelium']"
+          />
+
+          <NetworkItem
+            tooltip-text="Enabling WireGuard Access allows you to establish private, secure, and encrypted connections to your instance."
+            label="Add Wireguard Access"
+            :value="$props.wireguard"
+            :emit-function="$attrs['onUpdate:wireguard']"
+          />
+
+          <v-alert
+            v-if="error"
+            class="my-2"
+            type="warning"
+            variant="tonal"
+            text="You must enable at least one of network options."
+          />
+        </v-expansion-panel-text>
+      </v-expansion-panel>
+    </v-expansion-panels>
+  </input-tooltip>
 </template>
 
 <script lang="ts">
@@ -104,48 +68,23 @@ import { computed, getCurrentInstance, onMounted, onUnmounted, ref, watch } from
 import { useForm, ValidatorStatus } from "@/hooks/form_validator";
 import type { InputValidatorService } from "@/hooks/input_validator";
 
+import NetworkItem from "./NetworkItem.vue";
+
 export default {
   name: "Network",
+  components: { NetworkItem },
   props: {
-    required: {
-      type: Boolean,
-      default: () => false,
-    },
-    ipv4: {
-      type: Boolean,
-      default: () => null,
-    },
-    ipv6: {
-      type: Boolean,
-      default: () => null,
-    },
-    planetary: {
-      type: Boolean,
-      default: () => null,
-    },
-    mycelium: {
-      type: Boolean,
-      default: () => null,
-    },
-    wireguard: {
-      type: Boolean,
-      default: () => null,
-    },
-    disabled: { type: Boolean },
-    enableIpv4: {
-      type: Boolean,
-      default: () => null,
-    },
+    required: { type: Boolean, default: () => false },
+    ipv4: { type: Boolean, default: () => null },
+    ipv6: { type: Boolean, default: () => null },
+    planetary: { type: Boolean, default: () => null },
+    mycelium: { type: Boolean, default: () => null },
+    wireguard: { type: Boolean, default: () => null },
+    disabled: Boolean,
   },
-  emits: {
-    "update:ipv4": (value?: boolean) => value,
-    "update:ipv6": (value?: boolean) => value,
-    "update:planetary": (value?: boolean) => value,
-    "update:mycelium": (value?: boolean) => value,
-    "update:wireguard": (value?: boolean) => value,
-  },
-  setup(props, { expose }) {
+  setup(props) {
     const input = ref();
+    const $el = computed(() => input.value?.$el);
 
     if (
       props.ipv4 === null &&
@@ -156,11 +95,8 @@ export default {
     ) {
       throw new Error("You must provide at least one network  option");
     }
-    const error = computed(
-      () => !(props.ipv4 || props.ipv6 || props.planetary || props.wireguard || props.mycelium) && props.required,
-    );
-    expose({
-      error,
+    const error = computed(() => {
+      return !(props.ipv4 || props.ipv6 || props.planetary || props.wireguard || props.mycelium) && props.required;
     });
 
     /* Adapter to work with old code validation */
@@ -173,7 +109,7 @@ export default {
       reset: noop,
       status: ValidatorStatus.Valid,
       error: null,
-      $el: input,
+      $el,
       highlightOnError: true,
     };
 
