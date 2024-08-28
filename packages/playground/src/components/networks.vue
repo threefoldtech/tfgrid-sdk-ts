@@ -101,7 +101,7 @@ import { computed, getCurrentInstance, onMounted, onUnmounted, type PropType, re
 
 import { useForm, ValidatorStatus } from "@/hooks/form_validator";
 import type { InputValidatorService } from "@/hooks/input_validator";
-import { type DomainInfo } from "@/types/nodeSelector";
+import type { DomainInfo } from "@/types/nodeSelector";
 
 export default {
   name: "Network",
@@ -193,7 +193,7 @@ export default {
       form?.updateStatus(uid.toString(), fakeService.status);
     });
 
-    const isWireguardReadOnly = computed(() => !(!props.domain?.enabledCustomDomain && props.ipv4 === true));
+    const isWireguardReadOnly = computed(() => !(props.domain?.enabledCustomDomain && props.ipv4 === true));
 
     watch(
       isWireguardReadOnly,
