@@ -46,7 +46,6 @@
 
         <Network
           required
-          ref="network"
           v-model:ipv4="ipv4"
           v-model:ipv6="ipv6"
           v-model:planetary="planetary"
@@ -155,7 +154,6 @@ const selectionDetails = ref<SelectionDetails>();
 
 const layout = useLayout();
 const tabs = ref();
-const profileManager = useProfileManager();
 const solution = ref() as Ref<SolutionFlavor>;
 const images: VmImage[] = [
   {
@@ -196,7 +194,6 @@ const wireguard = ref(false);
 const dedicated = ref(false);
 const certified = ref(false);
 const disks = ref<Disk[]>([]);
-const network = ref();
 const hasGPU = ref(false);
 const rootFilesystemSize = computed(() =>
   flist.value?.name === "Ubuntu-24.04" || flist.value?.name === "Other" ? solution.value?.disk : 2,

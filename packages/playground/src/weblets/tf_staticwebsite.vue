@@ -61,13 +61,7 @@
         :medium="{ cpu: 2, memory: 4, disk: 100 }"
       />
 
-      <Networks
-        ref="network"
-        v-model:ipv4="ipv4"
-        v-model:mycelium="mycelium"
-        v-model:planetary="planetary"
-        v-model:ipv6="ipv6"
-      />
+      <Networks v-model:ipv4="ipv4" v-model:mycelium="mycelium" v-model:planetary="planetary" v-model:ipv6="ipv6" />
 
       <input-tooltip
         inline

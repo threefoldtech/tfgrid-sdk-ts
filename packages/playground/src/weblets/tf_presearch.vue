@@ -62,7 +62,6 @@
           v-model:planetary="planetary"
           v-model:mycelium="mycelium"
           v-model:ipv6="ipv6"
-          ref="network"
         />
 
         <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
@@ -137,7 +136,6 @@ const rootFilesystemSize = calculateRootFileSystem({ CPUCores: cpu, RAMInMegaByt
 const dockerDiskSize = 10;
 const privateRestoreKey = ref("");
 const publicRestoreKey = ref("");
-const network = ref();
 const flist: Flist = {
   value: "https://hub.grid.tf/tf-official-apps/presearch-v2.3.flist",
   entryPoint: "/sbin/zinit init",

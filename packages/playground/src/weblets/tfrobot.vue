@@ -52,7 +52,6 @@
           v-model:planetary="planetary"
           v-model:mycelium="mycelium"
           v-model:wireguard="wireguard"
-          ref="network"
         />
         <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
           <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
@@ -201,7 +200,6 @@ const mycelium = ref(true);
 const wireguard = ref(false);
 const envs = ref<Env[]>([]);
 const disks = ref<Disk[]>([]);
-const network = ref();
 const dedicated = ref(false);
 const certified = ref(false);
 const rootFilesystemSize = computed(() => solution.value?.disk);

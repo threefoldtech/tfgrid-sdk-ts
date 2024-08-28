@@ -67,7 +67,6 @@
 
       <Network
         required
-        ref="network"
         v-model:ipv4="ipv4"
         v-model:planetary="planetary"
         v-model:wireguard="wireguard"
@@ -139,7 +138,6 @@ const ipv4 = ref(false);
 const ipv6 = ref(false);
 const planetary = ref(true);
 const wireguard = ref(false);
-const network = ref();
 const solution = ref() as Ref<SolutionFlavor>;
 const flist: Flist = {
   value: "https://hub.grid.tf/tf-official-apps/umbrel-latest.flist",
