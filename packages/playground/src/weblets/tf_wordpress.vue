@@ -89,7 +89,13 @@
         :large="{ cpu: 4, memory: 16, disk: 100 }"
       />
 
-      <Networks v-model:ipv4="ipv4" v-model:mycelium="mycelium" v-model:planetary="planetary" v-model:ipv6="ipv6" />
+      <Networks
+        v-model:ipv4="ipv4"
+        v-model:mycelium="mycelium"
+        v-model:planetary="planetary"
+        v-model:ipv6="ipv6"
+        :has-custom-domain="selectionDetails?.domain?.enabledCustomDomain"
+      />
 
       <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
         <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />

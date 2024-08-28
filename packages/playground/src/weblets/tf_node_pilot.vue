@@ -40,6 +40,7 @@
         v-model:ipv6="ipv6"
         v-model:planetary="planetary"
         v-model:mycelium="mycelium"
+        :has-custom-domain="selectionDetails?.domain?.enabledCustomDomain"
       />
 
       <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">

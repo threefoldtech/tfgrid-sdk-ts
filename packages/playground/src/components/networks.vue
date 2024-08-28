@@ -45,7 +45,7 @@
             tooltip-text="Enabling WireGuard Access allows you to establish private, secure, and encrypted connections to your instance."
             label="Add Wireguard Access"
             :value="$props.wireguard"
-            :emit-function="$attrs['onUpdate:wireguard']"
+            :emit-function="readonlyWireguard ? undefined : $attrs['onUpdate:wireguard']"
           />
 
           <v-alert
@@ -63,7 +63,7 @@
 
 <script lang="ts">
 import { noop } from "lodash";
-import { computed, getCurrentInstance, onMounted, onUnmounted, ref, watch } from "vue";
+import { computed, getCurrentInstance, onMounted, onUnmounted, ref, toRefs, watch } from "vue";
 
 import { useForm, ValidatorStatus } from "@/hooks/form_validator";
 import type { InputValidatorService } from "@/hooks/input_validator";
@@ -80,9 +80,10 @@ export default {
     planetary: { type: Boolean, default: () => null },
     mycelium: { type: Boolean, default: () => null },
     wireguard: { type: Boolean, default: () => null },
+    hasCustomDomain: { type: Boolean, default: () => true },
     disabled: Boolean,
   },
-  setup(props) {
+  setup(props, { attrs }) {
     const input = ref();
     const $el = computed(() => input.value?.$el);
 
@@ -121,9 +122,22 @@ export default {
       form?.updateStatus(uid.toString(), fakeService.status);
     });
 
+    const readonlyWireguard = computed(() => props.hasCustomDomain && !props.ipv4);
+    watch(
+      readonlyWireguard,
+      readonly => {
+        const fn = attrs["onUpdate:wireguard"];
+        if (readonly && !props.wireguard && typeof fn === "function") {
+          fn(true);
+        }
+      },
+      { immediate: true },
+    );
+
     return {
       error,
       input,
+      readonlyWireguard,
     };
   },
 };

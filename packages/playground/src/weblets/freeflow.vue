@@ -46,7 +46,11 @@
         :large="{ cpu: 4, memory: 32, disk: 1000 }"
       />
 
-      <Networks v-model:ipv4="ipv4" v-model:ipv6="ipv6"></Networks>
+      <Networks
+        v-model:ipv4="ipv4"
+        v-model:ipv6="ipv6"
+        :has-custom-domain="selectionDetails?.domain?.enabledCustomDomain"
+      />
 
       <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
         <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
