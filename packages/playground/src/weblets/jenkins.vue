@@ -17,7 +17,7 @@
         :rules="[
           validators.required('Name is required.'),
           validators.IsAlphanumericExpectUnderscore('Name should consist of letters ,numbers and underscores only.'),
-          name => validators.isAlpha('Name must start with alphabet char.')(name[0]),
+          (name: string) => validators.isAlpha('Name must start with an alphabetical character.')(name[0]),
           validators.minLength('Name must be at least 2 characters.', 2),
           validators.maxLength('Name cannot exceed 50 characters.', 50),
         ]"
@@ -128,7 +128,7 @@ const rootFilesystemSize = computed(() =>
   calculateRootFileSystem({ CPUCores: solution.value?.cpu ?? 0, RAMInMegaBytes: solution.value?.memory ?? 0 }),
 );
 const flist: Flist = {
-  value: "https://hub.grid.tf/amryassir.3bot/amryassir-jenkinsv3-latest.flist",
+  value: "https://hub.grid.tf/tf-official-apps/jenkins-latest.flist",
   entryPoint: "/sbin/zinit init",
 };
 const dedicated = ref(false);
