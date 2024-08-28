@@ -172,6 +172,13 @@ export const deploymentListEnvironments = {
     SSH_KEY: _ssh,
   },
 
+  jenkins: {
+    SSH_KEY: _ssh,
+    JENKINS_HOSTNAME: "Jenkins Hostname",
+    JENKINS_ADMIN_USERNAME: "Jenkins Admin Username",
+    JENKINS_ADMIN_PASSWORD: { label: "Jenkins Admin Password", type: "password" },
+  },
+
   gitea: {
     SSH_KEY: _ssh,
     GITEA__HOSTNAME: "Gitea Hostname",

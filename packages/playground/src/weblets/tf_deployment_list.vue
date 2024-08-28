@@ -100,6 +100,20 @@
           />
         </template>
 
+        <template #Jenkins-actions="{ item }">
+          <IconActionBtn
+            tooltip="Show Details"
+            icon="mdi-eye-outline"
+            @click="openDialog(tabs[activeTab].value, item)"
+          />
+          <IconActionBtn
+            tooltip="Visit"
+            icon="mdi-web"
+            color="anchor"
+            :href="'https://' + item.env.JENKINS_HOSTNAME"
+          />
+        </template>
+
         <template #Taiga-actions="{ item }">
           <IconActionBtn
             tooltip="Show Details"
@@ -443,6 +457,7 @@ const tabs: Tab[] = [
   { title: "TFRobot", value: "TFRobot", imgPath: "images/icons/tfrobot.png" },
   { title: "Gitea", value: "Gitea", imgPath: "images/icons/gitea.png" },
   { title: "Nostr", value: "Nostr", imgPath: "images/icons/nostr.png" },
+  { title: "Jenkins", value: "Jenkins", imgPath: "images/icons/jenkins.png" },
   { title: "Domains", value: "Domains", imgPath: "images/icons/domains.png" },
 ];
 

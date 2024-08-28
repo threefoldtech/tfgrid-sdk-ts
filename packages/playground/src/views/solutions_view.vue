@@ -46,6 +46,13 @@ export default {
         route: DashboardRoutes.Applications.TFRobot,
       },
       {
+        title: "Jenkins",
+        excerpt:
+          "Jenkins is a popular open-source automation server that enables developers to build, test, and deploy their applications continuously.",
+        icon: "jenkins.png",
+        route: DashboardRoutes.Applications.Jenkins,
+      },
+      {
         title: "Peertube",
         excerpt: "Peertube aspires to be a decentralized and free/libre alternative to video broadcasting services.",
         icon: "peertube.png",

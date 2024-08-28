@@ -432,6 +432,28 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
       },
     },
     {
+      path: DashboardRoutes.Applications.Jenkins,
+      component: () => import("../views/jenkins_view.vue"),
+      meta: {
+        title: "Jenkins",
+        info: { page: "info/jenkins.md" },
+        navbarConfig: {
+          back: true,
+          path: [
+            { title: "Deploy" },
+            {
+              title: "Applications",
+              disabled: false,
+              to: DashboardRoutes.Deploy.Applications,
+            },
+            {
+              title: "Jenkins",
+            },
+          ],
+        },
+      },
+    },
+    {
       path: DashboardRoutes.Applications.Gitea,
       component: () => import("../views/gitea_view.vue"),
       meta: {
