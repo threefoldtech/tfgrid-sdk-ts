@@ -338,6 +338,15 @@
               @click="dialog = item.name"
             />
 
+            <IconActionBtn
+              icon="mdi-cog"
+              tooltip="Manage Domains"
+              :disabled="item.fromAnotherClient"
+              @click="dialog = item.masters[0].name"
+            />
+
+            <ManageGatewayDialog v-if="dialog === item.masters[0].name" :k8s="item" @close="dialog = undefined" />
+
             <ManageK8SWorkerDialog
               v-if="dialog === item.name"
               :data="item"
