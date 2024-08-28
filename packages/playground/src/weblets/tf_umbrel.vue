@@ -73,7 +73,7 @@
         v-model:wireguard="wireguard"
         v-model:mycelium="mycelium"
         v-model:ipv6="ipv6"
-        :enabledCustomDomain="!selectionDetails?.domain?.enabledCustomDomain"
+        :domain="selectionDetails?.domain"
       />
 
       <SelectSolutionFlavor

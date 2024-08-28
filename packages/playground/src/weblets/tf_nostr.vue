@@ -44,7 +44,7 @@
           v-model:planetary="planetary"
           v-model:mycelium="mycelium"
           v-model:wireguard="wireguard"
-          :enabledCustomDomain="!selectionDetails?.domain?.enabledCustomDomain"
+          :domain="selectionDetails?.domain"
         />
         <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
           <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />

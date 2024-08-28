@@ -94,7 +94,7 @@
         v-model:mycelium="mycelium"
         v-model:ipv6="ipv6"
         v-model:wireguard="wireguard"
-        :enabledCustomDomain="!selectionDetails?.domain?.enabledCustomDomain"
+        :domain="selectionDetails?.domain"
       />
 
       <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">

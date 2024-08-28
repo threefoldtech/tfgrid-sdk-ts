@@ -68,7 +68,7 @@
         v-model:planetary="planetary"
         v-model:ipv6="ipv6"
         v-model:wireguard="wireguard"
-        :enabledCustomDomain="!selectionDetails?.domain?.enabledCustomDomain"
+        :domain="selectionDetails?.domain"
       />
 
       <input-tooltip
