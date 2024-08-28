@@ -145,10 +145,12 @@ function toMachine(worker?: K8SWorker): SelectedMachine | undefined {
   }
 
   return {
+    farmId: worker.selectionDetails.node.farmId,
     nodeId: worker.selectionDetails.node.nodeId,
     cpu: worker.cpu,
     memory: worker.memory,
     disk: (worker.diskSize ?? 0) + (worker.rootFsSize ?? 0),
+    publicIp: worker.ipv4,
   };
 }
 

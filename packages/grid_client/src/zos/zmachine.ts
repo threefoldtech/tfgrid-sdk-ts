@@ -2,12 +2,12 @@ import { Expose, Transform, Type } from "class-transformer";
 import {
   IsBoolean,
   IsDefined,
-  isDefined,
   IsInt,
   IsIP,
   IsNotEmpty,
   IsOptional,
   IsString,
+  IsUrl,
   Max,
   Min,
   ValidateNested,
@@ -61,9 +61,9 @@ class Mount {
 
 @ValidateMembers()
 class Zmachine extends WorkloadData {
-  @Expose() @IsString() @IsNotEmpty() flist: string;
+  @Expose() @IsString() @IsNotEmpty() @IsUrl() flist: string;
   @Expose() @Type(() => ZmachineNetwork) @ValidateNested() network: ZmachineNetwork;
-  @Expose() @IsInt() @Max(10 * 1024 ** 4) size: number; // in bytes
+  @Expose() @IsInt() @Min(0) @Max(10 * 1024 ** 4) size: number; // in bytes
   @Expose() @Type(() => ComputeCapacity) @ValidateNested() compute_capacity: ComputeCapacity;
   @Expose() @Type(() => Mount) @ValidateNested({ each: true }) mounts: Mount[];
   @Expose() @IsString() @IsDefined() entrypoint: string;

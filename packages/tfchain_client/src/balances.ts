@@ -1,8 +1,9 @@
+import { isAddress } from "@polkadot/util-crypto";
 import { ValidationError } from "@threefold/types";
 
 import { Client, QueryClient } from "./client";
 import { ExtrinsicResult } from "./types";
-import { checkConnection } from "./utils";
+import { checkConnection, requireCouncil } from "./utils";
 
 interface Balance {
   free: number;
@@ -42,6 +43,8 @@ export interface BalanceForceTransferOptions {
   amount: number;
 }
 
+export type BalanceForceSetBalanceOptions = BalanceTransferOptions;
+
 class Balances extends QueryBalances {
   constructor(public client: Client) {
     super(client);
@@ -66,12 +69,34 @@ class Balances extends QueryBalances {
    * @returns {Promise<ExtrinsicResult<number>>} A promise that resolves once the transfer extrinsic is created.
    */
   @checkConnection
+  @requireCouncil
   async forceTransfer(options: BalanceForceTransferOptions): Promise<ExtrinsicResult<number>> {
     if (isNaN(options.amount) || options.amount <= 0) {
       throw new ValidationError("The amount must be a positive numeric value");
     }
 
     const extrinsic = await this.client.api.tx.balances.forceTransfer(options.source, options.dest, options.amount);
+    return this.client.patchExtrinsic<number>(extrinsic, { map: () => options.amount });
+  }
+
+  /**
+   * Prepare a force set balance extrinsic to a specified amount of TFT (`ThreeFold Tokens`).
+   * It's a council call that can't be executed by a normal user. It should be called in a proposal.
+   *
+   * @param {BalanceForceSetBalanceOptions} options - The set balance options, including the account address and the amount to set.
+   * @returns {Promise<ExtrinsicResult<number>>} A promise that resolves once the set balance extrinsic is created.
+   */
+  @checkConnection
+  @requireCouncil
+  async forceSetBalance(options: BalanceForceSetBalanceOptions): Promise<ExtrinsicResult<number>> {
+    if (isNaN(options.amount) || options.amount < 0) {
+      throw new ValidationError("The amount must be a positive numeric value");
+    }
+    if (!isAddress(options.address)) {
+      throw new ValidationError("The address is invalid");
+    }
+
+    const extrinsic = await this.client.api.tx.balances.forceSetBalance(options.address, options.amount);
     return this.client.patchExtrinsic<number>(extrinsic, { map: () => options.amount });
   }
 
