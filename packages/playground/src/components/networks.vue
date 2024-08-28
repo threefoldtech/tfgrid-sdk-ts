@@ -84,8 +84,8 @@
                 inset
                 label="Add Wireguard Access"
                 :modelValue="$props.wireguard"
-                :readonly="readOnlyWireGuard"
-                :style="readOnlyWireGuard ? 'opacity: .5' : 'opacity: 1'"
+                :readonly="isWireguardReadOnly"
+                :style="isWireguardReadOnly ? 'opacity: .5' : 'opacity: 1'"
                 @update:modelValue="$emit('update:wireguard', $event ?? undefined)"
               />
             </input-tooltip>
@@ -152,10 +152,6 @@ export default {
   },
   setup(props, { expose, emit }) {
     const input = ref();
-    const _wireguard = ref(props.wireguard);
-    const readOnlyWireGuard = computed(
-      () => (props.ipv4 && !props.enabledCustomDomain) || (!props.ipv4 && !props.enabledCustomDomain),
-    );
 
     if (
       props.ipv4 === null &&
@@ -195,23 +191,16 @@ export default {
       form?.updateStatus(uid.toString(), fakeService.status);
     });
 
-    watch(
-      () => props.enabledCustomDomain,
-      () => {
-        if (props.enabledCustomDomain && props.ipv4) {
-          _wireguard.value = false;
-        } else {
-          _wireguard.value = true;
-        }
-        emit("update:wireguard", _wireguard.value);
-      },
-      { deep: true },
-    );
+    const isWireguardReadOnly = computed(() => !(!props.enabledCustomDomain && props.ipv4 === true));
+    watch(isWireguardReadOnly, () => emit("update:wireguard", isWireguardReadOnly.value), {
+      immediate: true,
+      deep: true,
+    });
+
     return {
       error,
       input,
-      readOnlyWireGuard,
-      _wireguard,
+      isWireguardReadOnly,
     };
   },
 };
