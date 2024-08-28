@@ -124,6 +124,11 @@ export const deploymentListEnvironments = {
     CHAIN_ENDPOINT: "Chain Endpoint",
   },
 
+  expose: {
+    SSH_KEY: _ssh,
+    EXPOSE_WEBSERVER_HOSTNAME: "Expose Webserver Hostname",
+  },
+
   static_website: {
     SSH_KEY: _ssh,
     GITHUB_URL: "HTTPS URL for git repository",
