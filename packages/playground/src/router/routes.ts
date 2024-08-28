@@ -70,6 +70,7 @@ enum ApplicationRoutes {
   TFRobot = "/deploy/applications/tfrobot/",
   Gitea = "/deploy/applications/gitea/",
   Nostr = "/deploy/applications/nostr/",
+  Domains = "/deploy/applications/domains/",
 }
 
 const DashboardRoutes = {
