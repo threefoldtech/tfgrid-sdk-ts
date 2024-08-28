@@ -158,6 +158,13 @@ export default {
         icon: "domains.png",
         route: DashboardRoutes.Applications.Domains,
       },
+      {
+        title: "Jitsi",
+        excerpt:
+          "Jitsi Meet is a set of Open Source projects which empower users to use and deploy video conferencing platforms with state-of-the-art video quality and features.",
+        icon: "jitsi.png",
+        route: DashboardRoutes.Applications.Jitsi,
+      },
     ];
     cards = cards.sort((a, b) => a.title.localeCompare(b.title));
 

@@ -254,6 +254,28 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
       },
     },
     {
+      path: DashboardRoutes.Applications.Jitsi,
+      component: () => import("../views/jitsi_view.vue"),
+      meta: {
+        title: "Jitsi",
+        info: { page: "info/jitsi.md" },
+        navbarConfig: {
+          back: true,
+          path: [
+            { title: "Deploy" },
+            {
+              title: "Applications",
+              disabled: false,
+              to: DashboardRoutes.Deploy.Applications,
+            },
+            {
+              title: "Jitsi",
+            },
+          ],
+        },
+      },
+    },
+    {
       path: DashboardRoutes.Applications.Algorand,
       component: () => import("../views/algorand_view.vue"),
       meta: {

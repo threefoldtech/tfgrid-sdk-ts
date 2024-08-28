@@ -128,6 +128,7 @@ export enum ProjectName {
   Gitea = "Gitea",
   Nostr = "Nostr",
   Domains = "Domains",
+  Jitsi = "Jitsi",
 }
 
 export enum SolutionCode {
@@ -159,6 +160,7 @@ export enum SolutionCode {
   gitea = "gt",
   nostr = "nt",
   Domains = "dm",
+  jitsi = "jt",
 }
 
 export const solutionType: { [key: string]: string } = {
@@ -187,6 +189,7 @@ export const solutionType: { [key: string]: string } = {
   Gitea: "Gitea",
   nostr: "Nostr",
   domains: "Domains",
+  jitsi: "Jitsi",
 };
 
 export interface solutionFlavor {

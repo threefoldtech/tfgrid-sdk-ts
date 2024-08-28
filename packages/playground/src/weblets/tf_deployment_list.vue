@@ -106,12 +106,7 @@
             icon="mdi-eye-outline"
             @click="openDialog(tabs[activeTab].value, item)"
           />
-          <IconActionBtn
-            tooltip="Visit"
-            icon="mdi-web"
-            color="anchor"
-            :href="'https://' + item.env.JENKINS_HOSTNAME"
-          />
+          <IconActionBtn tooltip="Visit" icon="mdi-web" color="anchor" :href="'https://' + item.env.JENKINS_HOSTNAME" />
         </template>
 
         <template #Taiga-actions="{ item }">
@@ -343,6 +338,15 @@
             :href="'https://' + item.env.WP_URL + '/wp-admin'"
           />
         </template>
+
+        <template #Jitsi-actions="{ item }">
+          <IconActionBtn
+            tooltip="Show Details"
+            icon="mdi-eye-outline"
+            @click="openDialog(tabs[activeTab].value, item)"
+          />
+          <IconActionBtn tooltip="Visit" icon="mdi-web" color="anchor" :href="'https://' + item.env.JITSI_HOSTNAME" />
+        </template>
       </VmDeploymentTable>
 
       <template #Kubernetes>
@@ -459,6 +463,7 @@ const tabs: Tab[] = [
   { title: "Nostr", value: "Nostr", imgPath: "images/icons/nostr.png" },
   { title: "Jenkins", value: "Jenkins", imgPath: "images/icons/jenkins.png" },
   { title: "Domains", value: "Domains", imgPath: "images/icons/domains.png" },
+  { title: "Jitsi", value: "Jitsi", imgPath: "images/icons/jitsi.png" },
 ];
 
 const layout = useLayout();
