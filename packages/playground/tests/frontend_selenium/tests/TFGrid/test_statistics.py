@@ -19,9 +19,6 @@ def test_statistics_details(browser):
     # Convert necessary values from string to integer before comparing
     statistics_details_converted = [int(detail.replace(',', '')) if detail is not None and detail.isdigit() else detail for detail in statistics_details]
     # Full set of assertions, comparing UI stats with proxy stats
-    print(grid_statistics_details)
-    print("==========================")
-    print(statistics_details_converted)    
     assert grid_statistics_details['nodes'] == statistics_details_converted[0]
     assert grid_statistics_details['dedicatedNodes'] == statistics_details_converted[1]
     assert grid_statistics_details['farms'] == statistics_details_converted[2]

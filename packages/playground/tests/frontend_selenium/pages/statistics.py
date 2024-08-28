@@ -62,7 +62,7 @@ class StatisticsPage:
             ("Contracts", self.conracts),
             ("Number of workloads", self.number_of_workloads)
         ]
-        for name, locator in elements_to_fetch:
+        for _, locator in elements_to_fetch:
             try:
                 element_text = wait.until(EC.visibility_of_element_located(locator)).text
                 details.append(element_text)
