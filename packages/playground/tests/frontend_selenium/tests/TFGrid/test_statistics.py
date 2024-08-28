@@ -19,6 +19,9 @@ def test_statistics_details(browser):
     # Convert necessary values from string to integer before comparing
     statistics_details_converted = [int(detail.replace(',', '')) if detail is not None and detail.isdigit() else detail for detail in statistics_details]
     # Full set of assertions, comparing UI stats with proxy stats
+    print(grid_statistics_details)
+    print("==========================")
+    print(statistics_details_converted)    
     assert grid_statistics_details['nodes'] == statistics_details_converted[0]
     assert grid_statistics_details['dedicatedNodes'] == statistics_details_converted[1]
     assert grid_statistics_details['farms'] == statistics_details_converted[2]
@@ -34,5 +37,8 @@ def test_statistics_details(browser):
     assert grid_statistics_details['publicIps'] == statistics_details_converted[12]
     assert grid_statistics_details['contracts'] == statistics_details_converted[13]
     assert grid_statistics_details['workloads_number'] == statistics_details_converted[14]
+
+def test_tfgrid_links(browser):
+    statistics_page = before_test_setup(browser)
     assert statistics_page.grid_status_link() == 'https://status.grid.tf/status/threefold/'
     assert statistics_page.node_monitoring_link() == 'https://metrics.grid.tf/d/rYdddlPWkfqwf/zos-host-metrics?orgId=2&refresh=30s/'
