@@ -33,7 +33,7 @@
           validators.required('Username is required.'),
           validators.isLowercase('Username should consist of lowercase letters only.'),
           validators.isAlphanumeric('Username should consist of letters and numbers only.'),
-          username => validators.isAlpha('Username must start with alphabet char.')(username[0]),
+          (username: string) => validators.isAlpha('Username must start with an alphabetical character.')(username[0]),
           validators.minLength('Username must be at least 2 characters.', 2),
           validators.maxLength('Username cannot exceed 50 characters.', 50),
         ]"
