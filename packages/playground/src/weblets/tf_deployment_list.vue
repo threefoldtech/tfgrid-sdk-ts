@@ -106,12 +106,7 @@
             icon="mdi-eye-outline"
             @click="openDialog(tabs[activeTab].value, item)"
           />
-          <IconActionBtn
-            tooltip="Visit"
-            icon="mdi-web"
-            color="anchor"
-            :href="'https://' + item.env.JENKINS_HOSTNAME"
-          />
+          <IconActionBtn tooltip="Visit" icon="mdi-web" color="anchor" :href="'https://' + item.env.JENKINS_HOSTNAME" />
         </template>
 
         <template #Taiga-actions="{ item }">
@@ -361,7 +356,7 @@
             />
 
             <IconActionBtn
-              icon="mdi-cog"
+              icon="mdi-cube-outline"
               :disabled="item.fromAnotherClient"
               tooltip="Manage Workers"
               @click="dialog = item.name"
