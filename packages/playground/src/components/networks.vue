@@ -63,7 +63,7 @@
 
 <script lang="ts">
 import { noop } from "lodash";
-import { computed, getCurrentInstance, onMounted, onUnmounted, ref, toRefs, watch } from "vue";
+import { computed, getCurrentInstance, onMounted, onUnmounted, ref, watch } from "vue";
 
 import { useForm, ValidatorStatus } from "@/hooks/form_validator";
 import type { InputValidatorService } from "@/hooks/input_validator";
@@ -80,7 +80,7 @@ export default {
     planetary: { type: Boolean, default: () => null },
     mycelium: { type: Boolean, default: () => null },
     wireguard: { type: Boolean, default: () => null },
-    hasCustomDomain: { type: Boolean, default: () => true },
+    hasCustomDomain: { type: Boolean, default: () => false },
     disabled: Boolean,
   },
   setup(props, { attrs }) {
