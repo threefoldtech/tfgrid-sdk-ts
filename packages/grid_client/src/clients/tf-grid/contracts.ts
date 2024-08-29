@@ -2,6 +2,7 @@ import {
   Contract,
   ContractLock,
   ContractLockOptions,
+  ContractPaymentState,
   Contracts,
   ExtrinsicResult,
   GetDedicatedNodePriceOptions,
@@ -12,6 +13,8 @@ import { Decimal } from "decimal.js";
 import { formatErrorMessage } from "../../helpers";
 import { ContractStates } from "../../modules";
 import { Graphql } from "../graphql/client";
+
+const ONE_HOUR = 1000 * 60 * 60;
 
 export type DiscountLevel = "None" | "Default" | "Bronze" | "Silver" | "Gold";
 
@@ -98,6 +101,11 @@ export interface GetConsumptionOptions {
   id: number;
 }
 
+export interface CalculateOverdueOptions {
+  graphqlURL: string;
+  id: number;
+  paymentState: ContractPaymentState;
+}
 export interface CancelMyContractOptions {
   graphqlURL: string;
 }
@@ -108,6 +116,18 @@ export interface LockContracts {
   nodeContracts: LockDetails;
   rentContracts: LockDetails;
   totalAmountLocked: number;
+}
+export interface ContractOverdueDetails extends ContractPaymentState {
+  overdueAmount: number;
+}
+
+export type OverdueDetails = { [key: number]: ContractOverdueDetails };
+
+export interface ContractsOverdue {
+  nameContracts: OverdueDetails;
+  nodeContracts: OverdueDetails;
+  rentContracts: OverdueDetails;
+  totalOverdueAmount: number;
 }
 
 class TFContracts extends Contracts {
@@ -306,6 +326,31 @@ class TFContracts extends Contracts {
     const amountLocked = new Decimal(res.amountLocked);
     res.amountLocked = amountLocked.div(10 ** 7).toNumber();
     return res;
+  }
+
+  /**
+   * Calculates the overdue amount for a contract.
+   *
+   * This method calculates the overdue amount by summing the overdraft amounts
+   * from the contract payment state and multiplying it by the product of:
+   * 1. The time elapsed since the last billing in seconds (with an additional time allowance).
+   * 2. The contract cost per second.
+   *
+   * The resulting overdue amount represents the amount that needs to be addressed.
+   *
+   * @param {CalculateOverdueOptions} options - The options containing the contract ID.
+   * @returns {Promise<number>} - The calculated overdue amount.
+   */
+  async calculateContractOverDue(options: CalculateOverdueOptions) {
+    const { lastUpdatedSeconds, standardOverdraft, additionalOverdraft } = options.paymentState;
+    const contractCost = await this.getConsumption({ id: options.id, graphqlURL: options.graphqlURL });
+    const elapsedSeconds = (BigInt(Date.now()) - lastUpdatedSeconds) / 1000n;
+    const overdue =
+      (standardOverdraft + additionalOverdraft) *
+      (elapsedSeconds + BigInt(ONE_HOUR)) *
+      BigInt((contractCost / 60) * 60);
+
+    return Number(overdue / BigInt(10 ** 7));
   }
 
   /**

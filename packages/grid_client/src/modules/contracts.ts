@@ -3,6 +3,8 @@ import { DeploymentKeyDeletionError, InsufficientBalanceError } from "@threefold
 import * as PATH from "path";
 
 import {
+  ContractOverdueDetails,
+  ContractsOverdue,
   GqlContracts,
   GqlNameContract,
   GqlNodeContract,
@@ -25,6 +27,7 @@ import {
   ContractGetByNodeIdAndHashModel,
   ContractGetModel,
   ContractLockModel,
+  ContractOverdueModel,
   ContractState,
   ContractStates,
   CreateServiceContractModel,
@@ -602,6 +605,73 @@ class Contracts {
   @validateInput
   async unlockMyContracts(): Promise<number[]> {
     return await this.client.contracts.unlockMyContracts(this.config.graphqlURL);
+  }
+
+  /**
+   * Retrieves the `payment state` of a contract based on the provided `contract ID`.
+   *
+   * @param contractID - The ID for which contract to retrieve its `payment state`.
+   * @returns {Promise<ContractLock>} A Promise that resolves to the `payment state` of the specified contract.
+   */
+  async getContractPaymentState(contractID: number) {
+    return await this.client.contracts.getContractPaymentState(contractID);
+  }
+
+  /**
+   * Returns the contract payment state with its overdue amount of the contract.
+   *
+   * @param {ContractOverdueModel} options - Options to get the amount.
+   * @returns {Promise<ContractOverdueDetails>} A promise that resolves contract  overdue details.
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   */
+  @expose
+  @validateInput
+  async getContractOverdueDetails(options: ContractOverdueModel): Promise<ContractOverdueDetails> {
+    const paymentState = await this.getContractPaymentState(options.id);
+    const overdueAmount = await this.client.contracts.calculateContractOverDue({
+      id: options.id,
+      graphqlURL: this.config.graphqlURL,
+      paymentState,
+    });
+    return {
+      ...paymentState,
+      overdueAmount,
+    };
+  }
+
+  /**
+   * Retrieves overdue details of contracts.
+   * @returns {Promise<ContractsOverdue>} A Promise that resolves to an object of type ContractsOverdue containing details of locked contracts.
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   */
+  @expose
+  @validateInput
+  async getTotalContractsOverdueAmount(): Promise<ContractsOverdue> {
+    const contractsOverdue = {
+      nameContracts: {},
+      nodeContracts: {},
+      rentContracts: {},
+      totalOverdueAmount: 0,
+    };
+    const contracts = await this.listMyContracts({ state: [ContractStates.GracePeriod] });
+
+    if (contracts == undefined) return contractsOverdue;
+
+    const contractTypes = ["nameContracts", "nodeContracts", "rentContracts"];
+
+    for (const type of contractTypes) {
+      for (const contract of contracts[type]) {
+        const contractID = parseInt(contract.contractID);
+        const contractOverdueDetails = await this.getContractOverdueDetails({ id: contractID });
+        contractsOverdue[type][contractID] = contractOverdueDetails;
+        contractsOverdue.totalOverdueAmount += contractOverdueDetails.overdueAmount;
+      }
+    }
+    return contractsOverdue;
   }
 }
 

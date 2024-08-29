@@ -391,6 +391,7 @@ class ContractConsumption {
 }
 
 class ContractLockModel extends ContractConsumption {}
+class ContractOverdueModel extends ContractConsumption {}
 
 class TwinCreateModel {
   @Expose() @IsString() @IsNotEmpty() relay: string;
@@ -971,6 +972,7 @@ export {
   ContractsByAddress,
   ContractConsumption,
   ContractLockModel,
+  ContractOverdueModel,
   TwinCreateModel,
   TwinGetModel,
   TwinGetByAccountIdModel,

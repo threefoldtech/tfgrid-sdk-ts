@@ -24,6 +24,15 @@ export interface ContractLock {
   cycles: number;
 }
 
+export interface ContractPaymentState {
+  standardReserve: bigint;
+  additionalReserve: bigint;
+  standardOverdraft: bigint;
+  additionalOverdraft: bigint;
+  lastUpdatedSeconds: bigint;
+  cycles: number;
+}
+
 interface NodeContract {
   nodeId: number;
   deploymentHash: string;
@@ -172,6 +181,18 @@ class QueryContracts {
   async contractLock(options: ContractLockOptions): Promise<ContractLock> {
     const res = await this.client.api.query.smartContractModule.contractLock(options.id);
     return res.toPrimitive() as unknown as ContractLock;
+  }
+
+  /**
+   * Retrieves the `payment state` of a contract based on the provided `contract ID`.
+   *
+   * @param contractID - The ID for which contract to retrieve its `payment state`.
+   * @returns {Promise<ContractLock>} A Promise that resolves to the `payment state` of the specified contract.
+   */
+  @checkConnection
+  async getContractPaymentState(contractID: number) {
+    const res = await this.client.api.query.smartContractModule.contractPaymentState(contractID);
+    return res.toPrimitive() as unknown as ContractPaymentState;
   }
 
   /**
