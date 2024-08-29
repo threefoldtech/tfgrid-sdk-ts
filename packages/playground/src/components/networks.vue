@@ -63,12 +63,30 @@
 
 <script lang="ts">
 import { noop } from "lodash";
-import { computed, getCurrentInstance, onMounted, onUnmounted, ref, watch } from "vue";
+import { computed, getCurrentInstance, onMounted, onUnmounted, type Ref, ref, watch } from "vue";
 
 import { useForm, ValidatorStatus } from "@/hooks/form_validator";
 import type { InputValidatorService } from "@/hooks/input_validator";
 
 import NetworkItem from "./NetworkItem.vue";
+
+interface CreateNetworksOptions {
+  ipv4: boolean;
+  ipv6: boolean;
+  planetary: boolean;
+  mycelium: boolean;
+  wireguard: boolean;
+}
+
+export function createNetworks(options: Partial<CreateNetworksOptions> = {}): Ref<CreateNetworksOptions> {
+  return ref<CreateNetworksOptions>({
+    ipv4: options.ipv4 ?? false,
+    ipv6: options.ipv6 ?? false,
+    planetary: options.planetary ?? false,
+    mycelium: options.mycelium ?? true,
+    wireguard: options.wireguard ?? false,
+  });
+}
 
 export default {
   name: "Network",
