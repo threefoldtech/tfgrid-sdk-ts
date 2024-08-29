@@ -1,8 +1,9 @@
+import { Decimal } from "decimal.js";
+
 import { Client, QueryClient } from "./client";
 import { TFChainError } from "./errors";
 import { ExtrinsicResult, PublicIp } from "./types";
 import { checkConnection, requireCouncil } from "./utils";
-
 const TWO_WEEKS = 1209600000;
 
 interface State {
@@ -25,11 +26,11 @@ export interface ContractLock {
 }
 
 export interface ContractPaymentState {
-  standardReserve: bigint;
-  additionalReserve: bigint;
-  standardOverdraft: bigint;
-  additionalOverdraft: bigint;
-  lastUpdatedSeconds: bigint;
+  standardReserve: Decimal;
+  additionalReserve: Decimal;
+  standardOverdraft: Decimal;
+  additionalOverdraft: Decimal;
+  lastUpdatedSeconds: Decimal;
   cycles: number;
 }
 
