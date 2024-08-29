@@ -79,6 +79,10 @@ export async function rollbackDeployment(grid: GridClient, name: string) {
 
   return result;
 }
+export async function rollbackGateway(grid: GridClient, name: string) {
+  const result = await grid.gateway.delete_name({ name });
+  return result;
+}
 
 export type GridGateway = Awaited<ReturnType<GridClient["gateway"]["getObj"]>>[0];
 interface LoadDeploymentGatewaysOptions {

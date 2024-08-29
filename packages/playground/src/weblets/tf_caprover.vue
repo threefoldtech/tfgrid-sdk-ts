@@ -143,7 +143,7 @@ async function deploy() {
 
     const vm = await deployVM(grid!, {
       name: leader.value.name,
-      network: createNetwork({ addAccess: true }),
+      network: createNetwork({ addAccess: leader.value.wireguard }),
       machines: [
         normalizeCaproverWorker(leader.value, [
           { key: "SWM_NODE_MODE", value: "leader" },
@@ -181,15 +181,16 @@ function normalizeCaproverWorker(worker: CW, envs: Env[]): Machine {
     memory: worker.solution!.memory,
     flist: "https://hub.grid.tf/tf-official-apps/tf-caprover-latest.flist",
     entryPoint: "/sbin/zinit init",
-    publicIpv4: true,
-    planetary: true,
-    mycelium: worker.mycelium || false,
-    publicIpv6: worker.ipv6 || false,
+    publicIpv4: worker.ipv4,
+    planetary: worker.planetary,
+    mycelium: worker.mycelium,
+    publicIpv6: worker.ipv6,
 
     rootFilesystemSize: calculateRootFileSystem({
       CPUCores: worker.solution!.cpu,
       RAMInMegaBytes: worker.solution!.memory,
     }),
+
     disks: [
       {
         name: "data0",

@@ -19,7 +19,7 @@
           :rules="[
             validators.required('Name is required.'),
             validators.IsAlphanumericExpectUnderscore('Name should consist of letters ,numbers and underscores only.'),
-            name => validators.isAlpha('Name must start with alphabet char.')(name[0]),
+            (name: string) => validators.isAlpha('Name must start with an alphabetical character.')(name[0]),
             validators.minLength('Name must be at least 2 characters.', 2),
             validators.maxLength('Name cannot exceed 50 characters.', 50),
           ]"
@@ -81,7 +81,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, type Ref, ref } from "vue";
+import { computed, type Ref, ref, watch } from "vue";
 
 import { manual } from "@/utils/manual";
 
@@ -95,18 +95,18 @@ import { generateName } from "../utils/strings";
 
 const layout = useLayout();
 const tabs = ref();
+const selectionDetails = ref<SelectionDetails>();
 
 const name = ref(generateName({ prefix: "nt" }));
 const ipv4 = ref(false);
 const ipv6 = ref(false);
 const wireguard = ref(false);
-const planetary = ref(true);
+const planetary = ref(false);
 const mycelium = ref(true);
 const disks = ref<Disk[]>([]);
 const dedicated = ref(false);
 const certified = ref(false);
 const rootFilesystemSize = computed(() => solution.value?.disk);
-const selectionDetails = ref<SelectionDetails>();
 const selectedSSHKeys = ref("");
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
@@ -142,7 +142,7 @@ async function deploy() {
     vm = await deployVM(grid!, {
       name: name.value,
       network: {
-        addAccess: selectionDetails.value!.domain!.enableSelectedDomain,
+        addAccess: wireguard.value || selectionDetails.value!.domain!.enableSelectedDomain,
         accessNodeId: selectionDetails.value?.domain?.selectedDomain?.nodeId,
       },
       machines: [

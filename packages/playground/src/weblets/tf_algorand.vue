@@ -17,7 +17,7 @@
         :rules="[
           validators.required('Name is required.'),
           validators.IsAlphanumericExpectUnderscore('Name should consist of letters ,numbers and underscores only.'),
-          name => validators.isAlpha('Name must start with alphabet char.')(name[0]),
+          (name: string) => validators.isAlpha('Name must start with an alphabetical character.')(name[0]),
           validators.minLength('Name must be at least 2 characters.', 2),
           validators.maxLength('Name cannot exceed 50 characters.', 50),
         ]"
@@ -27,7 +27,13 @@
           <v-text-field label="Name" v-model="name" v-bind="props" />
         </input-tooltip>
       </input-validator>
-      <Networks v-model:mycelium="mycelium" v-model:planetary="planetary" v-model:ipv4="ipv4" v-model:ipv6="ipv6" />
+      <Networks
+        v-model:mycelium="mycelium"
+        v-model:planetary="planetary"
+        v-model:ipv4="ipv4"
+        v-model:ipv6="ipv6"
+        v-model:wireguard="wireguard"
+      />
       <AlgorandCapacity
         :network="network"
         :type="type"
@@ -122,7 +128,8 @@ const flist: Flist = {
 const name = ref(generateName({ prefix: "al" }));
 const ipv4 = ref(false);
 const ipv6 = ref(false);
-const planetary = ref(true);
+const wireguard = ref(false);
+const planetary = ref(false);
 const mycelium = ref(true);
 const cpu = ref() as Ref<number>;
 const memory = ref() as Ref<number>;
@@ -154,6 +161,9 @@ async function deploy() {
 
     const vm = await deployVM(grid!, {
       name: name.value,
+      network: {
+        addAccess: wireguard.value,
+      },
       machines: [
         {
           name: name.value,

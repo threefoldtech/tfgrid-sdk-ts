@@ -42,7 +42,7 @@
           />
 
           <NetworkItem
-            tooltip-text="Enabling WireGuard Access allows you to establish private, secure, and encrypted connections to your instance."
+            :tooltip-text="wireguardTooltip"
             label="Add Wireguard Access"
             :value="$props.wireguard"
             :emit-function="readonlyWireguard ? undefined : $attrs['onUpdate:wireguard']"
@@ -122,6 +122,12 @@ export default {
       form?.updateStatus(uid.toString(), fakeService.status);
     });
 
+    const wireguardTooltip = computed(() =>
+      props.hasCustomDomain
+        ? "Enabling WireGuard Access allows you to establish private, secure, and encrypted instance connections. Please note that this field will be read-only unless you use a custom domain with IPV4."
+        : "Enabling WireGuard Access allows you to establish private, secure, and encrypted instance connections.",
+    );
+
     const readonlyWireguard = computed(() => props.hasCustomDomain && !props.ipv4);
     watch(
       readonlyWireguard,
@@ -137,6 +143,7 @@ export default {
     return {
       error,
       input,
+      wireguardTooltip,
       readonlyWireguard,
     };
   },

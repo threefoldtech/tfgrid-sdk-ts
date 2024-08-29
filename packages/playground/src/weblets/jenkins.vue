@@ -3,15 +3,14 @@
     ref="layout"
     :cpu="solution?.cpu"
     :memory="solution?.memory"
-    :disk="(solution?.disk ?? 0) + rootFilesystemSize"
+    :disk="solution?.disk"
     :ipv4="ipv4"
     :dedicated="dedicated"
     :SelectedNode="selectionDetails?.node"
     :valid-filters="selectionDetails?.validFilters"
-    title-image="images/icons/nextcloud.png"
+    title-image="images/icons/jenkins.png"
   >
-    <template #title>Deploy a Nextcloud All-in-One Instance </template>
-
+    <template #title>Deploy a Jenkins Instance </template>
     <d-tabs :tabs="[{ title: 'Config', value: 'config' }]">
       <input-validator
         :value="name"
@@ -28,6 +27,40 @@
           <v-text-field label="Name" v-model="name" v-bind="props" />
         </input-tooltip>
       </input-validator>
+      <input-validator
+        :value="username"
+        :rules="[
+          validators.required('Username is required.'),
+          validators.isLowercase('Username should consist of lowercase letters only.'),
+          validators.isAlphanumeric('Username should consist of letters and numbers only.'),
+          (username: string) => validators.isAlpha('Username must start with an alphabetical character.')(username[0]),
+          validators.minLength('Username must be at least 2 characters.', 2),
+          validators.maxLength('Username cannot exceed 50 characters.', 50),
+        ]"
+        #="{ props }"
+      >
+        <input-tooltip tooltip="Jenkins admin username.">
+          <v-text-field label="Username" v-model="username" v-bind="props" />
+        </input-tooltip>
+      </input-validator>
+      <password-input-wrapper #="{ props }">
+        <input-validator
+          :value="password"
+          :rules="[
+            validators.required('Password is required.'),
+            validators.minLength('Password must be at least 6 characters.', 6),
+            validators.maxLength('Password cannot exceed 15 characters.', 15),
+            validators.pattern('Password should not contain whitespaces.', {
+              pattern: /^[^\s]+$/,
+            }),
+          ]"
+          #="{ props: validatorProps }"
+        >
+          <input-tooltip tooltip="Jenkins admin password.">
+            <v-text-field label="Password" v-model="password" v-bind="{ ...props, ...validatorProps }" />
+          </input-tooltip>
+        </input-validator>
+      </password-input-wrapper>
 
       <SelectSolutionFlavor
         :small="{ cpu: 2, memory: 4, disk: 50 }"
@@ -35,14 +68,7 @@
         :large="{ cpu: 4, memory: 16, disk: 1000 }"
         v-model="solution"
       />
-      <Networks
-        v-model:ipv4="ipv4"
-        v-model:mycelium="mycelium"
-        v-model:planetary="planetary"
-        v-model:ipv6="ipv6"
-        v-model:wireguard="wireguard"
-        :has-custom-domain="selectionDetails?.domain?.enabledCustomDomain"
-      />
+      <Networks v-model:ipv4="ipv4" v-model:planetary="planetary" v-model:mycelium="mycelium" v-model:ipv6="ipv6" />
 
       <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
         <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
@@ -78,7 +104,7 @@
 
 <script lang="ts" setup>
 import { calculateRootFileSystem, type GridClient } from "@threefold/grid_client";
-import { computed, type Ref, ref, watch } from "vue";
+import { computed, type Ref, ref } from "vue";
 
 import { manual } from "@/utils/manual";
 
@@ -89,45 +115,42 @@ import { ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
 import { deployGatewayName, getSubdomain, rollbackDeployment } from "../utils/gateway";
 import { normalizeError } from "../utils/helpers";
-import { generateName } from "../utils/strings";
+import { generateName, generatePassword } from "../utils/strings";
 
 const layout = useLayout();
 const profileManager = useProfileManager();
-const selectionDetails = ref<SelectionDetails>();
 
-const name = ref(generateName({ prefix: "nc" }));
+const name = ref(generateName({ prefix: "jk" }));
+const username = ref("admin");
+const password = ref(generatePassword(12));
 const solution = ref() as Ref<SolutionFlavor>;
+const rootFilesystemSize = computed(() =>
+  calculateRootFileSystem({ CPUCores: solution.value?.cpu ?? 0, RAMInMegaBytes: solution.value?.memory ?? 0 }),
+);
 const flist: Flist = {
-  value: "https://hub.grid.tf/tf-official-apps/threefoldtech-nextcloudaio-latest.flist",
+  value: "https://hub.grid.tf/tf-official-apps/jenkins-latest.flist",
   entryPoint: "/sbin/zinit init",
 };
 const dedicated = ref(false);
 const certified = ref(false);
 const ipv4 = ref(false);
 const ipv6 = ref(false);
-const wireguard = ref(false);
 const mycelium = ref(true);
-const planetary = ref(false);
-const rootFilesystemSize = computed(() =>
-  calculateRootFileSystem({ CPUCores: solution.value?.cpu ?? 0, RAMInMegaBytes: solution.value?.memory ?? 0 }),
-);
-const selectedSSHKeys = ref("");
+const planetary = ref(true);
+const selectionDetails = ref<SelectionDetails>();
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
+const selectedSSHKeys = ref("");
 
 function finalize(deployment: any) {
   layout.value.reloadDeploymentsList();
-  layout.value.setStatus(
-    "success",
-    "Successfully deployed a Nextcloud instance. Under Actions, click on the button Nextcloud Setup to set up Nextcloud. After installation, you can access the Nextcloud instance by clicking on the Open Nextcloud button or navigating to your Nextcloud domain.",
-  );
-  layout.value.openDialog(deployment, deploymentListEnvironments.nextcloud);
+  layout.value.setStatus("success", "Successfully deployed a Jenkins instance.");
+  layout.value.openDialog(deployment, deploymentListEnvironments.jenkins);
 }
-
 async function deploy() {
   layout.value.setStatus("deploy");
 
-  const projectName = ProjectName.Nextcloud.toLowerCase() + "/" + name.value;
+  const projectName = ProjectName.Jenkins.toLowerCase() + "/" + name.value;
 
   const subdomain = getSubdomain({
     deploymentName: name.value,
@@ -135,12 +158,9 @@ async function deploy() {
     twinId: profileManager.profile!.twinId,
   });
 
-  const domain = selectionDetails.value!.domain!.enabledCustomDomain
-    ? selectionDetails.value!.domain!.customDomain
-    : subdomain + "." + selectionDetails.value!.domain!.selectedDomain?.publicConfig.domain;
-
-  const has_gateway = !(selectionDetails.value!.domain!.enabledCustomDomain && ipv4.value);
-  const aio_link = domain + "/aio";
+  const domain = selectionDetails.value?.domain?.enabledCustomDomain
+    ? selectionDetails.value.domain.customDomain
+    : subdomain + "." + selectionDetails.value?.domain?.selectedDomain?.publicConfig.domain;
 
   let vm: any;
 
@@ -153,7 +173,7 @@ async function deploy() {
     vm = await deployVM(grid!, {
       name: name.value,
       network: {
-        addAccess: wireguard.value || selectionDetails.value!.domain!.enableSelectedDomain,
+        addAccess: selectionDetails.value!.domain!.enableSelectedDomain,
         accessNodeId: selectionDetails.value?.domain?.selectedDomain?.nodeId,
       },
       machines: [
@@ -164,21 +184,20 @@ async function deploy() {
           disks: [
             {
               size: solution.value.disk,
-              mountPoint: "/mnt/data",
+              mountPoint: "/data",
             },
           ],
           flist: flist.value,
           entryPoint: flist.entryPoint,
           publicIpv4: ipv4.value,
           publicIpv6: ipv6.value,
-          planetary: planetary.value,
           mycelium: mycelium.value,
+          planetary: planetary.value,
           envs: [
             { key: "SSH_KEY", value: selectedSSHKeys.value },
-            { key: "NEXTCLOUD_DOMAIN", value: domain },
-            { key: "NEXTCLOUD_AIO_LINK", value: aio_link },
-            { key: "GATEWAY", value: String(has_gateway) },
-            { key: "IPV4", value: String(ipv4.value) },
+            { key: "JENKINS_HOSTNAME", value: domain },
+            { key: "JENKINS_ADMIN_USERNAME", value: username.value },
+            { key: "JENKINS_ADMIN_PASSWORD", value: password.value },
           ],
           nodeId: selectionDetails.value!.node!.nodeId,
           rentedBy: dedicated.value ? grid!.twinId : undefined,
@@ -188,9 +207,8 @@ async function deploy() {
       ],
     });
   } catch (e) {
-    return layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Nextcloud instance."));
+    return layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Jenkins instance."));
   }
-
   if (!selectionDetails.value?.domain?.enableSelectedDomain) {
     vm[0].customDomain = selectionDetails.value?.domain?.customDomain;
     finalize(vm);
@@ -209,10 +227,10 @@ async function deploy() {
 
     finalize(vm);
   } catch (e) {
-    layout.value.setStatus("deploy", "Rolling back due to fail to deploy gateway...");
+    layout.value.setStatus("deploy", "Rolling back due to failure to deploy the gateway...");
 
     await rollbackDeployment(grid!, name.value);
-    layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Nextcloud instance."));
+    layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Jenkins instance."));
   }
 }
 
@@ -230,7 +248,7 @@ import type { SelectionDetails } from "../types/nodeSelector";
 import { updateGrid } from "../utils/grid";
 
 export default {
-  name: "TFNextcloud",
-  components: { SelectSolutionFlavor, Networks, ManageSshDeployemnt },
+  name: "Jenkins",
+  components: { SelectSolutionFlavor, Networks },
 };
 </script>

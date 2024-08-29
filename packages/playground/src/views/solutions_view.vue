@@ -46,6 +46,13 @@ export default {
         route: DashboardRoutes.Applications.TFRobot,
       },
       {
+        title: "Jenkins",
+        excerpt:
+          "Jenkins is a popular open-source automation server that enables developers to build, test, and deploy their applications continuously.",
+        icon: "jenkins.png",
+        route: DashboardRoutes.Applications.Jenkins,
+      },
+      {
         title: "Peertube",
         excerpt: "Peertube aspires to be a decentralized and free/libre alternative to video broadcasting services.",
         icon: "peertube.png",
@@ -143,6 +150,13 @@ export default {
           "Wordpress is the most popular CMS on the market, powering 65.2% of websites whose CMS we know. That translates to 42.4% of all websites – nearly half of the internet. It is a popular option for those who want to build a website or blog.",
         icon: "wordpress.png",
         route: DashboardRoutes.Applications.Wordpress,
+      },
+      {
+        title: "Domains",
+        excerpt:
+          "Domains allow users to securely expose servers hosted on local machines or VMs to the public internet.",
+        icon: "domains.png",
+        route: DashboardRoutes.Applications.Domains,
       },
     ];
     cards = cards.sort((a, b) => a.title.localeCompare(b.title));

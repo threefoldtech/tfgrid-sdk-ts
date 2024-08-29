@@ -124,6 +124,11 @@ export const deploymentListEnvironments = {
     CHAIN_ENDPOINT: "Chain Endpoint",
   },
 
+  expose: {
+    SSH_KEY: _ssh,
+    EXPOSE_WEBSERVER_HOSTNAME: "Expose Webserver Hostname",
+  },
+
   static_website: {
     SSH_KEY: _ssh,
     GITHUB_URL: "HTTPS URL for git repository",
@@ -165,6 +170,13 @@ export const deploymentListEnvironments = {
 
   tfrobot: {
     SSH_KEY: _ssh,
+  },
+
+  jenkins: {
+    SSH_KEY: _ssh,
+    JENKINS_HOSTNAME: "Jenkins Hostname",
+    JENKINS_ADMIN_USERNAME: "Jenkins Admin Username",
+    JENKINS_ADMIN_PASSWORD: { label: "Jenkins Admin Password", type: "password" },
   },
 
   gitea: {

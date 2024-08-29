@@ -213,7 +213,7 @@ const profileManager = useProfileManager();
 const gridStore = useGrid();
 const network = process.env.NETWORK || (window as any).env.NETWORK;
 
-const openProfile = ref(true);
+const openProfile = ref(false);
 const hasActiveProfile = computed(() => !!profileManager.profile);
 const theme = useTheme();
 const navbarConfig = ref();
@@ -248,7 +248,10 @@ function navigateToHome() {
   return $router.push(DashboardRoutes.Other.HomePage);
 }
 
-onMounted(window.$$appLoader || noop);
+onMounted(async () => {
+  await (window.$$appLoader || noop)();
+  openProfile.value = true;
+});
 
 // eslint-disable-next-line no-undef
 const version = process.env.VERSION as any;

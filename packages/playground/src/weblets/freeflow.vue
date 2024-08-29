@@ -46,9 +46,13 @@
         :large="{ cpu: 4, memory: 32, disk: 1000 }"
       />
 
-      <Networks
+      <Network
+        required
         v-model:ipv4="ipv4"
         v-model:ipv6="ipv6"
+        v-model:planetary="planetary"
+        v-model:mycelium="mycelium"
+        v-model:wireguard="wireguard"
         :has-custom-domain="selectionDetails?.domain?.enabledCustomDomain"
       />
 
@@ -101,6 +105,7 @@ import { normalizeError } from "../utils/helpers";
 
 const layout = useLayout();
 
+const selectionDetails = ref<SelectionDetails>();
 const threebotName = ref<string>("");
 const solution = ref() as Ref<SolutionFlavor>;
 const flist = ref<Flist>();
@@ -109,10 +114,12 @@ const dedicated = ref(false);
 const certified = ref(false);
 const ipv4 = ref(false);
 const ipv6 = ref(false);
+const wireguard = ref(false);
+const planetary = ref(false);
+const mycelium = ref(true);
 const rootFilesystemSize = computed(() =>
   calculateRootFileSystem({ CPUCores: solution.value?.cpu ?? 0, RAMInMegaBytes: solution.value?.memory ?? 0 }),
 );
-const selectionDetails = ref<SelectionDetails>();
 const selectedSSHKeys = ref("");
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
@@ -156,7 +163,7 @@ async function deploy() {
     vm = await deployVM(grid!, {
       name: threebotName.value,
       network: {
-        addAccess: selectionDetails.value!.domain!.enableSelectedDomain,
+        addAccess: wireguard.value || selectionDetails.value!.domain!.enableSelectedDomain,
         accessNodeId: selectionDetails.value!.domain!.selectedDomain?.nodeId,
       },
       machines: [
@@ -169,6 +176,8 @@ async function deploy() {
           entryPoint: flist.value!.entryPoint,
           publicIpv4: ipv4.value,
           publicIpv6: ipv6.value,
+          planetary: planetary.value,
+          mycelium: mycelium.value,
           envs: [
             { key: "SSH_KEY", value: selectedSSHKeys.value },
             { key: "USER_ID", value: threebotName.value },
@@ -217,7 +226,7 @@ function updateSSHkeyEnv(selectedKeys: string) {
 </script>
 
 <script lang="ts">
-import Networks from "../components/networks.vue";
+import Network from "../components/networks.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";
@@ -226,6 +235,6 @@ import { updateGrid } from "../utils/grid";
 
 export default {
   name: "TFFreeflow",
-  components: { SelectSolutionFlavor, Networks, ManageSshDeployemnt },
+  components: { SelectSolutionFlavor, Network, ManageSshDeployemnt },
 };
 </script>
