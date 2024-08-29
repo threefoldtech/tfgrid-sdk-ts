@@ -91,7 +91,7 @@ const profileManager = useProfileManager();
 const name = ref(generateName({ prefix: "jt" }));
 const solution = ref() as Ref<SolutionFlavor>;
 const flist: Flist = {
-  value: "https://hub.grid.tf/eyadhussein.3bot/eyadhussein-jitsi-latest.flist",
+  value: "https://hub.grid.tf/tf-official-apps/jitsi-latest.flist",
   entryPoint: "/sbin/zinit init",
 };
 const dedicated = ref(false);
