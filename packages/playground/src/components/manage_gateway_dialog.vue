@@ -303,7 +303,7 @@ export default {
 
       const isMaster =
         isMatchingIP(props.k8s!.masters[0].interfaces[0].ip) ||
-        isMatchingIP(props.k8s!.masters[0].publicIP.ip.split("/")[0]);
+        (props.k8s!.masters[0].publicIP && isMatchingIP(props.k8s!.masters[0].publicIP.ip.split("/")[0]));
 
       if (isMaster) {
         return props.k8s!.masters[0].name;
