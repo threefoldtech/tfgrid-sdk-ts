@@ -4,15 +4,15 @@
       <v-icon size="30" class="pr-3">mdi-swap-horizontal</v-icon>
       <v-card-title class="pa-0">Transfer TFT Across Chains</v-card-title>
     </v-card>
-    <v-card class="pa-5 white--text">
+    <v-card class="pa-sm-4 pa-md-5 white--text">
       <v-row class="pa-5 text-center">
         <v-col cols="12">
           <v-text-field model-value="Stellar" label="Selected Chain" variant="outlined" readonly></v-text-field>
         </v-col>
       </v-row>
-      <v-row class="pa-4 px-8">
-        <v-btn color="secondary" @click="navigation">Learn How?</v-btn>
-        <div class="ml-auto">
+      <v-row class="py-4 px-8">
+        <v-btn class="mb-4 mr-2" color="secondary" @click="navigation">Learn How?</v-btn>
+        <div class="ml-sm-0 ml-md-auto">
           <v-btn color="secondary" class="mr-2" @click="openWithdrawDialog = true">Withdraw</v-btn>
           <v-btn variant="elevated" class="mr-2" @click="openDepositDialog = true">Deposit</v-btn>
         </div>
