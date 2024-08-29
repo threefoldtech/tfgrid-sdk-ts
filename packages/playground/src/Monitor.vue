@@ -17,6 +17,8 @@ export default {
     const loadingApp = ref(true);
     onMounted(async () => {
       if (await setGlobalEnv()) {
+        /* Load d-tabs before app */
+        await import("./components/dynamic_tabs.vue");
         loadingApp.value = false;
       }
     });
