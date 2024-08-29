@@ -344,13 +344,12 @@ class TFContracts extends Contracts {
   async calculateContractOverDue(options: CalculateOverdueOptions) {
     const { lastUpdatedSeconds, standardOverdraft, additionalOverdraft } = options.paymentState;
     const contractCost = await this.getConsumption({ id: options.id, graphqlURL: options.graphqlURL });
-    const elapsedSeconds = (BigInt(Date.now()) - lastUpdatedSeconds) / 1000n;
-    const overdue =
-      (standardOverdraft + additionalOverdraft) *
-      (elapsedSeconds + BigInt(ONE_HOUR)) *
-      BigInt((contractCost / 60) * 60);
+    const elapsedSeconds = new Decimal(Date.now()).minus(lastUpdatedSeconds).div(1000);
+    const overdue = standardOverdraft
+      .plus(additionalOverdraft)
+      .times(elapsedSeconds.plus(ONE_HOUR).times((contractCost / 60) * 60));
 
-    return Number(overdue / BigInt(10 ** 7));
+    return Number(overdue.div(10 ** 7));
   }
 
   /**
