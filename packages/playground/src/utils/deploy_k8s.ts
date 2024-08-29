@@ -20,7 +20,7 @@ export async function deployK8s(grid: GridClient, options: DeployK8SOptions) {
     Promise.all(options.workers.map(worker => createWorker(worker))),
   ]);
 
-  k8s.network = createNetwork({ addAccess: true });
+  k8s.network = createNetwork({ addAccess: options.master.wireguard });
   k8s.masters = [workers[0]];
   k8s.workers = workers[1];
   k8s.metadata = options.metadata;

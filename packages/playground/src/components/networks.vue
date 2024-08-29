@@ -68,22 +68,20 @@
                 hide-details
                 color="primary"
                 inset
-                label="mycelium"
+                label="Mycelium"
                 :modelValue="$props.mycelium"
                 @update:modelValue="$emit('update:mycelium', $event ?? undefined)"
               />
             </input-tooltip>
-            <input-tooltip
-              v-if="wireguard !== null"
-              inline
-              tooltip="Enabling WireGuard Access allows you to establish private, secure, and encrypted connections to your instance."
-            >
+            <input-tooltip v-if="wireguard !== null" inline :tooltip="wireguardTooltip">
               <v-switch
                 hide-details
                 color="primary"
                 inset
                 label="Add Wireguard Access"
                 :modelValue="$props.wireguard"
+                :readonly="$props.domain ? isWireguardReadOnly : false"
+                :style="$props.domain ? (isWireguardReadOnly ? 'opacity: .5' : 'opacity: 1') : 'opacity: 1'"
                 @update:modelValue="$emit('update:wireguard', $event ?? undefined)"
               />
             </input-tooltip>
@@ -99,10 +97,11 @@
 
 <script lang="ts">
 import { noop } from "lodash";
-import { computed, getCurrentInstance, onMounted, onUnmounted, ref, watch } from "vue";
+import { computed, getCurrentInstance, onMounted, onUnmounted, type PropType, ref, watch } from "vue";
 
 import { useForm, ValidatorStatus } from "@/hooks/form_validator";
 import type { InputValidatorService } from "@/hooks/input_validator";
+import type { DomainInfo } from "@/types/nodeSelector";
 
 export default {
   name: "Network",
@@ -136,6 +135,10 @@ export default {
       type: Boolean,
       default: () => null,
     },
+    domain: {
+      type: Object as PropType<DomainInfo>,
+      required: false,
+    },
   },
   emits: {
     "update:ipv4": (value?: boolean) => value,
@@ -144,7 +147,7 @@ export default {
     "update:mycelium": (value?: boolean) => value,
     "update:wireguard": (value?: boolean) => value,
   },
-  setup(props, { expose }) {
+  setup(props, { expose, emit }) {
     const input = ref();
 
     if (
@@ -166,6 +169,11 @@ export default {
     /* Adapter to work with old code validation */
     const { uid } = getCurrentInstance() as { uid: number };
     const form = useForm();
+    const wireguardTooltip = computed(() =>
+      props.domain
+        ? "Enabling WireGuard Access allows you to establish private, secure, and encrypted instance connections. Please note that this field will be read-only unless you use a custom domain with IPV4."
+        : "Enabling WireGuard Access allows you to establish private, secure, and encrypted instance connections.",
+    );
 
     const fakeService: InputValidatorService = {
       validate: () => Promise.resolve(true),
@@ -185,9 +193,26 @@ export default {
       form?.updateStatus(uid.toString(), fakeService.status);
     });
 
+    const isWireguardReadOnly = computed(() => !(props.domain?.enabledCustomDomain && props.ipv4 === true));
+
+    watch(
+      isWireguardReadOnly,
+      () => {
+        if (!props.wireguard) {
+          emit("update:wireguard", true);
+        }
+      },
+      {
+        immediate: true,
+        deep: true,
+      },
+    );
+
     return {
       error,
       input,
+      isWireguardReadOnly,
+      wireguardTooltip,
     };
   },
 };
