@@ -188,7 +188,7 @@ async function deploy() {
 
     finalize(vm);
   } catch (e) {
-    layout.value.setStatus("deploy", "Rollbacking back due to fail to deploy gateway...");
+    layout.value.setStatus("deploy", "Rolling back due to failure to deploy gateway...");
 
     await rollbackDeployment(grid!, name.value);
     layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Jitsi instance."));

@@ -3,7 +3,7 @@
     <tf-jitsi />
 
     <template #list>
-      <TfDeploymentList title="Jitsi Instances" :project-name="name" />
+      <TfDeploymentList title="Jitsi" :project-name="name" />
     </template>
   </view-layout>
 </template>
