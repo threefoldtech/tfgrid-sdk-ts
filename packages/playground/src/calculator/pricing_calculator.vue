@@ -25,7 +25,7 @@
             @input="priceTask.run()"
           >
             <VRow>
-              <v-col md="6" sm="12">
+              <v-col md="6" sm="12" xs="12">
                 <InputTooltip tooltip="The number of virtual cores.">
                   <VTextField
                     label="CPU (vCores)"
@@ -38,7 +38,7 @@
                 </InputTooltip>
               </v-col>
 
-              <v-col md="6" sm="12">
+              <v-col md="6" sm="12" xs="12">
                 <InputTooltip tooltip="The amount of RAM (Random Access Memory) in GB.">
                   <VTextField
                     label="Memory (GB)"
@@ -363,5 +363,11 @@ export default {
   background: white;
   border: 1px solid #ccc;
   border-radius: 5px;
+}
+
+@media (max-width: 425px) {
+  .v-col {
+    flex-basis: auto !important;
+  }
 }
 </style>
