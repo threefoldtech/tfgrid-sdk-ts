@@ -107,7 +107,33 @@
       </v-navigation-drawer>
 
       <v-main :style="{ paddingTop: navbarConfig ? '140px' : '70px' }">
-        <v-toolbar class="border position-fixed pr-2" :style="{ zIndex: 1100, top: 0, left: 0, right: 0 }">
+        <v-toolbar 
+          :extended="permanent" 
+          extension-height="auto"
+          class="border position-fixed" 
+          :style="{ zIndex: 1100, top: 0, left: 0, right: 0 }"
+          :elevation="permanent ? '1' : '15'"
+        >
+          <template #extension>
+            <v-card class="w-100 ma-0 pa-0" v-if="openProfileResponsiveDialog">
+              <div class="pa-1">
+                
+                <div class="d-flex justify-center">
+                  <div class="">
+                    <TfSwapPrice>
+                      <FundsCard v-if="hasActiveProfile" />
+                    </TfSwapPrice>
+                  </div>
+                </div>
+                <v-divider class="mb-2" />
+                <div class="d-flex justify-center">
+                  <div class="">
+                    <ProfileManager v-model="openProfile" @update:modelValue="(e: boolean) => openProfileResponsiveDialog = e"/>
+                  </div>
+                </div>
+              </div>
+            </v-card>
+          </template>
           <v-toolbar-title class="custom-toolbar-title">
             <v-img
               :src="`${
@@ -115,14 +141,14 @@
                   ? baseUrl + 'images/logoTF_dark.png'
                   : baseUrl + 'images/logoTF_light.png'
               }`"
-              width="160px"
+              :width="openSidebar ? '160px' : '105px'"
               @click="navigateToHome"
               class="clickable-logo"
             />
           </v-toolbar-title>
 
           <v-spacer>
-            <div class="d-flex align-center justify-start">
+            <div class="d-flex align-center justify-start" v-if="permanent">
               <TfSwapPrice>
                 <FundsCard v-if="hasActiveProfile" />
               </TfSwapPrice>
@@ -134,7 +160,19 @@
           <v-divider vertical class="mx-2" />
           <AppTheme />
           <v-divider vertical class="mx-2" />
-          <ProfileManager v-model="openProfile" />
+          <ProfileManager v-model="openProfile" v-if="permanent" />
+
+          <div class="d-flex align-center" v-if="!permanent">
+            <v-btn
+              :color="theme.name.value !== AppThemeSelection.light ? 'white' : 'black'"
+              @click="() => {
+                openSidebar = false;
+                openProfileResponsiveDialog = !openProfileResponsiveDialog;
+              }"
+              icon="mdi-menu"
+              class="mr-2"
+            />
+          </div>
         </v-toolbar>
 
         <v-toolbar
@@ -175,6 +213,7 @@
               minHeight: '85%',
               maxHeight: '100%',
             }"
+            @click="() => openProfileResponsiveDialog = false" 
           >
             <div class="d-flex align-center">
               <v-btn
@@ -214,6 +253,7 @@ const gridStore = useGrid();
 const network = process.env.NETWORK || (window as any).env.NETWORK;
 
 const openProfile = ref(true);
+const openProfileResponsiveDialog = ref(false)
 const hasActiveProfile = computed(() => !!profileManager.profile);
 const theme = useTheme();
 const navbarConfig = ref();
@@ -234,6 +274,8 @@ function setSidebarOnResize() {
 }
 
 window.addEventListener("resize", setSidebarOnResize);
+
+watch(permanent, () => openProfileResponsiveDialog.value = !permanent.value, {immediate: true} )
 
 watch(
   () => $route.meta,
