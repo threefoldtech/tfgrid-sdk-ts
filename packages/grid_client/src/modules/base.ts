@@ -261,7 +261,7 @@ class BaseModule {
     if (fetch || !this.contracts) {
       let contracts = await this.tfClient.contracts.listMyNodeContracts({
         graphqlURL: this.config.graphqlURL,
-        type: modulesNames[this.moduleName] ?? this.moduleName,
+        type: modulesNames[this.moduleName] || (this.moduleName === "networks" ? "network" : this.moduleName),
         projectName: this.projectName,
       });
 
