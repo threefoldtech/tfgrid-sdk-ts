@@ -162,11 +162,7 @@ const flist: Flist = {
 };
 const dedicated = ref(false);
 const certified = ref(false);
-const ipv4 = ref(false);
-const ipv6 = ref(false);
-const wireguard = ref(false);
-const mycelium = ref(true);
-const planetary = ref(false);
+const { ipv4, ipv6, planetary, mycelium, wireguard } = useNetworks();
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
 const selectedSSHKeys = ref("");
@@ -271,7 +267,7 @@ function updateSSHkeyEnv(selectedKeys: string) {
 </script>
 
 <script lang="ts">
-import Networks from "../components/networks.vue";
+import Networks, { useNetworks } from "../components/networks.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";

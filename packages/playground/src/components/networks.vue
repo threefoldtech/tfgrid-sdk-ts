@@ -70,6 +70,24 @@ import type { InputValidatorService } from "@/hooks/input_validator";
 
 import NetworkItem from "./NetworkItem.vue";
 
+interface CreateNetworksOptions {
+  ipv4: boolean;
+  ipv6: boolean;
+  planetary: boolean;
+  mycelium: boolean;
+  wireguard: boolean;
+}
+
+export function useNetworks(options: Partial<CreateNetworksOptions> = {}) {
+  return {
+    ipv4: ref(options.ipv4 ?? false),
+    ipv6: ref(options.ipv6 ?? false),
+    planetary: ref(options.planetary ?? false),
+    mycelium: ref(options.mycelium ?? true),
+    wireguard: ref(options.wireguard ?? false),
+  };
+}
+
 export default {
   name: "Network",
   components: { NetworkItem },

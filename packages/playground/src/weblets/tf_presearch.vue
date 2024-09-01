@@ -56,7 +56,7 @@
           </password-input-wrapper>
         </input-validator>
 
-        <Network
+        <Networks
           required
           v-model:ipv4="ipv4"
           v-model:planetary="planetary"
@@ -116,7 +116,7 @@ import { ref } from "vue";
 
 import { manual } from "@/utils/manual";
 
-import Network from "../components/networks.vue";
+import Networks, { useNetworks } from "../components/networks.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useGrid } from "../stores";
 import { type Flist, ProjectName } from "../types";
@@ -128,11 +128,7 @@ const layout = useLayout();
 const tabs = ref();
 const name = ref(generateName({ prefix: "ps" }));
 const code = ref("");
-const ipv4 = ref(false);
-const ipv6 = ref(false);
-const wireguard = ref(false);
-const planetary = ref(false);
-const mycelium = ref(true);
+const { ipv4, ipv6, planetary, mycelium, wireguard } = useNetworks();
 const cpu = 1;
 const memory = 512;
 const rootFilesystemSize = calculateRootFileSystem({ CPUCores: cpu, RAMInMegaBytes: memory });

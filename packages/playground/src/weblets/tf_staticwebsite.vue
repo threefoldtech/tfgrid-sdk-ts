@@ -107,7 +107,7 @@
 
 <script lang="ts" setup>
 import { calculateRootFileSystem, type GridClient } from "@threefold/grid_client";
-import { computed, type Ref, ref, watch } from "vue";
+import { computed, type Ref, ref } from "vue";
 
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
@@ -129,11 +129,7 @@ const gitBranch = ref("");
 const root = ref("");
 const domain = ref();
 
-const ipv4 = ref(false);
-const ipv6 = ref(false);
-const wireguard = ref(false);
-const mycelium = ref(true);
-const planetary = ref(false);
+const { ipv4, ipv6, planetary, mycelium, wireguard } = useNetworks();
 const solution = ref() as Ref<SolutionFlavor>;
 const flist: Flist = {
   // Should be upgraded to an oficial Flist
@@ -269,7 +265,7 @@ async function isGithubRepoExist(gitUrl: string) {
 </script>
 
 <script lang="ts">
-import Networks from "../components/networks.vue";
+import Networks, { useNetworks } from "../components/networks.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";
