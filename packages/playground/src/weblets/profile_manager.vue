@@ -125,7 +125,10 @@
                         validators.required('Mnemonic or Hex Seed is required.'),
                         v => {
                           clearError();
-                          if (validateMnemonic(v) || isAddress(v.length >= 66 ? v : `0x${v}`)) {
+                          if (
+                            validateMnemonic(v) ||
+                            ((v.length === 64 || v.length === 66) && isAddress(v.length === 66 ? v : `0x${v}`))
+                          ) {
                             hasTwinId();
                             return;
                           }
@@ -190,11 +193,7 @@
                           color="secondary"
                           variant="outlined"
                           :disabled="
-                            (isValidForm ||
-                              !!mnemonic ||
-                              shouldActivateAccount ||
-                              keypairType === KeypairType.ed25519) &&
-                            !shouldCreateAccount
+                            isValidForm || !!mnemonic || shouldActivateAccount || keypairType === KeypairType.ed25519
                           "
                           :loading="creatingAccount"
                           @click="openAcceptTerms = termsLoading = true"
@@ -264,7 +263,7 @@
                   v-model="email"
                   v-bind="props"
                   :loading="loadEmail"
-                  :disabled="creatingAccount || activatingAccount || activating || loadEmail || shouldCreateAccount"
+                  :disabled="creatingAccount || activatingAccount || activating || loadEmail"
                   readonly
                   ref="emailRef"
                   @focus="handleFocus(emailRef)"
@@ -293,7 +292,7 @@
                           label="Password"
                           v-model="password"
                           v-bind="{ ...passwordInputProps, ...validationProps }"
-                          :disabled="creatingAccount || activatingAccount || activating || shouldCreateAccount"
+                          :disabled="creatingAccount || activatingAccount || activating"
                           autocomplete="off"
                         />
                       </div>
@@ -316,7 +315,7 @@
                       ...confirmPasswordInputProps,
                       ...validationProps,
                     }"
-                    :disabled="creatingAccount || activatingAccount || activating || shouldCreateAccount"
+                    :disabled="creatingAccount || activatingAccount || activating"
                     autocomplete="off"
                   />
                 </InputValidator>
@@ -456,7 +455,6 @@ interface Credentials {
   keypairTypeHash?: string;
   emailHash?: string;
 }
-const shouldCreateAccount = ref(false);
 const keyType = ["sr25519", "ed25519"];
 const keypairType = ref(KeypairType.sr25519);
 const enableReload = ref(true);
@@ -691,22 +689,6 @@ function reloadValidation() {
   mnemonicInput.value.validate();
 }
 
-async function hasTwinId() {
-  try {
-    await getGrid({ mnemonic: mnemonic.value, keypairType: keypairType.value });
-    await getEmail();
-    shouldCreateAccount.value = false;
-  } catch (e) {
-    if (e instanceof TwinNotExistError) {
-      shouldCreateAccount.value = true;
-    } else {
-      return {
-        message: normalizeError(e, "Something went wrong. please try again."),
-      };
-    }
-  }
-}
-
 async function activate(mnemonic: string, keypairType: KeypairType) {
   clearError();
   activating.value = true;
@@ -921,6 +903,20 @@ async function getEmail() {
   const grid = await getGrid({ mnemonic: mnemonic.value, keypairType: keypairType.value });
   email.value = await readEmail(grid!);
   loadEmail.value = false;
+}
+async function hasTwinId() {
+  try {
+    await getGrid({ mnemonic: mnemonic.value, keypairType: keypairType.value });
+    await getEmail();
+  } catch (e) {
+    if (e instanceof TwinNotExistError) {
+      isNonActiveMnemonic.value = true;
+    } else {
+      return {
+        message: normalizeError(e, "Something went wrong. please try again."),
+      };
+    }
+  }
 }
 </script>
 
