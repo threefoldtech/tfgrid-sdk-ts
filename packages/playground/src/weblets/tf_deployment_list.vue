@@ -100,6 +100,20 @@
           />
         </template>
 
+        <template #Jenkins-actions="{ item }">
+          <IconActionBtn
+            tooltip="Show Details"
+            icon="mdi-eye-outline"
+            @click="openDialog(tabs[activeTab].value, item)"
+          />
+          <IconActionBtn
+            tooltip="Visit"
+            icon="mdi-web"
+            color="anchor"
+            :href="'https://' + item.env.JENKINS_HOSTNAME"
+          />
+        </template>
+
         <template #Taiga-actions="{ item }">
           <IconActionBtn
             tooltip="Show Details"
@@ -214,6 +228,21 @@
             icon="mdi-web"
             color="anchor"
             :href="'https://' + item.env.SUBSQUID_WEBSERVER_HOSTNAME + '/graphql'"
+          />
+        </template>
+
+        <template #Domains-actions="{ item }">
+          <IconActionBtn
+            tooltip="Show Details"
+            icon="mdi-eye-outline"
+            @click="openDialog(tabs[activeTab].value, item)"
+          />
+
+          <IconActionBtn
+            tooltip="Visit"
+            icon="mdi-web"
+            color="anchor"
+            :href="'https://' + (item[0].workloads[0].result.data.fqdn || item[0].workloads[0].data.fqdn)"
           />
         </template>
 
@@ -338,6 +367,15 @@
               @click="dialog = item.name"
             />
 
+            <IconActionBtn
+              icon="mdi-cog"
+              tooltip="Manage Domains"
+              :disabled="item.fromAnotherClient"
+              @click="dialog = item.masters[0].name"
+            />
+
+            <ManageGatewayDialog v-if="dialog === item.masters[0].name" :k8s="item" @close="dialog = undefined" />
+
             <ManageK8SWorkerDialog
               v-if="dialog === item.name"
               :data="item"
@@ -387,7 +425,7 @@ import type { Tab } from "../components/dynamic_tabs.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { deploymentListEnvironments } from "../constants/deployment_list";
 import { useGrid } from "../stores";
-import { deleteDeployment } from "../utils/delete_deployment";
+import { deleteDeployment, deleteGatewayDeployment } from "../utils/delete_deployment";
 import { updateGrid } from "../utils/grid";
 
 const props = defineProps<{
@@ -419,6 +457,8 @@ const tabs: Tab[] = [
   { title: "TFRobot", value: "TFRobot", imgPath: "images/icons/tfrobot.png" },
   { title: "Gitea", value: "Gitea", imgPath: "images/icons/gitea.png" },
   { title: "Nostr", value: "Nostr", imgPath: "images/icons/nostr.png" },
+  { title: "Jenkins", value: "Jenkins", imgPath: "images/icons/jenkins.png" },
+  { title: "Domains", value: "Domains", imgPath: "images/icons/domains.png" },
 ];
 
 const layout = useLayout();
@@ -440,13 +480,20 @@ async function onDelete(k8s = false) {
   try {
     for (const item of selectedItems.value) {
       try {
-        await deleteDeployment(updateGrid(grid!, { projectName: item.projectName }), {
-          deploymentName: item.deploymentName,
-          name: k8s ? item.deploymentName : item.name,
-          projectName: item.projectName,
-          ip: item.interfaces?.[0]?.ip,
-          k8s,
-        });
+        if (props.projectName?.toLowerCase() === ProjectName.Domains.toLowerCase()) {
+          await deleteGatewayDeployment(
+            updateGrid(grid, { projectName: props.projectName.toLocaleLowerCase() }),
+            item[0].workloads[0].name as string,
+          );
+        } else {
+          await deleteDeployment(updateGrid(grid!, { projectName: item.projectName }), {
+            deploymentName: item.deploymentName,
+            name: k8s ? item.deploymentName : item.name,
+            projectName: item.projectName,
+            ip: item.interfaces?.[0]?.ip,
+            k8s,
+          });
+        }
       } catch (e: any) {
         createCustomToast(`Failed to delete deployment with name: ${item.name}`, ToastType.danger);
         console.log("Error while deleting deployment", e.message);

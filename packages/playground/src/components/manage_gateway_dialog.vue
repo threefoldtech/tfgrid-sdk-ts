@@ -8,7 +8,7 @@
       attach="#modals"
     >
       <weblet-layout ref="layout" @back="onBack">
-        <template #title>Manage Domains ({{ vm.name }})</template>
+        <template #title>Manage Domains ({{ vm ? vm.name : k8s.masters[0].name }})</template>
 
         <v-tabs align-tabs="center" color="secondary" class="mb-6" v-model="gatewayTab" :disabled="deleting">
           <v-tab>Domains List</v-tab>
@@ -124,13 +124,20 @@
               </input-tooltip>
             </div>
 
-            <copy-input-wrapper #="{ props }" :data="networkName">
-              <v-text-field label="Network name" v-model="networkName" readonly v-bind="props" />
-            </copy-input-wrapper>
-
-            <v-select label="Supported IPs" :items="networks" v-model="selectedIPAddress" />
+            <v-select
+              label="Select node"
+              class="mt-4"
+              :items="availableK8SNodesNames"
+              v-model="selectedK8SNodeName"
+              v-if="k8s"
+            />
+            <v-select label="Supported Interfaces" class="mt-4" :items="networks" v-model="selectedIPAddress" />
             <copy-input-wrapper #="{ props }" :data="(selectedIPAddress as any)">
               <v-text-field :readonly="true" label="Selected IP Address" v-model="selectedIPAddress" v-bind="props" />
+            </copy-input-wrapper>
+
+            <copy-input-wrapper #="{ props }" :data="networkName" v-if="isWireGuard">
+              <v-text-field label="Network name" v-model="networkName" readonly v-bind="props" />
             </copy-input-wrapper>
           </form-validator>
         </div>
@@ -186,7 +193,12 @@ import { onMounted, type PropType, ref, watch } from "vue";
 import { useGrid } from "../stores";
 import { ProjectName } from "../types";
 import type { SelectionDetails } from "../types/nodeSelector";
-import { deployGatewayName, type GridGateway, loadDeploymentGateways } from "../utils/gateway";
+import {
+  type DeployGatewayConfig,
+  deployGatewayName,
+  type GridGateway,
+  loadDeploymentGateways,
+} from "../utils/gateway";
 import { updateGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
 import { generateName } from "../utils/strings";
@@ -201,27 +213,39 @@ type VMNetwork = {
   value: string;
 };
 
+enum NetworkInterfaces {
+  PublicIPV4 = "Public IPv4",
+  PublicIPV6 = "Public IPv6",
+  Planetary = "Planetary",
+  Mycelium = "Mycelium",
+  WireGuard = "WireGuard",
+}
+
 export default {
   name: "ManageGatewayDialog",
   components: { ListTable, IconActionBtn },
   props: {
-    vm: { type: Object as PropType<any>, required: true },
+    vm: { type: Object as PropType<any>, required: false },
+    k8s: { type: Object as PropType<any>, required: false },
   },
   setup(props) {
     const layout = useLayout();
     const gatewayTab = ref(0);
     const dialogVisible = ref(true);
+    const isWireGuard = ref(false);
 
     const oldPrefix = ref("");
     const prefix = ref("");
     const subdomain = ref("");
-    const port = ref(80);
+    const port = ref(props.vm ? 80 : 443);
     const passThrough = ref(false);
     const valid = ref(false);
     const selectionDetails = ref<SelectionDetails>();
     const networks = ref<VMNetwork[]>([]);
     const selectedIPAddress = ref<VMNetwork | null>(null);
-    const networkName = props.vm.interfaces[0].network as string;
+    const networkName = props.vm
+      ? (props.vm.interfaces[0].network as string)
+      : (props.k8s.masters[0].interfaces[0].network as string);
     const gridStore = useGrid();
     const grid = gridStore.client as GridClient;
 
@@ -232,15 +256,16 @@ export default {
     const requestDelete = ref(false);
     const gatewaysToDelete = ref<GridGateway[]>([]);
     const deleting = ref(false);
+    const availableK8SNodes = props.k8s ? [...props.k8s.masters, ...props.k8s.workers] : [];
+    const availableK8SNodesNames = availableK8SNodes.map(node => node.name);
+    const selectedK8SNodeName = ref(availableK8SNodesNames[0]);
+    const selectedNode = ref();
+
+    watch(selectedK8SNodeName, getSupportedNetworks, { deep: true });
 
     onMounted(async () => {
       updateGrid(grid, { projectName: "" });
-
-      oldPrefix.value =
-        (props.vm.projectName.toLowerCase().includes(ProjectName.Fullvm.toLowerCase()) ? "fvm" : "vm") +
-        grid.config.twinId;
-      prefix.value = oldPrefix.value + props.vm.name;
-      subdomain.value = generateName({ prefix: prefix.value }, 4);
+      suggestName();
       await loadGateways();
       getSupportedNetworks();
     });
@@ -260,7 +285,7 @@ export default {
         gateways.value = [];
         gatewaysToDelete.value = [];
         loadingGateways.value = true;
-        updateGrid(grid, { projectName: props.vm.projectName });
+        updateGrid(grid, { projectName: props.vm ? props.vm.projectName : props.k8s.projectName });
 
         const { gateways: gws, failedToList } = await loadDeploymentGateways(grid, {
           filter: gw => true,
@@ -277,10 +302,17 @@ export default {
     async function deployGateway() {
       layout.value.setStatus("deploy");
       try {
-        let IP = selectedIPAddress.value as unknown as string;
-        const isWireGuard = networks.value.find(net => net.value === IP)?.title === "WireGuard IP";
+        const IP = selectedIPAddress.value as unknown as string;
 
-        if (isWireGuard) {
+        const gwConfig: DeployGatewayConfig = {
+          subdomain: subdomain.value,
+          ip: IP,
+          port: port.value,
+          tlsPassthrough: passThrough.value,
+        };
+
+        if (isWireGuard.value) {
+          gwConfig.network = networkName;
           const [x, y] = IP.split(".");
           const data = {
             name: networkName,
@@ -296,17 +328,8 @@ export default {
           }
         }
 
-        if (IP.includes("/")) {
-          IP = IP.split("/")[0];
-        }
-
-        await deployGatewayName(grid, selectionDetails.value!.domain, {
-          subdomain: subdomain.value,
-          ip: IP,
-          port: port.value,
-          network: networkName,
-          tlsPassthrough: passThrough.value,
-        });
+        await deployGatewayName(grid, selectionDetails.value!.domain, gwConfig);
+        suggestName();
         layout.value.setStatus("success", "Successfully deployed gateway.");
       } catch (error) {
         layout.value.setStatus("failed", normalizeError(error, "Something went wrong."));
@@ -341,13 +364,20 @@ export default {
     }
 
     function getSupportedNetworks() {
-      const { publicIP, planetary, myceliumIP, interfaces } = props.vm;
+      (selectedNode.value = props.vm
+        ? props.vm
+        : availableK8SNodes.filter(node => node.name === selectedK8SNodeName.value)[0]),
+        (networks.value = []);
+      const { publicIP, planetary, myceliumIP, interfaces } = selectedNode.value;
 
-      addNetwork("IPV6", publicIP?.ip6);
-      addNetwork("IPV4", publicIP?.ip);
-      addNetwork("Planetary IP", planetary);
-      addNetwork("Mycelium IP", myceliumIP);
-      addNetwork("WireGuard IP", interfaces?.[0]?.ip);
+      addNetwork(NetworkInterfaces.WireGuard, interfaces?.[0]?.ip);
+      addNetwork(NetworkInterfaces.PublicIPV4, publicIP?.ip.split("/")[0]);
+
+      if (props.vm) {
+        addNetwork(NetworkInterfaces.Planetary, planetary);
+        addNetwork(NetworkInterfaces.Mycelium, myceliumIP);
+        addNetwork(NetworkInterfaces.PublicIPV6, publicIP?.ip6.split("/")[0]);
+      }
       selectedIPAddress.value = networks.value[0];
     }
 
@@ -357,6 +387,9 @@ export default {
         if (selectedIPAddress.value?.value) {
           selectedIPAddress.value = selectedIPAddress.value.value as unknown as VMNetwork;
         }
+
+        const IP = selectedIPAddress.value as unknown as string;
+        isWireGuard.value = networks.value.find(net => net.value === IP)?.title === NetworkInterfaces.WireGuard;
       },
       { deep: true },
     );
@@ -374,6 +407,21 @@ export default {
     function onBack() {
       gatewayTab.value = 0;
       loadGateways();
+    }
+
+    function suggestName() {
+      if (props.k8s) {
+        oldPrefix.value = props.k8s.projectName.toLowerCase().includes(ProjectName.Fullvm.toLowerCase())
+          ? "k8s"
+          : "k8s" + grid.config.twinId;
+        prefix.value = oldPrefix.value + props.k8s.masters[0].name;
+      } else {
+        oldPrefix.value =
+          (props.vm.projectName.toLowerCase().includes(ProjectName.Fullvm.toLowerCase()) ? "fvm" : "vm") +
+          grid.config.twinId;
+        prefix.value = oldPrefix.value + props.vm.name;
+      }
+      subdomain.value = generateName({ prefix: prefix.value }, 4).toLowerCase();
     }
 
     const subdomainRules = [
@@ -419,6 +467,9 @@ export default {
       tableHeaders,
       subdomainRules,
       portRules,
+      isWireGuard,
+      availableK8SNodesNames,
+      selectedK8SNodeName,
     };
   },
 };

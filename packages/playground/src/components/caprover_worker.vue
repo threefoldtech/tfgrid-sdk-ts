@@ -5,7 +5,7 @@
         validators.required('Name is required.'),
         validators.isLowercase('Name should consist of lowercase letters only.'),
         validators.IsAlphanumericExpectUnderscore('Name should consist of letters ,numbers and underscores only.'),
-        name => validators.isAlpha('Name must start with alphabet char.')(name[0]),
+        (name: string) => validators.isAlpha('Name must start with an alphabetical character.')(name[0]),
         validators.minLength('Name must be at least 2 characters.', 2),
         validators.maxLength('Name cannot exceed 50 characters.', 50),
       ]"
@@ -22,7 +22,16 @@
       :small="{ cpu: 1, memory: 2, disk: 50 }"
       :medium="{ cpu: 2, memory: 4, disk: 100 }"
     />
-    <Networks v-model:mycelium="$props.modelValue.mycelium" v-model:ipv6="$props.modelValue.ipv6" />
+
+    <Networks
+      required
+      v-model:ipv4="$props.modelValue.ipv4"
+      v-model:ipv6="$props.modelValue.ipv6"
+      v-model:planetary="$props.modelValue.planetary"
+      v-model:mycelium="$props.modelValue.mycelium"
+      v-model:wireguard="$props.modelValue.wireguard"
+      enableIpv4
+    />
 
     <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
       <v-switch color="primary" inset label="Dedicated" v-model="$props.modelValue.dedicated" />
@@ -35,7 +44,7 @@
       :selected-machines="selectedMachines"
       :nodes-lock="nodesLock"
       :filters="{
-        ipv4: true,
+        ipv4: $props.modelValue.ipv4,
         ipv6: $props.modelValue.ipv6,
         certified: $props.modelValue.certified,
         dedicated: $props.modelValue.dedicated,
@@ -63,7 +72,14 @@ import { generateName } from "../utils/strings";
 import SelectSolutionFlavor from "./select_solution_flavor.vue";
 
 export function createWorker(name: string = generateName({ prefix: "wr" })): CaproverWorker {
-  return { name, mycelium: true, ipv6: false };
+  return {
+    name,
+    ipv4: true,
+    ipv6: false,
+    planetary: false,
+    wireguard: false,
+    mycelium: true,
+  };
 }
 
 function toMachine(rootFilesystemSize: number, worker?: CaproverWorker): SelectedMachine | undefined {
@@ -76,6 +92,8 @@ function toMachine(rootFilesystemSize: number, worker?: CaproverWorker): Selecte
     cpu: worker.solution?.cpu ?? 0,
     memory: worker.solution?.memory ?? 0,
     disk: (worker.solution?.disk ?? 0) + (rootFilesystemSize ?? 0),
+    farmId: worker.selectionDetails.node.farmId,
+    publicIp: true,
   };
 }
 

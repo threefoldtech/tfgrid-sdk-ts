@@ -196,7 +196,7 @@ provideService({
   },
 });
 
-function validateBeforeDeploy(fn: () => void, documentScrollend = true) {
+function validateBeforeDeploy(fn: () => void, documentScrollend = false) {
   const forms = __forms;
 
   let errorInput: [number, any, boolean] | null = null;

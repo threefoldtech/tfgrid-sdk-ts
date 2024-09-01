@@ -5,7 +5,7 @@
       :rules="[
         validators.required('Name is required.'),
         validators.isLowercase('Name should consist of lowercase letters only.'),
-        name => validators.isAlpha('Name must start with alphabet char.')(name[0]),
+        (name: string) => validators.isAlpha('Name must start with an alphabetical character.')(name[0]),
         validators.isAlphanumeric('Name should consist of alphabets & numbers only.'),
         validators.minLength('Name minimum length is 2 chars.', 2),
         validators.maxLength('Name max length is 50 chars.', 50),
@@ -67,6 +67,7 @@
       v-model:ipv6="$props.modelValue.ipv6"
       v-model:planetary="$props.modelValue.planetary"
       v-model:mycelium="$props.modelValue.mycelium"
+      v-model:wireguard="$props.modelValue.wireguard"
     />
 
     <RootFsSize
@@ -130,8 +131,9 @@ export function createWorker(name: string = generateName({ prefix: "wr" })): K8S
     diskSize: 100,
     ipv4: false,
     ipv6: false,
-    planetary: true,
+    planetary: false,
     mycelium: true,
+    wireguard: false,
     rootFsSize: 2,
     dedicated: false,
     certified: false,
@@ -145,10 +147,12 @@ function toMachine(worker?: K8SWorker): SelectedMachine | undefined {
   }
 
   return {
+    farmId: worker.selectionDetails.node.farmId,
     nodeId: worker.selectionDetails.node.nodeId,
     cpu: worker.cpu,
     memory: worker.memory,
     disk: (worker.diskSize ?? 0) + (worker.rootFsSize ?? 0),
+    publicIp: worker.ipv4,
   };
 }
 

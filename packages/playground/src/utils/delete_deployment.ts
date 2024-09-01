@@ -68,6 +68,9 @@ export async function deleteGateway(grid: GridClient, name: string) {
   const { deleted } = await grid.gateway.delete_name({ name });
   return deleted.length > 0;
 }
+export async function deleteGatewayDeployment(grid: GridClient, name: string) {
+  return await grid.gateway.delete_name({ name });
+}
 
 export function solutionHasGateway(projectName: ProjectName) {
   const solutions = [

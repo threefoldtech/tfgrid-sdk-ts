@@ -364,6 +364,28 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
         },
       },
     },
+    {
+      path: DashboardRoutes.Applications.Domains,
+      component: () => import("../views/domains_view.vue"),
+      meta: {
+        title: "Domains",
+        info: { page: "info/domains.md" },
+        navbarConfig: {
+          back: true,
+          path: [
+            { title: "Deploy" },
+            {
+              title: "Applications",
+              disabled: false,
+              to: DashboardRoutes.Deploy.Applications,
+            },
+            {
+              title: "Domains",
+            },
+          ],
+        },
+      },
+    },
     // Commented for now and will be user later.
     // {
     //   path: DashboardRoutes.Applications.Freeflow,
@@ -404,6 +426,28 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
             },
             {
               title: "TFRobot",
+            },
+          ],
+        },
+      },
+    },
+    {
+      path: DashboardRoutes.Applications.Jenkins,
+      component: () => import("../views/jenkins_view.vue"),
+      meta: {
+        title: "Jenkins",
+        info: { page: "info/jenkins.md" },
+        navbarConfig: {
+          back: true,
+          path: [
+            { title: "Deploy" },
+            {
+              title: "Applications",
+              disabled: false,
+              to: DashboardRoutes.Deploy.Applications,
+            },
+            {
+              title: "Jenkins",
             },
           ],
         },

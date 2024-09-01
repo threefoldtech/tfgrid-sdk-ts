@@ -27,7 +27,7 @@ export interface DeployGatewayConfig {
   subdomain: string;
   ip: string;
   port: number;
-  network: string;
+  network?: string;
   tlsPassthrough?: boolean;
 }
 
@@ -77,6 +77,10 @@ export async function rollbackDeployment(grid: GridClient, name: string) {
     throw new Error(`Failed to delete deployment with name "${name}".`);
   }
 
+  return result;
+}
+export async function rollbackGateway(grid: GridClient, name: string) {
+  const result = await grid.gateway.delete_name({ name });
   return result;
 }
 

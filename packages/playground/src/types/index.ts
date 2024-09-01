@@ -59,6 +59,7 @@ export interface K8SWorker {
   ipv6: boolean;
   planetary: boolean;
   mycelium: boolean;
+  wireguard: boolean;
   rootFsSize: number;
   rentedBy?: number;
   dedicated: boolean;
@@ -72,8 +73,11 @@ export interface CaproverWorker {
   dedicated?: boolean;
   certified?: boolean;
   selectionDetails?: SelectionDetails;
-  mycelium: boolean;
+  ipv4: boolean;
   ipv6: boolean;
+  wireguard: boolean;
+  planetary: boolean;
+  mycelium: boolean;
 }
 
 export interface FarmInterface {
@@ -98,6 +102,7 @@ export type VDataTableHeader = {
 }[];
 
 export enum ProjectName {
+  Jenkins = "Jenkins",
   Kubernetes = "Kubernetes",
   Caprover = "CapRover",
   Discourse = "Discourse",
@@ -126,9 +131,11 @@ export enum ProjectName {
   TFRobot = "TFRobot",
   Gitea = "Gitea",
   Nostr = "Nostr",
+  Domains = "Domains",
 }
 
 export enum SolutionCode {
+  jenkins = "jk",
   peertube = "pt",
   funkwhale = "fw",
   taiga = "tg",
@@ -155,9 +162,11 @@ export enum SolutionCode {
   tfrobot = "tfr",
   gitea = "gt",
   nostr = "nt",
+  Domains = "dm",
 }
 
 export const solutionType: { [key: string]: string } = {
+  jenkins: "Jenkins",
   algorand: "Algorand",
   caprover: "CapRover",
   casperlabs: "Casperlabs",
@@ -181,6 +190,7 @@ export const solutionType: { [key: string]: string } = {
   tfrobot: "TFRobot",
   Gitea: "Gitea",
   nostr: "Nostr",
+  domains: "Domains",
 };
 
 export interface solutionFlavor {
