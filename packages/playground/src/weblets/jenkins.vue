@@ -133,7 +133,7 @@ const flist: Flist = {
 };
 const dedicated = ref(false);
 const certified = ref(false);
-const { ipv4, ipv6, mycelium, planetary } = useNetworks();
+const { ipv4, ipv6, mycelium, planetary } = useNetworks({ planetary: true });
 const selectionDetails = ref<SelectionDetails>();
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;

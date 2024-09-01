@@ -34,7 +34,7 @@
         :large="{ cpu: 8, memory: 32, disk: 2000 }"
         v-model="solution"
       />
-      <Network
+      <Networks
         required
         v-model:ipv4="ipv4"
         v-model:ipv6="ipv6"
@@ -76,11 +76,11 @@
 </template>
 
 <script lang="ts" setup>
-import { type Ref, ref, watch } from "vue";
+import { type Ref, ref } from "vue";
 
 import { manual } from "@/utils/manual";
 
-import Network from "../components/networks.vue";
+import Networks, { useNetworks } from "../components/networks.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useGrid, useProfileManager } from "../stores";
 import { type Flist, ProjectName } from "../types";
@@ -95,11 +95,7 @@ const flist: Flist = {
   value: "https://hub.grid.tf/tf-official-vms/node-pilot-zdbfs.flist",
   entryPoint: "/",
 };
-const ipv4 = ref(false);
-const ipv6 = ref(false);
-const wireguard = ref(false);
-const planetary = ref(false);
-const mycelium = ref(true);
+const { ipv4, ipv6, planetary, mycelium, wireguard } = useNetworks();
 const dedicated = ref(false);
 const certified = ref(false);
 const rootFilesystemSize = 2;

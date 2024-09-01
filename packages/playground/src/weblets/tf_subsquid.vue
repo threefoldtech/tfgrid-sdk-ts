@@ -93,7 +93,7 @@
 
 <script lang="ts" setup>
 import { calculateRootFileSystem, type GridClient } from "@threefold/grid_client";
-import { computed, type Ref, ref, watch } from "vue";
+import { computed, type Ref, ref } from "vue";
 
 import { manual } from "@/utils/manual";
 
@@ -112,11 +112,7 @@ const selectionDetails = ref<SelectionDetails>();
 
 const name = ref(generateName({ prefix: "ss" }));
 const endpoint = ref("");
-const ipv4 = ref(false);
-const ipv6 = ref(false);
-const wireguard = ref(false);
-const planetary = ref(false);
-const mycelium = ref(true);
+const { ipv4, ipv6, planetary, mycelium, wireguard } = useNetworks();
 const solution = ref() as Ref<SolutionFlavor>;
 const flist: Flist = {
   value: "https://hub.grid.tf/tf-official-apps/subsquid-latest.flist",
@@ -229,7 +225,7 @@ function updateSSHkeyEnv(selectedKeys: string) {
 </script>
 
 <script lang="ts">
-import Networks from "../components/networks.vue";
+import Networks, { useNetworks } from "../components/networks.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";
