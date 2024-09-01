@@ -65,6 +65,7 @@
             v-model:value="confirmPassword"
             :rules="[validators.required('A confirmation password is required.'), validateConfirmPassword]"
             #="{ props: validationProps }"
+            ref="confirmPasswordInput"
           >
             <VTextField
               label="Confirm Password"
@@ -156,15 +157,15 @@
 </template>
 <script lang="ts">
 import type { GridClient } from "@threefold/grid_client";
-import md5 from "md5";
 import { onMounted, ref, watch } from "vue";
 import { useTheme } from "vuetify";
 
 import { useFormRef } from "@/hooks/form_validator";
+import { useInputRef } from "@/hooks/input_validator";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
 
 import { useGrid } from "../stores";
-import { getCredentials, updateCredentials } from "../utils/credentials";
+import { updateCredentials } from "../utils/credentials";
 
 export default {
   name: "Settings",
@@ -190,6 +191,10 @@ export default {
     const currentQueryTimeout = ref(window.env.TIMEOUT / 1000);
     const selectedQueryTimeout = ref(0);
     const gridStore = useGrid();
+    const confirmPasswordInput = useInputRef();
+    watch(newPassword, () => {
+      confirmPasswordInput.value?.validate();
+    });
 
     const deploymentTimeoutdefaultMinutes = gridStore!.client.clientOptions.deploymentTimeoutMinutes;
     const selectedDeploymentTimeout = ref(0);
@@ -325,6 +330,7 @@ export default {
       validateConfirmPassword,
       isCurrentTheme,
       isCurrentTimeout,
+      confirmPasswordInput,
     };
   },
 };
