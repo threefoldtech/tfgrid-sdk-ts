@@ -63,7 +63,7 @@
 
 <script lang="ts">
 import { noop } from "lodash";
-import { computed, getCurrentInstance, onMounted, onUnmounted, type Ref, ref, watch } from "vue";
+import { computed, getCurrentInstance, onMounted, onUnmounted, ref, watch } from "vue";
 
 import { useForm, ValidatorStatus } from "@/hooks/form_validator";
 import type { InputValidatorService } from "@/hooks/input_validator";
@@ -78,14 +78,14 @@ interface CreateNetworksOptions {
   wireguard: boolean;
 }
 
-export function createNetworks(options: Partial<CreateNetworksOptions> = {}): Ref<CreateNetworksOptions> {
-  return ref<CreateNetworksOptions>({
-    ipv4: options.ipv4 ?? false,
-    ipv6: options.ipv6 ?? false,
-    planetary: options.planetary ?? false,
-    mycelium: options.mycelium ?? true,
-    wireguard: options.wireguard ?? false,
-  });
+export function useNetworks(options: Partial<CreateNetworksOptions> = {}) {
+  return {
+    ipv4: ref(options.ipv4 ?? false),
+    ipv6: ref(options.ipv6 ?? false),
+    planetary: ref(options.planetary ?? false),
+    mycelium: ref(options.mycelium ?? true),
+    wireguard: ref(options.wireguard ?? false),
+  };
 }
 
 export default {
