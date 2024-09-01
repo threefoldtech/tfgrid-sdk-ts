@@ -366,6 +366,7 @@ const filteredHeaders = computed(() => {
     ProjectName.Subsquid,
     ProjectName.Peertube,
     ProjectName.Jenkins,
+    ProjectName.Caprover,
   ] as string[];
 
   const WireguardSolutions = [ProjectName.VM, ProjectName.Fullvm, ProjectName.Umbrel, ProjectName.TFRobot] as string[];
