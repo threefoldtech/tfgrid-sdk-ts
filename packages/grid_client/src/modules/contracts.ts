@@ -650,7 +650,7 @@ class Contracts {
    */
   @expose
   @validateInput
-  async getTotalContractsOverdueAmount(): Promise<ContractsOverdue> {
+  async getContractsOverdueAmount(): Promise<ContractsOverdue> {
     const contractsOverdue = {
       nameContracts: {},
       nodeContracts: {},

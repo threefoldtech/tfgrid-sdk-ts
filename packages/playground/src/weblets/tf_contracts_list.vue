@@ -230,7 +230,7 @@
 </template>
 
 <script lang="ts" setup>
-import type { GridClient, LockContracts } from "@threefold/grid_client";
+import type { ContractsOverdue, GridClient } from "@threefold/grid_client";
 import { type Contract, ContractState, NodeStatus, SortByContracts, SortOrder } from "@threefold/gridproxy_client";
 import { DeploymentKeyDeletionError } from "@threefold/types";
 import { Decimal } from "decimal.js";
@@ -274,7 +274,7 @@ const loadingTablesMessage = ref<string>();
 
 const totalCost = ref<number>();
 const totalCostUSD = ref<number>();
-const lockedContracts = ref<LockContracts>();
+const lockedContracts = ref<ContractsOverdue>();
 const unlockDialog = ref<boolean>(false);
 const deleteDialog = ref<boolean>(false);
 const deleting = ref<boolean>(false);
@@ -496,7 +496,7 @@ async function onDeletedContracts(_contracts: NormalizedContract[]) {
   totalCost.value = undefined;
 }
 async function getContractsLockDetails() {
-  lockedContracts.value = await grid.contracts.getContractsLockDetails();
+  lockedContracts.value = await grid.contracts.getContractsOverdueAmount();
 }
 
 // Define base table headers for contracts tables
