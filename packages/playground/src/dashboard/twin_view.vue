@@ -126,7 +126,7 @@
                 </v-col>
               </v-row>
               <v-row class="row-style">
-                <v-col cols="1" sm="2"> <v-list-item class="mr-auto"> Relay : </v-list-item></v-col>
+                <v-col cols="1" sm="2" style="min-width: fit-content"> <v-list-item class="mr-auto"> Relay : </v-list-item></v-col>
                 <v-col>
                   <v-list-item>
                     <div style="display: flex; justify-content: space-between; align-items: center">
@@ -349,8 +349,8 @@ export default {
 
 .row-style {
   border-bottom: 0.1px solid #8a8a8a;
-  margin-left: 10px;
-  margin-right: 10px;
+  margin-left: 6px;
+  margin-right: 6px;
 }
 
 .custom-toolbar {
