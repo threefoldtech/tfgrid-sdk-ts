@@ -44,7 +44,7 @@
           v-model="solution"
         />
 
-        <Network
+        <Networks
           required
           v-model:ipv4="ipv4"
           v-model:ipv6="ipv6"
@@ -141,9 +141,9 @@ import { computed, type Ref, ref, watch } from "vue";
 
 import { manual } from "@/utils/manual";
 
-import Network from "../components/networks.vue";
+import Networks, { useNetworks } from "../components/networks.vue";
 import { useLayout } from "../components/weblet_layout.vue";
-import { useGrid, useProfileManager } from "../stores";
+import { useGrid } from "../stores";
 import type { solutionFlavor as SolutionFlavor } from "../types";
 import { type Flist, ProjectName } from "../types";
 import { deployVM, type Disk } from "../utils/deploy_vm";
@@ -186,11 +186,7 @@ const images: VmImage[] = [
 const selectedSSHKeys = ref("");
 const name = ref(generateName({ prefix: "vm" }));
 const flist = ref<Flist>();
-const ipv4 = ref(false);
-const ipv6 = ref(false);
-const planetary = ref(false);
-const mycelium = ref(true);
-const wireguard = ref(false);
+const { ipv4, ipv6, mycelium, planetary, wireguard } = useNetworks();
 const dedicated = ref(false);
 const certified = ref(false);
 const disks = ref<Disk[]>([]);
