@@ -151,13 +151,6 @@ export default {
         icon: "wordpress.png",
         route: DashboardRoutes.Applications.Wordpress,
       },
-      {
-        title: "Domains",
-        excerpt:
-          "Domains allow users to securely expose servers hosted on local machines or VMs to the public internet.",
-        icon: "domains.png",
-        route: DashboardRoutes.Applications.Domains,
-      },
     ];
     cards = cards.sort((a, b) => a.title.localeCompare(b.title));
 

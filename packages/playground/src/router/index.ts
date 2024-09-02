@@ -364,28 +364,6 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
         },
       },
     },
-    {
-      path: DashboardRoutes.Applications.Domains,
-      component: () => import("../views/domains_view.vue"),
-      meta: {
-        title: "Domains",
-        info: { page: "info/domains.md" },
-        navbarConfig: {
-          back: true,
-          path: [
-            { title: "Deploy" },
-            {
-              title: "Applications",
-              disabled: false,
-              to: DashboardRoutes.Deploy.Applications,
-            },
-            {
-              title: "Domains",
-            },
-          ],
-        },
-      },
-    },
     // Commented for now and will be user later.
     // {
     //   path: DashboardRoutes.Applications.Freeflow,
@@ -605,6 +583,11 @@ function createDeployRoutes(): RouteRecordRaw[] {
           path: DashboardRoutes.Deploy.PricingCalculator,
           component: () => import("../calculator/pricing_calculator.vue"),
           meta: { title: "Resource Pricing", publicPath: true },
+        },
+        {
+          path: DashboardRoutes.Deploy.Domains,
+          component: () => import("@/views/domains_view.vue"),
+          meta: { title: "Domains", publicPath: true },
         },
         {
           path: DashboardRoutes.Deploy.NodeFinder,

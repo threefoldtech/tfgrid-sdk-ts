@@ -16,6 +16,7 @@
         :projectName="tabs[activeTab].value"
         v-model="selectedItems"
         :deleting="deleting"
+        :hideSsh="hideSsh"
         ref="table"
         @click:row="clickOpenDialog"
       >
@@ -106,12 +107,7 @@
             icon="mdi-eye-outline"
             @click="openDialog(tabs[activeTab].value, item)"
           />
-          <IconActionBtn
-            tooltip="Visit"
-            icon="mdi-web"
-            color="anchor"
-            :href="'https://' + item.env.JENKINS_HOSTNAME"
-          />
+          <IconActionBtn tooltip="Visit" icon="mdi-web" color="anchor" :href="'https://' + item.env.JENKINS_HOSTNAME" />
         </template>
 
         <template #Taiga-actions="{ item }">
@@ -431,6 +427,7 @@ import { updateGrid } from "../utils/grid";
 const props = defineProps<{
   projectName?: ProjectName;
   title?: string;
+  hideSsh?: boolean;
 }>();
 
 const tabs: Tab[] = [

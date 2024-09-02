@@ -55,7 +55,7 @@
       </v-dialog>
     </v-alert>
 
-    <AccessDeploymentAlert />
+    <AccessDeploymentAlert v-if="!hideSsh" />
 
     <InputTooltip
       v-if="props.projectName.toLowerCase() === 'vm'"
@@ -170,6 +170,7 @@ const props = defineProps<{
   projectName: string;
   modelValue: any[];
   deleting: boolean;
+  hideSsh?: boolean;
 }>();
 defineEmits<{ (event: "update:model-value", value: any[]): void }>();
 
