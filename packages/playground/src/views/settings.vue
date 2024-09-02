@@ -216,7 +216,7 @@ export default {
         currentDeploymentTimeout.value = +localStorage.getItem(LocalStorageSettingsKey.TIMEOUT_DEPLOYMENT_KEY)!;
       } else if (deploymentTimeoutdefaultMinutes) {
         currentDeploymentTimeout.value = deploymentTimeoutdefaultMinutes * 60;
-        localStorage.setItem(LocalStorageSettingsKey.TIMEOUT_DEPLOYMENT_KEY, `${deploymentTimeoutdefaultMinutes * 60}`);
+        localStorage.setItem(LocalStorageSettingsKey.TIMEOUT_DEPLOYMENT_KEY, `${currentDeploymentTimeout.value}`);
       }
       selectedDeploymentTimeout.value = currentDeploymentTimeout.value;
     });
