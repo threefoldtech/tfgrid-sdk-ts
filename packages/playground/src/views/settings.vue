@@ -115,7 +115,7 @@
         >
           <v-text-field
             label="Enter Query timeout (sec)"
-            class="pa-5"
+            class="pa-3"
             v-bind="props"
             type="number"
             v-model="selectedQueryTimeout"
@@ -144,7 +144,7 @@
         >
           <v-text-field
             label="Enter Deployment timeout (sec)"
-            class="pa-5"
+            class="pa-3"
             v-bind="props"
             type="number"
             v-model="selectedDeploymentTimeout"
