@@ -30,7 +30,7 @@ async function waitForGateway(domain: string) {
   return false;
 }
 
-async function testGateway(gateway: GatewayNameModel, name: string) {
+async function testGateway(gateway: GatewayNameModel) {
   const gatewayRes = await gridClient.gateway.deploy_name(gateway);
   log(gatewayRes);
 
@@ -47,7 +47,7 @@ async function testGateway(gateway: GatewayNameModel, name: string) {
   expect(gatewayResult[0].name).toBe(gateway.name);
   expect(gatewayResult[0].status).toBe("ok");
   expect(gatewayResult[0].type).toContain("name");
-  expect(gatewayResult[0].domain).toContain(name);
+  expect(gatewayResult[0].domain).toContain(gateway.name);
   expect(gatewayResult[0].tls_passthrough).toBe(gateway.tls_passthrough);
   expect(gatewayResult[0].backends).toStrictEqual(gateway.backends);
 
@@ -55,7 +55,7 @@ async function testGateway(gateway: GatewayNameModel, name: string) {
 
   if (await waitForGateway(domain)) {
     axios.get(domain).then(res => {
-      log(res);
+      log(res.data);
       expect(res.status).toBe(200);
       expect(res.statusText).toBe("OK");
       expect(res.data).toContain("Directory listing for /");
@@ -230,7 +230,7 @@ test("TC1237 - Gateways: Expose a VM Over Gateway", async () => {
     backends: backends,
   };
 
-  await testGateway(gw, name);
+  await testGateway(gw);
 
   //--------------------Mycelium--------------------
   backends = ["http://[" + result[0].myceliumIP + "]:8000"];
@@ -244,7 +244,7 @@ test("TC1237 - Gateways: Expose a VM Over Gateway", async () => {
     backends: backends,
   };
 
-  await testGateway(gw1, name);
+  await testGateway(gw1);
 
   //--------------------IPv6--------------------
   backends = ["http://[" + result[0].publicIP["ip6"].split("/")[0] + "]:8000"];
@@ -258,7 +258,7 @@ test("TC1237 - Gateways: Expose a VM Over Gateway", async () => {
     backends: backends,
   };
 
-  await testGateway(gw2, name);
+  await testGateway(gw2);
 
   //--------------------IPv4--------------------
   backends = ["http://" + result[0].publicIP["ip"].split("/")[0] + ":8000"];
@@ -272,7 +272,7 @@ test("TC1237 - Gateways: Expose a VM Over Gateway", async () => {
     backends: backends,
   };
 
-  await testGateway(gw3, name);
+  await testGateway(gw3);
 
   //--------------------Wireguard--------------------
   const IP = result[0].interfaces[0].ip;
@@ -303,7 +303,7 @@ test("TC1237 - Gateways: Expose a VM Over Gateway", async () => {
     await gridClient.networks.addNode(data);
   }
 
-  await testGateway(gw4, name);
+  await testGateway(gw4);
 });
 
 afterAll(async () => {
