@@ -59,6 +59,7 @@ export interface K8SWorker {
   ipv6: boolean;
   planetary: boolean;
   mycelium: boolean;
+  wireguard: boolean;
   rootFsSize: number;
   rentedBy?: number;
   dedicated: boolean;
@@ -72,8 +73,11 @@ export interface CaproverWorker {
   dedicated?: boolean;
   certified?: boolean;
   selectionDetails?: SelectionDetails;
-  mycelium: boolean;
+  ipv4: boolean;
   ipv6: boolean;
+  wireguard: boolean;
+  planetary: boolean;
+  mycelium: boolean;
 }
 
 export interface FarmInterface {

@@ -18,6 +18,56 @@ beforeAll(async () => {
   return gridClient;
 });
 
+async function waitForGateway(domain: string) {
+  for (let i = 0; i < 30; i++) {
+    try {
+      await axios.get(domain);
+      return true;
+    } catch (error) {
+      await setTimeout(5000, "Waiting for gateway to be ready");
+    }
+  }
+  return false;
+}
+
+async function testGateway(gateway: GatewayNameModel) {
+  const gatewayRes = await gridClient.gateway.deploy_name(gateway);
+  log(gatewayRes);
+
+  //Contracts Assertions
+  expect(gatewayRes.contracts.created).toHaveLength(1);
+  expect(gatewayRes.contracts.updated).toHaveLength(0);
+  expect(gatewayRes.contracts.deleted).toHaveLength(0);
+  expect(gatewayRes.contracts.created[0].contractType.nodeContract.nodeId).toBe(gateway.node_id);
+
+  const gatewayResult = await gridClient.gateway.getObj(gateway.name);
+  log(gatewayResult);
+
+  //Gateway Assertions
+  expect(gatewayResult[0].name).toBe(gateway.name);
+  expect(gatewayResult[0].status).toBe("ok");
+  expect(gatewayResult[0].type).toContain("name");
+  expect(gatewayResult[0].domain).toContain(gateway.name);
+  expect(gatewayResult[0].tls_passthrough).toBe(gateway.tls_passthrough);
+  expect(gatewayResult[0].backends).toStrictEqual(gateway.backends);
+
+  const domain = "https://" + gatewayResult[0].domain;
+
+  if (await waitForGateway(domain)) {
+    axios.get(domain).then(res => {
+      log(res.data);
+      expect(res.status).toBe(200);
+      expect(res.statusText).toBe("OK");
+      expect(res.data).toContain("Directory listing for /");
+      expect(res.data).toContain("bin/");
+      expect(res.data).toContain("dev/");
+      expect(res.data).toContain("etc/");
+    });
+  } else {
+    throw new Error("Gateway is unreachable after multiple retries");
+  }
+}
+
 //Private IP Regex
 const ipRegex = /(^127\.)|(^10\.)|(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1]\.)|(^192\.168\.)/;
 
@@ -52,7 +102,6 @@ test("TC1237 - Gateways: Expose a VM Over Gateway", async () => {
   const networkName = generateString(15);
   const vmName = generateString(15);
   const disks = [];
-  const publicIp = false;
   const ipRangeClassA = "10." + generateInt(1, 255) + ".0.0/16";
   const ipRangeClassB = "172." + generateInt(16, 31) + ".0.0/16";
   const ipRangeClassC = "192.168.0.0/16";
@@ -108,6 +157,7 @@ test("TC1237 - Gateways: Expose a VM Over Gateway", async () => {
     network: {
       name: networkName,
       ip_range: ipRange,
+      addAccess: true,
     },
     machines: [
       {
@@ -119,14 +169,15 @@ test("TC1237 - Gateways: Expose a VM Over Gateway", async () => {
         disks: disks,
         flist: "https://hub.grid.tf/tf-official-apps/threefoldtech-ubuntu-22.04.flist",
         entrypoint: "/usr/bin/python3 -m http.server --bind ::",
-        public_ip: publicIp,
+        public_ip: true,
+        public_ip6: true,
         planetary: true,
-        mycelium: false,
+        mycelium: true,
         env: {
           SSH_KEY: config.ssh_key,
           Test_KEY: envVarValue,
         },
-        solutionProviderId: null,
+        solutionProviderId: undefined,
       },
     ],
     metadata: metadata,
@@ -162,78 +213,100 @@ test("TC1237 - Gateways: Expose a VM Over Gateway", async () => {
   expect(result[0].capacity["cpu"]).toBe(cpu);
   expect(result[0].capacity["memory"]).toBe(memory);
   expect(result[0].planetary).toBeDefined();
-  expect(result[0].publicIP).toBeNull();
+  expect(result[0].myceliumIP).toBeDefined();
+  expect(result[0].publicIP["ip"]).toBeDefined();
+  expect(result[0].publicIP["ip6"]).toBeDefined();
   expect(result[0].description).toBe(description);
 
-  const backends = ["http://[" + result[0].planetary + "]:8000"];
+  //--------------------Planetary--------------------
+  let backends = ["http://[" + result[0].planetary + "]:8000"];
   log(backends);
 
   //Name Gateway Model
   const gw: GatewayNameModel = {
-    name: name,
+    name: name + "planetary",
     node_id: gatewayNodeId,
     tls_passthrough: tlsPassthrough,
     backends: backends,
   };
 
-  const gatewayRes = await gridClient.gateway.deploy_name(gw);
-  log(gatewayRes);
+  await testGateway(gw);
 
-  //Contracts Assertions
-  expect(gatewayRes.contracts.created).toHaveLength(1);
-  expect(gatewayRes.contracts.updated).toHaveLength(0);
-  expect(gatewayRes.contracts.deleted).toHaveLength(0);
-  expect(gatewayRes.contracts.created[0].contractType.nodeContract.nodeId).toBe(gatewayNodeId);
+  //--------------------Mycelium--------------------
+  backends = ["http://[" + result[0].myceliumIP + "]:8000"];
+  log(backends);
 
-  const gatewayResult = await gridClient.gateway.getObj(gw.name);
-  log(gatewayResult);
+  //Name Gateway Model
+  const gw1: GatewayNameModel = {
+    name: name + "mycelium",
+    node_id: gatewayNodeId,
+    tls_passthrough: tlsPassthrough,
+    backends: backends,
+  };
 
-  //Gateway Assertions
-  expect(gatewayResult[0].name).toBe(name);
-  expect(gatewayResult[0].status).toBe("ok");
-  expect(gatewayResult[0].type).toContain("name");
-  expect(gatewayResult[0].domain).toContain(name);
-  expect(gatewayResult[0].tls_passthrough).toBe(tlsPassthrough);
-  expect(gatewayResult[0].backends).toStrictEqual(backends);
+  await testGateway(gw1);
 
-  const domain = "https://" + gatewayResult[0].domain;
-  let reachable = false;
+  //--------------------IPv6--------------------
+  backends = ["http://[" + result[0].publicIP["ip6"].split("/")[0] + "]:8000"];
+  log(backends);
 
-  for (let i = 0; i < 30; i++) {
-    axios
-      .get(domain)
-      .then(() => {
-        log("gateway is reachable");
-        reachable = true;
-      })
-      .catch(() => {
-        log("gateway is not reachable");
-      });
-    if (reachable) {
-      break;
-    }
-    const wait = await setTimeout(5000, "Waiting for gateway to be ready");
-    log(wait);
+  //Name Gateway Model
+  const gw2: GatewayNameModel = {
+    name: name + "ipv6",
+    node_id: gatewayNodeId,
+    tls_passthrough: tlsPassthrough,
+    backends: backends,
+  };
+
+  await testGateway(gw2);
+
+  //--------------------IPv4--------------------
+  backends = ["http://" + result[0].publicIP["ip"].split("/")[0] + ":8000"];
+  log(backends);
+
+  //Name Gateway Model
+  const gw3: GatewayNameModel = {
+    name: name + "ipv4",
+    node_id: gatewayNodeId,
+    tls_passthrough: tlsPassthrough,
+    backends: backends,
+  };
+
+  await testGateway(gw3);
+
+  //--------------------Wireguard--------------------
+  const IP = result[0].interfaces[0].ip;
+  const wireguardNetworkName = result[0].interfaces[0].network;
+  backends = ["http://" + IP + ":8000"];
+  log(backends);
+
+  //Name Gateway Model
+  const gw4: GatewayNameModel = {
+    name: name + "wireguard",
+    node_id: gatewayNodeId,
+    tls_passthrough: tlsPassthrough,
+    backends: backends,
+  };
+
+  gw4.network = wireguardNetworkName;
+  const [x, y] = IP.split(".");
+  const data = {
+    name: wireguardNetworkName,
+    ipRange: `${x}.${y}.0.0/16`,
+    nodeId: gatewayNodeId,
+    mycelium: false,
+  };
+
+  const hasNode = await gridClient.networks.hasNode(data);
+
+  if (!hasNode) {
+    await gridClient.networks.addNode(data);
   }
 
-  if (reachable) {
-    axios.get(domain).then(res => {
-      log(res.status);
-      log(res.statusText);
-      log(res.data);
-      expect(res.status).toBe(200);
-      expect(res.statusText).toBe("OK");
-      expect(res.data).toContain("Directory listing for /");
-      expect(res.data).toContain("bin/");
-      expect(res.data).toContain("dev/");
-      expect(res.data).toContain("etc/");
-    });
-  } else {
-    throw new Error("Gateway is unreachable after multiple retries");
-  }
+  await testGateway(gw4);
 });
 
-afterEach(async () => {
+afterAll(async () => {
   const vmNames = await gridClient.machines.list();
   for (const name of vmNames) {
     const res = await gridClient.machines.delete({ name });
@@ -251,8 +324,6 @@ afterEach(async () => {
     expect(res.updated).toHaveLength(0);
     expect(res.deleted).toBeDefined();
   }
-});
 
-afterAll(async () => {
   return await gridClient.disconnect();
 }, 130000);

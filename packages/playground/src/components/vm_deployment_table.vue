@@ -367,6 +367,7 @@ const filteredHeaders = computed(() => {
     ProjectName.Subsquid,
     ProjectName.Peertube,
     ProjectName.Jenkins,
+    ProjectName.Caprover,
     ProjectName.Jitsi,
   ] as string[];
 
