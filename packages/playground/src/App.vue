@@ -205,6 +205,7 @@ import { useRoute, useRouter } from "vue-router";
 import { useTheme } from "vuetify";
 
 import TfLogger from "@/components/logger.vue";
+import { LocalStorageSettingsKey } from "@/utils/settings";
 
 import { useProfileManager } from "./stores/profile_manager";
 const $route = useRoute();
@@ -217,9 +218,7 @@ const openProfile = ref(false);
 const hasActiveProfile = computed(() => !!profileManager.profile);
 const theme = useTheme();
 const navbarConfig = ref();
-const TIMEOUT_QUERY_KEY = "APP_QUERY_TIMEOUT";
-const TIMEOUT_DEPLOYMENT_KEY = "APP_DEPLOYMENT_TIMEOUT";
-const THEME_KEY = "APP_CURRENT_THEME";
+
 const hasGrid = computed(() => !!gridStore.grid);
 
 // eslint-disable-next-line no-undef
@@ -246,7 +245,7 @@ function updateTheme() {
   } else {
     theme.global.name.value = AppThemeSelection.light;
   }
-  localStorage.setItem(THEME_KEY, ThemeSettingsInterface.System);
+  localStorage.setItem(LocalStorageSettingsKey.THEME_KEY, ThemeSettingsInterface.System);
 }
 
 // sets theme to system mode on application mount
@@ -272,10 +271,10 @@ onMounted(async () => {
 });
 
 onMounted(async () => {
-  if (!localStorage.getItem(TIMEOUT_QUERY_KEY)) {
-    localStorage.setItem(TIMEOUT_QUERY_KEY, `${window.env.TIMEOUT / 1000}`);
+  if (!localStorage.getItem(LocalStorageSettingsKey.TIMEOUT_QUERY_KEY)) {
+    localStorage.setItem(LocalStorageSettingsKey.TIMEOUT_QUERY_KEY, `${window.env.TIMEOUT / 1000}`);
   } else {
-    window.env.TIMEOUT = +localStorage.getItem(TIMEOUT_QUERY_KEY)! * 1000;
+    window.env.TIMEOUT = +localStorage.getItem(LocalStorageSettingsKey.TIMEOUT_QUERY_KEY)! * 1000;
   }
   const client = gridStore.client as GridClient;
   if (client) {
@@ -283,7 +282,7 @@ onMounted(async () => {
     if (clientOptions) {
       const deploymentTimeoutMinutes = clientOptions.deploymentTimeoutMinutes;
       if (deploymentTimeoutMinutes) {
-        if (!localStorage.getItem(TIMEOUT_DEPLOYMENT_KEY) && deploymentTimeoutMinutes) {
+        if (!localStorage.getItem(LocalStorageSettingsKey.TIMEOUT_DEPLOYMENT_KEY) && deploymentTimeoutMinutes) {
           await nextTick(getDeploymentTimeout);
         }
       }
@@ -292,14 +291,18 @@ onMounted(async () => {
 });
 async function getDeploymentTimeout() {
   const client = gridStore.client as GridClient;
-  if (!localStorage.getItem(TIMEOUT_DEPLOYMENT_KEY)) {
+  if (!localStorage.getItem(LocalStorageSettingsKey.TIMEOUT_DEPLOYMENT_KEY)) {
     // sets timeout in local storage in seconds
-    localStorage.setItem(TIMEOUT_DEPLOYMENT_KEY, `${+client.clientOptions.deploymentTimeoutMinutes! * 60}`);
+    localStorage.setItem(
+      LocalStorageSettingsKey.TIMEOUT_DEPLOYMENT_KEY,
+      `${+client.clientOptions.deploymentTimeoutMinutes! * 60}`,
+    );
     return;
   }
 
   if (client && client.clientOptions) {
-    client.clientOptions.deploymentTimeoutMinutes = +localStorage.getItem(TIMEOUT_DEPLOYMENT_KEY)! / 60;
+    client.clientOptions.deploymentTimeoutMinutes =
+      +localStorage.getItem(LocalStorageSettingsKey.TIMEOUT_DEPLOYMENT_KEY)! / 60;
 
     await client.connect();
   }
@@ -494,7 +497,8 @@ import type { GridClient } from "@threefold/grid_client";
 import { nextTick } from "process";
 
 import { DashboardRoutes } from "@/router/routes";
-import { AppThemeSelection, ThemeSettingsInterface } from "@/utils/app_theme";
+import { AppThemeSelection } from "@/utils/app_theme";
+import { ThemeSettingsInterface } from "@/utils/settings";
 
 import AppTheme from "./components/app_theme.vue";
 import DeploymentListManager from "./components/deployment_list_manager.vue";

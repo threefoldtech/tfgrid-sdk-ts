@@ -167,8 +167,9 @@ import { useTheme } from "vuetify";
 
 import { useFormRef } from "@/hooks/form_validator";
 import { useInputRef } from "@/hooks/input_validator";
-import { AppThemeSelection, ThemeSettingsInterface as ThemeInterface, ThemeSettingsInterface } from "@/utils/app_theme";
+import { AppThemeSelection } from "@/utils/app_theme";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
+import { LocalStorageSettingsKey, ThemeSettingsInterface as ThemeInterface } from "@/utils/settings";
 
 import { useGrid } from "../stores";
 import { updateCredentials } from "../utils/credentials";
@@ -177,14 +178,11 @@ export default {
   name: "Settings",
   setup() {
     const theme = useTheme();
-    const THEME_KEY = "APP_CURRENT_THEME";
-    const TIMEOUT_QUERY_KEY = "APP_QUERY_TIMEOUT";
-    const TIMEOUT_DEPLOYMENT_KEY = "APP_DEPLOYMENT_TIMEOUT";
 
     const themes = [ThemeInterface.Dark, ThemeInterface.Light, ThemeInterface.System];
 
-    const currentTheme = ref(localStorage.getItem(THEME_KEY));
-    const selectedTheme = ref(localStorage.getItem(THEME_KEY));
+    const currentTheme = ref(localStorage.getItem(LocalStorageSettingsKey.THEME_KEY));
+    const selectedTheme = ref(localStorage.getItem(LocalStorageSettingsKey.THEME_KEY));
 
     const currentPassword = ref("");
     const newPassword = ref("");
@@ -205,13 +203,13 @@ export default {
     const isValidPassword = ref(false);
 
     onMounted(async () => {
-      currentQueryTimeout.value = +localStorage.getItem(TIMEOUT_QUERY_KEY)!;
+      currentQueryTimeout.value = +localStorage.getItem(LocalStorageSettingsKey.TIMEOUT_QUERY_KEY)!;
       selectedQueryTimeout.value = currentQueryTimeout.value;
-      if (localStorage.getItem(TIMEOUT_DEPLOYMENT_KEY)) {
-        currentDeploymentTimeout.value = +localStorage.getItem(TIMEOUT_DEPLOYMENT_KEY)!;
+      if (localStorage.getItem(LocalStorageSettingsKey.TIMEOUT_DEPLOYMENT_KEY)) {
+        currentDeploymentTimeout.value = +localStorage.getItem(LocalStorageSettingsKey.TIMEOUT_DEPLOYMENT_KEY)!;
       } else if (deploymentTimeoutdefaultMinutes) {
         currentDeploymentTimeout.value = deploymentTimeoutdefaultMinutes * 60;
-        localStorage.setItem(TIMEOUT_DEPLOYMENT_KEY, `${deploymentTimeoutdefaultMinutes * 60}`);
+        localStorage.setItem(LocalStorageSettingsKey.TIMEOUT_DEPLOYMENT_KEY, `${deploymentTimeoutdefaultMinutes * 60}`);
       }
       selectedDeploymentTimeout.value = currentDeploymentTimeout.value;
     });
@@ -242,7 +240,7 @@ export default {
           break;
       }
 
-      localStorage.setItem(THEME_KEY, currentTheme.value!);
+      localStorage.setItem(LocalStorageSettingsKey.THEME_KEY, currentTheme.value!);
     }
     function validateCurrentPassword() {
       if (sessionStorage.getItem("password") != currentPassword.value) {
@@ -288,18 +286,19 @@ export default {
         const client = gridStore.client as GridClient;
 
         if (selectedQueryTimeout.value != currentQueryTimeout.value) {
-          localStorage.setItem(TIMEOUT_QUERY_KEY, `${selectedQueryTimeout.value}`);
-          window.env.TIMEOUT = +localStorage.getItem(TIMEOUT_QUERY_KEY)! * 1000;
-          currentQueryTimeout.value = +localStorage.getItem(TIMEOUT_QUERY_KEY)!;
+          localStorage.setItem(LocalStorageSettingsKey.TIMEOUT_QUERY_KEY, `${selectedQueryTimeout.value}`);
+          window.env.TIMEOUT = +localStorage.getItem(LocalStorageSettingsKey.TIMEOUT_QUERY_KEY)! * 1000;
+          currentQueryTimeout.value = +localStorage.getItem(LocalStorageSettingsKey.TIMEOUT_QUERY_KEY)!;
           selectedQueryTimeout.value = currentQueryTimeout.value;
         }
 
         if (selectedDeploymentTimeout.value != currentDeploymentTimeout.value) {
-          localStorage.setItem(TIMEOUT_DEPLOYMENT_KEY, `${selectedDeploymentTimeout.value}`);
-          currentDeploymentTimeout.value = +localStorage.getItem(TIMEOUT_DEPLOYMENT_KEY)!;
+          localStorage.setItem(LocalStorageSettingsKey.TIMEOUT_DEPLOYMENT_KEY, `${selectedDeploymentTimeout.value}`);
+          currentDeploymentTimeout.value = +localStorage.getItem(LocalStorageSettingsKey.TIMEOUT_DEPLOYMENT_KEY)!;
           selectedDeploymentTimeout.value = currentDeploymentTimeout.value;
           if (client) {
-            client.clientOptions.deploymentTimeoutMinutes = +localStorage.getItem(TIMEOUT_DEPLOYMENT_KEY)! / 60;
+            client.clientOptions.deploymentTimeoutMinutes =
+              +localStorage.getItem(LocalStorageSettingsKey.TIMEOUT_DEPLOYMENT_KEY)! / 60;
             await client.connect();
           }
         }
