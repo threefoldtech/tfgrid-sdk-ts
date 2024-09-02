@@ -162,6 +162,7 @@ import { useTheme } from "vuetify";
 
 import { useFormRef } from "@/hooks/form_validator";
 import { useInputRef } from "@/hooks/input_validator";
+import { AppThemeSelection, ThemeSettingsInterface as ThemeInterface, ThemeSettingsInterface } from "@/utils/app_theme";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
 
 import { useGrid } from "../stores";
@@ -175,7 +176,7 @@ export default {
     const TIMEOUT_QUERY_KEY = "APP_QUERY_TIMEOUT";
     const TIMEOUT_DEPLOYMENT_KEY = "APP_DEPLOYMENT_TIMEOUT";
 
-    const themes = ["System Mode", "Dark Mode", "Light Mode"];
+    const themes = [ThemeInterface.Dark, ThemeInterface.Light, ThemeInterface.System];
 
     const currentTheme = ref(localStorage.getItem(THEME_KEY));
     const selectedTheme = ref(localStorage.getItem(THEME_KEY));
@@ -210,18 +211,29 @@ export default {
       return selectedTheme.value == currentTheme.value;
     }
     function UpdateTheme() {
-      if (selectedTheme.value == "System Mode") {
-        if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-          theme.global.name.value = "dark";
-        } else if (window.matchMedia("(prefers-color-scheme: light)").matches) {
-          theme.global.name.value = "light";
-        }
-        localStorage.setItem(THEME_KEY, "System Mode");
+      switch (selectedTheme.value) {
+        case ThemeInterface.Dark:
+          currentTheme.value = ThemeInterface.Dark;
+          theme.global.name.value = AppThemeSelection.dark;
+          localStorage.se;
+          break;
+        case ThemeInterface.Light:
+          currentTheme.value = ThemeInterface.Light;
+          theme.global.name.value = AppThemeSelection.light;
+          break;
+
+        case ThemeInterface.System:
+          currentTheme.value = ThemeInterface.System;
+          if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+            theme.global.name.value = AppThemeSelection.dark;
+            break;
+          }
+
+          theme.global.name.value = AppThemeSelection.light;
+          break;
       }
-      if (selectedTheme.value) {
-        localStorage.setItem(THEME_KEY, selectedTheme.value);
-        theme.global.name.value = selectedTheme.value == "Light Mode" ? "light" : "dark";
-      }
+
+      localStorage.setItem(THEME_KEY, currentTheme.value!);
     }
     function validateCurrentPassword() {
       if (sessionStorage.getItem("password") != currentPassword.value) {

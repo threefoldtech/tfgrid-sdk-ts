@@ -237,18 +237,23 @@ function setSidebarOnResize() {
 }
 
 window.addEventListener("resize", setSidebarOnResize);
+
 const themeMatcher = window.matchMedia("(prefers-color-scheme: dark)");
 // changes theme based on changes in system mode
 themeMatcher.addEventListener("change", updateTheme);
 function updateTheme() {
   if (themeMatcher.matches) {
-    theme.global.name.value = "dark";
+    theme.global.name.value = AppThemeSelection.dark;
   } else {
-    theme.global.name.value = "light";
+    theme.global.name.value = AppThemeSelection.light;
   }
-  localStorage.setItem(THEME_KEY, "System Mode");
+  localStorage.setItem(THEME_KEY, ThemeSettingsInterface.System);
 }
 
+// sets theme to system mode on application mount
+onMounted(() => {
+  updateTheme();
+});
 watch(
   () => $route.meta,
   meta => {
@@ -474,7 +479,7 @@ function clickHandler({ route, url }: AppRouteItem): void {
 import type { GridClient } from "@threefold/grid_client";
 
 import { DashboardRoutes } from "@/router/routes";
-import { AppThemeSelection } from "@/utils/app_theme";
+import { AppThemeSelection, ThemeSettingsInterface } from "@/utils/app_theme";
 
 import AppTheme from "./components/app_theme.vue";
 import DeploymentListManager from "./components/deployment_list_manager.vue";
