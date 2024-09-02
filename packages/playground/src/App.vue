@@ -283,9 +283,9 @@ onMounted(async () => {
     localStorage.setItem(TIMEOUT_DEPLOYMENT_KEY, `${gridStore.client.clientOptions.deploymentTimeoutMinutes}`);
   } else {
     const client = gridStore.client as GridClient;
-    if (client) {
+    if (client && client.clientOptions) {
       client.clientOptions.deploymentTimeoutMinutes = +localStorage.getItem(TIMEOUT_DEPLOYMENT_KEY)! / 60;
-      await client._connect;
+      await client.connect();
     }
   }
 });
