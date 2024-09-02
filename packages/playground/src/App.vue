@@ -255,6 +255,15 @@ onMounted(async () => {
   openProfile.value = true;
 });
 
+/**
+ * Initializes the routes with update information.
+ *
+ * This function is called when the component is mounted.
+ * It iterates over the routes and their items, checking if the item has an update.
+ * If the item has an update, it calculates the next 30 days from the item's timestamp
+ * and sets the hasUpdate property to true if the current time is less than the calculated timestamp.
+ */
+
 onMounted(() => {
   const next30DaysInMs = 30 * 24 * 60 * 60 * 1000;
   routes.map(route => {
