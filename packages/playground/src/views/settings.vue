@@ -35,6 +35,7 @@
               v-bind="{ ...passwordInputProps, ...validationProps }"
               autocomplete="off"
               class="pa-3"
+              hide-details="auto"
             />
           </InputValidator>
         </PasswordInputWrapper>
@@ -56,6 +57,7 @@
               v-bind="{ ...passwordInputProps, ...validationProps }"
               autocomplete="off"
               class="pa-3"
+              hide-details="auto"
             />
           </InputValidator>
         </PasswordInputWrapper>
@@ -76,6 +78,7 @@
               }"
               autocomplete="off"
               class="pa-3"
+              hide-details="auto"
             />
           </InputValidator>
         </PasswordInputWrapper>
@@ -116,6 +119,7 @@
             v-bind="props"
             type="number"
             v-model="selectedQueryTimeout"
+            hide-details="auto"
           ></v-text-field>
         </input-validator>
 
@@ -144,6 +148,7 @@
             v-bind="props"
             type="number"
             v-model="selectedDeploymentTimeout"
+            hide-details="auto"
           ></v-text-field>
         </input-validator>
         <v-card-actions class="justify-end mb-3 mx-3">
