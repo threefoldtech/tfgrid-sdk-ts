@@ -1,15 +1,7 @@
 import axios from "axios";
 import { setTimeout } from "timers/promises";
 
-import {
-  FilterOptions,
-  GatewayDeploymentData,
-  GatewayNameModel,
-  generateString,
-  GridClient,
-  MachinesModel,
-  randomChoice,
-} from "../../src";
+import { FilterOptions, GatewayNameModel, generateString, GridClient, MachinesModel, randomChoice } from "../../src";
 import { config, getClient } from "../client_loader";
 import { generateInt, getOnlineNode, log, splitIP } from "../utils";
 
@@ -30,26 +22,40 @@ async function waitForGateway(domain: string) {
   for (let i = 0; i < 30; i++) {
     try {
       await axios.get(domain);
-      log("gateway is reachable");
       return true;
     } catch (error) {
-      log("gateway is not reachable");
+      await setTimeout(5000, "Waiting for gateway to be ready");
     }
-
-    const wait = await setTimeout(5000, "Waiting for gateway to be ready");
-    log(wait);
   }
   return false;
 }
 
-async function gatewayAsseration(gatewayResult: GatewayDeploymentData[]) {
+async function testGateway(gateway: GatewayNameModel, name: string) {
+  const gatewayRes = await gridClient.gateway.deploy_name(gateway);
+  log(gatewayRes);
+
+  //Contracts Assertions
+  expect(gatewayRes.contracts.created).toHaveLength(1);
+  expect(gatewayRes.contracts.updated).toHaveLength(0);
+  expect(gatewayRes.contracts.deleted).toHaveLength(0);
+  expect(gatewayRes.contracts.created[0].contractType.nodeContract.nodeId).toBe(gateway.node_id);
+
+  const gatewayResult = await gridClient.gateway.getObj(gateway.name);
+  log(gatewayResult);
+
+  //Gateway Assertions
+  expect(gatewayResult[0].name).toBe(gateway.name);
+  expect(gatewayResult[0].status).toBe("ok");
+  expect(gatewayResult[0].type).toContain("name");
+  expect(gatewayResult[0].domain).toContain(name);
+  expect(gatewayResult[0].tls_passthrough).toBe(gateway.tls_passthrough);
+  expect(gatewayResult[0].backends).toStrictEqual(gateway.backends);
+
   const domain = "https://" + gatewayResult[0].domain;
 
   if (await waitForGateway(domain)) {
     axios.get(domain).then(res => {
-      log(res.status);
-      log(res.statusText);
-      log(res.data);
+      log(res);
       expect(res.status).toBe(200);
       expect(res.statusText).toBe("OK");
       expect(res.data).toContain("Directory listing for /");
@@ -224,27 +230,7 @@ test("TC1237 - Gateways: Expose a VM Over Gateway", async () => {
     backends: backends,
   };
 
-  let gatewayRes = await gridClient.gateway.deploy_name(gw);
-  log(gatewayRes);
-
-  //Contracts Assertions
-  expect(gatewayRes.contracts.created).toHaveLength(1);
-  expect(gatewayRes.contracts.updated).toHaveLength(0);
-  expect(gatewayRes.contracts.deleted).toHaveLength(0);
-  expect(gatewayRes.contracts.created[0].contractType.nodeContract.nodeId).toBe(gatewayNodeId);
-
-  let gatewayResult = await gridClient.gateway.getObj(gw.name);
-  log(gatewayResult);
-
-  //Gateway Assertions
-  expect(gatewayResult[0].name).toBe(name + "planetary");
-  expect(gatewayResult[0].status).toBe("ok");
-  expect(gatewayResult[0].type).toContain("name");
-  expect(gatewayResult[0].domain).toContain(name);
-  expect(gatewayResult[0].tls_passthrough).toBe(tlsPassthrough);
-  expect(gatewayResult[0].backends).toStrictEqual(backends);
-
-  gatewayAsseration(gatewayResult);
+  await testGateway(gw, name);
 
   //--------------------Mycelium--------------------
   backends = ["http://[" + result[0].myceliumIP + "]:8000"];
@@ -258,27 +244,7 @@ test("TC1237 - Gateways: Expose a VM Over Gateway", async () => {
     backends: backends,
   };
 
-  gatewayRes = await gridClient.gateway.deploy_name(gw1);
-  log(gatewayRes);
-
-  //Contracts Assertions
-  expect(gatewayRes.contracts.created).toHaveLength(1);
-  expect(gatewayRes.contracts.updated).toHaveLength(0);
-  expect(gatewayRes.contracts.deleted).toHaveLength(0);
-  expect(gatewayRes.contracts.created[0].contractType.nodeContract.nodeId).toBe(gatewayNodeId);
-
-  gatewayResult = await gridClient.gateway.getObj(gw1.name);
-  log(gatewayResult);
-
-  //Gateway Assertions
-  expect(gatewayResult[0].name).toBe(name + "mycelium");
-  expect(gatewayResult[0].status).toBe("ok");
-  expect(gatewayResult[0].type).toContain("name");
-  expect(gatewayResult[0].domain).toContain(name);
-  expect(gatewayResult[0].tls_passthrough).toBe(tlsPassthrough);
-  expect(gatewayResult[0].backends).toStrictEqual(backends);
-
-  gatewayAsseration(gatewayResult);
+  await testGateway(gw1, name);
 
   //--------------------IPv6--------------------
   backends = ["http://[" + result[0].publicIP["ip6"].split("/")[0] + "]:8000"];
@@ -292,27 +258,7 @@ test("TC1237 - Gateways: Expose a VM Over Gateway", async () => {
     backends: backends,
   };
 
-  gatewayRes = await gridClient.gateway.deploy_name(gw2);
-  log(gatewayRes);
-
-  //Contracts Assertions
-  expect(gatewayRes.contracts.created).toHaveLength(1);
-  expect(gatewayRes.contracts.updated).toHaveLength(0);
-  expect(gatewayRes.contracts.deleted).toHaveLength(0);
-  expect(gatewayRes.contracts.created[0].contractType.nodeContract.nodeId).toBe(gatewayNodeId);
-
-  gatewayResult = await gridClient.gateway.getObj(gw2.name);
-  log(gatewayResult);
-
-  //Gateway Assertions
-  expect(gatewayResult[0].name).toBe(name + "ipv6");
-  expect(gatewayResult[0].status).toBe("ok");
-  expect(gatewayResult[0].type).toContain("name");
-  expect(gatewayResult[0].domain).toContain(name);
-  expect(gatewayResult[0].tls_passthrough).toBe(tlsPassthrough);
-  expect(gatewayResult[0].backends).toStrictEqual(backends);
-
-  gatewayAsseration(gatewayResult);
+  await testGateway(gw2, name);
 
   //--------------------IPv4--------------------
   backends = ["http://" + result[0].publicIP["ip"].split("/")[0] + ":8000"];
@@ -326,27 +272,7 @@ test("TC1237 - Gateways: Expose a VM Over Gateway", async () => {
     backends: backends,
   };
 
-  gatewayRes = await gridClient.gateway.deploy_name(gw3);
-  log(gatewayRes);
-
-  //Contracts Assertions
-  expect(gatewayRes.contracts.created).toHaveLength(1);
-  expect(gatewayRes.contracts.updated).toHaveLength(0);
-  expect(gatewayRes.contracts.deleted).toHaveLength(0);
-  expect(gatewayRes.contracts.created[0].contractType.nodeContract.nodeId).toBe(gatewayNodeId);
-
-  gatewayResult = await gridClient.gateway.getObj(gw3.name);
-  log(gatewayResult);
-
-  //Gateway Assertions
-  expect(gatewayResult[0].name).toBe(name + "ipv4");
-  expect(gatewayResult[0].status).toBe("ok");
-  expect(gatewayResult[0].type).toContain("name");
-  expect(gatewayResult[0].domain).toContain(name);
-  expect(gatewayResult[0].tls_passthrough).toBe(tlsPassthrough);
-  expect(gatewayResult[0].backends).toStrictEqual(backends);
-
-  gatewayAsseration(gatewayResult);
+  await testGateway(gw3, name);
 
   //--------------------Wireguard--------------------
   const IP = result[0].interfaces[0].ip;
@@ -377,27 +303,7 @@ test("TC1237 - Gateways: Expose a VM Over Gateway", async () => {
     await gridClient.networks.addNode(data);
   }
 
-  gatewayRes = await gridClient.gateway.deploy_name(gw4);
-  log(gatewayRes);
-
-  //Contracts Assertions
-  expect(gatewayRes.contracts.created).toHaveLength(1);
-  expect(gatewayRes.contracts.updated).toHaveLength(0);
-  expect(gatewayRes.contracts.deleted).toHaveLength(0);
-  expect(gatewayRes.contracts.created[0].contractType.nodeContract.nodeId).toBe(gatewayNodeId);
-
-  gatewayResult = await gridClient.gateway.getObj(gw4.name);
-  log(gatewayResult);
-
-  //Gateway Assertions
-  expect(gatewayResult[0].name).toBe(name + "wireguard");
-  expect(gatewayResult[0].status).toBe("ok");
-  expect(gatewayResult[0].type).toContain("name");
-  expect(gatewayResult[0].domain).toContain(name);
-  expect(gatewayResult[0].tls_passthrough).toBe(tlsPassthrough);
-  expect(gatewayResult[0].backends).toStrictEqual(backends);
-
-  gatewayAsseration(gatewayResult);
+  await testGateway(gw4, name);
 });
 
 afterAll(async () => {
