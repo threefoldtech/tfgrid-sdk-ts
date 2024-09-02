@@ -129,7 +129,7 @@
                             validateMnemonic(v) ||
                             ((v.length === 64 || v.length === 66) && isAddress(v.length === 66 ? v : `0x${v}`))
                           ) {
-                            hasTwinId();
+                            getEmail();
                             return;
                           }
                           email = '';
@@ -900,14 +900,11 @@ watch(openAcceptTerms, async () => {
 
 async function getEmail() {
   loadEmail.value = true;
-  const grid = await getGrid({ mnemonic: mnemonic.value, keypairType: keypairType.value });
-  email.value = await readEmail(grid!);
-  loadEmail.value = false;
-}
-async function hasTwinId() {
   try {
-    await getGrid({ mnemonic: mnemonic.value, keypairType: keypairType.value });
-    await getEmail();
+    const grid = await getGrid({ mnemonic: mnemonic.value, keypairType: keypairType.value });
+    if (grid) {
+      email.value = await readEmail(grid);
+    }
   } catch (e) {
     if (e instanceof TwinNotExistError) {
       isNonActiveMnemonic.value = true;
@@ -916,6 +913,8 @@ async function hasTwinId() {
         message: normalizeError(e, "Something went wrong. please try again."),
       };
     }
+  } finally {
+    loadEmail.value = false;
   }
 }
 </script>
