@@ -173,4 +173,4 @@ gridClient.disconnect();
 ## Related Documentations
 
 - [Contribution Guide](./docs/contribution.md)
-- [Grid Client documentation](https://manual.grid.tf/javascript/grid3_javascript_readme.html)
+- [Grid Client documentation](https://manual.grid.tf/documentation/developers/javascript/grid3_javascript_readme.html)

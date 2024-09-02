@@ -1,7 +1,7 @@
 import { Client, QueryClient } from "./client";
 import { TFChainError } from "./errors";
 import { ExtrinsicResult, PublicIp } from "./types";
-import { checkConnection } from "./utils";
+import { checkConnection, requireCouncil } from "./utils";
 
 const TWO_WEEKS = 1209600000;
 
@@ -411,6 +411,7 @@ class Contracts extends QueryContracts {
    * * or `undefined` if the contract does not exist.
    */
   @checkConnection
+  @requireCouncil
   async cancelCollective(options: CancelOptions) {
     const contract = await this.get(options);
     if (!contract) {

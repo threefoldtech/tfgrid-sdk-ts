@@ -143,6 +143,7 @@
 
 <script lang="ts">
 import type { FarmInfo, FilterOptions, NodeInfo } from "@threefold/grid_client";
+import type { Farm } from "@threefold/gridproxy_client";
 import { RequestError } from "@threefold/types";
 import type AwaitLock from "await-lock";
 import equals from "lodash/fp/equals.js";
@@ -185,6 +186,8 @@ export default {
       required: true,
     },
     nodesLock: Object as PropType<AwaitLock>,
+    loadFarm: { type: Function as PropType<(farmId: number) => Promise<Farm | undefined>>, required: true },
+    getFarm: { type: Function as PropType<(farmId: number) => Farm | undefined>, required: true },
   },
   emits: {
     "update:model-value": (node?: NodeInfo) => true || node,
@@ -195,7 +198,9 @@ export default {
     const _loadedNodes = ref<NodeInfo[]>([]);
     const loadedNodes = computed(() => {
       return _loadedNodes.value.filter(
-        node => node.nodeId === props.modelValue?.nodeId || isNodeValid(node, props.selectedMachines, filters.value),
+        node =>
+          node.nodeId === props.modelValue?.nodeId ||
+          isNodeValid(props.getFarm, node, props.selectedMachines, filters.value),
       );
     });
     const nodesTask = useAsync(loadValidNodes, {
@@ -215,8 +220,16 @@ export default {
     });
 
     async function _setValidNode(oldNodeId?: number) {
-      const node = await selectValidNode(_loadedNodes.value, props.selectedMachines, filters.value, oldNodeId);
+      const node = await selectValidNode(
+        props.getFarm,
+        _loadedNodes.value,
+        props.selectedMachines,
+        filters.value,
+        oldNodeId,
+      );
+
       if (node) {
+        await props.loadFarm(node.farmId);
         bindModelValue(node);
         nodeInputValidateTask.value.run(node);
       } else {
@@ -296,6 +309,11 @@ export default {
         }
         const nodeCapacityValid = await checkNodeCapacityPool(gridStore, node, props.filters);
         const rentContractValid = props.filters.dedicated ? await validateRentContract(gridStore, node) : true;
+
+        if (node && !isNodeValid(props.getFarm, node!, props.selectedMachines, filters.value)) {
+          throw `Node (${node.nodeId}) is not valid.`;
+        }
+
         return nodeCapacityValid && rentContractValid;
       },
       {

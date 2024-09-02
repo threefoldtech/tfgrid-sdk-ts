@@ -77,6 +77,12 @@
       :loading="loading"
       :deleting="deleting"
       :model-value="$props.modelValue"
+      :items-per-page-options="[
+        { value: 5, title: '5' },
+        { value: 10, title: '10' },
+        { value: 20, title: '20' },
+        { value: 50, title: '50' },
+      ]"
       @update:model-value="$emit('update:model-value', $event)"
       @click:row="$attrs['onClick:row']"
       :sort-by="sortBy"
@@ -149,7 +155,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, ref } from "vue";
+import { capitalize, computed, onMounted, ref } from "vue";
 
 import { getNodeHealthColor, NodeHealth } from "@/utils/get_nodes";
 
@@ -184,7 +190,28 @@ const failedDeployments = ref<
 
 onMounted(loadDeployments);
 
+async function loadDomains() {
+  try {
+    loading.value = true;
+    const grid = await getGrid(profileManager.profile!, props.projectName.toLowerCase());
+    const gateways = await grid!.gateway.list();
+    const gws = await Promise.all(gateways.map(name => grid!.gateway.get_name({ name })));
+    items.value = gws.map(gw => {
+      (gw as any).name = gw[0].workloads[0].name;
+      return gw;
+    });
+  } catch (e) {
+    errorMessage.value = `Failed to load Deployments: ${e}`;
+  } finally {
+    loading.value = false;
+  }
+}
+
 async function loadDeployments() {
+  if (props.projectName.toLowerCase() === ProjectName.Domains.toLowerCase()) {
+    return loadDomains();
+  }
+
   const migrateGateways = props.projectName.toLowerCase() !== "fullvm" && props.projectName.toLowerCase() !== "vm";
 
   items.value = [];
@@ -239,6 +266,43 @@ async function loadDeployments() {
 }
 
 const filteredHeaders = computed(() => {
+  if (props.projectName.toLowerCase() === ProjectName.Domains.toLowerCase()) {
+    return [
+      {
+        title: "Name",
+        key: "domain-name",
+        value(item: any) {
+          const [workload] = item[0].workloads;
+          return workload.data.name || workload.name;
+        },
+      },
+      {
+        title: "Backends",
+        key: "0.workloads.0.data.backends",
+        value(item: any) {
+          return item[0].workloads[0].data.backends.join(", ");
+        },
+      },
+      {
+        title: "Domain",
+        key: "fqdn",
+        value(item: any) {
+          const [workload] = item[0].workloads;
+          return workload.result.data.fqdn || workload.data.fqdn;
+        },
+      },
+      {
+        title: "Health",
+        key: "health",
+        value(item: any) {
+          return capitalize(item[0].workloads[0].result.state);
+        },
+        sortable: false,
+      },
+      { title: "Actions", key: "actions", sortable: false },
+    ];
+  }
+
   let headers = [
     { title: "PLACEHOLDER", key: "data-table-select" },
     { title: "Name", key: "name" },
@@ -278,6 +342,7 @@ const filteredHeaders = computed(() => {
     ProjectName.Algorand,
     ProjectName.Subsquid,
     ProjectName.Peertube,
+    ProjectName.Jenkins,
   ] as string[];
 
   const IPV4Solutions = [
@@ -300,6 +365,8 @@ const filteredHeaders = computed(() => {
     ProjectName.Algorand,
     ProjectName.Subsquid,
     ProjectName.Peertube,
+    ProjectName.Jenkins,
+    ProjectName.Caprover,
   ] as string[];
 
   const WireguardSolutions = [ProjectName.VM, ProjectName.Fullvm, ProjectName.Umbrel, ProjectName.TFRobot] as string[];

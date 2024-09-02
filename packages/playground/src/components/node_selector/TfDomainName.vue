@@ -11,7 +11,7 @@
     <div ref="input">
       <VForm v-model="domainNameValid">
         <VExpandTransition>
-          <input-tooltip tooltip="Domain Name that will points to this instance" v-if="enableCustomDomain">
+          <input-tooltip tooltip="Domain Name that will point to this instance" v-if="enableCustomDomain">
             <VTextField
               ref="customDomainInput"
               label="Custom Domain"

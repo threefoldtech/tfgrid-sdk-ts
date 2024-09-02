@@ -53,6 +53,7 @@
 
 <script lang="ts">
 import type { NodeInfo } from "@threefold/grid_client";
+import type { Farm } from "@threefold/gridproxy_client";
 import type AwaitLock from "await-lock";
 import isInt from "validator/lib/isInt";
 import { onUnmounted, type PropType, ref, watch } from "vue";
@@ -85,6 +86,8 @@ export default {
       required: true,
     },
     nodesLock: Object as PropType<AwaitLock>,
+    loadFarm: { type: Function as PropType<(farmId: number) => Promise<Farm | undefined>>, required: true },
+    getFarm: { type: Function as PropType<(farmId: number) => Farm | undefined>, required: true },
   },
   emits: {
     "update:model-value": (node?: NodeInfo) => true || node,
@@ -194,6 +197,17 @@ export default {
 
         await validateRentContract(gridStore, node);
         await checkNodeCapacityPool(gridStore, node, props.filters);
+
+        if (props.filters.ipv4) {
+          const ipsCount = props.selectedMachines.filter(m => m.publicIp && m.farmId === node.farmId).length + 1;
+          if (ipsCount > 1) {
+            const farm = await props.loadFarm(node.farmId);
+
+            if (farm && farm.publicIps.filter(ip => ip.contract_id === 0).length < ipsCount) {
+              throw `Farm ${node.farmId} which has node ${nodeId} doesn't have enough public ips`;
+            }
+          }
+        }
 
         bindModelValue(node);
         placeholderNode.value = undefined;

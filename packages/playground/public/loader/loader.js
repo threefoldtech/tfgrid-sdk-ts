@@ -10,6 +10,12 @@ const msgElement = document.querySelector(".app-loader-msg");
 /** @type { HTMLButtonElement} */
 const refreshBtn = document.querySelector(".app-loader-refresh");
 
+/** @type { HTMLDivElement } */
+const monitor = document.querySelector(".app-monitor-container");
+
+/** @type { HTMLUListElement} */
+const monitorList = document.querySelector(".app-monitor-status");
+
 const slowConnectionTime = 60 * 1000;
 const noConnectionTime = 120 * 1000;
 const appLoaderContainerTime = 0.3 * 1000;
@@ -41,20 +47,46 @@ refreshBtn &&
   );
 
 window.$$appLoader = () => {
-  refreshBtn && refreshBtn.classList.remove("active");
-  t1 && clearTimeout(t1);
-  t2 && clearTimeout(t2);
+  return new Promise(res => {
+    refreshBtn && refreshBtn.classList.remove("active");
+    t1 && clearTimeout(t1);
+    t2 && clearTimeout(t2);
 
-  refreshBtn && refreshBtn.classList.remove("active");
-  loader && loader.classList.remove("active");
-  if (msgElement) {
-    msgElement.textContent = "Dashboard loaded. Welcome!";
+    loader && loader.classList.remove("active");
+    if (msgElement) {
+      msgElement.textContent = "Dashboard loaded. Welcome!";
+    }
+
+    setTimeout(() => {
+      if (appLoaderContainer) {
+        appLoaderContainer.classList.remove("active");
+        setTimeout(() => {
+          appLoaderContainer.remove();
+          res();
+        }, appLoaderContainerTime);
+      }
+    }, welcomeMsgTime);
+  });
+};
+window.$$showMonitorError = urls => {
+  if (msgElement) msgElement.classList.remove("active");
+
+  if (monitor) monitor.classList.add("active");
+
+  const monitorMsgElement = document.querySelector(".app-monitor-msg");
+  if (monitorMsgElement) {
+    monitorMsgElement.classList.add("active");
+    monitorMsgElement.textContent = "Can't reach some services on provided stacks, Please try again";
   }
 
-  setTimeout(() => {
-    if (appLoaderContainer) {
-      appLoaderContainer.classList.remove("active");
-      setTimeout(() => appLoaderContainer.remove(), appLoaderContainerTime);
-    }
-  }, welcomeMsgTime);
+  if (monitorList) {
+    monitorList.innerHTML = Object.entries(urls).map(createElement).join(" ");
+  }
+  refreshBtn && refreshBtn.classList.add("active");
 };
+
+function createElement([serviceName, serviceStatus]) {
+  return `<li><div style="display:flex"><p class="service-name">${serviceName}</p> <p class="service-status service-${
+    serviceStatus !== null ? "reachable" : "unreachable"
+  }">${serviceStatus !== null ? "&#10003;" : "&#10007;"}</p></div></li>`;
+}
