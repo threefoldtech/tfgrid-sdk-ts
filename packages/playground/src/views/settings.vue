@@ -179,7 +179,7 @@ export default {
   setup() {
     const theme = useTheme();
 
-    const themes = [ThemeInterface.Dark, ThemeInterface.Light, ThemeInterface.System];
+    const themes: string[] = [ThemeInterface.Dark, ThemeInterface.Light, ThemeInterface.System];
 
     const currentTheme = ref(localStorage.getItem(LocalStorageSettingsKey.THEME_KEY));
     const selectedTheme = ref(localStorage.getItem(LocalStorageSettingsKey.THEME_KEY));
