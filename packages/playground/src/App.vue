@@ -141,7 +141,7 @@
                   ? baseUrl + 'images/logoTF_dark.png'
                   : baseUrl + 'images/logoTF_light.png'
               }`"
-              :width="openSidebar ? '160px' : '105px'"
+              :width="openSidebar ? '140px' : '120px'"
               @click="navigateToHome"
               class="clickable-logo"
             />
