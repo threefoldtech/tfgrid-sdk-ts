@@ -250,8 +250,12 @@ function navigateToHome() {
   return $router.push(DashboardRoutes.Other.HomePage);
 }
 
+onMounted(async () => {
+  await (window.$$appLoader || noop)();
+  openProfile.value = true;
+});
+
 onMounted(() => {
-  window.$$appLoader || noop();
   routes.map(route => {
     route.items.map(item => {
       const next30DaysInMs = 30 * 24 * 60 * 60 * 1000;
