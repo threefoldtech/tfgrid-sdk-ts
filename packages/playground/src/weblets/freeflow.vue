@@ -53,6 +53,7 @@
         v-model:planetary="planetary"
         v-model:mycelium="mycelium"
         v-model:wireguard="wireguard"
+        :has-custom-domain="selectionDetails?.domain?.enabledCustomDomain"
         require-domain
       />
 
@@ -76,6 +77,7 @@
           rootFilesystemSize,
           ssdDisks: disks.map(d => d.size),
         }"
+        :has-custom-domain="selectionDetails?.domain?.enabledCustomDomain"
         require-domain
         v-model="selectionDetails"
       />

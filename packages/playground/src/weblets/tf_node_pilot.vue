@@ -41,6 +41,7 @@
         v-model:planetary="planetary"
         v-model:mycelium="mycelium"
         v-model:wireguard="wireguard"
+        :has-custom-domain="selectionDetails?.domain?.enabledCustomDomain"
         require-domain
       />
 
@@ -63,6 +64,7 @@
           rootFilesystemSize,
         }"
         v-model="selectionDetails"
+        :has-custom-domain="selectionDetails?.domain?.enabledCustomDomain"
         require-domain
       />
 

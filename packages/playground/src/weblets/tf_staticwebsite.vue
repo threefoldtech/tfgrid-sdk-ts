@@ -67,6 +67,7 @@
         v-model:planetary="planetary"
         v-model:ipv6="ipv6"
         v-model:wireguard="wireguard"
+        :has-custom-domain="selectionDetails?.domain?.enabledCustomDomain"
         require-domain
       />
 
@@ -93,6 +94,7 @@
           memory: solution?.memory,
           rootFilesystemSize,
         }"
+        :has-custom-domain="selectionDetails?.domain?.enabledCustomDomain"
         require-domain
         v-model="selectionDetails"
       />

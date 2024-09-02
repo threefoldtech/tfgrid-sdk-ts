@@ -99,6 +99,7 @@ export default {
     mycelium: { type: Boolean, default: () => null },
     wireguard: { type: Boolean, default: () => null },
     requireDomain: { type: Boolean, default: () => false },
+    hasCustomDomain: { type: Boolean, default: () => false },
     disabled: Boolean,
   },
   setup(props, { attrs }) {
@@ -140,13 +141,17 @@ export default {
       form?.updateStatus(uid.toString(), fakeService.status);
     });
 
+    const readonlyWireguard = computed(() => {
+      if (!props.requireDomain) return false;
+      return !(props.hasCustomDomain && props.ipv4);
+    });
+
     const wireguardTooltip = computed(() =>
-      props.requireDomain
+      readonlyWireguard.value
         ? "Enabling WireGuard Access allows you to establish private, secure, and encrypted instance connections. Please note that this field will be read-only unless you use a custom domain with IPV4."
         : "Enabling WireGuard Access allows you to establish private, secure, and encrypted instance connections.",
     );
 
-    const readonlyWireguard = computed(() => props.requireDomain && !props.ipv4);
     watch(
       readonlyWireguard,
       readonly => {

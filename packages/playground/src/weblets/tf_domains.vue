@@ -23,7 +23,13 @@
         </input-tooltip>
 
         <div :style="{ marginTop: '-10px' }">
-          <TfSelectionDetails disable-node-selection require-domain use-fqdn v-model="selectionDetails" />
+          <TfSelectionDetails
+            disable-node-selection
+            :has-custom-domain="selectionDetails?.domain?.enabledCustomDomain"
+            require-domain
+            use-fqdn
+            v-model="selectionDetails"
+          />
         </div>
 
         <input-tooltip tooltip="The port used to access the machine.">
