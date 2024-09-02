@@ -636,6 +636,30 @@ export function isSlug(msg: string) {
     }
   };
 }
+export function validateCurrentPassword(msg: string) {
+  return (value: string) => {
+    if (sessionStorage.getItem("password") != value) {
+      return { message: msg };
+    }
+  };
+}
+/**
+ * Checks that new password isn't the same as the current one.
+ */
+export function validateNewPassword(msg: string, currentPassword: string) {
+  return (value: string) => {
+    if (value === currentPassword) {
+      return { message: msg };
+    }
+  };
+}
+export function validateConfirmPassword(msg: string, newPassword: string) {
+  return (value: string) => {
+    if (value !== newPassword) {
+      return { message: msg };
+    }
+  };
+}
 
 export type IsStrongPassword = validator.StrongPasswordOptions & {
   returnScore?: false;

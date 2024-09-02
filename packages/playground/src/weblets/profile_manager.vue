@@ -305,7 +305,10 @@
               <PasswordInputWrapper #="{ props: confirmPasswordInputProps }" v-if="activeTab === 1">
                 <InputValidator
                   :value="confirmPassword"
-                  :rules="[validators.required('A confirmation password is required.'), validateConfirmPassword]"
+                  :rules="[
+                    validators.required('A confirmation password is required.'),
+                    validators.validateConfirmPassword('Passwords should match.', password),
+                  ]"
                   #="{ props: validationProps }"
                   ref="confirmPasswordInput"
                 >
@@ -584,10 +587,8 @@ const shouldActivateAccount = computed(() => {
   if (!mnemonic.value) return false;
   return isNonActiveMnemonic.value;
 });
-
-const isValidConnectConfirmationPassword = computed(() =>
-  !validateConfirmPassword(confirmPassword.value) ? false : true,
-);
+const confirmPasswordInput = useInputRef();
+const isValidConnectConfirmationPassword = computed(() => confirmPasswordInput.value?.validate());
 const profileManagerController = useProfileManagerController();
 
 const balance = profileManagerController.balance;
@@ -599,7 +600,6 @@ const activeTab = ref(0);
 const password = ref("");
 const confirmPassword = ref("");
 const passwordInput = ref() as Ref<{ validate(value: string): Promise<boolean> }>;
-const confirmPasswordInput = useInputRef();
 
 const version = 1;
 const WALLET_KEY = "wallet.v" + version;
@@ -816,12 +816,6 @@ function validatePassword(value: string) {
     if (getCredentials().passwordHash !== md5(password.value)) {
       return { message: "We couldn't find a matching wallet for this password. Please connect your wallet first." };
     }
-  }
-}
-
-function validateConfirmPassword(value: string) {
-  if (value !== password.value) {
-    return { message: "Passwords should match." };
   }
 }
 

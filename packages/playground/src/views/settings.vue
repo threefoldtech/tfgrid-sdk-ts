@@ -25,7 +25,7 @@
             :rules="[
               validators.required('Password is required.'),
               validators.minLength('Password must be at least 6 characters.', 6),
-              validateCurrentPassword,
+              validators.validateCurrentPassword('Incorrect Password.'),
             ]"
             #="{ props: validationProps }"
           >
@@ -47,7 +47,10 @@
             :rules="[
               validators.required('Password is required.'),
               validators.minLength('Password must be at least 6 characters.', 6),
-              validateNewPassword,
+              validators.validateNewPassword(
+                'New password cannot be the same as current password. Please enter a different password.',
+                currentPassword,
+              ),
             ]"
             #="{ props: validationProps }"
           >
@@ -65,7 +68,10 @@
           <InputValidator
             default-value=""
             v-model:value="confirmPassword"
-            :rules="[validators.required('A confirmation password is required.'), validateConfirmPassword]"
+            :rules="[
+              validators.required('A confirmation password is required.'),
+              validators.validateConfirmPassword('Passwords should match.', newPassword),
+            ]"
             #="{ props: validationProps }"
             ref="confirmPasswordInput"
           >
@@ -162,7 +168,7 @@
 </template>
 <script lang="ts">
 import type { GridClient } from "@threefold/grid_client";
-import { onMounted, ref, watch } from "vue";
+import { nextTick, onMounted, ref, watch } from "vue";
 import { useTheme } from "vuetify";
 
 import { useFormRef } from "@/hooks/form_validator";
@@ -191,7 +197,8 @@ export default {
     const selectedQueryTimeout = ref(0);
     const gridStore = useGrid();
     const confirmPasswordInput = useInputRef();
-    watch(newPassword, () => {
+    watch(newPassword, async () => {
+      await nextTick();
       confirmPasswordInput.value?.validate();
     });
 
@@ -241,24 +248,6 @@ export default {
       }
 
       localStorage.setItem(LocalStorageSettingsKey.THEME_KEY, currentTheme.value!);
-    }
-    function validateCurrentPassword() {
-      if (sessionStorage.getItem("password") != currentPassword.value) {
-        return { message: "Incorrect Password." };
-      }
-    }
-    /**
-     * Checks that new password isn't the same as the current one.
-     */
-    function validateNewPassword() {
-      if (newPassword.value === currentPassword.value) {
-        return { message: "New password cannot be the same as current password. Please enter a different password." };
-      }
-    }
-    function validateConfirmPassword(value: string) {
-      if (value !== newPassword.value) {
-        return { message: "Passwords should match." };
-      }
     }
 
     /** Updates user credentials with the hashes produced by the new password  */
@@ -328,9 +317,6 @@ export default {
       passFormRef,
       UpdatePassword,
       UpdateTimeout,
-      validateCurrentPassword,
-      validateNewPassword,
-      validateConfirmPassword,
       isCurrentTheme,
       isCurrentTimeout,
       confirmPasswordInput,
