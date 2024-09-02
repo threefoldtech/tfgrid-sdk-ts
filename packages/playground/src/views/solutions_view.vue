@@ -31,7 +31,7 @@ export default {
         icon: "nostr.png",
         route: DashboardRoutes.Applications.Nostr,
         isNew: false,
-        createdAt: 0, // Update creation time in milliseconds ex: 1723468996310 is 'Mon Aug 12 2024 16:23:16'
+        createdAt: 1725283777169, // Update creation time in milliseconds ex: 1723468996310 is 'Mon Aug 12 2024 16:23:16'
       },
       {
         title: "Gitea",
@@ -40,7 +40,7 @@ export default {
         icon: "gitea.png",
         route: DashboardRoutes.Applications.Gitea,
         isNew: false,
-        createdAt: 0,
+        createdAt: 1723468996310,
       },
       {
         title: "TFRobot",
@@ -49,7 +49,7 @@ export default {
         icon: "tfrobot.png",
         route: DashboardRoutes.Applications.TFRobot,
         isNew: false,
-        createdAt: 0,
+        createdAt: 1723468996310,
       },
       {
         title: "Jenkins",
@@ -57,6 +57,8 @@ export default {
           "Jenkins is a popular open-source automation server that enables developers to build, test, and deploy their applications continuously.",
         icon: "jenkins.png",
         route: DashboardRoutes.Applications.Jenkins,
+        isNew: false,
+        createdAt: 1723468996310,
       },
       {
         title: "Peertube",
@@ -64,7 +66,7 @@ export default {
         icon: "peertube.png",
         route: DashboardRoutes.Applications.Peertube,
         isNew: false,
-        createdAt: 0,
+        createdAt: 1723468996310,
       },
       {
         title: "Funkwhale",
@@ -73,7 +75,7 @@ export default {
         icon: "funkwhale.png",
         route: DashboardRoutes.Applications.Funkwhale,
         isNew: false,
-        createdAt: 0,
+        createdAt: 1723468996310,
       },
       {
         title: "Mattermost",
@@ -83,7 +85,7 @@ export default {
         route: DashboardRoutes.Applications.Mattermost,
         tags: ["Alpha"],
         isNew: false,
-        createdAt: 0,
+        createdAt: 1723468996310,
       },
       {
         title: "Discourse",
@@ -92,7 +94,7 @@ export default {
         icon: "discourse.png",
         route: DashboardRoutes.Applications.Discourse,
         isNew: false,
-        createdAt: 0,
+        createdAt: 1723468996310,
       },
       {
         title: "Taiga",
@@ -101,7 +103,7 @@ export default {
         icon: "taiga.png",
         route: DashboardRoutes.Applications.Taiga,
         isNew: false,
-        createdAt: 0,
+        createdAt: 1723468996310,
       },
       {
         title: "Static Website",
@@ -110,7 +112,7 @@ export default {
         icon: "static_website.png",
         route: DashboardRoutes.Applications.StaticWebsite,
         isNew: false,
-        createdAt: 0,
+        createdAt: 1723468996310,
       },
       {
         title: "Nextcloud",
@@ -120,7 +122,7 @@ export default {
         route: DashboardRoutes.Applications.Nextcloud,
         tags: ["Community"],
         isNew: false,
-        createdAt: 0,
+        createdAt: 1723468996310,
       },
       {
         title: "Presearch",
@@ -129,7 +131,7 @@ export default {
         icon: "presearch.png",
         route: DashboardRoutes.Applications.Presearch,
         isNew: false,
-        createdAt: 0,
+        createdAt: 1723468996310,
       },
       {
         title: "Subsquid",
@@ -138,7 +140,7 @@ export default {
         icon: "subsquid.png",
         route: DashboardRoutes.Applications.Subsquid,
         isNew: false,
-        createdAt: 0,
+        createdAt: 1723468996310,
       },
       {
         title: "Casperlabs",
@@ -147,7 +149,7 @@ export default {
         icon: "casperlabs.png",
         route: DashboardRoutes.Applications.Casperlabs,
         isNew: false,
-        createdAt: 0,
+        createdAt: 1723468996310,
       },
       {
         title: "Algorand",
@@ -156,7 +158,7 @@ export default {
         icon: "algorand.png",
         route: DashboardRoutes.Applications.Algorand,
         isNew: false,
-        createdAt: 0,
+        createdAt: 1723468996310,
       },
       {
         title: "Node Pilot",
@@ -165,7 +167,7 @@ export default {
         icon: "vm.png",
         route: DashboardRoutes.Applications.Nodepilot,
         isNew: false,
-        createdAt: 0,
+        createdAt: 1723468996310,
       },
       {
         title: "Umbrel",
@@ -174,7 +176,7 @@ export default {
         icon: "umbrel.png",
         route: DashboardRoutes.Applications.Umbrel,
         isNew: false,
-        createdAt: 0,
+        createdAt: 1723468996310,
       },
       {
         title: "Wordpress",
@@ -183,7 +185,7 @@ export default {
         icon: "wordpress.png",
         route: DashboardRoutes.Applications.Wordpress,
         isNew: false,
-        createdAt: 0,
+        createdAt: 1723468996310,
       },
       {
         title: "Domains",
@@ -191,6 +193,8 @@ export default {
           "Domains allow users to securely expose servers hosted on local machines or VMs to the public internet.",
         icon: "domains.png",
         route: DashboardRoutes.Applications.Domains,
+        isNew: false,
+        createdAt: 1723468996310,
       },
     ];
     cards = cards.sort((a, b) => a.title.localeCompare(b.title));

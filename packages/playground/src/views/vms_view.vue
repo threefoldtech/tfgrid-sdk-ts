@@ -26,6 +26,8 @@ export default {
           "Deploy a full virtual machine on Threefold Grid. Full VM allows you to have a complete image with a custom kernel optimized for your own usecase.",
         icon: "vm.png",
         route: DashboardRoutes.VirtualMachines.FullVirtualMachine,
+        isNew: false,
+        createdAt: 1723468996310,
       },
       {
         title: "Micro Virtual Machine",
@@ -33,6 +35,8 @@ export default {
           "Deploy a micro virtual machine on Threefold Grid. We provide few images managed by Threefold like Ubuntu 22.04, and NixOS, but you can still use a custom one.",
         icon: "vm.png",
         route: DashboardRoutes.VirtualMachines.MicroVirtualMachine,
+        isNew: false,
+        createdAt: 1723468996310,
       },
     ];
 

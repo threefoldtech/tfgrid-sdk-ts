@@ -261,7 +261,6 @@ onMounted(() => {
       const next30DaysInMs = 30 * 24 * 60 * 60 * 1000;
       const timestamp = 1724769030739; // Update with the time of creation
       const next30DaysFromNow = timestamp + next30DaysInMs;
-
       if (item.hasUpdate == true) {
         item.hasUpdate = Date.now() < next30DaysFromNow;
       }

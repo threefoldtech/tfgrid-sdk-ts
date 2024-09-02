@@ -21,6 +21,6 @@ export interface ApplicationCard {
   icon: string;
   route: string;
   tags?: string[];
-  isNew?: boolean;
-  createdAt?: number;
+  isNew: boolean;
+  createdAt: number;
 }
