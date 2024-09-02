@@ -256,11 +256,10 @@ onMounted(async () => {
 });
 
 onMounted(() => {
+  const next30DaysInMs = 30 * 24 * 60 * 60 * 1000;
   routes.map(route => {
     route.items.map(item => {
-      const next30DaysInMs = 30 * 24 * 60 * 60 * 1000;
-      const timestamp = 1724769030739; // Update with the time of creation
-      const next30DaysFromNow = timestamp + next30DaysInMs;
+      const next30DaysFromNow = item.timestamp ? item.timestamp + next30DaysInMs : 0;
       if (item.hasUpdate == true) {
         item.hasUpdate = Date.now() < next30DaysFromNow;
       }
@@ -319,12 +318,16 @@ const routes: AppRoute[] = [
         icon: "mdi-television",
         route: DashboardRoutes.Deploy.VirtualMachines,
         tooltip: "Deploy your Virtal Machine instances.",
+        hasUpdate: true,
+        timestamp: 1724769030739,
       },
       {
         title: "Orchestrators",
         icon: "mdi-group",
         route: DashboardRoutes.Deploy.Orchestrators,
         tooltip: "Deploy your orchestrator instances.",
+        hasUpdate: false,
+        timestamp: 1724769030739,
       },
       {
         title: "Applications",
@@ -332,6 +335,7 @@ const routes: AppRoute[] = [
         route: DashboardRoutes.Deploy.Applications,
         tooltip: "Deploy ready applications on the ThreeFold grid.",
         hasUpdate: false, // Change to true and update the timestamp in onMounted hook
+        timestamp: 1724769030739,
       },
       {
         title: "Your Contracts",
@@ -474,6 +478,7 @@ interface AppRouteItem {
   icon?: string;
   tooltip?: string;
   hasUpdate?: boolean;
+  timestamp?: number;
 }
 
 export default {
