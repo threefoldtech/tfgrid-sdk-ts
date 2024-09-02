@@ -220,7 +220,6 @@ const navbarConfig = ref();
 const TIMEOUT_QUERY_KEY = "APP_QUERY_TIMEOUT";
 const TIMEOUT_DEPLOYMENT_KEY = "APP_DEPLOYMENT_TIMEOUT";
 const THEME_KEY = "APP_CURRENT_THEME";
-
 const hasGrid = computed(() => !!gridStore.grid);
 
 // eslint-disable-next-line no-undef
@@ -274,22 +273,37 @@ onMounted(async () => {
 
 onMounted(async () => {
   if (!localStorage.getItem(TIMEOUT_QUERY_KEY)) {
-    localStorage.setItem(TIMEOUT_QUERY_KEY, `${window.env.TIMEOUT}`);
+    localStorage.setItem(TIMEOUT_QUERY_KEY, `${window.env.TIMEOUT / 1000}`);
   } else {
     window.env.TIMEOUT = +localStorage.getItem(TIMEOUT_QUERY_KEY)! * 1000;
   }
-
-  if (!localStorage.getItem(TIMEOUT_DEPLOYMENT_KEY)) {
-    localStorage.setItem(TIMEOUT_DEPLOYMENT_KEY, `${gridStore.client.clientOptions.deploymentTimeoutMinutes}`);
-  } else {
-    const client = gridStore.client as GridClient;
-    if (client && client.clientOptions) {
-      client.clientOptions.deploymentTimeoutMinutes = +localStorage.getItem(TIMEOUT_DEPLOYMENT_KEY)! / 60;
-      await client.connect();
+  const client = gridStore.client as GridClient;
+  if (client) {
+    const clientOptions = client.clientOptions;
+    if (clientOptions) {
+      const deploymentTimeoutMinutes = clientOptions.deploymentTimeoutMinutes;
+      if (deploymentTimeoutMinutes) {
+        if (!localStorage.getItem(TIMEOUT_DEPLOYMENT_KEY) && deploymentTimeoutMinutes) {
+          await nextTick(getDeploymentTimeout);
+        }
+      }
     }
   }
 });
+async function getDeploymentTimeout() {
+  const client = gridStore.client as GridClient;
+  if (!localStorage.getItem(TIMEOUT_DEPLOYMENT_KEY)) {
+    // sets timeout in local storage in seconds
+    localStorage.setItem(TIMEOUT_DEPLOYMENT_KEY, `${+client.clientOptions.deploymentTimeoutMinutes! * 60}`);
+    return;
+  }
 
+  if (client && client.clientOptions) {
+    client.clientOptions.deploymentTimeoutMinutes = +localStorage.getItem(TIMEOUT_DEPLOYMENT_KEY)! / 60;
+
+    await client.connect();
+  }
+}
 // eslint-disable-next-line no-undef
 const version = process.env.VERSION as any;
 
@@ -477,6 +491,7 @@ function clickHandler({ route, url }: AppRouteItem): void {
 
 <script lang="ts">
 import type { GridClient } from "@threefold/grid_client";
+import { nextTick } from "process";
 
 import { DashboardRoutes } from "@/router/routes";
 import { AppThemeSelection, ThemeSettingsInterface } from "@/utils/app_theme";

@@ -197,9 +197,9 @@ export default {
       confirmPasswordInput.value?.validate();
     });
 
-    const deploymentTimeoutdefaultMinutes = gridStore!.client.clientOptions.deploymentTimeoutMinutes;
+    const deploymentTimeoutdefaultMinutes = gridStore?.client.clientOptions.deploymentTimeoutMinutes;
     const selectedDeploymentTimeout = ref(0);
-    const currentDeploymentTimeout = ref(deploymentTimeoutdefaultMinutes! * 60);
+    const currentDeploymentTimeout = ref(0);
 
     const isValidTimeout = ref(false);
     const isValidPassword = ref(false);
@@ -207,8 +207,12 @@ export default {
     onMounted(async () => {
       currentQueryTimeout.value = +localStorage.getItem(TIMEOUT_QUERY_KEY)!;
       selectedQueryTimeout.value = currentQueryTimeout.value;
-
-      currentDeploymentTimeout.value = +localStorage.getItem(TIMEOUT_DEPLOYMENT_KEY)!;
+      if (localStorage.getItem(TIMEOUT_DEPLOYMENT_KEY)) {
+        currentDeploymentTimeout.value = +localStorage.getItem(TIMEOUT_DEPLOYMENT_KEY)!;
+      } else if (deploymentTimeoutdefaultMinutes) {
+        currentDeploymentTimeout.value = deploymentTimeoutdefaultMinutes * 60;
+        localStorage.setItem(TIMEOUT_DEPLOYMENT_KEY, `${deploymentTimeoutdefaultMinutes * 60}`);
+      }
       selectedDeploymentTimeout.value = currentDeploymentTimeout.value;
     });
 
@@ -296,7 +300,7 @@ export default {
           selectedDeploymentTimeout.value = currentDeploymentTimeout.value;
           if (client) {
             client.clientOptions.deploymentTimeoutMinutes = +localStorage.getItem(TIMEOUT_DEPLOYMENT_KEY)! / 60;
-            await client._connect;
+            await client.connect();
           }
         }
 
