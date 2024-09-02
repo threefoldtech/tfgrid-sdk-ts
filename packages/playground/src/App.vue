@@ -238,15 +238,15 @@ function setSidebarOnResize() {
 
 window.addEventListener("resize", setSidebarOnResize);
 const themeMatcher = window.matchMedia("(prefers-color-scheme: dark)");
+// changes theme based on changes in system mode
 themeMatcher.addEventListener("change", updateTheme);
 function updateTheme() {
   if (themeMatcher.matches) {
-    localStorage.setItem(THEME_KEY, "dark");
     theme.global.name.value = "dark";
   } else {
-    localStorage.setItem(THEME_KEY, "light");
     theme.global.name.value = "light";
   }
+  localStorage.setItem(THEME_KEY, "System Mode");
 }
 
 watch(
@@ -262,12 +262,10 @@ function navigateToHome() {
   return $router.push(DashboardRoutes.Other.HomePage);
 }
 
-
 onMounted(async () => {
   await (window.$$appLoader || noop)();
   openProfile.value = true;
 });
-
 
 onMounted(async () => {
   if (!localStorage.getItem(TIMEOUT_QUERY_KEY)) {

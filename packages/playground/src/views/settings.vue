@@ -178,12 +178,7 @@ export default {
     const themes = ["System Mode", "Dark Mode", "Light Mode"];
 
     const currentTheme = ref(localStorage.getItem(THEME_KEY));
-    const selectedTheme = ref(currentTheme.value == "light" ? "Light Mode" : "Dark Mode");
-
-    watch(theme.global.name, () => {
-      currentTheme.value = localStorage.getItem(THEME_KEY);
-      selectedTheme.value = currentTheme.value == "light" ? "Light Mode" : "Dark Mode";
-    });
+    const selectedTheme = ref(localStorage.getItem(THEME_KEY));
 
     const currentPassword = ref("");
     const newPassword = ref("");
@@ -212,33 +207,21 @@ export default {
     });
 
     function isCurrentTheme() {
-      if (selectedTheme.value.split(" ")[0].toLowerCase() == "system") {
-        return (
-          (window.matchMedia("(prefers-color-scheme: dark)").matches && currentTheme.value == "dark") ||
-          (window.matchMedia("(prefers-color-scheme: light)").matches && currentTheme.value == "light")
-        );
-      }
-      if (currentTheme.value) {
-        return selectedTheme.value.split(" ")[0].toLowerCase() == currentTheme.value;
-      }
+      return selectedTheme.value == currentTheme.value;
     }
     function UpdateTheme() {
       if (selectedTheme.value == "System Mode") {
         if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-          localStorage.setItem(THEME_KEY, "dark");
           theme.global.name.value = "dark";
-
-          return;
-        }
-        if (window.matchMedia("(prefers-color-scheme: light)").matches) {
-          localStorage.setItem(THEME_KEY, "light");
+        } else if (window.matchMedia("(prefers-color-scheme: light)").matches) {
           theme.global.name.value = "light";
-
-          return;
         }
+        localStorage.setItem(THEME_KEY, "System Mode");
       }
-      localStorage.setItem(THEME_KEY, selectedTheme.value == "Light Mode" ? "light" : "dark");
-      theme.global.name.value = selectedTheme.value == "Light Mode" ? "light" : "dark";
+      if (selectedTheme.value) {
+        localStorage.setItem(THEME_KEY, selectedTheme.value);
+        theme.global.name.value = selectedTheme.value == "Light Mode" ? "light" : "dark";
+      }
     }
     function validateCurrentPassword() {
       if (sessionStorage.getItem("password") != currentPassword.value) {
