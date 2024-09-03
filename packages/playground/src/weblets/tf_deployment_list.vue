@@ -511,6 +511,11 @@ function openDialog(project: string, item?: any): void {
     : project === ProjectName.Kubernetes
     ? "k8s"
     : (project.toLowerCase() as any);
+
+  if (item && item.projectName.includes(ProjectName.Caprover.toLocaleLowerCase())) {
+    item = [item, ...item.workers];
+  }
+
   layout.value.openDialog(item, deploymentListEnvironments[key]);
 }
 
