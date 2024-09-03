@@ -16,7 +16,7 @@
               :height="200"
               class="pa-3 pt-6"
               v-bind="props"
-              :class="[isHovering ? 'card-opacity' : undefined, card.isNew ? 'ribben' : '']"
+              :class="[isHovering ? 'card-opacity' : undefined, card.hasUpdate && card.releaseDate ? 'ribben' : '']"
             >
               <v-img
                 class="d-inline-block ml-3 mb-2"
@@ -66,10 +66,12 @@ export default defineComponent({
       const today = new Date().toDateString();
       const next30DaysInMs = 30 * 24 * 60 * 60 * 1000;
       filteredCards.value.forEach(card => {
-        const next30DaysFromNow = card.createdAt + next30DaysInMs;
-        const createdAt = new Date(card.createdAt).toDateString();
-        if (createdAt == today) {
-          card.isNew = Date.now() < next30DaysFromNow;
+        if (card.hasUpdate && card.releaseDate) {
+          const next30DaysFromNow = card.releaseDate + next30DaysInMs;
+          const createdAt = new Date(card.releaseDate).toDateString();
+          if (createdAt == today) {
+            card.hasUpdate = card.releaseDate < next30DaysFromNow;
+          }
         }
       });
     });
