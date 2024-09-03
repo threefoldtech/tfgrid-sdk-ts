@@ -327,8 +327,8 @@ const routes: AppRoute[] = [
         icon: "mdi-television",
         route: DashboardRoutes.Deploy.VirtualMachines,
         tooltip: "Deploy your Virtal Machine instances.",
-        hasUpdate: true,
-        timestamp: 1724769030739,
+        hasUpdate: false, // Change to true and update the timestamp in onMounted hook
+        // timestamp: undefined,
       },
       {
         title: "Orchestrators",
@@ -336,7 +336,7 @@ const routes: AppRoute[] = [
         route: DashboardRoutes.Deploy.Orchestrators,
         tooltip: "Deploy your orchestrator instances.",
         hasUpdate: false,
-        timestamp: 1724769030739,
+        // timestamp: undefined,
       },
       {
         title: "Applications",
@@ -344,7 +344,7 @@ const routes: AppRoute[] = [
         route: DashboardRoutes.Deploy.Applications,
         tooltip: "Deploy ready applications on the ThreeFold grid.",
         hasUpdate: false, // Change to true and update the timestamp in onMounted hook
-        timestamp: 1724769030739,
+        // timestamp: undefined,
       },
       {
         title: "Your Contracts",
