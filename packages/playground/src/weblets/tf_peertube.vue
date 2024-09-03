@@ -18,7 +18,7 @@
         :rules="[
           validators.required('Name is required.'),
           validators.IsAlphanumericExpectUnderscore('Name should consist of letters ,numbers and underscores only.'),
-          name => validators.isAlpha('Name must start with alphabet char.')(name[0]),
+          (name: string) => validators.isAlpha('Name must start with an alphabetical character.')(name[0]),
           validators.minLength('Name must be at least 2 characters.', 2),
           validators.maxLength('Name cannot exceed 50 characters.', 50),
         ]"
@@ -62,7 +62,14 @@
       </password-input-wrapper>
 
       <SelectSolutionFlavor v-model="solution" />
-      <Networks v-model:mycelium="mycelium" v-model:planetary="planetary" v-model:ipv6="ipv6" v-model:ipv4="ipv4" />
+      <Networks
+        v-model:mycelium="mycelium"
+        v-model:planetary="planetary"
+        v-model:ipv6="ipv6"
+        v-model:ipv4="ipv4"
+        v-model:wireguard="wireguard"
+        :domain="selectionDetails?.domain"
+      />
 
       <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
         <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
@@ -98,7 +105,7 @@
 
 <script lang="ts" setup>
 import { calculateRootFileSystem, type GridClient } from "@threefold/grid_client";
-import { computed, type Ref, ref } from "vue";
+import { computed, type Ref, ref, watch } from "vue";
 
 import { manual } from "@/utils/manual";
 
@@ -112,6 +119,8 @@ import { generateName, generatePassword } from "../utils/strings";
 
 const layout = useLayout();
 const profileManager = useProfileManager();
+const selectionDetails = ref<SelectionDetails>();
+
 const name = ref(generateName({ prefix: "pt" }));
 const email = ref(profileManager.profile?.email || "");
 const password = ref(generatePassword());
@@ -124,12 +133,12 @@ const dedicated = ref(false);
 const certified = ref(false);
 const ipv4 = ref(false);
 const ipv6 = ref(false);
+const wireguard = ref(false);
 const rootFilesystemSize = computed(() =>
   calculateRootFileSystem({ CPUCores: solution.value?.cpu ?? 0, RAMInMegaBytes: solution.value?.memory ?? 0 }),
 );
-const selectionDetails = ref<SelectionDetails>();
 const mycelium = ref(true);
-const planetary = ref(true);
+const planetary = ref(false);
 const selectedSSHKeys = ref("");
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
@@ -164,7 +173,7 @@ async function deploy() {
     vm = await deployVM(grid!, {
       name: name.value,
       network: {
-        addAccess: selectionDetails.value!.domain!.enableSelectedDomain,
+        addAccess: wireguard.value || selectionDetails.value!.domain!.enableSelectedDomain,
         accessNodeId: selectionDetails.value?.domain?.selectedDomain?.nodeId,
       },
       machines: [

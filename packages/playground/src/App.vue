@@ -275,8 +275,6 @@ function setSidebarOnResize() {
 
 window.addEventListener("resize", setSidebarOnResize);
 
-watch(permanent, () => (toolbarExtended.value = !permanent.value), { immediate: true });
-
 watch(
   () => $route.meta,
   meta => {
@@ -290,7 +288,13 @@ function navigateToHome() {
   return $router.push(DashboardRoutes.Other.HomePage);
 }
 
-onMounted(window.$$appLoader || noop);
+onMounted(async () => {
+  await (window.$$appLoader || noop)();
+  openProfile.value = true;
+  if (!permanent.value) {
+    toolbarExtended.value = true;
+  }
+});
 
 // eslint-disable-next-line no-undef
 const version = process.env.VERSION as any;
