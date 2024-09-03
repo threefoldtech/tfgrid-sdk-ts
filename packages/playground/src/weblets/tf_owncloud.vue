@@ -26,7 +26,7 @@
           :rules="[
             validators.required('Name is required.'),
             validators.IsAlphanumericExpectUnderscore('Name should consist of letters ,numbers and underscores only.'),
-            name => validators.isAlpha('Name must start with alphabet char.')(name[0]),
+            (name: string) => validators.isAlpha('Name must start with an alphabetical character.')(name[0]),
             validators.minLength('Name must be at least 2 characters.', 2),
             validators.maxLength('Name cannot exceed 50 characters.', 50),
           ]"
@@ -42,7 +42,7 @@
           :rules="[
             validators.required('Username is required.'),
             validators.isAlphanumeric('Username should consist of letters and numbers only.'),
-            username => validators.isAlpha('Username must start with alphabet char.')(username[0]),
+            (username: string) => validators.isAlpha('Username must start with alphabet char.')(username[0]),
             validators.minLength('Username must be at least 2 characters.', 2),
             validators.maxLength('Username cannot exceed 15 characters.', 15),
           ]"
@@ -78,7 +78,14 @@
           :medium="{ cpu: 4, memory: 16, disk: 500 }"
           :large="{ cpu: 8, memory: 32, disk: 1000 }"
         />
-        <Networks v-model:ipv4="ipv4" v-model:mycelium="mycelium" v-model:ipv6="ipv6" />
+        <Networks
+          v-model:ipv4="ipv4"
+          v-model:mycelium="mycelium"
+          v-model:ipv6="ipv6"
+          v-model:wireguard="wireguard"
+          v-model:planetary="planetary"
+          :domain="selectionDetails?.domain"
+        />
         <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
           <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
         </input-tooltip>
@@ -150,6 +157,8 @@ const dedicated = ref(false);
 const certified = ref(false);
 const ipv4 = ref(false);
 const ipv6 = ref(false);
+const wireguard = ref(false);
+const planetary = ref(false);
 const mycelium = ref(true);
 const smtp = ref(createSMTPServer());
 const rootFilesystemSize = computed(() =>
@@ -190,7 +199,7 @@ async function deploy() {
       name: name.value,
       network: {
         accessNodeId: selectionDetails.value?.domain?.selectedDomain?.nodeId,
-        addAccess: selectionDetails.value?.domain?.enableSelectedDomain,
+        addAccess: wireguard.value || selectionDetails.value?.domain?.enableSelectedDomain,
       },
       machines: [
         {
@@ -208,7 +217,7 @@ async function deploy() {
           rootFilesystemSize: rootFilesystemSize.value,
           publicIpv4: ipv4.value,
           publicIpv6: ipv6.value,
-          planetary: true,
+          planetary: planetary.value,
           mycelium: mycelium.value,
           envs: [
             { key: "SSH_KEY", value: selectedSSHKeys.value },
@@ -267,6 +276,7 @@ async function deploy() {
 function updateSSHkeyEnv(selectedKeys: string) {
   selectedSSHKeys.value = selectedKeys;
 }
+
 watch(
   () => smtp.value.enabled,
   newValue => {
@@ -275,6 +285,7 @@ watch(
     }
   },
 );
+
 watch(
   () => ipv4.value,
   newValue => {

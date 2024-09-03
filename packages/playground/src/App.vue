@@ -290,7 +290,10 @@ function navigateToHome() {
   return $router.push(DashboardRoutes.Other.HomePage);
 }
 
-onMounted(window.$$appLoader || noop);
+onMounted(async () => {
+  await (window.$$appLoader || noop)();
+  openProfile.value = true;
+});
 
 // eslint-disable-next-line no-undef
 const version = process.env.VERSION as any;
