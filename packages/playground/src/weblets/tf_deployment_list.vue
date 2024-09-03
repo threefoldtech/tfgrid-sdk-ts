@@ -16,7 +16,7 @@
         :projectName="tabs[activeTab].value"
         v-model="selectedItems"
         :deleting="deleting"
-        :hideSsh="hideSsh"
+        :hideSSH="hideSSH"
         ref="table"
         @click:row="clickOpenDialog"
       >
@@ -427,7 +427,7 @@ import { updateGrid } from "../utils/grid";
 const props = defineProps<{
   projectName?: ProjectName;
   title?: string;
-  hideSsh?: boolean;
+  hideSSH?: boolean;
 }>();
 
 const tabs: Tab[] = [
