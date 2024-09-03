@@ -264,6 +264,12 @@ const hasGrid = computed(() => !!gridStore.grid);
 const permanent = ref(window.innerWidth > 980);
 const openSidebar = ref(permanent.value);
 
+watch(permanent, value => {
+  if (value) {
+    toolbarExtended.value = false;
+  }
+});
+
 function setSidebarOnResize() {
   permanent.value =
     window.innerWidth >
