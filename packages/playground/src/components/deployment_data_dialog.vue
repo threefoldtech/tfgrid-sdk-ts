@@ -228,7 +228,7 @@ async function getGrafanaUrl() {
   isLoading.value = false;
 }
 
-onMounted(getGrafanaUrl);
+onMounted(() => getGrafanaUrl());
 
 async function getGPUInfo() {
   loadingCard.value = true;
