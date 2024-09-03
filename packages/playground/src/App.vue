@@ -108,14 +108,14 @@
 
       <v-main :style="{ paddingTop: navbarConfig ? '140px' : '70px' }">
         <v-toolbar
-          :extended="permanent"
+          :extended="toolbarExtended"
           extension-height="auto"
           class="border position-fixed"
           :style="{ zIndex: 1100, top: 0, left: 0, right: 0 }"
           :elevation="permanent ? '1' : '15'"
         >
           <template #extension>
-            <v-card class="w-100 ma-0 pa-0" v-if="openProfileResponsiveDialog">
+            <v-card class="w-100 ma-0 pa-0" v-if="toolbarExtended">
               <div class="pa-1">
                 <div class="d-flex justify-center">
                   <div class="">
@@ -127,10 +127,7 @@
                 <v-divider class="mb-2" />
                 <div class="d-flex justify-center">
                   <div class="">
-                    <ProfileManager
-                      v-model="openProfile"
-                      @update:modelValue="(e: boolean) => openProfileResponsiveDialog = e"
-                    />
+                    <ProfileManager v-model="openProfile" @update:modelValue="(e: boolean) => toolbarExtended = e" />
                   </div>
                 </div>
               </div>
@@ -143,7 +140,7 @@
                   ? baseUrl + 'images/logoTF_dark.png'
                   : baseUrl + 'images/logoTF_light.png'
               }`"
-              :width="openSidebar ? '140px' : '120px'"
+              :width="permanent ? '140px' : '120px'"
               @click="navigateToHome"
               class="clickable-logo"
             />
@@ -170,7 +167,7 @@
               @click="
                 () => {
                   openSidebar = false;
-                  openProfileResponsiveDialog = !openProfileResponsiveDialog;
+                  toolbarExtended = !toolbarExtended;
                 }
               "
               icon="mdi-menu"
@@ -217,7 +214,7 @@
               minHeight: '85%',
               maxHeight: '100%',
             }"
-            @click="() => (openProfileResponsiveDialog = false)"
+            @click="() => (toolbarExtended = false)"
           >
             <div class="d-flex align-center">
               <v-btn
@@ -255,9 +252,8 @@ const $router = useRouter();
 const profileManager = useProfileManager();
 const gridStore = useGrid();
 const network = process.env.NETWORK || (window as any).env.NETWORK;
-
+const toolbarExtended = ref(false);
 const openProfile = ref(true);
-const openProfileResponsiveDialog = ref(false);
 const hasActiveProfile = computed(() => !!profileManager.profile);
 const theme = useTheme();
 const navbarConfig = ref();
@@ -279,7 +275,7 @@ function setSidebarOnResize() {
 
 window.addEventListener("resize", setSidebarOnResize);
 
-watch(permanent, () => (openProfileResponsiveDialog.value = !permanent.value), { immediate: true });
+watch(permanent, () => (toolbarExtended.value = !permanent.value), { immediate: true });
 
 watch(
   () => $route.meta,
