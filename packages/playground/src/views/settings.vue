@@ -198,8 +198,11 @@ export default {
     const gridStore = useGrid();
     const confirmPasswordInput = useInputRef();
     watch(newPassword, async () => {
-      await nextTick();
-      confirmPasswordInput.value?.validate();
+      if (newPassword.value) {
+        await nextTick();
+
+        confirmPasswordInput.value?.validate();
+      }
     });
 
     const deploymentTimeoutdefaultMinutes = gridStore?.client.clientOptions.deploymentTimeoutMinutes;
