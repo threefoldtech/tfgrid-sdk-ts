@@ -18,7 +18,7 @@ import InputValidator from "./components/input_validator.vue";
 import TfSelectCountry from "./components/node_selector/select_location_internals/TfSelectCountry.vue";
 import TfSelectRegion from "./components/node_selector/select_location_internals/TfSelectRegion.vue";
 import PasswordInputWrapper from "./components/password_input_wrapper.vue";
-import TfErrorFormater from "./components/tf_error_formater.vue";
+import TfLogFormatter from "./components/tf_log_formatter.vue";
 import ViewLayout from "./components/view_layout.vue";
 import * as validators from "./utils/validators";
 
@@ -35,7 +35,7 @@ const GLOBAL_COMPONENTS: { [key: string]: Component } = {
   TfSelectionDetails: defineAsyncComponent(() => import("./components/node_selector/TfSelectionDetails.vue")),
   TfSelectRegion,
   TfSelectCountry,
-  TfErrorFormater,
+  TfLogFormatter,
 };
 
 export function defineGlobals(app: App<Element>): void {

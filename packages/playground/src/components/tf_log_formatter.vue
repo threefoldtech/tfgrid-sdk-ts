@@ -1,19 +1,19 @@
 <template>
-  <FormatedError :error="parsedError" />
+  <FormatedLog :msg="parsedMsg" />
 </template>
 
 <script lang="ts">
 import { computed, type PropType, toRef } from "vue";
 
-import FormatedError, { type ErrorToken } from "./formated_error.vue";
+import FormatedLog, { type MsgToken } from "./formated_log.vue";
 
-function parseError(error?: any): ErrorToken[] {
-  const err = error || "";
+function parseMsg(msg?: any): MsgToken[] {
+  const _msg = msg || "";
   const parts: any[] = [];
 
   let open = 0;
   let part = "";
-  for (const char of err) {
+  for (const char of _msg) {
     if (char === "{" || char === "[") {
       if (open === 0 && part.length > 0) {
         parts.push(part);
@@ -41,7 +41,7 @@ function parseError(error?: any): ErrorToken[] {
     parts.push(part);
   }
 
-  const tokens: ErrorToken[] = [];
+  const tokens: MsgToken[] = [];
 
   const idRef = { id: 0 };
   for (const part of parts) {
@@ -57,7 +57,7 @@ function parseError(error?: any): ErrorToken[] {
   return tokens;
 }
 
-function parseObject(idRef: { id: number }, obj: any): ErrorToken {
+function parseObject(idRef: { id: number }, obj: any): MsgToken {
   if (Array.isArray(obj)) {
     return { id: idRef.id++, type: "Array", value: obj.map(x => parseObject(idRef, x)) };
   }
@@ -77,16 +77,16 @@ function parseObject(idRef: { id: number }, obj: any): ErrorToken {
 }
 
 export default {
-  name: "TfErrorFormater",
-  components: { FormatedError },
+  name: "TfLogFormatter",
+  components: { FormatedLog },
   props: {
-    error: { type: String as PropType<string | undefined | null>, required: true },
+    msg: { type: String as PropType<string | undefined | null>, required: true },
   },
   setup(_props) {
     const props = toRef(_props);
-    const parsedError = computed(() => parseError(props.value.error));
+    const parsedMsg = computed(() => parseMsg(props.value.msg));
 
-    return { parsedError };
+    return { parsedMsg };
   },
 };
 </script>

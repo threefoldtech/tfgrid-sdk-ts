@@ -29,7 +29,7 @@
 
         <div ref="msgAlert">
           <v-alert variant="tonal" v-show="profileManager.profile && status" :type="alertType">
-            <tf-error-formater :error="message" />
+            <TfLogFormatter :msg="message" />
           </v-alert>
         </div>
 
