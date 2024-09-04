@@ -365,7 +365,7 @@
             />
 
             <IconActionBtn
-              icon="mdi-cog"
+              icon="mdi-cube-outline"
               :disabled="item.fromAnotherClient"
               tooltip="Manage Workers"
               @click="dialog = item.name"
