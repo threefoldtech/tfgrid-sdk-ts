@@ -474,9 +474,7 @@ const deletingDialog = ref(false);
 const table = ref() as Ref<{ loadDeployments(): void }>;
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
-const hasWorkers = computed(
-  () => selectedItems.value.map(item => item.projectName.includes(ProjectName.Caprover.toLocaleLowerCase())).length > 0,
-);
+const hasWorkers = computed(() => selectedItems.value.map(item => item.workers && item.workers.length).some(i => i));
 
 const _idx = tabs.findIndex(t => t.value === props.projectName);
 const activeTab = ref(!props.projectName ? 0 : _idx) as Ref<number>;
