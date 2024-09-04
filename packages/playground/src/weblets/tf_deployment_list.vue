@@ -26,9 +26,9 @@
             @click="openDialog(tabs[activeTab].value, item)"
           />
 
-          <IconActionBtn icon="mdi-cog" tooltip="Manage Domains" @click="dialog = item.deploymentName" />
+          <IconActionBtn icon="mdi-cog" tooltip="Manage Domains" @click="dialog = item.name" />
 
-          <ManageGatewayDialog v-if="dialog === item.deploymentName" :vm="item" @close="dialog = undefined" />
+          <ManageGatewayDialog v-if="dialog === item.name" :vm="item" @close="dialog = undefined" />
         </template>
 
         <template #VM-actions="{ item }">
@@ -42,10 +42,10 @@
             icon="mdi-cog"
             tooltip="Manage Domains"
             :disabled="item.fromAnotherClient"
-            @click="dialog = item.deploymentName"
+            @click="dialog = item.name"
           />
 
-          <ManageGatewayDialog v-if="dialog === item.deploymentName" :vm="item" @close="dialog = undefined" />
+          <ManageGatewayDialog v-if="dialog === item.name" :vm="item" @close="dialog = undefined" />
         </template>
 
         <template #CapRover-actions="{ item, update }">
@@ -60,10 +60,10 @@
             icon="mdi-view-dashboard"
             :href="'http://captain.' + item.env.CAPROVER_ROOT_DOMAIN"
           />
-          <IconActionBtn icon="mdi-cog" tooltip="Manage Workers" @click="dialog = item.deploymentName" />
+          <IconActionBtn icon="mdi-cog" tooltip="Manage Workers" @click="dialog = item.name" />
 
           <ManageCaproverWorkerDialog
-            v-if="dialog === item.deploymentName"
+            v-if="dialog === item.name"
             :master="item"
             :data="item.workers || []"
             :project-name="item.projectName"
@@ -98,6 +98,15 @@
             color="anchor"
             :href="'https://' + item.env.FUNKWHALE_HOSTNAME"
           />
+        </template>
+
+        <template #Jenkins-actions="{ item }">
+          <IconActionBtn
+            tooltip="Show Details"
+            icon="mdi-eye-outline"
+            @click="openDialog(tabs[activeTab].value, item)"
+          />
+          <IconActionBtn tooltip="Visit" icon="mdi-web" color="anchor" :href="'https://' + item.env.JENKINS_HOSTNAME" />
         </template>
 
         <template #Taiga-actions="{ item }">
@@ -217,6 +226,21 @@
           />
         </template>
 
+        <template #Domains-actions="{ item }">
+          <IconActionBtn
+            tooltip="Show Details"
+            icon="mdi-eye-outline"
+            @click="openDialog(tabs[activeTab].value, item)"
+          />
+
+          <IconActionBtn
+            tooltip="Visit"
+            icon="mdi-web"
+            color="anchor"
+            :href="'https://' + (item[0].workloads[0].result.data.fqdn || item[0].workloads[0].data.fqdn)"
+          />
+        </template>
+
         <template #StaticWebsite-actions="{ item }">
           <IconActionBtn
             tooltip="Show Details"
@@ -249,7 +273,7 @@
             tooltip="Visit"
             icon="mdi-web"
             color="anchor"
-            :href="'http://' + (item.publicIP?.ip ? item.publicIP.ip.slice(0, -3) : '[' + item.planetary + ']')"
+            :href="'https://' + item.env.NODE_PILOT_HOSTNAME"
           />
         </template>
 
@@ -280,6 +304,24 @@
             icon="mdi-eye-outline"
             @click="openDialog(tabs[activeTab].value, item)"
           />
+        </template>
+
+        <template #Gitea-actions="{ item }">
+          <IconActionBtn
+            tooltip="Show Details"
+            icon="mdi-eye-outline"
+            @click="openDialog(tabs[activeTab].value, item)"
+          />
+          <IconActionBtn tooltip="Visit" icon="mdi-web" color="anchor" :href="'https://' + item.env.GITEA__HOSTNAME" />
+        </template>
+
+        <template #Nostr-actions="{ item }">
+          <IconActionBtn
+            tooltip="Show Details"
+            icon="mdi-eye-outline"
+            @click="openDialog(tabs[activeTab].value, item)"
+          />
+          <IconActionBtn tooltip="Visit" icon="mdi-web" color="anchor" :href="'https://' + item.env.NOSTR_HOSTNAME" />
         </template>
 
         <template #Wordpress-actions="{ item }">
@@ -314,14 +356,23 @@
             />
 
             <IconActionBtn
-              icon="mdi-cog"
+              icon="mdi-cube-outline"
               :disabled="item.fromAnotherClient"
               tooltip="Manage Workers"
-              @click="dialog = item.deploymentName"
+              @click="dialog = item.name"
             />
 
+            <IconActionBtn
+              icon="mdi-cog"
+              tooltip="Manage Domains"
+              :disabled="item.fromAnotherClient"
+              @click="dialog = item.masters[0].name"
+            />
+
+            <ManageGatewayDialog v-if="dialog === item.masters[0].name" :k8s="item" @close="dialog = undefined" />
+
             <ManageK8SWorkerDialog
-              v-if="dialog === item.deploymentName"
+              v-if="dialog === item.name"
               :data="item"
               @close="dialog = undefined"
               @update:k8s="item.workers = $event.workers"
@@ -343,14 +394,14 @@
     </template>
   </weblet-layout>
 
-  <v-dialog v-model="deletingDialog" scrollable width="600">
+  <v-dialog v-model="deletingDialog" scrollable width="600" attach="#modals">
     <v-card>
       <v-card-title>
         <strong>Delete the following deployments?</strong>
       </v-card-title>
       <v-card-text>
-        <v-chip class="ma-1" v-for="item in selectedItems" :key="item.deploymentName">
-          {{ item.deploymentName }}
+        <v-chip class="ma-1" v-for="item in selectedItems" :key="item.name">
+          {{ item.name }}
         </v-chip>
         <v-divider />
       </v-card-text>
@@ -369,7 +420,7 @@ import type { Tab } from "../components/dynamic_tabs.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { deploymentListEnvironments } from "../constants/deployment_list";
 import { useGrid } from "../stores";
-import { deleteDeployment } from "../utils/delete_deployment";
+import { deleteDeployment, deleteGatewayDeployment } from "../utils/delete_deployment";
 import { updateGrid } from "../utils/grid";
 
 const props = defineProps<{
@@ -399,6 +450,10 @@ const tabs: Tab[] = [
   { title: "Wordpress", value: "Wordpress", imgPath: "images/icons/wordpress.png" },
   { title: "Static Website", value: "StaticWebsite", imgPath: "images/icons/wordpress.png" },
   { title: "TFRobot", value: "TFRobot", imgPath: "images/icons/tfrobot.png" },
+  { title: "Gitea", value: "Gitea", imgPath: "images/icons/gitea.png" },
+  { title: "Nostr", value: "Nostr", imgPath: "images/icons/nostr.png" },
+  { title: "Jenkins", value: "Jenkins", imgPath: "images/icons/jenkins.png" },
+  { title: "Domains", value: "Domains", imgPath: "images/icons/domains.png" },
 ];
 
 const layout = useLayout();
@@ -420,18 +475,27 @@ async function onDelete(k8s = false) {
   try {
     for (const item of selectedItems.value) {
       try {
-        await deleteDeployment(updateGrid(grid!, { projectName: item.projectName }), {
-          name: item.deploymentName,
-          projectName: item.projectName,
-          k8s,
-        });
+        if (props.projectName?.toLowerCase() === ProjectName.Domains.toLowerCase()) {
+          await deleteGatewayDeployment(
+            updateGrid(grid, { projectName: props.projectName.toLocaleLowerCase() }),
+            item[0].workloads[0].name as string,
+          );
+        } else {
+          await deleteDeployment(updateGrid(grid!, { projectName: item.projectName }), {
+            deploymentName: item.deploymentName,
+            name: k8s ? item.deploymentName : item.name,
+            projectName: item.projectName,
+            ip: item.interfaces?.[0]?.ip,
+            k8s,
+          });
+        }
       } catch (e: any) {
-        createCustomToast(`Failed to delete deployment with name: ${item.deploymentName}`, ToastType.danger);
+        createCustomToast(`Failed to delete deployment with name: ${item.name}`, ToastType.danger);
         console.log("Error while deleting deployment", e.message);
         continue;
       }
-      table.value?.loadDeployments();
     }
+    table.value?.loadDeployments();
   } catch (e) {
     createCustomToast((e as Error).message, ToastType.danger);
   } finally {

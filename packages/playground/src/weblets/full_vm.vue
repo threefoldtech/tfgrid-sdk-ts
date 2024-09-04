@@ -24,11 +24,10 @@
           :value="name"
           :rules="[
             validators.required('Name is required.'),
-            validators.isLowercase('Name should consist of lowercase letters only.'),
-            validators.isAlphanumeric('Name should consist of letters and numbers only.'),
-            name => validators.isAlpha('Name must start with alphabet char.')(name[0]),
+            validators.IsAlphanumericExpectUnderscore('Name should consist of letters ,numbers and underscores only.'),
+            (name: string) => validators.isAlpha('Name must start with an alphabetical character.')(name[0]),
             validators.minLength('Name must be at least 2 characters.', 2),
-            validators.maxLength('Name cannot exceed 15 characters.', 15),
+            validators.maxLength('Name cannot exceed 50 characters.', 50),
           ]"
           #="{ props }"
         >
@@ -103,10 +102,10 @@
             :value="disks[index].name"
             :rules="[
               validators.required('Disk name is required.'),
-              name => validators.isAlpha('Name must start with alphabet char.')(name[0]),
-              validators.minLength('Disk minLength is 2 chars.', 2),
-              validators.isAlphanumeric('Disk name only accepts alphanumeric chars.'),
-              validators.maxLength('Disk maxLength is 15 chars.', 15),
+              (name: string) => validators.isAlpha('Name must start with an alphabetical character.')(name[0]), 
+              validators.minLength('Disk name minimum length is 2 characters.', 2), 
+              validators.isAlphanumeric('Disk name only accepts alphanumeric characters.'),
+              validators.maxLength('Disk name maximum length is 50 characters.', 50),
             ]"
             #="{ props }"
           >
@@ -139,7 +138,7 @@
 </template>
 
 <script lang="ts" setup>
-import { type Ref, ref, watch } from "vue";
+import { computed, type Ref, ref, watch } from "vue";
 
 import { manual } from "@/utils/manual";
 
@@ -159,6 +158,11 @@ const tabs = ref();
 const profileManager = useProfileManager();
 const solution = ref() as Ref<SolutionFlavor>;
 const images: VmImage[] = [
+  {
+    name: "Ubuntu-24.04",
+    flist: "https://hub.grid.tf/tf-official-vms/ubuntu-24.04-full.flist",
+    entryPoint: "",
+  },
   {
     name: "Ubuntu-22.04",
     flist: "https://hub.grid.tf/tf-official-vms/ubuntu-22.04.flist",
@@ -186,7 +190,7 @@ const name = ref(generateName({ prefix: "vm" }));
 const flist = ref<Flist>();
 const ipv4 = ref(false);
 const ipv6 = ref(false);
-const planetary = ref(true);
+const planetary = ref(false);
 const mycelium = ref(true);
 const wireguard = ref(false);
 const dedicated = ref(false);
@@ -194,7 +198,9 @@ const certified = ref(false);
 const disks = ref<Disk[]>([]);
 const network = ref();
 const hasGPU = ref(false);
-const rootFilesystemSize = 2;
+const rootFilesystemSize = computed(() =>
+  flist.value?.name === "Ubuntu-24.04" || flist.value?.name === "Other" ? solution.value?.disk : 2,
+);
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
 
@@ -247,13 +253,16 @@ async function deploy() {
           memory: solution.value.memory,
           flist: flist.value!.value,
           entryPoint: flist.value!.entryPoint,
-          disks: [{ size: solution?.value.disk, mountPoint: "/" }, ...disks.value],
+          disks:
+            flist.value?.name === "Ubuntu-24.04" || flist.value?.name === "Other"
+              ? [...disks.value]
+              : [{ size: solution?.value.disk, mountPoint: "/" }, ...disks.value],
           publicIpv4: ipv4.value,
           publicIpv6: ipv6.value,
           planetary: planetary.value,
           mycelium: mycelium.value,
           envs: [{ key: "SSH_KEY", value: selectedSSHKeys.value }],
-          rootFilesystemSize,
+          rootFilesystemSize: rootFilesystemSize.value,
           hasGPU: hasGPU.value,
           nodeId: selectionDetails.value?.node?.nodeId,
           gpus: hasGPU.value ? selectionDetails.value?.gpuCards.map(card => card.id) : undefined,

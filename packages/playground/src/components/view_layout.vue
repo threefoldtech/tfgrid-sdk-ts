@@ -1,11 +1,10 @@
 <template>
   <div
-    class="border px-4 pb-4 rounded position-relative mt-10"
-    :class="{ 'pt-10': hasInfo, 'pt-6': !hasInfo }"
+    class="border px-4 pb-4 rounded position-relative mt-1"
+    :class="{ 'pt-10': hasInfo, 'pt-3': !hasInfo }"
     ref="viewLayoutContainer"
   >
     <div
-      class="mb-6"
       :style="{ opacity: $vuetify.theme.name === 'dark' ? 'var(--v-medium-emphasis-opacity)' : '' }"
       v-if="$slots.description"
     />
@@ -25,8 +24,10 @@
     </div>
 
     <template v-if="requireSSH && !ssh">
-      <VAlert variant="tonal" type="error" :text="title + ' requires public ssh key.'" class="mb-4" />
-      <SshkeyView />
+      <VAlert variant="tonal" type="error" class="mb-4">
+        {{ title }} requires a public SSH key. You can generate or import it from the
+        <router-link :to="DashboardRoutes.Deploy.SSHKey">SSH Keys</router-link> page.
+      </VAlert>
     </template>
     <slot v-else :key="tick" />
 
@@ -40,14 +41,14 @@
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import { useRoute } from "vue-router";
 
+import { DashboardRoutes } from "@/router/routes";
 import { useProfileManager } from "@/stores";
-import SshkeyView from "@/views/sshkey_view.vue";
 
 import AppInfo from "./app_info.vue";
 
 export default {
   name: "ViewLayout",
-  components: { AppInfo, SshkeyView },
+  components: { AppInfo },
   setup() {
     const route = useRoute();
     const profileManager = useProfileManager();
@@ -76,6 +77,7 @@ export default {
       requireSSH: computed(() => route.meta.requireSSH),
       tick,
       viewLayoutContainer,
+      DashboardRoutes,
     };
   },
 };

@@ -124,6 +124,11 @@ export const deploymentListEnvironments = {
     CHAIN_ENDPOINT: "Chain Endpoint",
   },
 
+  expose: {
+    SSH_KEY: _ssh,
+    EXPOSE_WEBSERVER_HOSTNAME: "Expose Webserver Hostname",
+  },
+
   static_website: {
     SSH_KEY: _ssh,
     GITHUB_URL: "HTTPS URL for git repository",
@@ -165,5 +170,32 @@ export const deploymentListEnvironments = {
 
   tfrobot: {
     SSH_KEY: _ssh,
+  },
+
+  jenkins: {
+    SSH_KEY: _ssh,
+    JENKINS_HOSTNAME: "Jenkins Hostname",
+    JENKINS_ADMIN_USERNAME: "Jenkins Admin Username",
+    JENKINS_ADMIN_PASSWORD: { label: "Jenkins Admin Password", type: "password" },
+  },
+
+  gitea: {
+    SSH_KEY: _ssh,
+    GITEA__HOSTNAME: "Gitea Hostname",
+    GITEA__mailer__HOST: "Email Host",
+    GITEA__mailer__PORT: "Email Port",
+    GITEA__mailer__USER: "Email Host User",
+    GITEA__mailer__FROM: "Send Email As",
+    GITEA__mailer__ENABLED: "Email Host Enabled",
+    GITEA__mailer__PASSWD: { label: "Email Host Password", type: "password" },
+  },
+  nostr: {
+    SSH_KEY: _ssh,
+    NOSTR_HOSTNAME: "Nostr Hostname",
+  },
+
+  nodepilot: {
+    SSH_KEY: _ssh,
+    NODE_PILOT_HOSTNAME: "Node Pilot Hostname",
   },
 };

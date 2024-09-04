@@ -10,17 +10,16 @@
     :valid-filters="selectionDetails?.validFilters"
     title-image="images/icons/algorand.png"
   >
-    <template #title>Deploy a Algorand Instance </template>
+    <template #title>Deploy an Algorand Instance</template>
     <d-tabs :tabs="[{ title: 'Config', value: 'config' }]">
       <input-validator
         :value="name"
         :rules="[
           validators.required('Name is required.'),
-          validators.isLowercase('Name should consist of lowercase letters only.'),
-          validators.isAlphanumeric('Name should consist of letters and numbers only.'),
-          name => validators.isAlpha('Name must start with alphabet char.')(name[0]),
+          validators.IsAlphanumericExpectUnderscore('Name should consist of letters ,numbers and underscores only.'),
+          (name: string) => validators.isAlpha('Name must start with an alphabetical character.')(name[0]),
           validators.minLength('Name must be at least 2 characters.', 2),
-          validators.maxLength('Name cannot exceed 15 characters.', 15),
+          validators.maxLength('Name cannot exceed 50 characters.', 50),
         ]"
         #="{ props }"
       >
@@ -28,9 +27,13 @@
           <v-text-field label="Name" v-model="name" v-bind="props" />
         </input-tooltip>
       </input-validator>
-      <Networks v-model:mycelium="mycelium" />
-      <v-switch color="primary" inset label="IPv4" v-model="ipv4" hide-details />
-
+      <Networks
+        v-model:mycelium="mycelium"
+        v-model:planetary="planetary"
+        v-model:ipv4="ipv4"
+        v-model:ipv6="ipv6"
+        v-model:wireguard="wireguard"
+      />
       <AlgorandCapacity
         :network="network"
         :type="type"
@@ -85,6 +88,7 @@
         }"
         :filters="{
           ipv4,
+          ipv6,
           certified,
           dedicated,
           cpu,
@@ -123,6 +127,9 @@ const flist: Flist = {
 };
 const name = ref(generateName({ prefix: "al" }));
 const ipv4 = ref(false);
+const ipv6 = ref(false);
+const wireguard = ref(false);
+const planetary = ref(false);
 const mycelium = ref(true);
 const cpu = ref() as Ref<number>;
 const memory = ref() as Ref<number>;
@@ -154,6 +161,9 @@ async function deploy() {
 
     const vm = await deployVM(grid!, {
       name: name.value,
+      network: {
+        addAccess: wireguard.value,
+      },
       machines: [
         {
           name: name.value,
@@ -172,8 +182,9 @@ async function deploy() {
               : [],
           rootFilesystemSize: rootFilesystemSize.value,
           publicIpv4: ipv4.value,
+          publicIpv6: ipv6.value,
           mycelium: mycelium.value,
-          planetary: true,
+          planetary: planetary.value,
           nodeId: selectionDetails.value!.node!.nodeId,
           rentedBy: dedicated.value ? grid!.twinId : undefined,
           certified: certified.value,
@@ -188,10 +199,10 @@ async function deploy() {
     });
 
     layout.value.reloadDeploymentsList();
-    layout.value.setStatus("success", "Successfully deployed an alogrand node.");
+    layout.value.setStatus("success", "Successfully deployed an Algorand instance.");
     layout.value.openDialog(vm, deploymentListEnvironments.algorand);
   } catch (e) {
-    layout.value.setStatus("failed", normalizeError(e, "Failed to deploy an alogrand node."));
+    layout.value.setStatus("failed", normalizeError(e, "Failed to deploy an Algorand instance."));
   }
 }
 

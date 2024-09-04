@@ -18,9 +18,9 @@
         :value="threebotName"
         :rules="[
           validators.required('Name is required.'),
-          validators.isAlphanumeric('Name should consist of letters and numbers only.'),
+          validators.IsAlphanumericExpectUnderscore('Name should consist of letters ,numbers and underscores only.'),
           validators.minLength('Name must be at least 4 characters.', 4),
-          validators.maxLength('Name cannot exceed 15 characters.', 15),
+          validators.maxLength('Name cannot exceed 50 characters.', 50),
         ]"
         #="{ props }"
       >
@@ -46,7 +46,15 @@
         :large="{ cpu: 4, memory: 32, disk: 1000 }"
       />
 
-      <Networks v-model:ipv4="ipv4"></Networks>
+      <Network
+        required
+        v-model:ipv4="ipv4"
+        v-model:ipv6="ipv6"
+        v-model:planetary="planetary"
+        v-model:mycelium="mycelium"
+        v-model:wireguard="wireguard"
+        :domain="selectionDetails?.domain"
+      />
 
       <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
         <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
@@ -59,6 +67,7 @@
       <TfSelectionDetails
         :filters="{
           ipv4,
+          ipv6,
           certified,
           dedicated,
           cpu: solution?.cpu,
@@ -81,8 +90,8 @@
 </template>
 
 <script lang="ts" setup>
-import type { GridClient } from "@threefold/grid_client";
-import { computed, onMounted, type Ref, ref } from "vue";
+import { calculateRootFileSystem, type GridClient } from "@threefold/grid_client";
+import { computed, onMounted, type Ref, ref, watch } from "vue";
 
 import { manual } from "@/utils/manual";
 
@@ -96,6 +105,7 @@ import { normalizeError } from "../utils/helpers";
 
 const layout = useLayout();
 
+const selectionDetails = ref<SelectionDetails>();
 const threebotName = ref<string>("");
 const solution = ref() as Ref<SolutionFlavor>;
 const flist = ref<Flist>();
@@ -103,8 +113,13 @@ const disks = ref<Disk[]>([]);
 const dedicated = ref(false);
 const certified = ref(false);
 const ipv4 = ref(false);
-const rootFilesystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solution.value?.memory ?? 0));
-const selectionDetails = ref<SelectionDetails>();
+const ipv6 = ref(false);
+const wireguard = ref(false);
+const planetary = ref(false);
+const mycelium = ref(true);
+const rootFilesystemSize = computed(() =>
+  calculateRootFileSystem({ CPUCores: solution.value?.cpu ?? 0, RAMInMegaBytes: solution.value?.memory ?? 0 }),
+);
 const selectedSSHKeys = ref("");
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
@@ -148,7 +163,7 @@ async function deploy() {
     vm = await deployVM(grid!, {
       name: threebotName.value,
       network: {
-        addAccess: selectionDetails.value!.domain!.enableSelectedDomain,
+        addAccess: wireguard.value || selectionDetails.value!.domain!.enableSelectedDomain,
         accessNodeId: selectionDetails.value!.domain!.selectedDomain?.nodeId,
       },
       machines: [
@@ -160,6 +175,9 @@ async function deploy() {
           flist: flist?.value!.value,
           entryPoint: flist.value!.entryPoint,
           publicIpv4: ipv4.value,
+          publicIpv6: ipv6.value,
+          planetary: planetary.value,
+          mycelium: mycelium.value,
           envs: [
             { key: "SSH_KEY", value: selectedSSHKeys.value },
             { key: "USER_ID", value: threebotName.value },
@@ -208,16 +226,15 @@ function updateSSHkeyEnv(selectedKeys: string) {
 </script>
 
 <script lang="ts">
-import Networks from "../components/networks.vue";
+import Network from "../components/networks.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";
 import type { SelectionDetails } from "../types/nodeSelector";
 import { updateGrid } from "../utils/grid";
-import rootFs from "../utils/root_fs";
 
 export default {
   name: "TFFreeflow",
-  components: { SelectSolutionFlavor, Networks, ManageSshDeployemnt },
+  components: { SelectSolutionFlavor, Network, ManageSshDeployemnt },
 };
 </script>

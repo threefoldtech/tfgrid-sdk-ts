@@ -8,7 +8,7 @@ image:
   repository: ghcr.io/threefoldtech/playground
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "2.5.0-rc1"
+  tag: "2.5.0"
   
   env:
     - name: "MODE"
@@ -27,6 +27,10 @@ image:
       value: ""
     - name: "STELLAR_NETWORK"
       value: ""
+    - name: "SENTRY_DSN"
+      value: ""
+    - name: "ENABLE_TELEMETRY"
+      value: false
 
 
 imagePullSecrets: []

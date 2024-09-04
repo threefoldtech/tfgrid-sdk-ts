@@ -21,20 +21,28 @@
           <TfSelectLocation v-model="location" title="Choose a Location" :status="NodeStatus.Up" />
           <TfSelectFarm :valid-filters="validFilters" :filters="filters" :location="location" v-model="farm" />
           <TfAutoNodeSelector
+            :selected-machines="selectedMachines"
+            :nodes-lock="nodesLock"
             :valid-filters="validFilters"
             :filters="filters"
             :location="location"
             :farm="farm"
             v-model="node"
             v-model:status="nodeStatus"
+            :load-farm="loadFarm"
+            :get-farm="getFarm"
           />
         </template>
 
         <TfManualNodeSelector
+          :selected-machines="selectedMachines"
+          :nodes-lock="nodesLock"
           :valid-filters="validFilters"
           :filters="filters"
           v-model="node"
           v-model:status="nodeStatus"
+          :load-farm="loadFarm"
+          :get-farm="getFarm"
           v-else
         />
       </div>
@@ -66,17 +74,20 @@
 
 <script lang="ts">
 import type { FarmInfo, GPUCardInfo, NodeInfo } from "@threefold/grid_client";
-import { NodeStatus } from "@threefold/gridproxy_client";
+import { type Farm, NodeStatus } from "@threefold/gridproxy_client";
+import type AwaitLock from "await-lock";
 import noop from "lodash/fp/noop.js";
 import type { DeepPartial } from "utility-types";
 import { computed, getCurrentInstance, onMounted, onUnmounted, type PropType, ref, watch } from "vue";
 
+import { gridProxyClient } from "../../clients";
 import { useWatchDeep } from "../../hooks";
 import { useForm, ValidatorStatus } from "../../hooks/form_validator";
 import type { InputValidatorService } from "../../hooks/input_validator";
 import type {
   DomainInfo,
   SelectedLocation,
+  SelectedMachine,
   SelectionDetails,
   SelectionDetailsFilters,
   SelectionDetailsFiltersValidators,
@@ -106,6 +117,11 @@ export default {
     disableNodeSelection: { type: Boolean, default: () => false },
     status: String as PropType<ValidatorStatus>,
     useFqdn: Boolean,
+    selectedMachines: {
+      type: Array as PropType<SelectedMachine[]>,
+      default: () => [],
+    },
+    nodesLock: Object as PropType<AwaitLock>,
   },
   emits: {
     "update:model-value": (value: SelectionDetails) => true || value,
@@ -128,6 +144,21 @@ export default {
 
     const domain = ref<DomainInfo>();
     const domainStatus = ref<ValidatorStatus>();
+
+    const loadedFarms = new Map<number, Farm>();
+    async function loadFarm(farmId: number) {
+      if (loadedFarms.has(farmId)) {
+        return loadedFarms.get(farmId)!;
+      }
+
+      const [farm] = (await gridProxyClient.farms.list({ farmId })).data;
+      loadedFarms.set(farmId, farm);
+      return farm;
+    }
+
+    function getFarm(farmId: number) {
+      return loadedFarms.get(farmId);
+    }
 
     const selectionDetails = computed(() => {
       return {
@@ -153,6 +184,7 @@ export default {
       status: ValidatorStatus.Init,
       error: null,
       $el: input,
+      highlightOnError: true,
     };
 
     onMounted(() => form?.register(uid.toString(), fakeService));
@@ -223,6 +255,8 @@ export default {
       domainStatus,
       selectionDetails,
       NodeStatus,
+      loadFarm,
+      getFarm,
     };
   },
 };

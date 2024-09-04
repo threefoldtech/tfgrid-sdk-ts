@@ -1,4 +1,5 @@
 <template>
+  <v-alert class="mb-4" type="info" variant="tonal"> Choose a GPU card to deploy your VM. </v-alert>
   <div ref="input">
     <input-tooltip
       tooltip="Please select at least one card from the available GPU cards. Note that if you have a deployment that already uses certain cards, they will not appear in the selection area. You have the option to select one or more cards.."
@@ -59,19 +60,6 @@ export default {
     const input = ref<HTMLElement>();
     const cardsTask = useAsync(getNodeGpuCards, { default: [] });
 
-    useWatchDeep(
-      () => [props.validNode, props.node],
-      ([valid, node]) => {
-        bindModelValue();
-        if (valid && node) {
-          return cardsTask.value.run(gridStore, node as NodeInfo);
-        }
-        bindStatus();
-        cardsTask.value.initialized && cardsTask.value.reset();
-      },
-      { immediate: true, deep: true },
-    );
-
     onUnmounted(() => {
       bindModelValue();
       bindStatus();
@@ -98,6 +86,19 @@ export default {
       error: null,
       $el: input,
     };
+
+    useWatchDeep(
+      () => [props.validNode, props.node],
+      ([valid, node]) => {
+        bindModelValue();
+        if (valid && node) {
+          return cardsTask.value.run(gridStore, node as NodeInfo);
+        }
+        bindStatus();
+        cardsTask.value.initialized && cardsTask.value.reset();
+      },
+      { immediate: true, deep: true },
+    );
 
     onMounted(() => form?.register(uid.toString(), fakeService));
     onUnmounted(() => form?.unregister(uid.toString()));

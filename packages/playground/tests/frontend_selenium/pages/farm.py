@@ -1,3 +1,4 @@
+from time import sleep
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -35,7 +36,7 @@ class FarmPage:
     save_button = (By.XPATH, "//button[.//span[text()='Add']]")
     close_button = (By.XPATH, "//button[.//span[text()='Close']]")
     delete_button = (By.XPATH, "//button[.//span[text()=' Delete ']]")
-    confirm_button = (By.XPATH, "//button[.//span[text()='Confirm']]")
+    confirm_button = (By.XPATH, "//button[.//span[text()='Delete']]")
     zero = (By.XPATH,'//html/body/main/div[1]/div/h1')
     table_farm_name=(By.XPATH, '//*[@id="app"]/div[1]/div[2]/div/div[1]/div[4]/div[1]/table/tbody/tr[1]/td[3]')
     stellar_payout_address = (By.XPATH, '//table/tbody/tr[2]/td/div[1]/div/div/div[3]/div/div/div[1]/div[2]/p')
@@ -75,15 +76,35 @@ class FarmPage:
     def create_farm_invalid_name(self, data):
         self.browser.find_element(*self.farm_name_text_field).send_keys(Keys.CONTROL + "a")
         self.browser.find_element(*self.farm_name_text_field).send_keys(Keys.DELETE)
-        self.browser.find_element(*self.farm_name_text_field).send_keys(data)
+        for char in data:
+            self.browser.find_element(*self.farm_name_text_field).send_keys(char)
 
     def search_functionality(self, farm_name):
+        tries = 3
+        table = 'No data available'
+        while('No data available' in table and tries > 0):
+            sleep(5)
+            self.browser.find_element(*self.search_bar).send_keys(Keys.CONTROL + "a")
+            self.browser.find_element(*self.search_bar).send_keys(Keys.DELETE)
+            for char in farm_name:
+                self.browser.find_element(*self.search_bar).send_keys(char)
+            table = self.browser.find_element(*self.table).text
+            tries -= 1
+            sleep(5)
+            if table.count('NotCertified')>1:
+                continue
+            if farm_name in table:
+                break
+        return table
+    
+    def search_functionality_invalid_name(self, farm_name):
+        sleep(2)
         self.browser.find_element(*self.search_bar).send_keys(Keys.CONTROL + "a")
         self.browser.find_element(*self.search_bar).send_keys(Keys.DELETE)
-        self.browser.find_element(*self.search_bar).send_keys(farm_name)
+        for char in farm_name:
+            self.browser.find_element(*self.search_bar).send_keys(char)
         table = self.browser.find_element(*self.table).text
-        while('loading farms' in table):
-            table = self.browser.find_element(*self.table).text
+        sleep(3)
         return table
 
     def display_all_farms(self):
@@ -223,7 +244,8 @@ class FarmPage:
         self.browser.find_element(*self.details_arrow).click()
         if(len(self.browser.find_elements(By.XPATH, "//span[contains(@class, 'v-btn__content')]/i[contains(@class, 'mdi-chevron-up')]")) == 0):
             self.browser.find_element(*self.details_arrow).click()
-        self.browser.execute_script("window.scrollBy(0, 250);")
+        webdriver.ActionChains(self.browser).send_keys(Keys.PAGE_DOWN).perform()
+        sleep(10)
 
     def reopen_details(self):
         WebDriverWait(self.browser, 60).until(EC.visibility_of_element_located((By.XPATH, "//span[contains(@class, 'v-btn__content')]/i[contains(@class, 'mdi-chevron-down')]")))
@@ -293,12 +315,10 @@ class FarmPage:
         self.setup_farmpayout_address(farm_name)
         WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located((By.XPATH, self.farm_public_ips)))
         for i in range(len(self.browser.find_elements(By.XPATH, self.farm_public_ips))):
-            print(len(self.browser.find_elements(By.XPATH, self.farm_public_ips)))
-            print(f"{self.farm_public_ips}[{str(i+1)}]/td[1]")
-            if(self.browser.find_element(By.XPATH,  f"{self.farm_public_ips}[{str(i+1)}]/td[2]").text == ip):
+           if(self.browser.find_element(By.XPATH,  f"{self.farm_public_ips}[{str(i+1)}]/td[2]").text == ip):
                 if(self.browser.find_element(By.XPATH,  f"{self.farm_public_ips}[{str(i+1)}]/td[3]").text == gateway):
-                    WebDriverWait(self.browser, 30).until(EC.element_to_be_clickable((By.XPATH,  f"{self.farm_public_ips}[{str(i+1)}]/td[1]/div/div/div/input")))
-                    self.browser.find_element(By.XPATH,  f"{self.farm_public_ips}[{str(i+1)}]/td[1]/div/div/div/input").click()
+                    #WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located((By.XPATH,  f"{self.farm_public_ips}[{str(i+1)}]/td[1]/div/div/div/div/div/input")))
+                    self.browser.find_element(By.XPATH,  f"{self.farm_public_ips}[{str(i+1)}]/td[1]/div/div/div/div/div/input").click()
                     WebDriverWait(self.browser, 30).until(EC.element_to_be_clickable(self.delete_button))
                     self.browser.find_element(*self.delete_button).click()
                     WebDriverWait(self.browser, 30).until(EC.element_to_be_clickable(self.confirm_button))
@@ -329,11 +349,13 @@ class FarmPage:
         return details
 
     def verify_the_availability_of_zero_os_bootstrap(self):
-        self.browser.execute_script("window.scrollTo(0,0)")
         self.browser.find_element(*self.view_bootstrap_button).click()
         WebDriverWait(self.browser, 30).until(EC.number_of_windows_to_be(2))
         self.browser.switch_to.window(self.browser.window_handles[1])
-        return self.browser.current_url
+        site = self.browser.current_url
+        self.browser.close()
+        self.browser.switch_to.window(self.browser.window_handles[0])
+        return site
         
     def open_create(self):
         self.browser.find_element(*self.create_button).click()
@@ -345,9 +367,9 @@ class FarmPage:
         self.browser.find_element(*self.details_arrow).click()
 
     def wait_for_farm_name(self, keyword):
-        td_elements = self.browser.find_elements(By.XPATH, "//table[1]//tbody//tr//td[2]")
+        td_elements = self.browser.find_elements(By.XPATH, "//table[1]//tbody//tr")
         td_texts = [td.text for td in td_elements]
-        return keyword in td_texts
+        return keyword in td_texts[0]
 
     def wait_for_button(self, button):
         WebDriverWait(self.browser, 30).until(EC.element_to_be_clickable(button))

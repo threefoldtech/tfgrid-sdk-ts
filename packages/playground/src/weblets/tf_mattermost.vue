@@ -24,11 +24,10 @@
           :value="name"
           :rules="[
             validators.required('Name is required.'),
-            validators.isLowercase('Name should consist of lowercase letters only.'),
-            validators.isAlphanumeric('Name should consist of letters and numbers only.'),
-            name => validators.isAlpha('Name must start with alphabet char.')(name[0]),
+            validators.IsAlphanumericExpectUnderscore('Name should consist of letters ,numbers and underscores only.'),
+            (name: string) => validators.isAlpha('Name must start with an alphabetical character.')(name[0]),
             validators.minLength('Name must be at least 2 characters.', 2),
-            validators.maxLength('Name cannot exceed 15 characters.', 15),
+            validators.maxLength('Name cannot exceed 50 characters.', 50),
           ]"
           #="{ props }"
         >
@@ -42,7 +41,14 @@
           :medium="{ cpu: 2, memory: 4, disk: 50 }"
           :large="{ cpu: 4, memory: 16, disk: 100 }"
         />
-        <Networks v-model:mycelium="mycelium" v-model:ipv4="ipv4" />
+        <Networks
+          v-model:mycelium="mycelium"
+          v-model:planetary="planetary"
+          v-model:ipv4="ipv4"
+          v-model:ipv6="ipv6"
+          v-model:wireguard="wireguard"
+          :domain="selectionDetails?.domain"
+        />
 
         <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
           <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
@@ -55,6 +61,7 @@
         <TfSelectionDetails
           :filters="{
             ipv4,
+            ipv6,
             certified,
             dedicated,
             cpu: solution?.cpu,
@@ -80,7 +87,7 @@
 </template>
 
 <script lang="ts" setup>
-import type { GridClient } from "@threefold/grid_client";
+import { calculateRootFileSystem, type GridClient } from "@threefold/grid_client";
 import { computed, type Ref, ref, watch } from "vue";
 
 import { manual } from "@/utils/manual";
@@ -96,6 +103,7 @@ import { generateName, generatePassword } from "../utils/strings";
 const layout = useLayout();
 const tabs = ref();
 const profileManager = useProfileManager();
+const selectionDetails = ref<SelectionDetails>();
 
 const name = ref(generateName({ prefix: "mm" }));
 const solution = ref() as Ref<SolutionFlavor>;
@@ -106,17 +114,21 @@ const flist: Flist = {
 const dedicated = ref(false);
 const certified = ref(false);
 const ipv4 = ref(false);
-const smtp = ref(createSMTPServer());
-const rootFilesystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solution.value?.memory ?? 0));
-const selectionDetails = ref<SelectionDetails>();
+const ipv6 = ref(false);
+const wireguard = ref(false);
+const planetary = ref(false);
 const mycelium = ref(true);
+const smtp = ref(createSMTPServer());
+const rootFilesystemSize = computed(() =>
+  calculateRootFileSystem({ CPUCores: solution.value?.cpu ?? 0, RAMInMegaBytes: solution.value?.memory ?? 0 }),
+);
 const selectedSSHKeys = ref("");
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
 
 function finalize(deployment: any) {
   layout.value.reloadDeploymentsList();
-  layout.value.setStatus("success", "Successfully deployed a mattermost instance.");
+  layout.value.setStatus("success", "Successfully deployed a Mattermost instance.");
   layout.value.openDialog(deployment, deploymentListEnvironments.mattermost);
 }
 
@@ -146,7 +158,7 @@ async function deploy() {
     vm = await deployVM(grid!, {
       name: name.value,
       network: {
-        addAccess: selectionDetails.value!.domain!.enableSelectedDomain,
+        addAccess: wireguard.value || selectionDetails.value!.domain!.enableSelectedDomain,
         accessNodeId: selectionDetails.value?.domain?.selectedDomain?.nodeId,
       },
       machines: [
@@ -164,7 +176,8 @@ async function deploy() {
           entryPoint: flist.entryPoint,
           rootFilesystemSize: rootFilesystemSize.value,
           publicIpv4: ipv4.value,
-          planetary: true,
+          publicIpv6: ipv6.value,
+          planetary: planetary.value,
           mycelium: mycelium.value,
           envs: [
             { key: "SSH_KEY", value: selectedSSHKeys.value },
@@ -187,7 +200,7 @@ async function deploy() {
       ],
     });
   } catch (e) {
-    return layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a mattermost instance."));
+    return layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Mattermost instance."));
   }
 
   if (!selectionDetails.value?.domain?.enableSelectedDomain) {
@@ -210,7 +223,7 @@ async function deploy() {
   } catch (e) {
     layout.value.setStatus("deploy", "Rollbacking back due to fail to deploy gateway...");
     await rollbackDeployment(grid!, name.value);
-    layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a mattermost instance."));
+    layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Mattermost instance."));
   }
 }
 
@@ -246,7 +259,6 @@ import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue"
 import { deploymentListEnvironments } from "../constants";
 import type { SelectionDetails } from "../types/nodeSelector";
 import { normalizeError } from "../utils/helpers";
-import rootFs from "../utils/root_fs";
 
 export default {
   name: "TfMattermost",

@@ -19,11 +19,11 @@ grid_client is a client used for deploying workloads (VMs, ZDBs, k8s, etc.) on g
 
 ## Installation
 
-> **Warning**: For **Qanet**, Please use @2.3.5 version
+> **Warning**: For **Qanet**, Please use @2.5.2 version
 
-> **Warning**: For **Testnet**, Please use @2.3.5 version
+> **Warning**: For **Testnet**, Please use @2.5.2 version
 
-> **Warning**: For **Mainnet**, Please use @2.3.5 version
+> **Warning**: For **Mainnet**, Please use @2.5.2 version
 
 ### External package
 
@@ -43,6 +43,12 @@ git clone https://github.com/threefoldtech/tfgrid-sdk-ts.git
 
 ```bash
 yarn install
+```
+
+> **Note:** If the used Python version is 3.12 or later, you need to install setuptools.
+
+```bash
+python3 -m pip install setuptools
 ```
 
 ## Getting started
@@ -167,4 +173,4 @@ gridClient.disconnect();
 ## Related Documentations
 
 - [Contribution Guide](./docs/contribution.md)
-- [Grid Client documentation](https://manual.grid.tf/javascript/grid3_javascript_readme.html)
+- [Grid Client documentation](https://manual.grid.tf/documentation/developers/javascript/grid3_javascript_readme.html)

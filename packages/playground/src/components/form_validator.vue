@@ -48,6 +48,21 @@ export default {
         if (statusMap.value.get(uid) !== status) {
           statusMap.value.set(uid, status);
         }
+
+        const el = serviceMap.value.get(uid)?.$el;
+        if (status === ValidatorStatus.Valid && el) {
+          const input =
+            el instanceof HTMLElement
+              ? el
+              : el && typeof el === "object" && "value" in el && el.value instanceof HTMLElement
+              ? el.value
+              : null;
+
+          if (input) {
+            input.classList.remove("weblet-layout-error");
+            setTimeout(() => input.classList.remove("weblet-layout-error-transition"), 152);
+          }
+        }
       },
 
       reset() {

@@ -1,11 +1,14 @@
 <template>
-  <div class="hint">
-    <v-alert class="mb-4" type="info" variant="tonal">
-      Node status is updated every 90 minutes. For a realtime status, click on the node's card.
-    </v-alert>
-  </div>
-
   <view-layout>
+    <v-card color="primary" class="d-flex justify-center items-center pa-3 text-center">
+      <v-icon size="30" class="pr-3">mdi-access-point</v-icon>
+      <v-card-title class="pa-0">Node Finder</v-card-title>
+    </v-card>
+    <div class="hint mt-3">
+      <v-alert class="mb-4" type="info" variant="tonal">
+        Node status is updated every 90 minutes. For a realtime status, click on the node's card.
+      </v-alert>
+    </div>
     <TfFiltersLayout>
       <template #filters>
         <TfFiltersContainer class="mb-4" @apply="loadNodes(true)" :loading="loading">
@@ -38,24 +41,42 @@
             />
           </TfFilter>
 
-          <TfFilter class="mt-4" query-route="node-status" v-model="filters.status">
-            <v-select
-              :model-value="filters.status || undefined"
-              @update:model-value="filters.status = $event || ''"
-              :items="[
-                { title: 'Up', value: NodeStatus.Up },
-                { title: 'Down', value: NodeStatus.Down },
-                { title: 'Standby', value: NodeStatus.Standby },
-              ]"
-              label="Select Nodes Status"
-              item-title="title"
-              item-value="value"
-              variant="outlined"
-              clearable
-              @click:clear="filters.status = ''"
-              density="compact"
-            />
+          <TfFilter query-route="ipv6" v-model="filters.ipv6">
+            <v-switch color="primary" inset label="IPv6" v-model="filters.ipv6" density="compact" hide-details />
           </TfFilter>
+          <TfFilter query-route="myNodes" v-model="filters.myNodes" v-if="profileManager.profile">
+            <v-switch color="primary" inset label="My Nodes" v-model="filters.myNodes" density="compact" hide-details />
+          </TfFilter>
+
+          <VTooltip
+            location="bottom"
+            offset="-25"
+            :disabled="!filters.rentable"
+            text="The 'Rentable' filter will list only 'Standby & Up' nodes."
+          >
+            <template #activator="{ props }">
+              <TfFilter class="mt-4" v-bind="props" query-route="node-status" v-model="filters.status">
+                <v-select
+                  :disabled="filters.rentable"
+                  :model-value="filters.status || undefined"
+                  @update:model-value="filters.status = $event || ''"
+                  :items="[
+                    { title: 'Up', value: UnifiedNodeStatus.Up },
+                    { title: 'Standby', value: UnifiedNodeStatus.Standby },
+                    { title: 'Up & Standby', value: UnifiedNodeStatus.UpStandby },
+                    { title: 'Down', value: UnifiedNodeStatus.Down },
+                  ]"
+                  label="Select Nodes Status"
+                  item-title="title"
+                  item-value="value"
+                  variant="outlined"
+                  clearable
+                  @click:clear="filters.status = ''"
+                  density="compact"
+                />
+              </TfFilter>
+            </template>
+          </VTooltip>
 
           <TfFilter
             query-route="node-id"
@@ -408,6 +429,12 @@
           <v-row>
             <v-col cols="12">
               <div class="table">
+                <VAlert type="error" class="text-body-1 mb-4" v-if="error">
+                  Failed to load Nodes. Please try again!
+                  <template #append>
+                    <VBtn icon="mdi-reload" color="error" variant="plain" density="compact" @click="loadNodes(true)" />
+                  </template>
+                </VAlert>
                 <nodes-table
                   v-model="nodes"
                   max-height="730px"
@@ -443,9 +470,9 @@
 </template>
 
 <script lang="ts">
-import { type GridNode, NodeStatus, SortBy, SortOrder } from "@threefold/gridproxy_client";
+import { type GridNode, SortBy, SortOrder, UnifiedNodeStatus } from "@threefold/gridproxy_client";
 import { sortBy } from "lodash";
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 
 import NodeDetails from "@/components/node_details.vue";
@@ -487,6 +514,7 @@ export default {
   setup() {
     const profileManager = useProfileManager();
     const size = ref(window.env.PAGE_SIZE);
+    const error = ref(false);
     const page = ref(1);
     const filters = ref({
       nodeId: "",
@@ -508,8 +536,21 @@ export default {
       dedicated: false,
       numGpu: "",
       rentable: false,
+      ipv6: false,
+      myNodes: false,
     });
-
+    const oldNodeStatus = ref();
+    watch(
+      () => filters.value.rentable,
+      rentable => {
+        if (rentable) {
+          oldNodeStatus.value = filters.value.status;
+          filters.value.status = UnifiedNodeStatus.UpStandby;
+        } else {
+          filters.value.status = oldNodeStatus.value;
+        }
+      },
+    );
     const loading = ref<boolean>(true);
     const _nodes = ref<GridNode[]>([]);
 
@@ -526,6 +567,7 @@ export default {
     async function loadNodes(retCount = false) {
       _nodes.value = [];
       loading.value = true;
+      error.value = false;
       if (retCount) page.value = 1;
       try {
         const { count, data } = await requestNodes(
@@ -538,7 +580,7 @@ export default {
             farmName: filters.value.farmName || undefined,
             country: filters.value.country,
             region: filters.value.region,
-            status: (filters.value.status as NodeStatus) || undefined,
+            status: (filters.value.status as UnifiedNodeStatus) || undefined,
             freeHru: convertToBytes(filters.value.freeHDD),
             freeMru: convertToBytes(filters.value.freeRAM),
             freeSru: convertToBytes(filters.value.freeSSD),
@@ -550,11 +592,12 @@ export default {
             domain: filters.value.gateway || undefined,
             freeIps: +filters.value.publicIPs || undefined,
             dedicated: filters.value.dedicated || undefined,
-            sortBy: SortBy.FreeCRU,
-            sortOrder: SortOrder.Desc,
+            sortBy: SortBy.Status,
+            sortOrder: SortOrder.Asc,
             numGpu: +filters.value.numGpu || undefined,
-            rentable: filters.value.rentable && profileManager.profile ? filters.value.rentable : undefined,
-            availableFor: filters.value.rentable && profileManager.profile ? profileManager.profile.twinId : undefined,
+            rentable: filters.value.rentable ? filters.value.rentable : undefined,
+            hasIPv6: filters.value.ipv6 ? filters.value.ipv6 : undefined,
+            rentedBy: filters.value.myNodes && profileManager.profile ? profileManager.profile.twinId : undefined,
           },
           { loadFarm: true },
         );
@@ -563,6 +606,7 @@ export default {
         if (retCount) nodesCount.value = count ?? 0;
       } catch (err) {
         console.log(err);
+        error.value = true;
       } finally {
         loading.value = false;
       }
@@ -605,9 +649,10 @@ export default {
       requestNodes,
       isDialogOpened,
       filters,
-      NodeStatus,
+      UnifiedNodeStatus,
       size,
       page,
+      error,
       loadNodes,
     };
   },

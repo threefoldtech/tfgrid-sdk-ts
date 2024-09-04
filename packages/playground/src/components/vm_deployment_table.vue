@@ -20,7 +20,13 @@
         </template>
       </v-tooltip>
 
-      <v-dialog transition="dialog-bottom-transition" v-model="showDialog" max-width="500px" scrollable>
+      <v-dialog
+        transition="dialog-bottom-transition"
+        v-model="showDialog"
+        max-width="500px"
+        scrollable
+        attach="#modals"
+      >
         <v-card>
           <v-card-title style="font-weight: bold">Failed Deployments</v-card-title>
           <v-divider color="#FFCC00" />
@@ -71,6 +77,12 @@
       :loading="loading"
       :deleting="deleting"
       :model-value="$props.modelValue"
+      :items-per-page-options="[
+        { value: 5, title: '5' },
+        { value: 10, title: '10' },
+        { value: 20, title: '20' },
+        { value: 50, title: '50' },
+      ]"
       @update:model-value="$emit('update:model-value', $event)"
       @click:row="$attrs['onClick:row']"
       :sort-by="sortBy"
@@ -83,27 +95,15 @@
         {{ item.publicIP?.ip?.split("/")?.[0] || item.publicIP?.ip || "-" }}
       </template>
 
-      <template #[`item.ipv6`]="{ item }">
-        {{ item.publicIP?.ip6.replace(/\/64$/, "") || "-" }}
-      </template>
-
-      <template #[`item.planetary`]="{ item }">
-        {{ item.planetary || "-" }}
-      </template>
-
       <template #[`item.mycelium`]="{ item }">
         {{ item.myceliumIP || "-" }}
-      </template>
-
-      <template #[`item.wireguard`]="{ item }">
-        {{ item.interfaces?.[0]?.ip || "-" }}
       </template>
 
       <template #[`item.flist`]="{ item }">
         <v-tooltip :text="item.flist" location="bottom right">
           <template #activator="{ props }">
             <p v-bind="props">
-              {{ item.flist.replace("https://hub.grid.tf/", "").replace(".flist", "") }}
+              {{ renameFlist(item.flist) }}
             </p>
           </template>
         </v-tooltip>
@@ -155,7 +155,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, ref } from "vue";
+import { capitalize, computed, onMounted, ref } from "vue";
 
 import { getNodeHealthColor, NodeHealth } from "@/utils/get_nodes";
 
@@ -190,7 +190,28 @@ const failedDeployments = ref<
 
 onMounted(loadDeployments);
 
+async function loadDomains() {
+  try {
+    loading.value = true;
+    const grid = await getGrid(profileManager.profile!, props.projectName.toLowerCase());
+    const gateways = await grid!.gateway.list();
+    const gws = await Promise.all(gateways.map(name => grid!.gateway.get_name({ name })));
+    items.value = gws.map(gw => {
+      (gw as any).name = gw[0].workloads[0].name;
+      return gw;
+    });
+  } catch (e) {
+    errorMessage.value = `Failed to load Deployments: ${e}`;
+  } finally {
+    loading.value = false;
+  }
+}
+
 async function loadDeployments() {
+  if (props.projectName.toLowerCase() === ProjectName.Domains.toLowerCase()) {
+    return loadDomains();
+  }
+
   const migrateGateways = props.projectName.toLowerCase() !== "fullvm" && props.projectName.toLowerCase() !== "vm";
 
   items.value = [];
@@ -245,6 +266,43 @@ async function loadDeployments() {
 }
 
 const filteredHeaders = computed(() => {
+  if (props.projectName.toLowerCase() === ProjectName.Domains.toLowerCase()) {
+    return [
+      {
+        title: "Name",
+        key: "domain-name",
+        value(item: any) {
+          const [workload] = item[0].workloads;
+          return workload.data.name || workload.name;
+        },
+      },
+      {
+        title: "Backends",
+        key: "0.workloads.0.data.backends",
+        value(item: any) {
+          return item[0].workloads[0].data.backends.join(", ");
+        },
+      },
+      {
+        title: "Domain",
+        key: "fqdn",
+        value(item: any) {
+          const [workload] = item[0].workloads;
+          return workload.result.data.fqdn || workload.data.fqdn;
+        },
+      },
+      {
+        title: "Health",
+        key: "health",
+        value(item: any) {
+          return capitalize(item[0].workloads[0].result.state);
+        },
+        sortable: false,
+      },
+      { title: "Actions", key: "actions", sortable: false },
+    ];
+  }
+
   let headers = [
     { title: "PLACEHOLDER", key: "data-table-select" },
     { title: "Name", key: "name" },
@@ -254,10 +312,7 @@ const filteredHeaders = computed(() => {
       sortable: false,
       children: [
         { title: "Public IPv4", key: "ipv4", sortable: false },
-        { title: "Public IPv6", key: "ipv6", sortable: false },
-        { title: "Planetary IP", key: "planetary", sortable: false },
         { title: "Mycelium IP", key: "mycelium", sortable: false },
-        { title: "WireGuard", key: "wireguard", sortable: false },
       ],
     },
     { title: "Flist", key: "flist" },
@@ -267,9 +322,8 @@ const filteredHeaders = computed(() => {
     { title: "Actions", key: "actions", sortable: false },
   ];
 
-  const IPV6Solutions = [ProjectName.VM, ProjectName.Fullvm, ProjectName.TFRobot] as string[];
-
-  const IPV4Solutions = [
+  const IPV6Solutions = [
+    ProjectName.NodePilot,
     ProjectName.VM,
     ProjectName.Fullvm,
     ProjectName.Presearch,
@@ -283,6 +337,36 @@ const filteredHeaders = computed(() => {
     ProjectName.StaticWebsite,
     ProjectName.Wordpress,
     ProjectName.TFRobot,
+    ProjectName.Gitea,
+    ProjectName.Nostr,
+    ProjectName.Algorand,
+    ProjectName.Subsquid,
+    ProjectName.Peertube,
+    ProjectName.Jenkins,
+  ] as string[];
+
+  const IPV4Solutions = [
+    ProjectName.NodePilot,
+    ProjectName.VM,
+    ProjectName.Fullvm,
+    ProjectName.Presearch,
+    ProjectName.Umbrel,
+    ProjectName.Nextcloud,
+    ProjectName.Funkwhale,
+    ProjectName.Casperlabs,
+    ProjectName.Mattermost,
+    ProjectName.Discourse,
+    ProjectName.Taiga,
+    ProjectName.StaticWebsite,
+    ProjectName.Wordpress,
+    ProjectName.TFRobot,
+    ProjectName.Gitea,
+    ProjectName.Nostr,
+    ProjectName.Algorand,
+    ProjectName.Subsquid,
+    ProjectName.Peertube,
+    ProjectName.Jenkins,
+    ProjectName.Caprover,
   ] as string[];
 
   const WireguardSolutions = [ProjectName.VM, ProjectName.Fullvm, ProjectName.Umbrel, ProjectName.TFRobot] as string[];
@@ -347,6 +431,12 @@ function updateItem(newItem: any) {
   if (index > -1) {
     items.value[index] = newItem;
   }
+}
+
+function renameFlist(url: string) {
+  const flist = url.substring(url.lastIndexOf("/") + 1, url.lastIndexOf("."));
+
+  return flist.length > 40 ? flist.substring(0, 40) + "..." : flist;
 }
 
 defineExpose({ loadDeployments });

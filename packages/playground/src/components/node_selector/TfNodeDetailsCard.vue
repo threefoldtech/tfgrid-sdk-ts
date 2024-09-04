@@ -1,6 +1,6 @@
 <template>
   <VCard
-    class="tf-node-card rounded-0 w-100 pb-3"
+    class="tf-node-card rounded-0 w-100 pb-3 text-left"
     :class="{ 'selected-node': status !== 'Init' }"
     :color="
       status === 'Valid'
@@ -14,10 +14,11 @@
     :flat="flat"
     v-bind="{
       onClick: selectable
-        ? () => {
+        ? async () => {
             if (status === 'Init' && node) {
               $emit('node:select', (node as NodeInfo));
             }
+            await validateRentContract(gridStore, node as NodeInfo);
           }
         : undefined,
     }"
@@ -25,7 +26,6 @@
     <template #loader>
       <VProgressLinear indeterminate color="primary" height="2" v-if="status === 'Pending'" />
     </template>
-
     <template #prepend>
       <VTooltip :text="node?.location.country" :disabled="!node">
         <template #activator="{ props }">
@@ -52,7 +52,7 @@
           </VChip>
         </template>
       </VTooltip>
-      <VTooltip text="Node Country" v-if="node && node.location.country" location="left">
+      <VTooltip text="Node Country" v-if="node && node.location.country.trim().length > 0" location="left">
         <template #activator="{ props }">
           <VChip class="ml-2" size="x-small" v-bind="props">
             <span class="font-weight-bold" v-text="node?.location.country" />
@@ -68,7 +68,8 @@
         <span class="font-weight-bold" v-text="toReadableDate(node.uptime)" />
       </span>
       <span class="ml-2" v-if="node"
-        >Last Deployment Time: {{ lastDeploymentTime === 0 ? "N/A" : toHumanDate(lastDeploymentTime) }}
+        >Last Deployment Time:
+        {{ lastDeploymentTime === 0 ? "N/A" : toHumanDate(lastDeploymentTime) }}
       </span>
     </template>
 
@@ -157,7 +158,7 @@
         <VCol class="tf-node-resource">
           <ResourceDetails
             name="CPU"
-            :used="node?.used_resources.cru ?? 0"
+            :used="(node?.used_resources.cru ?? 0) + selectedMachines.reduce((r, m) => r + m.cpu, 0)"
             :total="node?.total_resources.cru ?? 0"
             :text="cruText"
             :cpuType="dmi?.processor[0]?.version"
@@ -166,7 +167,7 @@
         <VCol class="tf-node-resource">
           <ResourceDetails
             name="Memory"
-            :used="node?.used_resources.mru ?? 0"
+            :used="(node?.used_resources.mru ?? 0) + selectedMachines.reduce((r, m) => r + (m.memory / 1024) * 1e9, 0)"
             :total="node?.total_resources.mru ?? 0"
             :text="mruText"
             :memoryType="dmi?.memory[0]?.type"
@@ -175,10 +176,10 @@
       </VRow>
 
       <VRow>
-        <VCol class="tf-node-resource">
+        <VCol class="tf-node-resource mb-5">
           <ResourceDetails
             name="SSD Disks"
-            :used="node?.used_resources.sru ?? 0"
+            :used="(node?.used_resources.sru ?? 0) + selectedMachines.reduce((r, m) => r + m.disk * 1e9, 0)"
             :total="node?.total_resources.sru ?? 0"
             :text="sruText"
           />
@@ -192,26 +193,51 @@
           />
         </VCol>
       </VRow>
-      <div class="mt-5 ml-auto text-right">
+      <div class="ml-auto text-right" v-if="node && (rentedByUser || (node.status !== 'down' && node.rentable))">
         <v-tooltip bottom color="primary" close-delay="100" :disabled="!(node && node.dedicated)">
-          <template v-slot:activator="{ isActive, props }" v-if="node && node.dedicated">
-            <span v-bind="props" v-on="isActive" class="font-weight-bold"
-              ><v-icon class="scale_beat mr-2" color="warning">mdi-brightness-percent</v-icon
-              >{{ (price_usd! / 24 / 30).toFixed(2) }} USD/Hour</span
-            >
-          </template>
-
-          <template v-slot:activator="{ isActive, props }" v-else>
+          <template v-slot:activator="{ isActive, props }">
             <span v-bind="props" v-on="isActive" class="font-weight-bold"
               ><v-icon class="scale_beat mr-2" color="warning" :disabled="!(node && node.dedicated)"
                 >mdi-brightness-percent</v-icon
-              >{{ price_usd }} USD/Month</span
+              >{{ hourlyPriceAfterDiscount }} USD/Hour</span
             >
           </template>
+
           <span>
-            Discounts:
             <v-spacer />
-            <ul class="pl-2">
+            <v-card class="text-center pa-4 mt-3"><strong>Available Discount Packages</strong></v-card>
+            <v-data-table
+              class="mb-5 mt-2 rounded-lg"
+              hover
+              :loading="loadingdiscountTableItems"
+              :headers="[
+                {
+                  title: 'Packages',
+                  align: 'center',
+                  key: 'name',
+                  sortable: false,
+                },
+                {
+                  title: 'Discount',
+                  align: 'center',
+                  key: 'discount',
+                  sortable: false,
+                },
+                {
+                  title: 'TFTs Required',
+                  align: 'center',
+                  key: 'tfts',
+                  sortable: false,
+                },
+              ]"
+              :items="discountTableItems"
+              disable-sort="true"
+              density="compact"
+            >
+              <template #bottom></template>
+            </v-data-table>
+
+            <ul class="pl-5 py-2">
               <li>
                 {{ rentedByUser ? "You receive " : "You'll receive " }} a
                 <strong class="mr-1">50%</strong>
@@ -227,6 +253,29 @@
                 <a target="_blank" :href="manual?.discount_levels"> staking discounts </a>
               </li>
             </ul>
+            <v-divider />
+            <v-table density="compact" class="mb-2 no-border discount-table" :hide-default="true">
+              <tbody>
+                <tr class="no-border">
+                  <td class="no-border">Price after discount</td>
+                  <td class="no-border">
+                    <strong>{{ monthlyPriceAfterDiscount }} $/month</strong>
+                  </td>
+                  <td class="no-border">
+                    <strong>{{ hourlyPriceAfterDiscount }} $/hr</strong>
+                  </td>
+                </tr>
+                <tr class="no-border">
+                  <td class="no-border">Price before discount</td>
+                  <td class="text-decoration-line-through no-border">
+                    <strong>{{ price_usd?.toFixed(2) }} $/month</strong>
+                  </td>
+                  <td class="text-decoration-line-through no-border">
+                    <strong>{{ (price_usd! / 24 / 30).toFixed(2) }} $/hr</strong>
+                  </td>
+                </tr>
+              </tbody>
+            </v-table>
           </span>
         </v-tooltip>
 
@@ -242,20 +291,26 @@
 </template>
 <script lang="ts">
 import type { GridClient, NodeInfo, NodeResources } from "@threefold/grid_client";
+import { discountPackages } from "@threefold/grid_client";
 import { CertificationType, type GridNode } from "@threefold/gridproxy_client";
-import { computed, onMounted, ref, watch } from "vue";
-import { capitalize } from "vue";
+import { QueryClient } from "@threefold/tfchain_client";
+import { capitalize, computed, onMounted, type PropType, ref, watch } from "vue";
 
 import { gridProxyClient } from "@/clients";
 import ReserveBtn from "@/dashboard/components/reserve_action_btn.vue";
+import type { SelectedMachine } from "@/types/nodeSelector";
 import toHumanDate from "@/utils/date";
+import type { discountItems } from "@/utils/get_nodes";
 import { getCountryCode } from "@/utils/get_nodes";
 import { manual } from "@/utils/manual";
 import toReadableDate from "@/utils/to_readable_data";
 
+import { calculator as Calculator } from "../../../../grid_client/dist/es6";
 import { useGrid, useProfileManager } from "../../stores";
 import formatResourceSize from "../../utils/format_resource_size";
 import { toGigaBytes } from "../../utils/helpers";
+import { validateRentContract } from "../../utils/nodeSelector";
+import { normalizePrice } from "../../utils/pricing_calculator";
 import ResourceDetails from "./node_details_internals/ResourceDetails.vue";
 
 export default {
@@ -266,6 +321,7 @@ export default {
     status: String as () => "Init" | "Pending" | "Invalid" | "Valid",
     selectable: Boolean,
     flat: Boolean,
+    selectedMachines: { type: Array as PropType<SelectedMachine[]>, default: () => [] },
   },
   emits: {
     "node:select": (node: NodeInfo) => true || node,
@@ -275,10 +331,13 @@ export default {
     const profileManager = useProfileManager();
     const gridStore = useGrid();
     const grid = gridStore.client as unknown as GridClient;
-    const node = ref(props.node);
     const stakingDiscount = ref<number>();
     const loadingStakingDiscount = ref<boolean>(false);
+    const loadingdiscountTableItems = ref<boolean>(false);
     const lastDeploymentTime = ref<number>(0);
+    const discountTableItems = ref<discountItems[]>([]);
+    const tftMarketPrice = ref<number>(0);
+    const calculator = new Calculator(new QueryClient(window.env.SUBSTRATE_URL));
     const rentedByUser = computed(() => {
       return props.node?.rentedByTwinId === profileManager.profile?.twinId;
     });
@@ -298,6 +357,8 @@ export default {
 
     onMounted(async () => {
       await getLastDeploymentTime();
+      tftMarketPrice.value = await calculator.tftPrice();
+      tftsNeeded();
     });
 
     async function refreshStakingDiscount() {
@@ -322,59 +383,59 @@ export default {
     }
 
     const dedicated = computed(() => {
-      if (isGridNode(node.value)) {
-        return node.value?.dedicated;
+      if (isGridNode(props.node)) {
+        return props.node?.dedicated;
       }
       return null;
     });
 
     const serialNumber = computed(() => {
-      if (isGridNode(node.value)) {
+      if (isGridNode(props.node)) {
         return null;
       }
-      return node.value?.serialNumber;
+      return props.node?.serialNumber;
     });
 
     const num_gpu = computed(() => {
-      if (isGridNode(node.value)) {
-        return node.value?.num_gpu;
+      if (isGridNode(props.node)) {
+        return props.node?.num_gpu;
       }
-      return node.value?.hasGPU;
+      return props.node?.hasGPU;
     });
 
     const rentable = computed(() => {
-      if (isGridNode(node.value)) {
-        return node.value?.rentable;
+      if (isGridNode(props.node)) {
+        return props.node?.rentable;
       }
       return null;
     });
 
     const rented = computed(() => {
-      if (isGridNode(node.value)) {
-        return node.value?.rented;
+      if (isGridNode(props.node)) {
+        return props.node?.rented;
       }
       return null;
     });
 
     const speed = computed(() => {
-      if (isGridNode(node.value)) {
-        return node.value?.speed;
+      if (isGridNode(props.node)) {
+        return props.node?.speed;
       }
       return null;
     });
 
     const price_usd = computed(() => {
-      if (isGridNode(node.value)) {
+      if (isGridNode(props.node)) {
         // convert extra fee from mili usd to usd
-        const extraFee = node.value?.extraFee / 1000;
-        return node.value?.price_usd + extraFee;
+        const extraFee = props.node?.extraFee / 1000;
+        return props.node?.price_usd + extraFee;
       }
       return null;
     });
 
     const dmi = computed(() => {
-      if (isGridNode(node.value)) {
-        return node.value?.dmi;
+      if (isGridNode(props.node)) {
+        return props.node?.dmi;
       }
       return null;
     });
@@ -385,7 +446,16 @@ export default {
           return "";
         }
 
-        const used = formatResourceSize(props.node.used_resources[name]);
+        let additionalUsed = 0;
+        if (name === "mru") {
+          additionalUsed = props.selectedMachines.reduce((r, m) => r + (m.memory / 1024) * 1e9, 0);
+        }
+
+        if (name === "sru") {
+          additionalUsed = props.selectedMachines.reduce((r, m) => r + m.disk * 1e9, 0);
+        }
+
+        const used = formatResourceSize(props.node.used_resources[name] + additionalUsed);
         const total = formatResourceSize(props.node.total_resources[name]);
 
         if (total === "0") return "";
@@ -417,6 +487,7 @@ export default {
       try {
         const total_resources = props.node?.total_resources;
         const { cru, hru, mru, sru } = total_resources as NodeResources;
+
         const price = await grid?.calculator.calculateWithMyBalance({
           cru,
           hru: toGigaBytes(hru),
@@ -433,11 +504,11 @@ export default {
     }
 
     function onReserveChange() {
-      if (!node.value) {
+      if (!props.node) {
         return;
       }
 
-      const n = { ...node.value } as NodeInfo | GridNode;
+      const n = { ...props.node } as NodeInfo | GridNode;
       const gotReserved = n.rentedByTwinId === 0;
 
       if (gotReserved) {
@@ -448,7 +519,6 @@ export default {
         n.rented = false;
       }
       n.rentable = !n.rented;
-
       ctx.emit("update:node", n);
     }
 
@@ -463,7 +533,7 @@ export default {
     }
 
     async function getLastDeploymentTime() {
-      if (props.node?.id) {
+      if (props.node?.id && props.node?.status == "up") {
         try {
           const obj = await gridProxyClient.nodes.statsById(props.node.nodeId);
           lastDeploymentTime.value = obj.users.last_deployment_timestamp;
@@ -474,7 +544,71 @@ export default {
       }
     }
 
+    function formatDiscount(discount: number) {
+      return `-${discount}%`;
+    }
+    function formatTFTsNeeded(duration: number) {
+      if (price_usd.value && tftMarketPrice.value) {
+        const tfts = normalizePrice((price_usd.value * 0.5 * duration) / tftMarketPrice.value);
+        return Math.ceil(tfts);
+      }
+      return 0;
+    }
+
+    function tftsNeeded() {
+      loadingdiscountTableItems.value = true;
+
+      discountTableItems.value = [
+        {
+          name: "Default",
+          discount: formatDiscount(discountPackages.default.discount),
+          tfts: formatTFTsNeeded(discountPackages.default.duration),
+        },
+        {
+          name: "Bronze",
+          discount: formatDiscount(discountPackages.bronze.discount),
+          tfts: formatTFTsNeeded(discountPackages.bronze.duration),
+        },
+        {
+          name: "Silver",
+          discount: formatDiscount(discountPackages.silver.discount),
+          tfts: formatTFTsNeeded(discountPackages.silver.duration),
+        },
+        {
+          name: "Gold",
+          discount: formatDiscount(discountPackages.gold.discount),
+          tfts: formatTFTsNeeded(discountPackages.gold.duration),
+        },
+      ];
+
+      loadingdiscountTableItems.value = false;
+    }
+
+    const monthlyPriceAfterDiscount = computed(() => {
+      if (price_usd.value) {
+        if (stakingDiscount.value) {
+          const priceAfterDiscount = price_usd.value - 0.5 * price_usd.value;
+          return (priceAfterDiscount - (stakingDiscount.value / 100) * priceAfterDiscount).toFixed(2);
+        }
+        return (price_usd.value - 0.5 * price_usd.value).toFixed(2);
+      }
+      return null;
+    });
+    const hourlyPriceAfterDiscount = computed(() => {
+      if (price_usd.value) {
+        const hourlyPrice = price_usd.value / 24 / 30;
+        if (stakingDiscount.value) {
+          const priceAfterDiscount = hourlyPrice - 0.5 * hourlyPrice;
+          return (priceAfterDiscount - (stakingDiscount.value / 100) * priceAfterDiscount).toFixed(2);
+        }
+        return (hourlyPrice - 0.5 * hourlyPrice).toFixed(2);
+      }
+      return null;
+    });
     return {
+      hourlyPriceAfterDiscount,
+      monthlyPriceAfterDiscount,
+
       cruText,
       mruText,
       sruText,
@@ -500,7 +634,11 @@ export default {
       formatSpeed,
       onReserveChange,
       getNodeStatusColor,
+      validateRentContract,
+      discountTableItems,
       lastDeploymentTime,
+      loadingdiscountTableItems,
+      gridStore,
     };
   },
 };
@@ -536,6 +674,12 @@ export default {
   100% {
     transform: scale(1.2);
   }
+}
+.discount-table,
+tr,
+td.no-border {
+  border: none !important;
+  background-color: transparent;
 }
 
 .v-icon--disabled {

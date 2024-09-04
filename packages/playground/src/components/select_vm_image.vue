@@ -2,7 +2,7 @@
   <input-tooltip
     tooltip="A virtual machine (VM) image is a snapshot or template of a virtual machine that contains the necessary components to create and run a virtual instance of an operating system. It includes the operating system, installed applications, configurations, and any additional files or data required for the virtual machine, also you can put your own image/flist by choosing the other option."
   >
-    <v-autocomplete
+    <v-select
       label="VM Image"
       :items="[...$props.images, { name: 'Other' }]"
       return-object
@@ -29,13 +29,11 @@
       </input-tooltip>
     </input-validator>
 
-    <input-validator :rules="[validators.required('Entry point is required.')]" :value="entryPoint" #="{ props }">
-      <input-tooltip
-        tooltip="The entry point of the selected flist. It's the first process that runs on the machine once it's deployed."
-      >
-        <v-text-field label="Entry Point" v-model="entryPoint" v-bind="props" />
-      </input-tooltip>
-    </input-validator>
+    <input-tooltip
+      tooltip="The entry point of the selected flist. It's the first process that runs on the machine once it's deployed."
+    >
+      <v-text-field label="Entry Point" v-model="entryPoint" />
+    </input-tooltip>
   </template>
 </template>
 
@@ -61,12 +59,14 @@ const props = defineProps({
 });
 const emits = defineEmits<{ (event: "update:model-value", value?: Flist): void }>();
 const flist = ref<string>();
-const entryPoint = ref<string>();
+const entryPoint = ref<string>("");
 
 const image = ref<VmImage>(props.images[0]);
+const name = ref<string>();
 watch(
   image,
   vm => {
+    name.value = vm.name;
     if (vm.name !== "Other") {
       flist.value = vm.flist;
       entryPoint.value = vm.entryPoint;
@@ -76,9 +76,9 @@ watch(
 );
 
 watch(
-  [flist, entryPoint],
-  ([value, entryPoint]) => {
-    emits("update:model-value", value && entryPoint ? { value, entryPoint } : undefined);
+  [flist, entryPoint, name],
+  ([value, entryPoint, name]) => {
+    emits("update:model-value", value ? { name, value, entryPoint } : undefined);
   },
   { immediate: true, deep: true },
 );

@@ -1,3 +1,5 @@
+import { InsufficientBalanceError } from "@threefold/types";
+
 import type { NodeGPUCardType } from "../utils/filter_nodes";
 
 export function downloadAsFile(name: string, data: string) {
@@ -25,7 +27,19 @@ export function downloadAsJson(data: object, filename: string) {
   a.remove();
 }
 
+/* prettier-ignore */
+const HANDLED_ERRORS = [
+  [InsufficientBalanceError, "Failed to apply Transaction due to account balance is too low."],
+  /** @Usage [Constructor, "messageError"] */
+] as const;
+
 export function normalizeError(error: any, fallbackError: string): string {
+  for (const [Ctor, msg] of HANDLED_ERRORS) {
+    if (error instanceof Ctor) {
+      return msg;
+    }
+  }
+
   return typeof error === "string"
     ? error
     : error && typeof error === "object" && "message" in error && typeof error.message === "string"

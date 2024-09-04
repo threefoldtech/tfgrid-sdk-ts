@@ -16,7 +16,7 @@
     </v-tooltip>
 
     <span v-if="showDialogue">
-      <v-dialog v-model="showDialogue" max-width="600">
+      <v-dialog v-model="showDialogue" max-width="600" attach="#modals">
         <v-card>
           <v-card-title class="bg-primary"> Set Additional Fees </v-card-title>
           <v-card-text>
@@ -66,6 +66,7 @@
 </template>
 
 <script lang="ts">
+import { TFChainError } from "@threefold/tfchain_client";
 import { onMounted, ref, watch } from "vue";
 
 import { useGrid } from "../../stores";
@@ -119,8 +120,10 @@ export default {
         });
         createCustomToast("Additional fee is set successfully.", ToastType.success);
         await getExtraFee();
-      } catch (error) {
-        createCustomToast("Failed to set additional fees!", ToastType.danger);
+      } catch (e) {
+        let msg = "Failed to set additional fees.";
+        if (e instanceof TFChainError && e.keyError === "NodeHasActiveContracts") msg += " Node has active contracts.";
+        createCustomToast(msg, ToastType.danger);
       } finally {
         isSetting.value = false;
         showDialogue.value = false;

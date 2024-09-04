@@ -73,3 +73,12 @@ export interface SelectionDetails {
   gpuCards: GPUCardInfo[];
   domain?: DomainInfo;
 }
+
+export interface SelectedMachine {
+  farmId: number;
+  nodeId: number;
+  cpu: number;
+  memory: number;
+  disk: number;
+  publicIp: boolean;
+}

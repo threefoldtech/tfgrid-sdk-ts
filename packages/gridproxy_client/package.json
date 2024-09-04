@@ -1,9 +1,17 @@
 {
   "name": "@threefold/gridproxy_client",
-  "version": "2.5.0-rc1",
+  "version": "2.5.0",
   "description": "gridproxy_client help to interact with gridproxy based on network",
-  "main": "dist/public_api.js",
-  "types": "dist/public_api.d.ts",
+  "main": "./dist/node/public_api.js",
+  "module": "./dist/es6/public_api.js",
+  "exports": {
+    "require": "./dist/node/public_api.js",
+    "import": "./dist/es6/public_api.js"
+  },
+  "types": "dist/es6/public_api.d.ts",
+  "files": [
+    "/dist"
+  ],
   "repository": "git@github.com:MohamedElmdary/gridproxy_client.git",
   "author": "MohamedElmdary <engm5081@gmail.com>",
   "license": "MIT",
@@ -12,7 +20,9 @@
     "access": "public"
   },
   "scripts": {
-    "build": "tsc"
+    "build": "npm run es6-build && npm run node-build",
+    "node-build": "tsc --build tsconfig-node.json",
+    "es6-build": "tsc --build tsconfig.json"
   },
   "devDependencies": {
     "typescript": "^4.8.4"

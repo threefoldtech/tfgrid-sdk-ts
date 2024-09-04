@@ -40,6 +40,7 @@
 
             <v-tooltip class="overflowText" v-if="item.hint && !item.icon" location="top" :text="item.hint">
               <template #activator="{ props }">
+                <span class="flag-avatar" v-if="item.name === 'Flag' && !item.imgSrc">NA</span>
                 <p class="font-14" v-bind="props">
                   {{
                     item.value && item.value.length > maxLenChar ? item.value.slice(0, maxLenChar) + "..." : item.value
@@ -144,6 +145,13 @@ export default {
 </script>
 
 <style scoped>
+.flag-avatar {
+  padding: 7px;
+  background-color: var(--primary);
+  border-radius: 50%;
+  color: white;
+  font-weight: 700;
+}
 .bb-gray {
   border-bottom: 1px solid gray;
 }

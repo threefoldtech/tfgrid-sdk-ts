@@ -1,6 +1,6 @@
 <template>
   <container>
-    <v-dialog v-model="openUnreserveDialog" max-width="600" class="custom-dialog">
+    <v-dialog v-model="openUnreserveDialog" max-width="600" class="custom-dialog" attach="#modals">
       <v-card>
         <v-card-title class="pt-4">
           <span style="display: flex; align-items: center">
@@ -21,6 +21,7 @@
       v-if="node.rentedByTwinId === 0"
       :disabled="disableButton || hasInsufficientBalance"
       @click.stop="reserveNode"
+      color="primary"
     >
       Reserve
     </v-btn>

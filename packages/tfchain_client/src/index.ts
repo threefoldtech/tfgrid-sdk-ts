@@ -12,3 +12,5 @@ export * from "./twins";
 export * from "./types";
 export * from "./utility";
 export * from "./tft_bridge";
+export * from "./council";
+export { ITFChainError, TFChainError, TFChainErrorWrapper } from "./errors";

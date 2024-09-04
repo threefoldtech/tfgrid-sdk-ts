@@ -1,6 +1,8 @@
 import type { FarmFilterOptions, FarmInfo, FilterOptions, NodeInfo } from "@threefold/grid_client";
-import type { NodeStatus } from "@threefold/gridproxy_client";
+import type { Farm, NodeStatus } from "@threefold/gridproxy_client";
 import { GridClientErrors } from "@threefold/types";
+import type AwaitLock from "await-lock";
+import shuffle from "lodash/fp/shuffle.js";
 import type { DeepPartial } from "utility-types";
 import { z } from "zod";
 
@@ -13,6 +15,7 @@ import type {
   NormalizeNodeFiltersOptions,
   NumericValidator,
   SelectedLocation,
+  SelectedMachine,
   SelectionDetailsFilters,
   SelectionDetailsFiltersValidators,
 } from "../types/nodeSelector";
@@ -104,6 +107,7 @@ export function normalizeFarmFilters(
     publicIp: filters.ipv4 || undefined,
     nodeCertified: filters.certified || undefined,
     nodeHasGPU: filters.hasGPU || undefined,
+    nodeHasIPv6: filters.ipv6 || undefined,
   };
 }
 
@@ -195,6 +199,7 @@ export function normalizeNodeFilters(
         (filters.solutionDisk ?? 0) + (filters.rootFilesystemSize ?? 0),
       ) || undefined,
     publicIPs: filters.ipv4 || undefined,
+    hasIPv6: filters.ipv6 || undefined,
     hasGPU: filters.hasGPU || undefined,
     rentedBy: filters.dedicated ? options.twinId : undefined,
     certified: filters.certified || undefined,
@@ -240,7 +245,29 @@ export async function validateRentContract(
     throw err;
   }
 }
+
+export function release(lock?: AwaitLock) {
+  if (lock?.acquired) {
+    lock.release();
+    return true;
+  }
+  return false;
+}
+
 export async function loadValidNodes(
+  gridStore: ReturnType<typeof useGrid>,
+  selectionFitlers: SelectionDetailsFilters,
+  filters: FilterOptions,
+  pagination: ReturnType<typeof usePagination>,
+  nodesLock?: AwaitLock,
+): Promise<NodeInfo[]> {
+  if (nodesLock) {
+    await nodesLock.acquireAsync();
+  }
+  return _loadValidNodes(gridStore, selectionFitlers, filters, pagination);
+}
+
+async function _loadValidNodes(
   gridStore: ReturnType<typeof useGrid>,
   selectionFitlers: SelectionDetailsFilters,
   filters: FilterOptions,
@@ -263,8 +290,82 @@ export async function loadValidNodes(
   return [];
 }
 
+type GetFarmFn = (farmId: number) => Farm | undefined;
+export function isNodeValid(
+  getFarm: GetFarmFn,
+  node: NodeInfo,
+  machines: SelectedMachine[],
+  filters: FilterOptions,
+): boolean {
+  const machinesWithSameNode = machines.filter(m => m.nodeId === node.nodeId);
+  const requiredMru = (filters.mru ?? 0) * 1e9;
+  const requiredSru = (filters.sru ?? 0) * 1e9;
+
+  let mru = node.total_resources.mru - node.used_resources.mru;
+  let sru = node.total_resources.sru - node.used_resources.sru;
+  for (const machine of machinesWithSameNode) {
+    mru -= machine.memory * 1e9;
+    sru -= machine.disk * 1e9;
+  }
+
+  let valid = mru >= requiredMru && sru >= requiredSru;
+
+  if (valid && filters.publicIPs) {
+    const ipsCount = machines.filter(m => m.publicIp && m.farmId === node.farmId).length + 1;
+    if (ipsCount > 1) {
+      const farm = getFarm(node.farmId);
+      if (farm) {
+        valid &&= farm.publicIps.filter(ip => ip.contract_id === 0).length >= ipsCount;
+      }
+    }
+  }
+
+  return valid;
+}
+
+export async function selectValidNode(
+  getFarm: GetFarmFn,
+  nodes: NodeInfo[],
+  selectedMachines: SelectedMachine[],
+  filters: FilterOptions,
+  oldSelectedNodeId?: number,
+  nodesLock?: AwaitLock,
+): Promise<NodeInfo | void> {
+  let locked = true;
+  if (nodesLock && !nodesLock.acquired) {
+    locked = false;
+    await nodesLock.acquireAsync();
+  }
+
+  if (oldSelectedNodeId) {
+    const node = nodes.find(n => n.nodeId === oldSelectedNodeId);
+
+    if (node && isNodeValid(getFarm, node, selectedMachines, filters)) {
+      if (nodesLock && !locked) {
+        release(nodesLock);
+      }
+      return node;
+    }
+  }
+
+  for (const node of shuffle(nodes)) {
+    if (isNodeValid(getFarm, node, selectedMachines, filters)) {
+      if (nodesLock && !locked) {
+        release(nodesLock);
+      }
+      return node;
+    }
+  }
+
+  if (nodesLock && !locked) {
+    release(nodesLock);
+  }
+}
+
 export async function getNodePageCount(gridStore: ReturnType<typeof useGrid>, filters: FarmFilterOptions) {
-  const count = await gridStore.client.capacity.getNodesCount(filters);
+  const clonedFilter = { ...filters };
+  clonedFilter.size = 0;
+  const count = await gridStore.client.capacity.getNodesCount(clonedFilter);
   return Math.ceil(count / window.env.PAGE_SIZE);
 }
 

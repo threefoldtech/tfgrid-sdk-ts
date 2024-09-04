@@ -4,6 +4,8 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.alert import Alert
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import StaleElementReferenceException
+import time
 
 class BridgePage:
 
@@ -44,6 +46,7 @@ class BridgePage:
     
     def twin_address(self):
         self.browser.find_element(*self.deposit_close_button).click()
+        WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.twin_page))
         self.browser.find_element(*self.twin_page).click()
         return self.browser.find_element(*self.twin_address_text).text 
 
@@ -86,7 +89,14 @@ class BridgePage:
         self.browser.find_element(*self.amount_tft).send_keys(data)
     
     def setup_widthdraw_address(self, data):
-        balance = self.browser.find_element(*self.balance_text).text[:-4]
+        balance = 'Loadin'
+        while(balance == 'Loadin'):
+            while True:
+                try:
+                    balance = self.browser.find_element(*self.balance_text).text[:-4]
+                    break  # Exit the loop if interaction is successful
+                except StaleElementReferenceException:
+                    time.sleep(0.5)
         self.browser.find_element(*self.withdraw).click()
         self.browser.find_element(*self.stellar_address).send_keys(Keys.CONTROL + "a")
         self.browser.find_element(*self.stellar_address).send_keys(Keys.DELETE)
@@ -97,6 +107,7 @@ class BridgePage:
         self.browser.find_element(*self.stellar_address).send_keys(Keys.CONTROL + "a")
         self.browser.find_element(*self.stellar_address).send_keys(Keys.DELETE)
         self.browser.find_element(*self.stellar_address).send_keys(data)
+        time.sleep(2)
         return self.browser.find_element(*self.submit_button).is_enabled()
 
     def check_withdraw_tft_amount(self, data):
@@ -104,12 +115,14 @@ class BridgePage:
         self.browser.find_element(*self.amount_tft).send_keys(Keys.DELETE)
         self.browser.find_element(*self.amount_tft).send_keys(data)
         WebDriverWait(self.browser, 30).until(EC.element_to_be_clickable(self.submit_button))
+        time.sleep(2)
         return self.browser.find_element(*self.submit_button).is_enabled()
 
     def check_withdraw_invalid_tft_amount(self, data):
         self.browser.find_element(*self.amount_tft).send_keys(Keys.CONTROL + "a")
         self.browser.find_element(*self.amount_tft).send_keys(Keys.DELETE)
         self.browser.find_element(*self.amount_tft).send_keys(data)
+        time.sleep(2)
         return self.browser.find_element(*self.submit_button).is_enabled()
 
     def check_withdraw(self, address, amount):
@@ -125,20 +138,40 @@ class BridgePage:
         return self.browser.find_element(*self.submit_button)
     
     def get_balance(self):
-        new_balance = self.browser.find_element(*self.balance_text).text[:-4]
+        while True:
+            try:
+                new_balance = self.browser.find_element(*self.balance_text).text[:-4]
+                break  # Exit the loop if interaction is successful
+            except StaleElementReferenceException:
+                time.sleep(0.5)
         WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.transfer_tft_title))
         while('Loadin' in new_balance):
             self.wait_for(' Balance: ')
-            new_balance = self.browser.find_element(*self.balance_text).text[:-4]
+            while True:
+                try:
+                    new_balance = self.browser.find_element(*self.balance_text).text[:-4]
+                    break  # Exit the loop if interaction is successful
+                except StaleElementReferenceException:
+                    time.sleep(0.5)
         return new_balance
     
     def get_balance_withdraw(self, balance):
-        new_balance = self.browser.find_element(*self.balance_text).text[:-4]
+        while True:
+            try:
+                new_balance = self.browser.find_element(*self.balance_text).text[:-4]
+                break  # Exit the loop if interaction is successful
+            except StaleElementReferenceException:
+                time.sleep(0.5)
         self.browser.refresh()
-        alert = Alert(self.browser)
-        alert.accept()
+        # alert = Alert(self.browser)
+        # alert.accept()
         while(new_balance==balance):
-            new_balance = self.browser.find_element(*self.balance_text).text[:-4]
+            while True:
+                try:
+                    new_balance = self.browser.find_element(*self.balance_text).text[:-4]
+                    break  # Exit the loop if interaction is successful
+                except StaleElementReferenceException:
+                    time.sleep(0.5)
         return new_balance
 
     def wait_for_button(self, button):

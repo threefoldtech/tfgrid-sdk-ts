@@ -14,8 +14,8 @@
           </v-col>
         </v-row>
       </div>
-      <v-card class="pa-5">
-        <v-row>
+      <v-card class="d-flex">
+        <v-row align="center" class="pa-5">
           <v-col color="red" v-if="failed">
             <v-alert type="error" variant="tonal">
               Failed to get stats data after 3 attempts, Feel free to contact the support team or try again later.
@@ -24,14 +24,21 @@
               </v-btn>
             </v-alert>
           </v-col>
-          <v-col xl="6" lg="6" md="12" cols="12" class="mx-auto mt-15 pr-2">
+          <v-col cols="12" md="8">
             <tf-map r="125" g="227" b="200" :nodes="nodesDistribution" />
           </v-col>
-          <v-divider class="main_divider mx-1 my-4" vertical></v-divider>
-          <v-col v-if="Istats.length !== 0" class="d-flex flex-wrap justify-start">
-            <v-col v-for="item of Istats" :key="item.title" xl="4" lg="6" md="6" cols="12" class="px-0 py-0">
-              <StatisticsCard :item="item" />
-            </v-col>
+          <v-col v-if="Istats.length !== 0" cols="12" md="4">
+            <v-row>
+              <v-col
+                v-for="(item, index) of Istats"
+                :key="item.title"
+                :cols="index === Istats.length - 1 ? 12 : 6"
+                :md="index === Istats.length - 1 ? 12 : 6"
+                class="d-flex flex-grow-1"
+              >
+                <StatisticsCard :item="item" />
+              </v-col>
+            </v-row>
           </v-col>
         </v-row>
       </v-card>
@@ -67,6 +74,12 @@ function mergeNodeDistribution(stats: Stats["nodesDistribution"][]) {
     stats.forEach(country => {
       res[key] += country[key] ?? 0;
     });
+
+    if (key === "The Netherlands" && res["The Netherlands"]) {
+      res["Netherlands"] = res["The Netherlands"];
+      delete res["The Netherlands"];
+    }
+
     return res;
   }, {} as { [key: string]: number });
 }

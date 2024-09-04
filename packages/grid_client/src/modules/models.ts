@@ -4,6 +4,7 @@ import { Expose, Transform, Type } from "class-transformer";
 import {
   ArrayNotEmpty,
   IsAlphanumeric,
+  IsArray,
   IsBoolean,
   IsDefined,
   IsEnum,
@@ -20,10 +21,11 @@ import {
   ValidateNested,
 } from "class-validator";
 
+import { IsAlphanumericExpectUnderscore } from "../helpers";
 import { Deployment } from "../zos/deployment";
 import { ZdbModes } from "../zos/zdb";
 import { blockchainType } from "./blockchainInterface";
-const NameLength = 15;
+const NameLength = 50;
 const FarmNameLength = 40;
 
 enum ContractStates {
@@ -92,23 +94,42 @@ class NetworkModel {
 }
 
 class MyceliumNetworkModel {
+  /**
+   * ### Mycelium Network Seed:
+   * - The `seed` is an optional field used to provide a specific seed for the Mycelium network.
+   * - If not provided, the `GridClient` will generate a seed automatically when the `mycelium` flag is enabled.
+   * - **Use Case:** If you need the new machine to have the same IP address as a previously deleted machine, set the `seed` field to the old seed value.
+   */
   @Expose() @IsString() @Length(32) seed?: string;
   @Expose() @IsInt() @Min(1) nodeId: number;
 }
 
 class BaseGetDeleteModel {
-  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
+  @Expose() @IsString() @IsNotEmpty() @IsAlphanumericExpectUnderscore() @MaxLength(NameLength) name: string;
 }
 
 class MachineModel {
-  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
+  @Expose() @IsString() @IsNotEmpty() @MaxLength(NameLength) @IsAlphanumericExpectUnderscore() name: string;
   @Expose() @IsInt() @Min(1) node_id: number;
   @Expose() @IsOptional() @Type(() => DiskModel) @ValidateNested({ each: true }) disks?: DiskModel[];
   @Expose() @IsOptional() @Type(() => QSFSDiskModel) @ValidateNested({ each: true }) qsfs_disks?: QSFSDiskModel[];
   @Expose() @IsBoolean() public_ip: boolean;
   @Expose() @IsOptional() @IsBoolean() public_ip6?: boolean;
   @Expose() @IsBoolean() planetary: boolean;
+  /**
+   * ### Mycelium Flag Behavior:
+   * - When the `mycelium` flag is enabled, there’s no need to manually provide the `myceliumSeed` flag.
+   * - The `GridClient` will automatically generate the necessary seed for you.
+   * - **However**, if you have **an existing seed** from a previously deleted machine and wish to deploy a new machine that retains the same IP address,
+   * - **you can simply pass in the old seed during deployment instead of calling the `generateRandomHexSeed()` function**.
+   */
   @Expose() @IsBoolean() mycelium: boolean;
+  /**
+   * ### Mycelium Seed:
+   * - The `myceliumSeed` is an optional field used to provide a specific seed for the Mycelium network.
+   * - If not provided, the `GridClient` will generate a seed automatically when the `mycelium` flag is enabled.
+   * - **Use Case:** If you need the new machine to have the same IP address as a previously deleted machine, set the `seed` field to the old seed value.
+   */
   @Expose() @IsOptional() @IsString() @Length(6) myceliumSeed?: string;
   @Expose() @IsInt() @Min(1) cpu: number;
   @Expose() @Min(256) memory: number; // in MB
@@ -124,7 +145,7 @@ class MachineModel {
 }
 
 class MachinesModel {
-  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
+  @Expose() @IsString() @IsNotEmpty() @IsAlphanumericExpectUnderscore() @MaxLength(NameLength) name: string;
   @Expose() @Type(() => NetworkModel) @ValidateNested() network: NetworkModel;
   @Expose() @Type(() => MachineModel) @ValidateNested({ each: true }) machines: MachineModel[];
   @Expose() @IsString() @IsOptional() metadata?: string;
@@ -137,8 +158,8 @@ class AddMachineModel extends MachineModel {
 }
 
 class DeleteMachineModel {
-  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
-  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) deployment_name: string;
+  @Expose() @IsString() @IsNotEmpty() @IsAlphanumericExpectUnderscore() @MaxLength(NameLength) name: string;
+  @Expose() @IsString() @IsNotEmpty() @IsAlphanumericExpectUnderscore() @MaxLength(NameLength) deployment_name: string;
 }
 
 class MachinesGetModel extends BaseGetDeleteModel {}
@@ -233,7 +254,7 @@ class QSFSZDBGetModel extends BaseGetDeleteModel {}
 class QSFSZDBDeleteModel extends BaseGetDeleteModel {}
 
 class BaseGatewayNameModel {
-  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength + 20) name: string;
+  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
 }
 
 class GatewayFQDNModel extends BaseGatewayNameModel {
@@ -340,7 +361,7 @@ class GetServiceContractModel {
   @Expose() @IsInt() @Min(1) serviceId: number;
 }
 class NameContractGetModel {
-  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength + 20) name: string;
+  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
 }
 
 class NodeContractUpdateModel {
@@ -404,7 +425,6 @@ class KVStoreBatchRemoveModel {
   @Expose() @ArrayNotEmpty() @IsString({ each: true }) keys: string[];
 }
 class DaoVoteModel {
-  @Expose() @IsString() @IsNotEmpty() address: string;
   @Expose() @IsInt() @IsNotEmpty() @Min(1) farmId: number;
   @Expose() @IsBoolean() approve: boolean;
   @Expose() @IsString() @IsNotEmpty() hash: string;
@@ -455,7 +475,6 @@ class TfchainWalletBalanceByAddressModel {
 }
 class TfchainDaoVoteModel {
   @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
-  @Expose() @IsString() @IsNotEmpty() address: string;
   @Expose() @IsInt() @IsNotEmpty() @Min(1) farmId: number;
   @Expose() @IsBoolean() approve: boolean;
   @Expose() @IsString() @IsNotEmpty() hash: string;
@@ -593,6 +612,7 @@ class FilterOptions {
   @Expose() @IsOptional() @Min(0) sru?: number; // GB
   @Expose() @IsOptional() @Min(0) hru?: number; // GB
   @Expose() @IsOptional() @IsBoolean() publicIPs?: boolean;
+  @Expose() @IsOptional() @IsBoolean() hasIPv6?: boolean;
   @Expose() @IsOptional() @IsBoolean() accessNodeV4?: boolean;
   @Expose() @IsOptional() @IsBoolean() accessNodeV6?: boolean;
   @Expose() @IsOptional() @IsBoolean() gateway?: boolean;
@@ -629,6 +649,7 @@ class FarmFilterOptions {
   @Expose() @IsOptional() @Min(0) nodeSRU?: number; // GB
   @Expose() @IsOptional() @Min(0) nodeHRU?: number; // GB
   @Expose() @IsOptional() @IsBoolean() publicIp?: boolean;
+  @Expose() @IsOptional() @IsBoolean() nodeHasIPv6?: boolean;
   @Expose() @IsOptional() @IsBoolean() certificationType?: CertificationType;
   @Expose() @IsOptional() @IsString() farmName?: string;
   @Expose() @IsOptional() @IsString() country?: string;
@@ -684,6 +705,11 @@ class NodeCPUTest {
   @Expose() @IsNotEmpty() @IsString() description: string;
   @Expose() @IsNotEmpty() @IsNumber() timestamp: number;
   @Expose() result: CPUBenchmark | {};
+}
+
+class NodeHealthCheck {
+  @Expose() @IsArray() cache: [];
+  @Expose() @IsArray() network: [];
 }
 
 class NodeIPValidation {
@@ -843,6 +869,58 @@ interface GPUCardInfo {
   vendor: string;
 }
 
+class ZOSVersionResultModel {
+  @Expose() @IsString() @IsNotEmpty() zos: string;
+  @Expose() @IsString() @IsNotEmpty() zinit: string;
+}
+
+class ZOSResources {
+  @Expose() @IsNumber() @IsNotEmpty() cru: number;
+  @Expose() @IsNumber() @IsNotEmpty() sru: number;
+  @Expose() @IsNumber() @IsNotEmpty() hru: number;
+  @Expose() @IsNumber() @IsNotEmpty() mru: number;
+  @Expose() @IsNumber() @IsNotEmpty() ipv4u: number;
+}
+
+class ZOSNodeStatistics {
+  system: ZOSResources;
+  total: ZOSResources;
+  used: ZOSResources;
+  users: {
+    deployments: number;
+    workloads: number;
+    last_deployment_timestamp: number;
+  };
+}
+
+class ZOSNetworkInterfaces {
+  @Expose() @IsArray() ygg: string[];
+  @Expose() @IsArray() zos: string[];
+}
+
+class ZOSNetworkPublicConfig {
+  @Expose() @IsString() type: string;
+  @Expose() @IsString() ipv4: string;
+  @Expose() @IsString() ipv6: string;
+  @Expose() @IsString() gw4: string;
+  @Expose() @IsString() gw6: string;
+  @Expose() @IsString() domain: string;
+}
+
+class ZOSStoragePools {
+  @Expose() @IsString() @IsNotEmpty() name: string;
+  @Expose() @IsString() @IsNotEmpty() type: string;
+  @Expose() @IsNumber() size: number;
+  @Expose() @IsNumber() used: number;
+}
+
+class ZOSNodePerfTestsResult {
+  @Expose() iperf?: NodeIPerf;
+  @Expose() publicIPValidation?: NodeIPValidation;
+  @Expose() healthCheck?: NodeHealthCheck;
+  @Expose() cpuBenchmark?: NodeCPUTest;
+}
+
 export {
   AlgorandAccountCreateModel,
   AlgorandAccountInitModel,
@@ -981,5 +1059,12 @@ export {
   NodeCPUTest,
   NodeIPValidation,
   NodeIPerf,
+  NodeHealthCheck,
   CurrencyModel,
+  ZOSVersionResultModel,
+  ZOSNodeStatistics,
+  ZOSNetworkInterfaces,
+  ZOSNetworkPublicConfig,
+  ZOSStoragePools,
+  ZOSNodePerfTestsResult,
 };

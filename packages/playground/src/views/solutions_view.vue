@@ -1,62 +1,56 @@
 <template>
   <view-layout>
+    <v-card color="primary" class="d-flex justify-center items-center mb-4 pa-3 text-center">
+      <v-icon size="30" class="pr-3">mdi-lightbulb-on-outline</v-icon>
+      <v-card-title class="pa-0">Applications</v-card-title>
+    </v-card>
     <v-text-field label="Search Applications" v-model="searchItem" class="mb-5" clearable></v-text-field>
-    <v-row>
-      <v-col sm="12" md="6" lg="4" v-for="card in filteredCards" :key="card.title">
-        <router-link :to="card.route">
-          <v-hover>
-            <template v-slot:default="{ isHovering, props }">
-              <v-card class="pa-3 pt-6" height="100%" v-bind="props" :class="isHovering ? 'card-opacity' : undefined">
-                <v-img
-                  class="d-inline-block ml-3 mb-2"
-                  width="35"
-                  :src="baseURL + 'images/icons/' + card.icon"
-                  :alt="card.title"
-                  :style="{
-                    filter: `brightness(${$vuetify.theme.global.name === 'light' ? 0.2 : 1})`,
-                    lineHeight: 1,
-                  }"
-                />
-                <v-card-title class="d-inline-block">
-                  {{ card.title }}
-                  <v-chip v-for="tag in card.tags" :key="tag" class="ml-2 pulse-animation">
-                    {{ tag }}
-                  </v-chip>
-                </v-card-title>
-                <v-card-text class="mt-2"> {{ card.excerpt }} </v-card-text>
-              </v-card>
-            </template></v-hover
-          >
-        </router-link>
-      </v-col>
-      <p v-if="filteredCards.length === 0" class="mx-3 mb-3">No solution was found with the provided search query.</p>
-    </v-row>
+    <ApplicationCards :cards="filteredCards" />
+    <p v-if="filteredCards.length === 0" class="mx-3 mb-3">No solution was found with the provided search query.</p>
   </view-layout>
 </template>
 
 <script lang="ts">
 import { computed, ref } from "vue";
 
+import ApplicationCards from "@/components/applications/ApplicationCards.vue";
 import { DashboardRoutes } from "@/router/routes";
-
-interface Card {
-  title: string;
-  excerpt: string;
-  icon: string;
-  route: string;
-  tags?: string[];
-}
+import type { ApplicationCard } from "@/utils/types";
 
 export default {
   name: "SolutionsView",
+  components: {
+    ApplicationCards,
+  },
   setup() {
-    let cards: Card[] = [
+    let cards: ApplicationCard[] = [
+      {
+        title: "Nostr",
+        excerpt:
+          "Nostr is a simple, open protocol that enables global, decentralized, and censorship-resistant social media.",
+        icon: "nostr.png",
+        route: DashboardRoutes.Applications.Nostr,
+      },
+      {
+        title: "Gitea",
+        excerpt:
+          "Gitea is a forge software package for hosting software development version control using Git as well as other collaborative features like bug tracking, code review, continuous integration, kanban boards, tickets, and wikis. It supports self-hosting but also provides a free public first-party instance.",
+        icon: "gitea.png",
+        route: DashboardRoutes.Applications.Gitea,
+      },
       {
         title: "TFRobot",
         excerpt:
           "TFRobot is a command line interface tool that offers simultaneous mass deployment of groups of VMs on the ThreeFold Grid, with support of multiple retries for failed deployments, and customizable configurations.",
         icon: "tfrobot.png",
         route: DashboardRoutes.Applications.TFRobot,
+      },
+      {
+        title: "Jenkins",
+        excerpt:
+          "Jenkins is a popular open-source automation server that enables developers to build, test, and deploy their applications continuously.",
+        icon: "jenkins.png",
+        route: DashboardRoutes.Applications.Jenkins,
       },
       {
         title: "Peertube",
@@ -157,10 +151,16 @@ export default {
         icon: "wordpress.png",
         route: DashboardRoutes.Applications.Wordpress,
       },
+      {
+        title: "Domains",
+        excerpt:
+          "Domains allow users to securely expose servers hosted on local machines or VMs to the public internet.",
+        icon: "domains.png",
+        route: DashboardRoutes.Applications.Domains,
+      },
     ];
     cards = cards.sort((a, b) => a.title.localeCompare(b.title));
 
-    const baseURL = import.meta.env.BASE_URL;
     const searchItem = ref("");
     const filteredCards = computed(() =>
       cards.filter(n => n.title.toLocaleLowerCase().includes(searchItem.value.toLocaleLowerCase())),
@@ -168,20 +168,9 @@ export default {
 
     return {
       cards,
-      baseURL,
       searchItem,
       filteredCards,
     };
   },
 };
 </script>
-
-<style scoped>
-a {
-  text-decoration: none !important;
-}
-
-.card-opacity {
-  background-color: rgba(125, 227, 200, 0.12);
-}
-</style>

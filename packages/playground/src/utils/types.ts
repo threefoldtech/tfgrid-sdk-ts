@@ -14,3 +14,11 @@ export interface IPublicConfig {
   gw6?: string;
   domain?: string;
 }
+
+export interface ApplicationCard {
+  title: string;
+  excerpt: string;
+  icon: string;
+  route: string;
+  tags?: string[];
+}

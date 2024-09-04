@@ -1,14 +1,24 @@
 {
   "name": "@threefold/graphql_client",
-  "version": "2.5.0-rc1",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "version": "2.5.0",
+  "main": "./dist/node/index.js",
+  "module": "./dist/es6/index.js",
+  "exports": {
+    "require": "./dist/node/index.js",
+    "import": "./dist/es6/index.js"
+  },
+  "types": "dist/es6/index.d.ts",
+  "files": [
+    "/dist"
+  ],
   "license": "MIT",
   "scripts": {
-    "build": "tsc"
+    "build": "npm run es6-build && npm run node-build",
+    "node-build": "tsc --build tsconfig-node.json",
+    "es6-build": "tsc --build tsconfig.json"
   },
   "dependencies": {
-    "@threefold/types": "^2.5.0-rc1",
+    "@threefold/types": "2.5.0",
     "ts-mixer": "^6.0.2"
   },
   "devDependencies": {

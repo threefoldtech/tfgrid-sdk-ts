@@ -1,5 +1,5 @@
 <template>
-  <div class="border px-4 pb-4 rounded position-relative mt-2">
+  <div class="border px-4 pb-4 rounded position-relative">
     <v-card color="primary" class="d-flex justify-center items-center mt-3 pa-3 text-center">
       <v-icon size="30" class="pr-3">mdi-note-check-outline</v-icon>
       <v-card-title class="pa-0">DAO</v-card-title>
@@ -68,11 +68,7 @@
               <v-col class="votes">
                 <v-container class="" :style="{}">
                   <v-row v-if="expired(proposal.end)" class="d-flex justify-space-between">
-                    <v-btn
-                      :style="{ backgroundColor: '#1AA18F' }"
-                      @click="openVoteDialog(proposal.hash, true)"
-                      :disabled="loadingVote"
-                      class="text-white"
+                    <v-btn @click="openVoteDialog(proposal.hash, true)" :disabled="loadingVote" variant="flat"
                       >Yes <v-divider class="mx-3" vertical />{{ proposal.ayes.length }}
                     </v-btn>
                     <div class="d-flex align-center text-center pr-2">
@@ -213,7 +209,7 @@
           </v-card>
         </v-window-item>
       </v-window>
-      <v-dialog v-model="openVDialog" max-width="600" scrollable>
+      <v-dialog v-model="openVDialog" max-width="600" scrollable attach="#modals">
         <v-card>
           <v-card-title>Cast Vote</v-card-title>
           <v-card-text>
@@ -239,7 +235,7 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
-      <v-dialog v-model="openInfoModal" width="50vw">
+      <v-dialog v-model="openInfoModal" width="50vw" attach="#modals">
         <v-card>
           <v-card-title class="text-h5 my-2"> Proposals Information </v-card-title>
           <v-divider></v-divider>
@@ -292,7 +288,7 @@
 </template>
 <script lang="ts" setup>
 import type { GridClient } from "@threefold/grid_client";
-import type { Proposal, Proposals } from "@threefold/tfchain_client";
+import { type DaoProposalDetails, type DaoProposals, TFChainError } from "@threefold/tfchain_client";
 import type moment from "moment";
 import { createToast } from "mosha-vue-toastify";
 import { onMounted, ref } from "vue";
@@ -306,9 +302,9 @@ import { updateGrid } from "../utils/grid";
 
 const loadingProposals = ref(true);
 const activeTab = ref(0);
-const activeProposals = ref<Proposal[]>();
-const inactiveProposals = ref<Proposal[]>();
-const proposals = ref<Proposals>();
+const activeProposals = ref<DaoProposalDetails[]>();
+const inactiveProposals = ref<DaoProposalDetails[]>();
+const proposals = ref<DaoProposals>();
 const searchTerm = ref("");
 const openInfoModal = ref(false);
 const openVDialog = ref(false);
@@ -349,7 +345,7 @@ function openVoteDialog(hash: any, vote: boolean) {
   castedVote.value = vote;
   selectedProposal.value = hash;
 }
-function filteredProposals(proposals: Proposal[] | undefined) {
+function filteredProposals(proposals: DaoProposalDetails[] | undefined) {
   if (searchTerm.value.length) {
     if (proposals) {
       return proposals.filter(proposal => proposal.description.toLowerCase().includes(searchTerm.value.toLowerCase()));
@@ -363,7 +359,6 @@ async function castVote() {
   if (grid) {
     try {
       await grid.dao.vote({
-        address: profile.value.address,
         farmId: selectedFarm.value,
         approve: castedVote.value,
         hash: selectedProposal.value,
@@ -376,8 +371,16 @@ async function castVote() {
         showIcon: true,
         type: "success",
       });
+      openVDialog.value = false;
     } catch (err) {
-      createToast(`Vote Failed!`, {
+      let errMsg = `Vote Failed!`;
+
+      if (err instanceof TFChainError && err.keyError == "DuplicateVote") {
+        errMsg = "Failed to vote. You have already voted.";
+      }
+      console.error(errMsg, err);
+
+      createToast(errMsg, {
         position: "top-right",
         hideProgressBar: true,
         toastBackgroundColor: "#FF5252",

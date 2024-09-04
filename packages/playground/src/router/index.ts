@@ -364,6 +364,28 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
         },
       },
     },
+    {
+      path: DashboardRoutes.Applications.Domains,
+      component: () => import("../views/domains_view.vue"),
+      meta: {
+        title: "Domains",
+        info: { page: "info/domains.md" },
+        navbarConfig: {
+          back: true,
+          path: [
+            { title: "Deploy" },
+            {
+              title: "Applications",
+              disabled: false,
+              to: DashboardRoutes.Deploy.Applications,
+            },
+            {
+              title: "Domains",
+            },
+          ],
+        },
+      },
+    },
     // Commented for now and will be user later.
     // {
     //   path: DashboardRoutes.Applications.Freeflow,
@@ -404,6 +426,72 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
             },
             {
               title: "TFRobot",
+            },
+          ],
+        },
+      },
+    },
+    {
+      path: DashboardRoutes.Applications.Jenkins,
+      component: () => import("../views/jenkins_view.vue"),
+      meta: {
+        title: "Jenkins",
+        info: { page: "info/jenkins.md" },
+        navbarConfig: {
+          back: true,
+          path: [
+            { title: "Deploy" },
+            {
+              title: "Applications",
+              disabled: false,
+              to: DashboardRoutes.Deploy.Applications,
+            },
+            {
+              title: "Jenkins",
+            },
+          ],
+        },
+      },
+    },
+    {
+      path: DashboardRoutes.Applications.Gitea,
+      component: () => import("../views/gitea_view.vue"),
+      meta: {
+        title: "Gitea",
+        info: { page: "info/gitea.md" },
+        navbarConfig: {
+          back: true,
+          path: [
+            { title: "Deploy" },
+            {
+              title: "Applications",
+              disabled: false,
+              to: DashboardRoutes.Deploy.Applications,
+            },
+            {
+              title: "Gitea",
+            },
+          ],
+        },
+      },
+    },
+    {
+      path: DashboardRoutes.Applications.Nostr,
+      component: () => import("../views/nostr_view.vue"),
+      meta: {
+        title: "Nostr",
+        info: { page: "info/nostr.md" },
+        navbarConfig: {
+          back: true,
+          path: [
+            { title: "Deploy" },
+            {
+              title: "Applications",
+              disabled: false,
+              to: DashboardRoutes.Deploy.Applications,
+            },
+            {
+              title: "Nostr",
             },
           ],
         },
@@ -497,7 +585,6 @@ function createTFChainRoutes(): RouteRecordRaw[] {
         {
           path: DashboardRoutes.TFChain.TFMintingReports,
           component: () => import("../views/minting_view.vue"),
-          meta: { title: "Minting", info: { page: "info/minting.md" }, publicPath: true },
         },
       ],
     },
@@ -650,7 +737,6 @@ function createDeployRoutes(): RouteRecordRaw[] {
           component: () => import("../dashboard/contracts_list.vue"),
           meta: {
             title: "Your Contracts List",
-            info: { page: "info/contracts_list.md" },
           },
         },
 

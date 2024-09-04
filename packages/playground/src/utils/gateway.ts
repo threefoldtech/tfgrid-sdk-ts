@@ -1,4 +1,5 @@
 import { type FilterOptions, GatewayFQDNModel, GatewayNameModel, type GridClient } from "@threefold/grid_client";
+import validator from "validator";
 
 import { SolutionCode } from "@/types";
 import type { DomainInfo } from "@/types/nodeSelector";
@@ -26,7 +27,7 @@ export interface DeployGatewayConfig {
   subdomain: string;
   ip: string;
   port: number;
-  network: string;
+  network?: string;
   tlsPassthrough?: boolean;
 }
 
@@ -52,9 +53,14 @@ export async function deployGatewayName(
   gw.name = config.subdomain;
   gw.node_id = domain.selectedDomain.nodeId;
   gw.tls_passthrough = config.tlsPassthrough || false;
-  gw.backends = [`${config.tlsPassthrough ? "" : "http://"}${config.ip}:${config.port}`];
   gw.network = config.network;
   gw.solutionProviderId = id ? +id : undefined;
+
+  if (validator.isIP(config.ip, "6")) {
+    gw.backends = [`${config.tlsPassthrough ? "" : "http://"}[${config.ip}]:${config.port}`];
+  } else {
+    gw.backends = [`${config.tlsPassthrough ? "" : "http://"}${config.ip}:${config.port}`];
+  }
 
   if (domain.useFQDN) {
     (gw as GatewayFQDNModel).fqdn = domain.customDomain;
@@ -73,9 +79,17 @@ export async function rollbackDeployment(grid: GridClient, name: string) {
 
   return result;
 }
+export async function rollbackGateway(grid: GridClient, name: string) {
+  const result = await grid.gateway.delete_name({ name });
+  return result;
+}
 
 export type GridGateway = Awaited<ReturnType<GridClient["gateway"]["getObj"]>>[0];
-export async function loadDeploymentGateways(grid: GridClient) {
+interface LoadDeploymentGatewaysOptions {
+  filter?: (gateway: GridGateway) => boolean;
+}
+
+export async function loadDeploymentGateways(grid: GridClient, options?: LoadDeploymentGatewaysOptions) {
   const failedToList: string[] = [];
   const gws = await grid.gateway.list();
   const items = await Promise.all(
@@ -97,5 +111,13 @@ export async function loadDeploymentGateways(grid: GridClient) {
         .finally(() => timeout && clearTimeout(timeout));
     }),
   );
-  return { gateways: items.flat().filter(Boolean) as GridGateway[], failedToList };
+
+  const filter = options?.filter ?? (() => true);
+  return {
+    gateways: items
+      .flat()
+      .filter(Boolean)
+      .filter(filter as any) as GridGateway[],
+    failedToList,
+  };
 }

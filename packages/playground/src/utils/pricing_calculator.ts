@@ -29,8 +29,8 @@ export const nuRules = _applyRules([
 
 export const mruRules = _applyRules([
   required("Memory is required."),
-  min("Minimum allowed Memory size is 1 GB.", 1),
-  isInt("Memory must be a valid integer."),
+  min("Minimum allowed Memory size is .5 GB.", 0.5),
+  isNumeric("Memory must be a valid number."),
   max("Maximum allowed memory is 1024 GB.", 1024),
 ]);
 

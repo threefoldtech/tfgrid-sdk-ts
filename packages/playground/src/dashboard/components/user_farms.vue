@@ -10,6 +10,9 @@
     <v-alert type="warning" variant="tonal" v-if="farmsCount == 0" class="my-8">
       Can't see any of your farms? Try changing your key type in your TFChain Wallet above.
     </v-alert>
+    <v-alert type="info" variant="tonal" v-if="farmsCount > 0" class="my-8">
+      Click on the row to view farm details.
+    </v-alert>
     <v-data-table-server
       :loading="loading"
       :items-length="farmsCount"
@@ -17,6 +20,12 @@
       :headers="headers"
       :items="farms"
       v-model:items-per-page="pageSize"
+      :items-per-page-options="[
+        { value: 5, title: '5' },
+        { value: 10, title: '10' },
+        { value: 20, title: '20' },
+        { value: 50, title: '50' },
+      ]"
       v-model:page="page"
       show-expand
       :expanded="expanded"
@@ -29,15 +38,16 @@
           }
         }
       "
+      @update:sort-by="
+        if ($event[0]) {
+          sortBy = $event[0].key == 'farmId' ? SortBy.FarmId : $event[0].key;
+          sortOrder = $event[0].order;
+          getUserFarms();
+        }
+      "
       expand-on-click
       @update:options="getUserFarms"
       :hover="true"
-      :items-per-page-options="[
-        { value: 5, title: '5' },
-        { value: 10, title: '10' },
-        { value: 15, title: '15' },
-        { value: 50, title: '50' },
-      ]"
       return-object
     >
       <template v-slot:top>
@@ -83,7 +93,7 @@
         </tr>
 
         <v-container v-if="showDialogue">
-          <v-dialog v-model="showDialogue" max-width="600">
+          <v-dialog v-model="showDialogue" max-width="600" attach="#modals">
             <v-card>
               <v-toolbar color="primary" dark>
                 <v-toolbar-title class="custom-toolbar_title mb-6"> Add/Edit Stellar V2 Address </v-toolbar-title>
@@ -125,7 +135,7 @@
 </template>
 
 <script lang="ts">
-import type { Farm } from "@threefold/gridproxy_client";
+import { type Farm, SortBy, SortOrder } from "@threefold/gridproxy_client";
 import { jsPDF } from "jspdf";
 import { debounce } from "lodash";
 import { StrKey } from "stellar-sdk";
@@ -164,13 +174,13 @@ export default {
         title: "Farm ID",
         align: "center",
         key: "farmId",
-        sortable: false,
+        sortable: true,
       },
       {
         title: "Farm Name",
         align: "center",
         key: "name",
-        sortable: false,
+        sortable: true,
       },
       {
         title: "Linked Twin ID",
@@ -198,24 +208,10 @@ export default {
     const isAdding = ref(false);
     const network = process.env.NETWORK || (window as any).env.NETWORK;
     const refreshPublicIPs = ref(false);
+    const sortBy = ref(SortBy.FarmId);
+    const sortOrder = ref(SortOrder.Asc);
 
     const reloadFarms = debounce(getUserFarms, 20000);
-    function filter(items: Farm[]) {
-      const start = (page.value - 1) * pageSize.value;
-      const end = start + pageSize.value;
-
-      let filteredItems;
-      if (search.value) {
-        filteredItems = items.filter(
-          item => item.name.toLowerCase().includes(search.value!.toLowerCase()) || item.farmId == +search.value!,
-        );
-      }
-
-      const paginated = filteredItems ? filteredItems.slice(start, end) : items;
-
-      return paginated;
-    }
-
     async function getUserFarms() {
       try {
         const { data, count } = await gridProxyClient.farms.list({
@@ -223,11 +219,13 @@ export default {
           twinId,
           page: page.value,
           size: pageSize.value,
+          nameContains: search.value,
+          sortBy: sortBy.value,
+          sortOrder: sortOrder.value,
         });
 
-        const filteredFarms = filter(data);
-        farms.value = filteredFarms as unknown as Farm[];
-        farmsCount.value = count || filteredFarms.length;
+        farms.value = data as Farm[];
+        farmsCount.value = count || farms.value.length;
       } catch (error) {
         console.log(error);
         createCustomToast("Failed to get user farms!", ToastType.danger);
@@ -351,6 +349,9 @@ export default {
       isAdding,
       farmsCount,
       network,
+      sortBy,
+      SortBy,
+      sortOrder,
       getUserFarms,
       setStellarAddress,
       customStellarValidation,

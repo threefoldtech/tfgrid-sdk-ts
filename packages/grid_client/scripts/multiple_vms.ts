@@ -1,26 +1,32 @@
-import { FilterOptions, MachinesModel } from "../src";
+import { FilterOptions, GridClient, MachinesModel } from "../src";
 import { config, getClient } from "./client_loader";
-import { log } from "./utils";
+import { log, pingNodes } from "./utils";
 
-async function deploy(client, vms) {
+async function deploy(client: GridClient, vms: MachinesModel) {
   const res = await client.machines.deploy(vms);
   log("================= Deploying VM =================");
   log(res);
   log("================= Deploying VM =================");
 }
 
-async function getDeployment(client, vms) {
-  const res = await client.machines.getObj(vms);
+async function getDeployment(client: GridClient, name: string) {
+  const res = await client.machines.getObj(name);
   log("================= Getting deployment information =================");
   log(res);
   log("================= Getting deployment information =================");
 }
 
-async function cancel(client, vms) {
-  const res = await client.machines.delete(vms);
+async function cancel(client: GridClient, name: string) {
+  const res = await client.machines.delete({ name });
   log("================= Canceling the deployment =================");
   log(res);
   log("================= Canceling the deployment =================");
+}
+
+async function getNodeId(client: GridClient, options: FilterOptions) {
+  const nodes = await client.capacity.filterNodes(options);
+  const nodeId = await pingNodes(client, nodes);
+  return nodeId;
 }
 
 async function main() {
@@ -30,10 +36,12 @@ async function main() {
   const vmQueryOptions: FilterOptions = {
     cru: 1,
     mru: 1, // GB
-    sru: 1,
+    sru: 14,
     availableFor: grid3.twinId,
     farmId: 1,
   };
+
+  const nodeId = await getNodeId(grid3, vmQueryOptions);
 
   const vms: MachinesModel = {
     name,
@@ -44,7 +52,7 @@ async function main() {
     machines: [
       {
         name: "testvm1",
-        node_id: +(await grid3.capacity.filterNodes(vmQueryOptions))[0].nodeId,
+        node_id: nodeId!,
         disks: [
           {
             name: "newDisk1",
@@ -67,7 +75,7 @@ async function main() {
       },
       {
         name: "testvm2",
-        node_id: +(await grid3.capacity.filterNodes(vmQueryOptions))[1].nodeId,
+        node_id: nodeId!,
         disks: [
           {
             name: "newDisk2",
@@ -100,7 +108,7 @@ async function main() {
   await getDeployment(grid3, name);
 
   // //Uncomment the line below to cancel the deployment
-  // await cancel(grid3, { name });
+  await cancel(grid3, name);
 
   await grid3.disconnect();
 }

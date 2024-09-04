@@ -133,9 +133,9 @@ def test_account_validation(browser):
     grid_proxy = GridProxy(browser)
     cases = [generate_string(), '123456', '!)$%&@#(+?', '0x123456ae7be88dc11f7', 'wrong hat egg gospel crowd foster lonely control cat recipe mean spoon']
     for case in cases:
-        dashboard_page.import_account(case)
+        dashboard_page.import_account(case, False)
         assert dashboard_page.wait_for('seem to be valid')
-    dashboard_page.import_account('')
+    dashboard_page.import_account('', False)
     assert dashboard_page.wait_for('Mnemonic or Hex Seed is required.')
     dashboard_page.import_account(get_seed())
     cases = [generate_string(), '123456', '!)$%&@#(+?', '1@c@vva.ca', '1f@test,com', '@test.com', 'test@.com', 'test@com']

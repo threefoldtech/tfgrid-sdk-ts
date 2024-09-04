@@ -1,5 +1,10 @@
 <template>
   <view-layout>
+    <v-card color="primary" class="d-flex justify-center items-center pa-3 mb-3 text-center">
+      <v-icon size="30" class="pr-3">mdi-lan-connect</v-icon>
+      <v-card-title class="pa-0">Farm Finder</v-card-title>
+    </v-card>
+    <v-alert type="info" variant="tonal" class="mb-6"> Click on the row to view farm details. </v-alert>
     <TfFiltersLayout>
       <template #filters>
         <TfFiltersContainer @apply="loadFarms(true)" class="mb-4" :loading="loading">
@@ -84,12 +89,13 @@
         loading-text="Loading Farms..."
         :items="farms"
         :items-length="totalFarms"
+        :items-per-page="size"
         :items-per-page-options="[
           { value: 5, title: '5' },
           { value: 10, title: '10' },
-          { value: 15, title: '15' },
+          { value: 20, title: '20' },
+          { value: 50, title: '50' },
         ]"
-        :items-per-page="size"
         @update:items-per-page="
           size = $event;
           loadFarms();
@@ -99,7 +105,17 @@
           page = $event;
           loadFarms();
         "
-        :disable-sort="true"
+        @update:options="
+          if (!$event.sortBy.length) {
+            sortBy = SortBy.FarmId;
+            sortOrder = SortOrder.Asc;
+          } else if ($event.sortBy[0]) {
+            sortBy = $event.sortBy[0].key == 'farmId' ? SortBy.FarmId : $event.sortBy[0].key;
+            sortOrder = $event.sortBy[0].order;
+          }
+
+          loadFarms();
+        "
         @click:row="openSheet"
       >
         <template #[`item.usedPublicIp`]="{ item }">
@@ -108,7 +124,7 @@
       </v-data-table-server>
     </TfFiltersLayout>
 
-    <v-dialog v-model="dialog" hide-overlay transition="dialog-bottom-transition">
+    <v-dialog v-model="dialog" hide-overlay transition="dialog-bottom-transition" attach="#modals">
       <v-container>
         <v-toolbar :height="35">
           <div class="ml-auto">
@@ -141,7 +157,7 @@
 </template>
 
 <script lang="ts" setup>
-import type { Farm } from "@threefold/gridproxy_client";
+import { type Farm, SortBy, SortOrder } from "@threefold/gridproxy_client";
 import { ref } from "vue";
 
 import type { VDataTableHeader } from "@/types";
@@ -151,6 +167,8 @@ const farms = ref<Farm[]>();
 
 const page = ref(1);
 const size = ref(window.env.PAGE_SIZE);
+const sortBy = ref(SortBy.FarmId);
+const sortOrder = ref(SortOrder.Asc);
 const filters = ref({
   farmId: "",
   farmName: "",
@@ -166,6 +184,7 @@ async function loadFarms(retCount = false) {
   loading.value = true;
   farms.value = [];
   if (retCount) page.value = 1;
+
   try {
     const { count, data } = await getAllFarms({
       retCount,
@@ -174,6 +193,8 @@ async function loadFarms(retCount = false) {
       nameContains: filters.value.farmName || undefined,
       page: page.value,
       size: size.value,
+      sortBy: sortBy.value,
+      sortOrder: sortOrder.value,
     });
 
     if (data) {
@@ -207,8 +228,8 @@ const openDialog = (item: Farm) => {
 };
 
 const headers: VDataTableHeader = [
-  { title: "ID", key: "farmId", sortable: false },
-  { title: "Name", key: "name", sortable: false },
+  { title: "ID", key: "farmId", sortable: true },
+  { title: "Name", key: "name", sortable: true },
   {
     title: "Public IPs",
     key: "publicIps",

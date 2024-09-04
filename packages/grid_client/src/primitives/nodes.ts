@@ -1,13 +1,8 @@
+import { SortBy, SortOrder } from "@threefold/gridproxy_client";
 import { Client as RMBClient } from "@threefold/rmb_direct_client";
 import { QueryClient } from "@threefold/tfchain_client";
-import {
-  BaseError,
-  GridClientError,
-  GridClientErrors,
-  RequestError,
-  TFChainError,
-  ValidationError,
-} from "@threefold/types";
+import { TFChainError } from "@threefold/tfchain_client";
+import { BaseError, GridClientError, GridClientErrors, RequestError, ValidationError } from "@threefold/types";
 import { default as PrivateIp } from "private-ip";
 import urlJoin from "url-join";
 
@@ -135,13 +130,22 @@ class Nodes {
     let nodes: NodeInfo[] = [];
     let page = 1;
     do {
-      nodes = await this.filterNodes({ accessNodeV4: true, accessNodeV6: true, availableFor, page });
+      nodes = await this.filterNodes({
+        accessNodeV4: true,
+        accessNodeV6: true,
+        availableFor,
+        page,
+      });
       for (const node of nodes) {
         const ipv4 = node.publicConfig.ipv4;
         const ipv6 = node.publicConfig.ipv6;
         const domain = node.publicConfig.domain;
         if (PrivateIp(ipv4.split("/")[0]) === false) {
-          accessNodes[+node.nodeId] = { ipv4: ipv4, ipv6: ipv6, domain: domain };
+          accessNodes[+node.nodeId] = {
+            ipv4: ipv4,
+            ipv6: ipv6,
+            domain: domain,
+          };
         }
       }
       page++;
@@ -163,7 +167,9 @@ class Nodes {
       })
       .catch(err => {
         //TODO add error handling in QueryClient/contracts
-        throw new TFChainError(`Error getting node ID from contract ID ${contractId}: ${err}`);
+        throw new TFChainError({
+          message: `Error getting node ID from contract ID ${contractId}: ${err}`,
+        });
       });
   }
 
@@ -279,7 +285,13 @@ class Nodes {
         .request([node_twin_id], "zos.statistics.get", "")
         .then(res => {
           const node: RMBNodeCapacity = res;
-          const ret: NodeResources = { cru: 0, mru: 0, hru: 0, sru: 0, ipv4u: 0 };
+          const ret: NodeResources = {
+            cru: 0,
+            mru: 0,
+            hru: 0,
+            sru: 0,
+            ipv4u: 0,
+          };
 
           ret.cru = +node.total.cru;
           ret.mru = +node.total.mru - +node.used.mru;
@@ -391,6 +403,7 @@ class Nodes {
       free_ips: options.publicIPs ? 1 : "",
       ipv4: options.accessNodeV4,
       ipv6: options.accessNodeV6,
+      has_ipv6: options.hasIPv6,
       certification_type: options.certified ? "Certified" : "",
       farm_ids: options.farmId ? [options.farmId] : options.farmIds,
       farm_name: options.farmName,
@@ -408,6 +421,8 @@ class Nodes {
       ret_count: options.ret_count,
       region: options.region,
       healthy: options.healthy,
+      sort_by: SortBy.FreeCRU,
+      sort_order: SortOrder.Desc,
     };
 
     if (options.gateway) {
@@ -430,6 +445,7 @@ class Nodes {
       country: options.country,
       dedicated: options.dedicated,
       node_available_for: options.availableFor,
+      node_has_ipv6: options.nodeHasIPv6,
       node_status: "up",
       page: options.page,
       size: options.size,
@@ -449,9 +465,9 @@ class Nodes {
   async nodeHasResources(nodeId: number, options: FilterOptions): Promise<boolean> {
     const resources = await this.getNodeFreeResources(nodeId, "zos");
     if (
-      resources.mru < this._g2b(options.mru) ||
-      resources.sru < this._g2b(options.sru) ||
-      resources.hru < this._g2b(options.hru)
+      (options.mru && options.mru > 0 && resources.mru < this._g2b(options.mru)) ||
+      (options.sru && options.sru > 0 && resources.sru < this._g2b(options.sru)) ||
+      (options.hru && options.hru > 0 && resources.hru < this._g2b(options.hru))
     ) {
       return false;
     }

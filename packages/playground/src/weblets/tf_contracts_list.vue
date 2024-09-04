@@ -4,28 +4,65 @@
     Error while listing contracts due: {{ loadingErrorMessage }}
   </v-alert>
 
+  <v-alert type="success" variant="tonal" class="mt-2 mb-4" v-if="loadingTablesMessage">
+    {{ loadingTablesMessage }}
+  </v-alert>
+
   <!-- Contracts List Card -->
-  <v-card variant="text" class="mb-4">
+  <v-card color="primary" class="d-flex justify-center items-center mb-4 pa-3 text-center">
+    <v-icon size="30" class="pr-3">mdi-file-document-edit</v-icon>
+    <v-card-title class="pa-0">Contracts List</v-card-title>
+  </v-card>
+
+  <v-alert class="mb-4 text-subtitle-2 font-weight-regular" type="info" variant="tonal">
+    For more details about Contract Types, Billing Cycle & Grace Period, check
+    <a
+      class="app-link font-weight-medium"
+      target="_blank"
+      href="https://www.manual.grid.tf/documentation/developers/tfchain/tfchain.html"
+      >Contract Documentation,
+    </a>
+    and to explore further contract details, check
+    <a
+      class="app-link font-weight-medium"
+      target="_blank"
+      href="https://www.manual.grid.tf/documentation/dashboard/deploy/your_contracts.html"
+      >Node Contract Documentation.</a
+    >
+    <br />
+  </v-alert>
+
+  <v-card variant="text" class="my-3">
     <section class="d-flex align-center">
-      <v-card-title class="font-weight-bold d-flex align-center title ma-0 pa-0"> Contracts List </v-card-title>
       <v-spacer />
       <v-btn
         v-if="lockedContracts?.totalAmountLocked && !isLoading"
         class="mr-2"
         color="warning"
+        prepend-icon="mdi-lock-open"
         @click="openUnlockDialog"
         :loading="unlockContractLoading"
       >
         Unlock All
       </v-btn>
       <v-btn
+        class="mr-2"
+        v-if="contracts.length > 0"
+        :loading="deleting"
+        prepend-icon="mdi-delete"
+        color="error"
+        @click="deleteDialog = true"
+      >
+        Delete All
+      </v-btn>
+      <v-btn
         prepend-icon="mdi-refresh"
         color="info"
         @click="
           contractsTable.forEach(t => t.reset());
-          onMount();
+          loadContracts();
         "
-        :disabled="isLoadingNode && isLoadingName && isLoadingRent"
+        :disabled="totalCost === undefined"
       >
         refresh
       </v-btn>
@@ -33,7 +70,7 @@
   </v-card>
 
   <!-- Total Cost Card -->
-  <v-card variant="tonal" :loading="totalCost === undefined" class="mb-3 bg-blue-primary-lighten-3">
+  <v-card :loading="totalCost === undefined" variant="tonal" class="mb-3 bg-blue-primary-lighten-3">
     <template #title>
       <v-row>
         <v-col class="d-flex justify-start">
@@ -55,7 +92,7 @@
     </template>
   </v-card>
   <!-- locked amount Dialog -->
-  <v-dialog width="500" v-model="unlockDialog" v-if="lockedContracts?.totalAmountLocked">
+  <v-dialog width="800" v-model="unlockDialog" v-if="lockedContracts?.totalAmountLocked" attach="#modals">
     <v-card>
       <v-card-title class="bg-primary">
         Unlock All Contracts
@@ -75,30 +112,30 @@
           </template>
         </v-tooltip>
       </v-card-title>
-      <v-card-text>
-        <v-container>
-          <v-row v-if="loadingLockDetails" class="d-flex flex-column justify-center align-center py-4">
-            <v-progress-circular indeterminate />
-            <div class="text-subtitle-2 pt-2">Loading contracts lock details</div>
-          </v-row>
-          <v-row class="d-flex" v-else>
-            <v-alert class="ma-4" type="warning" variant="tonal">
-              <div v-if="lockedContracts?.totalAmountLocked < freeBalance" class="font-weigh-black">
-                You have enough balance to unlock your contracts!
-              </div>
-              <div v-else>
-                You need to fund your account with
-                <span class="font-weight-black">
-                  {{ Math.ceil(lockedContracts?.totalAmountLocked - freeBalance) }}
-                  TFTs
-                </span>
-                to resume your contracts
-              </div>
-            </v-alert>
-          </v-row>
-        </v-container>
+      <v-card-text v-if="loadingLockDetails">
+        <v-progress-circular indeterminate />
+
+        <div class="text-subtitle-2">Loading contracts lock details</div>
+        <v-divider class="mt-3" />
       </v-card-text>
-      <v-card-actions class="justify-end my-1 mr-2">
+      <v-card-text v-else>
+        <v-alert class="my-4" type="warning" variant="tonal">
+          <div v-if="lockedContracts?.totalAmountLocked < freeBalance">
+            You have enough balance to unlock your contracts, this will cost you around
+            <span class="font-weight-bold">{{ Math.ceil(lockedContracts?.totalAmountLocked) }}</span> TFTs.
+          </div>
+          <div v-else>
+            You need to fund your account with
+            <span class="font-weight-bold">
+              {{ Math.ceil(lockedContracts?.totalAmountLocked - freeBalance) }}
+              TFTs
+            </span>
+            to resume your contracts
+          </div>
+        </v-alert>
+        <v-divider class="mt-3" />
+      </v-card-text>
+      <v-card-actions class="justify-end mb-1 mr-2">
         <v-btn color="anchor" @click="unlockDialog = false"> Close </v-btn>
         <v-tooltip
           :text="
@@ -115,6 +152,7 @@
                 color="warning"
                 @click="unlockAllContracts"
                 :loading="unlockContractLoading"
+                class="ml-2"
               >
                 Unlock contracts
               </v-btn>
@@ -124,10 +162,28 @@
       </v-card-actions>
     </v-card>
   </v-dialog>
+
+  <!-- delete all dialog-->
+  <v-dialog width="800" v-model="deleteDialog" attach="#modals">
+    <v-card>
+      <v-card-title class="bg-primary"> Delete all your contracts </v-card-title>
+      <v-alert class="mx-4 mt-4" type="warning" variant="tonal">
+        <template v-slot:prepend>
+          <v-icon class="pt-4" icon="$warning"></v-icon>
+        </template>
+        <div>You are about to permanently delete all contracts. This action cannot be reversed!</div>
+        <div>Deleting contracts may take a while to complete.</div>
+      </v-alert>
+      <v-card-actions class="justify-end my-1 mr-2">
+        <v-btn color="anchor" @click="deleteDialog = false"> Cancel </v-btn>
+        <v-btn color="error" @click="deleteAll"> Delete </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
   <!-- Contracts Tables -->
   <v-expansion-panels v-model="panel" multiple>
     <v-expansion-panel class="mb-4" :elevation="3" v-for="(table, idx) of contractsTables" :key="idx">
-      <v-expansion-panel-title color="primary" style="height: 50px !important; min-height: 15px !important">
+      <v-expansion-panel-title color="primary" style="height: 40px !important; min-height: 15px !important">
         <v-icon size="24" class="pr-3">{{ table.icon }}</v-icon>
         <v-card-title class="pa-0 text-subtitle-1">
           <strong>{{ table.title }}</strong>
@@ -144,13 +200,29 @@
           :grid="table.grid"
           :contracts-type="table.type"
           :table-headers="table.headers"
-          @update:deleted-contracts="onDeletedContracts"
-          @update:unlock-contracts="onMount"
-          @update:lock-details="getContractsLockDetails"
           :count="table.count"
-          :page="page"
-          :size="size"
-          @update:options="loadContracts"
+          :page="table.page"
+          :size="table.size"
+          @update:unlock-contracts="loadContracts"
+          @update:deleted-contracts="onDeletedContracts"
+          @update:lock-details="getContractsLockDetails"
+          @update:page="
+            newPage => {
+              table.page.value = newPage;
+              loadContracts(table.type);
+            }
+          "
+          @update:size="
+            newSize => {
+              table.size.value = newSize;
+              loadContracts(table.type);
+            }
+          "
+          @update:sort="
+            sort => {
+              loadContracts(table.type, { sort });
+            }
+          "
         />
       </v-expansion-panel-text>
     </v-expansion-panel>
@@ -159,7 +231,8 @@
 
 <script lang="ts" setup>
 import type { GridClient, LockContracts } from "@threefold/grid_client";
-import { ContractState, NodeStatus } from "@threefold/gridproxy_client";
+import { type Contract, ContractState, NodeStatus, SortByContracts, SortOrder } from "@threefold/gridproxy_client";
+import { DeploymentKeyDeletionError } from "@threefold/types";
 import { Decimal } from "decimal.js";
 import { computed, defineComponent, onMounted, type Ref, ref } from "vue";
 
@@ -175,38 +248,36 @@ import {
   type NormalizedContract,
 } from "@/utils/contracts";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
+import { normalizeError } from "@/utils/helpers";
 import { manual } from "@/utils/manual";
 
 import { gridProxyClient, queryClient } from "../clients";
 import { useGrid } from "../stores";
-import { updateGrid } from "../utils/grid";
 
 const profileManagerController = useProfileManagerController();
 const balance = profileManagerController.balance;
-const freeBalance = computed(() => balance.value?.free ?? 0 - (balance.value?.locked ?? 0));
+const freeBalance = computed(() => (balance.value?.free ?? 0) - (balance.value?.locked ?? 0));
 const isLoading = ref<boolean>(false);
-const isLoadingNode = ref<boolean>(false);
-const isLoadingName = ref<boolean>(false);
-const isLoadingRent = ref<boolean>(false);
 
 const profileManager = useProfileManager();
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
+
 const contracts = ref<NormalizedContract[]>([]);
+const failedContracts = ref<number[]>([]);
 const nameContracts = ref<NormalizedContract[]>([]);
 const nodeContracts = ref<NormalizedContract[]>([]);
 const rentContracts = ref<NormalizedContract[]>([]);
-const allContracts = ref<NormalizedContract[]>([]);
+
 const loadingErrorMessage = ref<string>();
+const loadingTablesMessage = ref<string>();
+
 const totalCost = ref<number>();
 const totalCostUSD = ref<number>();
 const lockedContracts = ref<LockContracts>();
 const unlockDialog = ref<boolean>(false);
-const page = ref<number>(1);
-const size = ref<number>(5);
-const nodesCount = ref<number>(0);
-const rentsCount = ref<number>(0);
-const namesCount = ref<number>(0);
+const deleteDialog = ref<boolean>(false);
+const deleting = ref<boolean>(false);
 
 const panel = ref<number[]>([0, 1, 2]);
 const nodeInfo: Ref<{ [nodeId: number]: { status: NodeStatus; farmId: number } }> = ref({});
@@ -215,136 +286,109 @@ const contractsTable = ref<(typeof ContractsTable)[]>([]);
 const loadingLockDetails = ref(false);
 // Computed property to get unique node IDs from contracts
 const nodeIDs = computed(() => {
-  return [...new Set(allContracts.value.map(contract => contract.details.nodeId) || [])];
+  return [...new Set(contracts.value.map(contract => contract.details.nodeId) || [])];
 });
+// To avoid multiple requests
+const cachedNodeIDs = ref<number[]>([]);
 
-type ContractsLoadingOptions = { updateAllTables: boolean; loading: boolean; contractType?: ContractType };
+onMounted(loadContracts);
 
-function updateLoadingTableValue(options: ContractsLoadingOptions) {
-  if (options.updateAllTables) {
-    isLoadingNode.value = options.loading;
-    isLoadingName.value = options.loading;
-    isLoadingRent.value = options.loading;
-    return;
-  }
-
-  switch (options.contractType) {
-    case ContractType.Name:
-      isLoadingName.value = options.loading;
-      break;
-    case ContractType.Node:
-      isLoadingNode.value = options.loading;
-      break;
-    case ContractType.Rent:
-      isLoadingRent.value = options.loading;
-  }
-  return;
+async function _normalizeContracts(
+  contracts: Contract[],
+  contractType: ContractType.Node | ContractType.Name | ContractType.Rent,
+): Promise<NormalizedContract[]> {
+  const normalizedContracts = await Promise.all(
+    contracts.map(async contract => {
+      try {
+        return await normalizeContract(grid, contract, contractType);
+      } catch (error) {
+        failedContracts.value.push(contract.contract_id);
+      }
+    }),
+  );
+  return normalizedContracts.filter(Boolean) as NormalizedContract[];
 }
 
-onMounted(onMount);
+async function loadContractsByType(
+  contractType: ContractType.Node | ContractType.Name | ContractType.Rent,
+  contractsRef: Ref<NormalizedContract[]>,
+  options?: { sort: { key: string; order: "asc" | "desc" }[] },
+) {
+  const table = contractsTables.find(table => table.type === contractType);
+  if (!table) {
+    loadingErrorMessage.value = `No table found for contract type: ${contractType}`;
+    throw new Error(loadingErrorMessage.value);
+  }
 
-async function onMount() {
-  contracts.value = nameContracts.value = nodeContracts.value = rentContracts.value = [];
-  isLoadingNode.value = true;
-  isLoadingName.value = true;
-  isLoadingRent.value = true;
+  table.loading.value = true;
+  try {
+    const response = await gridProxyClient.contracts.list({
+      twinId: profileManager.profile!.twinId,
+      state: [ContractState.Created, ContractState.GracePeriod],
+      size: table.size.value,
+      page: table.page.value,
+      type: contractType,
+      retCount: true,
+      sortBy: options && options.sort.length ? (options?.sort[0].key as SortByContracts) : undefined,
+      sortOrder: options && options.sort.length ? (options?.sort[0].order as SortOrder) : undefined,
+    });
 
+    table.count.value = response.count ?? 0;
+    const normalizedContracts = await _normalizeContracts(response.data, contractType);
+    contractsRef.value = normalizedContracts;
+  } catch (error: any) {
+    loadingErrorMessage.value = `Error while listing ${contractType} contracts: ${error.message}`;
+    createCustomToast(loadingErrorMessage.value, ToastType.danger, {});
+  } finally {
+    table.loading.value = false;
+  }
+}
+
+async function loadContracts(type?: ContractType, options?: { sort: { key: string; order: "asc" | "desc" }[] }) {
   totalCost.value = undefined;
   totalCostUSD.value = undefined;
   loadingErrorMessage.value = undefined;
-  updateGrid(grid, { projectName: "" });
-
-  if (profileManager.profile) {
-    if (grid) {
-      await loadContracts({ page: page.value, itemsPerPage: size.value, contractType: ContractType.Node });
-      await loadContracts({ page: page.value, itemsPerPage: size.value, contractType: ContractType.Name });
-      await loadContracts({ page: page.value, itemsPerPage: size.value, contractType: ContractType.Rent });
-      // getting nodeStatus
-      allContracts.value = [...nodeContracts.value, ...nameContracts.value, ...rentContracts.value];
-      nodeInfo.value = await getNodeInfo(nodeIDs.value);
-
-      // load all contracts for total cost
-      const { data: dataContracts } = await gridProxyClient.contracts.list({
-        twinId: profileManager.profile!.twinId,
-        state: [ContractState.Created, ContractState.GracePeriod],
-      });
-
-      const normalizedContracts: NormalizedContract[] = [];
-      for (const contract of dataContracts) {
-        try {
-          const normalizedContract = await normalizeContract(grid, contract, contract.type);
-          normalizedContracts.push(normalizedContract);
-        } catch (error) {
-          console.error("Error normalizing contract:", error);
-        }
-      }
-      contracts.value = normalizedContracts;
-      totalCost.value = getTotalCost(contracts.value);
-      const TFTInUSD = await queryClient.tftPrice.get();
-      totalCostUSD.value = totalCost.value * (TFTInUSD / 1000);
-    } else {
-      loadingErrorMessage.value = "Failed to initialize an instance of grid type.";
-      createCustomToast("Failed to initialize an instance of grid type.", ToastType.danger, {});
-    }
-  } else {
-    loadingErrorMessage.value =
-      "Failed to initialize an instance of the profile manager, please make sure that you have a stable connection.";
-    createCustomToast(
-      "Failed to initialize an instance of the profile manager, please make sure that you have a stable connection.",
-      ToastType.danger,
-      {},
-    );
-  }
-  updateLoadingTableValue({ updateAllTables: true, loading: false });
-}
-
-async function loadContracts(options: { page: number; itemsPerPage: number; contractType: ContractType }) {
-  updateLoadingTableValue({
-    updateAllTables: false,
-    loading: true,
-    contractType: options.contractType,
-  });
+  loadingTablesMessage.value = undefined;
+  nodeInfo.value = {};
+  contracts.value = [];
+  cachedNodeIDs.value = [];
+  failedContracts.value = [];
   try {
-    const { count, data: dataContracts } = await gridProxyClient.contracts.list({
-      twinId: profileManager.profile!.twinId,
-      state: [ContractState.Created, ContractState.GracePeriod],
-      size: options.itemsPerPage,
-      page: options.page,
-      type: options.contractType,
-      retCount: true,
-    });
-
-    const normalizedContracts: NormalizedContract[] = [];
-    for (const contract of dataContracts) {
-      try {
-        const normalizedContract = await normalizeContract(grid, contract, options.contractType);
-        normalizedContracts.push(normalizedContract);
-      } catch (error) {
-        console.error("Error normalizing contract:", error);
+    if (type) {
+      switch (type) {
+        case ContractType.Name:
+          await loadContractsByType(ContractType.Name, nameContracts, options);
+          break;
+        case ContractType.Node:
+          await loadContractsByType(ContractType.Node, nodeContracts, options);
+          break;
+        case ContractType.Rent:
+          await loadContractsByType(ContractType.Rent, rentContracts, options);
+          break;
       }
-    }
-
-    if (options.contractType == ContractType.Node) {
-      nodeContracts.value = normalizedContracts;
-      nodesCount.value = count ?? 0;
-    } else if (options.contractType == ContractType.Name) {
-      nameContracts.value = normalizedContracts;
-      namesCount.value = count ?? 0;
     } else {
-      rentContracts.value = normalizedContracts;
-      rentsCount.value = count ?? 0;
+      await Promise.all([
+        loadContractsByType(ContractType.Name, nameContracts, options),
+        loadContractsByType(ContractType.Node, nodeContracts, options),
+        loadContractsByType(ContractType.Rent, rentContracts, options),
+      ]);
     }
-    nodeInfo.value = await getNodeInfo(normalizedContracts.map(contract => contract.details.nodeId));
+    const failedContractsLength = failedContracts.value.length;
+    if (failedContractsLength > 0)
+      loadingErrorMessage.value = `Failed to load details of the following contract${
+        failedContractsLength > 1 ? "s" : ""
+      }: ${failedContracts.value.join(", ")}.`;
+    await getContractsLockDetails();
+    contracts.value = [...nodeContracts.value, ...nameContracts.value, ...rentContracts.value];
+
+    // Update the total cost of the contracts.
+    await getTotalCost();
+    // Get the node info e.g. node status.
+    nodeInfo.value = await getNodeInfo(nodeIDs.value, cachedNodeIDs.value);
+    cachedNodeIDs.value.push(...nodeIDs.value);
   } catch (error: any) {
-    // Handle errors and display toast messages
-    loadingErrorMessage.value = error.message;
-    createCustomToast(`Error while listing contracts due: ${error.message}`, ToastType.danger, {});
-  } finally {
-    updateLoadingTableValue({
-      updateAllTables: false,
-      loading: false,
-      contractType: options.contractType,
-    });
+    loadingErrorMessage.value = `Error while loading contracts: ${error.message}`;
+    createCustomToast(loadingErrorMessage.value, ToastType.danger, {});
   }
 }
 
@@ -355,8 +399,8 @@ async function openUnlockDialog() {
     await getContractsLockDetails();
     await profileManagerController.reloadBalance();
   } catch (e) {
-    createCustomToast(`Failed to get contracts lock details`, ToastType.danger);
-    console.error(e);
+    loadingErrorMessage.value = `Failed to get contracts lock details`;
+    createCustomToast(loadingErrorMessage.value, ToastType.danger, {});
   } finally {
     loadingLockDetails.value = false;
   }
@@ -366,19 +410,43 @@ async function unlockAllContracts() {
   try {
     unlockContractLoading.value = true;
     await grid.contracts.unlockMyContracts();
-    createCustomToast(
-      `Your request to unlock your contracts has been processed successfully. Changes may take a few minutes to reflect`,
-      ToastType.info,
-    );
-    setTimeout(() => onMount(), 30000);
+    loadingTablesMessage.value =
+      "Your request to unlock your contracts has been processed successfully. Changes may take a few minutes to reflect";
+    createCustomToast(loadingTablesMessage.value, ToastType.info);
+    setTimeout(() => {
+      loadContracts();
+      loadingTablesMessage.value = undefined;
+    }, 30000);
     unlockDialog.value = false;
   } catch (e) {
-    createCustomToast(`Failed to unlock contract your contracts`, ToastType.danger);
-    console.error(e);
+    loadingErrorMessage.value = `Failed to unlock contract your contracts`;
+    createCustomToast(loadingErrorMessage.value, ToastType.danger, {});
   } finally {
     unlockContractLoading.value = false;
     unlockDialog.value = false;
   }
+}
+
+async function deleteAll() {
+  deleteDialog.value = false;
+  deleting.value = true;
+  try {
+    await grid.contracts.cancelMyContracts();
+    loadingTablesMessage.value =
+      "The contracts have been successfully deleted. Please note that all tables will be reloaded in 30 seconds.";
+    createCustomToast(loadingTablesMessage.value, ToastType.info);
+    setTimeout(() => {
+      loadContracts();
+      loadingTablesMessage.value = undefined;
+    }, 30000);
+  } catch (e) {
+    if (e instanceof DeploymentKeyDeletionError) {
+      createCustomToast("Failed to delete some keys, You don't have enough tokens", ToastType.danger);
+    } else {
+      createCustomToast(normalizeError(e, `Failed to delete some contracts.`), ToastType.danger);
+    }
+  }
+  deleting.value = false;
 }
 const nodeStatus = computed(() => {
   const statusObject: { [x: number]: NodeStatus } = {};
@@ -391,19 +459,41 @@ const nodeStatus = computed(() => {
 });
 
 // Calculate the total cost of contracts
-function getTotalCost(contracts: NormalizedContract[]) {
+async function getTotalCost() {
   totalCost.value = 0;
-  for (const contract of contracts) {
+  for (const contract of contracts.value) {
     totalCost.value = +new Decimal(totalCost.value).add(contract.consumption?.valueOf() || 0);
   }
-  return +totalCost.value.toFixed(3);
+  totalCost.value = +totalCost.value.toFixed(3);
+  const TFTInUSD = await queryClient.tftPrice.get();
+  totalCostUSD.value = totalCost.value * (TFTInUSD / 1000);
 }
 
 // Handle updates when contracts are deleted
-function onDeletedContracts(_contracts: NormalizedContract[]) {
-  contracts.value = _contracts;
+async function onDeletedContracts(_contracts: NormalizedContract[]) {
+  if (_contracts.length) {
+    switch (_contracts[0].type) {
+      case ContractType.Name:
+        nameContracts.value = _contracts;
+        break;
+      case ContractType.Rent:
+        rentContracts.value = _contracts;
+        break;
+      case ContractType.Node:
+        nodeContracts.value = _contracts;
+        break;
+    }
+  }
+  loadingTablesMessage.value =
+    "The contracts have been successfully deleted. Please note that all tables will be reloaded in 30 seconds.";
+  createCustomToast(loadingTablesMessage.value, ToastType.info);
+  setTimeout(() => {
+    loadContracts();
+    loadingTablesMessage.value = undefined;
+  }, 30000);
+  await getTotalCost();
+  contracts.value = [...rentContracts.value, ...nameContracts.value, ...nodeContracts.value];
   totalCost.value = undefined;
-  totalCost.value = getTotalCost(contracts.value);
 }
 async function getContractsLockDetails() {
   lockedContracts.value = await grid.contracts.getContractsLockDetails();
@@ -412,10 +502,10 @@ async function getContractsLockDetails() {
 // Define base table headers for contracts tables
 const baseTableHeaders: VDataTableHeader = [
   { title: "PLACEHOLDER", key: "data-table-select" },
-  { title: "ID", key: "contract_id" },
+  { title: "ID", key: "contract_id", sortable: true },
   { title: "State", key: "state", sortable: false },
-  { title: "Billing Rate", key: "consumption" },
-  { title: "Created At", key: "created_at" },
+  { title: "Billing Rate", key: "consumption", sortable: false },
+  { title: "Created At", key: "created_at", sortable: true },
 ];
 
 // Define specific table headers for each contract type
@@ -431,14 +521,14 @@ const nodeTableHeaders: VDataTableHeader = [
     ],
   },
   { title: "Type", key: "deploymentType", sortable: false },
-  { title: "Expiration", key: "expiration" },
-  { title: "Farm ID", key: "farm_id" },
+  { title: "Expiration", key: "expiration", sortable: false },
+  { title: "Farm ID", key: "farm_id", sortable: false },
   {
     title: "Node",
     key: "node",
     sortable: false,
     children: [
-      { title: "ID", key: "nodeId" },
+      { title: "ID", key: "nodeId", sortable: false },
       { title: "Status", key: "nodeStatus", sortable: false },
     ],
   },
@@ -447,20 +537,20 @@ const nodeTableHeaders: VDataTableHeader = [
 
 const nameTableHeaders: VDataTableHeader = [
   ...baseTableHeaders,
-  { title: "Solution Name", key: "solutionName" },
-  { title: "Expiration", key: "expiration" },
+  { title: "Solution Name", key: "solutionName", sortable: false },
+  { title: "Expiration", key: "expiration", sortable: false },
   { title: "Details", key: "actions", sortable: false },
 ];
 
 const RentTableHeaders: VDataTableHeader = [
   ...baseTableHeaders,
-  { title: "Farm ID", key: "farmId" },
+  { title: "Farm ID", key: "farm_id", sortable: false },
   {
     title: "Node",
     key: "node",
     sortable: false,
     children: [
-      { title: "ID", key: "nodeId" },
+      { title: "ID", key: "nodeId", sortable: false },
       { title: "Status", key: "nodeStatus", sortable: false },
     ],
   },
@@ -476,9 +566,10 @@ const contractsTables: ContractsTableType[] = [
     icon: "mdi-file",
     title: "Node Contracts",
     grid: grid,
-    loading: isLoadingNode,
-    count: nodesCount,
-    page: page,
+    loading: ref(false),
+    count: ref(0),
+    page: ref(1),
+    size: ref(5),
   },
   {
     headers: nameTableHeaders,
@@ -487,9 +578,10 @@ const contractsTables: ContractsTableType[] = [
     icon: "mdi-note-edit-outline",
     title: "Name Contracts",
     grid: grid,
-    loading: isLoadingName,
-    count: namesCount,
-    page: page,
+    loading: ref(false),
+    count: ref(0),
+    page: ref(1),
+    size: ref(5),
   },
   {
     headers: RentTableHeaders,
@@ -498,9 +590,10 @@ const contractsTables: ContractsTableType[] = [
     icon: "mdi-newspaper-variant",
     title: "Rent Contracts",
     grid: grid,
-    loading: isLoadingRent,
-    count: rentsCount,
-    page: page,
+    loading: ref(false),
+    count: ref(0),
+    page: ref(1),
+    size: ref(5),
   },
 ];
 </script>
