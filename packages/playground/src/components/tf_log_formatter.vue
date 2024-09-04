@@ -1,11 +1,11 @@
 <template>
-  <FormatedLog :msg="parsedMsg" />
+  <FormattedLog :msg="parsedMsg" />
 </template>
 
 <script lang="ts">
 import { computed, type PropType, toRef } from "vue";
 
-import FormatedLog, { type MsgToken } from "./formated_log.vue";
+import FormattedLog, { type MsgToken } from "./formatted_log.vue";
 
 function parseMsg(msg?: any): MsgToken[] {
   const _msg = msg || "";
@@ -78,7 +78,7 @@ function parseObject(idRef: { id: number }, obj: any): MsgToken {
 
 export default {
   name: "TfLogFormatter",
-  components: { FormatedLog },
+  components: { FormattedLog },
   props: {
     msg: { type: String as PropType<string | undefined | null>, required: true },
   },

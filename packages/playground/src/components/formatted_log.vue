@@ -1,6 +1,6 @@
 <template>
   <template v-if="Array.isArray(msg)">
-    <FormatedLog v-for="item in msg" :depth="depth + 1" :key="item.id" :msg="item" />
+    <FormattedLog v-for="item in msg" :depth="depth + 1" :key="item.id" :msg="item" />
   </template>
 
   <template v-else-if="msg.type === 'Literal'">
@@ -29,7 +29,7 @@
         <span v-html="msg.type === 'Array' ? '&#91; ' : '&#123; '" />
         <div class="ml-4 d-flex" v-for="([key, item], index) in Object.entries(msg.value)" :key="item.id">
           "{{ key }}":
-          <FormatedLog :depth="depth + 1" :msg="item" :coma="index !== Object.keys(msg.value).length - 1" is-prop />
+          <FormattedLog :depth="depth + 1" :msg="item" :coma="index !== Object.keys(msg.value).length - 1" is-prop />
         </div>
         <span v-html="msg.type === 'Array' ? ' &#93;' : ' &#125;'" /><span v-if="coma" v-text="','" />
       </div>
@@ -50,7 +50,7 @@ export type MsgToken =
   | { id: number; type: "Object"; value: { [key: string]: MsgToken } };
 
 export default {
-  name: "FormatedLog",
+  name: "FormattedLog",
   props: {
     msg: { type: Object as PropType<MsgToken | MsgToken[]>, required: true },
     depth: { type: Number, default: () => 0 },
