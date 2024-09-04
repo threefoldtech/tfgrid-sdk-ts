@@ -16,12 +16,12 @@
         'align-start': !collapsed,
       }"
     >
-      <v-btn class="mr-1" color="error" variant="tonal" icon @click.stop="collapsed = !collapsed">
+      <v-btn class="mr-1" variant="tonal" icon @click.stop="collapsed = !collapsed">
         <VIcon icon="mdi-chevron-right" class="open-arrow" :class="{ 'is-active': !collapsed }" />
       </v-btn>
       <span v-show="collapsed">
         <span v-html="error.type === 'Array' ? '&#91; ' : '&#123; '" />
-        <span :style="{ backgroundColor: 'rgba(var(--v-theme-error), 0.2)' }" v-text="'...'" />
+        <span v-text="'...'" />
         <span v-html="error.type === 'Array' ? ' &#93;' : ' &#125;'" /><span v-if="!root" v-text="','" />
       </span>
 
