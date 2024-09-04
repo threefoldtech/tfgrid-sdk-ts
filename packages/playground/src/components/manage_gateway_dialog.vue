@@ -296,8 +296,15 @@ export default {
     };
 
     const getDomainNode = (domain: GridGateway): string => {
-      const getIP = (url: string) => new URL(url).hostname;
-      const IP = getIP(domain.backends[0]);
+      const extractIP = (input: string) => {
+        try {
+          return new URL(input).hostname;
+        } catch {
+          return input.split(":")[0];
+        }
+      };
+
+      const IP = extractIP(domain.backends[0]);
 
       const isMatchingIP = (ip: string) => ip === IP;
 
