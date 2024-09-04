@@ -296,13 +296,7 @@ export default {
     };
 
     const getDomainNode = (domain: GridGateway): string => {
-      const extractIP = (input: string) => {
-        try {
-          return new URL(input).hostname;
-        } catch {
-          return input.split(":")[0];
-        }
-      };
+      const extractIP = (input: string) => input.replace("https://", "").replace("http://", "").split(":")[0];
 
       const IP = extractIP(domain.backends[0]);
 
