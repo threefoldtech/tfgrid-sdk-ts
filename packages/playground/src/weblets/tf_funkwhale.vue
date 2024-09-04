@@ -117,7 +117,6 @@
           memory: solution?.memory,
           rootFilesystemSize,
         }"
-        :has-custom-domain="selectionDetails?.domain?.enabledCustomDomain"
         require-domain
         v-model="selectionDetails"
       />

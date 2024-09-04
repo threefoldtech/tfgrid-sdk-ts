@@ -68,7 +68,6 @@
             rootFilesystemSize,
           }"
           v-model="selectionDetails"
-          :has-custom-domain="selectionDetails?.domain?.enabledCustomDomain"
           require-domain
         />
 
