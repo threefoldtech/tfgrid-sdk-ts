@@ -57,7 +57,12 @@
                           <span v-bind="props">
                             {{ item.title }}
                           </span>
-                          <v-badge dot inline color="primary" v-if="item.hasUpdate"></v-badge>
+                          <v-badge
+                            dot
+                            inline
+                            color="primary"
+                            v-if="item.releaseDate && isReleasedOverMon(item.releaseDate)"
+                          ></v-badge>
                         </template>
                       </v-tooltip>
                     </v-list-item-title>
@@ -89,7 +94,12 @@
                         <span v-bind="props">
                           {{ item.title }}
                         </span>
-                        <v-badge dot inline color="primary" v-if="item.hasUpdate"></v-badge>
+                        <v-badge
+                          dot
+                          inline
+                          color="primary"
+                          v-if="item.releaseDate && isReleasedOverMon(item.releaseDate)"
+                        ></v-badge>
                       </template>
                     </v-tooltip>
                   </v-list-item-title>
@@ -207,6 +217,7 @@ import { useRoute, useRouter } from "vue-router";
 import { useTheme } from "vuetify";
 
 import TfLogger from "@/components/logger.vue";
+import { isReleasedOverMon } from "@/utils/date";
 
 import { useProfileManager } from "./stores/profile_manager";
 const $route = useRoute();
@@ -253,27 +264,6 @@ function navigateToHome() {
 onMounted(async () => {
   await (window.$$appLoader || noop)();
   openProfile.value = true;
-});
-
-/**
- * Initializes the routes with update information.
- *
- * This function is called when the component is mounted.
- * It iterates over the routes and their items, checking if the item has an update.
- * If the item has an update, it calculates the next 30 days from the item's timestamp
- * and sets the hasUpdate property to true if the current time is less than the calculated timestamp.
- */
-
-onMounted(() => {
-  const next30DaysInMs = 30 * 24 * 60 * 60 * 1000;
-  routes.map(route => {
-    route.items.map(item => {
-      const next30DaysFromNow = item.timestamp ? item.timestamp + next30DaysInMs : 0;
-      if (item.hasUpdate == true) {
-        item.hasUpdate = Date.now() < next30DaysFromNow;
-      }
-    });
-  });
 });
 
 // eslint-disable-next-line no-undef
@@ -327,24 +317,19 @@ const routes: AppRoute[] = [
         icon: "mdi-television",
         route: DashboardRoutes.Deploy.VirtualMachines,
         tooltip: "Deploy your Virtal Machine instances.",
-        hasUpdate: false, // Change to true and update the timestamp in onMounted hook
-        // timestamp: undefined,
+        // releaseDate: { year: 2024, month: 9, day: 4 },
       },
       {
         title: "Orchestrators",
         icon: "mdi-group",
         route: DashboardRoutes.Deploy.Orchestrators,
         tooltip: "Deploy your orchestrator instances.",
-        hasUpdate: false,
-        // timestamp: undefined,
       },
       {
         title: "Applications",
         icon: "mdi-lightbulb-on-outline",
         route: DashboardRoutes.Deploy.Applications,
         tooltip: "Deploy ready applications on the ThreeFold grid.",
-        hasUpdate: false, // Change to true and update the timestamp in onMounted hook
-        // timestamp: undefined,
       },
       {
         title: "Your Contracts",
@@ -459,6 +444,7 @@ function clickHandler({ route, url }: AppRouteItem): void {
 <script lang="ts">
 import { DashboardRoutes } from "@/router/routes";
 import { AppThemeSelection } from "@/utils/app_theme";
+import type { Date } from "@/utils/types";
 
 import AppTheme from "./components/app_theme.vue";
 import DeploymentListManager from "./components/deployment_list_manager.vue";
@@ -472,7 +458,6 @@ import TfRouterView from "./components/TfRouterView.vue";
 import TfSwapPrice from "./components/TfSwapPrice.vue";
 import { useGrid } from "./stores";
 import ProfileManager from "./weblets/profile_manager.vue";
-
 interface AppRoute {
   title: string;
   items: AppRouteItem[];
@@ -486,8 +471,7 @@ interface AppRouteItem {
   url?: string;
   icon?: string;
   tooltip?: string;
-  hasUpdate?: boolean;
-  timestamp?: number;
+  releaseDate?: Date;
 }
 
 export default {

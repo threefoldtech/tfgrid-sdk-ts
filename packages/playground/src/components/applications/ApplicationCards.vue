@@ -5,7 +5,6 @@
       :key="card.title"
       cols="12"
       sm="12"
-      md="12"
       lg="6"
       :xl="filteredCards.length > 3 ? 4 : 6"
     >
@@ -51,8 +50,8 @@
 <script lang="ts">
 import { defineComponent, type PropType, ref } from "vue";
 
-import type { ApplicationCard, Date } from "@/utils/types";
-
+import { isReleasedOverMon } from "@/utils/date";
+import type { ApplicationCard } from "@/utils/types";
 export default defineComponent({
   name: "ApplicationCards",
   props: {
@@ -65,14 +64,6 @@ export default defineComponent({
     const baseURL = import.meta.env.BASE_URL;
     const filteredCards = ref(props.cards);
 
-    function isReleasedOverMon(date: Date): boolean {
-      const releaseDate = new Date(date.year, date.month - 1, date.day);
-      const currentDate = new Date();
-      const next30Days = 24 * 60 * 60 * 1000;
-
-      const diff = Math.abs((currentDate.getTime() - releaseDate.getTime()) / next30Days);
-      return diff <= 30;
-    }
     return {
       baseURL,
       filteredCards,
