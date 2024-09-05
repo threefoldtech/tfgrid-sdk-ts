@@ -30,8 +30,6 @@ export default {
           "Nostr is a simple, open protocol that enables global, decentralized, and censorship-resistant social media.",
         icon: "nostr.png",
         route: DashboardRoutes.Applications.Nostr,
-        hasUpdate: false, // change to `true` if the app has an update.
-        // releaseDate: 1723468996310, // Update creation time in milliseconds ex: 1723468996310 is 'Mon Aug 12 2024 16:23:16'
       },
       {
         title: "Gitea",
@@ -39,8 +37,7 @@ export default {
           "Gitea is a forge software package for hosting software development version control using Git as well as other collaborative features like bug tracking, code review, continuous integration, kanban boards, tickets, and wikis. It supports self-hosting but also provides a free public first-party instance.",
         icon: "gitea.png",
         route: DashboardRoutes.Applications.Gitea,
-        hasUpdate: false,
-        // releaseDate: 1723468996310,
+        // releaseDate: { year: 2024, month: 9, day: 4 },
       },
       {
         title: "TFRobot",
@@ -48,8 +45,6 @@ export default {
           "TFRobot is a command line interface tool that offers simultaneous mass deployment of groups of VMs on the ThreeFold Grid, with support of multiple retries for failed deployments, and customizable configurations.",
         icon: "tfrobot.png",
         route: DashboardRoutes.Applications.TFRobot,
-        hasUpdate: false,
-        // releaseDate: 1723468996310,
       },
       {
         title: "Jenkins",
@@ -57,16 +52,12 @@ export default {
           "Jenkins is a popular open-source automation server that enables developers to build, test, and deploy their applications continuously.",
         icon: "jenkins.png",
         route: DashboardRoutes.Applications.Jenkins,
-        hasUpdate: false,
-        // releaseDate: 1723468996310,
       },
       {
         title: "Peertube",
         excerpt: "Peertube aspires to be a decentralized and free/libre alternative to video broadcasting services.",
         icon: "peertube.png",
         route: DashboardRoutes.Applications.Peertube,
-        hasUpdate: false,
-        // releaseDate: 1723468996310,
       },
       {
         title: "Funkwhale",
@@ -74,8 +65,6 @@ export default {
           "Funkwhale is social platform to enjoy and share music. Funkwhale is a community-driven project that lets you listen and share music and audio within a decentralized, open network.",
         icon: "funkwhale.png",
         route: DashboardRoutes.Applications.Funkwhale,
-        hasUpdate: false,
-        // releaseDate: 1723468996310,
       },
       {
         title: "Mattermost",
@@ -84,8 +73,6 @@ export default {
         icon: "mattermost.png",
         route: DashboardRoutes.Applications.Mattermost,
         tags: ["Alpha"],
-        hasUpdate: false,
-        // releaseDate: 1723468996310,
       },
       {
         title: "Discourse",
@@ -93,8 +80,6 @@ export default {
           "Discourse is the 100% open source discussion platform built for the next decade of the Internet. Use it as a mailing list, discussion forum, long-form chat room, and more!",
         icon: "discourse.png",
         route: DashboardRoutes.Applications.Discourse,
-        hasUpdate: false,
-        // releaseDate: 1723468996310,
       },
       {
         title: "Taiga",
@@ -102,8 +87,6 @@ export default {
           "Taiga is a project management application that can handle both simple and complex projects for startups, software developers, and other target teams. It tracks the progress of a project.",
         icon: "taiga.png",
         route: DashboardRoutes.Applications.Taiga,
-        hasUpdate: false,
-        // releaseDate: 1723468996310,
       },
       {
         title: "Static Website",
@@ -111,8 +94,6 @@ export default {
           "Static Website is an application where a user provides a Github repository url and it's automatically served using Caddy.",
         icon: "static_website.png",
         route: DashboardRoutes.Applications.StaticWebsite,
-        hasUpdate: false,
-        // releaseDate: 1723468996310,
       },
       {
         title: "Nextcloud",
@@ -121,8 +102,6 @@ export default {
         icon: "nextcloud.png",
         route: DashboardRoutes.Applications.Nextcloud,
         tags: ["Community"],
-        hasUpdate: false,
-        // releaseDate: 1723468996310,
       },
       {
         title: "Presearch",
@@ -130,8 +109,6 @@ export default {
           "Presearch is a community-powered, decentralized search engine that provides better results while protecting your privacy and rewarding you when you search. This weblet deploys a Presearch node. ",
         icon: "presearch.png",
         route: DashboardRoutes.Applications.Presearch,
-        hasUpdate: false,
-        // releaseDate: 1723468996310,
       },
       {
         title: "Subsquid",
@@ -139,8 +116,6 @@ export default {
           "Subsquid indexer is a piece of software that reads all the blocks from a Substrate based blockchain, decodes and stores them for processing in a later stage.",
         icon: "subsquid.png",
         route: DashboardRoutes.Applications.Subsquid,
-        hasUpdate: false,
-        // releaseDate: 1723468996310,
       },
       {
         title: "Casperlabs",
@@ -148,8 +123,6 @@ export default {
           "Casper Network is a blockchain protocol built from the ground up to remain true to core Web3 principles and adapt to the needs of our evolving world.",
         icon: "casperlabs.png",
         route: DashboardRoutes.Applications.Casperlabs,
-        hasUpdate: false,
-        // releaseDate: 1723468996310,
       },
       {
         title: "Algorand",
@@ -157,8 +130,6 @@ export default {
           "Algorand builds technology that accelerates the convergence between decentralized and traditional finance by enabling the simple creation of next-generation financial products, protocols, and exchange of value.",
         icon: "algorand.png",
         route: DashboardRoutes.Applications.Algorand,
-        hasUpdate: false,
-        // releaseDate: 1723468996310,
       },
       {
         title: "Node Pilot",
@@ -166,8 +137,6 @@ export default {
           "Deploy, manage, and monetize crypto nodes with a few clicks. Seamless Docker integration brings enterprise-level security and scalability.",
         icon: "vm.png",
         route: DashboardRoutes.Applications.Nodepilot,
-        hasUpdate: false,
-        // releaseDate: 1723468996310,
       },
       {
         title: "Umbrel",
@@ -175,8 +144,6 @@ export default {
           "Umbrel is an OS for running a personal server in your home. Self-host open source apps like Nextcloud, Bitcoin node, and more.",
         icon: "umbrel.png",
         route: DashboardRoutes.Applications.Umbrel,
-        hasUpdate: false,
-        // releaseDate: 1723468996310,
       },
       {
         title: "Wordpress",
@@ -184,8 +151,6 @@ export default {
           "Wordpress is the most popular CMS on the market, powering 65.2% of websites whose CMS we know. That translates to 42.4% of all websites – nearly half of the internet. It is a popular option for those who want to build a website or blog.",
         icon: "wordpress.png",
         route: DashboardRoutes.Applications.Wordpress,
-        hasUpdate: false,
-        // releaseDate: 1723468996310,
       },
       {
         title: "Domains",
@@ -193,8 +158,6 @@ export default {
           "Domains allow users to securely expose servers hosted on local machines or VMs to the public internet.",
         icon: "domains.png",
         route: DashboardRoutes.Applications.Domains,
-        hasUpdate: false,
-        // releaseDate: 1723468996310,
       },
     ];
     cards = cards.sort((a, b) => a.title.localeCompare(b.title));

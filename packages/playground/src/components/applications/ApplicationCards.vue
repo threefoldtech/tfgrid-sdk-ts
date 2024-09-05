@@ -16,7 +16,10 @@
               :height="200"
               class="pa-3 pt-6"
               v-bind="props"
-              :class="[isHovering ? 'card-opacity' : undefined, card.hasUpdate && card.releaseDate ? 'ribben' : '']"
+              :class="[
+                isHovering ? 'card-opacity' : undefined,
+                card.releaseDate && isReleasedOverMon(card.releaseDate) ? 'ribben' : '',
+              ]"
             >
               <v-img
                 class="d-inline-block ml-3 mb-2"
@@ -46,9 +49,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, type PropType, ref } from "vue";
+import { defineComponent, type PropType, ref } from "vue";
 
-import type { ApplicationCard } from "@/utils/types";
+import type { ApplicationCard, Date } from "@/utils/types";
 
 export default defineComponent({
   name: "ApplicationCards",
@@ -62,22 +65,18 @@ export default defineComponent({
     const baseURL = import.meta.env.BASE_URL;
     const filteredCards = ref(props.cards);
 
-    onMounted(() => {
-      const today = new Date().toDateString();
-      const next30DaysInMs = 30 * 24 * 60 * 60 * 1000;
-      filteredCards.value.forEach(card => {
-        if (card.hasUpdate && card.releaseDate) {
-          const next30DaysFromNow = card.releaseDate + next30DaysInMs;
-          const createdAt = new Date(card.releaseDate).toDateString();
-          if (createdAt == today) {
-            card.hasUpdate = card.releaseDate < next30DaysFromNow;
-          }
-        }
-      });
-    });
+    function isReleasedOverMon(date: Date): boolean {
+      const releaseDate = new Date(date.year, date.month - 1, date.day);
+      const currentDate = new Date();
+      const next30Days = 24 * 60 * 60 * 1000;
+
+      const diff = Math.abs((currentDate.getTime() - releaseDate.getTime()) / next30Days);
+      return diff <= 30;
+    }
     return {
       baseURL,
       filteredCards,
+      isReleasedOverMon,
     };
   },
 });

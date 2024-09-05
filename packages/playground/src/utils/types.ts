@@ -15,12 +15,17 @@ export interface IPublicConfig {
   domain?: string;
 }
 
+export interface Date {
+  day: number;
+  month: number;
+  year: number;
+}
+
 export interface ApplicationCard {
   title: string;
   excerpt: string;
   icon: string;
   route: string;
   tags?: string[];
-  hasUpdate: boolean;
-  releaseDate?: number;
+  releaseDate?: Date;
 }
