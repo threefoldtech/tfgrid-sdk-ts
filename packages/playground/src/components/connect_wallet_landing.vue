@@ -8,7 +8,7 @@
     <v-container class="custom-container">
       <h4 class="text-center text-h5 text-lg-h4 my-4">A Co-Owned Global Sovereign Internet</h4>
       <v-container class="d-flex justify-center">
-        <p class="text-center text-subtitle w-75">
+        <p class="home_text text-center text-subtitle w-75 sm-w-auto">
           ThreeFold is
           <strong
             >a peer-to-peer open-source Internet platform that connects users directly with local Internet
@@ -62,7 +62,7 @@
       </div>
       <div class="text-center my-8">
         <h4 class="text-h5 mb-4">The <strong>Layer Zero</strong> for a Decentralized World</h4>
-        <p class="w-75 mx-auto text-subtitle-1">
+        <p class="home_text w-75 mx-auto text-subtitle-1">
           Anything that runs on Linux can run on ThreeFold – with more security, more sustainably, and in true
           decentralization. The ThreeFold Grid can support workloads from Blockchain to Web2 to Web3 to IoT and
           Metaverse and more.
@@ -106,6 +106,15 @@ export default {
 @media only screen and (max-width: 600px) {
   .v-col {
     flex-basis: auto !important;
+  }
+  .home_text {
+    width: auto !important;
+  }
+}
+
+@media (max-width: 375px) {
+  .v-container {
+    padding: 4px;
   }
 }
 </style>
