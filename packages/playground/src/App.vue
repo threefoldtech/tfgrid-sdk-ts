@@ -127,7 +127,13 @@
                 <v-divider class="mb-2" />
                 <div class="d-flex justify-center">
                   <div class="">
-                    <ProfileManager v-model="openProfile" @update:modelValue="(e: boolean) => toolbarExtended = e" />
+                    <ProfileManager
+                      :model-value="openProfile"
+                      @update:modelValue="(e: boolean) => {
+                    toolbarExtended = e;
+                    openProfile = e;
+                    }"
+                    />
                   </div>
                 </div>
               </div>

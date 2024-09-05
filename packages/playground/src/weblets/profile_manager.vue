@@ -190,7 +190,7 @@
 
                       <div class="d-flex flex-column flex-md-row justify-end mb-10">
                         <VBtn
-                          class="mt-2 ml-3"
+                          class="mt-2 ml-sm-0 ml-md-3"
                           color="secondary"
                           variant="outlined"
                           :disabled="
