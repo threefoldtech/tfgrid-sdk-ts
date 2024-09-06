@@ -42,7 +42,7 @@
     "pinia": "^2.0.32",
     "qrcode": "^1.5.1",
     "validator": "^13.9.0",
-    "vue": "^3.2.47",
+    "vue": "^3.3.5",
     "vue-chartjs": "^5.2.0",
     "vue-router": "^4.1.6",
     "vue3-virtual-scroller": "^0.2.3",
