@@ -212,7 +212,7 @@ class QueryContracts {
    * Retrieves the `payment state` of a contract based on the provided `contract ID`.
    *
    * @param contractID - The ID for which contract to retrieve its `payment state`.
-   * @returns {Promise<ContractLock>} A Promise that resolves to the `payment state` of the specified contract.
+   * @returns {Promise<ContractLock>} A Promise that resolves to the `ContractPaymentState` of the specified contract.
    */
   @checkConnection
   async getContractPaymentState(contractID: number) {
