@@ -125,7 +125,7 @@ interface CalcResourcesPrice extends Resources {
 }
 
 export interface CalculateOverdueOptions {
-  contractID: number;
+  contractInfo: ProxyContract;
   gridProxyClient: GridProxyClient;
 }
 
@@ -376,11 +376,16 @@ class TFContracts extends Contracts {
 
   private async calcResourcesPrice(options: CalcResourcesPrice) {
     const { cru, hru, sru, mru, calculator, ipv4, certified } = options;
+
+    const mruInGB = mru / Math.pow(1024, 3);
+    const sruInGB = sru / Math.pow(1024, 3);
+    const hruInGB = hru / Math.pow(1024, 3);
+
     const res = await calculator.calculateWithMyBalance({
       cru,
-      mru: mru / Math.pow(1024, 3),
-      sru: sru / Math.pow(1024, 3),
-      hru: hru / Math.pow(1024, 3),
+      mru: mruInGB,
+      sru: sruInGB,
+      hru: hruInGB,
       certified,
       ipv4u: !!ipv4,
     });
@@ -467,19 +472,21 @@ class TFContracts extends Contracts {
   async calculateContractOverDue(options: CalculateOverdueOptions) {
     //init clients
 
-    const contractInfo = await this.getContractInfoByContractId(options.contractID, options.gridProxyClient);
+    const contractInfo = options.contractInfo;
 
     /** Get the Un-billed amount for the network usage */
     const unbilledNU = (await this.client.contracts.getContractBillingInformationByID(contractInfo.contract_id))
       .amountUnbilled;
 
     const { standardOverdraft, additionalOverdraft, lastUpdatedSeconds } =
-      await this.client.contracts.getContractPaymentState(options.contractID);
+      await this.client.contracts.getContractPaymentState(contractInfo.contract_id);
 
     /**Calculate the elapsed seconds since last pilling*/
     const elapsedSeconds = Date.now() / 1000 - lastUpdatedSeconds;
 
-    const contractMonthlyCost = new Decimal(await this.getContractCost(contractInfo, elapsedSeconds, proxy));
+    const contractMonthlyCost = new Decimal(
+      await this.getContractCost(contractInfo, elapsedSeconds, options.gridProxyClient),
+    );
 
     /**Calculate total over overDraft added to the NU unbilled amount*/
     const totalOverDraft = new Decimal(standardOverdraft).add(additionalOverdraft);
@@ -530,14 +537,14 @@ class TFContracts extends Contracts {
     return ids;
   }
 
-  async batchUnlockContracts(ids: number[], proxy: GridProxyClient) {
+  async batchUnlockContracts(contracts: ProxyContract[], proxy: GridProxyClient) {
     const billableContractsIDs: number[] = [];
     //Todo could be parallel
-    for (const id of ids) {
+    for (const contract of contracts) {
       const contractOverdue = (
-        await this.calculateContractOverDue({ contractID: id, gridProxyClient: proxy })
+        await this.calculateContractOverDue({ contractInfo: contract, gridProxyClient: proxy })
       ).toNumber();
-      if (contractOverdue > 0) billableContractsIDs.push(id);
+      if (contractOverdue > 0) billableContractsIDs.push(contract.contract_id);
     }
     const extrinsics: ExtrinsicResult<number>[] = [];
     for (const id of billableContractsIDs) {
@@ -554,9 +561,7 @@ class TFContracts extends Contracts {
       twinId: await this.client.twins.getMyTwinId(),
     });
 
-    const ids: number[] = contracts.data.map(contract => contract.contract_id);
-
-    return await this.batchUnlockContracts(ids, proxy);
+    return await this.batchUnlockContracts(contracts.data, proxy);
   }
 
   async getDedicatedNodeExtraFee(options: GetDedicatedNodePriceOptions): Promise<number> {
