@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@noble/secp256k1": "^1.7.1",
-    "@polkadot/api": "^8.9.1",
+    "@polkadot/api": "^10.0.1",
     "@threefold/tfchain_client": "2.5.0",
     "@threefold/types": "2.5.0",
     "base64url": "^3.0.1",
