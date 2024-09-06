@@ -4,7 +4,7 @@ import { TFClient } from "../clients/tf-grid/client";
 import { GridClientConfig } from "../config";
 import { expose } from "../helpers/expose";
 import { validateInput } from "../helpers/validator";
-import { CalculatorModel, CUModel, NUModel, SUModel } from "./models";
+import { CalculatorModel, CUModel, NUModel, SUModel, UniqueNameModel } from "./models";
 
 export interface PricingInfo {
   dedicatedPrice: number;
@@ -120,6 +120,31 @@ class Calculator {
   async getPrices(): Promise<PricingPolicy> {
     const pricing = await this.client.pricingPolicies.get({ id: 1 });
     return pricing;
+  }
+
+  /**
+   * Calculates the cost of a unique name based on the elapsed time in seconds since last billing.
+   *
+   * This function retrieves the price per hour for a unique name, converts it to a per-second rate,
+   * and calculates the total cost in TFT for the given elapsed time. The result is returned in TFT units.
+   *
+   * @param {UniqueNameModel} options - Object containing the elapsed time in seconds for which the name has been used.
+   * @param {number} [options.elapsedSeconds=0] - The elapsed time in seconds since last billing process (default is 3600 'one hour').
+   *
+   * @returns {Promise<number>} - The price in TFT Unit (mTFT) for the unique name usage.
+   */
+  @validateInput
+  async namePricing(options: UniqueNameModel) {
+    //TODO verify the returned price unit
+
+    const SECONDS = 60 * 60;
+    const uniqueNamePricePerHour = (await this.getPrices()).uniqueName.value;
+    const uniqueNamePricePerSeconds = uniqueNamePricePerHour / SECONDS;
+    const elapsedSeconds = options.elapsedSeconds ?? SECONDS;
+    const priceInTFT = elapsedSeconds * uniqueNamePricePerSeconds;
+
+    /** will convert to TFTUnit */
+    return priceInTFT / Math.pow(10, 7);
   }
 
   /**

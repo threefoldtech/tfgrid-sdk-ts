@@ -691,6 +691,9 @@ class SUModel {
 class NUModel {
   @Expose() @IsNumber() @IsNotEmpty() @Min(0) nu: number; // GB
 }
+class UniqueNameModel {
+  @Expose() @IsNumber() @IsOptional() @Min(0) elapsedSeconds = 60 * 60;
+}
 
 class BatchModel<T> {
   @ArrayNotEmpty() @ValidateNested({ each: true }) extrinsics: ExtrinsicResult<T>[];
@@ -1027,6 +1030,7 @@ export {
   CUModel,
   SUModel,
   NUModel,
+  UniqueNameModel,
   BatchModel,
   ZOSGetDeploymentModel,
   ZOSNodeModel,
