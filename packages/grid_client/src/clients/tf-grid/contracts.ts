@@ -126,7 +126,7 @@ interface CalcResourcesPrice extends Resources {
 
 export interface CalculateOverdueOptions {
   contractID: number;
-  gridproxyUrl: string;
+  gridProxyClient: GridProxyClient;
 }
 
 const SECONDS_ONE_HOUR = 60 * 60;
@@ -466,9 +466,8 @@ class TFContracts extends Contracts {
    */
   async calculateContractOverDue(options: CalculateOverdueOptions) {
     //init clients
-    const proxy = new GridProxyClient(options.gridproxyUrl);
 
-    const contractInfo = await this.getContractInfoByContractId(options.contractID, proxy);
+    const contractInfo = await this.getContractInfoByContractId(options.contractID, options.gridProxyClient);
 
     /** Get the Un-billed amount for the network usage */
     const unbilledNU = (await this.client.contracts.getContractBillingInformationByID(contractInfo.contract_id))
@@ -531,10 +530,14 @@ class TFContracts extends Contracts {
     return ids;
   }
 
-  async batchUnlockContracts(ids: number[]) {
+  async batchUnlockContracts(ids: number[], proxy: GridProxyClient) {
     const billableContractsIDs: number[] = [];
+    //Todo could be parallel
     for (const id of ids) {
-      if ((await this.contractLock({ id })).amountLocked > 0) billableContractsIDs.push(id);
+      const contractOverdue = (
+        await this.calculateContractOverDue({ contractID: id, gridProxyClient: proxy })
+      ).toNumber();
+      if (contractOverdue > 0) billableContractsIDs.push(id);
     }
     const extrinsics: ExtrinsicResult<number>[] = [];
     for (const id of billableContractsIDs) {
@@ -543,15 +546,17 @@ class TFContracts extends Contracts {
     return this.client.applyAllExtrinsics(extrinsics);
   }
 
-  async unlockMyContracts(graphqlURL: string) {
-    const contracts = await this.listMyContracts({
-      stateList: [ContractStates.GracePeriod],
-      graphqlURL,
+  async unlockMyContracts(gridProxyUrl: string) {
+    const proxy = new GridProxyClient(gridProxyUrl);
+
+    const contracts = await proxy.contracts.list({
+      state: [ContractState.GracePeriod],
+      twinId: await this.client.twins.getMyTwinId(),
     });
-    const ids: number[] = [...contracts.nameContracts, ...contracts.nodeContracts, ...contracts.rentContracts].map(
-      contract => parseInt(contract.contractID),
-    );
-    return await this.batchUnlockContracts(ids);
+
+    const ids: number[] = contracts.data.map(contract => contract.contract_id);
+
+    return await this.batchUnlockContracts(ids, proxy);
   }
 
   async getDedicatedNodeExtraFee(options: GetDedicatedNodePriceOptions): Promise<number> {
