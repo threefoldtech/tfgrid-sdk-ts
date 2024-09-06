@@ -1,16 +1,25 @@
+import GridProxyClient, {
+  CertificationType,
+  Contract as ProxyContract,
+  ContractState,
+  ContractType,
+  Resources,
+} from "@threefold/gridproxy_client";
 import {
-  Contract,
+  BillingInformation,
   ContractLock,
   ContractLockOptions,
   Contracts,
   ExtrinsicResult,
   GetDedicatedNodePriceOptions,
+  NodeContractUsedResources,
   SetDedicatedNodeExtraFeesOptions,
 } from "@threefold/tfchain_client";
+import { GridClientError } from "@threefold/types";
 import { Decimal } from "decimal.js";
 
 import { formatErrorMessage } from "../../helpers";
-import { ContractStates } from "../../modules";
+import { calculator, ContractStates } from "../../modules";
 import { Graphql } from "../graphql/client";
 
 export type DiscountLevel = "None" | "Default" | "Bronze" | "Silver" | "Gold";
@@ -109,6 +118,18 @@ export interface LockContracts {
   rentContracts: LockDetails;
   totalAmountLocked: number;
 }
+interface CalcResourcesPrice extends Resources {
+  certified: boolean;
+  ipv4: number;
+  calculator: calculator;
+}
+
+export interface CalculateOverdueOptions {
+  contractID: number;
+  gridproxyUrl: string;
+}
+
+const SECONDS_ONE_HOUR = 60 * 60;
 
 class TFContracts extends Contracts {
   async listContractsByTwinId(options: ListContractByTwinIdOptions): Promise<GqlContracts> {
@@ -309,6 +330,178 @@ class TFContracts extends Contracts {
   }
 
   /**
+   * Retrieves the `payment state` of a contract based on the provided `contract ID`.
+   *
+   * @param contractID - The ID for which contract to retrieve its `payment state`.
+   * @returns {Promise<ContractLock>} A Promise that resolves to the `ContractPaymentState` of the specified contract.
+   */
+  async getContractPaymentState(contractID: number) {
+    return this.client.contracts.getContractPaymentState(contractID);
+  }
+
+  private async getNodeDetailsById(nodeID: number, proxy: GridProxyClient) {
+    return await proxy.nodes.byId(nodeID);
+  }
+
+  private async getContractInfoByContractId(id: number, proxy: GridProxyClient) {
+    const res = await proxy.contracts.list({ contractId: id });
+    return res["data"][0];
+  }
+
+  private async convertTomTFT(mUSD: Decimal) {
+    try {
+      const tftPrice = (await this.client.tftPrice.get()) ?? 0;
+      const tft = mUSD.div(tftPrice);
+      return tft.mul(10 ** 7);
+    } catch (error) {
+      throw new GridClientError(`Failed to convert to mTFT due: ${error}`);
+    }
+  }
+
+  private async getContractsCostOnRentedNode(nodeId: number, proxy: GridProxyClient) {
+    const contracts = await proxy.contracts.list({ nodeId, state: [ContractState.GracePeriod], numberOfPublicIps: 1 });
+    const ipPrice = (await this.client.pricingPolicies.get({ id: 1 })).ipu.value;
+    const BillingInformationPromises = contracts.data.reduce((acc: Promise<BillingInformation>[], contract) => {
+      acc.push(this.client.contracts.getContractBillingInformationByID(contract.contract_id));
+      return acc;
+    }, []);
+
+    const cost = await Promise.all(BillingInformationPromises);
+    const totalNUCost = cost.reduce((acc: number, billingInfo) => acc + billingInfo.amountUnbilled, 0);
+    const totalIPCost = ipPrice * (contracts.count || 0);
+
+    //Todo verify the contract nu cost as it always added to the overdue amount whatever the contract type is.
+    return totalNUCost + totalIPCost;
+  }
+
+  private async calcResourcesPrice(options: CalcResourcesPrice) {
+    const { cru, hru, sru, mru, calculator, ipv4, certified } = options;
+    const res = await calculator.calculateWithMyBalance({
+      cru,
+      mru: mru / Math.pow(1024, 3),
+      sru: sru / Math.pow(1024, 3),
+      hru: hru / Math.pow(1024, 3),
+      certified,
+      ipv4u: !!ipv4,
+    });
+
+    return {
+      dedicatedPrice: res.dedicatedPrice,
+      sharedPrice: res.sharedPrice,
+    };
+  }
+
+  async getContractCost(contract: ProxyContract, elapsedSeconds: number, proxy: GridProxyClient) {
+    const calc = new calculator(this.client);
+
+    if (contract.type == ContractType.Name) {
+      const mUSDCostPerSecond = await calc.namePricing({ elapsedSeconds: elapsedSeconds });
+      /** return cost per month */
+      return mUSDCostPerSecond * 60 * 60 * 24 * 30;
+    }
+
+    //TODO allow ipv4 to be number
+
+    /** Other contract types need the node information */
+    const nodeDetails = await proxy.nodes.byId(contract.details.nodeId);
+
+    const certified = nodeDetails.certificationType == CertificationType.Certified ? true : false;
+
+    if (contract.type == ContractType.Rent) {
+      // get the contracts on the rented node, calculate the nu, then add the ipv4 cost
+      const totalContractsCost = await this.getContractsCostOnRentedNode(contract.details.nodeId, proxy);
+
+      const mUSDCost = (
+        await this.calcResourcesPrice({
+          calculator: calc,
+          ipv4: 0,
+          certified,
+          ...nodeDetails.total_resources,
+        })
+      ).dedicatedPrice;
+
+      /**returns the cost of renting the node with its contracts cost */
+      return (await this.convertTomTFT(new Decimal(mUSDCost))).add(totalContractsCost);
+    }
+
+    /** Node contract on rented node */
+    //TODO should be verified
+    if (nodeDetails.rented) return 0;
+
+    /**2 cases 
+    --> if resume rent contract resume its node contracts ---> should be handled in UI, will return zero,
+    TODO add ipv4 
+    --> if not should handled 
+    */
+
+    /** Node Contract */
+    const usedREsources: NodeContractUsedResources = await this.client.contracts.getNodeContractResources({
+      id: contract.contract_id,
+    });
+
+    const mUSDCost = (
+      await this.calcResourcesPrice({
+        calculator: calc,
+        ...usedREsources.used,
+        certified,
+        ipv4: contract.details.number_of_public_ips ?? 0,
+      })
+    ).sharedPrice;
+
+    return await this.convertTomTFT(new Decimal(mUSDCost));
+  }
+
+  /**
+   * Calculates the overdue amount for a contract.
+   *
+   * This method calculates the overdue amount by summing the overdraft amounts
+   * from the contract payment state and  the unbilled network usage then sum the total by the product of:
+   * 1. The time elapsed since the last billing in seconds (with an additional time allowance).
+   * 2. The contract cost per second.
+   *
+   * The resulting overdue amount represents the amount that needs to be addressed.
+   *
+   * @param {CalculateOverdueOptions} options - The options containing the contract ID.
+   * @returns {Promise<number>} - The calculated overdue amount.
+   */
+  async calculateContractOverDue(options: CalculateOverdueOptions) {
+    //init clients
+    const proxy = new GridProxyClient(options.gridproxyUrl);
+
+    const contractInfo = await this.getContractInfoByContractId(options.contractID, proxy);
+
+    /** Get the Un-billed amount for the network usage */
+    const unbilledNU = (await this.client.contracts.getContractBillingInformationByID(contractInfo.contract_id))
+      .amountUnbilled;
+
+    const { standardOverdraft, additionalOverdraft, lastUpdatedSeconds } =
+      await this.client.contracts.getContractPaymentState(options.contractID);
+
+    /**Calculate the elapsed seconds since last pilling*/
+    const elapsedSeconds = Date.now() / 1000 - lastUpdatedSeconds;
+
+    const contractMonthlyCost = new Decimal(await this.getContractCost(contractInfo, elapsedSeconds, proxy));
+
+    /**Calculate total over overDraft added to the NU unbilled amount*/
+    const totalOverDraft = new Decimal(standardOverdraft).add(additionalOverdraft);
+
+    // time since the last billing with allowance time of **one hour**
+    const totalPeriodTime = elapsedSeconds + SECONDS_ONE_HOUR;
+
+    //mUSD
+    const contractCostPerSecond = contractMonthlyCost.div(30 * 24 * SECONDS_ONE_HOUR);
+
+    const mTFTCost = await this.convertTomTFT(contractCostPerSecond);
+
+    // cost of the current billing period with the mentioned allowance time
+    const totalPeriodCost = mTFTCost.times(totalPeriodTime);
+
+    const mTFTOverdue = totalOverDraft.add(totalPeriodCost).add(unbilledNU);
+    const overdueTFTs = mTFTOverdue.div(10 ** 7);
+    return overdueTFTs;
+  }
+
+  /**
    * WARNING: Please be careful when executing this method, it will delete all your contracts.
    * @param  {CancelMyContractOptions} options
    * @returns {Promise<Record<string, number>[]>}
@@ -326,6 +519,8 @@ class TFContracts extends Contracts {
     await this.batchCancelContracts(ids);
     return contracts;
   }
+
+  //TODO refactor unlock functions to use new calculation in the conditions
 
   async batchCancelContracts(ids: number[]): Promise<number[]> {
     const extrinsics: ExtrinsicResult<number>[] = [];
