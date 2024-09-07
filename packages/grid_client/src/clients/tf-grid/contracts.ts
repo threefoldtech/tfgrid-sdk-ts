@@ -124,6 +124,14 @@ interface CalcResourcesPrice extends Resources {
   calculator: calculator;
 }
 
+export type OverdueDetails = { [key: number]: number };
+
+export interface ContractsOverdue {
+  nameContracts: OverdueDetails;
+  nodeContracts: OverdueDetails;
+  rentContracts: OverdueDetails;
+  totalOverdueAmount: number;
+}
 export interface CalculateOverdueOptions {
   contractInfo: Contract;
   gridProxyClient: GridProxyClient;
@@ -470,8 +478,6 @@ class TFContracts extends Contracts {
    * @returns {Promise<number>} - The calculated overdue amount.
    */
   async calculateContractOverDue(options: CalculateOverdueOptions) {
-    //init clients
-
     const contractInfo = options.contractInfo;
 
     /** Get the Un-billed amount for the network usage */
