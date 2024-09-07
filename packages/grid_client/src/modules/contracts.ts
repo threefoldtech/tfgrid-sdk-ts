@@ -1,3 +1,4 @@
+import GridProxyClient, { Contract as GridProxyContract, Pagination } from "@threefold/gridproxy_client";
 import { Contract, ContractLock, ServiceContract } from "@threefold/tfchain_client";
 import { DeploymentKeyDeletionError, InsufficientBalanceError } from "@threefold/types";
 import * as PATH from "path";
@@ -13,6 +14,7 @@ import {
 } from "../clients/tf-grid";
 import { TFClient } from "../clients/tf-grid/client";
 import { GridClientConfig } from "../config";
+import { formatErrorMessage } from "../helpers";
 import { events } from "../helpers/events";
 import { expose } from "../helpers/expose";
 import { validateInput } from "../helpers/validator";
@@ -577,9 +579,22 @@ class Contracts {
     }
     return LockedContracts;
   }
+  //TODO calculate single contract overDue
+  //TODO calculate multiple contract overDue
 
   /**
    * Unlocks multiple contracts.
+   * @param contracts An array of contracts to be unlocked.
+   * @returns A Promise that resolves to an array of billed contracts representing the result of batch unlocking.
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   */
+  async unlockContracts(contracts: GridProxyContract[], proxy: GridProxyClient) {
+    return await this.client.contracts.batchUnlockContracts(contracts, proxy);
+  }
+  /**
+   * Unlocks multiple contracts by their ids.
    * @param ids An array of contract IDs to be unlocked.
    * @returns A Promise that resolves to an array of billed contracts representing the result of batch unlocking.
    * @decorators
@@ -588,8 +603,18 @@ class Contracts {
    */
   @expose
   @validateInput
-  async unlockContracts(ids: number[]): Promise<number[]> {
-    return await this.client.contracts.batchUnlockContracts(ids);
+  async unlockContractsByIds(ids: number[]): Promise<number[]> {
+    try {
+      const proxy = new GridProxyClient(this.config.proxyURL);
+      const promises: Promise<Pagination<GridProxyContract[]>>[] = [];
+      ids.forEach(id => promises.push(proxy.contracts.list({ contractId: id })));
+      const res = await Promise.all(promises);
+      const contracts = res.map(contract => contract.data[0]).filter(contract => contract != undefined);
+      return await this.unlockContracts(contracts, proxy);
+    } catch (error) {
+      (error as Error).message = formatErrorMessage("Failed to get the contracts due:", error);
+      throw error;
+    }
   }
   /**
    * Unlocks contracts associated with the current user.
@@ -601,7 +626,7 @@ class Contracts {
   @expose
   @validateInput
   async unlockMyContracts(): Promise<number[]> {
-    return await this.client.contracts.unlockMyContracts(this.config.graphqlURL);
+    return await this.client.contracts.unlockMyContracts(this.config.proxyURL);
   }
 }
 
