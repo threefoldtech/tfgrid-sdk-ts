@@ -1,9 +1,16 @@
-import GridProxyClient, { Contract as GridProxyContract, Pagination } from "@threefold/gridproxy_client";
+import GridProxyClient, {
+  Contract as GridProxyContract,
+  ContractState as GridProxyContractState,
+  ContractType,
+  Pagination,
+} from "@threefold/gridproxy_client";
 import { Contract, ContractLock, ServiceContract } from "@threefold/tfchain_client";
 import { DeploymentKeyDeletionError, InsufficientBalanceError } from "@threefold/types";
 import * as PATH from "path";
 
+import { GridClientError } from "../../../types/dist/node";
 import {
+  ContractsOverdue,
   GqlContracts,
   GqlNameContract,
   GqlNodeContract,
@@ -579,8 +586,87 @@ class Contracts {
     }
     return LockedContracts;
   }
-  //TODO calculate single contract overDue
-  //TODO calculate multiple contract overDue
+
+  /**
+   * Retrieves the overdue amount for a given contract .
+   *
+   * @param {GridProxyContract} contract - The contract for which the overdue amount is to be calculated.
+   * @param {GridProxyClient} proxy - The proxy client will be used overdue calculation.
+   *
+   * @returns {Promise<number>} - A promise that resolves to the overdue amount for the specified contract.
+   */
+  @expose
+  @validateInput
+  async getContractOverdueAmount(contract: GridProxyContract, proxy: GridProxyClient) {
+    return await this.client.contracts.calculateContractOverDue({ contractInfo: contract, gridProxyClient: proxy });
+  }
+
+  /**
+   * Retrieves the overdue amount for a given contract by its id.
+   *
+   * @param {number} contractId - The contract id for which contract the overdue amount is to be calculated.
+   *
+   * @returns {Promise<number>} - A promise that resolves to the overdue amount for the specified contract.
+   */
+  @expose
+  @validateInput
+  async getContractOverdueAmountById(contractId: number) {
+    try {
+      const proxy = new GridProxyClient(this.config.proxyURL);
+      const contract = (await proxy.contracts.list({ contractId })).data[0];
+      if (!contract) throw new GridClientError(`Can't find contract ${contractId} info`);
+      return await this.getContractOverdueAmount(contract, proxy);
+    } catch (error) {
+      (error as Error).message = formatErrorMessage("Failed to get contract overdue info", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Retrieves the overdue amount for all grace period contracts for the current user.
+   *
+   * @returns {Promise<number>} - A promise that resolves to the overdue amount for the specified contract.
+   */
+  @expose
+  async getTotalOverdue() {
+    const proxy = new GridProxyClient(this.config.proxyURL);
+    const result: ContractsOverdue = {
+      nameContracts: {},
+      nodeContracts: {},
+      rentContracts: {},
+      totalOverdueAmount: 0,
+    };
+
+    const contracts = await proxy.contracts.list({
+      twinId: this.config.twinId,
+      state: [GridProxyContractState.GracePeriod],
+    });
+
+    for (const contract of contracts.data) {
+      switch (contract.type) {
+        case ContractType.Name:
+          result.nameContracts[contract.contract_id] = (
+            await this.getContractOverdueAmount(contract, proxy)
+          ).toNumber();
+          result.totalOverdueAmount += result.nameContracts[contract.contract_id];
+          break;
+
+        case ContractType.Rent:
+          result.rentContracts[contract.contract_id] = (
+            await this.getContractOverdueAmount(contract, proxy)
+          ).toNumber();
+          result.totalOverdueAmount += result.rentContracts[contract.contract_id];
+          break;
+
+        default:
+          result.rentContracts[contract.contract_id] = (
+            await this.getContractOverdueAmount(contract, proxy)
+          ).toNumber();
+          result.totalOverdueAmount += result.rentContracts[contract.contract_id];
+      }
+    }
+    return result;
+  }
 
   /**
    * Unlocks multiple contracts.
@@ -590,9 +676,28 @@ class Contracts {
    * - `@expose`: Exposes the method for external use.
    * - `@validateInput`: Validates the input options.
    */
-  async unlockContracts(contracts: GridProxyContract[], proxy: GridProxyClient) {
+  @expose
+  @validateInput
+  async unlockContracts(contracts: GridProxyContract[]) {
+    const proxy = new GridProxyClient(this.config.proxyURL);
+    return await this.batchUnlockContracts(contracts, proxy);
+  }
+
+  /**
+   * Unlocks multiple contracts.
+   * @param contracts An array of contracts to be unlocked.
+   * @param proxy An instance of Grid proxy client.
+   * @returns A Promise that resolves to an array of billed contracts representing the result of batch unlocking.
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   */
+  @expose
+  @validateInput
+  async batchUnlockContracts(contracts: GridProxyContract[], proxy: GridProxyClient) {
     return await this.client.contracts.batchUnlockContracts(contracts, proxy);
   }
+
   /**
    * Unlocks multiple contracts by their ids.
    * @param ids An array of contract IDs to be unlocked.
@@ -610,12 +715,13 @@ class Contracts {
       ids.forEach(id => promises.push(proxy.contracts.list({ contractId: id })));
       const res = await Promise.all(promises);
       const contracts = res.map(contract => contract.data[0]).filter(contract => contract != undefined);
-      return await this.unlockContracts(contracts, proxy);
+      return await this.batchUnlockContracts(contracts, proxy);
     } catch (error) {
       (error as Error).message = formatErrorMessage("Failed to get the contracts due:", error);
       throw error;
     }
   }
+
   /**
    * Unlocks contracts associated with the current user.
    * @returns A Promise that resolves to an array of billed contracts.
