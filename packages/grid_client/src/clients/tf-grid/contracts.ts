@@ -1,6 +1,6 @@
 import GridProxyClient, {
   CertificationType,
-  Contract as ProxyContract,
+  Contract,
   ContractState,
   ContractType,
   Resources,
@@ -125,7 +125,7 @@ interface CalcResourcesPrice extends Resources {
 }
 
 export interface CalculateOverdueOptions {
-  contractInfo: ProxyContract;
+  contractInfo: Contract;
   gridProxyClient: GridProxyClient;
 }
 
@@ -396,7 +396,7 @@ class TFContracts extends Contracts {
     };
   }
 
-  async getContractCost(contract: ProxyContract, elapsedSeconds: number, proxy: GridProxyClient) {
+  async getContractCost(contract: Contract, elapsedSeconds: number, proxy: GridProxyClient) {
     const calc = new calculator(this.client);
 
     if (contract.type == ContractType.Name) {
@@ -537,7 +537,7 @@ class TFContracts extends Contracts {
     return ids;
   }
 
-  async batchUnlockContracts(contracts: ProxyContract[], proxy: GridProxyClient) {
+  async batchUnlockContracts(contracts: Contract[], proxy: GridProxyClient) {
     const billableContractsIDs: number[] = [];
     //Todo could be parallel
     for (const contract of contracts) {
