@@ -9,6 +9,7 @@ import {
   BillingInformation,
   ContractLock,
   ContractLockOptions,
+  ContractPaymentState,
   Contracts,
   ExtrinsicResult,
   GetDedicatedNodePriceOptions,
@@ -346,10 +347,10 @@ class TFContracts extends Contracts {
     return res["data"][0];
   }
 
-  private async convertTomTFT(mUSD: Decimal) {
+  private async convertToTFT(USD: Decimal) {
     try {
       const tftPrice = (await this.client.tftPrice.get()) ?? 0;
-      return mUSD.div(tftPrice);
+      return USD.div(tftPrice);
     } catch (error) {
       throw new GridClientError(`Failed to convert to mTFT due: ${error}`);
     }
@@ -357,18 +358,33 @@ class TFContracts extends Contracts {
 
   private async getContractsCostOnRentedNode(nodeId: number, proxy: GridProxyClient) {
     const contracts = await proxy.contracts.list({ nodeId, state: [ContractState.GracePeriod], numberOfPublicIps: 1 });
-    const ipPrice = (await this.client.pricingPolicies.get({ id: 1 })).ipu.value;
+
+    //TODO revisit the unit of of public ip
+    const ipPrice = (await this.client.pricingPolicies.get({ id: 1 })).ipu.value / 10 ** 7;
+    console.log(ipPrice, "ipPrice");
     const BillingInformationPromises = contracts.data.reduce((acc: Promise<BillingInformation>[], contract) => {
       acc.push(this.client.contracts.getContractBillingInformationByID(contract.contract_id));
       return acc;
     }, []);
+    const overDraftPromises = contracts.data.reduce((acc: Promise<ContractPaymentState>[], contract) => {
+      acc.push(this.client.contracts.getContractPaymentState(contract.contract_id));
+      return acc;
+    }, []);
 
-    const cost = await Promise.all(BillingInformationPromises);
-    const totalNUCost = cost.reduce((acc: number, billingInfo) => acc + billingInfo.amountUnbilled, 0);
-    const totalIPCost = ipPrice * (contracts.count || 0);
+    const overDraftResult = await Promise.all(overDraftPromises);
+    const billingInfoResult = await Promise.all(BillingInformationPromises);
 
-    //Todo verify the contract nu cost as it always added to the overdue amount whatever the contract type is.
-    return totalNUCost + totalIPCost;
+    const totalOverDraft = overDraftResult.reduce(
+      (acc: Decimal, paymentState) => acc.add(paymentState.additionalOverdraft).add(paymentState.standardOverdraft),
+      new Decimal(0),
+    );
+    const totalNUCost = billingInfoResult.reduce((acc: number, billingInfo) => acc + billingInfo.amountUnbilled, 0);
+    const totalIPCost = (ipPrice * (contracts.data.length || 0)) / 1e7;
+    return {
+      //return ip cost per month
+      totalIpCost: totalIPCost * 24 * 30,
+      totalOverdraft: totalOverDraft.add(totalNUCost),
+    };
   }
 
   private async calcResourcesPrice(options: CalcResourcesPrice) {
@@ -406,11 +422,8 @@ class TFContracts extends Contracts {
     const certified = nodeDetails.certificationType == CertificationType.Certified ? true : false;
 
     if (contract.type == ContractType.Rent) {
-      // get the contracts on the rented node, calculate the nu, then add the ipv4 cost
-      const totalContractsCost = await this.getContractsCostOnRentedNode(contract.details.nodeId, proxy);
       //TODO add the overdraft of the child of the ipv4 overdraft
-
-      const mUSDCost = (
+      const USDCost = (
         await this.calcResourcesPrice({
           calculator: calc,
           ipv4: 0,
@@ -420,7 +433,7 @@ class TFContracts extends Contracts {
       ).dedicatedPrice;
 
       /**returns the cost of renting the node with its contracts cost */
-      return (await this.convertTomTFT(new Decimal(mUSDCost))).add(totalContractsCost);
+      return USDCost;
     }
 
     /** Node contract on rented node */
@@ -438,7 +451,7 @@ class TFContracts extends Contracts {
       id: contract.contract_id,
     });
 
-    const mUSDCost = (
+    const USDCost = (
       await this.calcResourcesPrice({
         calculator: calc,
         ...usedREsources.used,
@@ -447,7 +460,7 @@ class TFContracts extends Contracts {
       })
     ).sharedPrice;
 
-    return await this.convertTomTFT(new Decimal(mUSDCost));
+    return await USDCost;
   }
 
   /**
@@ -476,25 +489,35 @@ class TFContracts extends Contracts {
     /**Calculate the elapsed seconds since last pilling*/
     const elapsedSeconds = Date.now() / 1000 - lastUpdatedSeconds;
 
-    const contractMonthlyCost = new Decimal(await this.getContractCost(contractInfo, options.gridProxyClient));
-
+    let contractMonthlyCost = new Decimal(await this.getContractCost(contractInfo, options.gridProxyClient));
     /**Calculate total over overDraft added to the NU unbilled amount*/
-    const totalOverDraft = new Decimal(standardOverdraft).add(additionalOverdraft);
+    let totalOverDraft = new Decimal(standardOverdraft).add(additionalOverdraft);
+
+    if (contractInfo.type == ContractType.Rent) {
+      // get the contracts on the rented node, calculate the nu, then add the ipv4 cost
+      const totalContractsCost = await this.getContractsCostOnRentedNode(
+        contractInfo.details.nodeId,
+        options.gridProxyClient,
+      );
+      totalOverDraft = totalOverDraft.add(totalContractsCost.totalOverdraft);
+      contractMonthlyCost = contractMonthlyCost.add(totalContractsCost.totalIpCost);
+    }
 
     // time since the last billing with allowance time of **one hour**
     const totalPeriodTime = elapsedSeconds + SECONDS_ONE_HOUR;
 
-    //mUSD
+    //USD
     const contractCostPerSecond = contractMonthlyCost.div(30 * 24 * SECONDS_ONE_HOUR);
-
-    const mTFTCost = await this.convertTomTFT(contractCostPerSecond);
+    const contractCostTFT = await this.convertToTFT(contractCostPerSecond);
 
     // cost of the current billing period with the mentioned allowance time
-    const totalPeriodCost = mTFTCost.times(totalPeriodTime);
+    const totalPeriodCost = contractCostTFT.times(totalPeriodTime);
+    const overdue = totalOverDraft.add(unbilledNU);
 
-    const mTFTOverdue = totalOverDraft.add(totalPeriodCost).add(unbilledNU);
-    const overdueTFTs = mTFTOverdue.div(10 ** 7);
-    return overdueTFTs;
+    //convert to TFT
+    const OverdueTFT = overdue.div(10 ** 7);
+
+    return OverdueTFT.add(totalPeriodCost);
   }
 
   /**
