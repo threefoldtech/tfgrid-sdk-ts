@@ -132,11 +132,10 @@ class Calculator {
    */
   @validateInput
   async namePricing() {
-    const SECONDS = 60 * 60;
     const uniqueNamePricePerHour = (await this.getPrices()).uniqueName.value;
-    const uniqueNamePricePerSeconds = uniqueNamePricePerHour / SECONDS;
+    const priceInUSD = uniqueNamePricePerHour / 10 ** 7;
     // return cost per month
-    return uniqueNamePricePerSeconds * (SECONDS * 24 * 30);
+    return priceInUSD * 24 * 30;
   }
 
   /**
