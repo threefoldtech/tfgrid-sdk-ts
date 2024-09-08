@@ -337,16 +337,6 @@ class TFContracts extends Contracts {
     return res;
   }
 
-  /**
-   * Retrieves the `payment state` of a contract based on the provided `contract ID`.
-   *
-   * @param contractID - The ID for which contract to retrieve its `payment state`.
-   * @returns {Promise<ContractLock>} A Promise that resolves to the `ContractPaymentState` of the specified contract.
-   */
-  async getContractPaymentState(contractID: number) {
-    return this.client.contracts.getContractPaymentState(contractID);
-  }
-
   private async getNodeDetailsById(nodeID: number, proxy: GridProxyClient) {
     return await proxy.nodes.byId(nodeID);
   }
