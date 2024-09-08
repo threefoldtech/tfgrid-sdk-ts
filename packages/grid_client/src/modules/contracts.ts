@@ -589,16 +589,35 @@ class Contracts {
 
   /**
    * Retrieves the overdue amount for a given contract .
+   * It is a private function that helps other get contracts overdue amount.
    *
    * @param {GridProxyContract} contract - The contract for which the overdue amount is to be calculated.
    * @param {GridProxyClient} proxy - The proxy client will be used overdue calculation.
    *
    * @returns {Promise<number>} - A promise that resolves to the overdue amount for the specified contract.
    */
+  @validateInput
+  private async getContractOverdueAmount(contract: GridProxyContract, proxy: GridProxyClient) {
+    return await this.client.contracts.calculateContractOverDue({ contractInfo: contract, gridProxyClient: proxy });
+  }
+
+  /**
+   * Retrieves the overdue amount for a given contract.
+   *
+   * @param {GridProxyContract} contract - The contract for which the overdue amount is to be calculated.
+   *
+   * @returns {Promise<number>} - A promise that resolves to the overdue amount for the specified contract.
+   */
   @expose
   @validateInput
-  async getContractOverdueAmount(contract: GridProxyContract, proxy: GridProxyClient) {
-    return await this.client.contracts.calculateContractOverDue({ contractInfo: contract, gridProxyClient: proxy });
+  async getContractOverdueAmountByContract(contract: GridProxyContract) {
+    try {
+      const proxy = new GridProxyClient(this.config.proxyURL);
+      return await this.client.contracts.calculateContractOverDue({ contractInfo: contract, gridProxyClient: proxy });
+    } catch (error) {
+      (error as Error).message = formatErrorMessage("Failed to get contract overdue info", error);
+      throw error;
+    }
   }
 
   /**
