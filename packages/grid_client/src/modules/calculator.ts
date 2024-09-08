@@ -123,28 +123,20 @@ class Calculator {
   }
 
   /**
-   * Calculates the cost of a unique name based on the elapsed time in seconds since last billing.
+   * Calculates the cost of a unique name per month.
    *
-   * This function retrieves the price per hour for a unique name, converts it to a per-second rate,
-   * and calculates the total cost in TFT for the given elapsed time. The result is returned in TFT units.
+   * This function retrieves the price per hour for a unique name, and calculates the total cost in mUSD.
    *
-   * @param {UniqueNameModel} options - Object containing the elapsed time in seconds for which the name has been used.
-   * @param {number} [options.elapsedSeconds=0] - The elapsed time in seconds since last billing process (default is 3600 'one hour').
    *
-   * @returns {Promise<number>} - The price in TFT Unit (mTFT) for the unique name usage.
+   * @returns {Promise<number>} - The price in mUSD for the unique name usage per month.
    */
   @validateInput
-  async namePricing(options: UniqueNameModel) {
-    //TODO verify the returned price unit
-
+  async namePricing() {
     const SECONDS = 60 * 60;
     const uniqueNamePricePerHour = (await this.getPrices()).uniqueName.value;
     const uniqueNamePricePerSeconds = uniqueNamePricePerHour / SECONDS;
-    const elapsedSeconds = options.elapsedSeconds ?? SECONDS;
-    const priceInTFT = elapsedSeconds * uniqueNamePricePerSeconds;
-
-    /** will convert to TFTUnit */
-    return priceInTFT / Math.pow(10, 7);
+    // return cost per month
+    return uniqueNamePricePerSeconds * (SECONDS * 24 * 30);
   }
 
   /**

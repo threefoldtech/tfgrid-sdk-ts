@@ -349,8 +349,7 @@ class TFContracts extends Contracts {
   private async convertTomTFT(mUSD: Decimal) {
     try {
       const tftPrice = (await this.client.tftPrice.get()) ?? 0;
-      const tft = mUSD.div(tftPrice);
-      return tft.mul(10 ** 7);
+      return mUSD.div(tftPrice);
     } catch (error) {
       throw new GridClientError(`Failed to convert to mTFT due: ${error}`);
     }
@@ -394,14 +393,10 @@ class TFContracts extends Contracts {
     };
   }
 
-  async getContractCost(contract: Contract, elapsedSeconds: number, proxy: GridProxyClient) {
+  async getContractCost(contract: Contract, proxy: GridProxyClient) {
     const calc = new calculator(this.client);
 
-    if (contract.type == ContractType.Name) {
-      const mUSDCostPerSecond = await calc.namePricing({ elapsedSeconds: elapsedSeconds });
-      /** return cost per month */
-      return mUSDCostPerSecond * 60 * 60 * 24 * 30;
-    }
+    if (contract.type == ContractType.Name) return await calc.namePricing();
 
     //TODO allow ipv4 to be number
 
@@ -480,9 +475,7 @@ class TFContracts extends Contracts {
     /**Calculate the elapsed seconds since last pilling*/
     const elapsedSeconds = Date.now() / 1000 - lastUpdatedSeconds;
 
-    const contractMonthlyCost = new Decimal(
-      await this.getContractCost(contractInfo, elapsedSeconds, options.gridProxyClient),
-    );
+    const contractMonthlyCost = new Decimal(await this.getContractCost(contractInfo, options.gridProxyClient));
 
     /**Calculate total over overDraft added to the NU unbilled amount*/
     const totalOverDraft = new Decimal(standardOverdraft).add(additionalOverdraft);
@@ -521,8 +514,6 @@ class TFContracts extends Contracts {
     await this.batchCancelContracts(ids);
     return contracts;
   }
-
-  //TODO refactor unlock functions to use new calculation in the conditions
 
   async batchCancelContracts(ids: number[]): Promise<number[]> {
     const extrinsics: ExtrinsicResult<number>[] = [];

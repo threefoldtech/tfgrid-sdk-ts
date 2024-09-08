@@ -6,9 +6,9 @@ import GridProxyClient, {
 } from "@threefold/gridproxy_client";
 import { Contract, ContractLock, ServiceContract } from "@threefold/tfchain_client";
 import { DeploymentKeyDeletionError, InsufficientBalanceError } from "@threefold/types";
+import { GridClientError } from "@threefold/types";
 import * as PATH from "path";
 
-import { GridClientError } from "../../../types/dist/node";
 import {
   ContractsOverdue,
   GqlContracts,
