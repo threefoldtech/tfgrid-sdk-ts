@@ -1,6 +1,6 @@
 import moment from "moment";
 
-import { type Date } from "./types";
+import type { Date } from "./types";
 export default function toHumanDate(timeInSeconds: number): string {
   return moment(timeInSeconds * 1000).format("DD MMM YYYY, hh:mm A");
 }
