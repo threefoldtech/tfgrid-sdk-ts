@@ -408,6 +408,7 @@ class TFContracts extends Contracts {
     if (contract.type == ContractType.Rent) {
       // get the contracts on the rented node, calculate the nu, then add the ipv4 cost
       const totalContractsCost = await this.getContractsCostOnRentedNode(contract.details.nodeId, proxy);
+      //TODO add the overdraft of the child of the ipv4 overdraft
 
       const mUSDCost = (
         await this.calcResourcesPrice({

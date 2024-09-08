@@ -149,12 +149,7 @@
           {{ getAmountLocked }}
           TFTs.
         </p>
-        <v-alert
-          v-if="contractLocked?.amountLocked == 0 && isNodeInRentContracts"
-          class="my-4"
-          type="warning"
-          variant="tonal"
-        >
+        <v-alert v-if="isNodeInRentContracts" class="my-4" type="warning" variant="tonal">
           This contract is in a grace period because it's on a dedicated machine also in a grace period. That's why this
           node is locked with zero TFTS and no billing rate.
         </v-alert>
@@ -278,9 +273,8 @@
 
 <script lang="ts" setup>
 // Import necessary types and libraries
-import { ContractStates, type GridClient, type LockDetails } from "@threefold/grid_client";
-import type { NodeStatus } from "@threefold/gridproxy_client";
-import type { ContractLock } from "@threefold/tfchain_client";
+import { ContractStates, type GridClient, type LockDetails, OverdueDetails } from "@threefold/grid_client";
+import type { Contract, NodeStatus } from "@threefold/gridproxy_client";
 import { TFChainError } from "@threefold/tfchain_client";
 import { DeploymentKeyDeletionError } from "@threefold/types";
 import { capitalize, computed, defineComponent, type PropType, type Ref, ref, watch } from "vue";
@@ -318,7 +312,7 @@ const props = defineProps({
     required: true,
   },
   lockedContracts: {
-    type: Object as PropType<LockDetails>,
+    type: Object as PropType<OverdueDetails>,
     required: true,
   },
   size: {
@@ -335,7 +329,7 @@ const props = defineProps({
   },
 });
 const getAmountLocked = computed(() => {
-  const amountLocked = contractLocked?.value?.amountLocked ?? 0;
+  const amountLocked = contractLocked?.value ?? 0;
   return amountLocked > 0 ? parseFloat(amountLocked.toFixed(3)) : 0;
 });
 
@@ -344,7 +338,7 @@ const isNodeInRentContracts = computed(() => {
     const nodeIds = new Set(
       props.contracts.value.map(contract => contract.details.nodeId).filter(nodeId => nodeId !== undefined) as number[],
     );
-    if (contractLocked.value && contractLocked.value.amountLocked === 0) {
+    if (contractLocked.value && contractLocked.value === 0) {
       return nodeIds.has(selectedItem.value.details.nodeId);
     }
   }
@@ -372,7 +366,7 @@ function updateSortBy(sort: { key: string; order: "asc" | "desc" }[]) {
 }
 
 const layout = ref();
-const contractLocked = ref<ContractLock>();
+const contractLocked = ref<number>(0);
 const deleting = ref<boolean>(false);
 const loadingShowDetails = ref<boolean>(false);
 const contractStateDialog = ref<boolean>(false);
@@ -424,21 +418,24 @@ async function openUnlockDialog() {
   unlockDialog.value = true;
   rentContractIds.value = [];
   selectedLockedAmount.value = 0;
-  const nodeIDsGracePeriod = new Set<number>();
+  const nodeContractsGracePeriod = new Set<number>();
   try {
     // get actual locked amount
     for (const contract of selectedContracts.value) {
-      if (contract.consumption == 0 && contract.type == ContractType.Node && contract.details.nodeId) {
-        nodeIDsGracePeriod.add(contract.details.nodeId);
+      //TODO revisit
+      const rentContract = await props.grid.nodes.getRentContractId({ nodeId: contract.details.nodeId });
+      if (rentContract) {
+        nodeContractsGracePeriod.add(contract.details.nodeId);
       } else {
-        selectedLockedAmount.value += (await getLockDetails(contract.contract_id)).amountLocked || 0;
+        const amount = await getContractOverdue(contract as unknown as Contract);
+        selectedLockedAmount.value += amount || 0;
       }
     }
-    for (const nodeId of nodeIDsGracePeriod) {
+    for (const nodeId of nodeContractsGracePeriod) {
       const rentContractId = await props.grid.nodes.getRentContractId({ nodeId });
       if (rentContractId) {
         rentContractIds.value.push(rentContractId);
-        selectedLockedAmount.value += (await getLockDetails(rentContractId)).amountLocked || 0;
+        selectedLockedAmount.value += (await getContractOverdueById(rentContractId)) || 0;
       }
     }
     await profileManagerController.reloadBalance();
@@ -451,18 +448,19 @@ async function openUnlockDialog() {
   }
 }
 
-async function getLockDetails(contractId: number) {
-  return await props.grid.contracts.contractLock({ id: contractId });
+async function getContractOverdueById(contractId: number) {
+  return (await props.grid.contracts.getContractOverdueAmountById(contractId)).toNumber();
+}
+async function getContractOverdue(contract: Contract) {
+  return (await props.grid.contracts.getContractOverdueAmountByContract(contract)).toNumber();
 }
 // Function to fetch contract lock details
 async function contractLockDetails(item: any) {
   selectedItem.value = item;
   loadingShowDetails.value = true;
   await profileManagerController.reloadBalance();
-  await getLockDetails(item.contract_id);
-  await props.grid?.contracts
-    .contractLock({ id: item.contract_id })
-    .then((data: ContractLock) => {
+  await getContractOverdue(item)
+    .then((data: number) => {
       contractLocked.value = data;
       contractStateDialog.value = true;
     })
@@ -520,7 +518,7 @@ async function onDelete() {
 async function unlockContract(contractId: number[]) {
   try {
     unlockContractLoading.value = true;
-    await props.grid.contracts.unlockContracts(contractId.filter(id => props.lockedContracts[id]?.amountLocked !== 0));
+    await props.grid.contracts.unlockContractsByIds(contractId.filter(id => props.lockedContracts[id] !== 0));
     createCustomToast(
       `Your request to unlock contract ${contractId} has been processed successfully. Changes may take a few minutes to reflect`,
       ToastType.info,

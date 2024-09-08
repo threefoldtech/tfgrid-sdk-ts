@@ -36,7 +36,7 @@
     <section class="d-flex align-center">
       <v-spacer />
       <v-btn
-        v-if="lockedContracts?.totalAmountLocked && !isLoading"
+        v-if="lockedContracts?.totalOverdueAmount && !isLoading"
         class="mr-2"
         color="warning"
         prepend-icon="mdi-lock-open"
@@ -92,7 +92,7 @@
     </template>
   </v-card>
   <!-- locked amount Dialog -->
-  <v-dialog width="800" v-model="unlockDialog" v-if="lockedContracts?.totalAmountLocked" attach="#modals">
+  <v-dialog width="800" v-model="unlockDialog" v-if="lockedContracts?.totalOverdueAmount" attach="#modals">
     <v-card>
       <v-card-title class="bg-primary">
         Unlock All Contracts
@@ -120,14 +120,14 @@
       </v-card-text>
       <v-card-text v-else>
         <v-alert class="my-4" type="warning" variant="tonal">
-          <div v-if="lockedContracts?.totalAmountLocked < freeBalance">
+          <div v-if="lockedContracts?.totalOverdueAmount < freeBalance">
             You have enough balance to unlock your contracts, this will cost you around
-            <span class="font-weight-bold">{{ Math.ceil(lockedContracts?.totalAmountLocked) }}</span> TFTs.
+            <span class="font-weight-bold">{{ Math.ceil(lockedContracts?.totalOverdueAmount) }}</span> TFTs.
           </div>
           <div v-else>
             You need to fund your account with
             <span class="font-weight-bold">
-              {{ Math.ceil(lockedContracts?.totalAmountLocked - freeBalance) }}
+              {{ Math.ceil(lockedContracts?.totalOverdueAmount - freeBalance) }}
               TFTs
             </span>
             to resume your contracts
@@ -139,7 +139,7 @@
         <v-btn color="anchor" @click="unlockDialog = false"> Close </v-btn>
         <v-tooltip
           :text="
-            freeBalance < lockedContracts?.totalAmountLocked
+            freeBalance < lockedContracts?.totalOverdueAmount
               ? `You don't have enough balance to unlock your contracts`
               : `Get your contracts ready again`
           "
@@ -148,7 +148,7 @@
           <template #activator="{ props }">
             <div v-bind="props">
               <v-btn
-                :disabled="freeBalance < lockedContracts.totalAmountLocked || loadingLockDetails"
+                :disabled="freeBalance < lockedContracts.totalOverdueAmount || loadingLockDetails"
                 color="warning"
                 @click="unlockAllContracts"
                 :loading="unlockContractLoading"
@@ -230,7 +230,7 @@
 </template>
 
 <script lang="ts" setup>
-import type { GridClient, LockContracts } from "@threefold/grid_client";
+import type { ContractsOverdue, GridClient } from "@threefold/grid_client";
 import { type Contract, ContractState, NodeStatus, SortByContracts, SortOrder } from "@threefold/gridproxy_client";
 import { DeploymentKeyDeletionError } from "@threefold/types";
 import { Decimal } from "decimal.js";
@@ -274,7 +274,7 @@ const loadingTablesMessage = ref<string>();
 
 const totalCost = ref<number>();
 const totalCostUSD = ref<number>();
-const lockedContracts = ref<LockContracts>();
+const lockedContracts = ref<ContractsOverdue>();
 const unlockDialog = ref<boolean>(false);
 const deleteDialog = ref<boolean>(false);
 const deleting = ref<boolean>(false);
@@ -496,7 +496,7 @@ async function onDeletedContracts(_contracts: NormalizedContract[]) {
   totalCost.value = undefined;
 }
 async function getContractsLockDetails() {
-  lockedContracts.value = await grid.contracts.getContractsLockDetails();
+  lockedContracts.value = await grid.contracts.getTotalOverdue();
 }
 
 // Define base table headers for contracts tables
