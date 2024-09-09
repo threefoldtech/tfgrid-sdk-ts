@@ -176,7 +176,7 @@
             <div v-bind="props">
               <v-btn
                 v-if="!isNodeInRentContracts"
-                :disabled="freeBalance < getAmountLocked"
+                :disabled="freeBalance < getAmountLocked || loadingShowDetails"
                 color="warning"
                 class="mr-2 px-3"
                 @click="unlockContract([selectedItem.contract_id])"
@@ -258,9 +258,7 @@
                 color="warning"
                 class="ml-2"
                 :loading="unlockContractLoading"
-                @click="
-                  unlockContract([...selectedContracts.map(contract => contract.contract_id), ...rentContractIds])
-                "
+                @click="unlockContract([...selectedContracts.map(contract => contract.contract_id)])"
               >
                 Unlock
               </v-btn>
@@ -362,7 +360,6 @@ function updateSortBy(sort: { key: string; order: "asc" | "desc" }[]) {
 }
 
 const layout = ref();
-const contractLocked = ref<number>(0);
 const deleting = ref<boolean>(false);
 const loadingShowDetails = ref<boolean>(false);
 const contractStateDialog = ref<boolean>(false);
@@ -385,8 +382,19 @@ const selectedLockedContracts = computed(() => {
   }
   return true;
 });
-//TODO remove
-const rentContractIds = ref<number[]>([]);
+
+/**This computed value is an array of the rent contract of the selected node contracts */
+const selectedRentContracts = computed(() => {
+  const contractsSet = new Set<number>();
+  selectedContracts.value.forEach(contract => {
+    const rentContract = rentContracts.value[contract.details.nodeId];
+    if (contract.type == ContractType.Node && rentContract) {
+      contractsSet.add(rentContract);
+    }
+  });
+
+  return Array.from(contractsSet);
+});
 const selectedLockedAmount = ref(0);
 // Function to show details of a contract
 async function showDetails(value: any) {
@@ -414,7 +422,6 @@ async function showDetails(value: any) {
 async function openUnlockDialog() {
   loadingShowDetails.value = true;
   unlockDialog.value = true;
-  rentContractIds.value = [];
   selectedLockedAmount.value = 0;
 
   const _rentedNodes = new Set();
@@ -526,7 +533,12 @@ async function onDelete() {
 async function unlockContract(contractId: number[]) {
   try {
     unlockContractLoading.value = true;
-    await props.grid.contracts.unlockContractsByIds(contractId.filter(id => props.lockedContracts[id] !== 0));
+    await props.grid.contracts.unlockContracts(
+      contractId
+        .filter(id => props.lockedContracts[id] !== 0)
+        .map(id => props.contracts.value[id] as unknown as Contract),
+    );
+    await props.grid.contracts.unlockContractsByIds(selectedRentContracts.value);
     createCustomToast(
       `Your request to unlock contract ${contractId} has been processed successfully. Changes may take a few minutes to reflect`,
       ToastType.info,
@@ -534,7 +546,6 @@ async function unlockContract(contractId: number[]) {
     setTimeout(() => emits("update:unlock-contracts"), 30000);
     contractStateDialog.value = false;
     unlockDialog.value = false;
-    rentContractIds.value = [];
     selectedContracts.value = [];
   } catch (e) {
     createCustomToast(`Failed to unlock contract ${contractId}`, ToastType.danger);
