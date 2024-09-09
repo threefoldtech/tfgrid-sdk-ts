@@ -615,6 +615,8 @@ class Contracts {
       const proxy = new GridProxyClient(this.config.proxyURL);
       return await this.client.contracts.calculateContractOverDue({ contractInfo: contract, gridProxyClient: proxy });
     } catch (error) {
+      console.log(error);
+
       (error as Error).message = formatErrorMessage("Failed to get contract overdue info", error);
       throw error;
     }
