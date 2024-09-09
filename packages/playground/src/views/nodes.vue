@@ -44,8 +44,8 @@
           <TfFilter query-route="ipv6" v-model="filters.ipv6">
             <v-switch color="primary" inset label="IPv6" v-model="filters.ipv6" density="compact" hide-details />
           </TfFilter>
-          <TfFilter query-route="mine" v-model="filters.mine" v-if="profileManager.profile">
-            <v-switch color="primary" inset label="Mine" v-model="filters.mine" density="compact" hide-details />
+          <TfFilter query-route="myNodes" v-model="filters.myNodes" v-if="profileManager.profile">
+            <v-switch color="primary" inset label="My Nodes" v-model="filters.myNodes" density="compact" hide-details />
           </TfFilter>
 
           <VTooltip
@@ -537,7 +537,7 @@ export default {
       numGpu: "",
       rentable: false,
       ipv6: false,
-      mine: false,
+      myNodes: false,
     });
     const oldNodeStatus = ref();
     watch(
@@ -597,7 +597,7 @@ export default {
             numGpu: +filters.value.numGpu || undefined,
             rentable: filters.value.rentable ? filters.value.rentable : undefined,
             hasIPv6: filters.value.ipv6 ? filters.value.ipv6 : undefined,
-            rentedBy: filters.value.mine && profileManager.profile ? profileManager.profile.twinId : undefined,
+            rentedBy: filters.value.myNodes && profileManager.profile ? profileManager.profile.twinId : undefined,
           },
           { loadFarm: true },
         );

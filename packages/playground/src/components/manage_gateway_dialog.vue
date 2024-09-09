@@ -8,7 +8,7 @@
       attach="#modals"
     >
       <weblet-layout ref="layout" @back="onBack">
-        <template #title>Manage Domains ({{ vm ? vm.name : k8s.masters[0].name }})</template>
+        <template #title>Manage Domains ({{ vm ? vm.name : k8s?.masters[0].name }})</template>
 
         <v-tabs align-tabs="center" color="secondary" class="mb-6" v-model="gatewayTab" :disabled="deleting">
           <v-tab>Domains List</v-tab>
@@ -83,6 +83,9 @@
 
             <template #[`item.actions`]="{ item }">
               <IconActionBtn tooltip="Visit" icon="mdi-web" color="anchor" :href="'https://' + item.domain" />
+            </template>
+            <template #[`item.attached_to`]="{ item }">
+              <v-chip>{{ getDomainNode(item) }}</v-chip>
             </template>
           </list-table>
         </div>
@@ -187,7 +190,7 @@
 </template>
 
 <script lang="ts">
-import type { GridClient } from "@threefold/grid_client";
+import type { GridClient, ZmachineData } from "@threefold/grid_client";
 import { onMounted, type PropType, ref, watch } from "vue";
 
 import { useGrid } from "../stores";
@@ -226,7 +229,10 @@ export default {
   components: { ListTable, IconActionBtn },
   props: {
     vm: { type: Object as PropType<any>, required: false },
-    k8s: { type: Object as PropType<any>, required: false },
+    k8s: {
+      type: Object as PropType<{ projectName: string; masters: ZmachineData[]; workers: ZmachineData[] }>,
+      required: false,
+    },
   },
   setup(props) {
     const layout = useLayout();
@@ -245,7 +251,7 @@ export default {
     const selectedIPAddress = ref<VMNetwork | null>(null);
     const networkName = props.vm
       ? (props.vm.interfaces[0].network as string)
-      : (props.k8s.masters[0].interfaces[0].network as string);
+      : (props.k8s?.masters[0].interfaces[0].network as string);
     const gridStore = useGrid();
     const grid = gridStore.client as GridClient;
 
@@ -262,30 +268,62 @@ export default {
     const selectedNode = ref();
 
     watch(selectedK8SNodeName, getSupportedNetworks, { deep: true });
+    const tableHeaders = ref([
+      { title: "Name", key: "name" },
+      { title: "Contract ID", key: "contractId" },
+      { title: "Domain", key: "domain" },
+      { title: "TLS Passthrough", key: "tls_passthrough" },
+      { title: "Backend", key: "backends", sortable: false },
+      { title: "Status", key: "status" },
+      { title: "Actions", key: "actions", sortable: false },
+    ]);
 
     onMounted(async () => {
       updateGrid(grid, { projectName: "" });
       suggestName();
       await loadGateways();
       getSupportedNetworks();
+      updateHeaders();
     });
 
-    const tableHeaders = [
-      { title: "Name", key: "name" },
-      { title: "Contract ID", key: "contractId" },
-      { title: "Domain", key: "domain" },
-      { title: "TLS Passthrough", key: "tls_passthrough" },
-      { title: "Backend", key: "backends" },
-      { title: "Status", key: "status" },
-      { title: "Actions", key: "actions" },
-    ];
+    const updateHeaders = () => {
+      if (props.k8s) {
+        const actionsIndex = tableHeaders.value.findIndex(header => header.key === "actions");
+        if (actionsIndex !== -1) {
+          tableHeaders.value.splice(actionsIndex, 0, { title: "Attached to", key: "attached_to", sortable: false });
+        }
+      }
+    };
+
+    const getDomainNode = (domain: GridGateway): string => {
+      const extractIP = (input: string) => input.replace("https://", "").replace("http://", "").split(":")[0];
+
+      const IP = extractIP(domain.backends[0]);
+
+      const isMatchingIP = (ip: string) => ip === IP;
+
+      const isMaster =
+        isMatchingIP(props.k8s!.masters[0].interfaces[0].ip) ||
+        (props.k8s!.masters[0].publicIP && isMatchingIP(props.k8s!.masters[0].publicIP.ip.split("/")[0]));
+
+      if (isMaster) {
+        return props.k8s!.masters[0].name;
+      }
+
+      const worker = props.k8s!.workers.find(
+        (worker: ZmachineData) =>
+          isMatchingIP(worker.interfaces[0].ip) || (worker.publicIP && isMatchingIP(worker.publicIP.ip.split("/")[0])),
+      );
+
+      return worker ? worker.name : "-";
+    };
 
     async function loadGateways() {
       try {
         gateways.value = [];
         gatewaysToDelete.value = [];
         loadingGateways.value = true;
-        updateGrid(grid, { projectName: props.vm ? props.vm.projectName : props.k8s.projectName });
+        updateGrid(grid, { projectName: props.vm ? props.vm.projectName : props.k8s!.projectName });
 
         const { gateways: gws, failedToList } = await loadDeploymentGateways(grid, {
           filter: gw => true,
@@ -464,6 +502,7 @@ export default {
       getSupportedNetworks,
       formatDomainName,
       onBack,
+      getDomainNode,
       tableHeaders,
       subdomainRules,
       portRules,

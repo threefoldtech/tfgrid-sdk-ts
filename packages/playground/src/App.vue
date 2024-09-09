@@ -372,6 +372,12 @@ const routes: AppRoute[] = [
         tooltip: "Deploy ready applications on the ThreeFold grid.",
       },
       {
+        title: "Domains",
+        icon: "domains.png",
+        route: DashboardRoutes.Deploy.Domains,
+        tooltip: "Expose servers hosted on local machines or VMs to the public internet.",
+      },
+      {
         title: "Your Contracts",
         icon: "mdi-file-document-edit",
         route: DashboardRoutes.Deploy.YourContracts,

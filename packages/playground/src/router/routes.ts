@@ -5,6 +5,7 @@ enum DeployRoutes {
   VirtualMachines = "/deploy/virtual-machines/",
   Orchestrators = "/deploy/orchestrators/",
   Applications = "/deploy/applications/",
+  Domains = "/deploy/domains/",
   YourContracts = "/deploy/your-contracts/",
   Images = "https://hub.grid.tf/",
   SSHKey = "/deploy/sshkey/",
@@ -72,7 +73,7 @@ enum ApplicationRoutes {
   Jenkins = "/deploy/applications/jenkins/",
   Gitea = "/deploy/applications/gitea/",
   Nostr = "/deploy/applications/nostr/",
-  Domains = "/deploy/applications/domains/",
+  Jitsi = "/deploy/applications/jitsi/",
 }
 
 const DashboardRoutes = {
