@@ -329,7 +329,7 @@ const props = defineProps({
   },
 });
 const getAmountLocked = computed(() => {
-  const amountLocked = contractLocked?.value ?? 0;
+  const amountLocked = selectedLockedAmount?.value ?? 0;
   return amountLocked > 0 ? parseFloat(amountLocked.toFixed(3)) : 0;
 });
 
@@ -454,26 +454,39 @@ async function getContractOverdueById(contractId: number) {
 async function getContractOverdue(contract: Contract) {
   return (await props.grid.contracts.getContractOverdueAmountByContract(contract)).toNumber();
 }
+
+// to store the node id with its rent contract
+const rentContracts = ref<{ [key: number]: number }>({});
+
 // Function to fetch contract lock details
-async function contractLockDetails(item: any) {
+async function contractLockDetails(item: Contract) {
   selectedItem.value = item;
   loadingShowDetails.value = true;
-  await profileManagerController.reloadBalance();
-  await getContractOverdue(item)
-    .then((data: number) => {
-      contractLocked.value = data;
-      contractStateDialog.value = true;
-    })
-    .catch((err: any) => {
-      layout.value.setStatus(
-        "failed",
-        normalizeError(err, `Failed to fetch the contract ${item.contract_id} lock details.`),
-      );
-      contractStateDialog.value = false;
-    })
-    .finally(() => {
-      loadingShowDetails.value = false;
-    });
+  selectedLockedAmount.value = 0;
+  try {
+    let rentContract = 0;
+    if (item.type == ContractType.Node)
+      rentContract =
+        rentContracts.value[item.details.nodeId] ??
+        (await props.grid.nodes.getRentContractId({ nodeId: item.details.nodeId }));
+    if (rentContract) {
+      rentContracts.value[item.details.nodeId] = rentContract;
+    } else {
+      await profileManagerController.reloadBalance();
+      const data = await getContractOverdue(item);
+      selectedLockedAmount.value = data;
+    }
+
+    contractStateDialog.value = true;
+  } catch (err: any) {
+    layout.value.setStatus(
+      "failed",
+      normalizeError(err, `Failed to fetch the contract ${item.contract_id} lock details.`),
+    );
+    contractStateDialog.value = false;
+  } finally {
+    loadingShowDetails.value = false;
+  }
 }
 
 // Function to export contract data as JSON
