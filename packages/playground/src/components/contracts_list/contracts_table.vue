@@ -381,6 +381,7 @@ const balance = profileManagerController.balance;
 const freeBalance = computed(() => (balance.value?.free ?? 0) - (balance.value?.locked ?? 0));
 const unlockContractLoading = ref(false);
 const unlockDialog = ref(false);
+const rentContracts = ref<{ [key: number]: number }>({}); // to store the node id with its rent contract
 const selectedLockedContracts = computed(() => {
   if (selectedContracts.value.length == 0) return false;
   for (const contract of selectedContracts.value) {
@@ -418,26 +419,26 @@ async function openUnlockDialog() {
   unlockDialog.value = true;
   rentContractIds.value = [];
   selectedLockedAmount.value = 0;
-  const nodeContractsGracePeriod = new Set<number>();
+
+  const _rentedNodes = new Set();
   try {
     // get actual locked amount
     for (const contract of selectedContracts.value) {
-      //TODO revisit
-      const rentContract = await props.grid.nodes.getRentContractId({ nodeId: contract.details.nodeId });
+      const nodeId = contract.details.nodeId;
+
+      let rentContract = 0;
+      if (contract.type == ContractType.Node && !_rentedNodes.has(nodeId))
+        rentContract = rentContracts.value[nodeId] ?? (await props.grid.nodes.getRentContractId({ nodeId }));
       if (rentContract) {
-        nodeContractsGracePeriod.add(contract.details.nodeId);
+        rentContracts.value[nodeId] = rentContract;
+        _rentedNodes.add(nodeId); // to avoid duplicated cost
+        selectedLockedAmount.value += (await getContractOverdueById(rentContract)) || 0;
       } else {
         const amount = await getContractOverdue(contract as unknown as Contract);
         selectedLockedAmount.value += amount || 0;
       }
     }
-    for (const nodeId of nodeContractsGracePeriod) {
-      const rentContractId = await props.grid.nodes.getRentContractId({ nodeId });
-      if (rentContractId) {
-        rentContractIds.value.push(rentContractId);
-        selectedLockedAmount.value += (await getContractOverdueById(rentContractId)) || 0;
-      }
-    }
+
     await profileManagerController.reloadBalance();
   } catch (e) {
     createCustomToast("Failed to load contracts lock details, please try again later", ToastType.danger);
@@ -454,9 +455,6 @@ async function getContractOverdueById(contractId: number) {
 async function getContractOverdue(contract: Contract) {
   return (await props.grid.contracts.getContractOverdueAmountByContract(contract)).toNumber();
 }
-
-// to store the node id with its rent contract
-const rentContracts = ref<{ [key: number]: number }>({});
 
 // Function to fetch contract lock details
 async function contractLockDetails(item: Contract) {
