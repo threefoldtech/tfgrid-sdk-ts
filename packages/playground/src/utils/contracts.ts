@@ -1,4 +1,4 @@
-import { ContractStates, type GridClient } from "@threefold/grid_client";
+import { ContractStates, type DiscountLevel, type GridClient } from "@threefold/grid_client";
 import { NodeStatus } from "@threefold/gridproxy_client";
 import type { Ref } from "vue";
 
@@ -59,6 +59,12 @@ export async function normalizeContract(
   } catch {
     consumption = 0;
   }
+  let discountPackage: DiscountLevel;
+  try {
+    discountPackage = await grid.contracts.getDiscountPackage({ id });
+  } catch {
+    discountPackage = "None";
+  }
 
   return {
     contract_id: id,
@@ -76,6 +82,7 @@ export async function normalizeContract(
     solutionType: data.projectName || data.type || "-",
     expiration,
     consumption: consumption,
+    discountPackage: discountPackage,
   };
 }
 
@@ -155,6 +162,7 @@ export interface NormalizedContract {
   solutionName?: string;
   deploymentType?: string;
   expiration?: string;
+  discountPackage?: DiscountLevel;
 }
 
 export enum ContractType {
