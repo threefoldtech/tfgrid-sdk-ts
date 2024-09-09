@@ -36,11 +36,9 @@
       </template>
 
       <template #[`item.consumption`]="{ item }">
-        <div
-          v-if="item?.consumption !== 0 && item?.consumption !== undefined"
-          class="d-flex row justify-between align-center"
-        >
+        <v-row v-if="item?.consumption !== 0 && item?.consumption !== undefined" class="d-flex justify-center">
           <p>{{ item.consumption.toFixed(3) }} TFT/hour</p>
+
           <v-tooltip bottom color="primary" close-delay="100" v-if="item.discountPackage">
             <template v-slot:activator="{ props }">
               <v-icon class="scale_beat mr-2" color="warning" v-bind="props">mdi-brightness-percent</v-icon>
@@ -50,7 +48,7 @@
               {{ item.discountPackage }}
             </span>
           </v-tooltip>
-        </div>
+        </v-row>
 
         <p v-else>No Data Available</p>
       </template>
