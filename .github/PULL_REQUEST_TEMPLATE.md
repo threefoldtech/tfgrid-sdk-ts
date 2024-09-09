@@ -10,7 +10,6 @@ List of changes this PR includes
 
 List of related issues
 
-
 ### Tested Scenarios
 
 A list of scenarios tried to match the deliverables
@@ -22,6 +21,7 @@ For UI changes, Please provide the Documetation PR on [info_grid](https://github
 ### To consider
 
 #### Preliminary Checks:
+
 - Does it completely address the issue linked?
 - What about edge cases?
 - Does it meet the specified acceptance criteria?
@@ -37,6 +37,7 @@ For UI changes, Please provide the Documetation PR on [info_grid](https://github
 - Are changes to documentation reflected in the code?
 
 #### UI Checks:
+
 - If a UI design is provided/ does it follow it?
 - Does every button work?
 - Is the data displayed logical? Is it what you expected?
@@ -47,6 +48,7 @@ For UI changes, Please provide the Documetation PR on [info_grid](https://github
 - What would a first time user have a hard time navigating here?
 
 #### Code Quality Checks:
+
 - Code formatted/linted? Are there unused imports? .. etc
 - Is there redundant/repeated code?
 - Are there conditionals that are always true or always false?
@@ -56,12 +58,9 @@ For UI changes, Please provide the Documetation PR on [info_grid](https://github
 - Can this code become too complex to understand for other devs?
 - Can this code cause future integration problems?
 
-
-
-
 ### Checklist
 
-- [ ] Tests included 
+- [ ] Tests included
 - [ ] Build pass
 - [ ] Documentation
 - [ ] Code format and docstrings
