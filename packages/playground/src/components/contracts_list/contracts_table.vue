@@ -38,7 +38,7 @@
       <template #[`item.consumption`]="{ item }">
         <div v-if="item?.consumption !== 0 && item?.consumption !== undefined">
           <p>{{ item.consumption.toFixed(3) }} TFT/hour</p>
-          <v-tooltip bottom color="primary" close-delay="100">
+          <v-tooltip bottom color="primary" close-delay="100" v-if="item.discountPackage">
             <template v-slot:activator="{ props }">
               <v-icon class="scale_beat mr-2" color="warning" v-bind="props">mdi-brightness-percent</v-icon>
             </template>
@@ -288,7 +288,7 @@
 
 <script lang="ts" setup>
 // Import necessary types and libraries
-import { ContractStates, type GridClient, type LockDetails } from "@threefold/grid_client";
+import { ContractStates, discountPackages, type GridClient, type LockDetails } from "@threefold/grid_client";
 import type { NodeStatus } from "@threefold/gridproxy_client";
 import type { ContractLock } from "@threefold/tfchain_client";
 import { TFChainError } from "@threefold/tfchain_client";

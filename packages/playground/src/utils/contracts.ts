@@ -59,12 +59,8 @@ export async function normalizeContract(
   } catch {
     consumption = 0;
   }
-  let discountPackage: DiscountLevel;
-  try {
-    discountPackage = await grid.contracts.getDiscountPackage({ id });
-  } catch {
-    discountPackage = "None";
-  }
+
+  const discountPackage = await grid.contracts.getDiscountPackage({ id });
 
   return {
     contract_id: id,
