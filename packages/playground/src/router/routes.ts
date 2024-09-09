@@ -72,6 +72,7 @@ enum ApplicationRoutes {
   Jenkins = "/deploy/applications/jenkins/",
   Gitea = "/deploy/applications/gitea/",
   Nostr = "/deploy/applications/nostr/",
+  Jitsi = "/deploy/applications/jitsi/",
 }
 
 const DashboardRoutes = {

@@ -31,6 +31,7 @@ const modulesNames = {
   gateways: "gateway",
   qsfs_zdbs: "qsfs",
   zdb: "zdb",
+  networks: "network",
 };
 
 /**
@@ -258,18 +259,19 @@ class BaseModule {
    * @returns {Promise<Required<GqlNodeContract>[]>} - A promise that resolves to an array of contracts associated with the current module.
    */
   private async getMyContracts(fetch = false): Promise<Required<GqlNodeContract>[]> {
+    const moduleName = modulesNames[this.moduleName];
     if (fetch || !this.contracts) {
       let contracts = await this.tfClient.contracts.listMyNodeContracts({
         graphqlURL: this.config.graphqlURL,
-        type: modulesNames[this.moduleName] || (this.moduleName === "networks" ? "network" : this.moduleName),
-        projectName: this.projectName,
+        type: moduleName,
+        projectName: moduleName === "network" ? "" : this.projectName,
       });
 
       const alreadyFetchedContracts: GqlNodeContract[] = [];
 
       for (const contract of BaseModule.newContracts) {
         if (!contract.parsedDeploymentData?.projectName.includes(this.projectName)) continue;
-        if (contract.parsedDeploymentData.type !== modulesNames[this.moduleName]) continue;
+        if (contract.parsedDeploymentData.type !== moduleName) continue;
 
         const filteredContract = contracts.filter(c => c.contractID === contract.contractID);
 
