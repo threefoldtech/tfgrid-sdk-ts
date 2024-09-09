@@ -112,10 +112,10 @@
           </template>
         </v-tooltip>
       </v-card-title>
-      <v-card-text v-if="loadingLockDetails">
+      <v-card-text v-if="loadingLockDetails" class="d-flex flex-column justify-center align-center pb-0 pt-6">
         <v-progress-circular indeterminate />
 
-        <div class="text-subtitle-2">Loading contracts lock details</div>
+        <div class="text-subtitle-2 pt">Loading contracts lock details</div>
         <v-divider class="mt-3" />
       </v-card-text>
       <v-card-text v-else>

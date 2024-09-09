@@ -217,10 +217,10 @@
       <v-card-title class="bg-primary">
         Unlock the following Contract<span v-if="selectedContracts.length > 1">s</span>
       </v-card-title>
-      <v-card-text v-if="loadingShowDetails">
+      <v-card-text v-if="loadingShowDetails" class="d-flex flex-column justify-center align-center pb-0 pt-6">
         <v-progress-circular indeterminate />
 
-        <div class="text-subtitle-2">Loading contracts lock details</div>
+        <div class="text-subtitle-2 pt-2">Loading contracts lock details</div>
         <v-divider class="mt-3" />
       </v-card-text>
       <v-card-text v-else>
