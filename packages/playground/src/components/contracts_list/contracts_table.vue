@@ -1,6 +1,5 @@
 <template>
   <weblet-layout ref="layout" @mount="() => {}">
-    {{ rentContracts }}
     <v-data-table-server
       v-if="$props.tableHeaders"
       :headers="$props.tableHeaders"
@@ -145,14 +144,14 @@
     <v-card>
       <v-card-title class="bg-primary"> Contract lock Details </v-card-title>
       <v-card-text class="mt-5">
-        <p class="d-flex justify-center">
+        <p v-if="!isNodeInRentContracts" class="d-flex justify-center">
           Amount Locked:
           {{ getAmountLocked }}
           TFTs.
         </p>
         <v-alert v-if="isNodeInRentContracts" class="my-4" type="warning" variant="tonal">
-          This contract is in a grace period because it's on a dedicated machine also in a grace period. That's why this
-          node is locked with zero TFTS and no billing rate.
+          This contract is in a grace period because it's on a dedicated machine also in a grace period. Check its rent
+          contract <span class="font-weight-black">{{ rentContracts[selectedItem.details.nodeId] }}</span>
         </v-alert>
 
         <v-alert class="mt-4" type="info" variant="tonal"
@@ -231,14 +230,22 @@
             cost you around {{ Math.ceil(selectedLockedAmount) }} TFTs.
           </div>
           <div v-else-if="selectedLockedAmount > 0">
-            You need to fund your account with
+            Make sure to have
             <span class="font-weight-bold">{{ Math.ceil(selectedLockedAmount - freeBalance) }} TFTs</span>
-            to resume your contracts
+            in your account to resume {{ selectedContracts.length > 1 ? "those contracts" : "this contract" }}.
           </div>
         </v-alert>
         <v-chip class="ma-1" label v-for="c in selectedContracts" :key="c.contract_id">
           {{ c.contract_id }}
         </v-chip>
+        <v-tooltip text="Rent contract associated with some of the selected contracts" location="top center">
+          <template #activator="{ props }">
+            <v-chip v-bind="props" class="ma-1" color="default" label v-for="id in selectedRentContracts" :key="id">
+              {{ id }}
+            </v-chip>
+          </template>
+        </v-tooltip>
+
         <v-divider class="mt-3" />
       </v-card-text>
       <v-card-actions class="justify-end mb-1 mr-2">
