@@ -1,5 +1,6 @@
 <template>
   <weblet-layout ref="layout" @mount="() => {}">
+    {{ rentContracts }}
     <v-data-table-server
       v-if="$props.tableHeaders"
       :headers="$props.tableHeaders"
@@ -334,13 +335,8 @@ const getAmountLocked = computed(() => {
 });
 
 const isNodeInRentContracts = computed(() => {
-  if (props.contractsType == ContractType.Node && selectedItem.value) {
-    const nodeIds = new Set(
-      props.contracts.value.map(contract => contract.details.nodeId).filter(nodeId => nodeId !== undefined) as number[],
-    );
-    if (contractLocked.value && contractLocked.value === 0) {
-      return nodeIds.has(selectedItem.value.details.nodeId);
-    }
+  if (selectedItem.value && selectedItem.value.type == ContractType.Node) {
+    return !!rentContracts.value[selectedItem.value.details.nodeId];
   }
   return false;
 });
@@ -389,6 +385,7 @@ const selectedLockedContracts = computed(() => {
   }
   return true;
 });
+//TODO remove
 const rentContractIds = ref<number[]>([]);
 const selectedLockedAmount = ref(0);
 // Function to show details of a contract
