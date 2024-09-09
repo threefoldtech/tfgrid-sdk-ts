@@ -99,7 +99,7 @@ async function main() {
       },
     ],
     metadata: "",
-    description: "test deploying CasberLabs via ts grid3 client",
+    description: "test deploying CasperLabs via ts grid3 client",
   };
 
   //Deploy VMs
