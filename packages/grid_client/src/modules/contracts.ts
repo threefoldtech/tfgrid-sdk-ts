@@ -678,10 +678,10 @@ class Contracts {
           break;
 
         default:
-          result.rentContracts[contract.contract_id] = (
+          result.nodeContracts[contract.contract_id] = (
             await this.getContractOverdueAmount(contract, proxy)
           ).toNumber();
-          result.totalOverdueAmount += result.rentContracts[contract.contract_id];
+          result.totalOverdueAmount += result.nodeContracts[contract.contract_id];
       }
     }
     return result;

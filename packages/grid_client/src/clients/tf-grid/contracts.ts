@@ -359,9 +359,7 @@ class TFContracts extends Contracts {
   private async getContractsCostOnRentedNode(nodeId: number, proxy: GridProxyClient) {
     const contracts = await proxy.contracts.list({ nodeId, state: [ContractState.GracePeriod], numberOfPublicIps: 1 });
 
-    //TODO revisit the unit of of public ip
     const ipPrice = (await this.client.pricingPolicies.get({ id: 1 })).ipu.value / 10 ** 7;
-    console.log(ipPrice, "ipPrice");
     const BillingInformationPromises = contracts.data.reduce((acc: Promise<BillingInformation>[], contract) => {
       acc.push(this.client.contracts.getContractBillingInformationByID(contract.contract_id));
       return acc;
@@ -479,6 +477,15 @@ class TFContracts extends Contracts {
   async calculateContractOverDue(options: CalculateOverdueOptions) {
     const contractInfo = options.contractInfo;
 
+    /** return 0 if it is a node contract on rented contract */
+    if (contractInfo.type == ContractType.Node) {
+      const isRentedNode = await this.client.contracts.getContractIdByActiveRentForNode({
+        nodeId: contractInfo.details.nodeId,
+      });
+
+      if (isRentedNode) return new Decimal(0);
+    }
+
     /** Get the Un-billed amount for the network usage */
     const unbilledNU = (await this.client.contracts.getContractBillingInformationByID(contractInfo.contract_id))
       .amountUnbilled;
@@ -555,8 +562,21 @@ class TFContracts extends Contracts {
       const contractOverdue = (
         await this.calculateContractOverDue({ contractInfo: contract, gridProxyClient: proxy })
       ).toNumber();
-      if (contractOverdue > 0) billableContractsIDs.push(contract.contract_id);
+      if (contractOverdue > 0) {
+        billableContractsIDs.push(contract.contract_id);
+
+        if (contract.type == ContractType.Rent) {
+          /** add node contracts on the rented node `with public ip` to the contracts to bill */
+          const nodeContracts = await proxy.contracts.list({
+            numberOfPublicIps: 1,
+            state: [ContractState.GracePeriod],
+            nodeId: contract.details.nodeId,
+          });
+          nodeContracts.data.forEach(contract => billableContractsIDs.push(contract.contract_id));
+        }
+      }
     }
+    console.log("contracts to bill:", billableContractsIDs);
     const extrinsics: ExtrinsicResult<number>[] = [];
     for (const id of billableContractsIDs) {
       extrinsics.push(await this.unlock(id));
