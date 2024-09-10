@@ -244,7 +244,7 @@ class Contracts {
 
   /**
    * Returns the lock details of the contract.
-   *
+   * @deprecated
    * @param {ContractLockModel} options - The options for locking the contract.
    * @returns {Promise<ContractLock>} A promise that resolves when the contract is successfully locked.
    * @decorators
@@ -556,6 +556,7 @@ class Contracts {
 
   /**
    * Retrieves lock details of contracts.
+   * @deprecated
    * @returns {Promise<LockContracts>} A Promise that resolves to an object of type LockContracts containing details of locked contracts.
    * @decorators
    * - `@expose`: Exposes the method for external use.

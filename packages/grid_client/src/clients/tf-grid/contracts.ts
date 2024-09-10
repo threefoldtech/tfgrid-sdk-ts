@@ -331,6 +331,7 @@ class TFContracts extends Contracts {
     });
   }
 
+  /** @deprecated */
   async contractLock(options: ContractLockOptions) {
     const res = await super.contractLock(options);
     const amountLocked = new Decimal(res.amountLocked);
