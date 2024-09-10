@@ -284,7 +284,7 @@
 <script lang="ts" setup>
 // Import necessary types and libraries
 import { ContractStates, type GridClient, type OverdueDetails } from "@threefold/grid_client";
-import type { Contract, NodeStatus } from "@threefold/gridproxy_client";
+import { type Contract, ContractState, type NodeStatus } from "@threefold/gridproxy_client";
 import { TFChainError } from "@threefold/tfchain_client";
 import { DeploymentKeyDeletionError } from "@threefold/types";
 import { capitalize, computed, defineComponent, type PropType, type Ref, ref, watch } from "vue";
@@ -295,6 +295,8 @@ import { ContractType, getNodeStateColor, getStateColor, type NormalizedContract
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
 import toHumanDate from "@/utils/date";
 import { downloadAsJson, normalizeError } from "@/utils/helpers";
+
+import { gridProxyClient } from "../../clients";
 
 const props = defineProps({
   contracts: {
@@ -479,9 +481,12 @@ async function contractLockDetails(item: Contract) {
   try {
     let rentContract = 0;
     if (item.type == ContractType.Node)
-      rentContract =
-        rentContracts.value[item.details.nodeId] ??
-        (await props.grid.nodes.getRentContractId({ nodeId: item.details.nodeId }));
+      if (rentContracts.value[item.details.nodeId]) {
+        rentContract = rentContracts.value[item.details.nodeId];
+      } else {
+        const res = await gridProxyClient.contracts.list({ nodeId: item.details.nodeId, type: ContractType.Rent });
+        if (res.data[0] && res.data[0].state == ContractState.GracePeriod) rentContract = res.data[0].contract_id;
+      }
     if (rentContract) {
       rentContracts.value[item.details.nodeId] = rentContract;
     } else {
