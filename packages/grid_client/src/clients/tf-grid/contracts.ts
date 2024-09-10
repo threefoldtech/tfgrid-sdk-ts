@@ -435,16 +435,6 @@ class TFContracts extends Contracts {
       return USDCost;
     }
 
-    /** Node contract on rented node */
-    //TODO should be verified
-    if (nodeDetails.rented) return 0;
-
-    /**2 cases 
-    --> if resume rent contract resume its node contracts ---> should be handled in UI, will return zero,
-    TODO add ipv4 
-    --> if not should handled 
-    */
-
     /** Node Contract */
     const usedREsources: NodeContractUsedResources = await this.client.contracts.getNodeContractResources({
       id: contract.contract_id,
