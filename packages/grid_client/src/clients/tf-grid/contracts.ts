@@ -339,15 +339,11 @@ class TFContracts extends Contracts {
     return res;
   }
 
-  private async getNodeDetailsById(nodeID: number, proxy: GridProxyClient) {
-    return await proxy.nodes.byId(nodeID);
-  }
-
-  private async getContractInfoByContractId(id: number, proxy: GridProxyClient) {
-    const res = await proxy.contracts.list({ contractId: id });
-    return res["data"][0];
-  }
-
+  /**
+   * Function to convert USD to TFT
+   * @param {Decimal} USD the amount in USD.
+   * @returns  {Decimal} The amount in TFT.
+   */
   private async convertToTFT(USD: Decimal) {
     try {
       const tftPrice = (await this.client.tftPrice.get()) ?? 0;
@@ -357,6 +353,12 @@ class TFContracts extends Contracts {
     }
   }
 
+  /**
+   * Calculate total IPV4 and total overdraft on all node contracts on rented node.
+   * @description In node contracts on rented nodes we need to have both the overdraft to be added to rent contract overdraft.
+   * please note that the unbilled NU amount is added to the total overdraft exactly as the in the other contract types.
+   * the IPV4 cost to add to the estimated cost of the rent contract.
+   */
   private async getContractsCostOnRentedNode(nodeId: number, proxy: GridProxyClient) {
     const contracts = await proxy.contracts.list({ nodeId, state: [ContractState.GracePeriod], numberOfPublicIps: 1 });
 
@@ -385,7 +387,12 @@ class TFContracts extends Contracts {
       totalOverdraft: totalOverDraft.add(totalNUCost),
     };
   }
-
+  /**
+   * A function to calculate the cost of the resources.
+   * @param {CalcResourcesPrice} options please not that the passed {Resources} should be in bytes.
+   * the function will convert them to GB and calculate the cost
+   * @returns { Object } contains the `dedicatedPrice` and the `sharedPrice` both are numbers
+   */
   private async calcResourcesPrice(options: CalcResourcesPrice) {
     const { cru, hru, sru, mru, calculator, ipv4, certified } = options;
 
@@ -408,6 +415,19 @@ class TFContracts extends Contracts {
     };
   }
 
+  /**
+   * This function is for calculating the estimated cost of the contract per month.
+   * @description
+   *  Name contract cost is fixed price for the unique name,
+   * Rent contract cost is the cost of the total node resources,
+   * Node contract have to cases:
+   * 1- on rented contract, this case the cost will be only for the ipv4.
+   * 2- on shared node, this will be the shared price of the used resources
+
+   * @param {Contract} contract 
+   * @param {GridProxyClient} proxy 
+   * @returns the cost of the contract per month in USD
+   */
   async getContractCost(contract: Contract, proxy: GridProxyClient) {
     const calc = new calculator(this.client);
 
@@ -421,7 +441,6 @@ class TFContracts extends Contracts {
     const certified = nodeDetails.certificationType == CertificationType.Certified ? true : false;
 
     if (contract.type == ContractType.Rent) {
-      //TODO add the overdraft of the child of the ipv4 overdraft
       const USDCost = (
         await this.calcResourcesPrice({
           calculator: calc,
@@ -431,11 +450,23 @@ class TFContracts extends Contracts {
         })
       ).dedicatedPrice;
 
-      /**returns the cost of renting the node with its contracts cost */
       return USDCost;
     }
 
     /** Node Contract */
+
+    /** Node contract on rented node
+     * If the node contract has IPV4 will return the price of the ipv4 per month
+     * If not there is no cost, will return zero
+     */
+
+    if (nodeDetails.rented) {
+      if (!contract.details.number_of_public_ips) return 0;
+
+      const ipPrice = (await this.client.pricingPolicies.get({ id: 1 })).ipu.value / 10 ** 7;
+      return ipPrice * 30 * 24;
+    }
+
     const usedREsources: NodeContractUsedResources = await this.client.contracts.getNodeContractResources({
       id: contract.contract_id,
     });
@@ -455,27 +486,19 @@ class TFContracts extends Contracts {
   /**
    * Calculates the overdue amount for a contract.
    *
-   * This method calculates the overdue amount by summing the overdraft amounts
-   * from the contract payment state and  the unbilled network usage then sum the total by the product of:
-   * 1. The time elapsed since the last billing in seconds (with an additional time allowance).
-   * 2. The contract cost per second.
-   *
+   * @description This method calculates the overdue amount, the overdue amount basically is the sum of three parts:
+   * 1- Total over draft: is the sum of additional overdraft and standard overdraft.
+   * 2- Unbilled NU: is the unbilled amount of network usage.
+   * 3- The estimated cost of the contract for the total period: this part is dependant on the contract type and if the contract is on rented node or not.
+   * If the contract is rent contract, will add both of ipv4 cost and the total overdue of all associated contracts.
+   * The total period is the time since the last billing added to Allowance period.
    * The resulting overdue amount represents the amount that needs to be addressed.
    *
-   * @param {CalculateOverdueOptions} options - The options containing the contract ID.
-   * @returns {Promise<number>} - The calculated overdue amount.
+   * @param {CalculateOverdueOptions} options - The options containing the contract and gridProxyClient.
+   * @returns {Promise<number>} - The calculated overdue amount in TFT.
    */
   async calculateContractOverDue(options: CalculateOverdueOptions) {
     const contractInfo = options.contractInfo;
-
-    /** return 0 if it is a node contract on rented contract */
-    if (contractInfo.type == ContractType.Node) {
-      const isRentedNode = await this.client.contracts.getContractIdByActiveRentForNode({
-        nodeId: contractInfo.details.nodeId,
-      });
-
-      if (isRentedNode) return new Decimal(0);
-    }
 
     /** Get the Un-billed amount for the network usage */
     const unbilledNU = (await this.client.contracts.getContractBillingInformationByID(contractInfo.contract_id))
