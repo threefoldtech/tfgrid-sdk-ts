@@ -81,7 +81,11 @@
           location="top center"
         >
           <template #activator="{ props }">
-            <v-chip @click.stop="contractLockDetails(item)" v-bind="props" :color="getStateColor(item.state)">
+            <v-chip
+              @click.stop="contractLockDetails(item as unknown as Contract)"
+              v-bind="props"
+              :color="getStateColor(item.state)"
+            >
               {{ item.state === ContractStates.GracePeriod ? "Grace Period" : item.state }}
             </v-chip>
           </template>
@@ -279,7 +283,7 @@
 
 <script lang="ts" setup>
 // Import necessary types and libraries
-import { ContractStates, type GridClient, type LockDetails, OverdueDetails } from "@threefold/grid_client";
+import { ContractStates, type GridClient, type OverdueDetails } from "@threefold/grid_client";
 import type { Contract, NodeStatus } from "@threefold/gridproxy_client";
 import { TFChainError } from "@threefold/tfchain_client";
 import { DeploymentKeyDeletionError } from "@threefold/types";
