@@ -265,7 +265,7 @@
           <template #activator="{ props }">
             <div v-bind="props">
               <v-btn
-                :disabled="selectedLockedAmount > freeBalance"
+                :disabled="selectedLockedAmount > freeBalance || loadingShowDetails"
                 color="warning"
                 class="ml-2"
                 :loading="unlockContractLoading"
@@ -544,12 +544,15 @@ async function onDelete() {
 async function unlockContract(contractId: number[]) {
   try {
     unlockContractLoading.value = true;
+    const billableContractIds = contractId.filter(id => props.lockedContracts[id] !== 0);
     await props.grid.contracts.unlockContracts(
-      contractId
-        .filter(id => props.lockedContracts[id] !== 0)
-        .map(id => props.contracts.value[id] as unknown as Contract),
+      props.contracts.value.filter(contract =>
+        billableContractIds.includes(contract.contract_id),
+      ) as unknown as Contract[],
     );
-    await props.grid.contracts.unlockContractsByIds(selectedRentContracts.value);
+
+    if (selectedRentContracts.value.length)
+      await props.grid.contracts.unlockContractsByIds(selectedRentContracts.value);
     createCustomToast(
       `Your request to unlock contract ${contractId} has been processed successfully. Changes may take a few minutes to reflect`,
       ToastType.info,
