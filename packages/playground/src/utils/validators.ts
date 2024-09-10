@@ -777,3 +777,9 @@ export async function isAvailableName(grid: GridClient, name: string) {
     return { message: "Name is already taken." };
   }
 }
+
+export function validateSmtp(v: string) {
+  const emailValidation = isEmail("Please provide a valid email address.")(v);
+  const username = isAlpha("Name must start with an alphabetical character.")(v[0]);
+  return emailValidation && username;
+}
