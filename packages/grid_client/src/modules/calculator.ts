@@ -4,7 +4,7 @@ import { TFClient } from "../clients/tf-grid/client";
 import { GridClientConfig } from "../config";
 import { expose } from "../helpers/expose";
 import { validateInput } from "../helpers/validator";
-import { CalculatorModel, CUModel, NUModel, SUModel, UniqueNameModel } from "./models";
+import { CalculatorModel, CUModel, NUModel, SUModel } from "./models";
 
 export interface PricingInfo {
   dedicatedPrice: number;
