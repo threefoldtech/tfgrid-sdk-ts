@@ -220,6 +220,7 @@ const theme = useTheme();
 const navbarConfig = ref();
 
 const hasGrid = computed(() => !!gridStore.grid);
+const hasClient = computed(() => !!gridStore.client);
 
 // eslint-disable-next-line no-undef
 const permanent = ref(window.innerWidth > 980);
@@ -270,43 +271,44 @@ onMounted(async () => {
   openProfile.value = true;
 });
 
-onMounted(async () => {
+watch(hasClient, () => setTimeouts());
+
+async function setTimeouts() {
+  console.log("we can set timeout now");
+
   if (!localStorage.getItem(LocalStorageSettingsKey.TIMEOUT_QUERY_KEY)) {
     localStorage.setItem(LocalStorageSettingsKey.TIMEOUT_QUERY_KEY, `${window.env.TIMEOUT / 1000}`);
   } else {
     window.env.TIMEOUT = +localStorage.getItem(LocalStorageSettingsKey.TIMEOUT_QUERY_KEY)! * 1000;
   }
+
   const client = gridStore.client as GridClient;
-  if (client) {
-    const clientOptions = client.clientOptions;
-    if (clientOptions) {
-      const deploymentTimeoutMinutes = clientOptions.deploymentTimeoutMinutes;
-      if (deploymentTimeoutMinutes) {
-        if (!localStorage.getItem(LocalStorageSettingsKey.TIMEOUT_DEPLOYMENT_KEY) && deploymentTimeoutMinutes) {
-          await nextTick(getDeploymentTimeout);
+
+  const localStorageDeploymentTimeout = localStorage.getItem(LocalStorageSettingsKey.TIMEOUT_DEPLOYMENT_KEY);
+  if (!localStorageDeploymentTimeout) {
+    if (client) {
+      const clientOptions = client.clientOptions;
+      if (clientOptions) {
+        const deploymentTimeoutMinutes = clientOptions.deploymentTimeoutMinutes;
+        if (deploymentTimeoutMinutes) {
+          localStorage.setItem(LocalStorageSettingsKey.TIMEOUT_DEPLOYMENT_KEY, `${+deploymentTimeoutMinutes * 60}`);
+        }
+      }
+    }
+  } else {
+    if (client) {
+      const clientOptions = client.clientOptions;
+      if (clientOptions) {
+        const deploymentTimeoutMinutes = clientOptions.deploymentTimeoutMinutes;
+        if (deploymentTimeoutMinutes) {
+          client.clientOptions.deploymentTimeoutMinutes = +localStorageDeploymentTimeout / 60;
+          await client.connect();
         }
       }
     }
   }
-});
-async function getDeploymentTimeout() {
-  const client = gridStore.client as GridClient;
-  if (!localStorage.getItem(LocalStorageSettingsKey.TIMEOUT_DEPLOYMENT_KEY)) {
-    // sets timeout in local storage in seconds
-    localStorage.setItem(
-      LocalStorageSettingsKey.TIMEOUT_DEPLOYMENT_KEY,
-      `${+client.clientOptions.deploymentTimeoutMinutes! * 60}`,
-    );
-    return;
-  }
-
-  if (client && client.clientOptions) {
-    client.clientOptions.deploymentTimeoutMinutes =
-      +localStorage.getItem(LocalStorageSettingsKey.TIMEOUT_DEPLOYMENT_KEY)! / 60;
-
-    await client.connect();
-  }
 }
+
 // eslint-disable-next-line no-undef
 const version = process.env.VERSION as any;
 
