@@ -568,10 +568,19 @@ class TFContracts extends Contracts {
     await this.client.applyAllExtrinsics(extrinsics);
     return ids;
   }
-
+  /**
+   * Async function that request to resume the passed contracts.
+   *
+   * @description
+   * This function create array of `ExtrinsicResult<number>` to use in `applyAllExtrinsics`.
+   * It's not guaranteed that the contracts will be resumed; It just trigger billing request; if it pass the contract will be resumed.
+   * the function will ignore all contracts that do not have overdue, also if there is sum rent contracts, its associated node contracts that have ipv4 will be added.
+   * @param {Contract[]} contracts contracts to be
+   * @param {GridProxyClient} proxy
+   * @returns {number[]} contract ids that have been requested to resume
+   */
   async batchUnlockContracts(contracts: Contract[], proxy: GridProxyClient) {
     const billableContractsIDs: number[] = [];
-    //Todo could be parallel
     for (const contract of contracts) {
       const contractOverdue = (
         await this.calculateContractOverDue({ contractInfo: contract, gridProxyClient: proxy })
@@ -580,7 +589,7 @@ class TFContracts extends Contracts {
         billableContractsIDs.push(contract.contract_id);
 
         if (contract.type == ContractType.Rent) {
-          /** add node contracts on the rented node `with public ip` to the contracts to bill */
+          /** add associated node contracts on the rented node `with public ip` to the contracts to bill */
           const nodeContracts = await proxy.contracts.list({
             numberOfPublicIps: 1,
             state: [ContractState.GracePeriod],
@@ -590,7 +599,6 @@ class TFContracts extends Contracts {
         }
       }
     }
-    console.log("contracts to bill:", billableContractsIDs);
     const extrinsics: ExtrinsicResult<number>[] = [];
     for (const id of billableContractsIDs) {
       extrinsics.push(await this.unlock(id));
@@ -598,6 +606,13 @@ class TFContracts extends Contracts {
     return this.client.applyAllExtrinsics(extrinsics);
   }
 
+  /**
+   * Request to resume all grace period contracts associated with the current twinId
+   * @description
+   * This function lists all grace period contracts, then call {@link batchUnlockContracts}.
+   * @param {String} gridProxyUrl
+   * @returns contract ids that have been requested to resume.
+   */
   async unlockMyContracts(gridProxyUrl: string) {
     const proxy = new GridProxyClient(gridProxyUrl);
 
