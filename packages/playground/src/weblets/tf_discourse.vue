@@ -94,7 +94,7 @@
       </template>
 
       <template #mail>
-        <SmtpServer v-model="smtp" :persistent="true" tls>
+        <SmtpServer v-model="smtp" persistent tls>
           Discourse needs SMTP service so please configure these settings properly.
         </SmtpServer>
       </template>
