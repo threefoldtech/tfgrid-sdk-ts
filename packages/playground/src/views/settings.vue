@@ -198,7 +198,7 @@ export default {
     const gridStore = useGrid();
     const confirmPasswordInput = useInputRef();
     watch(newPassword, async () => {
-      if (newPassword.value) {
+      if (newPassword.value && confirmPassword.value.length != 0) {
         await nextTick();
 
         confirmPasswordInput.value?.validate();
