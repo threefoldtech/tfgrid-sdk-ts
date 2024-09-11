@@ -45,7 +45,7 @@
           :rules="[
             validators.required('Password is required.'),
             validators.minLength('Password must be at least 6 characters.', 6),
-            validators.maxLength('Password cannot exceed 50 characters.', 69),
+            validators.maxLength('Password cannot exceed 69 characters.', 69),
             validators.pattern('Password should not contain whitespaces.', {
               pattern: /^[^\s]+$/,
             }),
