@@ -274,6 +274,8 @@ onMounted(async () => {
 watch(hasClient, () => setTimeouts());
 
 async function setTimeouts() {
+  console.log("we can set timeout now");
+
   if (!localStorage.getItem(LocalStorageSettingsKey.TIMEOUT_QUERY_KEY)) {
     localStorage.setItem(LocalStorageSettingsKey.TIMEOUT_QUERY_KEY, `${window.env.TIMEOUT / 1000}`);
   } else {
