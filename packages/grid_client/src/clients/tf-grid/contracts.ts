@@ -580,13 +580,13 @@ class TFContracts extends Contracts {
    * @returns {number[]} contract ids that have been requested to resume
    */
   async batchUnlockContracts(contracts: Contract[], proxy: GridProxyClient) {
-    const billableContractsIDs: number[] = [];
+    const billableContractsIDs: Set<number> = new Set();
     for (const contract of contracts) {
       const contractOverdue = (
         await this.calculateContractOverDue({ contractInfo: contract, gridProxyClient: proxy })
       ).toNumber();
       if (contractOverdue > 0) {
-        billableContractsIDs.push(contract.contract_id);
+        billableContractsIDs.add(contract.contract_id);
 
         if (contract.type == ContractType.Rent) {
           /** add associated node contracts on the rented node `with public ip` to the contracts to bill */
@@ -595,12 +595,12 @@ class TFContracts extends Contracts {
             state: [ContractState.GracePeriod],
             nodeId: contract.details.nodeId,
           });
-          nodeContracts.data.forEach(contract => billableContractsIDs.push(contract.contract_id));
+          nodeContracts.data.forEach(contract => billableContractsIDs.add(contract.contract_id));
         }
       }
     }
     const extrinsics: ExtrinsicResult<number>[] = [];
-    for (const id of billableContractsIDs) {
+    for (const id of Array.from(billableContractsIDs)) {
       extrinsics.push(await this.unlock(id));
     }
     return this.client.applyAllExtrinsics(extrinsics);

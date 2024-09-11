@@ -558,6 +558,11 @@ async function onDelete() {
 async function unlockContract(contractId: number[]) {
   try {
     unlockContractLoading.value = true;
+    let unlockedContracts: number[] = [];
+
+    if (selectedRentContracts.value.length)
+      unlockedContracts = await props.grid.contracts.unlockContractsByIds(selectedRentContracts.value);
+    contractId = contractId.filter(id => !unlockedContracts.includes(id));
     const billableContractIds = contractId.filter(id => props.lockedContracts[id] !== 0);
     await props.grid.contracts.unlockContracts(
       props.contracts.value.filter(contract =>
@@ -565,8 +570,6 @@ async function unlockContract(contractId: number[]) {
       ) as unknown as Contract[],
     );
 
-    if (selectedRentContracts.value.length)
-      await props.grid.contracts.unlockContractsByIds(selectedRentContracts.value);
     createCustomToast(
       `Your request to unlock contract ${contractId} has been processed successfully. Changes may take a few minutes to reflect`,
       ToastType.info,
