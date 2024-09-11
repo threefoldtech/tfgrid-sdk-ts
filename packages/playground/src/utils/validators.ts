@@ -8,6 +8,8 @@ import type { IsURLOptions } from "validator/lib/isURL";
 
 import type { RuleReturn } from "@/components/input_validator.vue";
 
+import { SessionStorageSettingsKey } from "./settings";
+
 /**
  * Checks if a value is empty, undefined, or null.
  * @param msg - The error message to be returned if the value is empty.
@@ -638,7 +640,7 @@ export function isSlug(msg: string) {
 }
 export function validateCurrentPassword(msg: string) {
   return (value: string) => {
-    if (sessionStorage.getItem("password") != value) {
+    if (sessionStorage.getItem(SessionStorageSettingsKey.PASSWORD_KEY) != value) {
       return { message: msg };
     }
   };

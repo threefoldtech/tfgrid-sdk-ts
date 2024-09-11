@@ -175,7 +175,11 @@ import { useFormRef } from "@/hooks/form_validator";
 import { useInputRef } from "@/hooks/input_validator";
 import { AppThemeSelection } from "@/utils/app_theme";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
-import { LocalStorageSettingsKey, ThemeSettingsInterface as ThemeInterface } from "@/utils/settings";
+import {
+  LocalStorageSettingsKey,
+  SessionStorageSettingsKey,
+  ThemeSettingsInterface as ThemeInterface,
+} from "@/utils/settings";
 
 import { useGrid } from "../stores";
 import { updateCredentials } from "../utils/credentials";
@@ -258,8 +262,8 @@ export default {
     async function UpdatePassword() {
       try {
         await updateCredentials(currentPassword.value, newPassword.value);
+        sessionStorage.setItem(SessionStorageSettingsKey.PASSWORD_KEY, newPassword.value);
         passFormRef.value.reset();
-        sessionStorage.setItem("password", newPassword.value);
 
         createCustomToast("Password Updated!", ToastType.success);
       } catch (err) {
