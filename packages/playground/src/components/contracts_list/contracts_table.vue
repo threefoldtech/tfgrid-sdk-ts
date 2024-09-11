@@ -444,8 +444,17 @@ async function openUnlockDialog() {
       const nodeId = contract.details.nodeId;
 
       let rentContract = 0;
-      if (contract.type == ContractType.Node && !_rentedNodes.has(nodeId))
-        rentContract = rentContracts.value[nodeId] ?? (await props.grid.nodes.getRentContractId({ nodeId }));
+      if (contract.type == ContractType.Node && !_rentedNodes.has(nodeId)) {
+        if (rentContracts.value[nodeId]) rentContract = rentContracts.value[nodeId];
+        else {
+          // check the rent contract status, if in grace period  the total cost will be shown there
+          const res = await gridProxyClient.contracts.list({
+            nodeId: contract.details.nodeId,
+            type: ContractType.Rent,
+          });
+          if (res.data[0] && res.data[0].state == ContractState.GracePeriod) rentContract = res.data[0].contract_id;
+        }
+      }
       if (rentContract) {
         rentContracts.value[nodeId] = rentContract;
         _rentedNodes.add(nodeId); // to avoid duplicated cost
