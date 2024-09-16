@@ -254,6 +254,28 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
       },
     },
     {
+      path: DashboardRoutes.Applications.Jitsi,
+      component: () => import("../views/jitsi_view.vue"),
+      meta: {
+        title: "Jitsi",
+        info: { page: "info/jitsi.md" },
+        navbarConfig: {
+          back: true,
+          path: [
+            { title: "Deploy" },
+            {
+              title: "Applications",
+              disabled: false,
+              to: DashboardRoutes.Deploy.Applications,
+            },
+            {
+              title: "Jitsi",
+            },
+          ],
+        },
+      },
+    },
+    {
       path: DashboardRoutes.Applications.Algorand,
       component: () => import("../views/algorand_view.vue"),
       meta: {
@@ -359,28 +381,6 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
             },
             {
               title: "Static Website",
-            },
-          ],
-        },
-      },
-    },
-    {
-      path: DashboardRoutes.Applications.Domains,
-      component: () => import("../views/domains_view.vue"),
-      meta: {
-        title: "Domains",
-        info: { page: "info/domains.md" },
-        navbarConfig: {
-          back: true,
-          path: [
-            { title: "Deploy" },
-            {
-              title: "Applications",
-              disabled: false,
-              to: DashboardRoutes.Deploy.Applications,
-            },
-            {
-              title: "Domains",
             },
           ],
         },
@@ -605,6 +605,11 @@ function createDeployRoutes(): RouteRecordRaw[] {
           path: DashboardRoutes.Deploy.PricingCalculator,
           component: () => import("../calculator/pricing_calculator.vue"),
           meta: { title: "Resource Pricing", publicPath: true },
+        },
+        {
+          path: DashboardRoutes.Deploy.Domains,
+          component: () => import("@/views/domains_view.vue"),
+          meta: { title: "Domains", publicPath: true },
         },
         {
           path: DashboardRoutes.Deploy.NodeFinder,

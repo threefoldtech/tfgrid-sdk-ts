@@ -55,7 +55,7 @@
       </v-dialog>
     </v-alert>
 
-    <AccessDeploymentAlert />
+    <AccessDeploymentAlert v-if="!hideSSH" />
 
     <InputTooltip
       v-if="props.projectName.toLowerCase() === 'vm'"
@@ -135,6 +135,19 @@
           </span>
         </v-chip>
       </template>
+      <template #[`item.health`]="{ item }">
+        <v-chip :color="getNodeHealthColor(item[0].workloads[0].result.state as string).color">
+          <v-tooltip v-if="item[0].workloads[0].result.state == NodeHealth.Error" activator="parent" location="top">{{
+            item.message
+          }}</v-tooltip>
+          <v-tooltip v-if="item[0].workloads[0].result.state == NodeHealth.Paused" activator="parent" location="top"
+            >The deployment contract is in grace period</v-tooltip
+          >
+          <span class="text-uppercase">
+            {{ getNodeHealthColor(item[0].workloads[0].result.state as string).type }}
+          </span>
+        </v-chip>
+      </template>
 
       <template #no-data-text>
         <div v-if="failedDeploymentList.length > 0" class="text-center">
@@ -170,6 +183,7 @@ const props = defineProps<{
   projectName: string;
   modelValue: any[];
   deleting: boolean;
+  hideSSH?: boolean;
 }>();
 defineEmits<{ (event: "update:model-value", value: any[]): void }>();
 
@@ -278,7 +292,7 @@ const filteredHeaders = computed(() => {
       },
       {
         title: "Backends",
-        key: "0.workloads.0.data.backends",
+        key: "backends",
         value(item: any) {
           return item[0].workloads[0].data.backends.join(", ");
         },
@@ -343,6 +357,7 @@ const filteredHeaders = computed(() => {
     ProjectName.Subsquid,
     ProjectName.Peertube,
     ProjectName.Jenkins,
+    ProjectName.Jitsi,
   ] as string[];
 
   const IPV4Solutions = [
@@ -367,6 +382,7 @@ const filteredHeaders = computed(() => {
     ProjectName.Peertube,
     ProjectName.Jenkins,
     ProjectName.Caprover,
+    ProjectName.Jitsi,
   ] as string[];
 
   const WireguardSolutions = [ProjectName.VM, ProjectName.Fullvm, ProjectName.Umbrel, ProjectName.TFRobot] as string[];

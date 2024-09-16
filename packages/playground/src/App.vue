@@ -107,7 +107,38 @@
       </v-navigation-drawer>
 
       <v-main :style="{ paddingTop: navbarConfig ? '140px' : '70px' }">
-        <v-toolbar class="border position-fixed pr-2" :style="{ zIndex: 1100, top: 0, left: 0, right: 0 }">
+        <v-toolbar
+          :extended="toolbarExtended"
+          extension-height="auto"
+          class="border position-fixed"
+          :style="{ zIndex: 1100, top: 0, left: 0, right: 0 }"
+          :elevation="permanent ? '1' : '15'"
+        >
+          <template #extension>
+            <v-card class="w-100 ma-0 pa-0" v-if="toolbarExtended">
+              <div class="pa-1">
+                <div class="d-flex justify-center">
+                  <div class="">
+                    <TfSwapPrice>
+                      <FundsCard v-if="hasActiveProfile" />
+                    </TfSwapPrice>
+                  </div>
+                </div>
+                <v-divider class="mb-2" />
+                <div class="d-flex justify-center">
+                  <div class="">
+                    <ProfileManager
+                      :model-value="openProfile"
+                      @update:modelValue="(e: boolean) => {
+                    toolbarExtended = e;
+                    openProfile = e;
+                    }"
+                    />
+                  </div>
+                </div>
+              </div>
+            </v-card>
+          </template>
           <v-toolbar-title class="custom-toolbar-title">
             <v-img
               :src="`${
@@ -115,14 +146,14 @@
                   ? baseUrl + 'images/logoTF_dark.png'
                   : baseUrl + 'images/logoTF_light.png'
               }`"
-              width="160px"
+              :width="permanent ? '140px' : '120px'"
               @click="navigateToHome"
               class="clickable-logo"
             />
           </v-toolbar-title>
 
           <v-spacer>
-            <div class="d-flex align-center justify-start">
+            <div class="d-flex align-center justify-start" v-if="permanent">
               <TfSwapPrice>
                 <FundsCard v-if="hasActiveProfile" />
               </TfSwapPrice>
@@ -134,7 +165,21 @@
           <v-divider vertical class="mx-2" />
           <AppTheme />
           <v-divider vertical class="mx-2" />
-          <ProfileManager v-model="openProfile" />
+          <ProfileManager v-model="openProfile" v-if="permanent" />
+
+          <div class="d-flex align-center" v-if="!permanent">
+            <v-btn
+              :color="theme.name.value !== AppThemeSelection.light ? 'white' : 'black'"
+              @click="
+                () => {
+                  openSidebar = false;
+                  toolbarExtended = !toolbarExtended;
+                }
+              "
+              icon="mdi-menu"
+              class="mr-2"
+            />
+          </div>
         </v-toolbar>
 
         <v-toolbar
@@ -175,6 +220,7 @@
               minHeight: '85%',
               maxHeight: '100%',
             }"
+            @click="() => (toolbarExtended = false)"
           >
             <div class="d-flex align-center">
               <v-btn
@@ -212,8 +258,8 @@ const $router = useRouter();
 const profileManager = useProfileManager();
 const gridStore = useGrid();
 const network = process.env.NETWORK || (window as any).env.NETWORK;
-
-const openProfile = ref(false);
+const toolbarExtended = ref(false);
+const openProfile = ref(true);
 const hasActiveProfile = computed(() => !!profileManager.profile);
 const theme = useTheme();
 const navbarConfig = ref();
@@ -223,6 +269,12 @@ const hasGrid = computed(() => !!gridStore.grid);
 // eslint-disable-next-line no-undef
 const permanent = ref(window.innerWidth > 980);
 const openSidebar = ref(permanent.value);
+
+watch(permanent, value => {
+  if (value) {
+    toolbarExtended.value = false;
+  }
+});
 
 function setSidebarOnResize() {
   permanent.value =
@@ -251,6 +303,9 @@ function navigateToHome() {
 onMounted(async () => {
   await (window.$$appLoader || noop)();
   openProfile.value = true;
+  if (!permanent.value) {
+    toolbarExtended.value = true;
+  }
 });
 
 // eslint-disable-next-line no-undef
@@ -316,6 +371,12 @@ const routes: AppRoute[] = [
         icon: "mdi-lightbulb-on-outline",
         route: DashboardRoutes.Deploy.Applications,
         tooltip: "Deploy ready applications on the ThreeFold grid.",
+      },
+      {
+        title: "Domains",
+        icon: "domains.png",
+        route: DashboardRoutes.Deploy.Domains,
+        tooltip: "Expose servers hosted on local machines or VMs to the public internet.",
       },
       {
         title: "Your Contracts",
@@ -504,5 +565,11 @@ body {
 
 html {
   overflow: hidden;
+}
+
+@media only screen and (max-width: 600px) {
+  .v-toolbar-title {
+    flex: auto;
+  }
 }
 </style>

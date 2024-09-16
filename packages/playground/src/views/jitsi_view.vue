@@ -1,9 +1,9 @@
 <template>
   <view-layout>
-    <TfDomains />
+    <tf-jitsi />
 
     <template #list>
-      <TfDeploymentList title="Domains" :project-name="name" :hide-ssh="true" />
+      <TfDeploymentList title="Jitsi" :project-name="name" />
     </template>
   </view-layout>
 </template>
@@ -11,16 +11,16 @@
 <script lang="ts">
 import { ProjectName } from "../types";
 import TfDeploymentList from "../weblets/tf_deployment_list.vue";
-import TfDomains from "../weblets/tf_domains.vue";
+import TfJitsi from "../weblets/tf_jitsi.vue";
 
 export default {
-  name: "DomainsView",
+  name: "JitsiView",
   components: {
-    TfDomains,
     TfDeploymentList,
+    TfJitsi,
   },
   setup() {
-    return { name: ProjectName.Domains };
+    return { name: ProjectName.Jitsi };
   },
 };
 </script>

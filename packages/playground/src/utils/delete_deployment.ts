@@ -85,6 +85,7 @@ export function solutionHasGateway(projectName: ProjectName) {
     ProjectName.Taiga,
     ProjectName.Wordpress,
     ProjectName.Nextcloud,
+    ProjectName.Jitsi,
   ];
 
   for (const solution of solutions) {
