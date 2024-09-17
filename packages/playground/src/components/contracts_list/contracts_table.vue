@@ -37,7 +37,7 @@
 
       <template #[`item.consumption`]="{ item }">
         <v-row v-if="item?.consumption !== 0 && item?.consumption !== undefined" class="d-flex justify-center">
-          <p>{{ item.consumption.toFixed(3) }} TFT/hour</p>
+          <p class="mr-2">{{ item.consumption.toFixed(3) }} TFT/hour</p>
 
           <v-tooltip bottom color="primary" close-delay="100" v-if="item.discountPackage">
             <template v-slot:activator="{ props }">
