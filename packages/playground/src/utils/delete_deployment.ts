@@ -44,7 +44,7 @@ export async function deleteDeployment(grid: GridClient, options: DeleteDeployme
       try {
         await grid.gateway.delete_name({ name: gateway.name });
       } catch (error) {
-        console.log("Error while deleting k8s gateway.", error);
+        console.error("Error while deleting k8s gateway.", error);
       }
     }
     return grid.k8s.delete({ name: options.name });
