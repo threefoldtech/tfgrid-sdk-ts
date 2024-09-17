@@ -19,7 +19,7 @@ import {
 import { GridClientError } from "@threefold/types";
 import { Decimal } from "decimal.js";
 
-import { formatErrorMessage } from "../../helpers";
+import { bytesToGB, formatErrorMessage } from "../../helpers";
 import { calculator, ContractStates, currency } from "../../modules";
 import { Graphql } from "../graphql/client";
 
@@ -118,11 +118,6 @@ export interface LockContracts {
   nodeContracts: LockDetails;
   rentContracts: LockDetails;
   totalAmountLocked: number;
-}
-interface CalcResourcesPrice extends Resources {
-  certified: boolean;
-  ipv4: number;
-  calculator: calculator;
 }
 
 export type OverdueDetails = { [key: number]: number };
@@ -388,33 +383,6 @@ class TFContracts extends Contracts {
       totalOverdraft: totalOverDraft.add(totalNUCost),
     };
   }
-  /**
-   * A function to calculate the cost of the resources.
-   * @param {CalcResourcesPrice} options please not that the passed {Resources} should be in bytes.
-   * the function will convert them to GB and calculate the cost
-   * @returns { Object } contains the `dedicatedPrice` and the `sharedPrice` both are numbers
-   */
-  private async calcResourcesPrice(options: CalcResourcesPrice) {
-    const { cru, hru, sru, mru, calculator, ipv4, certified } = options;
-
-    const mruInGB = mru / Math.pow(1024, 3);
-    const sruInGB = sru / Math.pow(1024, 3);
-    const hruInGB = hru / Math.pow(1024, 3);
-
-    const res = await calculator.calculateWithMyBalance({
-      cru,
-      mru: mruInGB,
-      sru: sruInGB,
-      hru: hruInGB,
-      certified,
-      ipv4u: !!ipv4,
-    });
-
-    return {
-      dedicatedPrice: res.dedicatedPrice,
-      sharedPrice: res.sharedPrice,
-    };
-  }
 
   /**
    * This function is for calculating the estimated cost of the contract per month.
@@ -440,14 +408,16 @@ class TFContracts extends Contracts {
     const nodeDetails = await proxy.nodes.byId(contract.details.nodeId);
 
     const certified = nodeDetails.certificationType == CertificationType.Certified ? true : false;
-
     if (contract.type == ContractType.Rent) {
+      const { cru, sru, mru, hru } = nodeDetails.total_resources;
       const USDCost = (
-        await this.calcResourcesPrice({
-          calculator: calc,
-          ipv4: 0,
+        await calc.calculateWithMyBalance({
+          ipv4u: false,
           certified,
-          ...nodeDetails.total_resources,
+          cru: bytesToGB(cru),
+          mru: bytesToGB(mru),
+          hru: bytesToGB(hru),
+          sru: bytesToGB(sru),
         })
       ).dedicatedPrice;
 
@@ -471,13 +441,15 @@ class TFContracts extends Contracts {
     const usedREsources: NodeContractUsedResources = await this.client.contracts.getNodeContractResources({
       id: contract.contract_id,
     });
-
+    const { cru, sru, mru, hru } = usedREsources.used;
     const USDCost = (
-      await this.calcResourcesPrice({
-        calculator: calc,
-        ...usedREsources.used,
+      await calc.calculateWithMyBalance({
+        ipv4u: !!contract.details.number_of_public_ips,
         certified,
-        ipv4: contract.details.number_of_public_ips ?? 0,
+        cru: bytesToGB(cru),
+        mru: bytesToGB(mru),
+        hru: bytesToGB(hru),
+        sru: bytesToGB(sru),
       })
     ).sharedPrice;
 
