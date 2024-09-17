@@ -115,6 +115,7 @@
             validators.required('Query timeout is required.'),
             validators.isInt('Timeout must be a valid integer.'),
             validators.min(`Query timeout should be at least 3 second.`, 3),
+            validators.max('Query timeout maximum limit exceeded', 3 * 60),
           ]"
           #="{ props }"
           ref="timeoutQueryInput"
@@ -144,6 +145,7 @@
             validators.required('Deployment timeout is required.'),
             validators.isInt('Timeout must be a valid integer.'),
             validators.min(`Deployment timeout should be at least 3 second.`, 3),
+            validators.max('Deployment timeout maximum limit exceeded', 30 * 60),
           ]"
           #="{ props }"
           ref="timeoutDeploymentInput"
