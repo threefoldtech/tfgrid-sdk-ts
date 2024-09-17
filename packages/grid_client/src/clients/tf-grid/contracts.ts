@@ -398,7 +398,7 @@ class TFContracts extends Contracts {
       new Decimal(0),
     );
     const totalNUCost = billingInfoResult.reduce((acc: number, billingInfo) => acc + billingInfo.amountUnbilled, 0);
-    const totalIPCost = (ipPrice * (contracts.data.length || 0)) / 1e7;
+    const totalIPCost = (ipPrice * (contracts.length || 0)) / 1e7;
     return {
       //return ip cost per month
       totalIpCost: totalIPCost * 24 * 30,
@@ -614,6 +614,8 @@ class TFContracts extends Contracts {
       state: [ContractState.GracePeriod],
       twinId: await this.client.twins.getMyTwinId(),
     });
+
+    if (contracts.length == 0) return [];
     return await this.batchUnlockContracts(contracts as Contract[], proxy);
   }
 
