@@ -338,26 +338,13 @@ async function setTimeouts() {
   const client = gridStore.client as GridClient;
 
   const localStorageDeploymentTimeout = localStorage.getItem(LocalStorageSettingsKey.TIMEOUT_DEPLOYMENT_KEY);
-  if (!localStorageDeploymentTimeout) {
-    if (client) {
-      const clientOptions = client.clientOptions;
-      if (clientOptions) {
-        const deploymentTimeoutMinutes = clientOptions.deploymentTimeoutMinutes;
-        if (deploymentTimeoutMinutes) {
-          localStorage.setItem(LocalStorageSettingsKey.TIMEOUT_DEPLOYMENT_KEY, `${+deploymentTimeoutMinutes * 60}`);
-        }
-      }
-    }
-  } else {
-    if (client) {
-      const clientOptions = client.clientOptions;
-      if (clientOptions) {
-        const deploymentTimeoutMinutes = clientOptions.deploymentTimeoutMinutes;
-        if (deploymentTimeoutMinutes) {
-          client.clientOptions.deploymentTimeoutMinutes = +localStorageDeploymentTimeout / 60;
-          await client.connect();
-        }
-      }
+  if (client && !localStorageDeploymentTimeout) {
+    const deploymentTimeoutMinutes = client.clientOptions.deploymentTimeoutMinutes;
+    if (deploymentTimeoutMinutes) {
+      localStorage.setItem(LocalStorageSettingsKey.TIMEOUT_DEPLOYMENT_KEY, `${+deploymentTimeoutMinutes * 60}`);
+    } else {
+      client.clientOptions.deploymentTimeoutMinutes = +localStorageDeploymentTimeout! / 60;
+      await client.connect();
     }
   }
 }
