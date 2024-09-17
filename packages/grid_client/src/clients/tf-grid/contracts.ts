@@ -20,7 +20,7 @@ import { GridClientError } from "@threefold/types";
 import { Decimal } from "decimal.js";
 
 import { formatErrorMessage } from "../../helpers";
-import { calculator, ContractStates } from "../../modules";
+import { calculator, ContractStates, currency } from "../../modules";
 import { Graphql } from "../graphql/client";
 
 export type DiscountLevel = "None" | "Default" | "Bronze" | "Silver" | "Gold";
@@ -347,7 +347,8 @@ class TFContracts extends Contracts {
   private async convertToTFT(USD: Decimal) {
     try {
       const tftPrice = (await this.client.tftPrice.get()) ?? 0;
-      return USD.div(tftPrice);
+      const tft = new currency(tftPrice).convertUSDtoTFT({ amount: USD.toNumber() });
+      return new Decimal(tft);
     } catch (error) {
       throw new GridClientError(`Failed to convert to mTFT due: ${error}`);
     }
