@@ -605,3 +605,11 @@ export default defineComponent({
   components: {},
 });
 </script>
+
+<style>
+@media only screen and (max-width: 600px) {
+  .v-expansion-panel-text__wrapper {
+    padding: 0px !important;
+  }
+}
+</style>
