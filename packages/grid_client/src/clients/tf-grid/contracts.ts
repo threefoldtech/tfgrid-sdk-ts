@@ -1,9 +1,9 @@
 import GridProxyClient, {
   CertificationType,
   Contract,
+  ContractsQuery,
   ContractState,
   ContractType,
-  Resources,
 } from "@threefold/gridproxy_client";
 import {
   BillingInformation,
@@ -348,6 +348,24 @@ class TFContracts extends Contracts {
       throw new GridClientError(`Failed to convert to mTFT due: ${error}`);
     }
   }
+  /**
+   * list all contracts, this is not restricted with the items counts
+   * this basically check if the count is larger than the page size, it make another request with the item count as the size pram.
+   * @param {GridProxyClient} proxy will be used to list the contracts
+   * @param {Partial<ContractsQuery>} queries
+   * @returns
+   */
+  async listAllContracts(proxy: GridProxyClient, queries: Partial<ContractsQuery>) {
+    const contracts = await proxy.contracts.list({ ...queries, retCount: true });
+    if (contracts.data.length < contracts.count!) {
+      return (
+        await proxy.contracts.list({
+          ...queries,
+          size: contracts.count!,
+        })
+      ).data;
+    } else return contracts.data;
+  }
 
   /**
    * Calculate total IPV4 and total overdraft on all node contracts on rented node.
@@ -356,14 +374,18 @@ class TFContracts extends Contracts {
    * the IPV4 cost to add to the estimated cost of the rent contract.
    */
   private async getContractsCostOnRentedNode(nodeId: number, proxy: GridProxyClient) {
-    const contracts = await proxy.contracts.list({ nodeId, state: [ContractState.GracePeriod], numberOfPublicIps: 1 });
+    const contracts = await this.listAllContracts(proxy, {
+      nodeId,
+      state: [ContractState.GracePeriod],
+      numberOfPublicIps: 1,
+    });
 
     const ipPrice = (await this.client.pricingPolicies.get({ id: 1 })).ipu.value / 10 ** 7;
-    const BillingInformationPromises = contracts.data.reduce((acc: Promise<BillingInformation>[], contract) => {
+    const BillingInformationPromises = contracts.reduce((acc: Promise<BillingInformation>[], contract) => {
       acc.push(this.client.contracts.getContractBillingInformationByID(contract.contract_id));
       return acc;
     }, []);
-    const overDraftPromises = contracts.data.reduce((acc: Promise<ContractPaymentState>[], contract) => {
+    const overDraftPromises = contracts.reduce((acc: Promise<ContractPaymentState>[], contract) => {
       acc.push(this.client.contracts.getContractPaymentState(contract.contract_id));
       return acc;
     }, []);
@@ -563,12 +585,12 @@ class TFContracts extends Contracts {
 
         if (contract.type == ContractType.Rent) {
           /** add associated node contracts on the rented node `with public ip` to the contracts to bill */
-          const nodeContracts = await proxy.contracts.list({
+          const nodeContracts = await this.listAllContracts(proxy, {
             numberOfPublicIps: 1,
             state: [ContractState.GracePeriod],
             nodeId: contract.details.nodeId,
           });
-          nodeContracts.data.forEach(contract => billableContractsIDs.add(contract.contract_id));
+          nodeContracts.forEach(contract => billableContractsIDs.add(contract.contract_id));
         }
       }
     }
@@ -588,13 +610,11 @@ class TFContracts extends Contracts {
    */
   async unlockMyContracts(gridProxyUrl: string) {
     const proxy = new GridProxyClient(gridProxyUrl);
-
-    const contracts = await proxy.contracts.list({
+    const contracts = await this.listAllContracts(proxy, {
       state: [ContractState.GracePeriod],
       twinId: await this.client.twins.getMyTwinId(),
     });
-
-    return await this.batchUnlockContracts(contracts.data, proxy);
+    return await this.batchUnlockContracts(contracts as Contract[], proxy);
   }
 
   async getDedicatedNodeExtraFee(options: GetDedicatedNodePriceOptions): Promise<number> {
