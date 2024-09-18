@@ -560,8 +560,8 @@ import { nextTick } from "process";
 
 import { DashboardRoutes } from "@/router/routes";
 import { AppThemeSelection } from "@/utils/app_theme";
-import type { Date } from "@/utils/types";
 import { ThemeSettingsInterface } from "@/utils/settings";
+import type { Date } from "@/utils/types";
 
 import AppTheme from "./components/app_theme.vue";
 import DeploymentListManager from "./components/deployment_list_manager.vue";
