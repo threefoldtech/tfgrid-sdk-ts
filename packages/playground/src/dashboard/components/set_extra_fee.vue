@@ -67,7 +67,7 @@
 
 <script lang="ts">
 import { TFChainError } from "@threefold/tfchain_client";
-import { InsufficientBalanceError } from "@threefold/types";
+import { ValidationError } from "@threefold/types";
 import { onMounted, ref, watch } from "vue";
 
 import { useGrid } from "../../stores";
@@ -124,7 +124,8 @@ export default {
       } catch (e) {
         let msg = "Failed to set additional fees";
         if (e instanceof TFChainError && e.keyError === "NodeHasActiveContracts") msg += ". Node has active contracts.";
-        if (e instanceof InsufficientBalanceError) msg += " due to insufficient balance.";
+        if (e instanceof ValidationError && e.toString().includes("Balance is not enough"))
+          msg += " due to insufficient balance.";
         createCustomToast(msg, ToastType.danger);
       } finally {
         isSetting.value = false;
