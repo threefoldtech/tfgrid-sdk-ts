@@ -380,6 +380,7 @@ class TFContracts extends Contracts {
       numberOfPublicIps: 1,
     });
 
+    // will convert  from Unit USD to USD inline;
     const ipPrice = (await this.client.pricingPolicies.get({ id: 1 })).ipu.value / 10 ** 7;
     const BillingInformationPromises = contracts.reduce((acc: Promise<BillingInformation>[], contract) => {
       acc.push(this.client.contracts.getContractBillingInformationByID(contract.contract_id));
@@ -398,11 +399,12 @@ class TFContracts extends Contracts {
       new Decimal(0),
     );
     const totalNUCost = billingInfoResult.reduce((acc: number, billingInfo) => acc + billingInfo.amountUnbilled, 0);
-    const totalIPCost = (ipPrice * (contracts.length || 0)) / 1e7;
+    const totalNUCostTFTUnit = await this.convertToTFT(new Decimal(totalNUCost));
+    const totalIPCost = ipPrice * (contracts.length || 0);
     return {
       //return ip cost per month
       totalIpCost: totalIPCost * 24 * 30,
-      totalOverdraft: totalOverDraft.add(totalNUCost),
+      totalOverdraft: totalOverDraft.add(totalNUCostTFTUnit),
     };
   }
 
@@ -411,7 +413,7 @@ class TFContracts extends Contracts {
    * @description
    *  Name contract cost is fixed price for the unique name,
    * Rent contract cost is the cost of the total node resources,
-   * Node contract have to cases:
+   * Node contract have two cases:
    * 1- on rented contract, this case the cost will be only for the ipv4.
    * 2- on shared node, this will be the shared price of the used resources
 
@@ -429,13 +431,13 @@ class TFContracts extends Contracts {
     /** Other contract types need the node information */
     const nodeDetails = await proxy.nodes.byId(contract.details.nodeId);
 
-    const certified = nodeDetails.certificationType == CertificationType.Certified ? true : false;
+    const isCertified = nodeDetails.certificationType == CertificationType.Certified ? true : false;
     if (contract.type == ContractType.Rent) {
       const { cru, sru, mru, hru } = nodeDetails.total_resources;
       const USDCost = (
         await calc.calculateWithMyBalance({
           ipv4u: false,
-          certified,
+          certified: isCertified,
           cru: bytesToGB(cru),
           mru: bytesToGB(mru),
           hru: bytesToGB(hru),
@@ -467,7 +469,7 @@ class TFContracts extends Contracts {
     const USDCost = (
       await calc.calculateWithMyBalance({
         ipv4u: !!contract.details.number_of_public_ips,
-        certified,
+        certified: isCertified,
         cru: bytesToGB(cru),
         mru: bytesToGB(mru),
         hru: bytesToGB(hru),
@@ -495,9 +497,10 @@ class TFContracts extends Contracts {
   async calculateContractOverDue(options: CalculateOverdueOptions) {
     const contractInfo = options.contractInfo;
 
-    /** Get the Un-billed amount for the network usage */
+    /** Get the Un-billed amount in unit USD  for the network usage */
     const unbilledNU = (await this.client.contracts.getContractBillingInformationByID(contractInfo.contract_id))
       .amountUnbilled;
+    const unbilledNUTFTUnit = await this.convertToTFT(new Decimal(unbilledNU));
 
     const { standardOverdraft, additionalOverdraft, lastUpdatedSeconds } =
       await this.client.contracts.getContractPaymentState(contractInfo.contract_id);
@@ -528,7 +531,7 @@ class TFContracts extends Contracts {
 
     // cost of the current billing period with the mentioned allowance time
     const totalPeriodCost = contractCostTFT.times(totalPeriodTime);
-    const overdue = totalOverDraft.add(unbilledNU);
+    const overdue = totalOverDraft.add(unbilledNUTFTUnit);
 
     //convert to TFT
     const OverdueTFT = overdue.div(10 ** 7);
