@@ -379,7 +379,7 @@ class TFContracts extends Contracts {
       state: [ContractState.GracePeriod],
       numberOfPublicIps: 1,
     });
-
+    const publicIpsCount = contracts.reduce((acc, contract) => acc + (contract.details.number_of_public_ips || 0), 0);
     // will convert  from Unit USD to USD inline;
     const ipPrice = (await this.client.pricingPolicies.get({ id: 1 })).ipu.value / 10 ** 7;
     const BillingInformationPromises = contracts.reduce((acc: Promise<BillingInformation>[], contract) => {
@@ -400,7 +400,7 @@ class TFContracts extends Contracts {
     );
     const totalNUCost = billingInfoResult.reduce((acc: number, billingInfo) => acc + billingInfo.amountUnbilled, 0);
     const totalNUCostTFTUnit = await this.convertToTFT(new Decimal(totalNUCost));
-    const totalIPCost = ipPrice * (contracts.length || 0);
+    const totalIPCost = ipPrice * publicIpsCount;
     return {
       //return ip cost per month
       totalIpCost: totalIPCost * 24 * 30,
