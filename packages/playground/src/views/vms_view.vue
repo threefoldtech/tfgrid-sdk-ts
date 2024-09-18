@@ -26,7 +26,6 @@ export default {
           "Deploy a full virtual machine on Threefold Grid. Full VM allows you to have a complete image with a custom kernel optimized for your own usecase.",
         icon: "vm.png",
         route: DashboardRoutes.VirtualMachines.FullVirtualMachine,
-        // releaseDate: { year: 2024, month: 9, day: 4 },
       },
       {
         title: "Micro Virtual Machine",

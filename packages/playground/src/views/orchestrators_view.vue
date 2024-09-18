@@ -25,7 +25,6 @@ export default {
           "Kubernetes is the standard container orchestration tool. On the TF grid, Kubernetes clusters can be deployed out of the box. We have implemented K3S, a full-blown Kubernetes offering that uses only half of the memory footprint.",
         icon: "kubernetes.png",
         route: DashboardRoutes.Orchestrators.Kubernetes,
-        // releaseDate: { year: 2024, month: 9, day: 4 },
       },
       {
         title: "CapRover",
@@ -33,7 +32,6 @@ export default {
           "CapRover is an extremely easy to use app/database deployment & web server manager for your NodeJS, Python, PHP, ASP.NET, Ruby, MySQL, MongoDB, Postgres, WordPress (and etc…) applications!",
         icon: "caprover.png",
         route: DashboardRoutes.Orchestrators.CapRover,
-        // releaseDate: { year: 2024, month: 9, day: 4 },
       },
     ];
 

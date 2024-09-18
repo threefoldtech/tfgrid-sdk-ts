@@ -317,7 +317,6 @@ const routes: AppRoute[] = [
         icon: "mdi-television",
         route: DashboardRoutes.Deploy.VirtualMachines,
         tooltip: "Deploy your Virtal Machine instances.",
-        // releaseDate: { year: 2024, month: 9, day: 4 },
       },
       {
         title: "Orchestrators",
