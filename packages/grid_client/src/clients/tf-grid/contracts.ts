@@ -457,7 +457,7 @@ class TFContracts extends Contracts {
   private async getContractsCostOnRentedNode(nodeId: number, proxy: GridProxyClient): Promise<TotalContractsCost> {
     const contracts = await this.getNodeContractsOnRentedNode(nodeId, proxy);
 
-    if (contracts.length == 0) return { ipsCost: 0, overdraft: new Decimal(0), nuCost: new Decimal(0) };
+    if (contracts.length == 0) return { ipsCost: 0, nuCost: 0, overdraft: new Decimal(0) };
 
     const totalIpCost = await this.calculateIPCostPerMonth(contracts);
     const totalOverdraft = await this.calculateNodeContractsOverdraft(contracts);
@@ -490,10 +490,10 @@ class TFContracts extends Contracts {
 
     //TODO allow ipv4 to be number
 
-    /** Other contract types need the node information */
+    // Other contract types need the node information
     const nodeDetails = await proxy.nodes.byId(contract.details.nodeId);
 
-    const isCertified = nodeDetails.certificationType == CertificationType.Certified ? true : false;
+    const isCertified = nodeDetails.certificationType === CertificationType.Certified;
     if (contract.type == ContractType.Rent) {
       const { cru, sru, mru, hru } = nodeDetails.total_resources;
       const USDCost = (
@@ -566,7 +566,7 @@ class TFContracts extends Contracts {
     const { standardOverdraft, additionalOverdraft, lastUpdatedSeconds } =
       await this.client.contracts.getContractPaymentState(contractInfo.contract_id);
 
-    /**Calculate the elapsed seconds since last pilling*/
+    /**Calculate the elapsed seconds since last billing*/
     const elapsedSeconds = Date.now() / 1000 - lastUpdatedSeconds;
 
     /** Cost in USD */
@@ -603,9 +603,9 @@ class TFContracts extends Contracts {
     const overdue = totalOverDraft.add(unbilledNuTFTUnit);
 
     /** TFT */
-    const OverdueTFT = overdue.div(TFT_CONVERSION_FACTOR);
+    const overdueTFT = overdue.div(TFT_CONVERSION_FACTOR);
 
-    return OverdueTFT.add(totalPeriodCost);
+    return overdueTFT.add(totalPeriodCost);
   }
 
   /**
