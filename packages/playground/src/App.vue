@@ -57,6 +57,12 @@
                           <span v-bind="props">
                             {{ item.title }}
                           </span>
+                          <v-badge
+                            dot
+                            inline
+                            color="primary"
+                            v-if="item.releaseDate && isReleasedOverMon(item.releaseDate, new Date())"
+                          ></v-badge>
                         </template>
                       </v-tooltip>
                     </v-list-item-title>
@@ -88,6 +94,12 @@
                         <span v-bind="props">
                           {{ item.title }}
                         </span>
+                        <v-badge
+                          dot
+                          inline
+                          color="primary"
+                          v-if="item.releaseDate && isReleasedOverMon(item.releaseDate, new Date())"
+                        ></v-badge>
                       </template>
                     </v-tooltip>
                   </v-list-item-title>
@@ -251,6 +263,7 @@ import { useRoute, useRouter } from "vue-router";
 import { useTheme } from "vuetify";
 
 import TfLogger from "@/components/logger.vue";
+import { isReleasedOverMon } from "@/utils/date";
 import { LocalStorageSettingsKey } from "@/utils/settings";
 
 import { useProfileManager } from "./stores/profile_manager";
@@ -561,7 +574,6 @@ import TfRouterView from "./components/TfRouterView.vue";
 import TfSwapPrice from "./components/TfSwapPrice.vue";
 import { useGrid } from "./stores";
 import ProfileManager from "./weblets/profile_manager.vue";
-
 interface AppRoute {
   title: string;
   items: AppRouteItem[];
@@ -575,6 +587,7 @@ interface AppRouteItem {
   url?: string;
   icon?: string;
   tooltip?: string;
+  releaseDate?: Date;
 }
 
 export default {
