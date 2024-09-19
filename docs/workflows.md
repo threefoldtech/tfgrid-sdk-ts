@@ -44,6 +44,7 @@ VERSION = "release tag or the first 7 chars of commit hash"
 ### [CD](/.github/workflows/playground_cd.yml)
 
 On **Push** to the development branch, this workflow will do the following:
+
 - clean install of node dependencies
 - cache/restore dependencies
 - build source code 
