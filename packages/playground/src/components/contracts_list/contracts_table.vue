@@ -451,6 +451,7 @@ async function openUnlockDialog() {
           const res = await gridProxyClient.contracts.list({
             nodeId: contract.details.nodeId,
             type: ContractType.Rent,
+            state: [ContractState.Created, ContractState.GracePeriod],
           });
           if (res.data[0] && res.data[0].state == ContractState.GracePeriod) rentContract = res.data[0].contract_id;
         }
@@ -493,7 +494,11 @@ async function contractLockDetails(item: Contract) {
       if (rentContracts.value[item.details.nodeId]) {
         rentContract = rentContracts.value[item.details.nodeId];
       } else {
-        const res = await gridProxyClient.contracts.list({ nodeId: item.details.nodeId, type: ContractType.Rent });
+        const res = await gridProxyClient.contracts.list({
+          nodeId: item.details.nodeId,
+          type: ContractType.Rent,
+          state: [ContractState.Created, ContractState.GracePeriod],
+        });
         if (res.data[0] && res.data[0].state == ContractState.GracePeriod) rentContract = res.data[0].contract_id;
       }
     if (rentContract) {
