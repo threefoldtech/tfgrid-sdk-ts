@@ -5,15 +5,15 @@ export default function toHumanDate(timeInSeconds: number): string {
 }
 
 /**
- * Checks if a release date is within the last 30 days from a given current date.
+ * Checks if a release date is within the last 30 days from the current date.
  *
- * @param {Date} releaseDate - The date of release.
- * @param {Date} [currentDate] - The current date to compare with. Defaults to the current date.
- * @returns {boolean} True if the release date is within the last 30 days, false otherwise.
+ * @param {Date} releaseDate - The date of release
+ * @param {Date} currentDate - The current date
+ * @returns {boolean} True if the release date is within the last 30 days, false otherwise
  */
 
 export function isReleasedOverMon(releaseDate: Date, currentDate: Date): boolean {
-  const thirtyDaysInMilliseconds = 24 * 60 * 60 * 1000;
-  const diff = Math.abs((currentDate.getTime() - releaseDate.getTime()) / thirtyDaysInMilliseconds);
+  const millisecondsInADay = 24 * 60 * 60 * 1000;
+  const diff = Math.abs((currentDate.getTime() - releaseDate.getTime()) / millisecondsInADay);
   return diff <= 30;
 }
