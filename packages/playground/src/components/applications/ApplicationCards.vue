@@ -10,7 +10,7 @@
               v-bind="props"
               :class="[
                 isHovering ? 'card-opacity' : undefined,
-                card.releaseDate && isReleasedOverMon(card.releaseDate) ? 'ribben' : '',
+                card.releaseDate && isReleasedOverMon(card.releaseDate, new Date()) ? 'ribben' : '',
               ]"
             >
               <v-img

@@ -20,9 +20,4 @@ describe("isReleasedOverMon", () => {
     const currentDate = new Date("2024-09-19");
     expect(isReleasedOverMon(releaseDate, currentDate)).toBe(true);
   });
-
-  it("return true if the releaseDate is within 30 days and the currentDate wasn't provided", () => {
-    const releaseDate = new Date("2024-09-1");
-    expect(isReleasedOverMon(releaseDate)).toBe(true);
-  });
 });
