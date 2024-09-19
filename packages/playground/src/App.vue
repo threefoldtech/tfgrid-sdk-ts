@@ -61,7 +61,7 @@
                             dot
                             inline
                             color="primary"
-                            v-if="item.releaseDate && thirtyDaysInMilliseconds(item.releaseDate)"
+                            v-if="item.releaseDate && isReleasedOverMon(item.releaseDate)"
                           ></v-badge>
                         </template>
                       </v-tooltip>
@@ -98,7 +98,7 @@
                           dot
                           inline
                           color="primary"
-                          v-if="item.releaseDate && thirtyDaysInMilliseconds(item.releaseDate)"
+                          v-if="item.releaseDate && isReleasedOverMon(item.releaseDate)"
                         ></v-badge>
                       </template>
                     </v-tooltip>
@@ -263,7 +263,7 @@ import { useRoute, useRouter } from "vue-router";
 import { useTheme } from "vuetify";
 
 import TfLogger from "@/components/logger.vue";
-import { thirtyDaysInMilliseconds } from "@/utils/date";
+import { isReleasedOverMon } from "@/utils/date";
 import { LocalStorageSettingsKey } from "@/utils/settings";
 
 import { useProfileManager } from "./stores/profile_manager";

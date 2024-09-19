@@ -10,7 +10,7 @@
               v-bind="props"
               :class="[
                 isHovering ? 'card-opacity' : undefined,
-                card.releaseDate && thirtyDaysInMilliseconds(card.releaseDate) ? 'ribben' : '',
+                card.releaseDate && isReleasedOverMon(card.releaseDate) ? 'ribben' : '',
               ]"
             >
               <v-img
@@ -43,7 +43,7 @@
 <script lang="ts">
 import { defineComponent, type PropType } from "vue";
 
-import { thirtyDaysInMilliseconds } from "@/utils/date";
+import { isReleasedOverMon } from "@/utils/date";
 import type { ApplicationCard } from "@/utils/types";
 export default defineComponent({
   name: "ApplicationCards",
@@ -58,7 +58,7 @@ export default defineComponent({
 
     return {
       baseURL,
-      thirtyDaysInMilliseconds,
+      isReleasedOverMon,
     };
   },
 });

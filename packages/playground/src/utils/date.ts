@@ -5,25 +5,21 @@ export default function toHumanDate(timeInSeconds: number): string {
 }
 
 /**
- * Checks if the provided date is within the last 30 days.
+ * Checks if a release date is within the last 30 days from a given current date.
  *
- * @param {Date} date - The date to check.
- * @returns {boolean} True if the date is within the last 30 days, false otherwise.
- *
- * @description
- * This function calculates the difference in days between the provided date and the current date.
- * It then checks if this difference is less than or equal to 30 days.
- *
- * @example
- * const date = new Date('2022-01-01');
- * console.log(thirtyDaysInMilliseconds(date)); // Output: true or false depending on the current date
+ * @param {Date} releaseDate - The date of release.
+ * @param {Date} [currentDate] - The current date to compare with. Defaults to the current date.
+ * @returns {boolean} True if the release date is within the last 30 days, false otherwise.
  */
 
-export function thirtyDaysInMilliseconds(date: Date): boolean {
-  const releaseDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-  const currentDate = new Date();
-  const next30Days = 24 * 60 * 60 * 1000;
-
-  const diff = Math.abs((currentDate.getTime() - releaseDate.getTime()) / next30Days);
+export function isReleasedOverMon(releaseDate: Date, currentDate?: Date): boolean {
+  const thirtyDaysInMilliseconds = 24 * 60 * 60 * 1000;
+  let diff = 0;
+  if (currentDate) {
+    diff = Math.abs((currentDate.getTime() - releaseDate.getTime()) / thirtyDaysInMilliseconds);
+  } else {
+    const date = new Date();
+    diff = Math.abs((date.getTime() - releaseDate.getTime()) / thirtyDaysInMilliseconds);
+  }
   return diff <= 30;
 }
