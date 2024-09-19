@@ -61,7 +61,7 @@
                             dot
                             inline
                             color="primary"
-                            v-if="item.releaseDate && isReleasedOverMon(item.releaseDate)"
+                            v-if="item.releaseDate && thirtyDaysInMilliseconds(item.releaseDate)"
                           ></v-badge>
                         </template>
                       </v-tooltip>
@@ -98,7 +98,7 @@
                           dot
                           inline
                           color="primary"
-                          v-if="item.releaseDate && isReleasedOverMon(item.releaseDate)"
+                          v-if="item.releaseDate && thirtyDaysInMilliseconds(item.releaseDate)"
                         ></v-badge>
                       </template>
                     </v-tooltip>
@@ -263,7 +263,7 @@ import { useRoute, useRouter } from "vue-router";
 import { useTheme } from "vuetify";
 
 import TfLogger from "@/components/logger.vue";
-import { isReleasedOverMon } from "@/utils/date";
+import { thirtyDaysInMilliseconds } from "@/utils/date";
 import { LocalStorageSettingsKey } from "@/utils/settings";
 
 import { useProfileManager } from "./stores/profile_manager";
@@ -561,7 +561,6 @@ import { nextTick } from "process";
 import { DashboardRoutes } from "@/router/routes";
 import { AppThemeSelection } from "@/utils/app_theme";
 import { ThemeSettingsInterface } from "@/utils/settings";
-import type { Date } from "@/utils/types";
 
 import AppTheme from "./components/app_theme.vue";
 import DeploymentListManager from "./components/deployment_list_manager.vue";

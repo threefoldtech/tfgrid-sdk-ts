@@ -16,20 +16,6 @@ export interface IPublicConfig {
 }
 
 /**
- * Represents a date object with day, month, and year properties.
- *
- * @interface Date
- * @property {number} day - The day of the month (1-31).
- * @property {number} month - The month of the year (1-12).
- * @property {number} year - The year.
- */
-export interface Date {
-  day: number;
-  month: number;
-  year: number;
-}
-
-/**
  * Represents an application card with metadata and optional release date.
  *
  * @interface ApplicationCard
