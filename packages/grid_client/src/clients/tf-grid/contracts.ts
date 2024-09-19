@@ -500,7 +500,7 @@ class TFContracts extends Contracts {
         await calc.calculateWithMyBalance({
           ipv4u: false,
           certified: isCertified,
-          cru: bytesToGB(cru),
+          cru: cru,
           mru: bytesToGB(mru),
           hru: bytesToGB(hru),
           sru: bytesToGB(sru),
@@ -532,7 +532,7 @@ class TFContracts extends Contracts {
       await calc.calculateWithMyBalance({
         ipv4u: !!contract.details.number_of_public_ips,
         certified: isCertified,
-        cru: bytesToGB(cru),
+        cru: cru,
         mru: bytesToGB(mru),
         hru: bytesToGB(hru),
         sru: bytesToGB(sru),
