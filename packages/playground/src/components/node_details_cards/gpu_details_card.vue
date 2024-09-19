@@ -52,7 +52,6 @@ import type { GPUCard, GridNode } from "@threefold/gridproxy_client";
 import { onMounted, type PropType, ref } from "vue";
 import { watch } from "vue";
 
-import { gridProxyClient } from "@/clients";
 import type { NodeDetailsCard } from "@/types";
 import type { GridProxyRequestConfig } from "@/types";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
