@@ -56,7 +56,7 @@
             <twin-details-card class="mt-3" :node="node" />
             <gpu-details-card
               class="mt-3"
-              v-if="node.cards?.length || node.num_gpu > 0"
+              v-if="node.gpus?.length || node.num_gpu > 0"
               :node="node"
               :nodeOptions="nodeOptions"
             />
@@ -72,7 +72,6 @@
 import { type GridNode, NodeStatus } from "@threefold/gridproxy_client";
 import { type PropType, ref, watch } from "vue";
 import { computed } from "vue";
-import { useRoute } from "vue-router";
 
 import CountryDetailsCard from "@/components/node_details_cards/country_details_card.vue";
 import cpuBenchmarkCard from "@/components/node_details_cards/cpu_benchmark_card.vue";
@@ -127,7 +126,6 @@ export default {
 
     const errorLoadingStatsMessage = ref<string>();
     const errorMessage = ref<string>("");
-    const route = useRoute();
     const profileManager = useProfileManager();
     const hasActiveProfile = computed(() => {
       return !!profileManager.profile;

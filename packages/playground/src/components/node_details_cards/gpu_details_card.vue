@@ -52,6 +52,7 @@ import type { GPUCard, GridNode } from "@threefold/gridproxy_client";
 import { onMounted, type PropType, ref } from "vue";
 import { watch } from "vue";
 
+import { gridProxyClient } from "@/clients";
 import type { NodeDetailsCard } from "@/types";
 import type { GridProxyRequestConfig } from "@/types";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
@@ -78,7 +79,7 @@ export default {
     const gpuFields = ref<NodeDetailsCard[]>([]);
     const cardsIds = ref<string[]>([]);
     const cardId = ref<string>("");
-    const selectedCard = ref<GPUCard>(props.node.cards[0]);
+    const selectedCard = ref<GPUCard>(props.node.gpus[0]);
     const isError = ref<boolean>(false);
     const errorMessage = ref<string>("");
     const node = ref(props.node);
@@ -87,16 +88,16 @@ export default {
 
     watch(cardId, newCardId => {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      selectedCard.value = node.value.cards.find(card => card.id === newCardId)!;
+      selectedCard.value = node.value.gpus.find(card => card.id === newCardId)!;
       gpuFields.value = getNodeTwinDetailsCard();
     });
 
     const mount = () => {
       loading.value = true;
-      if (node.value.cards?.length > 0) {
-        cardsLength.value = node.value.cards?.length;
-        selectedCard.value = node.value.cards[0];
-        node.value.cards.map((card: GPUCard) => {
+      if (node.value.gpus?.length > 0) {
+        cardsLength.value = node.value.gpus?.length;
+        selectedCard.value = node.value.gpus[0];
+        node.value.gpus.map((card: GPUCard) => {
           cardsIds.value.push(card.id);
         });
         cardId.value = cardsIds.value[0];
