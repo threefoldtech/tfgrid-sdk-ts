@@ -3,7 +3,7 @@
     <TfDomains />
 
     <template #list>
-      <TfDeploymentList title="Domains" :project-name="name" :hide-ssh="true" />
+      <TfDeploymentList title="Domains" :project-name="name" :hideSSH="true" />
     </template>
   </view-layout>
 </template>
