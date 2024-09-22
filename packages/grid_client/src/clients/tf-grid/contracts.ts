@@ -412,17 +412,37 @@ class TFContracts extends Contracts {
     return totalIPCost * HOURS_ONE_MONTH;
   }
   /**
+   * Get the contract billing info, and add the additional price markup if the node is certified
+   * @param {Contract} contract contract to get its billing info
+   * @returns {Decimal}
+   */
+  private async getUnbilledNu(contract_id: number, node_id: number) {
+    const billingInfo = await this.client.contracts.getContractBillingInformationByID(contract_id);
+    const unbilledNU = billingInfo.amountUnbilled;
+    if (unbilledNU > 0) {
+      const nodeInfo = await this.client.nodes.get({ id: node_id });
+      const isCertified = nodeInfo.certification === CertificationType.Certified;
+      if (isCertified) {
+        /** premium pricing is 25% on certified nodes */
+        const premiumUnbilledNU = unbilledNU * (125 / 100);
+        return premiumUnbilledNU;
+      }
+    }
+    return unbilledNU;
+  }
+
+  /**
    * Get total unbilled network usage amount for the provided contracts
    * @param {Contract []} contracts contracts to get their unbilled NU.
    * @returns {Decimal} total unbilled amount for NU in Unit USD.
    */
   private async calculateUnbilledNUAmount(contracts: Contract[]): Promise<number> {
-    const BillingInformationPromises = contracts.reduce((acc: Promise<BillingInformation>[], contract) => {
-      acc.push(this.client.contracts.getContractBillingInformationByID(contract.contract_id));
+    const unbilledNuPromises = contracts.reduce((acc: Promise<number>[], contract) => {
+      acc.push(this.getUnbilledNu(contract.contract_id, contract.details.nodeId));
       return acc;
     }, []);
-    const billingInfoResult = await Promise.all(BillingInformationPromises);
-    const totalNUCost = billingInfoResult.reduce((acc: number, billingInfo) => acc + billingInfo.amountUnbilled, 0);
+    const unbilledNUResults = await Promise.all(unbilledNuPromises);
+    const totalNUCost = unbilledNUResults.reduce((acc: number, unbuilledNu) => acc + unbuilledNu, 0);
     return totalNUCost;
   }
 
@@ -562,9 +582,8 @@ class TFContracts extends Contracts {
   async calculateContractOverDue(options: CalculateOverdueOptions) {
     const contractInfo = options.contractInfo;
 
-    /** Un-billed amount in unit USD  for the network usage */
-    let unbilledNU = (await this.client.contracts.getContractBillingInformationByID(contractInfo.contract_id))
-      .amountUnbilled;
+    /** Un-billed amount in unit USD for the network usage, including the premium price for the certified node */
+    let unbilledNU = await this.getUnbilledNu(contractInfo.contract_id, contractInfo.details.nodeId);
 
     const { standardOverdraft, additionalOverdraft, lastUpdatedSeconds } =
       await this.client.contracts.getContractPaymentState(contractInfo.contract_id);
