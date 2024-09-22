@@ -496,6 +496,9 @@ class TFContracts extends Contracts {
     const isCertified = nodeDetails.certificationType === CertificationType.Certified;
     if (contract.type == ContractType.Rent) {
       const { cru, sru, mru, hru } = nodeDetails.total_resources;
+      /**node extra fees in mille USD per month */
+      const extraFeesInMilliUsd = await this.client.contracts.getDedicatedNodeExtraFee({ nodeId: nodeDetails.nodeId });
+      const extraFeeUSD = extraFeesInMilliUsd / 1000;
       const USDCost = (
         await calc.calculateWithMyBalance({
           ipv4u: false,
@@ -507,7 +510,7 @@ class TFContracts extends Contracts {
         })
       ).dedicatedPrice;
 
-      return USDCost;
+      return USDCost + extraFeeUSD;
     }
 
     /** Node Contract */
