@@ -339,20 +339,16 @@ async function setTimeouts() {
 
   const localStorageDeploymentTimeout = localStorage.getItem(LocalStorageSettingsKey.TIMEOUT_DEPLOYMENT_KEY);
 
-  if (client) {
-    const clientOptions = client.clientOptions;
-    if (clientOptions) {
-      const deploymentTimeoutMinutes = clientOptions.deploymentTimeoutMinutes;
-      if (!localStorageDeploymentTimeout && deploymentTimeoutMinutes) {
-        localStorage.setItem(LocalStorageSettingsKey.TIMEOUT_DEPLOYMENT_KEY, `${+deploymentTimeoutMinutes * 60}`);
-      } else {
-        client.clientOptions.deploymentTimeoutMinutes = +localStorageDeploymentTimeout! / 60;
-        await client.connect();
-      }
+  if (client && client.clientOptions) {
+    const deploymentTimeoutMinutes = client.clientOptions.deploymentTimeoutMinutes;
+    if (!localStorageDeploymentTimeout && deploymentTimeoutMinutes) {
+      localStorage.setItem(LocalStorageSettingsKey.TIMEOUT_DEPLOYMENT_KEY, `${+deploymentTimeoutMinutes * 60}`);
+    } else {
+      client.clientOptions.deploymentTimeoutMinutes = +localStorageDeploymentTimeout! / 60;
+      await client.connect();
     }
   }
 }
-
 // eslint-disable-next-line no-undef
 const version = process.env.VERSION as any;
 
