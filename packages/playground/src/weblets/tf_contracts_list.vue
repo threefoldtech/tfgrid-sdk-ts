@@ -256,7 +256,7 @@ import { useGrid } from "../stores";
 
 const profileManagerController = useProfileManagerController();
 const balance = profileManagerController.balance;
-const freeBalance = computed(() => (balance.value?.free ?? 0) - (balance.value?.locked ?? 0));
+const freeBalance = computed(() => balance.value?.free ?? 0);
 const isLoading = ref<boolean>(false);
 
 const profileManager = useProfileManager();
