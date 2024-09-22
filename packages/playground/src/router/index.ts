@@ -787,6 +787,12 @@ const mainRoutes: RouteRecordRaw[] = [
     path: DashboardRoutes.TFChain.BaseRoute,
     children: createTFChainRoutes(),
   },
+  // Settings Route
+  {
+    path: DashboardRoutes.Other.Settings,
+    component: () => import("../views/settings.vue"),
+    meta: { title: "Settings" },
+  },
   // NotFound
   {
     path: "/:pathMatch(.*)*",

@@ -57,6 +57,12 @@
                           <span v-bind="props">
                             {{ item.title }}
                           </span>
+                          <v-badge
+                            dot
+                            inline
+                            color="primary"
+                            v-if="item.releaseDate && isReleasedOverMon(item.releaseDate, new Date())"
+                          ></v-badge>
                         </template>
                       </v-tooltip>
                     </v-list-item-title>
@@ -88,6 +94,12 @@
                         <span v-bind="props">
                           {{ item.title }}
                         </span>
+                        <v-badge
+                          dot
+                          inline
+                          color="primary"
+                          v-if="item.releaseDate && isReleasedOverMon(item.releaseDate, new Date())"
+                        ></v-badge>
                       </template>
                     </v-tooltip>
                   </v-list-item-title>
@@ -251,6 +263,8 @@ import { useRoute, useRouter } from "vue-router";
 import { useTheme } from "vuetify";
 
 import TfLogger from "@/components/logger.vue";
+import { isReleasedOverMon } from "@/utils/date";
+import { LocalStorageSettingsKey } from "@/utils/settings";
 
 import { useProfileManager } from "./stores/profile_manager";
 const $route = useRoute();
@@ -265,6 +279,7 @@ const theme = useTheme();
 const navbarConfig = ref();
 
 const hasGrid = computed(() => !!gridStore.grid);
+const hasClient = computed(() => !!gridStore.client);
 
 // eslint-disable-next-line no-undef
 const permanent = ref(window.innerWidth > 980);
@@ -287,6 +302,22 @@ function setSidebarOnResize() {
 
 window.addEventListener("resize", setSidebarOnResize);
 
+const themeMatcher = window.matchMedia("(prefers-color-scheme: dark)");
+// changes theme based on changes in system mode
+themeMatcher.addEventListener("change", updateTheme);
+function updateTheme() {
+  if (themeMatcher.matches) {
+    theme.global.name.value = AppThemeSelection.dark;
+  } else {
+    theme.global.name.value = AppThemeSelection.light;
+  }
+  localStorage.setItem(LocalStorageSettingsKey.THEME_KEY, ThemeSettingsInterface.System);
+}
+
+// sets theme to system mode on application mount
+onMounted(() => {
+  updateTheme();
+});
 watch(
   () => $route.meta,
   meta => {
@@ -307,6 +338,30 @@ onMounted(async () => {
     toolbarExtended.value = true;
   }
 });
+
+watch(hasClient, () => setTimeouts());
+
+async function setTimeouts() {
+  if (!localStorage.getItem(LocalStorageSettingsKey.TIMEOUT_QUERY_KEY)) {
+    localStorage.setItem(LocalStorageSettingsKey.TIMEOUT_QUERY_KEY, `${window.env.TIMEOUT / 1000}`);
+  } else {
+    window.env.TIMEOUT = +localStorage.getItem(LocalStorageSettingsKey.TIMEOUT_QUERY_KEY)! * 1000;
+  }
+
+  const client = gridStore.client as GridClient;
+  const clientOptions = client.clientOptions;
+  const localStorageDeploymentTimeout = localStorage.getItem(LocalStorageSettingsKey.TIMEOUT_DEPLOYMENT_KEY);
+  const deploymentTimeoutMinutes = clientOptions.deploymentTimeoutMinutes;
+
+  if (client && clientOptions && deploymentTimeoutMinutes) {
+    if (!localStorageDeploymentTimeout) {
+      localStorage.setItem(LocalStorageSettingsKey.TIMEOUT_DEPLOYMENT_KEY, `${+deploymentTimeoutMinutes * 60}`);
+    } else {
+      client.clientOptions.deploymentTimeoutMinutes = +localStorageDeploymentTimeout! / 60;
+      await client.connect();
+    }
+  }
+}
 
 // eslint-disable-next-line no-undef
 const version = process.env.VERSION as any;
@@ -475,6 +530,17 @@ const routes: AppRoute[] = [
       },
     ],
   },
+  {
+    title: "Settings",
+    items: [
+      {
+        title: "Settings",
+        icon: "mdi-cog-outline",
+        route: DashboardRoutes.Other.Settings,
+        tooltip: "Application Settings.",
+      },
+    ],
+  },
 ];
 
 const baseUrl = import.meta.env.BASE_URL;
@@ -489,8 +555,12 @@ function clickHandler({ route, url }: AppRouteItem): void {
 </script>
 
 <script lang="ts">
+import type { GridClient } from "@threefold/grid_client";
+import { nextTick } from "process";
+
 import { DashboardRoutes } from "@/router/routes";
 import { AppThemeSelection } from "@/utils/app_theme";
+import { ThemeSettingsInterface } from "@/utils/settings";
 
 import AppTheme from "./components/app_theme.vue";
 import DeploymentListManager from "./components/deployment_list_manager.vue";
@@ -504,7 +574,6 @@ import TfRouterView from "./components/TfRouterView.vue";
 import TfSwapPrice from "./components/TfSwapPrice.vue";
 import { useGrid } from "./stores";
 import ProfileManager from "./weblets/profile_manager.vue";
-
 interface AppRoute {
   title: string;
   items: AppRouteItem[];
@@ -518,6 +587,7 @@ interface AppRouteItem {
   url?: string;
   icon?: string;
   tooltip?: string;
+  releaseDate?: Date;
 }
 
 export default {
