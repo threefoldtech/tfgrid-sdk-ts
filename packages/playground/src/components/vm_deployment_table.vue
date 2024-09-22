@@ -257,19 +257,26 @@ async function loadDeployments() {
 
     const vms = mergeLoadedDeployments(chunk1, chunk2, chunk3 as any);
     failedDeployments.value = vms.failedDeployments;
-
     count.value = vms.count;
-    items.value = vms.items
-      .map((vm: any) => {
-        if (props.projectName.toLowerCase() === ProjectName.Caprover.toLowerCase()) {
-          const [leader, ...workers] = vm;
-          leader.workers = workers;
-          return leader;
-        }
 
-        return vm;
-      })
-      .flat();
+    items.value = vms.items.map((item: any) => {
+      let leader: any = null;
+      const workers: any[] = [];
+
+      item.forEach((vm: any) => {
+        if (vm.env["SWM_NODE_MODE"] === "leader") {
+          leader = vm;
+        } else if (vm.env["SWM_NODE_MODE"] === "worker") {
+          workers.push(vm);
+        }
+      });
+
+      if (leader) {
+        leader.workers = workers;
+      }
+
+      return leader || item;
+    });
   } catch (err) {
     errorMessage.value = `Failed to load Deployments: ${err}`;
   } finally {
