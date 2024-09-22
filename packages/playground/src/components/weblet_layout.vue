@@ -279,7 +279,7 @@ defineExpose({
 
     const balance = await loadBalance(grid);
     if (balance.free < min) {
-      throw new Error(`You have ${balance.free.toFixed(2)} TFT but it's required to have at least ${min} TFT.`);
+      throw new Error(`Insufficient balance: it's required to have at least ${min} TFT.`);
     }
     message.value = "You have enough TFT to continue...";
     return balance;
