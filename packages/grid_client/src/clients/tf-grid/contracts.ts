@@ -223,8 +223,9 @@ class TFContracts extends Contracts {
    */
   async getDiscountPackage(options: GetDiscountPackageOptions): Promise<DiscountLevel> {
     const gqlClient = new Graphql(options.graphqlURL);
+
     const body = `query getConsumption($contractId: BigInt!){
-            contractBillReports(where: {contractID_eq: $contractId}, limit: 1 ) {
+            contractBillReports(where: {contractID_eq: $contractId} ) {
                 discountReceived
 
             }
@@ -232,12 +233,13 @@ class TFContracts extends Contracts {
 
     try {
       const response = await gqlClient.query(body, { contractId: options.id });
+
       const gqlDiscountPackage: GqlDiscountPackage = response["data"] as GqlDiscountPackage;
       const billReports = gqlDiscountPackage.contractBillReports;
       if (billReports.length === 0) {
         return "None";
       } else {
-        const discountPackage = billReports[0].discountReceived;
+        const discountPackage = billReports[billReports.length - 1].discountReceived;
         return discountPackage;
       }
     } catch (err) {
