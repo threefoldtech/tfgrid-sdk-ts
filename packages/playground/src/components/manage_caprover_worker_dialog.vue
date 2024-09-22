@@ -126,7 +126,7 @@ async function deploy(layout: any) {
           mountPoint: "/var/lib/docker",
         },
       ],
-      flist: "https://hub.grid.tf/tf-official-apps/tf-caprover-main.flist",
+      flist: "https://hub.grid.tf/tf-official-apps/tf-caprover-latest.flist",
       entryPoint: "/sbin/zinit init",
       farmId: worker.value.selectionDetails!.farm?.farmId,
       farmName: worker.value.selectionDetails!.farm?.name,
