@@ -22,7 +22,7 @@
         :rules="[
           validators.required('Email or Username is required.'),
           (v: string) => {
-            return validators.validateSmtp(v);
+            return validators.isValidSmtp(v);
           }
         ]"
         #="{ props }"
