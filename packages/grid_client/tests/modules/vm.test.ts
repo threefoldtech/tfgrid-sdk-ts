@@ -1,6 +1,6 @@
 import { FilterOptions, generateString, GridClient, MachineModel, MachinesModel, randomChoice } from "../../src";
 import { config, getClient } from "../client_loader";
-import { bytesToGB, generateInt, getOnlineNode, log, RemoteRun, splitIP } from "../utils";
+import { GBToBytes, generateInt, getOnlineNode, log, RemoteRun, splitIP } from "../utils";
 
 jest.setTimeout(300000);
 
@@ -307,7 +307,7 @@ test("TC1229 - VM: Deploy a VM With a Disk", async () => {
 
   //Disk Assertions
   expect(result[0].mounts[0]["name"]).toBe(diskName);
-  expect(result[0].mounts[0]["size"]).toBe(bytesToGB(diskSize));
+  expect(result[0].mounts[0]["size"]).toBe(GBToBytes(diskSize));
   expect(result[0].mounts[0]["mountPoint"]).toBe(mountPoint);
   expect(result[0].mounts[0]["state"]).toBe("ok");
 

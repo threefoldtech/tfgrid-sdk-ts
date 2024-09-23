@@ -3,7 +3,7 @@ import { setTimeout } from "timers/promises";
 
 import { FilterOptions, GatewayNameModel, generateString, GridClient, MachinesModel, randomChoice } from "../../../src";
 import { config, getClient } from "../../client_loader";
-import { bytesToGB, generateInt, getOnlineNode, log, splitIP } from "../../utils";
+import { GBToBytes, generateInt, getOnlineNode, log, splitIP } from "../../utils";
 
 jest.setTimeout(1250000);
 
@@ -150,9 +150,9 @@ test("TC2683 - Applications: Deploy Casperlabs", async () => {
   expect(result[0].planetary).toBeDefined();
   expect(result[0].publicIP).toBeNull();
   expect(result[0].description).toBe(description);
-  expect(result[0].rootfs_size).toBe(bytesToGB(rootfsSize));
+  expect(result[0].rootfs_size).toBe(GBToBytes(rootfsSize));
   expect(result[0].mounts[0]["name"]).toBe(diskName);
-  expect(result[0].mounts[0]["size"]).toBe(bytesToGB(diskSize));
+  expect(result[0].mounts[0]["size"]).toBe(GBToBytes(diskSize));
   expect(result[0].mounts[0]["mountPoint"]).toBe(mountPoint);
   expect(result[0].mounts[0]["state"]).toBe("ok");
 
