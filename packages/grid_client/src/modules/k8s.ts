@@ -425,6 +425,7 @@ class K8sModule extends BaseModule {
     const networkName = masterWorkload.data["network"].interfaces[0].network;
     const networkIpRange = Addr(masterWorkload.data["network"].interfaces[0].ip).mask(16).toString();
     const network = new Network(networkName, networkIpRange, this.config);
+    const masterFlist = masterWorkload.data["flist"];
     await network.load();
     const contractMetadata = JSON.stringify({
       version: 3,
@@ -461,6 +462,7 @@ class K8sModule extends BaseModule {
       options.solutionProviderId!,
       options.zlogsOutput,
       options.gpus,
+      masterFlist,
     );
 
     return await this._add(options.deployment_name, options.node_id, oldDeployments, twinDeployments, network);
