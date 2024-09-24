@@ -8,7 +8,7 @@ import {
   randomChoice,
 } from "../../src";
 import { config, getClient } from "../client_loader";
-import { bytesToGB, generateInt, getOnlineNode, k8sWait, log, RemoteRun, splitIP } from "../utils";
+import { GBToBytes, generateInt, getOnlineNode, k8sWait, log, RemoteRun, splitIP } from "../utils";
 
 jest.setTimeout(500000);
 
@@ -202,7 +202,7 @@ test("TC1231 - Kubernetes: Deploy a Kubernetes Cluster", async () => {
   expect(result.masters[0].interfaces[0]["ip"]).toMatch(ipRegex);
   expect(result.masters[0].capacity["cpu"]).toBe(masterCpu);
   expect(result.masters[0].capacity["memory"]).toBe(masterMemory);
-  expect(result.masters[0].mounts[0]["size"]).toBe(bytesToGB(masterDiskSize));
+  expect(result.masters[0].mounts[0]["size"]).toBe(GBToBytes(masterDiskSize));
   expect(result.masters[0].mounts[0]["state"]).toBe("ok");
   expect(result.masters[0].env["K3S_NODE_NAME"]).toBe(masterName);
   expect(result.masters[0].description).toBe(description);
@@ -217,7 +217,7 @@ test("TC1231 - Kubernetes: Deploy a Kubernetes Cluster", async () => {
   expect(result.workers[0].interfaces[0]["ip"]).toMatch(ipRegex);
   expect(result.workers[0].capacity["cpu"]).toBe(workerCpu);
   expect(result.workers[0].capacity["memory"]).toBe(workerMemory);
-  expect(result.workers[0].mounts[0]["size"]).toBe(bytesToGB(workerDiskSize));
+  expect(result.workers[0].mounts[0]["size"]).toBe(GBToBytes(workerDiskSize));
   expect(result.workers[0].mounts[0]["state"]).toBe("ok");
   expect(result.workers[0].env["K3S_NODE_NAME"]).toBe(workerName);
   expect(result.workers[0].description).toBe(description);
@@ -497,7 +497,7 @@ test("TC1232 - Kubernetes: Add Worker", async () => {
   expect(newResult.workers[1].interfaces[0]["ip"]).toMatch(ipRegex);
   expect(newResult.workers[1].capacity["cpu"]).toBe(workerCpu);
   expect(newResult.workers[1].capacity["memory"]).toBe(workerMemory);
-  expect(newResult.workers[1].mounts[0]["size"]).toBe(bytesToGB(workerDiskSize));
+  expect(newResult.workers[1].mounts[0]["size"]).toBe(GBToBytes(workerDiskSize));
   expect(newResult.workers[1].mounts[0]["state"]).toBe("ok");
   expect(newResult.workers[1].description).toBe(description);
 

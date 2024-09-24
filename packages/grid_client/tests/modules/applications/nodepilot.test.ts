@@ -1,10 +1,9 @@
 import axios from "axios";
-import https from "https";
 import { setTimeout } from "timers/promises";
 
 import { FilterOptions, generateString, GridClient, MachinesModel, randomChoice } from "../../../src";
 import { config, getClient } from "../../client_loader";
-import { bytesToGB, generateInt, getOnlineNode, log, splitIP } from "../../utils";
+import { GBToBytes, generateInt, getOnlineNode, log, splitIP } from "../../utils";
 
 jest.setTimeout(1250000);
 
@@ -145,11 +144,11 @@ test.skip("TC2701 - Applications: Deploy Nodepilot", async () => {
   expect(result[0].publicIP).toBeDefined();
   expect(result[0].description).toBe(description);
   expect(result[0].mounts[0]["name"]).toBe(disk1Name);
-  expect(result[0].mounts[0]["size"]).toBe(bytesToGB(disk1Size));
+  expect(result[0].mounts[0]["size"]).toBe(GBToBytes(disk1Size));
   expect(result[0].mounts[0]["mountPoint"]).toBe(mountPoint1);
   expect(result[0].mounts[0]["state"]).toBe("ok");
   expect(result[0].mounts[1]["name"]).toBe(disk2Name);
-  expect(result[0].mounts[1]["size"]).toBe(bytesToGB(disk2Size));
+  expect(result[0].mounts[1]["size"]).toBe(GBToBytes(disk2Size));
   expect(result[0].mounts[1]["mountPoint"]).toBe(mountPoint2);
   expect(result[0].mounts[1]["state"]).toBe("ok");
 
