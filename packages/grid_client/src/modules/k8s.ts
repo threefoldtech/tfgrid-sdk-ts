@@ -179,6 +179,12 @@ class K8sModule extends BaseModule {
         wireguardConfig = wgConfig;
       }
     }
+    const masterWorkloads = await this._getMastersWorkload(options.name, deployments);
+    if (masterWorkloads.length === 0) {
+      throw new GridClientErrors.Workloads.WorkloadUpdateError("Couldn't get master node.");
+    }
+    const masterWorkload = masterWorkloads[masterWorkloads.length - 1];
+    const masterFlist = masterWorkload.data["flist"];
 
     if (masterIps.length === 0) {
       masterIps = await this._getMastersIp(options.name, deployments);
@@ -220,6 +226,7 @@ class K8sModule extends BaseModule {
         worker.solutionProviderId!,
         worker.zlogsOutput,
         worker.gpus,
+        masterFlist,
       );
 
       deployments = deployments.concat(twinDeployments);
