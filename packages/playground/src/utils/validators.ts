@@ -778,6 +778,15 @@ export async function isAvailableName(grid: GridClient, name: string) {
   }
 }
 
+/**
+ * Validates an SMTP input string.
+ *
+ * Checks if the input string is a valid email address and does not contain special characters.
+ *
+ * @param {string} input - The input string to validate.
+ * @returns {{ message: string }} - An object with an error message if the input is invalid, or undefined if the input is valid.
+ */
+
 export function isValidSmtp(input: string) {
   const emailValidation = isEmail("Please provide a valid email address.")(input);
   const username = /[!@#$%^&*()_+\-={}:<>?,./]/.test(input);
