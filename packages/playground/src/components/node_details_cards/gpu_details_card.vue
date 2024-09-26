@@ -70,7 +70,7 @@ export default {
       gpuFields.value = getNodeTwinDetailsCard();
     });
 
-    onMounted(async () => {
+    onMounted(() => {
       loading.value = true;
       cards.value = node.value.gpus?.length;
       selectedCard.value = node.value.gpus[0];
