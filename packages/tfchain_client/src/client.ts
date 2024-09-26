@@ -91,9 +91,15 @@ class QueryClient {
       await this.disconnect();
 
       provider = new WsProvider(this.url);
-      this.api = await ApiPromise.create({ provider, throwOnConnect: !this.keepReconnecting });
+      this.api = await ApiPromise.create({
+        provider,
+        throwOnConnect: !this.keepReconnecting,
+      });
       await this.wait();
-      QueryClient.connections.set(this.url, { api: this.api, disconnectHandler: this.__disconnectHandler });
+      QueryClient.connections.set(this.url, {
+        api: this.api,
+        disconnectHandler: this.__disconnectHandler,
+      });
       this.api.on("disconnected", this.__disconnectHandler);
       this.api.on("error", this.__disconnectHandler);
     } catch (e) {
@@ -294,11 +300,11 @@ class Client extends QueryClient {
           // seed shouldn't have spaces
           throw new ValidationError("Invalid mnemonic! Must be bip39 compliant");
 
-        if (!this.mnemonicOrSecret.startsWith("0x"))
-          throw new ValidationError("Invalid secret seed. secret seed should starts with 0x");
-        const secret = this.mnemonicOrSecret.substring(2);
-        if (secret.length !== 64) throw new ValidationError("Invalid secret length. Secret length should be 64");
-        if (!isValidSeed(secret)) throw new ValidationError("Invalid secret seed");
+        if (this.mnemonicOrSecret.startsWith("0x")) {
+          const secret = this.mnemonicOrSecret.substring(2);
+          if (secret.length !== 64) throw new ValidationError("Invalid secret length. Secret length should be 64");
+          if (!isValidSeed(secret)) throw new ValidationError("Invalid secret seed");
+        }
       }
     }
   }
