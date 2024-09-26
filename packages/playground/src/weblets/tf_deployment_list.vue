@@ -545,7 +545,7 @@ function openDialog(project: string, item?: any): void {
     ? "k8s"
     : (project.toLowerCase() as any);
 
-  if (item && item.projectName.includes(ProjectName.Caprover.toLocaleLowerCase())) {
+  if (item && item.projectName && item.projectName.includes(ProjectName.Caprover.toLocaleLowerCase())) {
     item = [item, ...item.workers];
   }
 
