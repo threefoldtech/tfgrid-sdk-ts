@@ -9,7 +9,6 @@ export interface NodesExtractOptions {
   loadFarm?: boolean;
   loadTwin?: boolean;
   loadStats?: boolean;
-  loadGpu?: boolean;
 }
 
 export class NodesClient extends AbstractClient<NodesBuilder, NodesQuery> {

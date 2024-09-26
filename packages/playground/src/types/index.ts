@@ -285,13 +285,6 @@ export type NodeDetailsCard = {
   uploadSpeed?: string;
 };
 
-export type GridProxyRequestConfig = {
-  loadFarm?: boolean;
-  loadTwin?: boolean;
-  loadStats?: boolean;
-  loadGpu?: boolean;
-};
-
 export type NodeStatusColor = {
   color: string;
   status: string;
