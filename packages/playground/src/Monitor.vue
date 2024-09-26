@@ -8,6 +8,7 @@
 import { defineAsyncComponent, onMounted, ref } from "vue";
 
 import { setGlobalEnv } from "./config";
+
 export default {
   name: "AppMonitor",
   components: {
@@ -18,7 +19,6 @@ export default {
     onMounted(async () => {
       if (await setGlobalEnv()) {
         /* Load d-tabs before app */
-        await import("./components/dynamic_tabs.vue");
         loadingApp.value = false;
       }
     });
