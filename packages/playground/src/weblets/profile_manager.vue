@@ -22,7 +22,8 @@
             <p>
               Balance:
               <strong :class="theme.name.value === AppThemeSelection.light ? 'text-primary' : 'text-info'">
-                {{ normalizeBalance(balance.free + balance.reserved, true) }} TFT
+                {{ normalizeBalance(balance.free + balance.reserved, true) }}
+                TFT
               </strong>
             </p>
             <p>
@@ -130,7 +131,6 @@
                             validateMnemonic(v) ||
                             ((v.length === 64 || v.length === 66) && isAddress(v.length === 66 ? v : `0x${v}`))
                           ) {
-                            mnemonic = toHexSeed(mnemonic);
                             getEmail();
                             return;
                           }
@@ -354,7 +354,11 @@
           <v-col cols="12" md="6" lg="6" xl="6">
             <PasswordInputWrapper #="{ props }">
               <VTextField
-                :label="profileManager.profile.mnemonic.startsWith('0x') ? 'Your Hex Seed' : 'Your Mnemonic'"
+                :label="
+                  profileManager.profile.mnemonic.startsWith('0x') || profileManager.profile.mnemonic.length === 64
+                    ? 'Your Hex Seed'
+                    : 'Your Mnemonic'
+                "
                 readonly
                 v-model="profileManager.profile.mnemonic"
                 v-bind="props"
@@ -423,7 +427,7 @@
 </template>
 <script lang="ts" setup>
 import { isAddress } from "@polkadot/util-crypto";
-import { KeypairType, toHexSeed } from "@threefold/grid_client";
+import { KeypairType } from "@threefold/grid_client";
 import { validateMnemonic } from "bip39";
 import Cryptr from "cryptr";
 import { marked } from "marked";
@@ -715,6 +719,7 @@ async function createNewAccount() {
 }
 
 const activatingAccount = ref(false);
+
 async function activateAccount() {
   openAcceptTerms.value = false;
   termsLoading.value = false;
@@ -723,7 +728,8 @@ async function activateAccount() {
   activatingAccount.value = true;
   activating.value = true;
   try {
-    await activateAccountAndCreateTwin(mnemonic.value);
+    const mnemonicValue = mnemonic.value.length === 66 ? mnemonic.value : `0x${mnemonic.value}`;
+    await activateAccountAndCreateTwin(mnemonicValue);
     await storeAndLogin();
   } catch (e) {
     enableReload.value = true;
@@ -795,9 +801,9 @@ async function storeAndLogin() {
     await activate(mnemonic.value, keypairType.value);
   } catch (e) {
     if (e instanceof TwinNotExistError) {
-      isNonActiveMnemonic.value = true;
       openAcceptTerms.value = true;
       termsLoading.value = true;
+      isNonActiveMnemonic.value = true;
     }
     enableReload.value = false;
     return {
