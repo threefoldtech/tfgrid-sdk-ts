@@ -57,6 +57,12 @@
                           <span v-bind="props">
                             {{ item.title }}
                           </span>
+                          <v-badge
+                            dot
+                            inline
+                            color="primary"
+                            v-if="item.releaseDate && isReleasedOverMon(item.releaseDate, new Date())"
+                          ></v-badge>
                         </template>
                       </v-tooltip>
                     </v-list-item-title>
@@ -88,6 +94,12 @@
                         <span v-bind="props">
                           {{ item.title }}
                         </span>
+                        <v-badge
+                          dot
+                          inline
+                          color="primary"
+                          v-if="item.releaseDate && isReleasedOverMon(item.releaseDate, new Date())"
+                        ></v-badge>
                       </template>
                     </v-tooltip>
                   </v-list-item-title>
@@ -251,6 +263,7 @@ import { useRoute, useRouter } from "vue-router";
 import { useTheme } from "vuetify";
 
 import TfLogger from "@/components/logger.vue";
+import { isReleasedOverMon } from "@/utils/date";
 import { LocalStorageSettingsKey } from "@/utils/settings";
 
 import { useProfileManager } from "./stores/profile_manager";
@@ -336,12 +349,12 @@ async function setTimeouts() {
   }
 
   const client = gridStore.client as GridClient;
-  const clientOptions = client.clientOptions;
-  const localStorageDeploymentTimeout = localStorage.getItem(LocalStorageSettingsKey.TIMEOUT_DEPLOYMENT_KEY);
-  const deploymentTimeoutMinutes = clientOptions.deploymentTimeoutMinutes;
 
-  if (client && clientOptions && deploymentTimeoutMinutes) {
-    if (!localStorageDeploymentTimeout) {
+  const localStorageDeploymentTimeout = localStorage.getItem(LocalStorageSettingsKey.TIMEOUT_DEPLOYMENT_KEY);
+
+  if (client && client.clientOptions) {
+    const deploymentTimeoutMinutes = client.clientOptions.deploymentTimeoutMinutes;
+    if (!localStorageDeploymentTimeout && deploymentTimeoutMinutes) {
       localStorage.setItem(LocalStorageSettingsKey.TIMEOUT_DEPLOYMENT_KEY, `${+deploymentTimeoutMinutes * 60}`);
     } else {
       client.clientOptions.deploymentTimeoutMinutes = +localStorageDeploymentTimeout! / 60;
@@ -349,7 +362,6 @@ async function setTimeouts() {
     }
   }
 }
-
 // eslint-disable-next-line no-undef
 const version = process.env.VERSION as any;
 
@@ -561,7 +573,6 @@ import TfRouterView from "./components/TfRouterView.vue";
 import TfSwapPrice from "./components/TfSwapPrice.vue";
 import { useGrid } from "./stores";
 import ProfileManager from "./weblets/profile_manager.vue";
-
 interface AppRoute {
   title: string;
   items: AppRouteItem[];
@@ -575,6 +586,7 @@ interface AppRouteItem {
   url?: string;
   icon?: string;
   tooltip?: string;
+  releaseDate?: Date;
 }
 
 export default {
