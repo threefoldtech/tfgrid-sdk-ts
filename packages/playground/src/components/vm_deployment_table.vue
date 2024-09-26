@@ -259,23 +259,9 @@ async function loadDeployments() {
     failedDeployments.value = vms.failedDeployments;
     count.value = vms.count;
 
-    items.value = vms.items.map((item: any) => {
-      let leader: any = null;
-      const workers: any[] = [];
-
-      item.forEach((vm: any) => {
-        if (vm.env["SWM_NODE_MODE"] === "leader") {
-          leader = vm;
-        } else if (vm.env["SWM_NODE_MODE"] === "worker") {
-          workers.push(vm);
-        }
-      });
-
-      if (leader) {
-        leader.workers = workers;
-      }
-
-      return leader || item;
+    items.value = vms.items.map((_vms: any) => {
+      const leader = setCaproverWorkers(_vms);
+      return leader || _vms;
     });
   } catch (err) {
     errorMessage.value = `Failed to load Deployments: ${err}`;
@@ -467,6 +453,7 @@ defineExpose({ loadDeployments });
 
 <script lang="ts">
 import toHumanDate from "@/utils/date";
+import { setCaproverWorkers } from "@/utils/deploy_helpers";
 
 import { ProjectName } from "../types";
 import { migrateModule } from "../utils/migration";

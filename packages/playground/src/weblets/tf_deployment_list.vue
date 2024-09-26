@@ -493,91 +493,48 @@ const activeTab = ref(!props.projectName ? 0 : _idx) as Ref<number>;
 watch(activeTab, () => (selectedItems.value = []));
 
 async function onDelete(k8s = false) {
-  try {
-    prepareForDeletion();
-    await processSelectedItems(k8s);
-    refreshDeployments();
-  } catch (e) {
-    handleError(e);
-  } finally {
-    finalizeDeletion();
-  }
-}
-
-function prepareForDeletion() {
   deletingDialog.value = false;
   deleting.value = true;
-}
 
-async function processSelectedItems(k8s: boolean) {
-  const itemsToDelete = getAllItemsToDelete();
-
-  for (const item of itemsToDelete) {
-    await deleteItem(item, k8s);
-  }
-}
-
-function getAllItemsToDelete() {
-  const itemsToDelete = [...selectedItems.value];
-
-  selectedItems.value.forEach(item => {
-    if (item?.projectName.toLowerCase().includes(ProjectName.Caprover.toLowerCase())) {
-      itemsToDelete.push(...item.workers);
-    }
-  });
-
-  return itemsToDelete;
-}
-
-async function deleteItem(item: any, k8s: boolean) {
   try {
-    if (isDomainProject()) {
-      await deleteDomainProject(item);
-    } else {
-      await deleteStandardItem(item, k8s);
-    }
-  } catch (e: any) {
-    logDeletionError(item.name, e);
+    const projectNameLower = props.projectName?.toLowerCase();
+    const allSelectedItems = [...selectedItems.value];
+    selectedItems.value.forEach(item => {
+      if (item.projectName.toLowerCase().includes(ProjectName.Caprover.toLowerCase()) && item.workers) {
+        allSelectedItems.push(...item.workers);
+      }
+    });
+
+    await Promise.all(
+      allSelectedItems.map(async item => {
+        try {
+          if (projectNameLower === ProjectName.Domains.toLowerCase()) {
+            await deleteGatewayDeployment(
+              updateGrid(grid, { projectName: projectNameLower }),
+              item[0].workloads[0].name as string,
+            );
+          } else {
+            await deleteDeployment(updateGrid(grid!, { projectName: item.projectName }), {
+              deploymentName: item.deploymentName,
+              name: k8s ? item.deploymentName : item.name,
+              projectName: item.projectName,
+              ip: item.interfaces?.[0]?.ip,
+              k8s,
+            });
+          }
+        } catch (e: any) {
+          createCustomToast(`Failed to delete deployment with name: ${item.name}`, ToastType.danger);
+          console.log("Error while deleting deployment", e.message);
+        }
+      }),
+    );
+    table.value?.loadDeployments();
+  } catch (e) {
+    createCustomToast((e as Error).message, ToastType.danger);
+  } finally {
+    selectedItems.value = [];
+    deleting.value = false;
   }
-}
-
-function isDomainProject() {
-  return props.projectName?.toLowerCase() === ProjectName.Domains.toLowerCase();
-}
-
-async function deleteDomainProject(item: any) {
-  await deleteGatewayDeployment(
-    updateGrid(grid, { projectName: props.projectName!.toLowerCase() }),
-    item.workloads[0].name as string,
-  );
-}
-
-async function deleteStandardItem(item: any, k8s: boolean) {
-  await deleteDeployment(updateGrid(grid!, { projectName: item.projectName }), {
-    deploymentName: item.deploymentName,
-    name: k8s ? item.deploymentName : item.name,
-    projectName: item.projectName,
-    ip: item.interfaces?.[0]?.ip,
-    k8s,
-  });
-}
-
-function logDeletionError(itemName: string, error: any) {
-  createCustomToast(`Failed to delete deployment with name: ${itemName}`, ToastType.danger);
-  console.error("Error while deleting deployment", error.message);
-}
-
-function refreshDeployments() {
-  table.value?.loadDeployments();
-}
-
-function handleError(e: any) {
-  createCustomToast((e as Error).message, ToastType.danger);
-}
-
-function finalizeDeletion() {
-  selectedItems.value = [];
-  deleting.value = false;
 }
 
 const VMS: string[] = [ProjectName.Fullvm, ProjectName.VM, ProjectName.NodePilot];
