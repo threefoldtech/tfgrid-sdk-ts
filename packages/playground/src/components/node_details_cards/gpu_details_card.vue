@@ -22,7 +22,6 @@
             <v-select
               chips
               density="compact"
-              clearable
               hide-details="auto"
               v-model="cardId"
               :items="cardsIds"
