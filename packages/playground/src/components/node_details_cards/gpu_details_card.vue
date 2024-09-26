@@ -7,7 +7,7 @@
     icon="mdi-credit-card-settings-outline"
   >
     <template #gpu-hint-message>
-      <div v-if="cards > 0" class="mb-3">
+      <div class="mb-3">
         <v-chip class="d-flex justify-center ma-4 mt-1" color="info">
           Select a GPU card ID from the below selection to load its data.
         </v-chip>
@@ -63,7 +63,6 @@ export default {
     const cardId = ref<string>("");
     const selectedCard = ref<GPUCard>(props.node.gpus[0]);
     const node = ref(props.node);
-    const cards = ref(0);
 
     watch(cardId, newCardId => {
       selectedCard.value = node.value.gpus.find(card => card.id === newCardId)!;
@@ -72,7 +71,6 @@ export default {
 
     onMounted(() => {
       loading.value = true;
-      cards.value = node.value.gpus?.length;
       selectedCard.value = node.value.gpus[0];
       node.value.gpus.map((card: GPUCard) => {
         cardsIds.value.push(card.id);
@@ -112,7 +110,6 @@ export default {
       cardsIds,
       cardId,
       selectedCard,
-      cards,
       copy,
     };
   },
