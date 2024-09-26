@@ -806,4 +806,11 @@ const router = createRouter({
   routes: mainRoutes,
 });
 
+/* Guard to verify monitor is completed */
+const removeMonitorGuard = router.beforeEach(async (_, __, next) => {
+  await window.$$monitorLock;
+  removeMonitorGuard();
+  return next();
+});
+
 export default router;

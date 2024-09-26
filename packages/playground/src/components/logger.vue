@@ -203,7 +203,7 @@ export default {
     let _interceptorQueue: LI[] = [];
 
     async function interceptMessage(instance: LI) {
-      if (connectDB.value.error) {
+      if (connectDB?.value?.error) {
         _interceptorQueue.push(instance);
         return;
       }

@@ -18,6 +18,7 @@ export default {
     const loadingApp = ref(true);
     onMounted(async () => {
       if (await setGlobalEnv()) {
+        window.$$releaseMonitorLock();
         /* Load d-tabs before app */
         loadingApp.value = false;
       }
