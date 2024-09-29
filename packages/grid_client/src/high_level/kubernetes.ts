@@ -115,6 +115,7 @@ class KubernetesHL extends HighLevelBase {
     solutionProviderId: number,
     zlogsOutput?: string,
     gpus: string[] = [],
+    masterFlist?: string,
   ) {
     events.emit("logs", `Creating a worker with name: ${name} on node: ${nodeId}, network: ${network.name}`);
     const machine = new VMHL(this.config);
@@ -135,7 +136,7 @@ class KubernetesHL extends HighLevelBase {
     return await machine.create(
       name,
       nodeId,
-      Flist,
+      masterFlist ? masterFlist : Flist,
       cpu,
       memory,
       rootfs_size,

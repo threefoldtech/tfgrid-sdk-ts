@@ -190,7 +190,7 @@ export const solutionType: { [key: string]: string } = {
   wordpress: "Wordpress",
   staticwebsite: "Static Website",
   tfrobot: "TFRobot",
-  Gitea: "Gitea",
+  gitea: "Gitea",
   nostr: "Nostr",
   domains: "Domains",
   jitsi: "Jitsi",
