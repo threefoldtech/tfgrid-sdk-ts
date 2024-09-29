@@ -47,7 +47,7 @@ On **Push** to the development branch, this workflow will do the following:
 
 - clean install of node dependencies
 - cache/restore dependencies
-- build source code 
+- build source code
 - copy artifacts to `staging.dashboard.dev.grid.tf` using SSH
 - deploy to the staging server
 
