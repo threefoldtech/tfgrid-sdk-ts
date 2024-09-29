@@ -28,30 +28,6 @@ const createDataInstance = (type: WorkloadTypes) => {
 
   const rootfs_size = 2;
   const size = 100 * 1025 ** 2;
-  // const qsfsZdbName = "exampleZDBName";
-  // const qsfsCount = 5;
-  // const qsfsNodes = [];
-  // const qsfsPassword = "examplePassword123";
-  // const qsfsDiskSize = 10;
-  // const cpu = 2;
-  // const memory = 2048;
-  // const rootfsSize = 4;
-  // const networkName = "exampleNetwork";
-  // const vmName = "exampleVM";
-  // const disksQsfs = [];
-  // const publicIP = false;
-  // const ipRangeClassA = "10.1.0.0/16";
-  // const ipRangeClassB = "172.16.0.0/16";
-  // const ipRangeClassC = "192.168.0.0/16";
-  // const ipRange = ipRangeClassA;
-  // const metadata = "{'deploymentType': 'vm'}";
-  // const description = "test deploying VM via ts grid3 client";
-  // const qsfsName = "exampleQSFS";
-  // const qsfsEncryptionKey = "encryptionKey123";
-  // const qsfsPrefix = "prefix";
-  // const qsfsCache = 2;
-  // const qsfsMountPoint = "/exampleMountPoint";
-  // const envVarValue = "envVarValue";
 
   switch (type) {
     case WorkloadTypes.zmachine:
@@ -94,7 +70,6 @@ const createDataInstance = (type: WorkloadTypes) => {
       instance = new Volume();
       instance.size = size;
       break;
-
     case WorkloadTypes.zdb:
       instance = new Zdb();
       instance.size = size;
