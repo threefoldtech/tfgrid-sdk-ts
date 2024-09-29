@@ -524,7 +524,7 @@ async function onDelete(k8s = false) {
           }
         } catch (e: any) {
           createCustomToast(`Failed to delete deployment with name: ${item.name}`, ToastType.danger);
-          console.log("Error while deleting deployment", e.message);
+          console.error("Error while deleting deployment", e.message);
         }
       }),
     );
