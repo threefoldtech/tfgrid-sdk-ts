@@ -21,6 +21,7 @@
         :value="$props.modelValue.username"
         :rules="[
           validators.required('Email or Username is required.'),
+          validators.minLength('Email or Username must be at least 2 characters.', 2),
           (v: string) => {
             return validators.isValidSmtp(v);
           }

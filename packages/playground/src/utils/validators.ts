@@ -789,7 +789,7 @@ export async function isAvailableName(grid: GridClient, name: string) {
 
 export function isValidSmtp(input: string) {
   const emailValidation = isEmail("Please provide a valid email address.")(input);
-  const username = /[!@#$%^&*()_+\-={}:<>?,./]/.test(input);
+  const username = /[!@#$%^&*()\s_+\-={}:<>?,./]/.test(input);
   if (username && emailValidation) {
     return { message: "Please provide a valid username or email" };
   }
