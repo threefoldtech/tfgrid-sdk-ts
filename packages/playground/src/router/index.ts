@@ -386,28 +386,6 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
         },
       },
     },
-    {
-      path: DashboardRoutes.Applications.Domains,
-      component: () => import("../views/domains_view.vue"),
-      meta: {
-        title: "Domains",
-        info: { page: "info/domains.md" },
-        navbarConfig: {
-          back: true,
-          path: [
-            { title: "Deploy" },
-            {
-              title: "Applications",
-              disabled: false,
-              to: DashboardRoutes.Deploy.Applications,
-            },
-            {
-              title: "Domains",
-            },
-          ],
-        },
-      },
-    },
     // Commented for now and will be user later.
     // {
     //   path: DashboardRoutes.Applications.Freeflow,
@@ -629,6 +607,11 @@ function createDeployRoutes(): RouteRecordRaw[] {
           meta: { title: "Resource Pricing", publicPath: true },
         },
         {
+          path: DashboardRoutes.Deploy.Domains,
+          component: () => import("@/views/domains_view.vue"),
+          meta: { title: "Domains", publicPath: true },
+        },
+        {
           path: DashboardRoutes.Deploy.NodeFinder,
           component: () => import("@/views/nodes.vue"),
           meta: { title: "Nodes", publicPath: true, sidebarBreakpoint: 1150, filtersCollapsibleBreakpoint: 850 },
@@ -804,6 +787,12 @@ const mainRoutes: RouteRecordRaw[] = [
     path: DashboardRoutes.TFChain.BaseRoute,
     children: createTFChainRoutes(),
   },
+  // Settings Route
+  {
+    path: DashboardRoutes.Other.Settings,
+    component: () => import("../views/settings.vue"),
+    meta: { title: "Settings" },
+  },
   // NotFound
   {
     path: "/:pathMatch(.*)*",
@@ -815,6 +804,13 @@ const mainRoutes: RouteRecordRaw[] = [
 const router = createRouter({
   history: createWebHashHistory(),
   routes: mainRoutes,
+});
+
+/* Guard to verify monitor is completed */
+const removeMonitorGuard = router.beforeEach(async (_, __, next) => {
+  await window.$$monitorLock;
+  removeMonitorGuard();
+  return next();
 });
 
 export default router;

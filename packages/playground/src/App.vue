@@ -57,6 +57,12 @@
                           <span v-bind="props">
                             {{ item.title }}
                           </span>
+                          <v-badge
+                            dot
+                            inline
+                            color="primary"
+                            v-if="item.releaseDate && isReleasedOverMon(item.releaseDate, new Date())"
+                          ></v-badge>
                         </template>
                       </v-tooltip>
                     </v-list-item-title>
@@ -88,6 +94,12 @@
                         <span v-bind="props">
                           {{ item.title }}
                         </span>
+                        <v-badge
+                          dot
+                          inline
+                          color="primary"
+                          v-if="item.releaseDate && isReleasedOverMon(item.releaseDate, new Date())"
+                        ></v-badge>
                       </template>
                     </v-tooltip>
                   </v-list-item-title>
@@ -107,7 +119,38 @@
       </v-navigation-drawer>
 
       <v-main :style="{ paddingTop: navbarConfig ? '140px' : '70px' }">
-        <v-toolbar class="border position-fixed pr-2" :style="{ zIndex: 1100, top: 0, left: 0, right: 0 }">
+        <v-toolbar
+          :extended="toolbarExtended"
+          extension-height="auto"
+          class="border position-fixed"
+          :style="{ zIndex: 1100, top: 0, left: 0, right: 0 }"
+          :elevation="permanent ? '1' : '15'"
+        >
+          <template #extension>
+            <v-card class="w-100 ma-0 pa-0" v-if="toolbarExtended">
+              <div class="pa-1">
+                <div class="d-flex justify-center">
+                  <div class="">
+                    <TfSwapPrice>
+                      <FundsCard v-if="hasActiveProfile" />
+                    </TfSwapPrice>
+                  </div>
+                </div>
+                <v-divider class="mb-2" />
+                <div class="d-flex justify-center">
+                  <div class="">
+                    <ProfileManager
+                      :model-value="openProfile"
+                      @update:modelValue="(e: boolean) => {
+                    toolbarExtended = e;
+                    openProfile = e;
+                    }"
+                    />
+                  </div>
+                </div>
+              </div>
+            </v-card>
+          </template>
           <v-toolbar-title class="custom-toolbar-title">
             <v-img
               :src="`${
@@ -115,14 +158,14 @@
                   ? baseUrl + 'images/logoTF_dark.png'
                   : baseUrl + 'images/logoTF_light.png'
               }`"
-              width="160px"
+              :width="permanent ? '140px' : '120px'"
               @click="navigateToHome"
               class="clickable-logo"
             />
           </v-toolbar-title>
 
           <v-spacer>
-            <div class="d-flex align-center justify-start">
+            <div class="d-flex align-center justify-start" v-if="permanent">
               <TfSwapPrice>
                 <FundsCard v-if="hasActiveProfile" />
               </TfSwapPrice>
@@ -134,7 +177,21 @@
           <v-divider vertical class="mx-2" />
           <AppTheme />
           <v-divider vertical class="mx-2" />
-          <ProfileManager v-model="openProfile" />
+          <ProfileManager v-model="openProfile" v-if="permanent" />
+
+          <div class="d-flex align-center" v-if="!permanent">
+            <v-btn
+              :color="theme.name.value !== AppThemeSelection.light ? 'white' : 'black'"
+              @click="
+                () => {
+                  openSidebar = false;
+                  toolbarExtended = !toolbarExtended;
+                }
+              "
+              icon="mdi-menu"
+              class="mr-2"
+            />
+          </div>
         </v-toolbar>
 
         <v-toolbar
@@ -175,6 +232,7 @@
               minHeight: '85%',
               maxHeight: '100%',
             }"
+            @click="() => (toolbarExtended = false)"
           >
             <div class="d-flex align-center">
               <v-btn
@@ -205,6 +263,8 @@ import { useRoute, useRouter } from "vue-router";
 import { useTheme } from "vuetify";
 
 import TfLogger from "@/components/logger.vue";
+import { isReleasedOverMon } from "@/utils/date";
+import { LocalStorageSettingsKey } from "@/utils/settings";
 
 import { useProfileManager } from "./stores/profile_manager";
 const $route = useRoute();
@@ -212,17 +272,24 @@ const $router = useRouter();
 const profileManager = useProfileManager();
 const gridStore = useGrid();
 const network = process.env.NETWORK || (window as any).env.NETWORK;
-
+const toolbarExtended = ref(false);
 const openProfile = ref(false);
 const hasActiveProfile = computed(() => !!profileManager.profile);
 const theme = useTheme();
 const navbarConfig = ref();
 
 const hasGrid = computed(() => !!gridStore.grid);
+const hasClient = computed(() => !!gridStore.client);
 
 // eslint-disable-next-line no-undef
 const permanent = ref(window.innerWidth > 980);
 const openSidebar = ref(permanent.value);
+
+watch(permanent, value => {
+  if (value) {
+    toolbarExtended.value = false;
+  }
+});
 
 function setSidebarOnResize() {
   permanent.value =
@@ -235,6 +302,22 @@ function setSidebarOnResize() {
 
 window.addEventListener("resize", setSidebarOnResize);
 
+const themeMatcher = window.matchMedia("(prefers-color-scheme: dark)");
+// changes theme based on changes in system mode
+themeMatcher.addEventListener("change", updateTheme);
+function updateTheme() {
+  if (themeMatcher.matches) {
+    theme.global.name.value = AppThemeSelection.dark;
+  } else {
+    theme.global.name.value = AppThemeSelection.light;
+  }
+  localStorage.setItem(LocalStorageSettingsKey.THEME_KEY, ThemeSettingsInterface.System);
+}
+
+// sets theme to system mode on application mount
+onMounted(() => {
+  updateTheme();
+});
 watch(
   () => $route.meta,
   meta => {
@@ -251,8 +334,34 @@ function navigateToHome() {
 onMounted(async () => {
   await (window.$$appLoader || noop)();
   openProfile.value = true;
+  if (!permanent.value) {
+    toolbarExtended.value = true;
+  }
 });
 
+watch(hasClient, () => setTimeouts());
+
+async function setTimeouts() {
+  if (!localStorage.getItem(LocalStorageSettingsKey.TIMEOUT_QUERY_KEY)) {
+    localStorage.setItem(LocalStorageSettingsKey.TIMEOUT_QUERY_KEY, `${window.env.TIMEOUT / 1000}`);
+  } else {
+    window.env.TIMEOUT = +localStorage.getItem(LocalStorageSettingsKey.TIMEOUT_QUERY_KEY)! * 1000;
+  }
+
+  const client = gridStore.client as GridClient;
+
+  const localStorageDeploymentTimeout = localStorage.getItem(LocalStorageSettingsKey.TIMEOUT_DEPLOYMENT_KEY);
+
+  if (client && client.clientOptions) {
+    const deploymentTimeoutMinutes = client.clientOptions.deploymentTimeoutMinutes;
+    if (!localStorageDeploymentTimeout && deploymentTimeoutMinutes) {
+      localStorage.setItem(LocalStorageSettingsKey.TIMEOUT_DEPLOYMENT_KEY, `${+deploymentTimeoutMinutes * 60}`);
+    } else {
+      client.clientOptions.deploymentTimeoutMinutes = +localStorageDeploymentTimeout! / 60;
+      await client.connect();
+    }
+  }
+}
 // eslint-disable-next-line no-undef
 const version = process.env.VERSION as any;
 
@@ -316,6 +425,12 @@ const routes: AppRoute[] = [
         icon: "mdi-lightbulb-on-outline",
         route: DashboardRoutes.Deploy.Applications,
         tooltip: "Deploy ready applications on the ThreeFold grid.",
+      },
+      {
+        title: "Domains",
+        icon: "domains.png",
+        route: DashboardRoutes.Deploy.Domains,
+        tooltip: "Expose servers hosted on local machines or VMs to the public internet.",
       },
       {
         title: "Your Contracts",
@@ -414,6 +529,17 @@ const routes: AppRoute[] = [
       },
     ],
   },
+  {
+    title: "Settings",
+    items: [
+      {
+        title: "Settings",
+        icon: "mdi-cog-outline",
+        route: DashboardRoutes.Other.Settings,
+        tooltip: "Application Settings.",
+      },
+    ],
+  },
 ];
 
 const baseUrl = import.meta.env.BASE_URL;
@@ -428,8 +554,12 @@ function clickHandler({ route, url }: AppRouteItem): void {
 </script>
 
 <script lang="ts">
+import type { GridClient } from "@threefold/grid_client";
+import { nextTick } from "process";
+
 import { DashboardRoutes } from "@/router/routes";
 import { AppThemeSelection } from "@/utils/app_theme";
+import { ThemeSettingsInterface } from "@/utils/settings";
 
 import AppTheme from "./components/app_theme.vue";
 import DeploymentListManager from "./components/deployment_list_manager.vue";
@@ -443,7 +573,6 @@ import TfRouterView from "./components/TfRouterView.vue";
 import TfSwapPrice from "./components/TfSwapPrice.vue";
 import { useGrid } from "./stores";
 import ProfileManager from "./weblets/profile_manager.vue";
-
 interface AppRoute {
   title: string;
   items: AppRouteItem[];
@@ -457,6 +586,7 @@ interface AppRouteItem {
   url?: string;
   icon?: string;
   tooltip?: string;
+  releaseDate?: Date;
 }
 
 export default {
@@ -504,5 +634,11 @@ body {
 
 html {
   overflow: hidden;
+}
+
+@media only screen and (max-width: 600px) {
+  .v-toolbar-title {
+    flex: auto;
+  }
 }
 </style>

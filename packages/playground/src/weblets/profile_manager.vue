@@ -22,13 +22,13 @@
             <p>
               Balance:
               <strong :class="theme.name.value === AppThemeSelection.light ? 'text-primary' : 'text-info'">
-                {{ normalizeBalance(balance.free, true) }} TFT
+                {{ normalizeBalance(balance.free + balance.reserved, true) }} TFT
               </strong>
             </p>
             <p>
               Locked:
               <strong :class="theme.name.value === AppThemeSelection.light ? 'text-primary' : 'text-info'">
-                {{ normalizeBalance(balance.locked, true) || 0 }} TFT
+                {{ normalizeBalance(balance.reserved, true) || 0 }} TFT
               </strong>
               <v-tooltip text="Locked balance documentation" location="bottom right">
                 <template #activator="{ props }">
@@ -190,7 +190,7 @@
 
                       <div class="d-flex flex-column flex-md-row justify-end mb-10">
                         <VBtn
-                          class="mt-2 ml-3"
+                          class="mt-2 ml-sm-0 ml-md-3"
                           color="secondary"
                           variant="outlined"
                           :disabled="
@@ -440,6 +440,8 @@ import { useProfileManagerController } from "../components/profile_manager_contr
 import { useOnline } from "../hooks";
 import { useInputRef } from "../hooks/input_validator";
 import { useProfileManager } from "../stores";
+import type { Credentials } from "../utils/credentials";
+import { getCredentials, setCredentials } from "../utils/credentials";
 import { activateAccountAndCreateTwin, createAccount, getGrid, loadBalance, loadProfile } from "../utils/grid";
 import { readEmail, storeEmail } from "../utils/grid";
 import { normalizeBalance, normalizeError } from "../utils/helpers";
@@ -450,12 +452,7 @@ const selectedName = ref("");
 const selectedItem = ref(items.value[0]);
 const depositFee = ref(0);
 const loadEmail = ref<boolean>(false);
-interface Credentials {
-  passwordHash?: string;
-  mnemonicHash?: string;
-  keypairTypeHash?: string;
-  emailHash?: string;
-}
+
 const keyType = ["sr25519", "ed25519"];
 const keypairType = ref(KeypairType.sr25519);
 const enableReload = ref(true);
@@ -555,32 +552,6 @@ async function mounted() {
   }
 }
 
-function getCredentials() {
-  const getCredentials = localStorage.getItem(WALLET_KEY);
-  let credentials: Credentials = {};
-
-  if (getCredentials) {
-    credentials = JSON.parse(getCredentials);
-  }
-  return credentials;
-}
-
-function setCredentials(
-  passwordHash: string,
-  mnemonicHash: string,
-  keypairTypeHash: string,
-  emailHash: string,
-): Credentials {
-  const credentials: Credentials = {
-    passwordHash,
-    mnemonicHash,
-    keypairTypeHash,
-    emailHash,
-  };
-  localStorage.setItem(WALLET_KEY, JSON.stringify(credentials));
-  return credentials;
-}
-
 function isStoredCredentials() {
   return localStorage.getItem(WALLET_KEY) ? true : false;
 }
@@ -618,7 +589,7 @@ const isValidConnectConfirmationPassword = computed(() =>
 const profileManagerController = useProfileManagerController();
 
 const balance = profileManagerController.balance;
-let freeBalance = balance.value?.free ?? 0;
+const freeBalance = computed(() => balance.value?.free ?? 0);
 
 const email = ref("");
 
@@ -772,7 +743,6 @@ async function __loadBalance(profile?: Profile, tries = 1) {
     loadingBalance.value = true;
     const grid = await getGrid(profile);
     balance.value = await loadBalance(grid!);
-    freeBalance = balance.value.free ?? 0;
     if (!BalanceWarningRaised && balance.value?.free) {
       if (balance.value?.free < 0.01) {
         createCustomToast("Your balance is too low, Please fund your account.", ToastType.warning);

@@ -1,6 +1,6 @@
 <template>
   <weblet-layout ref="layout" title-image="images/icons/domains.png">
-    <template #title>Deploy a Domains Instance </template>
+    <template #title>Deploy Domains Instance </template>
 
     <d-tabs :tabs="[{ title: 'Config', value: 'config' }]">
       <template #config>
