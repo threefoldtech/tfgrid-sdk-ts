@@ -427,7 +427,7 @@
 </template>
 <script lang="ts" setup>
 import { isAddress } from "@polkadot/util-crypto";
-import { KeypairType } from "@threefold/grid_client";
+import { KeypairType, toHexSeed } from "@threefold/grid_client";
 import { validateMnemonic } from "bip39";
 import Cryptr from "cryptr";
 import { marked } from "marked";
@@ -728,7 +728,11 @@ async function activateAccount() {
   activatingAccount.value = true;
   activating.value = true;
   try {
-    const mnemonicValue = mnemonic.value.length === 66 ? mnemonic.value : `0x${mnemonic.value}`;
+    const mnemonicValue = validateMnemonic(mnemonic.value)
+      ? mnemonic.value
+      : mnemonic.value.length === 66
+      ? mnemonic.value
+      : `0x${mnemonic.value}`;
     await activateAccountAndCreateTwin(mnemonicValue);
     await storeAndLogin();
   } catch (e) {
