@@ -427,7 +427,7 @@
 </template>
 <script lang="ts" setup>
 import { isAddress } from "@polkadot/util-crypto";
-import { KeypairType, toHexSeed } from "@threefold/grid_client";
+import { KeypairType } from "@threefold/grid_client";
 import { validateMnemonic } from "bip39";
 import Cryptr from "cryptr";
 import { marked } from "marked";
