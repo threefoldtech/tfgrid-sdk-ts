@@ -67,7 +67,9 @@ export interface GqlContracts {
 }
 
 export interface GqlConsumption {
-  contracts: GqlContracts;
+  nameContracts: GqlNameContract[];
+  nodeContracts: GqlNodeContract[];
+  rentContracts: GqlRentContract[];
   contractBillReports: GqlContractBillReports[];
 }
 
@@ -239,16 +241,16 @@ class TFContracts extends Contracts {
       if (billReports.length === 0) {
         return 0;
       } else {
-        let duration: number;
+        let duration = 1;
         const amountBilled = new Decimal(billReports[0].amountBilled);
         if (billReports.length === 2) {
           duration = (billReports[0].timestamp - billReports[1].timestamp) / 3600; // one hour
         } else {
           let createdAt: number;
           for (const contracts of [
-            gqlConsumption.contracts.nodeContracts,
-            gqlConsumption.contracts.nameContracts,
-            gqlConsumption.contracts.rentContracts,
+            gqlConsumption.nodeContracts,
+            gqlConsumption.nameContracts,
+            gqlConsumption.rentContracts,
           ]) {
             if (contracts.length === 1) {
               createdAt = +contracts[0].createdAt;
@@ -257,11 +259,8 @@ class TFContracts extends Contracts {
             }
           }
         }
-        if (!duration) {
-          duration = 1;
-        }
         return amountBilled
-          .div(duration)
+          .div(duration || 1)
           .div(10 ** 7)
           .toNumber();
       }
