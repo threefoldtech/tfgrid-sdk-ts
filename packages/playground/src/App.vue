@@ -273,7 +273,7 @@ const profileManager = useProfileManager();
 const gridStore = useGrid();
 const network = process.env.NETWORK || (window as any).env.NETWORK;
 const toolbarExtended = ref(false);
-const openProfile = ref(true);
+const openProfile = ref(false);
 const hasActiveProfile = computed(() => !!profileManager.profile);
 const theme = useTheme();
 const navbarConfig = ref();
@@ -349,12 +349,12 @@ async function setTimeouts() {
   }
 
   const client = gridStore.client as GridClient;
-  const clientOptions = client.clientOptions;
-  const localStorageDeploymentTimeout = localStorage.getItem(LocalStorageSettingsKey.TIMEOUT_DEPLOYMENT_KEY);
-  const deploymentTimeoutMinutes = clientOptions.deploymentTimeoutMinutes;
 
-  if (client && clientOptions && deploymentTimeoutMinutes) {
-    if (!localStorageDeploymentTimeout) {
+  const localStorageDeploymentTimeout = localStorage.getItem(LocalStorageSettingsKey.TIMEOUT_DEPLOYMENT_KEY);
+
+  if (client && client.clientOptions) {
+    const deploymentTimeoutMinutes = client.clientOptions.deploymentTimeoutMinutes;
+    if (!localStorageDeploymentTimeout && deploymentTimeoutMinutes) {
       localStorage.setItem(LocalStorageSettingsKey.TIMEOUT_DEPLOYMENT_KEY, `${+deploymentTimeoutMinutes * 60}`);
     } else {
       client.clientOptions.deploymentTimeoutMinutes = +localStorageDeploymentTimeout! / 60;
@@ -362,7 +362,6 @@ async function setTimeouts() {
     }
   }
 }
-
 // eslint-disable-next-line no-undef
 const version = process.env.VERSION as any;
 
