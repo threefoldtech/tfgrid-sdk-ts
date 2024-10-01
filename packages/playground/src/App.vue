@@ -273,7 +273,7 @@ const profileManager = useProfileManager();
 const gridStore = useGrid();
 const network = process.env.NETWORK || (window as any).env.NETWORK;
 const toolbarExtended = ref(false);
-const openProfile = ref(true);
+const openProfile = ref(false);
 const hasActiveProfile = computed(() => !!profileManager.profile);
 const theme = useTheme();
 const navbarConfig = ref();

@@ -6,8 +6,6 @@ import type { IsEmailOptions } from "validator/lib/isEmail";
 import type { IsFQDNOptions } from "validator/lib/isFQDN";
 import type { IsURLOptions } from "validator/lib/isURL";
 
-import type { RuleReturn } from "@/components/input_validator.vue";
-
 import { SessionStorageSettingsKey } from "./settings";
 
 /**
@@ -777,7 +775,9 @@ export function isValidDecimalNumber(length: number, msg: string) {
     }
   };
 }
-export async function isValidStellarAddress(target: string): Promise<RuleReturn> {
+export async function isValidStellarAddress(
+  target: string,
+): Promise<import("@/components/input_validator.vue").RuleReturn> {
   const server = new StellarSdk.Server(window.env.STELLAR_HORIZON_URL);
   try {
     // check if the account provided exists on stellar
