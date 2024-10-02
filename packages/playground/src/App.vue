@@ -61,7 +61,7 @@
                             dot
                             inline
                             color="primary"
-                            v-if="item.releaseDate && isReleasedOverMon(item.releaseDate, new Date())"
+                            v-if="item.releaseDate && isReleasedOverMon(item.releaseDate, new Date('2024-10-02'))"
                           ></v-badge>
                         </template>
                       </v-tooltip>
@@ -425,6 +425,7 @@ const routes: AppRoute[] = [
         icon: "mdi-lightbulb-on-outline",
         route: DashboardRoutes.Deploy.Applications,
         tooltip: "Deploy ready applications on the ThreeFold grid.",
+        releaseDate: new Date("2024-10-2"),
       },
       {
         title: "Domains",
@@ -555,7 +556,6 @@ function clickHandler({ route, url }: AppRouteItem): void {
 
 <script lang="ts">
 import type { GridClient } from "@threefold/grid_client";
-import { nextTick } from "process";
 
 import { DashboardRoutes } from "@/router/routes";
 import { AppThemeSelection } from "@/utils/app_theme";
