@@ -612,15 +612,15 @@ class TFContracts extends Contracts {
     // time since the last billing with allowance time of **one hour**
     const totalPeriodTime = elapsedSeconds + SECONDS_ONE_HOUR;
 
-    /** USD */
-    const contractCostPerSecond = contractMonthlyCost.div(HOURS_ONE_MONTH * SECONDS_ONE_HOUR);
+    const contractMonthlyCostTFT = await this.convertToTFT(contractMonthlyCost);
 
-    const contractCostTFT = await this.convertToTFT(contractCostPerSecond);
+    /** contract cost per second in TFT */
+    const contractCostPerSecond = contractMonthlyCostTFT.div(HOURS_ONE_MONTH * SECONDS_ONE_HOUR);
 
     const unbilledNuTFTUnit = await this.convertToTFT(new Decimal(unbilledNU));
 
     /** cost of the current billing period and the mentioned allowance time in TFT*/
-    const totalPeriodCost = contractCostTFT.times(totalPeriodTime);
+    const totalPeriodCost = contractCostPerSecond.times(totalPeriodTime);
 
     const overdue = totalOverDraft.add(unbilledNuTFTUnit);
 
