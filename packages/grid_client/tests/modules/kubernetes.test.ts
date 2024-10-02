@@ -15,7 +15,7 @@ jest.setTimeout(500000);
 let gridClient: GridClient;
 let deploymentName: string;
 
-beforeAll(async () => {
+beforeEach(async () => {
   gridClient = await getClient();
   deploymentName = generateString(15);
   gridClient.clientOptions.projectName = `kubernetes/${deploymentName}`;
@@ -743,8 +743,5 @@ afterEach(async () => {
     expect(res.updated).toHaveLength(0);
     expect(res.deleted).toBeDefined();
   }
-});
-
-afterAll(async () => {
   return await gridClient.disconnect();
 }, 130000);
