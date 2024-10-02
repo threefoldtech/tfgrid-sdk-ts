@@ -117,6 +117,14 @@ export function IsAlphanumericExpectUnderscore(msg: string) {
   };
 }
 
+/**
+ * Returns a validation function that checks if the value only contains alphanumeric characters, dashes, and underscores.
+ *
+ * @param {string} msg - The error message to return if the validation fails.
+ *
+ * @returns {(value: string) => { message: string, requiredTrue: boolean }} - A function that takes a string value as input and returns an object with an error message and a requiredTrue flag if the validation fails.
+ */
+
 export function IsAlphaExpectDashAndUnderscore(msg: string) {
   return (value: string) => {
     if (!/^[a-zA-Z0-9_-]+$/.test(value)) {
