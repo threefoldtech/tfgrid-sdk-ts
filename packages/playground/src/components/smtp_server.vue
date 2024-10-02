@@ -21,10 +21,16 @@
         :value="$props.modelValue.username"
         :rules="[
           validators.required('Email or Username is required.'),
-          validators.minLength('Email or Username must be at least 2 characters.', 2),
+          validators.minLength('Username must be at least 2 characters.', 2),
+          validators.maxLength('Username must be at least 50 characters.', 50),
           (v: string) => {
-            return validators.isValidSmtp(v);
-          }
+            return (
+              validators.isEmail('Please provide a valid email address.')(v) &&
+              (validators.IsAlphaExpectDashAndUnderscore(
+                'Username should consist of letters, dashs and underscores only.' 
+              )(v) || validators.isAlpha('Username must start with an alphabetical character.')(v[0]))
+            );
+          },
         ]"
         #="{ props }"
       >

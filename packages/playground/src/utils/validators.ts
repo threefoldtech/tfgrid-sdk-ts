@@ -117,6 +117,14 @@ export function IsAlphanumericExpectUnderscore(msg: string) {
   };
 }
 
+export function IsAlphaExpectDashAndUnderscore(msg: string) {
+  return (value: string) => {
+    if (!/^[a-zA-Z0-9_-]+$/.test(value)) {
+      return { message: msg, requiredTrue: true };
+    }
+  };
+}
+
 export function isAfter(msg: string, date?: string) {
   return (value: string) => {
     if (!validator.isAfter(value, date)) {
@@ -775,22 +783,5 @@ export async function isAvailableName(grid: GridClient, name: string) {
   const valid = await grid.contracts.get_name_contract({ name });
   if (name && !!valid) {
     return { message: "Name is already taken." };
-  }
-}
-
-/**
- * Validates an SMTP input string.
- *
- * Checks if the input string is a valid email address and does not contain special characters.
- *
- * @param {string} input - The input string to validate.
- * @returns {{ message: string }} - An object with an error message if the input is invalid, or undefined if the input is valid.
- */
-
-export function isValidSmtp(input: string) {
-  const emailValidation = isEmail("Please provide a valid email address.")(input);
-  const username = /[!@#$%^&*()\s_+\-={}:<>?,./]/.test(input);
-  if (username && emailValidation) {
-    return { message: "Please provide a valid username or email" };
   }
 }
