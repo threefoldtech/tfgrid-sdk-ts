@@ -61,7 +61,7 @@
                             dot
                             inline
                             color="primary"
-                            v-if="item.releaseDate && isReleasedOverMon(item.releaseDate, new Date('2024-10-02'))"
+                            v-if="item.releaseDate && isReleasedOverMon(item.releaseDate, new Date())"
                           ></v-badge>
                         </template>
                       </v-tooltip>
