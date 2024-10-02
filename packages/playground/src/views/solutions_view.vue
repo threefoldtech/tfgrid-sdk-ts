@@ -162,6 +162,7 @@ export default {
           "Jitsi Meet is a set of Open Source projects which empower users to use and deploy video conferencing platforms with state-of-the-art video quality and features.",
         icon: "jitsi.png",
         route: DashboardRoutes.Applications.Jitsi,
+        releaseDate: new Date("2024-10-02"),
       },
     ];
     cards = cards.sort((a, b) => a.title.localeCompare(b.title));

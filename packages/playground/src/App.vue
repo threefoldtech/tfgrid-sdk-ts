@@ -432,6 +432,7 @@ const routes: AppRoute[] = [
         icon: "domains.png",
         route: DashboardRoutes.Deploy.Domains,
         tooltip: "Expose servers hosted on local machines or VMs to the public internet.",
+        releaseDate: new Date("2024-10-2"),
       },
       {
         title: "Your Contracts",
