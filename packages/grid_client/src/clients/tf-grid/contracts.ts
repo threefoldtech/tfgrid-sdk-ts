@@ -66,10 +66,7 @@ export interface GqlContracts {
   rentContracts: GqlRentContract[];
 }
 
-export interface GqlConsumption {
-  nameContracts: GqlNameContract[];
-  nodeContracts: GqlNodeContract[];
-  rentContracts: GqlRentContract[];
+export interface GqlConsumption extends GqlContracts {
   contractBillReports: GqlContractBillReports[];
 }
 
