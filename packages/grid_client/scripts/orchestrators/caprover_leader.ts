@@ -33,6 +33,7 @@ async function main() {
     mru: 4, // GB
     sru: 10,
     farmId: 1,
+    availableFor: grid3.twinId,
   };
 
   const vms: MachinesModel = {
@@ -64,7 +65,7 @@ async function main() {
         env: {
           PUBLIC_KEY: config.ssh_key,
           SWM_NODE_MODE: "leader",
-          CAPROVER_ROOT_DOMAIN: "rafy.grid.tf", // update me
+          CAPROVER_ROOT_DOMAIN: "dmrcfk2.gent01.dev.grid.tf", // update me
           DEFAULT_PASSWORD: "captain42",
           CAPTAIN_IMAGE_VERSION: "latest",
         },
