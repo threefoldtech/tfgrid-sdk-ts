@@ -45,7 +45,14 @@
             </form-validator>
           </v-card-text>
           <v-card-actions class="justify-end my-1 mr-2">
-            <v-btn color="anchor" @click="showDialogue = false">Close</v-btn>
+            <v-btn
+              color="anchor"
+              @click="
+                showDialogue = false;
+                $emit('update:name', '');
+              "
+              >Close</v-btn
+            >
             <v-btn @click="createFarm" :loading="isCreating" :disabled="!valid || isCreating">Create</v-btn>
           </v-card-actions>
         </v-card>
@@ -71,7 +78,7 @@ export default {
       required: true,
     },
   },
-  setup(props) {
+  setup(props, { emit }) {
     const showDialogue = ref(false);
     const isCreating = ref(false);
     const gridStore = useGrid();
@@ -83,6 +90,7 @@ export default {
         createCustomToast("Farm created successfully.", ToastType.success);
         notifyDelaying();
         showDialogue.value = false;
+        emit("update:name", "");
       } catch (error) {
         console.log(error);
         createCustomToast("Failed to create farm.", ToastType.danger);
