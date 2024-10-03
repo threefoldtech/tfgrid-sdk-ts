@@ -610,8 +610,7 @@ class TFContracts extends Contracts {
     }
 
     // time since the last billing with allowance time of **one hour**
-    const totalPeriodTime = elapsedSeconds + SECONDS_ONE_HOUR;
-
+    const totalPeriodTime = elapsedSeconds + 45;
     const contractMonthlyCostTFT = await this.convertToTFT(contractMonthlyCost);
 
     /** contract cost per second in TFT */
@@ -623,6 +622,13 @@ class TFContracts extends Contracts {
     const totalPeriodCost = contractCostPerSecond.times(totalPeriodTime);
 
     const overdue = totalOverDraft.add(unbilledNuTFTUnit);
+    console.log("---------------------------------------------------------");
+    console.log(`total period time ${totalPeriodTime / 60} minutes`);
+    console.log(`contract cost ${contractMonthlyCostTFT.div(HOURS_ONE_MONTH * 60).toNumber()} per minute`);
+    console.log(`total period cost: ${totalPeriodCost.toNumber()}`);
+    console.log(`total overdraft: ${totalOverDraft.div(TFT_CONVERSION_FACTOR).toNumber()} TFT`);
+    console.log(`unbilled network usage: ${unbilledNuTFTUnit.div(TFT_CONVERSION_FACTOR).toNumber()}`);
+    console.log("---------------------------------------------------------");
 
     /** TFT */
     const overdueTFT = overdue.div(TFT_CONVERSION_FACTOR);

@@ -148,7 +148,11 @@
     <v-card>
       <v-card-title class="bg-primary"> Contract lock Details </v-card-title>
       <v-card-text class="mt-5">
-        <p v-if="!isNodeInRentContracts" class="d-flex justify-center">
+        <p
+          v-if="!isNodeInRentContracts"
+          class="d-flex justify-center"
+          @click="profileManagerController.reloadBalance()"
+        >
           Amount Locked:
           {{ getAmountLocked }}
           TFTs.
