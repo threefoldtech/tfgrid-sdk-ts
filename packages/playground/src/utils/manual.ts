@@ -1,7 +1,7 @@
 const BASE = window.env.MANUAL_URL;
 
 export const manual = {
-  dedicated_machines: `${BASE}/documentation/dashboard/deploy/dedicated_machines.html`,
+  dedicated_machines: `${BASE}/documentation/dashboard/deploy/node_finder.html#dedicated-nodes`,
   tft_bridges: `${BASE}/documentation/threefold_token/tft_bridges/tft_bridges.html`,
   buy_sell_tft: `${BASE}/documentation/threefold_token/buy_sell_tft/buy_sell_tft.html`,
   farmers: `${BASE}/documentation/farmers/farmers.html`,
