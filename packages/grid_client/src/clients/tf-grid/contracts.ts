@@ -610,7 +610,7 @@ class TFContracts extends Contracts {
     }
 
     // time since the last billing with allowance time of **one hour**
-    const totalPeriodTime = elapsedSeconds + 45;
+    const totalPeriodTime = elapsedSeconds + 30;
     const contractMonthlyCostTFT = await this.convertToTFT(contractMonthlyCost);
 
     /** contract cost per second in TFT */

@@ -1,4 +1,5 @@
 <template>
+  {{ rentContracts }}
   <weblet-layout ref="layout" @mount="() => {}">
     <v-data-table-server
       v-if="$props.tableHeaders"
