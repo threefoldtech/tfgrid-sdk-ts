@@ -361,7 +361,7 @@ class TFContracts extends Contracts {
   private async convertToTFT(USD: Decimal) {
     try {
       const tftPrice = (await this.client.tftPrice.get()) ?? 0;
-      const tft = new currency(tftPrice, 7).convertUSDtoTFT({ amount: USD.toNumber() });
+      const tft = new currency(tftPrice, 15).convertUSDtoTFT({ amount: USD.toNumber() });
       return new Decimal(tft);
     } catch (error) {
       throw new GridClientError(`Failed to convert to mTFT due: ${error}`);
@@ -540,7 +540,7 @@ class TFContracts extends Contracts {
 
     if (nodeDetails.rented) {
       if (!contract.details.number_of_public_ips) return 0;
-
+      /** ip price in USD per hour */
       const ipPrice = (await this.client.pricingPolicies.get({ id: 1 })).ipu.value / TFT_CONVERSION_FACTOR;
       return ipPrice * HOURS_ONE_MONTH;
     }
@@ -595,9 +595,10 @@ class TFContracts extends Contracts {
     const totalOverDraft = new Decimal(standardOverdraft).add(additionalOverdraft);
 
     // time since the last billing with allowance time of **one hour**
-    const totalPeriodTime = elapsedSeconds + 30;
+    const totalPeriodTime = elapsedSeconds + 40;
     const contractMonthlyCostTFT = await this.convertToTFT(contractMonthlyCost);
 
+    console.log("last pilling was on ", new Date(lastUpdatedSeconds * 1000).toLocaleTimeString("en-US"));
     /** contract cost per second in TFT */
     const contractCostPerSecond = contractMonthlyCostTFT.div(HOURS_ONE_MONTH * SECONDS_ONE_HOUR);
 
@@ -607,7 +608,7 @@ class TFContracts extends Contracts {
     const totalPeriodCost = contractCostPerSecond.times(totalPeriodTime);
 
     const overdue = totalOverDraft.add(unbilledNuTFTUnit);
-    console.log("---------------------------------------------------------");
+    console.log(`-----------------------------${contractInfo.contract_id}----------------------------`);
     console.log(`total period time ${totalPeriodTime / 60} minutes`);
     console.log(`contract cost ${contractMonthlyCostTFT.div(HOURS_ONE_MONTH * 60).toNumber()} per minute`);
     console.log(`total period cost: ${totalPeriodCost.toNumber()}`);
@@ -618,6 +619,7 @@ class TFContracts extends Contracts {
     /** TFT */
     const overdueTFT = overdue.div(TFT_CONVERSION_FACTOR);
     const contractOverdue = overdueTFT.add(totalPeriodCost);
+    console.log(`contract overdue: ${contractOverdue}`);
     /** list all node contracts on the rented node and add their values */
     if (contractInfo.type == ContractType.Rent) {
       /** The contracts on the rented node, this includes total overdraft, total ips count, and total unbuilled amount*/
@@ -626,6 +628,7 @@ class TFContracts extends Contracts {
         options.gridProxyClient,
       );
       const totalContractsOverDue = contractOverdue.add(totalContractsCost);
+      console.log("listing on ", new Date(Date.now() * 1000).toLocaleTimeString("en-US"), "inside node");
       return totalContractsOverDue;
     }
     return contractOverdue;

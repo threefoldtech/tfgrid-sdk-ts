@@ -485,7 +485,7 @@ async function getContractOverdueById(contractId: number) {
   return (await props.grid.contracts.getContractOverdueAmountById(contractId)).toNumber();
 }
 async function getContractOverdue(contract: Contract) {
-  return (await props.grid.contracts.getContractOverdueAmountByContract(contract)).toNumber();
+  return (await props.grid.contracts.getContractOverdueAmountById(contract.contract_id)).toNumber();
 }
 
 // Function to fetch contract lock details
@@ -510,7 +510,7 @@ async function contractLockDetails(item: Contract) {
       rentContracts.value[item.details.nodeId] = rentContract;
     } else {
       await profileManagerController.reloadBalance();
-      const data = await getContractOverdue(item);
+      const data = await getContractOverdue({ ...item });
       selectedLockedAmount.value = data;
     }
 
@@ -574,11 +574,11 @@ async function unlockContract(contractId: number[]) {
       unlockedContracts = await props.grid.contracts.unlockContractsByIds(selectedRentContracts.value);
     contractId = contractId.filter(id => !unlockedContracts.includes(id));
     const billableContractIds = contractId.filter(id => props.lockedContracts[id] !== 0);
-    await props.grid.contracts.unlockContracts(
-      props.contracts.value.filter(contract =>
-        billableContractIds.includes(contract.contract_id),
-      ) as unknown as Contract[],
-    );
+    const filteredContracts = props.contracts.value.filter(contract =>
+      billableContractIds.includes(contract.contract_id),
+    ) as unknown as Contract[];
+
+    await props.grid.contracts.unlockContractsByIds(filteredContracts.map(contract => contract.contract_id));
 
     createCustomToast(
       `Your request to unlock contract ${contractId} has been processed successfully. Changes may take a few minutes to reflect`,

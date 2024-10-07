@@ -1,11 +1,12 @@
+import { GridClient } from "../src";
 import { getClient } from "./client_loader";
 import { log } from "./utils";
 
-async function listAllContracts(client) {
-  const res = await client.contracts.listMyContracts();
-  log("================= Listing all contracts =================");
+async function listAllContracts(client: GridClient) {
+  const res = await client.contracts.getContractOverdueAmountById(158182);
+  log("================= contract overdue in tft =================");
   log(res);
-  log("================= Listing all contracts =================");
+  log("================= contract overdue in tft =================");
 }
 
 async function main() {
