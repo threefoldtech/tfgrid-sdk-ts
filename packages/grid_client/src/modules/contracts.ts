@@ -663,7 +663,7 @@ class Contracts {
       twinId: this.config.twinId,
       state: [GridProxyContractState.GracePeriod],
     });
-
+    const rentedNodesIds: number[] = [];
     for (const contract of contracts.data) {
       switch (contract.type) {
         case ContractType.Name:
@@ -677,10 +677,13 @@ class Contracts {
           result.rentContracts[contract.contract_id] = (
             await this.getContractOverdueAmount(contract, proxy)
           ).toNumber();
+          rentedNodesIds.push(contract.details.nodeId);
           result.totalOverdueAmount += result.rentContracts[contract.contract_id];
           break;
 
         default:
+          /** skip node contracts on rented nodes as it already calculated in the rent contract */
+          if (rentedNodesIds.includes(contract.details.nodeId)) continue;
           result.nodeContracts[contract.contract_id] = (
             await this.getContractOverdueAmount(contract, proxy)
           ).toNumber();
