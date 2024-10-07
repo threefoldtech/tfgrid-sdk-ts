@@ -469,25 +469,23 @@ class TFContracts extends Contracts {
   }
 
   /**
-   * Calculate total IPV4 and total overdraft on all node contracts on rented node.
-   * @description In node contracts on rented nodes we need to have both the overdraft to be added to rent contract overdraft.
+   * Calculate contract cost  for all node contracts on rented node.
+   * @description will list all node contracts with public ip and calculate all contracts overdue .
    * please note that the unbilled NU amount is added to the total overdraft exactly as the in the other contract types.
    * the IPV4 cost to add to the estimated cost of the rent contract.
    */
-  private async getContractsCostOnRentedNode(nodeId: number, proxy: GridProxyClient): Promise<TotalContractsCost> {
+  private async getContractsCostOnRentedNode(nodeId: number, proxy: GridProxyClient): Promise<Decimal> {
     const contracts = await this.getNodeContractsOnRentedNode(nodeId, proxy);
 
-    if (contracts.length == 0) return { ipsCost: 0, nuCost: 0, overdraft: new Decimal(0) };
+    if (contracts.length == 0) return new Decimal(0);
+    const costPromises = contracts.reduce((acc: Promise<Decimal>[], contract) => {
+      acc.push(this.calculateContractOverDue({ contractInfo: contract, gridProxyClient: proxy }));
+      return acc;
+    }, []);
+    const costResult = await Promise.all(costPromises);
 
-    const totalIpCost = await this.calculateIPCostPerMonth(contracts);
-    const totalOverdraft = await this.calculateNodeContractsOverdraft(contracts);
-    const totalUnbilledNUamount = await this.calculateUnbilledNUAmount(contracts);
-
-    return {
-      ipsCost: totalIpCost,
-      overdraft: totalOverdraft,
-      nuCost: totalUnbilledNUamount,
-    };
+    const totalContractsCost = costResult.reduce((acc: Decimal, contractCost) => acc.add(contractCost), new Decimal(0));
+    return totalContractsCost;
   }
 
   /**
@@ -583,7 +581,7 @@ class TFContracts extends Contracts {
     const contractInfo = options.contractInfo;
 
     /** Un-billed amount in unit USD for the network usage, including the premium price for the certified node */
-    let unbilledNU = await this.getUnbilledNu(contractInfo.contract_id, contractInfo.details.nodeId);
+    const unbilledNU = await this.getUnbilledNu(contractInfo.contract_id, contractInfo.details.nodeId);
 
     const { standardOverdraft, additionalOverdraft, lastUpdatedSeconds } =
       await this.client.contracts.getContractPaymentState(contractInfo.contract_id);
@@ -592,22 +590,9 @@ class TFContracts extends Contracts {
     const elapsedSeconds = Date.now() / 1000 - lastUpdatedSeconds;
 
     /** Cost in USD */
-    let contractMonthlyCost = new Decimal(await this.getContractCost(contractInfo, options.gridProxyClient));
-
+    const contractMonthlyCost = new Decimal(await this.getContractCost(contractInfo, options.gridProxyClient));
     /**Calculate total overDraft in Unit TFT*/
-    let totalOverDraft = new Decimal(standardOverdraft).add(additionalOverdraft);
-
-    /** list all node contracts on the rented node and add their values */
-    if (contractInfo.type == ContractType.Rent) {
-      /** The contracts on the rented node, this includes total overdraft, total ips count, and total unbuilled amount*/
-      const totalContractsCost = await this.getContractsCostOnRentedNode(
-        contractInfo.details.nodeId,
-        options.gridProxyClient,
-      );
-      totalOverDraft = totalOverDraft.add(totalContractsCost.overdraft);
-      contractMonthlyCost = contractMonthlyCost.add(totalContractsCost.ipsCost);
-      unbilledNU += totalContractsCost.nuCost;
-    }
+    const totalOverDraft = new Decimal(standardOverdraft).add(additionalOverdraft);
 
     // time since the last billing with allowance time of **one hour**
     const totalPeriodTime = elapsedSeconds + SECONDS_ONE_HOUR;
@@ -626,8 +611,18 @@ class TFContracts extends Contracts {
 
     /** TFT */
     const overdueTFT = overdue.div(TFT_CONVERSION_FACTOR);
-
-    return overdueTFT.add(totalPeriodCost);
+    const contractOverdue = overdueTFT.add(totalPeriodCost);
+    /** list all node contracts on the rented node and add their values */
+    if (contractInfo.type == ContractType.Rent) {
+      /** The contracts on the rented node, this includes total overdraft, total ips count, and total unbuilled amount*/
+      const totalContractsCost = await this.getContractsCostOnRentedNode(
+        contractInfo.details.nodeId,
+        options.gridProxyClient,
+      );
+      const totalContractsOverDue = contractOverdue.add(totalContractsCost);
+      return totalContractsOverDue;
+    }
+    return contractOverdue;
   }
 
   /**
