@@ -599,9 +599,7 @@ class TFContracts extends Contracts {
 
     /** cost of the current billing period and the mentioned allowance time in TFT*/
     const totalPeriodCost = contractCostPerSecond.times(totalPeriodTime);
-    /*******************************************************************/
 
-    /****************************Contract Overdraft + Unbuilled nu *****/
     /**Calculate total overDraft in Unit TFT*/
     const totalOverDraft = new Decimal(standardOverdraft).add(additionalOverdraft);
 
