@@ -596,6 +596,7 @@ watch(contractStateDialog, contractStateDialog => {
 });
 defineExpose({
   reset() {
+    rentContracts.value = {};
     selectedContracts.value = [];
   },
 });
