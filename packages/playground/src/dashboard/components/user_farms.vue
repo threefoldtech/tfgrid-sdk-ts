@@ -139,7 +139,7 @@ import { type Farm, SortBy, SortOrder } from "@threefold/gridproxy_client";
 import { jsPDF } from "jspdf";
 import { debounce } from "lodash";
 import { StrKey } from "stellar-sdk";
-import { ref } from "vue";
+import { ref, watch } from "vue";
 
 import { gridProxyClient } from "@/clients";
 import CardDetails from "@/components/node_details_cards/card_details.vue";
@@ -164,11 +164,30 @@ export default {
     CardDetails,
     AddIP,
   },
-  setup(_, context) {
+  props: {
+    reloadFarms: {
+      type: Boolean,
+    },
+  },
+
+  setup(props, context) {
     const gridStore = useGrid();
     const profile = useProfileManager().profile;
     const twinId = profile!.twinId;
     const search = ref<string>();
+    watch(
+      () => props.reloadFarms,
+      async () => {
+        console.log(props.reloadFarms);
+        loading.value = true;
+        console.log(loading.value);
+        setTimeout(async () => {
+          await reloadFarms();
+        }, 30000);
+        loading.value = false;
+      },
+    );
+
     const headers = [
       {
         title: "Farm ID",
@@ -213,6 +232,7 @@ export default {
 
     const reloadFarms = debounce(getUserFarms, 20000);
     async function getUserFarms() {
+      loading.value = true;
       try {
         const { data, count } = await gridProxyClient.farms.list({
           retCount: true,
@@ -333,6 +353,7 @@ export default {
     }
 
     context.expose({ getFarmsNames, reloadFarms });
+
     return {
       gridStore,
       headers,

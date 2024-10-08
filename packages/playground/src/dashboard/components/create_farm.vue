@@ -54,62 +54,54 @@
   </v-container>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
 import { ref } from "vue";
-
-import { notifyDelaying } from "@/utils/notifications";
 
 import { gridProxyClient } from "../../clients";
 import { useGrid } from "../../stores";
 import { createCustomToast, ToastType } from "../../utils/custom_toast";
 
+const props = defineProps<{
+  name: {
+    type: string;
+    required: true;
+  };
+}>();
+const showDialogue = ref(false);
+const isCreating = ref(false);
+const gridStore = useGrid();
+const valid = ref(false);
+const emits = defineEmits(["farm-created"]);
+async function createFarm() {
+  try {
+    isCreating.value = true;
+    await gridStore.grid.farms.create({ name: props.name });
+    createCustomToast("Farm created successfully.", ToastType.success);
+    showDialogue.value = false;
+    emits("farm-created");
+  } catch (error) {
+    console.log(error);
+    createCustomToast("Failed to create farm.", ToastType.danger);
+  } finally {
+    isCreating.value = false;
+  }
+}
+async function validateFarmName(name: string) {
+  if (!name.split("").every((c: string) => /[a-zA-Z0-9\-_]/.test(c))) {
+    return {
+      message: "Farm name can only contain alphabetic letters, numbers, '-' or '_'",
+    };
+  }
+
+  const farmsWithSameName = await gridProxyClient.farms.listAll({ name: name.toLocaleLowerCase() });
+  if (farmsWithSameName.length > 0) {
+    return { message: "Farm name already exists!" };
+  }
+}
+</script>
+<script lang="ts">
 export default {
   name: "CreateFarm",
-  props: {
-    name: {
-      type: String,
-      required: true,
-    },
-  },
-  setup(props) {
-    const showDialogue = ref(false);
-    const isCreating = ref(false);
-    const gridStore = useGrid();
-    const valid = ref(false);
-    async function createFarm() {
-      try {
-        isCreating.value = true;
-        await gridStore.grid.farms.create({ name: props.name });
-        createCustomToast("Farm created successfully.", ToastType.success);
-        notifyDelaying();
-        showDialogue.value = false;
-      } catch (error) {
-        console.log(error);
-        createCustomToast("Failed to create farm.", ToastType.danger);
-      } finally {
-        isCreating.value = false;
-      }
-    }
-    async function validateFarmName(name: string) {
-      if (!name.split("").every((c: string) => /[a-zA-Z0-9\-_]/.test(c))) {
-        return {
-          message: "Farm name can only contain alphabetic letters, numbers, '-' or '_'",
-        };
-      }
-
-      const farmsWithSameName = await gridProxyClient.farms.listAll({ name: name.toLocaleLowerCase() });
-      if (farmsWithSameName.length > 0) {
-        return { message: "Farm name already exists!" };
-      }
-    }
-    return {
-      showDialogue,
-      isCreating,
-      valid,
-      createFarm,
-      validateFarmName,
-    };
-  },
 };
 </script>
 
