@@ -428,7 +428,7 @@ const routes: AppRoute[] = [
       },
       {
         title: "Domains",
-        icon: "domains.png",
+        icon: "mdi-web-box",
         route: DashboardRoutes.Deploy.Domains,
         tooltip: "Expose servers hosted on local machines or VMs to the public internet.",
       },
