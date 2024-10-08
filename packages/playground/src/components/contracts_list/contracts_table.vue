@@ -1,5 +1,4 @@
 <template>
-  {{ rentContracts }}
   <weblet-layout ref="layout" @mount="() => {}">
     <v-data-table-server
       v-if="$props.tableHeaders"
@@ -601,6 +600,7 @@ watch(contractStateDialog, contractStateDialog => {
 });
 defineExpose({
   reset() {
+    rentContracts.value = {};
     selectedContracts.value = [];
   },
 });

@@ -345,6 +345,7 @@ async function loadContractsByType(
 }
 
 async function loadContracts(type?: ContractType, options?: { sort: { key: string; order: "asc" | "desc" }[] }) {
+  lockedContracts.value = undefined;
   totalCost.value = undefined;
   totalCostUSD.value = undefined;
   loadingErrorMessage.value = undefined;
