@@ -211,7 +211,7 @@ test("TC2847 - VM: Deploy a VM With Mycelium", async () => {
   const ipRangeClassC = "192.168.0.0/16";
   const ipRange = randomChoice([ipRangeClassA, ipRangeClassB, ipRangeClassC]);
   const metadata = "{'deploymentType': 'vm'}";
-  const description = "test deploying VMs via ts grid3 client";
+  const description = "test deploying VM with Mycelium via ts grid3 client";
   const envVarValue = generateString(30);
 
   //Node Selection
