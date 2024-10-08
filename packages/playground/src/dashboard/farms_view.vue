@@ -5,8 +5,8 @@
       <v-card-title class="pa-0">Farms</v-card-title>
     </v-card>
 
-    <CreateFarm v-model:name="name" class="mt-4" @farm-created.once="farmsReload = true" />
-    <UserFarms ref="userFarms" @farm-created="farmsReload" />
+    <CreateFarm v-model:name="name" class="mt-4" @farm-created="farmsReload = true" />
+    <UserFarms ref="userFarms" :reloadFarms="farmsReload" />
     <UserNodes />
   </div>
 </template>

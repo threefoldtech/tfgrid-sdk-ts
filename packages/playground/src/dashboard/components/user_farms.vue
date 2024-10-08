@@ -178,13 +178,9 @@ export default {
     watch(
       () => props.reloadFarms,
       async () => {
-        console.log(props.reloadFarms);
-        loading.value = true;
-        console.log(loading.value);
         setTimeout(async () => {
-          await reloadFarms();
+          await getUserFarms();
         }, 30000);
-        loading.value = false;
       },
     );
 
