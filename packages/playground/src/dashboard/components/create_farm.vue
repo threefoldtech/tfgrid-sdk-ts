@@ -71,18 +71,20 @@ export default {
       required: true,
     },
   },
-  setup(props) {
+
+  setup(props, context) {
     const showDialogue = ref(false);
     const isCreating = ref(false);
     const gridStore = useGrid();
     const valid = ref(false);
+
     async function createFarm() {
       try {
         isCreating.value = true;
         await gridStore.grid.farms.create({ name: props.name });
         createCustomToast("Farm created successfully.", ToastType.success);
-        notifyDelaying();
         showDialogue.value = false;
+        context.emit("farm-created");
       } catch (error) {
         console.log(error);
         createCustomToast("Failed to create farm.", ToastType.danger);
