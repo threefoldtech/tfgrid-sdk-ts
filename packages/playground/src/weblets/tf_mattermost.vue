@@ -47,7 +47,8 @@
           v-model:ipv4="ipv4"
           v-model:ipv6="ipv6"
           v-model:wireguard="wireguard"
-          :domain="selectionDetails?.domain"
+          :has-custom-domain="selectionDetails?.domain?.enabledCustomDomain"
+          require-domain
         />
 
         <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
@@ -113,11 +114,7 @@ const flist: Flist = {
 };
 const dedicated = ref(false);
 const certified = ref(false);
-const ipv4 = ref(false);
-const ipv6 = ref(false);
-const wireguard = ref(false);
-const planetary = ref(false);
-const mycelium = ref(true);
+const { ipv4, ipv6, planetary, mycelium, wireguard } = useNetworks();
 const smtp = ref(createSMTPServer());
 const rootFilesystemSize = computed(() =>
   calculateRootFileSystem({ CPUCores: solution.value?.cpu ?? 0, RAMInMegaBytes: solution.value?.memory ?? 0 }),
@@ -252,7 +249,7 @@ watch(
 <script lang="ts">
 import { updateGrid } from "@/utils/grid";
 
-import Networks from "../components/networks.vue";
+import Networks, { useNetworks } from "../components/networks.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import SmtpServer, { createSMTPServer } from "../components/smtp_server.vue";
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
