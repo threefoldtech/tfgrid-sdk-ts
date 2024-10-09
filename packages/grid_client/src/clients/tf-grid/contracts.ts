@@ -401,17 +401,6 @@ class TFContracts extends Contracts {
   }
 
   /**
-   * Get the total ips cost per month based on the the ip price and the pricing polices
-   * @param {Contract[]} contracts
-   * @returns {number} the total cost per month in USD;
-   */
-  private async calculateIPCostPerMonth(contracts: Contract[]) {
-    const publicIpsCount = contracts.reduce((acc, contract) => acc + (contract.details.number_of_public_ips || 0), 0);
-    const ipPrice = (await this.client.pricingPolicies.get({ id: 1 })).ipu.value / TFT_CONVERSION_FACTOR;
-    const totalIPCost = ipPrice * publicIpsCount;
-    return totalIPCost * HOURS_ONE_MONTH;
-  }
-  /**
    * Get the contract billing info, and add the additional price markup if the node is certified
    * @param {Contract} contract contract to get its billing info
    * @returns {Decimal}
@@ -429,43 +418,6 @@ class TFContracts extends Contracts {
       }
     }
     return unbilledNU;
-  }
-
-  /**
-   * Get total unbilled network usage amount for the provided contracts
-   * @param {Contract []} contracts contracts to get their unbilled NU.
-   * @returns {Decimal} total unbilled amount for NU in Unit USD.
-   */
-  private async calculateUnbilledNUAmount(contracts: Contract[]): Promise<number> {
-    const unbilledNuPromises = contracts.reduce((acc: Promise<number>[], contract) => {
-      acc.push(this.getUnbilledNu(contract.contract_id, contract.details.nodeId));
-      return acc;
-    }, []);
-    const unbilledNUResults = await Promise.all(unbilledNuPromises);
-    const totalNUCost = unbilledNUResults.reduce((acc: number, unbuilledNu) => acc + unbuilledNu, 0);
-    return totalNUCost;
-  }
-
-  /**
-   * Calculates the contract overdraft
-   * the overdraft here is returned in unit TFT
-   * @param {Contract} contracts
-   * @returns {Decimal}
-   */
-  private async calculateNodeContractsOverdraft(contracts: Contract[]): Promise<Decimal> {
-    const overDraftPromises = contracts.reduce((acc: Promise<ContractPaymentState>[], contract) => {
-      acc.push(this.client.contracts.getContractPaymentState(contract.contract_id));
-      return acc;
-    }, []);
-
-    const overDraftResult = await Promise.all(overDraftPromises);
-
-    const totalOverDraft = overDraftResult.reduce(
-      (acc: Decimal, paymentState) => acc.add(paymentState.additionalOverdraft).add(paymentState.standardOverdraft),
-      new Decimal(0),
-    );
-
-    return totalOverDraft;
   }
 
   /**
