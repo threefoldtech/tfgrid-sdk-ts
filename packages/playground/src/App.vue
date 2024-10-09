@@ -108,14 +108,6 @@
             </v-list>
           </div>
         </div>
-
-        <template v-if="version">
-          <div class="version">
-            <v-chip color="secondary">
-              {{ version }}
-            </v-chip>
-          </div>
-        </template>
       </v-navigation-drawer>
 
       <v-main :style="{ paddingTop: navbarConfig ? '140px' : '70px' }">
@@ -363,7 +355,6 @@ async function setTimeouts() {
   }
 }
 // eslint-disable-next-line no-undef
-const version = process.env.VERSION as any;
 
 const routes: AppRoute[] = [
   {

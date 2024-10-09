@@ -82,7 +82,19 @@
         </v-col>
       </v-row>
       <v-divider class="my-3 w-25 mx-auto" />
-      <div class="text-center mb-12">{{ new Date().getFullYear() }} — ThreeFoldTech</div>
+      <div class="d-flex justify-center text-subtitle-2">
+        <div class="text-center mb-12">
+          &#169; {{ new Date().getFullYear() }} ThreeFoldTech <span class="mx-2">|</span>
+        </div>
+        <template v-if="version">
+          <span>Version</span>
+          <div class="mx-2">
+            <v-chip color="secondary">
+              {{ version }}
+            </v-chip>
+          </div>
+        </template>
+      </div>
     </v-container>
   </v-footer>
 </template>
@@ -96,7 +108,7 @@ import { AppThemeSelection } from "@/utils/app_theme";
 import { manual } from "@/utils/manual";
 
 const theme = useTheme();
-
+const version = process.env.VERSION as any;
 const baseUrl = import.meta.env.BASE_URL;
 const $router = useRouter();
 
