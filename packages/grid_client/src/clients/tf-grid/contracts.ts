@@ -542,7 +542,9 @@ class TFContracts extends Contracts {
       if (!contract.details.number_of_public_ips) return 0;
       /** ip price in USD per hour */
       const ipPrice = (await this.client.pricingPolicies.get({ id: 1 })).ipu.value / TFT_CONVERSION_FACTOR;
-      return ipPrice * HOURS_ONE_MONTH;
+      const pricePerMonth = ipPrice * HOURS_ONE_MONTH;
+      if (isCertified) return pricePerMonth * (125 / 100);
+      return pricePerMonth;
     }
 
     const usedREsources: NodeContractUsedResources = await this.client.contracts.getNodeContractResources({
