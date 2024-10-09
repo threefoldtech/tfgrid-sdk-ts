@@ -277,7 +277,7 @@ class Client extends QueryClient {
 
   checkInputs(): void {
     if (!this.url) {
-      throw new ValidationError("URL is required.");
+      throw new ValidationError("TFChain URL is required.");
     }
 
     if (!SUPPORTED_KEYPAIR_TYPES.includes(this.keypairType)) {
