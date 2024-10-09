@@ -88,10 +88,8 @@
         </div>
         <template v-if="version">
           <span>Version</span>
-          <div class="mx-2">
-            <v-chip color="secondary">
-              {{ version }}
-            </v-chip>
+          <div class="mx-2 footer_header">
+            {{ version }}
           </div>
         </template>
       </div>
