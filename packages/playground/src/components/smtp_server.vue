@@ -22,7 +22,7 @@
         :rules="[
           validators.required('Email or Username is required.'),
           validators.minLength('Username must be at least 2 characters.', 2),
-          validators.maxLength('Username must be at least 50 characters.', 50),
+          validators.maxLength('Name cannot exceed 50 characters.', 50),
           (v: string) => {
             return (
               validators.isEmail('Please provide a valid email address.')(v) &&
