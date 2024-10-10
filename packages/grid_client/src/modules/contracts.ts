@@ -683,11 +683,14 @@ class Contracts {
 
         default:
           /** skip node contracts on rented nodes as it already calculated in the rent contract */
-          if (rentedNodesIds.includes(contract.details.nodeId)) continue;
-          result.nodeContracts[contract.contract_id] = (
-            await this.getContractOverdueAmount(contract, proxy)
-          ).toNumber();
-          result.totalOverdueAmount += result.nodeContracts[contract.contract_id];
+          if (rentedNodesIds.includes(contract.details.nodeId)) {
+            result.nodeContracts[contract.contract_id] = 0;
+          } else {
+            result.nodeContracts[contract.contract_id] = (
+              await this.getContractOverdueAmount(contract, proxy)
+            ).toNumber();
+            result.totalOverdueAmount += result.nodeContracts[contract.contract_id];
+          }
       }
     }
     return result;
