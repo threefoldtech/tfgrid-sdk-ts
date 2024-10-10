@@ -83,14 +83,18 @@
       </v-row>
       <v-divider class="my-3 w-25 mx-auto" />
 
-      <div class="mb-12 d-flex justify-center text-subtitle-2">
-        &#169; {{ new Date().getFullYear() }} ThreeFoldTech <span class="mx-2">|</span>
-        <template v-if="version">
-          <span>Version</span>
-          <div class="mx-2 footer_header">
-            {{ version }}
-          </div>
-        </template>
+      <div class="d-flex justify-center text-subtitle-2">
+        <div class="text-center mb-12">
+          <p>
+            &#169; {{ new Date().getFullYear() }} ThreeFoldTech
+            <span v-if="version !== 'No version to show'">
+              <span class="mx-2">|</span>Version
+              <span class="footer_header">
+                {{ version }}
+              </span></span
+            >
+          </p>
+        </div>
       </div>
     </v-container>
   </v-footer>
