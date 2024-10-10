@@ -82,10 +82,9 @@
         </v-col>
       </v-row>
       <v-divider class="my-3 w-25 mx-auto" />
-      <div class="d-flex justify-center text-subtitle-2">
-        <div class="text-center mb-12">
-          &#169; {{ new Date().getFullYear() }} ThreeFoldTech <span class="mx-2">|</span>
-        </div>
+
+      <div class="mb-12 d-flex justify-center text-subtitle-2">
+        &#169; {{ new Date().getFullYear() }} ThreeFoldTech <span class="mx-2">|</span>
         <template v-if="version">
           <span>Version</span>
           <div class="mx-2 footer_header">
