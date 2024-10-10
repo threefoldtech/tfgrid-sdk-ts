@@ -425,12 +425,14 @@ const routes: AppRoute[] = [
         icon: "mdi-lightbulb-on-outline",
         route: DashboardRoutes.Deploy.Applications,
         tooltip: "Deploy ready applications on the ThreeFold grid.",
+        releaseDate: new Date("2024-10-2"),
       },
       {
         title: "Domains",
         icon: "mdi-web-box",
         route: DashboardRoutes.Deploy.Domains,
         tooltip: "Expose servers hosted on local machines or VMs to the public internet.",
+        releaseDate: new Date("2024-10-2"),
       },
       {
         title: "Your Contracts",
@@ -555,7 +557,6 @@ function clickHandler({ route, url }: AppRouteItem): void {
 
 <script lang="ts">
 import type { GridClient } from "@threefold/grid_client";
-import { nextTick } from "process";
 
 import { DashboardRoutes } from "@/router/routes";
 import { AppThemeSelection } from "@/utils/app_theme";
