@@ -728,12 +728,12 @@ async function activateAccount() {
   activatingAccount.value = true;
   activating.value = true;
   try {
-    const mnemonicValue = validateMnemonic(mnemonic.value)
+    const mnemonicOrSeedValue = validateMnemonic(mnemonic.value)
       ? mnemonic.value
       : mnemonic.value.length === 66
       ? mnemonic.value
       : `0x${mnemonic.value}`;
-    await activateAccountAndCreateTwin(mnemonicValue);
+    await activateAccountAndCreateTwin(mnemonicOrSeedValue);
     await storeAndLogin();
   } catch (e) {
     enableReload.value = true;
