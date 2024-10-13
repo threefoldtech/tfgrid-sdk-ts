@@ -43,13 +43,13 @@ describe("ZmachineLight Class Tests", () => {
     expect(zmachineLight).toBeInstanceOf(ZmachineLight);
   });
 
-  // it("should correctly serialize and deserialize a ZmachineLight instance", () => {
-  //   const serialized = JSON.stringify(zmachineLight);
-  //   const deserialized = plainToClass(ZmachineLight, JSON.parse(serialized));
+  it("should correctly serialize and deserialize a ZmachineLight instance", () => {
+    const serialized = JSON.stringify(zmachineLight);
+    const deserialized = plainToClass(ZmachineLight, JSON.parse(serialized));
 
-  //   expect(deserialized).toBeInstanceOf(ZmachineLight);
-  //   expect(deserialized.challenge()).toBe(zmachineLight.challenge());
-  // });
+    expect(deserialized).toBeInstanceOf(ZmachineLight);
+    expect(deserialized.challenge()).toBe(zmachineLight.challenge());
+  });
 
   it("should correctly handle env vars", () => {
     const challenge = zmachineLight.challenge();

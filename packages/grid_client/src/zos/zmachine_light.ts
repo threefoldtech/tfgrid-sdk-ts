@@ -16,19 +16,13 @@ import {
 import { ValidateMembers } from "../helpers";
 import { ComputeCapacity } from "./computecapacity";
 import { WorkloadData, WorkloadDataResult } from "./workload_base";
+import { Mount, MyceliumIP } from "./zmachine";
 
-//Why not do a challenge in the dollowing two classew
 class MachineInterface {
   @Expose() @IsString() @IsNotEmpty() network: string;
   @Expose() @IsIP() @IsNotEmpty() ip: string;
 }
 
-class MyceliumIP {
-  // Should network var changed to name as it's in zos??
-  @Expose() @IsString() @IsNotEmpty() network: string;
-  @Expose() @IsString() hex_seed: string;
-}
-// should I change name to ZmachineLightNetwork??
 class ZmachineLightNetwork {
   //what is ValidateNested
   @Expose() @Type(() => MachineInterface) @ValidateNested({ each: true }) interfaces: MachineInterface[];
@@ -45,18 +39,6 @@ class ZmachineLightNetwork {
     return out;
   }
 }
-class Mount {
-  @Expose() @IsString() @IsNotEmpty() name: string;
-  @Expose() @IsString() @IsNotEmpty() mountpoint: string;
-
-  challenge(): string {
-    let out = "";
-    out += this.name;
-    out += this.mountpoint;
-    return out;
-  }
-}
-
 @ValidateMembers()
 class ZmachineLight extends WorkloadData {
   @Expose() @IsString() @IsNotEmpty() @IsUrl() flist: string;
@@ -99,4 +81,4 @@ class ZmachineLightResult extends WorkloadDataResult {
   @Expose() mycelium_ip: string;
 }
 
-export { ZmachineLight, ZmachineLightNetwork, MachineInterface, Mount, ZmachineLightResult, MyceliumIP };
+export { ZmachineLight, ZmachineLightNetwork, MachineInterface, ZmachineLightResult };

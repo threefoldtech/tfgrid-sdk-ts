@@ -11,7 +11,8 @@ import { Graphql } from "../clients/graphql/client";
 import { formatErrorMessage } from "../helpers";
 import { send, sendWithFullResponse } from "../helpers/requests";
 import { convertObjectToQueryString } from "../helpers/utils";
-import { FarmFilterOptions, FilterOptions, NodeStatus } from "../modules/models";
+import { FarmFilterOptions, FilterOptions, MachineModel, NodeStatus } from "../modules/models";
+import { WorkloadTypes } from "../zos";
 
 interface FarmInfo {
   name: string;
@@ -332,6 +333,77 @@ class Nodes {
         throw new GridClientError(`Couldn't get Node with ID ${nodeId} due to ${e}`);
       });
   }
+  // static getFeaturesFromFilters(options: FilterOptions = {}): string[] {
+  //   const features: string[] = [];
+
+  //   if (options.cru || options.mru || options.sru || options.hru ) {
+  //     features.push(WorkloadTypes.volume);
+  //     features.push(WorkloadTypes.zdb);
+
+  //   }
+
+  //   // Check for public IPs and IPv6
+  //   if (options.publicIPs || options.hasIPv6) {
+  //     features.push(WorkloadTypes.ip);
+  //     features.push(WorkloadTypes.ipv4);
+  //     features.push(WorkloadTypes.network);
+  //   }
+
+  //   // Access nodes (IPv4 or IPv6)
+  //   // if (options.accessNodeV4) {
+  //   //   features.push("Access Node IPv4");
+  //   // }
+  //   // if (filters.accessNodeV6) {
+  //   //   features.push("Access Node IPv6");
+  //   // }
+
+  //   // Check for gateway
+  //   if (options.gateway) {
+  //     features.push(WorkloadTypes.gatewayfqdnproxy);
+  //     features.push(WorkloadTypes.gatewaynameproxy);
+  //   }
+  //   return features;
+  // }
+
+  // static getFeaturesFromMachine(machine: MachineModel): string[] {
+  //   const featuresSet = new Set<string>();
+
+  //   if (machine.public_ip6 || machine.public_ip) {
+  //     featuresSet.add(WorkloadTypes.ip);
+  //   }
+
+  //   if (machine.planetary) {
+  //     featuresSet.add(WorkloadTypes.zmachine);
+  //   }
+
+  //   if (machine.mycelium && machine.planetary && !machine.public_ip && !machine.public_ip6) {
+  //     featuresSet.add(WorkloadTypes.zmachinelight);
+  //     featuresSet.add(WorkloadTypes.networklight);
+  //   } else {
+  //     featuresSet.add(WorkloadTypes.zmachine);
+  //     featuresSet.add(WorkloadTypes.network);
+  //   }
+
+  //   if (machine.disks && machine.disks.length > 0) {
+  //     featuresSet.add(WorkloadTypes.volume);
+  //     featuresSet.add(WorkloadTypes.zmount);
+  //   }
+
+  //   if (machine.qsfs_disks && machine.qsfs_disks.length > 0) {
+  //     featuresSet.add(WorkloadTypes.qsfs);
+  //   }
+
+  //   if (machine.gpus && machine.gpus.length > 0) {
+  //     featuresSet.add(WorkloadTypes.zmachine);
+  //     featuresSet.add(WorkloadTypes.zmachinelight);
+  //   }
+
+  //   if (machine.zlogsOutput) {
+  //     featuresSet.add(WorkloadTypes.zlogs);
+  //   }
+
+  //   return Array.from(featuresSet);
+  // }
 
   async filterNodes(options: FilterOptions = {}, url = ""): Promise<NodeInfo[]> {
     let nodes: NodeInfo[] = [];

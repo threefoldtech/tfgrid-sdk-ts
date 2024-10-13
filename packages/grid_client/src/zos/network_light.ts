@@ -11,7 +11,6 @@ class Mycelium {
 
 @ValidateMembers()
 class NetworkLight extends WorkloadData {
-  // subnet shouldn't be a string, should be ```gridtypes.IPNet```
   @Expose() @IsString() @IsNotEmpty() subnet: string;
   @Expose() @IsOptional() @Type(() => Mycelium) @ValidateNested() mycelium: Mycelium;
 
