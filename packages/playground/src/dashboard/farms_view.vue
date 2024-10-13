@@ -5,15 +5,13 @@
       <v-card-title class="pa-0">Farms</v-card-title>
     </v-card>
 
-    <CreateFarm v-model:name="name" class="mt-4" />
+    <CreateFarm class="mt-4" />
     <UserFarms ref="userFarms" />
     <UserNodes />
   </div>
 </template>
 
 <script lang="ts">
-import { ref } from "vue";
-
 import CreateFarm from "./components/create_farm.vue";
 import UserFarms from "./components/user_farms.vue";
 import UserNodes from "./components/user_nodes.vue";
@@ -24,13 +22,6 @@ export default {
     UserNodes,
     UserFarms,
     CreateFarm,
-  },
-  setup() {
-    const name = ref<string>("");
-
-    return {
-      name,
-    };
   },
 };
 </script>
