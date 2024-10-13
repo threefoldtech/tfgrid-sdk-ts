@@ -28,7 +28,7 @@
               validators.isEmail('Please provide a valid email address.')(v) &&
               (validators.IsAlphaExpectDashAndUnderscore(
                 'Username should consist of letters, dashs and underscores only.' 
-              )(v) || validators.isAlpha('Username must start with an alphabetical character.')(v[0]))
+              )(v))
             );
           },
         ]"

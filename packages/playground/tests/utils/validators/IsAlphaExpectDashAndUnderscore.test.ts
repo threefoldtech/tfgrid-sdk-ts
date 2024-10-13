@@ -35,4 +35,9 @@ describe("IsAlphaExpectDashAndUnderscore", () => {
     const result = validator("hello");
     expect(result).toBeUndefined();
   });
+
+  it("returns undefined for valid username/email that starts with numbers", () => {
+    const result = validator("4me");
+    expect(result).toBeUndefined();
+  });
 });
