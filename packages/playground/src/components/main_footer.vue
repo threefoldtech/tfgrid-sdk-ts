@@ -86,7 +86,7 @@
       <div class="mb-12 d-flex justify-center text-subtitle-2">
         <p>
           &#169; {{ new Date().getFullYear() }} ThreeFoldTech
-          <span v-if="version !== message">
+          <span v-if="version !== messages">
             <span class="mx-2">|</span>Version
             <span class="footer_header">
               {{ version }}
