@@ -364,7 +364,7 @@ class TFContracts extends Contracts {
       const tft = new currency(tftPrice, 15).convertUSDtoTFT({ amount: USD.toNumber() });
       return new Decimal(tft);
     } catch (error) {
-      throw new GridClientError(`Failed to convert to mTFT due: ${error}`);
+      throw new GridClientError(`Failed to convert to TFT due: ${error}`);
     }
   }
   /**

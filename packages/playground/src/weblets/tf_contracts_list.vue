@@ -125,12 +125,15 @@
             <span class="font-weight-bold">{{ Math.ceil(lockedContracts?.totalOverdueAmount) }}</span> TFTs.
           </div>
           <div v-else>
-            You need to fund your account with
-            <span class="font-weight-bold">
-              {{ Math.ceil(lockedContracts?.totalOverdueAmount - freeBalance) }}
-              TFTs
-            </span>
-            to resume your contracts
+            <div>
+              Please fund your account with
+              <span class="font-weight-bold">
+                {{ Math.ceil(lockedContracts?.totalOverdueAmount - freeBalance) }}
+                TFTs
+              </span>
+            </div>
+            Note that this amount will allow you to resume the contracts for up to one hour only. Make sure to complete
+            the funding promptly to avoid any interruptions!
           </div>
         </v-alert>
         <v-divider class="mt-3" />
