@@ -86,7 +86,7 @@
       <div class="mb-12 d-flex justify-center text-subtitle-2">
         <p>
           &#169; {{ new Date().getFullYear() }} ThreeFoldTech
-          <span v-if="version !== 'No version to show'">
+          <span v-if="version !== message">
             <span class="mx-2">|</span>Version
             <span class="footer_header">
               {{ version }}
@@ -99,6 +99,7 @@
 </template>
 
 <script lang="ts" setup>
+import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { useTheme } from "vuetify";
 
@@ -110,7 +111,7 @@ const theme = useTheme();
 const version = process.env.VERSION as any;
 const baseUrl = import.meta.env.BASE_URL;
 const $router = useRouter();
-
+const message = ref("No version to show");
 function navigateToHome() {
   return $router.push(DashboardRoutes.Other.HomePage);
 }
