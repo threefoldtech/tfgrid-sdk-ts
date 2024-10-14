@@ -160,8 +160,8 @@
 
         <v-alert class="mt-4" type="info" variant="tonal"
           >The Contracts in Grace Period, which means that your workloads are suspended but not deleted; in order to
-          resume your workloads and restore their functionality, Please fund your account with the amount mentioned
-          above.</v-alert
+          resume your workloads and restore their functionality for up to one hour, Please fund your account with the
+          amount mentioned above.</v-alert
         >
         <v-divider class="mt-3" />
       </v-card-text>
@@ -229,14 +229,20 @@
       </v-card-text>
       <v-card-text v-else>
         <v-alert class="my-4" type="warning" variant="tonal">
-          <div v-if="selectedLockedAmount < freeBalance">
+          <div v-if="selectedLockedAmount <= freeBalance">
             You have enough balance to unlock your contract<span v-if="selectedContracts.length > 1">s</span>; this will
             cost you around {{ Math.ceil(selectedLockedAmount) }} TFTs.
           </div>
           <div v-else-if="selectedLockedAmount > 0">
-            Make sure to have
-            <span class="font-weight-bold">{{ Math.ceil(selectedLockedAmount - freeBalance) }} TFTs</span>
-            in your account to resume {{ selectedContracts.length > 1 ? "those contracts" : "this contract" }}.
+            <div>
+              Please fund your account with
+              <span class="font-weight-bold">{{ Math.ceil(selectedLockedAmount - freeBalance) }} TFTs</span>
+              to resume {{ selectedContracts.length > 1 ? "those contracts" : "this contract" }}.
+            </div>
+            <div>
+              Note that this amount will allow you to resume the contracts for up to one hour only. Make sure to
+              complete the funding promptly to avoid any interruptions!
+            </div>
           </div>
         </v-alert>
         <v-chip class="ma-1" label v-for="c in selectedContracts" :key="c.contract_id">
