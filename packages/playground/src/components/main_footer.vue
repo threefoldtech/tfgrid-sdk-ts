@@ -108,7 +108,7 @@ import { AppThemeSelection } from "@/utils/app_theme";
 import { manual } from "@/utils/manual";
 
 const theme = useTheme();
-const version = process.env.VERSION as any;
+const version = process.env.VERSION;
 const baseUrl = import.meta.env.BASE_URL;
 const $router = useRouter();
 const message = inject("noAppVersion");
