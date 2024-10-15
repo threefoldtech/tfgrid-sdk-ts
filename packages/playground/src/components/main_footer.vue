@@ -99,7 +99,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from "vue";
+import { inject } from "vue";
 import { useRouter } from "vue-router";
 import { useTheme } from "vuetify";
 
@@ -111,7 +111,7 @@ const theme = useTheme();
 const version = process.env.VERSION as any;
 const baseUrl = import.meta.env.BASE_URL;
 const $router = useRouter();
-const message = ref("No version to show");
+const message = inject("noAppVersion");
 function navigateToHome() {
   return $router.push(DashboardRoutes.Other.HomePage);
 }
