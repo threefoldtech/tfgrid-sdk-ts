@@ -85,6 +85,7 @@ export default {
         createCustomToast("Farm created successfully.", ToastType.success);
         showDialogue.value = false;
         context.emit("farm-created");
+        notifyDelaying();
       } catch (error) {
         console.log(error);
         createCustomToast("Failed to create farm.", ToastType.danger);
