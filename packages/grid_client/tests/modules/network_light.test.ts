@@ -45,26 +45,12 @@ describe("NetworkLight Class Tests", () => {
     expect(setEmptySubnet).toThrow();
   });
 
-  // it("should throw an error if mycelium hex_key is empty", () => {
-  //   const setEmptyHexKey = () => (networkLight.mycelium.hex_key = "");
-
-  //   expect(setEmptyHexKey).toThrow();
-  // });
-
   it("should handle an empty mycelium object correctly", () => {
     networkLight.mycelium = undefined as any;
 
     const expectedChallenge = networkLight.subnet;
     expect(networkLight.challenge()).toBe(expectedChallenge);
   });
-
-  // it("should fail validation for invalid peer values", () => {
-  //   const invalidPeers = () => {
-  //     networkLight.mycelium.peers = [""];
-  //   };
-
-  //   expect(invalidPeers).toThrow();
-  // });
 
   it("should correctly handle peers being empty", () => {
     networkLight.mycelium.peers = [];
