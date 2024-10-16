@@ -1,6 +1,7 @@
 import { Keyring } from "@polkadot/keyring";
 import { KeyringPair } from "@polkadot/keyring/types";
 import { waitReady } from "@polkadot/wasm-crypto";
+import urlJoin from "url-join";
 
 import { bytesFromHex, KeypairType, send, stringToHex } from "../..";
 import { KycHeaders, TokenResponse, VerificationDataResponse, VerificationStatusResponse } from "./types";
@@ -88,7 +89,7 @@ export default class KYC {
    */
   async data(): Promise<VerificationDataResponse> {
     const headers = await this.prepareHeaders();
-    return (await send("GET", `${this.apiDomain}/data`, "", headers)) as VerificationDataResponse;
+    return (await send("GET", urlJoin(this.apiDomain, "data"), "", headers)) as VerificationDataResponse;
   }
 
   /**
@@ -99,7 +100,7 @@ export default class KYC {
    */
   async status(): Promise<VerificationStatusResponse> {
     const headers = await this.prepareHeaders();
-    return (await send("GET", `${this.apiDomain}/status`, "", headers)) as VerificationStatusResponse;
+    return (await send("GET", urlJoin(this.apiDomain, "status"), "", headers)) as VerificationStatusResponse;
   }
 
   /**
@@ -110,6 +111,6 @@ export default class KYC {
    */
   async token(): Promise<TokenResponse> {
     const headers = await this.prepareHeaders();
-    return (await send("POST", `${this.apiDomain}/token`, "", headers)) as TokenResponse;
+    return (await send("POST", urlJoin(this.apiDomain, "token"), "", headers)) as TokenResponse;
   }
 }
