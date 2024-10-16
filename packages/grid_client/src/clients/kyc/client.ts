@@ -2,7 +2,7 @@ import { Keyring } from "@polkadot/keyring";
 import { KeyringPair } from "@polkadot/keyring/types";
 import { waitReady } from "@polkadot/wasm-crypto";
 
-import { KeypairType, send } from "../..";
+import { bytesFromHex, KeypairType, send, stringToHex } from "../..";
 import { KycHeaders, TokenResponse, VerificationDataResponse, VerificationStatusResponse } from "./types";
 
 /**
@@ -54,22 +54,6 @@ export default class KYC {
     await waitReady();
     return this.keyr.addFromUri(this.mnemonic);
   }
-  /**
-   * Converts a string message to its hexadecimal representation.
-   * @param message - The message to convert.
-   * @returns The hexadecimal representation of the message.
-   */
-  private stringToHex(message: string): string {
-    return Buffer.from(message).toString("hex");
-  }
-  /**
-   * Converts a hexadecimal string to a byte array.
-   * @param hex - The hexadecimal string to convert.
-   * @returns {Uint8Array} The byte array representation of the hexadecimal string.
-   */
-  private bytesFromHex(hex: string): Uint8Array {
-    return new Uint8Array(Buffer.from(hex, "hex"));
-  }
 
   /**
    * Prepares the headers required for TFGrid KYC requests.
@@ -82,9 +66,9 @@ export default class KYC {
    */
   private async prepareHeaders(): Promise<Record<string, string>> {
     const timestamp = Date.now();
-    const challenge = this.stringToHex(`${this.apiDomain}:${timestamp}`);
+    const challenge = stringToHex(`${this.apiDomain}:${timestamp}`);
     const key = await this.getKey();
-    const signedChallenge = key.sign(this.bytesFromHex(challenge));
+    const signedChallenge = key.sign(bytesFromHex(challenge));
     const signedMsgHex = Buffer.from(signedChallenge).toString("hex");
 
     const headers: KycHeaders = {
