@@ -86,7 +86,7 @@
       <div class="mb-12 d-flex justify-center text-subtitle-2">
         <p>
           &#169; {{ new Date().getFullYear() }} ThreeFoldTech
-          <span v-if="version !== message">
+          <span v-if="version !== noAppVersionMessage">
             <span class="mx-2">|</span>Version
             <span class="footer_header">
               {{ version }}
@@ -111,7 +111,7 @@ const theme = useTheme();
 const version = process.env.VERSION;
 const baseUrl = import.meta.env.BASE_URL;
 const $router = useRouter();
-const message = inject("noAppVersion");
+const noAppVersionMessage = inject("noAppVersion");
 function navigateToHome() {
   return $router.push(DashboardRoutes.Other.HomePage);
 }
