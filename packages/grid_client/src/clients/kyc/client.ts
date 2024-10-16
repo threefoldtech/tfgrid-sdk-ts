@@ -14,13 +14,12 @@ import { KycHeaders, TokenResponse, VerificationDataResponse, VerificationStatus
  * @class KYC
  * @example
  * ```typescript
- * const kyc = new KYC("https://api.example.com", "TFChain-address", KeypairType.sr25519, "mnemonic");
+ * const kyc = new KYC("https://api.example.com", KeypairType.sr25519, "mnemonic");
  * const data = await kyc.data();
  * const status = await kyc.status();
  * const token = await kyc.token();
  * ```
  * @param {string} apiDomain - The API domain for the KYC service.
- * @param {string} address - The TFChain address.
  * @param {KeypairType} [keypairType=KeypairType.sr25519] - The type of keypair to use.
  * @param {string} mnemonic - The mnemonic for generating the keypair.
  * @method data - Fetches the verification data from the KYC service.
@@ -28,32 +27,32 @@ import { KycHeaders, TokenResponse, VerificationDataResponse, VerificationStatus
  * @method token - Fetches the token from the KYC service.
  */
 export default class KYC {
-  private keyr: Keyring;
+  private keyring: Keyring;
+  private keypair: KeyringPair;
+  public address: string;
   /**
    * Creates an instance of KYC.
    * @param apiDomain - The API domain for the TFGrid KYC service.
-   * @param address - The TFChain user address.
    * @param keypairType - The type of keypair to use (default is sr25519).
    * @param mnemonic - The mnemonic for generating the keypair.
    */
   constructor(
     public apiDomain: string,
-    public address: string,
     public keypairType: KeypairType = KeypairType.sr25519,
     private mnemonic: string,
-  ) {
-    this.keyr = new Keyring({ type: keypairType });
-  }
+  ) {}
 
   /**
-   * Retrieves a key pair from the mnemonic.
+   * Setup the keypair and the address
    *
-   * @returns {Promise<KeyringPair>} A promise that resolves to a KeyringPair object.
+   * @returns {Promise<void>}
    * @private
    */
-  private async getKey(): Promise<KeyringPair> {
+  private async setupKeyring() {
+    const keyring = new Keyring({ type: this.keypairType });
     await waitReady();
-    return this.keyr.addFromUri(this.mnemonic);
+    this.keypair = keyring.addFromUri(this.mnemonic);
+    this.address = this.keypair.address;
   }
 
   /**
@@ -66,10 +65,10 @@ export default class KYC {
    *
    */
   private async prepareHeaders(): Promise<Record<string, string>> {
+    await this.setupKeyring();
     const timestamp = Date.now();
     const challenge = stringToHex(`${this.apiDomain}:${timestamp}`);
-    const key = await this.getKey();
-    const signedChallenge = key.sign(bytesFromHex(challenge));
+    const signedChallenge = this.keypair.sign(bytesFromHex(challenge));
     const signedMsgHex = Buffer.from(signedChallenge).toString("hex");
 
     const headers: KycHeaders = {
