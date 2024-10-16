@@ -5,8 +5,8 @@
       <v-card-title class="pa-0">Farms</v-card-title>
     </v-card>
 
-    <CreateFarm v-model:name="name" class="mt-4" />
-    <UserFarms ref="userFarms" />
+    <CreateFarm v-model:name="name" class="mt-4" @farm-created="farmsReload = true" />
+    <UserFarms ref="userFarms" :reloadFarms="farmsReload" />
     <UserNodes />
   </div>
 </template>
@@ -27,9 +27,11 @@ export default {
   },
   setup() {
     const name = ref<string>("");
+    const farmsReload = ref<boolean>(false);
 
     return {
       name,
+      farmsReload,
     };
   },
 };
