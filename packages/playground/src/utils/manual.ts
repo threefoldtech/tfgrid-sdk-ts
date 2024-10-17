@@ -5,7 +5,7 @@ export const manual = {
   tft_bridges: `${BASE}/documentation/threefold_token/tft_bridges/tft_bridges.html`,
   buy_sell_tft: `${BASE}/documentation/threefold_token/buy_sell_tft/buy_sell_tft.html`,
   farmers: `${BASE}/documentation/farmers/farmers.html`,
-  governance: `${BASE}/knowledge_base/about/governance.html`,
+  governance: `${BASE}/documentation/dashboard/tfchain/tf_dao.html`,
   pricing: `${BASE}/knowledge_base/cloud/pricing/pricing.html`,
   dao: `${BASE}/documentation/dashboard/tfchain/tf_dao.html`,
   caprover: `${BASE}/documentation/dashboard/solutions/caprover.html`,
