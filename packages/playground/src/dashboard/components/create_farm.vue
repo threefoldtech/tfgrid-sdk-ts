@@ -71,9 +71,9 @@ export default {
         isCreating.value = true;
         await gridStore.grid.farms.create({ name: farmName.value });
         createCustomToast("Farm created successfully.", ToastType.success);
-        notifyDelaying();
         showDialogue.value = false;
         farmName.value = "";
+        notifyDelaying();
       } catch (error) {
         console.log(error);
         createCustomToast("Failed to create farm.", ToastType.danger);

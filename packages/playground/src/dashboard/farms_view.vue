@@ -5,8 +5,8 @@
       <v-card-title class="pa-0">Farms</v-card-title>
     </v-card>
 
-    <CreateFarm class="mt-4" />
-    <UserFarms ref="userFarms" />
+    <CreateFarm class="mt-4" @farm-created="farmsReload = true" />
+    <UserFarms ref="userFarms" :reloadFarms="farmsReload" />
     <UserNodes />
   </div>
 </template>
@@ -22,6 +22,13 @@ export default {
     UserNodes,
     UserFarms,
     CreateFarm,
+  },
+  setup() {
+    const farmsReload = ref<boolean>(false);
+
+    return {
+      farmsReload,
+    };
   },
 };
 </script>
