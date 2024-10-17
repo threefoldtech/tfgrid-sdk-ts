@@ -188,15 +188,20 @@ def convert_to_scaled_float(number):
     return scaled_number
 
 
-
 def byte_converter(value):
+    # Define the unit and the numeric value before checking conditions
+    unit = value[-2].upper()  # Last character represents the unit (P, T, G)
+    number_str = value[:-3].strip()  # Everything except the last two characters is the number
+
     if value != '0':
-        if value[-2] == 'P':
-            return float(value[:-3]) * (1024 ** 5)
-        elif value[-2] == 'T':
-            return float(value[:-3]) * (1024 ** 4)
-        elif value[-2] == 'G':
-            return float(value[:-3])
+        # Convert based on the unit
+        if unit == 'P':  # Petabytes
+            return float(number_str) * (1024 ** 5)
+        elif unit == 'T':  # Terabytes
+            return float(number_str) * (1024 ** 4)
+        elif unit == 'G':  # Gigabytes
+            return float(number_str)  # No conversion needed, already in gigabytes
+
     return float(value)
 
 

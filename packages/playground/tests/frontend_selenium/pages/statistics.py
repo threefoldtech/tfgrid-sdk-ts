@@ -43,31 +43,33 @@ class StatisticsPage:
         WebDriverWait(self.browser, 60).until(EC.visibility_of_element_located(self.statistics_label))
 
     def statistics_detials(self):
-        details = []
+        details = {}
         wait = WebDriverWait(self.browser, 60)  # Increased wait time to 60 seconds
-        elements_to_fetch = [
-            ("Nodes Online", self.nodes_online),
-            ("Dedicated Machines", self.dedicated_machines),
-            ("Farms", self.farms),
-            ("Countries", self.countries),
-            ("CPUs", self.cpus),
-            ("SSD Storage", self.ssd_storage),
-            ("HDD Storage", self.hdd_storage),
-            ("RAM", self.ram),
-            ("GPUs", self.gpus),
-            ("Access Nodes", self.access_nodes),
-            ("Gateways", self.gateways),
-            ("Twins", self.twins),
-            ("Public IPs", self.public_ips),
-            ("Contracts", self.conracts),
-            ("Number of workloads", self.number_of_workloads)
-        ]
-        for _, locator in elements_to_fetch:
+        elements_to_fetch = {
+            "nodes": self.nodes_online,
+            "dedicatedNodes": self.dedicated_machines,
+            "farms": self.farms,
+            "countries": self.countries,
+            "totalCru": self.cpus,
+            "totalSru": self.ssd_storage,
+            "totalHru": self.hdd_storage,
+            "totalMru": self.ram,
+            "gpus": self.gpus,
+            "accessNodes": self.access_nodes,
+            "gateways": self.gateways,
+            "twins": self.twins,
+            "publicIps": self.public_ips,
+            "contracts": self.conracts,
+            "workloads_number": self.number_of_workloads
+        }
+
+        for key, locator in elements_to_fetch.items():
             try:
                 element_text = wait.until(EC.visibility_of_element_located(locator)).text
-                details.append(element_text)
+                details[key] = element_text
             except TimeoutException:
-                details.append(None) # Add None or some default value to maintain list consistency
+                details[key] = None  # Add None or some default value to maintain dictionary consistency
+
         return details
 
     def get_link(self):
