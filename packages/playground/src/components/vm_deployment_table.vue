@@ -258,11 +258,16 @@ async function loadDeployments() {
     const vms = mergeLoadedDeployments(chunk1, chunk2, chunk3 as any);
     failedDeployments.value = vms.failedDeployments;
     count.value = vms.count;
-
-    items.value = vms.items.map((_vms: any) => {
+    const updatedVMS = vms.items.map((_vms: any) => {
       const leader = setCaproverWorkers(_vms);
       return leader || _vms;
     });
+
+    const has_leader = updatedVMS.filter(vm => vm.env && vm.env["SWM_NODE_MODE"] === "leader").length > 0;
+
+    if (has_leader) {
+      items.value = updatedVMS;
+    }
   } catch (err) {
     errorMessage.value = `Failed to load Deployments: ${err}`;
   } finally {

@@ -22,7 +22,7 @@ export function setCaproverWorkers(vms: ZmachineData[], projectName: string | un
       workers.push(vm);
     }
 
-    if (projectName) {
+    if (projectName && leader) {
       vm.projectName = projectName;
       vm.deploymentName = leader.name;
     }
