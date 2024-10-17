@@ -212,7 +212,8 @@ export default {
     });
 
     watch(theme.global.name, theme => {
-      selectedTheme.value = currentTheme.value = `${theme} Mode`;
+      selectedTheme.value = currentTheme.value = theme.includes("mode") ? theme : `${theme} mode`;
+      localStorage.setItem(LocalStorageSettingsKey.THEME_KEY, theme);
     });
 
     const deploymentTimeoutdefaultMinutes = gridStore?.client.clientOptions.deploymentTimeoutMinutes;
@@ -223,6 +224,8 @@ export default {
     const isValidPassword = ref(false);
 
     onMounted(async () => {
+      if (!selectedTheme.value) return;
+      selectedTheme.value = selectedTheme.value.includes("mode") ? selectedTheme.value : `${selectedTheme.value} mode`;
       currentQueryTimeout.value = +localStorage.getItem(LocalStorageSettingsKey.TIMEOUT_QUERY_KEY)!;
       selectedQueryTimeout.value = currentQueryTimeout.value;
       if (localStorage.getItem(LocalStorageSettingsKey.TIMEOUT_DEPLOYMENT_KEY)) {
@@ -235,7 +238,8 @@ export default {
     });
 
     function isCurrentTheme() {
-      return selectedTheme.value == currentTheme.value;
+      if (!currentTheme.value) return;
+      return selectedTheme.value?.includes(currentTheme.value);
     }
     function UpdateTheme() {
       switch (selectedTheme.value) {
