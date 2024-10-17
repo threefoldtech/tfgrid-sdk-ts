@@ -493,11 +493,12 @@ async function onDelete(k8s = false) {
             item[0].workloads[0].name as string,
           );
         } else {
+          getDeploymentIps(item);
           await deleteDeployment(updateGrid(grid!, { projectName: item.projectName }), {
             deploymentName: item.deploymentName,
             name: k8s ? item.deploymentName : item.name,
             projectName: item.projectName,
-            ip: item.interfaces?.[0]?.ip,
+            ip: getDeploymentIps(item),
             k8s,
           });
         }
@@ -539,6 +540,33 @@ deploymentListManager?.register(uid, () => {
 });
 
 onUnmounted(() => deploymentListManager?.unregister(uid));
+
+/**
+ * Collect the deployment interfaces ips
+ * @param item deployment data
+ * @returns {string[]} list of strings
+ */
+function getDeploymentIps(item: any): string[] {
+  const ips = [];
+  // wg ip
+  if (item.interfaces) {
+    for (const iface of item.interfaces) {
+      if (iface.ip) {
+        const ip = iface.ip.split("/")[0];
+        console.log();
+        ips.push(ip);
+      }
+    }
+  }
+  // public ip, ipv6
+  if (item.publicIP) {
+    if (item.publicIP.ip) ips.push(item.publicIP.ip);
+    if (item.publicIP.ipv6) ips.push(item.publicIP.ip6);
+  }
+  if (item.planetary) ips.push(item.planetary);
+  if (item.myceliumIP) ips.push(item.myceliumIP);
+  return ips;
+}
 </script>
 
 <script lang="ts">

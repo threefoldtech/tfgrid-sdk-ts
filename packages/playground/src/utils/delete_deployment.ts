@@ -10,7 +10,7 @@ export interface DeleteDeploymentOptions {
   deploymentName?: string;
   name: string;
   projectName: ProjectName;
-  ip?: string;
+  ip?: string[];
   k8s?: boolean;
 }
 
@@ -27,6 +27,7 @@ export async function deleteDeployment(grid: GridClient, options: DeleteDeployme
 
   /* For fvm/vm */
   if (isVm(options.projectName)) {
+    console.log("Deleting vm gateways", options.ip);
     await deleteVmGateways(grid, options.ip);
   }
 
@@ -117,10 +118,11 @@ function isVm(projectName: string) {
   return false;
 }
 
-async function deleteVmGateways(grid: GridClient, ip?: string) {
+async function deleteVmGateways(grid: GridClient, ips?: string[]) {
   const { gateways } = await loadDeploymentGateways(grid, {
-    filter: ip ? gw => gw.backends.some(bk => bk.includes(ip)) : undefined,
+    filter: ips ? gw => gw.backends.some(bk => ips.some(ip => bk.includes(ip))) : undefined,
   });
+  console.log("gateways", gateways);
   for (const gateway of gateways) {
     try {
       if (gateway.type.includes("name")) {
