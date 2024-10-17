@@ -1,14 +1,16 @@
 import { describe, expect, it } from "vitest";
 
-import { IsAlphaExpectDashAndUnderscore } from "../../../src/utils/validators";
+import { IsAlphanumericExpectDashAndUnderscore } from "../../../src/utils/validators";
 
-const validator = IsAlphaExpectDashAndUnderscore("Username should consist of letters, dashs and underscores only.");
+const validator = IsAlphanumericExpectDashAndUnderscore(
+  "Username should consist of letters, numbers, dashs and underscores only.",
+);
 
-describe("IsAlphaExpectDashAndUnderscore", () => {
+describe("IsAlphanumericExpectDashAndUnderscore", () => {
   it("returns an error message for input with spaces", () => {
     const result = validator("hello world!");
     expect(result).toEqual({
-      message: "Username should consist of letters, dashs and underscores only.",
+      message: "Username should consist of letters, numbers, dashs and underscores only.",
       requiredTrue: true,
     });
   });
@@ -16,7 +18,7 @@ describe("IsAlphaExpectDashAndUnderscore", () => {
   it("returns an error message for input with special characters", () => {
     const result = validator("hello@world");
     expect(result).toEqual({
-      message: "Username should consist of letters, dashs and underscores only.",
+      message: "Username should consist of letters, numbers, dashs and underscores only.",
       requiredTrue: true,
     });
   });

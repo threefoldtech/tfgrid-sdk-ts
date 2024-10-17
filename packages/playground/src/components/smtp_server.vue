@@ -26,8 +26,8 @@
           (v: string) => {
             return (
               validators.isEmail('Please provide a valid email address.')(v) &&
-              (validators.IsAlphaExpectDashAndUnderscore(
-                'Username should consist of letters, dashs and underscores only.' 
+              (validators.IsAlphanumericExpectDashAndUnderscore(
+                'Username should consist of letters, numbers, dashs and underscores only.' 
               )(v))
             );
           },
