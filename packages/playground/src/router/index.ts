@@ -609,7 +609,7 @@ function createDeployRoutes(): RouteRecordRaw[] {
         {
           path: DashboardRoutes.Deploy.Domains,
           component: () => import("@/views/domains_view.vue"),
-          meta: { title: "Domains", publicPath: true },
+          meta: { title: "Domains" },
         },
         {
           path: DashboardRoutes.Deploy.NodeFinder,
