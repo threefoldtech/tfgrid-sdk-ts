@@ -12,7 +12,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref, watch } from "vue";
+import { ref, watch } from "vue";
 import { useTheme } from "vuetify";
 
 import { LocalStorageSettingsKey } from "@/utils/settings";
@@ -21,9 +21,9 @@ const theme = useTheme();
 const light = ref(false);
 
 watch(light, light => (theme.global.name.value = light ? "light" : "dark"));
-watch(theme.global.name, theme => localStorage.setItem(LocalStorageSettingsKey.THEME_KEY, theme));
-onMounted(() => {
-  const theme = localStorage.getItem(LocalStorageSettingsKey.THEME_KEY);
+watch(theme.global.name, theme => {
+  const formattedThemeName = `${theme} mode`;
+  localStorage.setItem(LocalStorageSettingsKey.THEME_KEY, formattedThemeName);
   light.value = theme === "light";
 });
 </script>
