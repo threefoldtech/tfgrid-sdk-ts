@@ -22,7 +22,8 @@
             <p>
               Balance:
               <strong :class="theme.name.value === AppThemeSelection.light ? 'text-primary' : 'text-info'">
-                {{ normalizeBalance(balance.free + balance.reserved, true) }} TFT
+                {{ normalizeBalance(balance.free + balance.reserved, true) }}
+                TFT
               </strong>
             </p>
             <p>
@@ -353,7 +354,11 @@
           <v-col cols="12" md="6" lg="6" xl="6">
             <PasswordInputWrapper #="{ props }">
               <VTextField
-                :label="profileManager.profile.mnemonic.startsWith('0x') ? 'Your Hex Seed' : 'Your Mnemonic'"
+                :label="
+                  profileManager.profile.mnemonic.startsWith('0x') || profileManager.profile.mnemonic.length === 64
+                    ? 'Your Hex Seed'
+                    : 'Your Mnemonic'
+                "
                 readonly
                 v-model="profileManager.profile.mnemonic"
                 v-bind="props"
@@ -714,6 +719,7 @@ async function createNewAccount() {
 }
 
 const activatingAccount = ref(false);
+
 async function activateAccount() {
   openAcceptTerms.value = false;
   termsLoading.value = false;
@@ -722,7 +728,12 @@ async function activateAccount() {
   activatingAccount.value = true;
   activating.value = true;
   try {
-    await activateAccountAndCreateTwin(mnemonic.value);
+    const mnemonicOrSeedValue = validateMnemonic(mnemonic.value)
+      ? mnemonic.value
+      : mnemonic.value.length === 66
+      ? mnemonic.value
+      : `0x${mnemonic.value}`;
+    await activateAccountAndCreateTwin(mnemonicOrSeedValue);
     await storeAndLogin();
   } catch (e) {
     enableReload.value = true;
@@ -794,9 +805,9 @@ async function storeAndLogin() {
     await activate(mnemonic.value, keypairType.value);
   } catch (e) {
     if (e instanceof TwinNotExistError) {
-      isNonActiveMnemonic.value = true;
       openAcceptTerms.value = true;
       termsLoading.value = true;
+      isNonActiveMnemonic.value = true;
     }
     enableReload.value = false;
     return {
