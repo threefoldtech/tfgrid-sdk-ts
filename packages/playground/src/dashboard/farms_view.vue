@@ -12,10 +12,11 @@
 </template>
 
 <script lang="ts">
+import { ref } from "vue";
+
 import CreateFarm from "./components/create_farm.vue";
 import UserFarms from "./components/user_farms.vue";
 import UserNodes from "./components/user_nodes.vue";
-
 export default {
   name: "DashboardFarms",
   components: {
