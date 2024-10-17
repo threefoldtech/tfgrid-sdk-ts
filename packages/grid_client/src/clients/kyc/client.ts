@@ -5,7 +5,7 @@ import urlJoin from "url-join";
 
 import { bytesFromHex, KeypairType, send, stringToHex } from "../..";
 import { KycHeaders, TokenResponse, VerificationDataResponse, VerificationStatusResponse } from "./types";
-
+const API_PREFIX = "/api/v1/";
 /**
  * The KYC class provides methods to interact with a TFGid KYC (Know Your Customer) service.
  * It allows fetching verification data, status, and token by preparing necessary headers
@@ -88,7 +88,7 @@ export default class KYC {
    */
   async data(): Promise<VerificationDataResponse> {
     const headers = await this.prepareHeaders();
-    return (await send("GET", urlJoin(this.apiDomain, "data"), "", headers)) as VerificationDataResponse;
+    return (await send("GET", urlJoin(this.apiDomain, API_PREFIX, "data"), "", headers)) as VerificationDataResponse;
   }
 
   /**
@@ -99,7 +99,12 @@ export default class KYC {
    */
   async status(): Promise<VerificationStatusResponse> {
     const headers = await this.prepareHeaders();
-    return (await send("GET", urlJoin(this.apiDomain, "status"), "", headers)) as VerificationStatusResponse;
+    return (await send(
+      "GET",
+      urlJoin(this.apiDomain, API_PREFIX, "status"),
+      "",
+      headers,
+    )) as VerificationStatusResponse;
   }
 
   /**
@@ -110,6 +115,6 @@ export default class KYC {
    */
   async token(): Promise<TokenResponse> {
     const headers = await this.prepareHeaders();
-    return (await send("POST", urlJoin(this.apiDomain, "token"), "", headers)) as TokenResponse;
+    return (await send("POST", urlJoin(this.apiDomain, API_PREFIX, "token"), "", headers)) as TokenResponse;
   }
 }
