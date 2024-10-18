@@ -87,6 +87,7 @@ class VMHL extends HighLevelBase {
     } else {
       // If Available for twinId (dedicated), check it's not in grace period
       const nodeInfo = await this.nodes.getNode(nodeId);
+      console.log("nodeInfo", nodeInfo);
       if (nodeInfo.rentContractId !== 0) {
         const contract = await this.config.tfclient.contracts.get({ id: nodeInfo.rentContractId });
         if (contract && contract.state.gracePeriod) {
@@ -330,6 +331,8 @@ class VMHL extends HighLevelBase {
         ),
       );
     }
+
+    // should be VMLightPrimitive in case of features includes zmachine_light
 
     // vm
     const vm = new VMPrimitive();
