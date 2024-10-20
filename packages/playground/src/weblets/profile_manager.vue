@@ -22,13 +22,14 @@
             <p>
               Balance:
               <strong :class="theme.name.value === AppThemeSelection.light ? 'text-primary' : 'text-info'">
-                {{ normalizeBalance(balance.free, true) }} TFT
+                {{ normalizeBalance(balance.free + balance.reserved, true) }}
+                TFT
               </strong>
             </p>
             <p>
               Locked:
               <strong :class="theme.name.value === AppThemeSelection.light ? 'text-primary' : 'text-info'">
-                {{ normalizeBalance(balance.locked, true) || 0 }} TFT
+                {{ normalizeBalance(balance.reserved, true) || 0 }} TFT
               </strong>
               <v-tooltip text="Locked balance documentation" location="bottom right">
                 <template #activator="{ props }">
@@ -353,7 +354,11 @@
           <v-col cols="12" md="6" lg="6" xl="6">
             <PasswordInputWrapper #="{ props }">
               <VTextField
-                :label="profileManager.profile.mnemonic.startsWith('0x') ? 'Your Hex Seed' : 'Your Mnemonic'"
+                :label="
+                  profileManager.profile.mnemonic.startsWith('0x') || profileManager.profile.mnemonic.length === 64
+                    ? 'Your Hex Seed'
+                    : 'Your Mnemonic'
+                "
                 readonly
                 v-model="profileManager.profile.mnemonic"
                 v-bind="props"
@@ -440,6 +445,8 @@ import { useProfileManagerController } from "../components/profile_manager_contr
 import { useOnline } from "../hooks";
 import { useInputRef } from "../hooks/input_validator";
 import { useProfileManager } from "../stores";
+import type { Credentials } from "../utils/credentials";
+import { getCredentials, setCredentials } from "../utils/credentials";
 import { activateAccountAndCreateTwin, createAccount, getGrid, loadBalance, loadProfile } from "../utils/grid";
 import { readEmail, storeEmail } from "../utils/grid";
 import { normalizeBalance, normalizeError } from "../utils/helpers";
@@ -450,12 +457,7 @@ const selectedName = ref("");
 const selectedItem = ref(items.value[0]);
 const depositFee = ref(0);
 const loadEmail = ref<boolean>(false);
-interface Credentials {
-  passwordHash?: string;
-  mnemonicHash?: string;
-  keypairTypeHash?: string;
-  emailHash?: string;
-}
+
 const keyType = ["sr25519", "ed25519"];
 const keypairType = ref(KeypairType.sr25519);
 const enableReload = ref(true);
@@ -555,32 +557,6 @@ async function mounted() {
   }
 }
 
-function getCredentials() {
-  const getCredentials = localStorage.getItem(WALLET_KEY);
-  let credentials: Credentials = {};
-
-  if (getCredentials) {
-    credentials = JSON.parse(getCredentials);
-  }
-  return credentials;
-}
-
-function setCredentials(
-  passwordHash: string,
-  mnemonicHash: string,
-  keypairTypeHash: string,
-  emailHash: string,
-): Credentials {
-  const credentials: Credentials = {
-    passwordHash,
-    mnemonicHash,
-    keypairTypeHash,
-    emailHash,
-  };
-  localStorage.setItem(WALLET_KEY, JSON.stringify(credentials));
-  return credentials;
-}
-
 function isStoredCredentials() {
   return localStorage.getItem(WALLET_KEY) ? true : false;
 }
@@ -618,7 +594,7 @@ const isValidConnectConfirmationPassword = computed(() =>
 const profileManagerController = useProfileManagerController();
 
 const balance = profileManagerController.balance;
-let freeBalance = balance.value?.free ?? 0;
+const freeBalance = computed(() => balance.value?.free ?? 0);
 
 const email = ref("");
 
@@ -743,6 +719,7 @@ async function createNewAccount() {
 }
 
 const activatingAccount = ref(false);
+
 async function activateAccount() {
   openAcceptTerms.value = false;
   termsLoading.value = false;
@@ -751,7 +728,12 @@ async function activateAccount() {
   activatingAccount.value = true;
   activating.value = true;
   try {
-    await activateAccountAndCreateTwin(mnemonic.value);
+    const mnemonicOrSeedValue = validateMnemonic(mnemonic.value)
+      ? mnemonic.value
+      : mnemonic.value.length === 66
+      ? mnemonic.value
+      : `0x${mnemonic.value}`;
+    await activateAccountAndCreateTwin(mnemonicOrSeedValue);
     await storeAndLogin();
   } catch (e) {
     enableReload.value = true;
@@ -772,7 +754,6 @@ async function __loadBalance(profile?: Profile, tries = 1) {
     loadingBalance.value = true;
     const grid = await getGrid(profile);
     balance.value = await loadBalance(grid!);
-    freeBalance = balance.value.free ?? 0;
     if (!BalanceWarningRaised && balance.value?.free) {
       if (balance.value?.free < 0.01) {
         createCustomToast("Your balance is too low, Please fund your account.", ToastType.warning);
@@ -824,9 +805,9 @@ async function storeAndLogin() {
     await activate(mnemonic.value, keypairType.value);
   } catch (e) {
     if (e instanceof TwinNotExistError) {
-      isNonActiveMnemonic.value = true;
       openAcceptTerms.value = true;
       termsLoading.value = true;
+      isNonActiveMnemonic.value = true;
     }
     enableReload.value = false;
     return {

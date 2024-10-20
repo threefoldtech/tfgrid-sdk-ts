@@ -6,7 +6,7 @@ import type { IsEmailOptions } from "validator/lib/isEmail";
 import type { IsFQDNOptions } from "validator/lib/isFQDN";
 import type { IsURLOptions } from "validator/lib/isURL";
 
-import type { RuleReturn } from "@/components/input_validator.vue";
+import { SessionStorageSettingsKey } from "./settings";
 
 /**
  * Checks if a value is empty, undefined, or null.
@@ -636,6 +636,30 @@ export function isSlug(msg: string) {
     }
   };
 }
+export function validateCurrentPassword(msg: string) {
+  return (value: string) => {
+    if (sessionStorage.getItem(SessionStorageSettingsKey.PASSWORD_KEY) != value) {
+      return { message: msg };
+    }
+  };
+}
+/**
+ * Checks that new password isn't the same as the current one.
+ */
+export function validateNewPassword(msg: string, currentPassword: string) {
+  return (value: string) => {
+    if (value === currentPassword) {
+      return { message: msg };
+    }
+  };
+}
+export function validateConfirmPassword(msg: string, newPassword: string) {
+  return (value: string) => {
+    if (value !== newPassword) {
+      return { message: msg };
+    }
+  };
+}
 
 export type IsStrongPassword = validator.StrongPasswordOptions & {
   returnScore?: false;
@@ -751,7 +775,9 @@ export function isValidDecimalNumber(length: number, msg: string) {
     }
   };
 }
-export async function isValidStellarAddress(target: string): Promise<RuleReturn> {
+export async function isValidStellarAddress(
+  target: string,
+): Promise<import("@/components/input_validator.vue").RuleReturn> {
   const server = new StellarSdk.Server(window.env.STELLAR_HORIZON_URL);
   try {
     // check if the account provided exists on stellar

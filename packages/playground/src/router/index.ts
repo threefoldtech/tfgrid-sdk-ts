@@ -609,7 +609,7 @@ function createDeployRoutes(): RouteRecordRaw[] {
         {
           path: DashboardRoutes.Deploy.Domains,
           component: () => import("@/views/domains_view.vue"),
-          meta: { title: "Domains", publicPath: true },
+          meta: { title: "Domains" },
         },
         {
           path: DashboardRoutes.Deploy.NodeFinder,
@@ -787,6 +787,12 @@ const mainRoutes: RouteRecordRaw[] = [
     path: DashboardRoutes.TFChain.BaseRoute,
     children: createTFChainRoutes(),
   },
+  // Settings Route
+  {
+    path: DashboardRoutes.Other.Settings,
+    component: () => import("../views/settings.vue"),
+    meta: { title: "Settings" },
+  },
   // NotFound
   {
     path: "/:pathMatch(.*)*",
@@ -798,6 +804,13 @@ const mainRoutes: RouteRecordRaw[] = [
 const router = createRouter({
   history: createWebHashHistory(),
   routes: mainRoutes,
+});
+
+/* Guard to verify monitor is completed */
+const removeMonitorGuard = router.beforeEach(async (_, __, next) => {
+  await window.$$monitorLock;
+  removeMonitorGuard();
+  return next();
 });
 
 export default router;

@@ -57,6 +57,12 @@
                           <span v-bind="props">
                             {{ item.title }}
                           </span>
+                          <v-badge
+                            dot
+                            inline
+                            color="primary"
+                            v-if="item.releaseDate && isReleasedOverMon(item.releaseDate, new Date())"
+                          ></v-badge>
                         </template>
                       </v-tooltip>
                     </v-list-item-title>
@@ -88,6 +94,12 @@
                         <span v-bind="props">
                           {{ item.title }}
                         </span>
+                        <v-badge
+                          dot
+                          inline
+                          color="primary"
+                          v-if="item.releaseDate && isReleasedOverMon(item.releaseDate, new Date())"
+                        ></v-badge>
                       </template>
                     </v-tooltip>
                   </v-list-item-title>
@@ -96,14 +108,6 @@
             </v-list>
           </div>
         </div>
-
-        <template v-if="version">
-          <div class="version">
-            <v-chip color="secondary">
-              {{ version }}
-            </v-chip>
-          </div>
-        </template>
       </v-navigation-drawer>
 
       <v-main :style="{ paddingTop: navbarConfig ? '140px' : '70px' }">
@@ -251,6 +255,8 @@ import { useRoute, useRouter } from "vue-router";
 import { useTheme } from "vuetify";
 
 import TfLogger from "@/components/logger.vue";
+import { isReleasedOverMon } from "@/utils/date";
+import { LocalStorageSettingsKey } from "@/utils/settings";
 
 import { useProfileManager } from "./stores/profile_manager";
 const $route = useRoute();
@@ -259,12 +265,13 @@ const profileManager = useProfileManager();
 const gridStore = useGrid();
 const network = process.env.NETWORK || (window as any).env.NETWORK;
 const toolbarExtended = ref(false);
-const openProfile = ref(true);
+const openProfile = ref(false);
 const hasActiveProfile = computed(() => !!profileManager.profile);
 const theme = useTheme();
 const navbarConfig = ref();
 
 const hasGrid = computed(() => !!gridStore.grid);
+const hasClient = computed(() => !!gridStore.client);
 
 // eslint-disable-next-line no-undef
 const permanent = ref(window.innerWidth > 980);
@@ -287,6 +294,22 @@ function setSidebarOnResize() {
 
 window.addEventListener("resize", setSidebarOnResize);
 
+const themeMatcher = window.matchMedia("(prefers-color-scheme: dark)");
+// changes theme based on changes in system mode
+themeMatcher.addEventListener("change", updateTheme);
+function updateTheme() {
+  if (themeMatcher.matches) {
+    theme.global.name.value = AppThemeSelection.dark;
+  } else {
+    theme.global.name.value = AppThemeSelection.light;
+  }
+  localStorage.setItem(LocalStorageSettingsKey.THEME_KEY, ThemeSettingsInterface.System);
+}
+
+// sets theme to system mode on application mount
+onMounted(() => {
+  updateTheme();
+});
 watch(
   () => $route.meta,
   meta => {
@@ -308,8 +331,30 @@ onMounted(async () => {
   }
 });
 
+watch(hasClient, () => setTimeouts());
+
+async function setTimeouts() {
+  if (!localStorage.getItem(LocalStorageSettingsKey.TIMEOUT_QUERY_KEY)) {
+    localStorage.setItem(LocalStorageSettingsKey.TIMEOUT_QUERY_KEY, `${window.env.TIMEOUT / 1000}`);
+  } else {
+    window.env.TIMEOUT = +localStorage.getItem(LocalStorageSettingsKey.TIMEOUT_QUERY_KEY)! * 1000;
+  }
+
+  const client = gridStore.client as GridClient;
+
+  const localStorageDeploymentTimeout = localStorage.getItem(LocalStorageSettingsKey.TIMEOUT_DEPLOYMENT_KEY);
+
+  if (client && client.clientOptions) {
+    const deploymentTimeoutMinutes = client.clientOptions.deploymentTimeoutMinutes;
+    if (!localStorageDeploymentTimeout && deploymentTimeoutMinutes) {
+      localStorage.setItem(LocalStorageSettingsKey.TIMEOUT_DEPLOYMENT_KEY, `${+deploymentTimeoutMinutes * 60}`);
+    } else {
+      client.clientOptions.deploymentTimeoutMinutes = +localStorageDeploymentTimeout! / 60;
+      await client.connect();
+    }
+  }
+}
 // eslint-disable-next-line no-undef
-const version = process.env.VERSION as any;
 
 const routes: AppRoute[] = [
   {
@@ -371,12 +416,14 @@ const routes: AppRoute[] = [
         icon: "mdi-lightbulb-on-outline",
         route: DashboardRoutes.Deploy.Applications,
         tooltip: "Deploy ready applications on the ThreeFold grid.",
+        releaseDate: new Date("2024-10-2"),
       },
       {
         title: "Domains",
-        icon: "domains.png",
+        icon: "mdi-web-box",
         route: DashboardRoutes.Deploy.Domains,
         tooltip: "Expose servers hosted on local machines or VMs to the public internet.",
+        releaseDate: new Date("2024-10-2"),
       },
       {
         title: "Your Contracts",
@@ -475,6 +522,17 @@ const routes: AppRoute[] = [
       },
     ],
   },
+  {
+    title: "Settings",
+    items: [
+      {
+        title: "Settings",
+        icon: "mdi-cog-outline",
+        route: DashboardRoutes.Other.Settings,
+        tooltip: "Application Settings.",
+      },
+    ],
+  },
 ];
 
 const baseUrl = import.meta.env.BASE_URL;
@@ -489,8 +547,11 @@ function clickHandler({ route, url }: AppRouteItem): void {
 </script>
 
 <script lang="ts">
+import type { GridClient } from "@threefold/grid_client";
+
 import { DashboardRoutes } from "@/router/routes";
 import { AppThemeSelection } from "@/utils/app_theme";
+import { ThemeSettingsInterface } from "@/utils/settings";
 
 import AppTheme from "./components/app_theme.vue";
 import DeploymentListManager from "./components/deployment_list_manager.vue";
@@ -504,7 +565,6 @@ import TfRouterView from "./components/TfRouterView.vue";
 import TfSwapPrice from "./components/TfSwapPrice.vue";
 import { useGrid } from "./stores";
 import ProfileManager from "./weblets/profile_manager.vue";
-
 interface AppRoute {
   title: string;
   items: AppRouteItem[];
@@ -518,6 +578,7 @@ interface AppRouteItem {
   url?: string;
   icon?: string;
   tooltip?: string;
+  releaseDate?: Date;
 }
 
 export default {
