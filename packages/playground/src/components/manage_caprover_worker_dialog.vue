@@ -114,7 +114,7 @@ async function deploy(layout: any) {
 
     await layout.validateBalance(grid);
 
-    const vm = await addMachine(grid!, {
+    const vms = await addMachine(grid!, {
       name: worker.value.name,
       deploymentName: props.master.name,
       cpu: worker.value.solution!.cpu,
@@ -144,10 +144,7 @@ async function deploy(layout: any) {
       }),
     });
 
-    const [leader, ...workers] = vm;
-    leader.workers = workers;
-    leader.projectName = props.projectName;
-    leader.deploymentName = leader.name;
+    const leader = setCaproverWorkers(vms, props.projectName);
     caproverData.value = leader;
     deployedDialog.value = true;
     layout.setStatus("success", `Successfully add a new worker to Caprover('${props.master.name}') Instance.`);
@@ -159,8 +156,6 @@ async function deploy(layout: any) {
 async function onDelete(cb: (workers: any[]) => void) {
   deleting.value = true;
   for (const worker of selectedWorkers.value) {
-    console.log(props.master.name, worker.name);
-
     try {
       await deleteMachine(grid!, {
         deploymentName: props.master.name,
@@ -184,6 +179,8 @@ async function onDelete(cb: (workers: any[]) => void) {
 
 <script lang="ts">
 import { calculateRootFileSystem, type GridClient } from "@threefold/grid_client";
+
+import { setCaproverWorkers } from "@/utils/deploy_helpers";
 
 import CaproverWorker, { createWorker } from "../components/caprover_worker.vue";
 import ListTable from "../components/list_table.vue";
