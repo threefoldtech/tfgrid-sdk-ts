@@ -27,7 +27,6 @@ export async function deleteDeployment(grid: GridClient, options: DeleteDeployme
 
   /* For fvm/vm */
   if (isVm(options.projectName)) {
-    console.log("Deleting vm gateways", options.ip);
     await deleteVmGateways(grid, options.ip);
   }
 
