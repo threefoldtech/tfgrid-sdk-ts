@@ -551,17 +551,13 @@ function getDeploymentIps(item: any): string[] {
   // wg ip
   if (item.interfaces) {
     for (const iface of item.interfaces) {
-      if (iface.ip) {
-        const ip = iface.ip.split("/")[0];
-        console.log();
-        ips.push(ip);
-      }
+      if (iface.ip) ips.push(iface.ip);
     }
   }
   // public ip, ipv6
   if (item.publicIP) {
-    if (item.publicIP.ip) ips.push(item.publicIP.ip);
-    if (item.publicIP.ipv6) ips.push(item.publicIP.ip6);
+    if (item.publicIP.ip) ips.push(item.publicIP.ip.split("/")[0]);
+    if (item.publicIP.ip6) ips.push(item.publicIP.ip6.split("/")[0]);
   }
   if (item.planetary) ips.push(item.planetary);
   if (item.myceliumIP) ips.push(item.myceliumIP);
