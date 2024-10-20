@@ -530,6 +530,7 @@ const tabsRef = ref();
 function handleTabs() {
   const tabs = tabsRef.value?.$el;
   if (!tabs) return;
+  if (!isStoredCredentials()) return;
 
   const activeClass = "v-slide-group-item--active";
   const tabsButtons = tabs.nextSibling.querySelectorAll("button");
