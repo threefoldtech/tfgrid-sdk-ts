@@ -121,7 +121,6 @@ async function deleteVmGateways(grid: GridClient, ips?: string[]) {
   const { gateways } = await loadDeploymentGateways(grid, {
     filter: ips ? gw => gw.backends.some(bk => ips.some(ip => bk.includes(ip))) : undefined,
   });
-  console.log("gateways", gateways);
   for (const gateway of gateways) {
     try {
       if (gateway.type.includes("name")) {
