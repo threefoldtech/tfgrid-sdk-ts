@@ -69,6 +69,9 @@ export interface GqlContracts {
 export interface GqlConsumption extends GqlContracts {
   contractBillReports: GqlContractBillReports[];
 }
+export interface GqlDiscountPackage {
+  contractBillReports: GqlContractBillReports[];
+}
 
 export interface GqlContractBillReports {
   id: string;
@@ -93,6 +96,11 @@ export interface ListMyContractOptions {
 }
 
 export interface GetConsumptionOptions {
+  graphqlURL: string;
+  id: number;
+}
+
+export interface GetDiscountPackageOptions {
   graphqlURL: string;
   id: number;
 }
@@ -207,7 +215,37 @@ class TFContracts extends Contracts {
       throw err;
     }
   }
+  /**
+   * Get contract discount package
+   * @param {GetDiscountPackageOptions} options
+   * @returns {Promie<DiscountLevel>}
+   */
+  async getDiscountPackage(options: GetDiscountPackageOptions): Promise<DiscountLevel> {
+    const gqlClient = new Graphql(options.graphqlURL);
 
+    const body = `query getConsumption($contractId: BigInt!){
+            contractBillReports(where: {contractID_eq: $contractId} ) {
+                discountReceived
+
+            }
+          }`;
+
+    try {
+      const response = await gqlClient.query(body, { contractId: options.id });
+
+      const gqlDiscountPackage: GqlDiscountPackage = response["data"] as GqlDiscountPackage;
+      const billReports = gqlDiscountPackage.contractBillReports;
+      if (billReports.length === 0) {
+        return "None";
+      } else {
+        const discountPackage = billReports[billReports.length - 1].discountReceived;
+        return discountPackage;
+      }
+    } catch (err) {
+      (err as Error).message = formatErrorMessage(`Error getting discount package for contract ${options.id}.`, err);
+      throw err;
+    }
+  }
   /**
    * Get contract consumption per hour in TFT.
    *
