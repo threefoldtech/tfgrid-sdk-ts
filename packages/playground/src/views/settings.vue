@@ -240,8 +240,7 @@ export default {
     });
 
     function isCurrentTheme() {
-      if (!currentTheme.value) return;
-      return selectedTheme.value?.includes(currentTheme.value);
+      return selectedTheme.value == currentTheme.value;
     }
     function UpdateTheme() {
       switch (selectedTheme.value) {
