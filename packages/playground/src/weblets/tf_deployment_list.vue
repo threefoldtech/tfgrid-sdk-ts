@@ -56,12 +56,18 @@
             @click="openDialog(tabs[activeTab].value, item)"
           />
           <IconActionBtn
+            v-if="isCaproverLeader(item)"
             tooltip="Admin Panel"
             color="anchor"
             icon="mdi-view-dashboard"
             :href="'http://captain.' + item.env.CAPROVER_ROOT_DOMAIN"
           />
-          <IconActionBtn icon="mdi-cog" tooltip="Manage Workers" @click="dialog = item.name" />
+          <IconActionBtn
+            v-if="isCaproverLeader(item)"
+            icon="mdi-cog"
+            tooltip="Manage Workers"
+            @click="dialog = item.name"
+          />
 
           <ManageCaproverWorkerDialog
             v-if="dialog === item.name"
@@ -487,6 +493,7 @@ const table = ref() as Ref<{ loadDeployments(): void }>;
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
 const hasWorkers = computed(() => selectedItems.value.map(item => item.workers && item.workers.length).some(i => i));
+const isCaproverLeader = (vm: ZmachineData) => vm.env["SWM_NODE_MODE"] === "leader";
 
 const _idx = tabs.findIndex(t => t.value === props.projectName);
 const activeTab = ref(!props.projectName ? 0 : _idx) as Ref<number>;
@@ -546,7 +553,11 @@ function openDialog(project: string, item?: any): void {
     : (project.toLowerCase() as any);
 
   if (item && item.projectName && item.projectName.includes(ProjectName.Caprover.toLocaleLowerCase())) {
-    item = [item, ...item.workers];
+    if (!item.workers) {
+      item = [item];
+    } else {
+      item = [item, ...item.workers];
+    }
   }
 
   layout.value.openDialog(item, deploymentListEnvironments[key]);
@@ -568,7 +579,7 @@ onUnmounted(() => deploymentListManager?.unregister(uid));
 </script>
 
 <script lang="ts">
-import type { GridClient } from "@threefold/grid_client";
+import type { GridClient, ZmachineData } from "@threefold/grid_client";
 
 import { useDeploymentListManager } from "../components/deployment_list_manager.vue";
 import IconActionBtn from "../components/icon_action_btn.vue";
