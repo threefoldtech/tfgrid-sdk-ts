@@ -1,2 +1,2 @@
-export * as KYCClient from "./client";
-export * as KYCTypes from "./types";
+export * from "./client";
+export * from "./types";

@@ -1,10 +1,12 @@
 import { Keyring } from "@polkadot/keyring";
 import { KeyringPair } from "@polkadot/keyring/types";
 import { waitReady } from "@polkadot/wasm-crypto";
+import { RequestError, ValidationError } from "@threefold/types";
+import { Buffer } from "buffer";
 import urlJoin from "url-join";
 
 import { bytesFromHex, KeypairType, send, stringToHex } from "../..";
-import { KycHeaders, TokenResponse, VerificationDataResponse, VerificationStatusResponse } from "./types";
+import { KycHeaders, KycStatus, VerificationDataResponse } from "./types";
 const API_PREFIX = "/api/v1/";
 /**
  * The KYC class provides methods to interact with a TFGid KYC (Know Your Customer) service.
@@ -26,7 +28,7 @@ const API_PREFIX = "/api/v1/";
  * @method status - Fetches the verification status from the KYC service.
  * @method token - Fetches the token from the KYC service.
  */
-export default class KYC {
+export class KYC {
   private keyring: Keyring;
   private keypair: KeyringPair;
   public address: string;
@@ -38,9 +40,13 @@ export default class KYC {
    */
   constructor(
     public apiDomain: string,
-    public keypairType: KeypairType = KeypairType.sr25519,
     private mnemonic: string,
-  ) {}
+    public keypairType: KeypairType = KeypairType.sr25519,
+  ) {
+    if (mnemonic === "") {
+      throw new ValidationError("mnemonic is required");
+    }
+  }
 
   /**
    * Setup the keypair and the address
@@ -88,33 +94,39 @@ export default class KYC {
    */
   async data(): Promise<VerificationDataResponse> {
     const headers = await this.prepareHeaders();
-    return (await send("GET", urlJoin(this.apiDomain, API_PREFIX, "data"), "", headers)) as VerificationDataResponse;
+    return await send("GET", urlJoin("https://", this.apiDomain, API_PREFIX, "data"), "", headers);
   }
 
   /**
    * Retrieves the current verification status.
    *
-   * @returns {Promise<VerificationStatusResponse>} A promise that resolves to the verification status response.
+   * @returns {Promise<KycStatus>} A promise that resolves to the verification status.
    * @throws {RequestError} If there is an issue with fetching the status data.
    */
-  async status(): Promise<VerificationStatusResponse> {
+  async status(): Promise<KycStatus> {
     const headers = await this.prepareHeaders();
-    return (await send(
-      "GET",
-      urlJoin(this.apiDomain, API_PREFIX, "status"),
-      "",
-      headers,
-    )) as VerificationStatusResponse;
+    try {
+      //TODO handle the response value
+      const res = await send("GET", urlJoin("https://", this.apiDomain, API_PREFIX, "status"), "", headers);
+      return KycStatus.rejected;
+    } catch (e) {
+      if (e instanceof RequestError) {
+        if (e.statusCode === 404) {
+          return KycStatus.unverified;
+        }
+      }
+      throw e;
+    }
   }
-
   /**
    * Retrieves a token data from the KYC service API.
    *
-   * @returns {Promise<TokenResponse>} A promise that resolves to a TokenResponse object.
+   * @returns {Promise<string>} A promise that resolves to a string representing the idenify auth token .
    * @throws {RequestError} If there is an issue with fetching the token data.
    */
-  async token(): Promise<TokenResponse> {
+  async getToken(): Promise<string> {
     const headers = await this.prepareHeaders();
-    return (await send("POST", urlJoin(this.apiDomain, API_PREFIX, "token"), "", headers)) as TokenResponse;
+    const res = await send("POST", urlJoin("https://", this.apiDomain, API_PREFIX, "token"), "", headers);
+    return res.result.authToken;
   }
 }
