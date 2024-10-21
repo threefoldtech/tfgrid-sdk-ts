@@ -1,5 +1,6 @@
 <template>
   <div>
+    <KycVerifier :moduleValue="kycDialog" @update:moduleValue="kycDialog = $event" />
     <v-container v-if="editingTwin">
       <v-dialog v-model="editingTwin" max-width="600" attach="#modals">
         <v-card>
@@ -144,7 +145,7 @@
                 <v-col cols="9" class="px-0">
                   <v-list-item class="px-0">
                     <div style="display: flex; justify-content: space-between; align-items: center">
-                      <div v-if="profileManager.kyc">
+                      <div v-if="profileManager.kyc == KycStatus.approved">
                         <v-chip>Verified</v-chip>
                       </div>
                       <div v-else>
@@ -197,10 +198,10 @@
       </v-card>
     </div>
   </div>
-  <KycVerifier :moduleValue="kycDialog" @update:moduleValue="kycDialog = $event" />
 </template>
 
 <script lang="ts" setup>
+import { KycStatus } from "@threefold/grid_client";
 import { generatePublicKey } from "@threefold/rmb_direct_client";
 import { onMounted, ref } from "vue";
 
