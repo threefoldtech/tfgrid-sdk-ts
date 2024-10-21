@@ -428,6 +428,7 @@
 <script lang="ts" setup>
 import { isAddress } from "@polkadot/util-crypto";
 import { KeypairType } from "@threefold/grid_client";
+import { KYC } from "@threefold/grid_client";
 import { validateMnemonic } from "bip39";
 import Cryptr from "cryptr";
 import { marked } from "marked";
@@ -450,7 +451,6 @@ import { getCredentials, setCredentials } from "../utils/credentials";
 import { activateAccountAndCreateTwin, createAccount, getGrid, loadBalance, loadProfile } from "../utils/grid";
 import { readEmail, storeEmail } from "../utils/grid";
 import { normalizeBalance, normalizeError } from "../utils/helpers";
-
 const items = ref([{ id: 1, name: "stellar" }]);
 const depositWallet = ref("");
 const selectedName = ref("");
@@ -610,11 +610,19 @@ const WALLET_KEY = "wallet.v" + version;
 let interval: any;
 watch(
   () => profileManager.profile,
-  profile => {
+  async profile => {
     if (profile) {
       __loadBalance(profile);
       if (interval) clearInterval(interval);
       interval = setInterval(__loadBalance.bind(undefined, profile), 1000 * 60 * 2);
+      //TODO replace with the correct kyc url from env
+      const KycVerifier = new KYC("kyc1.gent01.dev.grid.tf", profile.mnemonic, profile.keypairType);
+      try {
+        const status = await KycVerifier.status();
+        profileManager.setKyc(status);
+      } catch (e) {
+        console.error("Failed to get kyc status", e);
+      }
     } else {
       if (interval) clearInterval(interval);
       balance.value = undefined;

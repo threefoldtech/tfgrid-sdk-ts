@@ -22,12 +22,18 @@
     >
       <AppInfo />
     </div>
-
-    <template v-if="requireSSH && !ssh">
-      <VAlert variant="tonal" type="error" class="mb-4">
-        {{ title }} requires a public SSH key. You can generate or import it from the
-        <router-link :to="DashboardRoutes.Deploy.SSHKey">SSH Keys</router-link> page.
-      </VAlert>
+    <template v-if="!kyc || requireSSH">
+      <template v-if="requireSSH && !ssh">
+        <VAlert variant="tonal" type="error" class="mb-4">
+          {{ title }} requires a public SSH key. You can generate or import it from the
+          <router-link :to="DashboardRoutes.Deploy.SSHKey">SSH Keys</router-link> page.
+        </VAlert>
+      </template>
+      <template v-if="!kyc">
+        <VAlert variant="tonal" type="error" class="mb-4">
+          {{ title }} requires a KYC verification. <v-chip color="error">verify now</v-chip>
+        </VAlert>
+      </template>
     </template>
     <slot v-else :key="tick" />
 
@@ -74,6 +80,7 @@ export default {
       title: computed(() => route.meta.title),
       hasInfo: computed(() => profileManager.profile && route.meta.info),
       ssh: computed(() => profileManager.profile?.ssh),
+      kyc: computed(() => profileManager.kyc),
       requireSSH: computed(() => route.meta.requireSSH),
       tick,
       viewLayoutContainer,

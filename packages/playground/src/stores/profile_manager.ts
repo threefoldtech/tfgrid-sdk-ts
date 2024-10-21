@@ -1,4 +1,4 @@
-import type { KeypairType } from "@threefold/grid_client";
+import type { KeypairType, KycStatus } from "@threefold/grid_client";
 import { defineStore } from "pinia";
 
 import type { SSHKeyData } from "@/types";
@@ -18,17 +18,21 @@ export interface Profile {
 
 export interface State {
   profile: Profile | null;
+  kyc: KycStatus | null;
 }
 
 const useProfileManager = defineStore("profile-manager", {
   state: (): State => {
-    return { profile: null };
+    return { profile: null, kyc: null };
   },
 
   actions: {
     set(profile: Profile | null) {
       this.profile = profile;
       useGrid().set(profile);
+    },
+    setKyc(kyc: KycStatus) {
+      this.kyc = kyc;
     },
     updateSSH(ssh: SSHKeyData[]) {
       if (this.profile) {
@@ -52,6 +56,7 @@ const useProfileManager = defineStore("profile-manager", {
     },
     clear() {
       this.profile = null;
+      this.kyc = false;
       useGrid().set(null);
     },
   },
