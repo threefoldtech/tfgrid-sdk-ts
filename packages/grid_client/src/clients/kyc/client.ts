@@ -106,9 +106,9 @@ export class KYC {
   async status(): Promise<KycStatus> {
     const headers = await this.prepareHeaders();
     try {
-      //TODO handle the response value
       const res = await send("GET", urlJoin("https://", this.apiDomain, API_PREFIX, "status"), "", headers);
-      return KycStatus.rejected;
+      if (!res.result.status) console.error("KYC status response does not contain status field"); // TODO throw kyc error
+      return res.result?.status;
     } catch (e) {
       if (e instanceof RequestError) {
         if (e.statusCode === 404) {

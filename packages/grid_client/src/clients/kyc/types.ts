@@ -83,7 +83,8 @@ export interface KycHeaders {
   "X-Signature": string;
 }
 export enum KycStatus {
-  unverified = "Unverified",
-  approved = "Approved",
-  rejected = "Rejected",
+  unverified = "UNVERIFIED",
+  verified = "VERIFIED",
+  rejected = "REJECTED",
+  pending = "PENDING",
 }
