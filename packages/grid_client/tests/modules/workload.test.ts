@@ -1,6 +1,6 @@
 import { plainToClass } from "class-transformer";
 
-import { DeploymentResult, ResultStates, Workload, WorkloadTypes, ZdbModes } from "../../src";
+import { DeploymentResult, QuantumSafeFSConfig, ResultStates, Workload, WorkloadTypes, ZdbModes } from "../../src";
 import {
   ComputeCapacity,
   GatewayFQDNProxy,
@@ -16,6 +16,7 @@ import {
   Zmount,
   Znet,
 } from "../../src";
+import { PublicIPv4 } from "../../src/zos/ipv4";
 
 let workload: Workload;
 
@@ -29,6 +30,7 @@ const createDataInstance = (type: WorkloadTypes) => {
   const rootfs_size = 2;
   const size = 100 * 1025 ** 2;
 
+  const qsfsCache = 262144000; // Fixed cache size
   switch (type) {
     case WorkloadTypes.zmachine:
       instance = new Zmachine();
@@ -70,6 +72,25 @@ const createDataInstance = (type: WorkloadTypes) => {
       instance = new Volume();
       instance.size = size;
       break;
+    case WorkloadTypes.network:
+      instance = new Znet();
+      instance.subnet = "10.0.0.1/32";
+      instance.ip_range = "10.0.0.2/32";
+      instance.wireguard_private_key = "2BwI0a7lVYxeKsh7jklashakdfjasdf7jksdHf";
+      instance.wireguard_listen_port = 5566;
+      instance.peers = [
+        {
+          subnet: "10.0.1.0/24",
+          wireguard_public_key: "9I8H7G6F5E4D3C2B1A0J",
+          allowed_ips: ["10.0.1.6"],
+          endpoint: "185.206.122.31:5566",
+        },
+      ];
+      instance.mycelium = {
+        hex_key: "abc123",
+      };
+      break;
+
     case WorkloadTypes.zdb:
       instance = new Zdb();
       instance.size = size;
@@ -84,10 +105,39 @@ const createDataInstance = (type: WorkloadTypes) => {
       instance.v6 = false;
 
       break;
+    case WorkloadTypes.ipv4:
+      instance = new PublicIPv4();
+      break;
     case WorkloadTypes.qsfs:
       instance = new QuantumSafeFS();
+      instance.cache = qsfsCache;
+      instance.config = {
+        minimal_shards: 2,
+        expected_shards: 3,
+        redundant_groups: 0,
+        redundant_nodes: 0,
+        max_zdb_data_dir_size: 2,
+        encryption: {
+          algorithm: "algorithm",
+          encryption_key: "EncryptionKey12345678",
+        },
+        meta: {
+          type: "qsfs",
+          config: {
+            prefix: "qsfs",
+            encryption: {
+              algorithm: "algorithm",
+              encryption_key: "EncryptionKey12345678",
+            },
+            backends: [{ address: "localhost", namespace: "http://localhost", password: "password" }],
+          },
+        },
 
-      // Initialize qsfs variables
+        groups: [{ address: "localhost", namespace: "http://localhost", password: "password" }],
+        compression: {
+          algorithm: "algorithm",
+        },
+      };
       break;
     case WorkloadTypes.zlogs:
       instance = new Zlogs();
@@ -131,6 +181,9 @@ describe.each(Object.values(WorkloadTypes))("Workload Tests for %s", type => {
     workload.result.state = ResultStates.ok;
     workload.result.message = "Deployment successful";
     workload.result.data = workload.data;
+    // if (workload.type === WorkloadTypes.qsfs) {
+    //   console.log("here", workload.data.config);
+    // }
   });
 
   test("should create a valid Workload instance", () => {
@@ -166,6 +219,10 @@ describe.each(Object.values(WorkloadTypes))("Workload Tests for %s", type => {
       case WorkloadTypes.ip:
         expect(workload.data).toBeInstanceOf(PublicIP);
         break;
+      case WorkloadTypes.ipv4:
+        expect(workload.data).toBeInstanceOf(PublicIPv4);
+        break;
+
       case WorkloadTypes.qsfs:
         expect(workload.data).toBeInstanceOf(QuantumSafeFS);
         break;
@@ -188,8 +245,22 @@ describe.each(Object.values(WorkloadTypes))("Workload Tests for %s", type => {
     const deserialized = plainToClass(Workload, JSON.parse(serialized));
 
     if (deserialized.data) {
-      deserialized.data = plainToClass(createDataInstance(type).constructor, deserialized.data);
+      if (workload.type === WorkloadTypes.qsfs) {
+        deserialized.data = plainToClass(createDataInstance(type).constructor, deserialized.data);
+        deserialized.data = plainToClass(QuantumSafeFSConfig, deserialized.data);
+        // deserialized.data.config.encryption = plainToClass(Encryption, deserialized.data.config.encryption);
+
+        // Deserializing nested structures like ZdbBackend, ZdbGroup, etc.
+        // deserialized.data.config.groups = deserialized.data.config.groups.map(group =>
+        //   plainToClass(ZdbGroup, group)
+        // );
+      } else {
+        deserialized.data = plainToClass(createDataInstance(type).constructor, deserialized.data);
+      }
     }
+
+    // if (deserialized.data) {
+    // }
 
     expect(deserialized).toBeInstanceOf(Workload);
     expect(deserialized.challenge()).toBe(workload.challenge());
@@ -203,6 +274,7 @@ describe.each(Object.values(WorkloadTypes))("Workload Tests for %s", type => {
       workload.metadata +
       workload.description +
       workload.data.challenge();
+    console.log("data", workload.data);
 
     expect(workload.challenge()).toBe(expectedChallenge);
   });
