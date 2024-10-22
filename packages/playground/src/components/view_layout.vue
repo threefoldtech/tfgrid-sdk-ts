@@ -30,8 +30,14 @@
         </VAlert>
       </template>
       <template v-if="kyc !== KycStatus.verified">
-        <VAlert variant="tonal" type="error" class="mb-4">
-          {{ title }} requires a KYC verification. <v-chip color="error">verify now</v-chip>
+        <VAlert variant="tonal" type="error">
+          <template #prepend>
+            <v-icon icon="mdi-shield-remove"></v-icon>
+          </template>
+          <div class="d-flex justify-space-between align-baseline">
+            <div>{{ title }} requires a KYC verification.</div>
+            <v-btn text="Verify now" size="small" color="error" @click="kycDialog = true" />
+          </div>
         </VAlert>
       </template>
     </template>
@@ -41,6 +47,7 @@
       <slot name="list" />
     </div>
   </div>
+  <KycVerifier v-if="kycDialog" :moduleValue="kycDialog" @update:moduleValue="kycDialog = $event" />
 </template>
 
 <script lang="ts">
@@ -53,17 +60,18 @@ import { useProfileManager } from "@/stores";
 import { useKYC } from "@/stores/kyc";
 
 import AppInfo from "./app_info.vue";
+import KycVerifier from "./KycVerifier.vue";
 
 export default {
   name: "ViewLayout",
-  components: { AppInfo },
+  components: { AppInfo, KycVerifier },
   setup() {
     const route = useRoute();
     const profileManager = useProfileManager();
     const kyc = useKYC();
     const viewLayoutContainer = ref<HTMLElement>();
     const tick = ref(0);
-
+    const kycDialog = ref(false);
     function reRender(e: Event) {
       e.stopPropagation();
       tick.value++;
@@ -89,6 +97,7 @@ export default {
       viewLayoutContainer,
       DashboardRoutes,
       KycStatus,
+      kycDialog,
     };
   },
 };

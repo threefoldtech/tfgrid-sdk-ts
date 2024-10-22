@@ -6,7 +6,7 @@
     width="100%"
     class="w-100 h-100 d-flex justify-center align-center"
   >
-    <v-card v-if="loading" class="d-flex justify-center align-center h-screen">
+    <v-card v-if="loading || !token" class="d-flex justify-center align-center h-screen">
       <div class="d-flex my-6 align-center justify-center">
         <v-progress-circular indeterminate />
       </div>
@@ -15,7 +15,6 @@
 
     <iframe
       id="iframe"
-      v-if="token"
       allowfullscreen
       style="width: 100%; height: 100%; border: none"
       :src="`https://ui.idenfy.com/?authToken=${token}`"
@@ -24,10 +23,10 @@
   </v-dialog>
 </template>
 <script lang="ts">
-import { KYC } from "@threefold/grid_client";
+import { KycStatus } from "@threefold/grid_client";
 import { onMounted, ref } from "vue";
 
-import { useGrid } from "@/stores";
+import { useKYC } from "@/stores/kyc";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
 
 export default {
@@ -40,7 +39,7 @@ export default {
   },
   emits: ["update:moduleValue"],
   setup(props, { emit }) {
-    const gridStore = useGrid();
+    const kyc = useKYC();
     const token = ref("");
     const loading = ref(false);
     const handleUpdateDialog = (event: boolean) => {
@@ -49,13 +48,15 @@ export default {
 
     const getToken = async () => {
       loading.value = true;
-      const KycVerifier = new KYC(
-        "kyc1.gent01.dev.grid.tf",
-        gridStore.client._mnemonic,
-        gridStore.client.clientOptions.keypairType,
-      );
+      await kyc.updateStatus();
+      if (kyc.status == KycStatus.verified) {
+        createCustomToast("Already verified", ToastType.info);
+        handleUpdateDialog(false);
+        return;
+      }
       try {
-        token.value = await KycVerifier.getToken();
+        if (!kyc.client) throw new Error("KYC client is not initialized");
+        token.value = await kyc.client.getToken();
       } catch (e) {
         handleUpdateDialog(false);
         const message = "Failed to get authentication token";
@@ -70,9 +71,10 @@ export default {
       handleUpdateDialog(false); // close the dialog
       if (!event.data.status) console.error("Can't check the verification status", event.data);
       const status = (event.data.status as string).toLowerCase();
-      if (status === "approved")
+      if (status === "approved") {
         createCustomToast("Verification completed, Changes may take a few minutes to reflect", ToastType.success);
-      else if (status === "failed") createCustomToast("Verification failed, Please try again", ToastType.danger);
+        kyc.updateStatus();
+      } else if (status === "failed") createCustomToast("Verification failed, Please try again", ToastType.danger);
       else if (status === "unverified") createCustomToast("Verification canceled", ToastType.info);
     };
     window.addEventListener("message", handleReceiveMessage, false);

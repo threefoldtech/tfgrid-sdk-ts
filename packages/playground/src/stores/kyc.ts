@@ -27,9 +27,9 @@ const useKYC = defineStore("KYC-client", {
         this.status = null;
         this.client = null;
       }
-      await this._setStatus();
+      await this.updateStatus();
     },
-    async _setStatus() {
+    async updateStatus() {
       if (this.client) {
         try {
           this.status = await this.client.status();
