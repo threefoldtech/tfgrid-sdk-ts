@@ -1,18 +1,12 @@
 <template>
   <v-dialog
+    v-if="!loading && token"
     fullscreen
     :model-value="moduleValue"
     @update:model-value="handleUpdateDialog($event)"
     width="100%"
     class="w-100 h-100 d-flex justify-center align-center"
   >
-    <v-card v-if="loading || !token" class="d-flex justify-center align-center h-screen">
-      <div class="d-flex my-6 align-center justify-center">
-        <v-progress-circular indeterminate />
-      </div>
-      <p>Connecting to a verification service</p>
-    </v-card>
-
     <iframe
       id="iframe"
       allowfullscreen
@@ -36,18 +30,21 @@ export default {
       type: Boolean,
       required: true,
     },
+    loading: {
+      type: Boolean,
+      required: true,
+    },
   },
-  emits: ["update:moduleValue"],
+  emits: ["update:moduleValue", "loaded"],
   setup(props, { emit }) {
     const kyc = useKYC();
     const token = ref("");
-    const loading = ref(false);
+
     const handleUpdateDialog = (event: boolean) => {
       emit("update:moduleValue", event);
     };
 
     const getToken = async () => {
-      loading.value = true;
       await kyc.updateStatus();
       if (kyc.status == KycStatus.verified) {
         createCustomToast("Already verified", ToastType.info);
@@ -63,7 +60,7 @@ export default {
         createCustomToast(`${message}, Please try again later`, ToastType.danger);
         console.error(message, e);
       } finally {
-        loading.value = false;
+        emit("loaded");
       }
     };
 
@@ -81,7 +78,6 @@ export default {
     onMounted(getToken);
     return {
       handleUpdateDialog,
-      loading,
       token,
     };
   },

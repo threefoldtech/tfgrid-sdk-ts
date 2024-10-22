@@ -36,7 +36,16 @@
           </template>
           <div class="d-flex justify-space-between align-baseline">
             <div>{{ title }} requires a KYC verification.</div>
-            <v-btn text="Verify now" size="small" color="error" @click="kycDialog = true" />
+            <v-btn
+              text="Verify now"
+              size="small"
+              color="error"
+              :loading="kycDialogLoading"
+              @click="
+                kycDialog = true;
+                kycDialogLoading = true;
+              "
+            />
           </div>
         </VAlert>
       </template>
@@ -47,7 +56,13 @@
       <slot name="list" />
     </div>
   </div>
-  <KycVerifier v-if="kycDialog" :moduleValue="kycDialog" @update:moduleValue="kycDialog = $event" />
+  <KycVerifier
+    v-if="kycDialog"
+    :loading="kycDialogLoading"
+    @loaded="kycDialogLoading = false"
+    :moduleValue="kycDialog"
+    @update:moduleValue="kycDialog = $event"
+  />
 </template>
 
 <script lang="ts">
@@ -72,6 +87,7 @@ export default {
     const viewLayoutContainer = ref<HTMLElement>();
     const tick = ref(0);
     const kycDialog = ref(false);
+    const kycDialogLoading = ref(false);
     function reRender(e: Event) {
       e.stopPropagation();
       tick.value++;
@@ -98,6 +114,7 @@ export default {
       DashboardRoutes,
       KycStatus,
       kycDialog,
+      kycDialogLoading,
     };
   },
 };
