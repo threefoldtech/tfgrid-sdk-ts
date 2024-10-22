@@ -28,6 +28,7 @@ import { KYC } from "@threefold/grid_client";
 import { onMounted, ref } from "vue";
 
 import { useGrid } from "@/stores";
+import { createCustomToast, ToastType } from "@/utils/custom_toast";
 
 export default {
   name: "KycVerifier",
@@ -47,6 +48,7 @@ export default {
     };
 
     const getToken = async () => {
+      loading.value = true;
       const KycVerifier = new KYC(
         "kyc1.gent01.dev.grid.tf",
         gridStore.client._mnemonic,
@@ -55,10 +57,25 @@ export default {
       try {
         token.value = await KycVerifier.getToken();
       } catch (e) {
-        console.log(e, "error");
+        handleUpdateDialog(false);
+        const message = "Failed to get authentication token";
+        createCustomToast(`${message}, Please try again later`, ToastType.danger);
+        console.error(message, e);
+      } finally {
+        loading.value = false;
       }
     };
 
+    const handleReceiveMessage = (event: MessageEvent) => {
+      handleUpdateDialog(false); // close the dialog
+      if (!event.data.status) console.error("Can't check the verification status", event.data);
+      const status = (event.data.status as string).toLowerCase();
+      if (status === "approved")
+        createCustomToast("Verification completed, Changes may take a few minutes to reflect", ToastType.success);
+      else if (status === "failed") createCustomToast("Verification failed, Please try again", ToastType.danger);
+      else if (status === "unverified") createCustomToast("Verification canceled", ToastType.info);
+    };
+    window.addEventListener("message", handleReceiveMessage, false);
     onMounted(getToken);
     return {
       handleUpdateDialog,
