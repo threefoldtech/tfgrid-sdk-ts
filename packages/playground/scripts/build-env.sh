@@ -7,6 +7,7 @@ TIMEOUT="${TIMEOUT:=10000}"
 PAGE_SIZE="${PAGE_SIZE:=20}"
 MINTING_URL="https://alpha.minting.tfchain.grid.tf"
 MANUAL_URL="${MANUAL_URL:-https://www.manual.grid.tf}"
+KYC_URL="kyc1.gent01.dev.grid.tf"
 ENABLE_TELEMETRY=false
 STELLAR_ENV_Vars=(
     STELLAR_HORIZON_URL
@@ -109,6 +110,7 @@ window.env = {
   STELLAR_HORIZON_URL: '$STELLAR_HORIZON_URL',
   TFT_ASSET_ISSUER: '$TFT_ASSET_ISSUER',
   MINTING_URL: '$MINTING_URL',
+  KYC_URL: '$KYC_URL',
   STATS_STACKS: "[$(parss_array "$STATS_URL")]",
   TIMEOUT: +'$TIMEOUT',
   PAGE_SIZE: +'$PAGE_SIZE',
