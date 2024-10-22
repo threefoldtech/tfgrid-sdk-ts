@@ -49,6 +49,7 @@ class ClientOptions {
     public activationURL?: string,
     public deploymentTimeoutMinutes?: number,
     public keepReconnectingToChain?: boolean,
+    public KycURL?: string,
   ) {}
 }
 

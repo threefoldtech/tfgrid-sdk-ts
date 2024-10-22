@@ -5,7 +5,7 @@ import { validateMnemonic } from "bip39";
 import * as PATH from "path";
 import urlJoin from "url-join";
 
-import { Graphql } from "./clients";
+import { Graphql, KYC as kycClient } from "./clients";
 import { TFClient } from "./clients/tf-grid/client";
 import { ClientOptions, GridClientConfig, NetworkEnv } from "./config";
 import { migrateKeysEncryption, send, toHexSeed } from "./helpers";
@@ -24,6 +24,7 @@ class GridClient {
   config: GridClientConfig;
   rmbClient: RMBClient;
   tfclient: TFClient;
+  kycClient: kycClient;
   /**The `MachinesModule` class provides methods to interact with machine operations.*/
   machines: modules.machines;
   k8s: modules.k8s;
@@ -139,7 +140,7 @@ class GridClient {
       this.clientOptions.keypairType,
       this.clientOptions.keepReconnectingToChain,
     );
-
+    this.kycClient = new kycClient(urls.KYC, this.clientOptions.mnemonic, this.clientOptions.keypairType);
     this.rmbClient = new RMBClient(
       urls.substrate,
       urls.relay,
@@ -245,6 +246,8 @@ class GridClient {
       substrate: substrateURL || `wss://tfchain.${base}/ws`,
       graphql: graphqlURL || `https://graphql.${base}/graphql`,
       activation: activationURL || `https://activation.${base}/activation/activate`,
+      //TODO handle kyc url
+      KYC: `kyc1.gent01.dev.grid.tf`,
     };
 
     return urls;
