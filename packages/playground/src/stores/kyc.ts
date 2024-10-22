@@ -39,6 +39,10 @@ const useKYC = defineStore("KYC-client", {
         }
       }
     },
+    clear() {
+      this.status = null;
+      this.client = null;
+    },
   },
 });
 

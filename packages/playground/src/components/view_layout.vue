@@ -29,7 +29,7 @@
           <router-link :to="DashboardRoutes.Deploy.SSHKey">SSH Keys</router-link> page.
         </VAlert>
       </template>
-      <template v-if="!kyc">
+      <template v-if="kyc !== KycStatus.verified">
         <VAlert variant="tonal" type="error" class="mb-4">
           {{ title }} requires a KYC verification. <v-chip color="error">verify now</v-chip>
         </VAlert>
@@ -44,11 +44,13 @@
 </template>
 
 <script lang="ts">
+import { KycStatus } from "@threefold/grid_client";
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import { useRoute } from "vue-router";
 
 import { DashboardRoutes } from "@/router/routes";
 import { useProfileManager } from "@/stores";
+import { useKYC } from "@/stores/kyc";
 
 import AppInfo from "./app_info.vue";
 
@@ -58,6 +60,7 @@ export default {
   setup() {
     const route = useRoute();
     const profileManager = useProfileManager();
+    const kyc = useKYC();
     const viewLayoutContainer = ref<HTMLElement>();
     const tick = ref(0);
 
@@ -80,11 +83,12 @@ export default {
       title: computed(() => route.meta.title),
       hasInfo: computed(() => profileManager.profile && route.meta.info),
       ssh: computed(() => profileManager.profile?.ssh),
-      kyc: computed(() => profileManager.kyc),
+      kyc: computed(() => kyc.status),
       requireSSH: computed(() => route.meta.requireSSH),
       tick,
       viewLayoutContainer,
       DashboardRoutes,
+      KycStatus,
     };
   },
 };

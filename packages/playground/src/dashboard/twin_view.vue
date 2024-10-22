@@ -1,6 +1,6 @@
 <template>
   <div>
-    <KycVerifier :moduleValue="kycDialog" @update:moduleValue="kycDialog = $event" />
+    <KycVerifier v-if="kycDialog" :moduleValue="kycDialog" @update:moduleValue="kycDialog = $event" />
     <v-container v-if="editingTwin">
       <v-dialog v-model="editingTwin" max-width="600" attach="#modals">
         <v-card>
@@ -145,7 +145,7 @@
                 <v-col cols="9" class="px-0">
                   <v-list-item class="px-0">
                     <div style="display: flex; justify-content: space-between; align-items: center">
-                      <div v-if="profileManager.kyc == KycStatus.approved">
+                      <div v-if="kyc.status == KycStatus.verified">
                         <v-chip>Verified</v-chip>
                       </div>
                       <div v-else>
@@ -214,7 +214,7 @@ import { createCustomToast, ToastType } from "../utils/custom_toast";
 import { getFarms } from "../utils/get_farms";
 import { type Balance, loadBalance, storeEmail } from "../utils/grid";
 const profileManager = useProfileManager();
-
+const kyc = useKYC();
 const editingTwin = ref(false);
 const relay = ref(profileManager.profile?.relay || "");
 const updateRelay = ref(false);
@@ -246,8 +246,6 @@ const apps = [
 ];
 onMounted(async () => {
   const profile = profileManager.profile!;
-  const kyc = profileManager.kyc;
-
   if (!grid) {
     createCustomToast("Fetch Grid Failed", ToastType.danger);
 
@@ -350,6 +348,7 @@ function copy(id: string) {
 import type { GridClient } from "@threefold/grid_client";
 
 import KycVerifier from "@/components/KycVerifier.vue";
+import { useKYC } from "@/stores/kyc";
 
 import QrcodeGenerator from "../components/qrcode_generator.vue";
 

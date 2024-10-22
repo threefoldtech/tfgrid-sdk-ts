@@ -606,7 +606,7 @@ const confirmPasswordInput = useInputRef();
 
 const version = 1;
 const WALLET_KEY = "wallet.v" + version;
-
+const kyc = useKYC();
 let interval: any;
 watch(
   () => profileManager.profile,
@@ -615,15 +615,9 @@ watch(
       __loadBalance(profile);
       if (interval) clearInterval(interval);
       interval = setInterval(__loadBalance.bind(undefined, profile), 1000 * 60 * 2);
-      //TODO replace with the correct kyc url from env
-      const KycVerifier = new KYC("kyc1.gent01.dev.grid.tf", profile.mnemonic, profile.keypairType);
-      try {
-        const status = await KycVerifier.status();
-        profileManager.setKyc(status);
-      } catch (e) {
-        console.error("Failed to get kyc status", e);
-      }
+      kyc.init(profile, window.env.KYC_URL);
     } else {
+      kyc.clear();
       if (interval) clearInterval(interval);
       balance.value = undefined;
     }
@@ -646,6 +640,7 @@ watch(
 function logout() {
   sessionStorage.removeItem("password");
   profileManager.clear();
+  kyc.clear();
   if (router.currentRoute.value.path.includes("/overview")) {
     router.push("/");
   }
@@ -913,6 +908,7 @@ async function getEmail() {
 import { TwinNotExistError } from "@threefold/types";
 import { capitalize } from "vue";
 
+import { useKYC } from "@/stores/kyc";
 import SSHKeysManagement from "@/utils/ssh";
 
 import QrcodeGenerator from "../components/qrcode_generator.vue";
