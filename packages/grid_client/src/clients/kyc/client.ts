@@ -46,6 +46,10 @@ export class KYC {
     if (mnemonic === "") {
       throw new ValidationError("mnemonic is required");
     }
+    /** The api domain should not contains any prefix or postfix */
+    this.apiDomain = apiDomain.replace("https://", "");
+    this.apiDomain = apiDomain.replace("http://", "");
+    this.apiDomain = apiDomain.replace("/", "");
   }
 
   /**
