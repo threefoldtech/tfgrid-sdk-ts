@@ -191,6 +191,7 @@ class GridClient {
       twinId: this.twinId,
       seed: this.clientOptions.seed,
       deploymentTimeoutMinutes: this.clientOptions.deploymentTimeoutMinutes!,
+      kycURL: urls.KYC,
     };
     for (const module of Object.getOwnPropertyNames(modules).filter(item => typeof modules[item] === "function")) {
       if (module.includes("Model")) {

@@ -31,6 +31,7 @@ class GridClientConfig {
   twinId: number;
   seed?: string;
   deploymentTimeoutMinutes: number;
+  kycURL: string;
 }
 class ClientOptions {
   constructor(
