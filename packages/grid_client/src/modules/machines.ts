@@ -25,6 +25,7 @@ class MachinesModule extends BaseModule {
     WorkloadTypes.ip,
     WorkloadTypes.ipv4,
     WorkloadTypes.zlogs,
+    WorkloadTypes.zmachinelight,
   ]; // TODO: remove deprecated
   vm: VMHL;
   /**
