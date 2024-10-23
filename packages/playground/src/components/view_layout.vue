@@ -22,14 +22,14 @@
     >
       <AppInfo />
     </div>
-    <template v-if="!kyc || requireSSH">
+    <template v-if="requireKYC || requireSSH">
       <template v-if="requireSSH && !ssh">
         <VAlert variant="tonal" type="error" class="mb-4">
           {{ title }} requires a public SSH key. You can generate or import it from the
           <router-link :to="DashboardRoutes.Deploy.SSHKey">SSH Keys</router-link> page.
         </VAlert>
       </template>
-      <template v-if="kyc !== KycStatus.verified">
+      <template v-if="requireKYC && kyc !== KycStatus.verified">
         <VAlert variant="tonal" type="error">
           <template #prepend>
             <v-icon icon="mdi-shield-remove"></v-icon>
@@ -109,6 +109,7 @@ export default {
       ssh: computed(() => profileManager.profile?.ssh),
       kyc: computed(() => kyc.status),
       requireSSH: computed(() => route.meta.requireSSH),
+      requireKYC: computed(() => route.meta.requireKYC || route.path.match(/\/applications\/.+$/)),
       tick,
       viewLayoutContainer,
       DashboardRoutes,
