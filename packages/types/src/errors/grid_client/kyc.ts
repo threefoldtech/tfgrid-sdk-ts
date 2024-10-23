@@ -2,7 +2,7 @@ import { BaseError } from "../base_error";
 import { ErrorModules } from "../modules";
 
 export enum Errors {
-  NotVerifiedError,
+  UnverifiedError,
   InvalidResponseError,
   RateLimitError,
   InvalidChallengeError,
@@ -24,9 +24,9 @@ export class KycInvalidResponseError extends TFGridKycError {
   }
 }
 
-export class KycNotVerifiedError extends TFGridKycError {
+export class KycUnverifiedError extends TFGridKycError {
   constructor(message: string) {
-    super("KycNotVerifiedError", Errors.NotVerifiedError, message);
+    super("KycUnverifiedError", Errors.UnverifiedError, message);
   }
 }
 

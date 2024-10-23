@@ -91,42 +91,75 @@ export class KYC {
   }
 
   /**
+   * Throws specific KYC-related errors based on the provided error message.
+   *
+   * @param errorMessage - The error message to evaluate.
+   * @throws {KycErrors.KycInvalidAddressError} If the error message indicates a malformed address.
+   * @throws {KycErrors.KycInvalidChallengeError} If the error message indicates a malformed or bad challenge.
+   * @throws {KycErrors.KycInvalidSignatureError} If the error message indicates a malformed or bad signature.
+   * @returns {undefined} If the error message does not match any known error patterns.
+   */
+  private ThrowHeadersRelatedError(errorMessage: string) {
+    switch (true) {
+      case errorMessage.includes("malformed address"):
+        throw new KycErrors.KycInvalidAddressError(errorMessage);
+      case errorMessage.includes("malformed challenge") || errorMessage.includes("bad challenge"):
+        throw new KycErrors.KycInvalidChallengeError(errorMessage);
+      case errorMessage.includes("malformed signature") || errorMessage.includes("bad signature"):
+        throw new KycErrors.KycInvalidSignatureError(errorMessage);
+      default:
+        return undefined;
+    }
+  }
+
+  /**
    * Fetches the verification data from the API.
    *
    * @returns {Promise<VerificationDataResponse>} A promise that resolves to the verification data response.
    * @throws {RequestError} If there is an issue with fetching the data.
    */
   async data(): Promise<VerificationDataResponse> {
-    const headers = await this.prepareHeaders();
-    return await send("GET", urlJoin("https://", this.apiDomain, API_PREFIX, "data"), "", headers);
+    try {
+      const headers = await this.prepareHeaders();
+      return await send("GET", urlJoin("https://", this.apiDomain, API_PREFIX, "data"), "", headers);
+    } catch (error) {
+      const messagePrefix = "Failed to get authentication data from KYC service";
+      const errorMessage = formatErrorMessage(messagePrefix, error);
+      const statusCode = (error as RequestError).statusCode;
+      this.ThrowHeadersRelatedError(errorMessage);
+      if (statusCode === 404) throw new KycErrors.KycUnverifiedError(errorMessage);
+      throw new KycBaseError(errorMessage);
+    }
   }
 
   /**
    * Retrieves the current verification status.
    *
    * @returns {Promise<KycStatus>} A promise that resolves to the verification status.
-   * @throws {RequestError} If there is an issue with fetching the status data.
+   * @throws {KycErrors.TFGridKycError | KycBaseError} If there is an issue with fetching the status data.
    */
   async status(): Promise<KycStatus> {
     const headers = await this.prepareHeaders();
     try {
       const res = await send("GET", urlJoin("https://", this.apiDomain, API_PREFIX, "status"), "", headers);
-      if (!res.result.status) console.error("KYC status response does not contain status field"); // TODO throw kyc error
-      return res.result?.status;
-    } catch (e) {
-      if (e instanceof RequestError) {
-        if (e.statusCode === 404) {
-          return KycStatus.unverified;
-        }
-      }
-      throw e;
+      if (!res.result.status)
+        throw new KycErrors.KycInvalidResponseError(
+          "Failed to get status due to: Response does not contain status field",
+        );
+      return res.result.status;
+    } catch (error) {
+      if (error instanceof RequestError && error.statusCode === 404) return KycStatus.unverified;
+      const messagePrefix = "Failed to get authentication status from KYC service";
+      const errorMessage = formatErrorMessage(messagePrefix, error);
+      this.ThrowHeadersRelatedError(errorMessage);
+      throw new KycBaseError(errorMessage);
     }
   }
   /**
    * Retrieves a token data from the KYC service API.
    *
    * @returns {Promise<string>} A promise that resolves to a string representing the idenify auth token .
-   * @throws {RequestError} If there is an issue with fetching the token data.
+   * @throws {KycErrors.TFGridKycError | KycBaseError} If there is an issue with fetching the token data.
    */
   async getToken(): Promise<string> {
     try {
@@ -141,16 +174,10 @@ export class KYC {
       const messagePrefix = "Failed to get auth token from KYC service";
       const errorMessage = formatErrorMessage(messagePrefix, error);
       const statusCode = (error as RequestError).statusCode;
-
+      this.ThrowHeadersRelatedError(errorMessage);
       switch (true) {
         case statusCode === 429:
           throw new KycErrors.KycRateLimitError(errorMessage);
-        case errorMessage.includes("malformed address"):
-          throw new KycErrors.KycInvalidAddressError(errorMessage);
-        case errorMessage.includes("malformed challenge") || errorMessage.includes("bad challenge"):
-          throw new KycErrors.KycInvalidChallengeError(errorMessage);
-        case errorMessage.includes("malformed signature") || errorMessage.includes("bad signature"):
-          throw new KycErrors.KycInvalidSignatureError(errorMessage);
         case errorMessage.includes("already verified"):
           throw new KycErrors.KycAlreadyVerifiedError(errorMessage);
         case errorMessage.includes("balance"):
