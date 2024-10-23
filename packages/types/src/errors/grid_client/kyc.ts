@@ -7,7 +7,6 @@ export enum Errors {
   RateLimitError,
   InvalidChallengeError,
   InvalidSignatureError,
-  UnknownStatusError,
   InvalidAddressError,
   AlreadyVerifiedError,
 }
@@ -51,12 +50,6 @@ export class KycInvalidChallengeError extends TFGridKycError {
 export class KycInvalidSignatureError extends TFGridKycError {
   constructor(message: string) {
     super("KycInvalidSignatureError", Errors.InvalidSignatureError, message);
-  }
-}
-
-export class KycInsufficientBalanceError extends TFGridKycError {
-  constructor(message: string) {
-    super("KycInsufficientBalanceError", Errors.UnknownStatusError, message);
   }
 }
 export class KycAlreadyVerifiedError extends TFGridKycError {

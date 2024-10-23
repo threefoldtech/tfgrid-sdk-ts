@@ -18,21 +18,17 @@ export interface Profile {
 
 export interface State {
   profile: Profile | null;
-  kyc: KycStatus | null;
 }
 
 const useProfileManager = defineStore("profile-manager", {
   state: (): State => {
-    return { profile: null, kyc: null };
+    return { profile: null };
   },
 
   actions: {
     set(profile: Profile | null) {
       this.profile = profile;
       useGrid().set(profile);
-    },
-    setKyc(kyc: KycStatus) {
-      this.kyc = kyc;
     },
     updateSSH(ssh: SSHKeyData[]) {
       if (this.profile) {

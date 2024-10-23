@@ -625,7 +625,7 @@ const kyc = useKYC();
 let interval: any;
 watch(
   () => profileManager.profile,
-  async profile => {
+  profile => {
     if (profile) {
       __loadBalance(profile);
       if (interval) clearInterval(interval);

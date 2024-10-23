@@ -19,14 +19,14 @@ const API_PREFIX = "/api/v1/";
  * const kyc = new KYC("https://api.example.com", KeypairType.sr25519, "mnemonic");
  * const data = await kyc.data();
  * const status = await kyc.status();
- * const token = await kyc.token();
+ * const token = await kyc.getToken();
  * ```
  * @param {string} apiDomain - The API domain for the KYC service.
  * @param {KeypairType} [keypairType=KeypairType.sr25519] - The type of keypair to use.
  * @param {string} mnemonic - The mnemonic for generating the keypair.
  * @method data - Fetches the verification data from the KYC service.
  * @method status - Fetches the verification status from the KYC service.
- * @method token - Fetches the token from the KYC service.
+ * @method getToken - Fetches the token from the KYC service.
  */
 export class KYC {
   private keyring: Keyring;
@@ -116,7 +116,7 @@ export class KYC {
    * Fetches the verification data from the API.
    *
    * @returns {Promise<VerificationDataResponse>} A promise that resolves to the verification data response.
-   * @throws {RequestError} If there is an issue with fetching the data.
+   * @throws {KycErrors.TFGridKycError | KycBaseError} If there is an issue with fetching the data.
    */
   async data(): Promise<VerificationDataResponse> {
     try {
