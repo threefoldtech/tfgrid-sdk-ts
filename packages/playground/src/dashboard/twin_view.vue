@@ -152,7 +152,7 @@
                   <v-list-item class="px-0">
                     <div style="display: flex; justify-content: space-between; align-items: center">
                       <div v-if="kyc.status == KycStatus.verified">
-                        <v-chip icon="mdi-shield-check">Verified</v-chip>
+                        <v-chip prepend-icon="mdi-shield-check">Verified</v-chip>
                       </div>
                       <div v-else>
                         <v-btn

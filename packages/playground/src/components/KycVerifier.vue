@@ -46,12 +46,6 @@ export default {
     };
 
     const getToken = async () => {
-      await kyc.updateStatus();
-      if (kyc.status == KycStatus.verified) {
-        createCustomToast("Already verified", ToastType.info);
-        handleUpdateDialog(false);
-        return;
-      }
       try {
         if (!kyc.client) throw new Error("KYC client is not initialized");
         token.value = await kyc.client.getToken();
