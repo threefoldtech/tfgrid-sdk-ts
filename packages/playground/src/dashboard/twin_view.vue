@@ -170,9 +170,8 @@
                           </template>
                         </v-btn>
                       </div>
-                      <!-- TODO Update the tooltip -->
                       <input-tooltip
-                        tooltip="Irure aliqua esse magna cillum reprehenderit nulla pariatur."
+                        tooltip="A verification process to confirm your identity and ensure compliance with regulations."
                         :align-center="true"
                         :class="'d-flex align-center'"
                         location="end"
