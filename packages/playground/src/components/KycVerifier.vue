@@ -22,6 +22,7 @@ import { onMounted, ref } from "vue";
 
 import { useKYC } from "@/stores/kyc";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
+import { handleKYCError } from "@/utils/helpers";
 
 export default {
   name: "KycVerifier",
@@ -57,7 +58,8 @@ export default {
       } catch (e) {
         handleUpdateDialog(false);
         const message = "Failed to get authentication token";
-        createCustomToast(`${message}, Please try again later`, ToastType.danger);
+        handleKYCError(message, e as Error);
+        createCustomToast(handleKYCError(message, e as Error), ToastType.danger);
         console.error(message, e);
       } finally {
         emit("loaded");
