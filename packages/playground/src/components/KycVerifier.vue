@@ -17,7 +17,7 @@
   </v-dialog>
 </template>
 <script lang="ts">
-import { KycStatus } from "@threefold/grid_client";
+import { KycErrors } from "@threefold/types";
 import { onMounted, ref } from "vue";
 
 import { useKYC } from "@/stores/kyc";
@@ -51,6 +51,11 @@ export default {
         token.value = await kyc.client.getToken();
       } catch (e) {
         handleUpdateDialog(false);
+        if (e instanceof KycErrors.KycAlreadyVerifiedError) {
+          kyc.updateStatus();
+          createCustomToast("Already verified", ToastType.info);
+          return;
+        }
         const message = "Failed to get authentication token";
         handleKYCError(message, e as Error);
         createCustomToast(handleKYCError(message, e as Error), ToastType.danger);

@@ -112,8 +112,6 @@ export function handleKYCError(message: string, error: Error): string {
         return `${message}: Invalid signature, please contact support`;
       case error instanceof InsufficientBalanceError:
         return `${message}: Insufficient balance, please fund your wallet`;
-      case error instanceof KycErrors.KycAlreadyVerifiedError:
-        return `${message}: Already verified`;
       case error instanceof KycErrors.KycUnverifiedError:
         return `${message}: KYC is not verified`;
       case error instanceof KycErrors.KycInvalidResponseError:
