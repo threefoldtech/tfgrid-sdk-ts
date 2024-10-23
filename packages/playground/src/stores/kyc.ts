@@ -1,5 +1,4 @@
 import { KYC as KycClient, KycStatus } from "@threefold/grid_client";
-import { create } from "lodash";
 import { defineStore } from "pinia";
 
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
