@@ -22,7 +22,8 @@
             <p>
               Balance:
               <strong :class="theme.name.value === AppThemeSelection.light ? 'text-primary' : 'text-info'">
-                {{ normalizeBalance(balance.free + balance.reserved, true) }} TFT
+                {{ normalizeBalance(balance.free + balance.reserved, true) }}
+                TFT
               </strong>
             </p>
             <p>
@@ -81,6 +82,7 @@
         :tabs="getTabs()"
         v-model="activeTab"
         :disabled="creatingAccount || activatingAccount || activating"
+        ref="tabsRef"
         @tab:change="
           () => {
             clearError();
@@ -353,7 +355,11 @@
           <v-col cols="12" md="6" lg="6" xl="6">
             <PasswordInputWrapper #="{ props }">
               <VTextField
-                :label="profileManager.profile.mnemonic.startsWith('0x') ? 'Your Hex Seed' : 'Your Mnemonic'"
+                :label="
+                  profileManager.profile.mnemonic.startsWith('0x') || profileManager.profile.mnemonic.length === 64
+                    ? 'Your Hex Seed'
+                    : 'Your Mnemonic'
+                "
                 readonly
                 v-model="profileManager.profile.mnemonic"
                 v-bind="props"
@@ -519,6 +525,19 @@ watch(
   },
   { deep: false },
 );
+const tabsRef = ref();
+
+function handleTabs() {
+  const tabs = tabsRef.value?.$el;
+  if (!tabs) return;
+  if (!isStoredCredentials()) return;
+
+  const activeClass = "v-slide-group-item--active";
+  const tabsButtons = tabs.nextSibling.querySelectorAll("button");
+  const ButtonsList: HTMLElement[] = Array.from(tabsButtons);
+  const activeButtonIndex = ButtonsList.findIndex(sibling => sibling.classList.contains(activeClass));
+  activeTab.value = activeButtonIndex;
+}
 
 async function mounted() {
   selectedName.value = items.value.filter(item => item.id === selectedItem.value.id)[0].name;
@@ -557,6 +576,7 @@ function isStoredCredentials() {
 }
 
 function getTabs() {
+  handleTabs();
   let tabs = [];
   if (isStoredCredentials()) {
     tabs = [
@@ -624,10 +644,6 @@ watch(
     confirmPassword.value && confirmPasswordInput.value?.validate();
   },
   { immediate: true },
-);
-watch(
-  () => [online, props.modelValue],
-  ([newOnline, newModelValue], [oldOnline, oldModelValue]) => {},
 );
 
 function logout() {
@@ -714,6 +730,7 @@ async function createNewAccount() {
 }
 
 const activatingAccount = ref(false);
+
 async function activateAccount() {
   openAcceptTerms.value = false;
   termsLoading.value = false;
@@ -722,7 +739,12 @@ async function activateAccount() {
   activatingAccount.value = true;
   activating.value = true;
   try {
-    await activateAccountAndCreateTwin(mnemonic.value);
+    const mnemonicOrSeedValue = validateMnemonic(mnemonic.value)
+      ? mnemonic.value
+      : mnemonic.value.length === 66
+      ? mnemonic.value
+      : `0x${mnemonic.value}`;
+    await activateAccountAndCreateTwin(mnemonicOrSeedValue);
     await storeAndLogin();
   } catch (e) {
     enableReload.value = true;
@@ -794,9 +816,9 @@ async function storeAndLogin() {
     await activate(mnemonic.value, keypairType.value);
   } catch (e) {
     if (e instanceof TwinNotExistError) {
-      isNonActiveMnemonic.value = true;
       openAcceptTerms.value = true;
       termsLoading.value = true;
+      isNonActiveMnemonic.value = true;
     }
     enableReload.value = false;
     return {
