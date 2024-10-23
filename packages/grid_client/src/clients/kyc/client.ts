@@ -1,11 +1,11 @@
 import { Keyring } from "@polkadot/keyring";
 import { KeyringPair } from "@polkadot/keyring/types";
 import { waitReady } from "@polkadot/wasm-crypto";
-import { RequestError, ValidationError } from "@threefold/types";
+import { InsufficientBalanceError, KycBaseError, KycErrors, RequestError, ValidationError } from "@threefold/types";
 import { Buffer } from "buffer";
 import urlJoin from "url-join";
 
-import { bytesFromHex, KeypairType, send, stringToHex } from "../..";
+import { bytesFromHex, formatErrorMessage, KeypairType, send, stringToHex } from "../..";
 import { KycHeaders, KycStatus, VerificationDataResponse } from "./types";
 const API_PREFIX = "/api/v1/";
 /**
@@ -129,8 +129,35 @@ export class KYC {
    * @throws {RequestError} If there is an issue with fetching the token data.
    */
   async getToken(): Promise<string> {
-    const headers = await this.prepareHeaders();
-    const res = await send("POST", urlJoin("https://", this.apiDomain, API_PREFIX, "token"), "", headers);
-    return res.result.authToken;
+    try {
+      const headers = await this.prepareHeaders();
+      const res = await send("POST", urlJoin("https://", this.apiDomain, API_PREFIX, "token"), "", headers);
+      if (!res.result.authToken)
+        throw new KycErrors.KycInvalidResponseError(
+          "Failed to get token due to: Response does not contain authToken field",
+        );
+      return res.result.authToken;
+    } catch (error) {
+      const messagePrefix = "Failed to get auth token from KYC service";
+      const errorMessage = formatErrorMessage(messagePrefix, error);
+      const statusCode = (error as RequestError).statusCode;
+
+      switch (true) {
+        case statusCode === 429:
+          throw new KycErrors.KycRateLimitError(errorMessage);
+        case errorMessage.includes("malformed address"):
+          throw new KycErrors.KycInvalidAddressError(errorMessage);
+        case errorMessage.includes("malformed challenge") || errorMessage.includes("bad challenge"):
+          throw new KycErrors.KycInvalidChallengeError(errorMessage);
+        case errorMessage.includes("malformed signature") || errorMessage.includes("bad signature"):
+          throw new KycErrors.KycInvalidSignatureError(errorMessage);
+        case errorMessage.includes("already verified"):
+          throw new KycErrors.KycAlreadyVerifiedError(errorMessage);
+        case errorMessage.includes("balance"):
+          throw new InsufficientBalanceError(errorMessage);
+        default:
+          throw new KycBaseError(errorMessage);
+      }
+    }
   }
 }
