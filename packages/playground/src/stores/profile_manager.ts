@@ -1,4 +1,4 @@
-import type { KeypairType, KycStatus } from "@threefold/grid_client";
+import type { KeypairType } from "@threefold/grid_client";
 import { defineStore } from "pinia";
 
 import type { SSHKeyData } from "@/types";
