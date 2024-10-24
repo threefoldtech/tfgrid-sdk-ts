@@ -259,7 +259,7 @@ async function loadDeployments() {
     const vms = mergeLoadedDeployments(chunk1, chunk2, chunk3 as any);
     failedDeployments.value = vms.failedDeployments;
     count.value = vms.count;
-    items.value = mergeCaproverDeployments(vms.items, props.projectName);
+    items.value = mergeCaproverDeployments(vms.items);
   } catch (err) {
     errorMessage.value = `Failed to load Deployments: ${err}`;
   } finally {

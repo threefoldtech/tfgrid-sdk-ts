@@ -13,7 +13,7 @@ export function createNetwork(network: Network = {}): NetworkModel {
   return nw;
 }
 
-export const mergeCaproverDeployments = (clusters: ZmachineData[][], projectName: string) => {
+export const mergeCaproverDeployments = (clusters: ZmachineData[][]) => {
   const vms: ZmachineData[] = [];
 
   for (const cluster of clusters) {
