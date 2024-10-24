@@ -81,6 +81,14 @@ function convertObjectToQueryString(obj: Record<string, any>): string {
 
   return queryString;
 }
+/**
+ * Function to convert from bytes to Gigabytes
+ * @param {Number} bytes
+ * @returns {Number}
+ */
+function bytesToGB(bytes: number) {
+  return bytes / Math.pow(1024, 3);
+}
 
 export {
   generateString,
@@ -95,4 +103,5 @@ export {
   generateRandomHexSeed,
   zeroPadding,
   convertObjectToQueryString,
+  bytesToGB,
 };
