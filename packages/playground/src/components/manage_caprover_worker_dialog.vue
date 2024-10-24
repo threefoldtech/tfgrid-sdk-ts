@@ -144,7 +144,10 @@ async function deploy(layout: any) {
       }),
     });
 
-    const leader = setCaproverWorkers(vms, props.projectName);
+    const [leader, ...workers] = vms;
+    leader.workers = workers;
+    leader.projectName = props.projectName;
+    leader.deploymentName = leader.name;
     caproverData.value = leader;
     deployedDialog.value = true;
     layout.setStatus("success", `Successfully add a new worker to Caprover('${props.master.name}') Instance.`);
@@ -179,8 +182,6 @@ async function onDelete(cb: (workers: any[]) => void) {
 
 <script lang="ts">
 import { calculateRootFileSystem, type GridClient } from "@threefold/grid_client";
-
-import { setCaproverWorkers } from "@/utils/deploy_helpers";
 
 import CaproverWorker, { createWorker } from "../components/caprover_worker.vue";
 import ListTable from "../components/list_table.vue";
