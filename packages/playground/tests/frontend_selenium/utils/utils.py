@@ -200,7 +200,7 @@ def byte_converter(value):
         elif unit == 'T':  # Terabytes
             return float(number_str) * (1024 ** 4)
         elif unit == 'G':  # Gigabytes
-            return float(number_str)  # No conversion needed, already in gigabytes
+            return float(number_str) * (1024 ** 3)
 
     return float(value)
 
