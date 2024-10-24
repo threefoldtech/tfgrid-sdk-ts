@@ -2,6 +2,7 @@ import { Keyring } from "@polkadot/keyring";
 import { KeyringPair } from "@polkadot/keyring/types";
 import { waitReady } from "@polkadot/wasm-crypto";
 import { InsufficientBalanceError, KycBaseError, KycErrors, RequestError, ValidationError } from "@threefold/types";
+import { HttpStatusCode } from "axios";
 import { Buffer } from "buffer";
 import urlJoin from "url-join";
 
@@ -148,7 +149,7 @@ export class KYC {
         );
       return res.result.status;
     } catch (error) {
-      if (error instanceof RequestError && error.statusCode === 404) return KycStatus.unverified;
+      if (error instanceof RequestError && error.statusCode === HttpStatusCode.NotFound) return KycStatus.unverified;
       const messagePrefix = "Failed to get authentication status from KYC service";
       const errorMessage = formatErrorMessage(messagePrefix, error);
       this.ThrowHeadersRelatedError(errorMessage);
@@ -176,7 +177,7 @@ export class KYC {
       const statusCode = (error as RequestError).statusCode;
       this.ThrowHeadersRelatedError(errorMessage);
       switch (true) {
-        case statusCode === 429:
+        case statusCode === HttpStatusCode.TooManyRequests:
           throw new KycErrors.KycRateLimitError(errorMessage);
         case errorMessage.includes("already verified"):
           throw new KycErrors.KycAlreadyVerifiedError(errorMessage);
