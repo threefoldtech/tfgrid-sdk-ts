@@ -1,4 +1,4 @@
-import { Features, FilterOptions, generateRandomHexSeed, MachinesModel } from "../src";
+import { Features, FilterOptions, MachinesModel } from "../src";
 import { config, getClient } from "./client_loader";
 import { log, pingNodes } from "./utils";
 
