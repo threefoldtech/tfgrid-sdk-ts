@@ -43,23 +43,11 @@ async function main() {
     network: {
       name: "dynamictest",
       ip_range: "10.249.0.0/16",
-      myceliumSeeds: [
-        {
-          nodeId: vmNode,
-          /**
-           * ### Mycelium Network Seed:
-           * - The `seed` is an optional field used to provide a specific seed for the Mycelium network.
-           * - If not provided, the `GridClient` will generate a seed automatically when the `mycelium` flag is enabled.
-           * - **Use Case:** If you need the new machine to have the same IP address as a previously deleted machine, set the `seed` field to the old seed value.
-           */
-          seed: generateRandomHexSeed(32),
-        },
-      ],
     },
     machines: [
       {
         name: "testvm",
-        node_id: +(await grid3.capacity.filterNodes(vmQueryOptions))[0].nodeId,
+        node_id: vmNode,
         disks: [
           {
             name: "dynamicDisk",
