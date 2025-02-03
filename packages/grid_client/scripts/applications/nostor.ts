@@ -74,7 +74,7 @@ async function main() {
 
   // Gateway Query Options
   const gatewayQueryOptions: FilterOptions = {
-    features: [Features.wireguard, Features.mycelium],
+    features: [Features.wireguard, Features.mycelium, Features.gatewaynameproxy],
     gateway: true,
     availableFor: grid3.twinId,
   };
