@@ -67,14 +67,14 @@
         v-model:status="domainStatus"
         :use-fqdn="$props.useFqdn"
         v-if="requireDomain"
-        :interfaces="$props.interfaces"
+        :interfaces="domainNameInterfaces"
       />
     </VExpandTransition>
   </section>
 </template>
 
 <script lang="ts">
-import type { FarmInfo, GPUCardInfo, NodeInfo } from "@threefold/grid_client";
+import { type FarmInfo, Features, type GPUCardInfo, type NodeInfo } from "@threefold/grid_client";
 import { type Farm, NodeStatus } from "@threefold/gridproxy_client";
 import type AwaitLock from "await-lock";
 import noop from "lodash/fp/noop.js";
@@ -151,6 +151,17 @@ export default {
     const domain = ref<DomainInfo>();
     const domainStatus = ref<ValidatorStatus>();
 
+    const domainNameInterfaces = computed((): NetworkFeatures[] => {
+      if (props.interfaces.length === 0) {
+        const interfaces: NetworkFeatures[] = [];
+        if (props.filters.ipv4) interfaces.push(Features.ipv4);
+        if (props.filters.ipv6) interfaces.push(Features.ip);
+        if (props.filters.planetary) interfaces.push(Features.yggdrasil);
+        if (props.filters.mycelium) interfaces.push(Features.mycelium);
+        if (props.filters.wireguard) interfaces.push(Features.wireguard);
+        return interfaces;
+      } else return props.interfaces;
+    });
     const loadedFarms = new Map<number, Farm>();
     async function loadFarm(farmId: number) {
       if (loadedFarms.has(farmId)) {
@@ -260,6 +271,7 @@ export default {
       domain,
       domainStatus,
       selectionDetails,
+      domainNameInterfaces,
       NodeStatus,
       loadFarm,
       getFarm,
