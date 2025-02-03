@@ -101,7 +101,13 @@
             </input-tooltip>
 
             <div :style="{ marginTop: '-10px' }">
-              <TfSelectionDetails disable-node-selection require-domain use-fqdn v-model="selectionDetails" />
+              <TfSelectionDetails
+                disable-node-selection
+                require-domain
+                use-fqdn
+                :interfaces="supportedNetworksFeatures"
+                v-model="selectionDetails"
+              />
             </div>
 
             <input-validator :value="port" :rules="portRules" #="{ props }">
@@ -187,12 +193,12 @@
 </template>
 
 <script lang="ts">
-import { type GridClient, WorkloadTypes, type ZmachineData } from "@threefold/grid_client";
-import { onMounted, type PropType, ref, watch } from "vue";
+import { Features, type GridClient, WorkloadTypes, type ZmachineData } from "@threefold/grid_client";
+import { computed, onMounted, type PropType, ref, watch } from "vue";
 
 import { useGrid } from "../stores";
 import { ProjectName } from "../types";
-import type { SelectionDetails } from "../types/nodeSelector";
+import type { NetworkFeatures, SelectionDetails } from "../types/nodeSelector";
 import {
   type DeployGatewayConfig,
   deployGatewayName,
@@ -236,6 +242,7 @@ export default {
     const gatewayTab = ref(0);
     const dialogVisible = ref(true);
     const isWireGuard = ref(false);
+    const usingWireguard = computed(() => !!networks.value.find(net => net.title === NetworkInterfaces.WireGuard));
 
     const oldPrefix = ref("");
     const prefix = ref("");
@@ -263,6 +270,7 @@ export default {
     const availableK8SNodesNames = availableK8SNodes.map(node => node.name);
     const selectedK8SNodeName = ref(availableK8SNodesNames[0]);
     const selectedNode = ref();
+    const supportedNetworksFeatures = ref<NetworkFeatures[]>([]);
     const errorMessage = ref("");
 
     watch(selectedK8SNodeName, getSupportedNetworks, { deep: true });
@@ -281,6 +289,7 @@ export default {
       suggestName();
       await loadGateways();
       getSupportedNetworks();
+      getSupportedNetworksFeatures();
       updateHeaders();
     });
 
@@ -408,6 +417,28 @@ export default {
       }
     }
 
+    function getSupportedNetworksFeatures() {
+      networks.value.forEach(net => {
+        switch (net.title) {
+          case NetworkInterfaces.PublicIPV4:
+            supportedNetworksFeatures.value.push(Features.ipv4);
+            break;
+          case NetworkInterfaces.PublicIPV6:
+            supportedNetworksFeatures.value.push(Features.ip);
+            break;
+          case NetworkInterfaces.Planetary:
+            supportedNetworksFeatures.value.push(Features.yggdrasil);
+            break;
+          case NetworkInterfaces.Mycelium:
+            supportedNetworksFeatures.value.push(Features.mycelium);
+            break;
+          case NetworkInterfaces.WireGuard:
+            supportedNetworksFeatures.value.push(Features.wireguard);
+            break;
+        }
+      });
+    }
+
     function getSupportedNetworks() {
       (selectedNode.value = props.vm
         ? props.vm
@@ -498,6 +529,7 @@ export default {
       networkName,
       loadingGateways,
       gateways,
+      supportedNetworksFeatures,
       failedToListGws,
       failedDomainDialog,
       requestDelete,

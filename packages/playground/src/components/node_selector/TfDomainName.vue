@@ -106,7 +106,7 @@ import type { InputValidatorService } from "@/hooks/input_validator";
 import { useAsync, usePagination, useWatchDeep } from "../../hooks";
 import { useForm, ValidatorStatus } from "../../hooks/form_validator";
 import { useGrid } from "../../stores";
-import type { DomainInfo, SelectionDetailsFilters } from "../../types/nodeSelector";
+import type { DomainInfo, NetworkFeatures, SelectionDetailsFilters } from "../../types/nodeSelector";
 import { getNodePageCount, loadNodes } from "../../utils/nodeSelector";
 
 export default {
@@ -121,6 +121,11 @@ export default {
     hideTitle: Boolean,
     status: String as PropType<ValidatorStatus>,
     useFqdn: Boolean,
+    interfaces: {
+      type: Array as PropType<NetworkFeatures[]>,
+      required: false,
+      default: () => [],
+    },
   },
   emits: {
     "update:model-value": (domain?: DomainInfo) => true || domain,
@@ -148,6 +153,7 @@ export default {
       page: Math.max(1, pagination.value.page),
       farmId: enableCustomDomain.value ? props.farm?.farmId : undefined,
       availableFor: gridStore.client?.twinId,
+      features: props.interfaces,
     }));
     const selectedDomain = ref<NodeInfo | null>(null);
     const loadDomains = () => domainsTask.value.run(gridStore, filters.value);

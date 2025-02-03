@@ -67,6 +67,7 @@
         v-model:status="domainStatus"
         :use-fqdn="$props.useFqdn"
         v-if="requireDomain"
+        :interfaces="$props.interfaces"
       />
     </VExpandTransition>
   </section>
@@ -86,6 +87,7 @@ import { useForm, ValidatorStatus } from "../../hooks/form_validator";
 import type { InputValidatorService } from "../../hooks/input_validator";
 import type {
   DomainInfo,
+  NetworkFeatures,
   SelectedLocation,
   SelectedMachine,
   SelectionDetails,
@@ -119,6 +121,10 @@ export default {
     useFqdn: Boolean,
     selectedMachines: {
       type: Array as PropType<SelectedMachine[]>,
+      default: () => [],
+    },
+    interfaces: {
+      type: Array as PropType<NetworkFeatures[]>,
       default: () => [],
     },
     nodesLock: Object as PropType<AwaitLock>,
