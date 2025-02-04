@@ -94,7 +94,7 @@
 </template>
 
 <script lang="ts">
-import type { FarmInfo, FilterOptions, NodeInfo } from "@threefold/grid_client";
+import { type FarmInfo, Features, type FilterOptions, type NodeInfo } from "@threefold/grid_client";
 import { noop } from "lodash";
 import { computed, getCurrentInstance, nextTick, onUnmounted, type PropType, ref, watch } from "vue";
 import { onMounted } from "vue";
@@ -153,7 +153,8 @@ export default {
       page: Math.max(1, pagination.value.page),
       farmId: enableCustomDomain.value ? props.farm?.farmId : undefined,
       availableFor: gridStore.client?.twinId,
-      features: props.interfaces,
+      features: props.interfaces.filter(i => i != Features.ip),
+      hasIPv6: props.interfaces.some(i => i === Features.ip),
     }));
     const selectedDomain = ref<NodeInfo | null>(null);
     const loadDomains = () => domainsTask.value.run(gridStore, filters.value);
