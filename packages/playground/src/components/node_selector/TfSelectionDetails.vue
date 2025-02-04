@@ -154,11 +154,8 @@ export default {
     const domainNameInterfaces = computed((): NetworkFeatures[] => {
       if (props.interfaces.length === 0) {
         const interfaces: NetworkFeatures[] = [];
-        if (props.filters.ipv4) interfaces.push(Features.ipv4);
-        if (props.filters.ipv6) interfaces.push(Features.ip);
-        if (props.filters.planetary) interfaces.push(Features.yggdrasil);
-        if (props.filters.mycelium) interfaces.push(Features.mycelium);
         if (props.filters.wireguard) interfaces.push(Features.wireguard);
+        // only wireguard needed for now; we may add some other interfaces in the future
         return interfaces;
       } else return props.interfaces;
     });
