@@ -242,7 +242,6 @@ export default {
     const gatewayTab = ref(0);
     const dialogVisible = ref(true);
     const isWireGuard = ref(false);
-    const usingWireguard = computed(() => !!networks.value.find(net => net.title === NetworkInterfaces.WireGuard));
 
     const oldPrefix = ref("");
     const prefix = ref("");
@@ -420,9 +419,6 @@ export default {
     function getSupportedNetworksFeatures() {
       networks.value.forEach(net => {
         switch (net.title) {
-          case NetworkInterfaces.PublicIPV4:
-            supportedNetworksFeatures.value.push(Features.ipv4);
-            break;
           case NetworkInterfaces.PublicIPV6:
             supportedNetworksFeatures.value.push(Features.ip);
             break;
