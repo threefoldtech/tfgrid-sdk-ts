@@ -840,39 +840,17 @@ function parseAcceptTermsImage(tempDiv: HTMLDivElement, url: string) {
     imgElement.setAttribute("class", "info-legal-image");
   });
 }
-
-function parseAcceptTermsLink(tempDiv: HTMLDivElement) {
-  const url = "https://library.threefold.me/info/legal#";
-  const linkElements = tempDiv.querySelectorAll("a");
-  linkElements.forEach(linkElement => {
-    const currentDomainMatch = linkElement.href.match(/^(https?:\/\/[^\\/]+)/);
-    if (
-      (currentDomainMatch && linkElement.href.includes("localhost")) ||
-      (currentDomainMatch && linkElement.href.includes("dashboard")) // To update only internal links
-    ) {
-      const currentDomain = currentDomainMatch[1];
-      linkElement.href = linkElement.href.replace(currentDomain, url);
-    }
-  });
-}
 watch(openAcceptTerms, async () => {
   if (openAcceptTerms.value) {
     try {
-      const url = "https://library.threefold.me/info/legal/";
-      const response = await fetch(url + "readme.md");
+      // Use the local markdown file from public folder
+      const response = await fetch("/info/terms.md");
       const mdContent = await response.text();
       const parsedContent = marked.parse(mdContent);
 
-      const tempDiv = document.createElement("div");
-      tempDiv.innerHTML = parsedContent;
-
-      parseAcceptTermsImage(tempDiv, url);
-      parseAcceptTermsLink(tempDiv);
-
-      const updatedHtmlContent = tempDiv.innerHTML;
-      acceptTermsContent.value = updatedHtmlContent;
+      acceptTermsContent.value = parsedContent;
     } catch (error) {
-      console.error("Error fetching or parsing Markdown content:", error);
+      console.error("Error loading markdown content:", error);
     } finally {
       termsLoading.value = false;
     }
