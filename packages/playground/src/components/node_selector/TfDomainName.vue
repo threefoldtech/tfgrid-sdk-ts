@@ -154,7 +154,7 @@ export default {
       farmId: enableCustomDomain.value ? props.farm?.farmId : undefined,
       availableFor: gridStore.client?.twinId,
       features: props.interfaces.filter(i => i != Features.ip),
-      hasIPv6: props.interfaces.some(i => i === Features.ip),
+      hasIPv6: props.interfaces.some(i => i === Features.ip) || undefined,
     }));
     const selectedDomain = ref<NodeInfo | null>(null);
     const loadDomains = () => domainsTask.value.run(gridStore, filters.value);
