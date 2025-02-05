@@ -843,7 +843,6 @@ function parseAcceptTermsImage(tempDiv: HTMLDivElement, url: string) {
 watch(openAcceptTerms, async () => {
   if (openAcceptTerms.value) {
     try {
-      // Use the local markdown file from public folder
       const response = await fetch("/info/terms.md");
       const mdContent = await response.text();
       const parsedContent = marked.parse(mdContent);
