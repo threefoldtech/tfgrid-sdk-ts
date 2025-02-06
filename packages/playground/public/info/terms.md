@@ -1,4 +1,4 @@
-![](./images/legal_header.jpg)
+![legal_header](./images/legal_header.jpg)
 
 ## TFGRID USER and/or FARMER TERMS AND CONDITIONS TFGRID 3.X
 
