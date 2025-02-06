@@ -4,7 +4,6 @@
     :cpu="solution?.cpu"
     :memory="solution?.memory"
     :disk="solution?.disk"
-    :ipv4="ipv4"
     :dedicated="dedicated"
     :SelectedNode="selectionDetails?.node"
     :valid-filters="selectionDetails?.validFilters"
@@ -36,7 +35,6 @@
       />
 
       <Networks
-        v-model:ipv4="ipv4"
         v-model:mycelium="mycelium"
         v-model:planetary="planetary"
         v-model:ipv6="ipv6"
@@ -55,7 +53,6 @@
 
       <TfSelectionDetails
         :filters="{
-          ipv4,
           ipv6,
           certified,
           dedicated,
@@ -104,13 +101,13 @@ const layout = useLayout();
 const profileManager = useProfileManager();
 const selectionDetails = ref<SelectionDetails>();
 
-const name = ref(generateName({ prefix: "sw" }));
+const name = ref(generateName({ prefix: "owui" }));
 const gitUrl = ref("");
 const gitBranch = ref("");
 const root = ref("");
 const domain = ref();
 
-const { ipv4, ipv6, planetary, mycelium, wireguard } = useNetworks();
+const { ipv6, planetary, mycelium, wireguard } = useNetworks();
 const solution = ref() as Ref<SolutionFlavor>;
 const flist: Flist = {
   // Should be upgraded to an oficial Flist
@@ -129,7 +126,10 @@ function updateSSHkeyEnv(selectedKeys: string) {
 
 function finalize(deployment: any) {
   layout.value.reloadDeploymentsList();
-  layout.value.setStatus("success", "Successfully deployed an Open WebUI instance.");
+  layout.value.setStatus(
+    "success",
+    "Successfully deployed an Open WebUI instance. You might need to wait a couple of minutes for the installation to complete, e.g. if you see Bad Gateway when opening the webpage, simply wait and refresh the page.",
+  );
   layout.value.openDialog(deployment, deploymentListEnvironments.openwebui);
 }
 
@@ -181,7 +181,6 @@ async function deploy() {
           ],
           flist: flist.value,
           entryPoint: flist.entryPoint,
-          publicIpv4: ipv4.value,
           publicIpv6: ipv6.value,
           mycelium: mycelium.value,
           planetary: planetary.value,
