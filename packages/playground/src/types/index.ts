@@ -16,7 +16,6 @@ export type InputFilterType = {
 };
 
 export enum NetworkFeatures {
-  ipv4 = "IPv4",
   ip = "IP",
   mycelium = "Mycelium",
   wireguard = "Wireguard",
