@@ -75,7 +75,7 @@ async function main() {
     },
     machines: [
       {
-        name: "cl" + generateString(8),
+        name: name,
         node_id: vmNode,
         disks: [
           {

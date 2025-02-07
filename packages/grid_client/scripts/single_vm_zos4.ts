@@ -68,7 +68,7 @@ async function main() {
     },
     machines: [
       {
-        name: "testvmMY",
+        name: name,
         node_id: vmNode,
         disks: [
           {
