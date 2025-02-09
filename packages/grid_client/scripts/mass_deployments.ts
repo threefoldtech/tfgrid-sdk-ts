@@ -6,7 +6,6 @@ import {
   DeploymentResultContracts,
   events,
   FarmFilterOptions,
-  Features,
   FilterOptions,
   generateString,
   GridClient,
@@ -47,19 +46,15 @@ async function handle(grid3: GridClient, twinDeployments: TwinDeployment[]) {
   let nameExtrinsics: ExtrinsicResult<Contract>[] = [];
   let deletedExtrinsics: ExtrinsicResult<number>[] = [];
 
-  const successfulNodesSet = new Set<number>();
-  const failedNodesSet = new Set<number>();
-
   for (const twinDeployment of twinDeployments) {
     for (const workload of twinDeployment.deployment.workloads) {
-      if (!twinDeployment.network) {
-        break;
-      }
+      if (!twinDeployment.network) break;
       if (workload.type === WorkloadTypes.network || workload.type === WorkloadTypes.networklight) {
         events.emit("logs", `Updating network workload with name: ${workload.name}`);
         twinDeployment.network.updateWorkload(twinDeployment.nodeId, workload);
       }
     }
+
     const extrinsics = await grid3.machines.twinDeploymentHandler.PrepareExtrinsic(twinDeployment, contracts);
     nodeExtrinsics = nodeExtrinsics.concat(extrinsics.nodeExtrinsics);
     nameExtrinsics = nameExtrinsics.concat(extrinsics.nameExtrinsics);
@@ -71,61 +66,61 @@ async function handle(grid3: GridClient, twinDeployments: TwinDeployment[]) {
   );
 
   for (const contract of extrinsicResults) {
-    const updatedContract = contracts.updated.filter(c => c["contractId"] === contract.contractId);
-    if (updatedContract.length === 0) contracts.created.push(contract);
+    const updatedContract = contracts.updated.find(c => c["contractId"] === contract.contractId);
+    if (!updatedContract) contracts.created.push(contract);
   }
 
-  await Promise.allSettled(
-    twinDeployments.map(async twinDeployment => {
-      try {
-        if (twinDeployment.operation === Operations.deploy) {
-          events.emit("logs", `Sending deployment to node_id: ${twinDeployment.nodeId}`);
-          for (const contract of extrinsicResults) {
-            if (twinDeployment.deployment.challenge_hash() === contract.contractType.nodeContract.deploymentHash) {
-              twinDeployment.deployment.contract_id = contract.contractId;
-              if (
-                twinDeployment.returnNetworkContracts ||
-                !(
-                  twinDeployment.deployment.workloads.length === 1 &&
-                  twinDeployment.deployment.workloads[0].type === WorkloadTypes.network
-                )
+  const successfulNodes = new Set<number>();
+  const failedNodes = new Set<number>();
+
+  for (const twinDeployment of twinDeployments) {
+    try {
+      if (twinDeployment.operation === Operations.deploy) {
+        events.emit("logs", `Sending deployment to node_id: ${twinDeployment.nodeId}`);
+        for (const contract of extrinsicResults) {
+          if (twinDeployment.deployment.challenge_hash() === contract.contractType.nodeContract.deploymentHash) {
+            twinDeployment.deployment.contract_id = contract.contractId;
+            if (
+              twinDeployment.returnNetworkContracts ||
+              !(
+                twinDeployment.deployment.workloads.length === 1 &&
+                twinDeployment.deployment.workloads[0].type === WorkloadTypes.network
               )
-                resultContracts.created.push(contract);
-              break;
-            }
+            )
+              resultContracts.created.push(contract);
+            break;
           }
-          await grid3.machines.twinDeploymentHandler.sendToNode(twinDeployment);
-          successfulNodesSet.add(twinDeployment.nodeId);
-          events.emit(
-            "logs",
-            `A deployment has been created on node_id: ${twinDeployment.nodeId} with contract_id: ${twinDeployment.deployment.contract_id}`,
-          );
-        } else if (twinDeployment.operation === Operations.update) {
-          events.emit("logs", `Updating deployment with contract_id: ${twinDeployment.deployment.contract_id}`);
-          for (const contract of extrinsicResults) {
-            if (twinDeployment.deployment.challenge_hash() === contract.contractType.nodeContract.deploymentHash) {
-              twinDeployment.nodeId = contract.contractType.nodeContract.nodeId;
-              if (
-                twinDeployment.returnNetworkContracts ||
-                !(
-                  twinDeployment.deployment.workloads.length === 1 &&
-                  twinDeployment.deployment.workloads[0].type === WorkloadTypes.network
-                )
-              )
-                resultContracts.updated.push(contract);
-              break;
-            }
-          }
-          await grid3.machines.twinDeploymentHandler.sendToNode(twinDeployment);
-          successfulNodesSet.add(twinDeployment.nodeId);
-          events.emit("logs", `Deployment has been updated with contract_id: ${twinDeployment.deployment.contract_id}`);
         }
-      } catch (error) {
-        failedNodesSet.add(twinDeployment.nodeId);
-        events.emit("logs", `Failed to process node_id: ${twinDeployment.nodeId} due to error: ${error}`);
+        await grid3.machines.twinDeploymentHandler.sendToNode(twinDeployment);
+        events.emit(
+          "logs",
+          `A deployment has been created on node_id: ${twinDeployment.nodeId} with contract_id: ${twinDeployment.deployment.contract_id}`,
+        );
+      } else if (twinDeployment.operation === Operations.update) {
+        events.emit("logs", `Updating deployment with contract_id: ${twinDeployment.deployment.contract_id}`);
+        for (const contract of extrinsicResults) {
+          if (twinDeployment.deployment.challenge_hash() === contract.contractType.nodeContract.deploymentHash) {
+            twinDeployment.nodeId = contract.contractType.nodeContract.nodeId;
+            if (
+              twinDeployment.returnNetworkContracts ||
+              !(
+                twinDeployment.deployment.workloads.length === 1 &&
+                twinDeployment.deployment.workloads[0].type === WorkloadTypes.network
+              )
+            )
+              resultContracts.updated.push(contract);
+            break;
+          }
+        }
+        await grid3.machines.twinDeploymentHandler.sendToNode(twinDeployment);
+        events.emit("logs", `Deployment has been updated with contract_id: ${twinDeployment.deployment.contract_id}`);
       }
-    }),
-  );
+      successfulNodes.add(twinDeployment.nodeId);
+    } catch (e) {
+      failedNodes.add(twinDeployment.nodeId);
+      events.emit("logs", `Deployment failed on node_id: ${twinDeployment.nodeId} with error: ${e}`);
+    }
+  }
 
   const deletedResult = await grid3.machines.twinDeploymentHandler.tfclient.applyAllExtrinsics<number>(
     deletedExtrinsics,
@@ -139,7 +134,7 @@ async function handle(grid3: GridClient, twinDeployments: TwinDeployment[]) {
 
   await grid3.machines.twinDeploymentHandler.waitForDeployments(twinDeployments);
   await grid3.machines.twinDeploymentHandler.saveNetworks(twinDeployments, contracts);
-  return { resultContracts, successfulNodesSet, failedNodesSet };
+  return { resultContracts, successfulNodes, failedNodes };
 }
 
 async function pingNodes(grid3: GridClient, nodes: NodeInfo[]) {
@@ -166,11 +161,11 @@ async function main() {
 
   const errors: any = [];
   const offlineNodes: number[] = [];
-  let failedCount = 0;
-  let successCount = 0;
   const batchSize = 3;
   const totalVMs = 6;
   const batches = totalVMs / batchSize;
+  const allSuccessfulNodes: number[] = [];
+  const allFailedNodes = new Set<number>();
 
   // resources
   const cru = 1;
@@ -205,7 +200,6 @@ async function main() {
       availableFor: await grid3.twins.get_my_twin_id(),
       farmIds: farmIds,
       randomize: true,
-      features: [Features.yggdrasil],
     } as FilterOptions);
 
     console.time("Ping Nodes");
@@ -218,22 +212,14 @@ async function main() {
       } else {
         offlineNodes.push(node.nodeId);
         console.log(`Node ${node.nodeId} is offline`);
-        if (error) {
-          console.error("Error:", error);
-        }
+        if (error) console.error("Error:", error);
       }
     });
 
     const onlineNodes = nodes.filter(node => !offlineNodes.includes(node.nodeId));
     const batchVMs: MachinesModel[] = [];
-
-    for (let i = 0; i < batchSize; i++) {
+    for (let i = 0; i < batchSize && onlineNodes.length > 0; i++) {
       const vmName = "vm" + generateString(8);
-
-      if (onlineNodes.length <= 0) {
-        errors.push("No online nodes available for deployment");
-        continue;
-      }
       const selectedNode = onlineNodes.pop();
 
       const vm = new MachineModel();
@@ -255,61 +241,74 @@ async function main() {
       const n = new NetworkModel();
       n.name = "nw" + generateString(5);
       n.ip_range = "10.238.0.0/16";
-      n.addAccess = true;
+      n.addAccess = false;
 
       const vms = new MachinesModel();
       vms.name = "batch" + (batch + 1);
       vms.network = n;
       vms.machines = [vm];
       vms.metadata = "";
-      vms.description = "Test deploying vm with name " + vm.name + " via ts grid3 client - Batch " + (batch + 1);
+      vms.description = `Test deploying vm with name ${vm.name} - Batch ${batch + 1}`;
 
       batchVMs.push(vms);
     }
 
     const allTwinDeployments: TwinDeployment[] = [];
 
-    const deploymentPromises = batchVMs.map(async (vms, index) => {
+    const deploymentPromises = batchVMs.map(async vms => {
       try {
-        const [twinDeployments, _, __] = await grid3.machines._createDeployment(vms);
-        return { twinDeployments, batchIndex: index };
+        const [twinDeployments] = await grid3.machines._createDeployment(vms);
+        return twinDeployments;
       } catch (error) {
         log(`Error creating deployment for batch ${batch + 1}: ${error}`);
-        return { twinDeployments: null, batchIndex: index };
+        return [];
       }
     });
     console.time("Preparing Batch " + (batch + 1));
     const deploymentResults = await Promise.allSettled(deploymentPromises).then(results =>
       results.flatMap(r => (r.status === "fulfilled" ? r.value : [])),
     );
-    console.timeEnd("Preparing Batch " + (batch + 1));
+    allTwinDeployments.push(...deploymentResults);
+    let batchSuccessfulNodes: Set<number> = new Set();
+    let batchFailedNodes: Set<number> = new Set();
 
-    for (const { twinDeployments } of deploymentResults) {
-      if (twinDeployments) {
-        allTwinDeployments.push(...twinDeployments);
-      }
+    if (allTwinDeployments.length > 0) {
+      const results = await Promise.allSettled([handle(grid3, allTwinDeployments)]);
+
+      results.forEach(result => {
+        if (result.status === "fulfilled") {
+          const { resultContracts, successfulNodes, failedNodes } = result.value;
+          batchSuccessfulNodes = successfulNodes;
+          batchFailedNodes = failedNodes;
+
+          successfulNodes.forEach(node => allSuccessfulNodes.push(node));
+          failedNodes.forEach(node => allFailedNodes.add(node));
+
+          log(`Successfully handled deployments for Batch ${batch + 1}`);
+        } else {
+          errors.push(`Error handling deployments for Batch ${batch + 1}: ${result.reason}`);
+        }
+      });
+
+      log(`Batch ${batch + 1} Summary:`);
+      log(`- Successful Deployments on Nodes: ${Array.from(batchSuccessfulNodes).join(", ")}`);
+      log(`- Failed Deployments on Nodes: ${Array.from(batchFailedNodes).join(", ")}`);
+      log(`- Successful Deployments: ${batchSuccessfulNodes.size}`);
+      log(`- Failed Deployments: ${batchFailedNodes.size}`);
+      log("---------------------------------------------");
+    } else {
+      log(`No deployments created for Batch ${batch + 1}`);
     }
-
-    try {
-      const { resultContracts, successfulNodesSet, failedNodesSet } = await handle(grid3, allTwinDeployments);
-      log(`Successfully handled and saved contracts for twin deployments`);
-      log(`Successful Nodes: ${Array.from(successfulNodesSet).join(", ")}`);
-      log(`Failed Nodes: ${Array.from(failedNodesSet).join(", ")}`);
-    } catch (error) {
-      errors.push(error);
-      failedCount += batchSize;
-      log(`Error handling contracts for twin deployments: ${error}`);
-    }
-
-    successCount = totalVMs - failedCount;
-    console.timeEnd("Batch " + (batch + 1));
   }
 
   console.timeEnd("Total Deployment Time");
 
-  log("Successful Deployments: " + successCount);
-  log("Failed Deployments: " + failedCount);
-  log("Failed Nodes: " + offlineNodes);
+  log("Final Summary:");
+  log(`- Total Successful Deployments: ${allSuccessfulNodes.length}`);
+  log(`- Total Failed Deployments: ${totalVMs - allSuccessfulNodes.length}`);
+  log(`- Offline Nodes: ${offlineNodes.join(", ")}`);
+  log(`- All Successful Deployments on Nodes: ${Array.from(allSuccessfulNodes).join(", ")}`);
+  log(`- All Failed Deployments on Nodes: ${Array.from(allFailedNodes).join(", ")}`);
 
   await grid3.disconnect();
 }
