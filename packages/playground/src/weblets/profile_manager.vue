@@ -840,13 +840,37 @@ function parseAcceptTermsImage(tempDiv: HTMLDivElement, url: string) {
     imgElement.setAttribute("class", "info-legal-image");
   });
 }
+
 watch(openAcceptTerms, async () => {
   if (openAcceptTerms.value) {
     try {
-      const response = await fetch("/info/terms.md");
-      const mdContent = await response.text();
-      const parsedContent = marked.parse(mdContent);
+      const response = await fetch(
+        "https://raw.githubusercontent.com/threefoldtech/info_grid/master/src/knowledge_base/legal/terms_conditions_all3.md",
+      );
+      let mdContent = await response.text();
 
+      // Replace the image path
+      mdContent = mdContent.replace(
+        "./img/legal_header.jpg",
+        "https://raw.githubusercontent.com/threefoldtech/info_grid/master/src/knowledge_base/legal/img/legal_header.jpg",
+      );
+
+      // Replace all relative markdown links with absolute URLs
+      mdContent = mdContent.replace(/\[([^\]]+)\]\((\.\/[^)]+)\.md\)/g, (match, linkText, path) => {
+        // Convert the relative path to absolute URL
+        const relativePath = path.replace("./", "");
+        const absoluteUrl = `https://manual.grid.tf/knowledge_base/legal/${relativePath}.html`;
+        return `[${linkText}](${absoluteUrl})`;
+      });
+
+      // Handle links in subdirectories
+      mdContent = mdContent.replace(/\[([^\]]+)\]\((\.\/[^)]+\/[^)]+)\.md\)/g, (match, linkText, path) => {
+        const relativePath = path.replace("./", "");
+        const absoluteUrl = `https://manual.grid.tf/knowledge_base/legal/${relativePath}.html`;
+        return `[${linkText}](${absoluteUrl})`;
+      });
+
+      const parsedContent = marked.parse(mdContent);
       acceptTermsContent.value = parsedContent;
     } catch (error) {
       console.error("Error fetching markdown content:", error);
