@@ -873,7 +873,7 @@ watch(openAcceptTerms, async () => {
       const parsedContent = marked.parse(mdContent);
       acceptTermsContent.value = parsedContent;
     } catch (error) {
-      console.error("Error fetching markdown content:", error);
+      console.error("Error fetching or parsing Markdown content:", error);
     } finally {
       termsLoading.value = false;
     }
