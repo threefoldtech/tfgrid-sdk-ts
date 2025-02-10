@@ -2,7 +2,7 @@ import { Features, FilterOptions, GatewayNameModel, GridClient, MachinesModel } 
 import { config, getClient } from "../client_loader";
 import { log, pingNodes } from "../utils";
 
-async function deploy(client: GridClient, vms: MachinesModel, subdomain: string, gatewayNode: any) {
+async function deploy(client: GridClient, vms: MachinesModel, subdomain: string, gatewayNode: NodeInfo) {
   // Deploy VM
   const resultVM = await client.machines.deploy(vms);
   log("================= Deploying VM =================");
@@ -74,7 +74,7 @@ async function main() {
 
   // Gateway Query Options
   const gatewayQueryOptions: FilterOptions = {
-    features: [Features.wireguard, Features.mycelium, Features.gatewaynameproxy],
+    features: [Features.wireguard, Features.mycelium],
     gateway: true,
     availableFor: grid3.twinId,
   };
