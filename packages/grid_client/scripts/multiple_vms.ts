@@ -46,12 +46,12 @@ async function main() {
   const vms: MachinesModel = {
     name,
     network: {
-      name: "vm" + generateString(8),
+      name: name,
       ip_range: "10.238.0.0/16",
     },
     machines: [
       {
-        name: "testvm1",
+        name: "vm" + generateString(8),
         node_id: nodeId!,
         disks: [
           {
@@ -74,7 +74,7 @@ async function main() {
         },
       },
       {
-        name: "testvm2",
+        name: "vm" + generateString(8),
         node_id: nodeId!,
         disks: [
           {
