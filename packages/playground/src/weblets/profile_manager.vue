@@ -832,15 +832,6 @@ function validateConfirmPassword(value: string) {
   }
 }
 
-function parseAcceptTermsImage(tempDiv: HTMLDivElement, url: string) {
-  const imageElements = tempDiv.querySelectorAll("img");
-  imageElements.forEach(imgElement => {
-    imgElement.setAttribute("src", url + "legal__legal_header_.jpg");
-    // Update the style of the image.
-    imgElement.setAttribute("class", "info-legal-image");
-  });
-}
-
 watch(openAcceptTerms, async () => {
   if (openAcceptTerms.value) {
     try {
