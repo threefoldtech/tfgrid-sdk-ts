@@ -1,4 +1,4 @@
-import { Features, FilterOptions, GatewayNameModel, GridClient, MachinesModel } from "../../src";
+import { Features, FilterOptions, GatewayNameModel, GridClient, MachinesModel, NodeInfo } from "../../src";
 import { config, getClient } from "../client_loader";
 import { log, pingNodes } from "../utils";
 
@@ -79,10 +79,12 @@ async function main() {
     availableFor: grid3.twinId,
   };
 
-  const gatewayNode = (await grid3.capacity.filterNodes(gatewayQueryOptions))[0];
+  const gatewayNodes = await grid3.capacity.filterNodes(gatewayQueryOptions);
+  const gatewayNodeId = await pingNodes(grid3, gatewayNodes);
+  const gatewayNode = gatewayNodes.find(node => node.nodeId == gatewayNodeId);
   const nodes = await grid3.capacity.filterNodes(vmQueryOptions);
   const vmNode = await pingNodes(grid3, nodes);
-  const domain = `${subdomain}.${gatewayNode.publicConfig.domain}`;
+  const domain = `${subdomain}.${gatewayNode!.publicConfig.domain}`;
 
   const vms: MachinesModel = {
     name,
@@ -90,7 +92,7 @@ async function main() {
       name: "nostrnet",
       ip_range: "10.252.0.0/16",
       addAccess: true,
-      accessNodeId: gatewayNode.nodeId,
+      accessNodeId: gatewayNode!.nodeId,
     },
     machines: [
       {
@@ -123,7 +125,7 @@ async function main() {
   };
 
   // Deploy VM and Gateway
-  await deploy(grid3, vms, subdomain, gatewayNode);
+  await deploy(grid3, vms, subdomain, gatewayNode!);
 
   // Get the deployment details
   await getDeployment(grid3, name, subdomain);
