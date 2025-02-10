@@ -39,6 +39,8 @@ async function deleteQsfs(client, qsfs) {
 
 async function main() {
   const name = "vm" + generateString(8);
+  const networName = "net" + generateString(8);
+
   const grid3 = await getClient(`vm/${name}`);
 
   const qsfs_name = "wed2710q1";
@@ -81,12 +83,12 @@ async function main() {
   const vms: MachinesModel = {
     name,
     network: {
-      name: "wed2710n1",
+      name: networName,
       ip_range: "10.201.0.0/16",
     },
     machines: [
       {
-        name: "vm" + generateString(8),
+        name: name,
         node_id: vmNode,
         disks: [
           {

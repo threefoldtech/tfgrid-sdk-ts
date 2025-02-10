@@ -27,6 +27,7 @@ async function deleteWorker(client, worker) {
 
 async function main() {
   const name = "k8s" + generateString(8);
+
   const grid3 = await getClient(`kubernetes/${name}`);
 
   const workerQueryOptions: FilterOptions = {

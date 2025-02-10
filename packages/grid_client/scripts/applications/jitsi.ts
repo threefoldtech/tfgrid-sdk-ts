@@ -65,11 +65,12 @@ async function main() {
   const nodes = await grid3.capacity.filterNodes(vmQueryOptions);
   const vmNode = await pingNodes(grid3, nodes);
   const domain = subdomain + "." + gatewayNode.publicConfig.domain;
+  const networkName = "net" + generateString(8);
 
   const vms: MachinesModel = {
     name,
     network: {
-      name: "jitnet",
+      name: networkName,
       ip_range: "10.251.0.0/16",
     },
     machines: [

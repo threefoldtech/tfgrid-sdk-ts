@@ -27,6 +27,7 @@ async function cancel(client, vms) {
 async function main() {
   const name = "cr" + generateString(8);
   const grid3 = await getClient(`caprover/${name}`);
+  const networkName = "net" + generateString(8);
 
   const vmQueryOptions: FilterOptions = {
     cru: 4,
@@ -40,7 +41,7 @@ async function main() {
   const vms: MachinesModel = {
     name,
     network: {
-      name: "wedtest",
+      name: networkName,
       ip_range: "10.249.0.0/16",
     },
     machines: [

@@ -27,12 +27,14 @@ async function cancel(client: GridClient, name: string) {
 
 async function main() {
   const name = "vm" + generateString(8);
+  const networName = "net" + generateString(8);
+
   const grid3 = await getClient(`vm/${name}`);
 
   const vms: MachinesModel = {
     name,
     network: {
-      name: "wedtest",
+      name: networName,
       ip_range: "10.249.0.0/16",
     },
     machines: [

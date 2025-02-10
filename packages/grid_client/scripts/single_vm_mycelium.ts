@@ -25,12 +25,14 @@ async function cancel(client: GridClient, options: MachinesDeleteModel) {
 
 async function main() {
   const name = "vm" + generateString(8);
+  const networName = "net" + generateString(8);
+
   const grid3 = await getClient(`vm/${name}`);
 
   const vms: MachinesModel = {
     name,
     network: {
-      name: "hellotest",
+      name: networName,
       ip_range: "10.249.0.0/16",
       myceliumSeeds: [
         {

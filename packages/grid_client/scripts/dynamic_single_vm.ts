@@ -25,6 +25,7 @@ async function cancel(client, vms) {
 
 async function main() {
   const name = "vm" + generateString(8);
+  const networName = "net" + generateString(8);
   const grid3 = await getClient(`vm/${name}`);
 
   const vmQueryOptions: FilterOptions = {
@@ -41,7 +42,7 @@ async function main() {
   const vms: MachinesModel = {
     name,
     network: {
-      name: "dynamictest",
+      name: networName,
       ip_range: "10.249.0.0/16",
     },
     machines: [

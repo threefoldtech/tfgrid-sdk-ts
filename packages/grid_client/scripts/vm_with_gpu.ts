@@ -25,6 +25,8 @@ async function cancel(client, vms) {
 
 async function main() {
   const name = "vm" + generateString(8);
+  const networName = "net" + generateString(8);
+
   const grid3 = await getClient(`vm/${name}`);
 
   const vmQueryOptions: FilterOptions = {
@@ -44,6 +46,7 @@ async function main() {
 
   let gpuList = await grid3.zos.getNodeGPUInfo({ nodeId: nodeId });
   gpuList = gpuList.filter(g => g.contract === 0);
+
   if (gpuList.length <= 0) {
     throw Error(`Couldn't find GPU card available on node ${nodeId}`);
   }
@@ -51,12 +54,12 @@ async function main() {
   const vms: MachinesModel = {
     name,
     network: {
-      name: "vmgpuNetwork",
+      name: networName,
       ip_range: "10.249.0.0/16",
     },
     machines: [
       {
-        name: "vm" + generateString(8),
+        name: name,
         node_id: nodeId,
         disks: [
           {

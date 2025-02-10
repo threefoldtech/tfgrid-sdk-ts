@@ -26,12 +26,13 @@ async function cancel(client, k8s) {
 async function main() {
   const name = "k8s" + generateString(8);
   const grid3 = await getClient(`kubernetes/${name}`);
+  const networkName = "net" + generateString(8);
 
   const k: K8SModel = {
     name,
     secret: "secret",
     network: {
-      name: "monNetwork",
+      name: networkName,
       ip_range: "10.238.0.0/16",
       addAccess: true,
       // myceliumSeeds: [
