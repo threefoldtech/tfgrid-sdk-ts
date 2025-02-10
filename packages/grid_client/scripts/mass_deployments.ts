@@ -20,6 +20,38 @@ import {
 } from "../src";
 import { config, getClient } from "./client_loader";
 import { log } from "./utils";
+
+async function waitForDeployments(grid3: GridClient, twinDeployments: TwinDeployment[]) {
+  const timeout = grid3.machines.twinDeploymentHandler.config.deploymentTimeoutMinutes;
+  const results = await Promise.allSettled(
+    twinDeployments.map(t => {
+      if ([Operations.deploy, Operations.update].includes(t.operation)) {
+        events.emit("logs", `Waiting for deployment with contract_id: ${t.deployment.contract_id} to be ready`);
+        return grid3.machines.twinDeploymentHandler.waitForDeployment(t, timeout);
+      }
+
+      return null;
+    }),
+  );
+
+  const passedDeployments: TwinDeployment[] = [];
+  const failedDeployments: { twinDeployment: TwinDeployment; reason: any }[] = [];
+
+  results.forEach((result, index) => {
+    const twinDeployment = twinDeployments[index];
+    if (result.status === "fulfilled") {
+      passedDeployments.push(twinDeployment);
+    } else {
+      failedDeployments.push({
+        twinDeployment,
+        reason: result.reason,
+      });
+    }
+  });
+
+  return { passedDeployments, failedDeployments };
+}
+
 async function handle(grid3: GridClient, twinDeployments: TwinDeployment[]) {
   const kycStatus = await grid3.machines.twinDeploymentHandler.kyc.status();
   if (kycStatus !== KycStatus.verified)
@@ -72,7 +104,6 @@ async function handle(grid3: GridClient, twinDeployments: TwinDeployment[]) {
 
   const successfulNodes = new Set<number>();
   const failedNodes = new Set<number>();
-
   for (const twinDeployment of twinDeployments) {
     try {
       if (twinDeployment.operation === Operations.deploy) {
@@ -115,9 +146,7 @@ async function handle(grid3: GridClient, twinDeployments: TwinDeployment[]) {
         await grid3.machines.twinDeploymentHandler.sendToNode(twinDeployment);
         events.emit("logs", `Deployment has been updated with contract_id: ${twinDeployment.deployment.contract_id}`);
       }
-      successfulNodes.add(twinDeployment.nodeId);
     } catch (e) {
-      failedNodes.add(twinDeployment.nodeId);
       events.emit("logs", `Deployment failed on node_id: ${twinDeployment.nodeId} with error: ${e}`);
     }
   }
@@ -132,8 +161,15 @@ async function handle(grid3: GridClient, twinDeployments: TwinDeployment[]) {
     }
   }
 
-  await grid3.machines.twinDeploymentHandler.waitForDeployments(twinDeployments);
-  await grid3.machines.twinDeploymentHandler.saveNetworks(twinDeployments, contracts);
+  try {
+    const { passedDeployments, failedDeployments } = await waitForDeployments(grid3, twinDeployments);
+    passedDeployments.forEach(deployment => successfulNodes.add(deployment.nodeId));
+    failedDeployments.forEach(deployment => failedNodes.add(deployment.twinDeployment.nodeId));
+    await grid3.machines.twinDeploymentHandler.saveNetworks(twinDeployments, contracts);
+  } catch (error) {
+    events.emit("logs", `Deployment Error: ${error}`);
+  }
+
   return { resultContracts, successfulNodes, failedNodes };
 }
 
@@ -271,9 +307,10 @@ async function main() {
     allTwinDeployments.push(...deploymentResults);
     let batchSuccessfulNodes: Set<number> = new Set();
     let batchFailedNodes: Set<number> = new Set();
-
     if (allTwinDeployments.length > 0) {
-      const results = await Promise.allSettled([handle(grid3, allTwinDeployments)]);
+      const handlePromises = [handle(grid3, allTwinDeployments)];
+
+      const results = await Promise.allSettled(handlePromises);
 
       results.forEach(result => {
         if (result.status === "fulfilled") {
