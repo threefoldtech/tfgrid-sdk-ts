@@ -101,9 +101,7 @@ const layout = useLayout();
 const profileManager = useProfileManager();
 const selectionDetails = ref<SelectionDetails>();
 
-const name = ref(generateName({ prefix: "owui" }));
-const gitUrl = ref("");
-const gitBranch = ref("");
+const name = ref(generateName({ prefix: "oi" }));
 const root = ref("");
 const domain = ref();
 
