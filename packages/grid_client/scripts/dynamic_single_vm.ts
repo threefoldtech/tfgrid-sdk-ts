@@ -1,6 +1,6 @@
-import { FilterOptions, MachinesModel } from "../src";
+import { Features, FilterOptions, MachinesModel } from "../src";
 import { config, getClient } from "./client_loader";
-import { log } from "./utils";
+import { log, pingNodes } from "./utils";
 
 async function deploy(client, vms) {
   const res = await client.machines.deploy(vms);
@@ -33,8 +33,11 @@ async function main() {
     sru: 7,
     availableFor: grid3.twinId,
     country: "Belgium",
+    features: [Features.mycelium, Features.yggdrasil],
   };
 
+  const nodes = await grid3.capacity.filterNodes(vmQueryOptions);
+  const vmNode = await pingNodes(grid3, nodes);
   const vms: MachinesModel = {
     name,
     network: {
@@ -44,7 +47,7 @@ async function main() {
     machines: [
       {
         name: "testvm",
-        node_id: +(await grid3.capacity.filterNodes(vmQueryOptions))[0].nodeId,
+        node_id: vmNode,
         disks: [
           {
             name: "dynamicDisk",
