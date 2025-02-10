@@ -833,35 +833,33 @@ function validateConfirmPassword(value: string) {
   }
 }
 
+const replaceMarkdownLinks = (content: string, pattern: RegExp, baseUrl: string) => {
+  return content.replace(pattern, (_, linkText, path) => {
+    const relativePath = path.replace("./", "");
+    return `[${linkText}](${urlJoin(baseUrl, `${relativePath}.html`)})`;
+  });
+};
+
+const processMarkdownContent = (content: string, baseUrl: string) => {
+  let processedContent = content.replace("./" + manual.legal_header_img, manual.manual_raw_legal_img);
+
+  const patterns = [/\[([^\]]+)\]\((\.\/[^)]+)\.md\)/g, /\[([^\]]+)\]\((\.\/[^)]+\/[^)]+)\.md\)/g];
+
+  for (const pattern of patterns) {
+    processedContent = replaceMarkdownLinks(processedContent, pattern, baseUrl);
+  }
+
+  return processedContent;
+};
+
 watch(openAcceptTerms, async () => {
   if (openAcceptTerms.value) {
     try {
       const response = await fetch(manual.manual_raw_legal);
-      let mdContent = await response.text();
+      const mdContent = await response.text();
 
-      // Replace the image path
-      mdContent = mdContent.replace("./img/legal_header.jpg", manual.manual_raw_legal_img);
-
-      // Helper function to replace markdown links
-      const replaceMarkdownLinks = (content: string, pattern: RegExp) => {
-        return content.replace(pattern, (_, linkText, path) => {
-          const relativePath = path.replace("./", "");
-          return `[${linkText}](${urlJoin(manual.manual_legal_base, `${relativePath}.html`)})`;
-        });
-      };
-
-      // Replace regular links and links in subdirectories
-      const patterns = [
-        /\[([^\]]+)\]\((\.\/[^)]+)\.md\)/g, // Regular links
-        /\[([^\]]+)\]\((\.\/[^)]+\/[^)]+)\.md\)/g, // Subdirectory links
-      ];
-
-      for (const pattern of patterns) {
-        mdContent = replaceMarkdownLinks(mdContent, pattern);
-      }
-
-      const parsedContent = marked.parse(mdContent);
-      acceptTermsContent.value = parsedContent;
+      const processedContent = processMarkdownContent(mdContent, manual.manual_legal_base);
+      acceptTermsContent.value = marked.parse(processedContent);
     } catch (error) {
       console.error("Error fetching or parsing Markdown content:", error);
     } finally {
