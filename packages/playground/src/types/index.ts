@@ -142,7 +142,7 @@ export enum SolutionCode {
   funkwhale = "fw",
   taiga = "tg",
   discourse = "dc",
-  openwebui = "owui",
+  openwebui = "oi",
   owncloud = "oc",
   nextcloud = "nc",
   mattermost = "mm",
