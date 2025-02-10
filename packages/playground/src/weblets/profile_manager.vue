@@ -429,6 +429,7 @@ import { validateMnemonic } from "bip39";
 import Cryptr from "cryptr";
 import { marked } from "marked";
 import md5 from "md5";
+import urlJoin from "url-join";
 import { computed, onMounted, type Ref, ref, watch } from "vue";
 import { nextTick } from "vue";
 import { useTheme } from "vuetify";
@@ -835,31 +836,29 @@ function validateConfirmPassword(value: string) {
 watch(openAcceptTerms, async () => {
   if (openAcceptTerms.value) {
     try {
-      const response = await fetch(
-        "https://raw.githubusercontent.com/threefoldtech/info_grid/master/src/knowledge_base/legal/terms_conditions_all3.md",
-      );
+      const response = await fetch(manual.manual_raw_legal);
       let mdContent = await response.text();
 
       // Replace the image path
-      mdContent = mdContent.replace(
-        "./img/legal_header.jpg",
-        "https://raw.githubusercontent.com/threefoldtech/info_grid/master/src/knowledge_base/legal/img/legal_header.jpg",
-      );
+      mdContent = mdContent.replace("./img/legal_header.jpg", manual.manual_raw_legal_img);
 
-      // Replace all relative markdown links with absolute URLs
-      mdContent = mdContent.replace(/\[([^\]]+)\]\((\.\/[^)]+)\.md\)/g, (match, linkText, path) => {
-        // Convert the relative path to absolute URL
-        const relativePath = path.replace("./", "");
-        const absoluteUrl = `https://manual.grid.tf/knowledge_base/legal/${relativePath}.html`;
-        return `[${linkText}](${absoluteUrl})`;
-      });
+      // Helper function to replace markdown links
+      const replaceMarkdownLinks = (content: string, pattern: RegExp) => {
+        return content.replace(pattern, (_, linkText, path) => {
+          const relativePath = path.replace("./", "");
+          return `[${linkText}](${urlJoin(manual.manual_legal_base, `${relativePath}.html`)})`;
+        });
+      };
 
-      // Handle links in subdirectories
-      mdContent = mdContent.replace(/\[([^\]]+)\]\((\.\/[^)]+\/[^)]+)\.md\)/g, (match, linkText, path) => {
-        const relativePath = path.replace("./", "");
-        const absoluteUrl = `https://manual.grid.tf/knowledge_base/legal/${relativePath}.html`;
-        return `[${linkText}](${absoluteUrl})`;
-      });
+      // Replace regular links and links in subdirectories
+      const patterns = [
+        /\[([^\]]+)\]\((\.\/[^)]+)\.md\)/g, // Regular links
+        /\[([^\]]+)\]\((\.\/[^)]+\/[^)]+)\.md\)/g, // Subdirectory links
+      ];
+
+      for (const pattern of patterns) {
+        mdContent = replaceMarkdownLinks(mdContent, pattern);
+      }
 
       const parsedContent = marked.parse(mdContent);
       acceptTermsContent.value = parsedContent;
