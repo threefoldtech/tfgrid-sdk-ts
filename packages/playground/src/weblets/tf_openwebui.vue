@@ -102,7 +102,6 @@ const profileManager = useProfileManager();
 const selectionDetails = ref<SelectionDetails>();
 
 const name = ref(generateName({ prefix: "oi" }));
-const root = ref("");
 const domain = ref();
 
 const { ipv6, planetary, mycelium, wireguard } = useNetworks();
