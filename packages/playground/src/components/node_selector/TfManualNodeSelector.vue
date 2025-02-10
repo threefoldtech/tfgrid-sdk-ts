@@ -181,10 +181,11 @@ export default {
             missingFeatures = missingFeatures.filter(feature => feature !== "ipv4");
 
             throw `Node ${nodeId} does not support ${missingFeatures
+              .slice(0, -1)
               .map(feature => NetworkFeatures[feature as keyof typeof NetworkFeatures])
-              .join(", ")} Feature${
-              missingFeatures.length > 1 ? "s" : ""
-            }. Please check compatibility or upgrade the node.`;
+              .join(", ")}${missingFeatures.length > 1 ? " or " : ""}${
+              NetworkFeatures[missingFeatures[missingFeatures.length - 1] as keyof typeof NetworkFeatures]
+            } Feature${missingFeatures.length > 1 ? "s" : ""}. Please check compatibility or upgrade the node.`;
         }
 
         const args = [nodeId, "proxy", gridStore.client.config.proxyURL] as const;
