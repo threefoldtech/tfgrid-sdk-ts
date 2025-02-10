@@ -58,11 +58,14 @@ async function handle(grid3: GridClient, twinDeployments: TwinDeployment[]) {
     throw new ValidationError(
       "Your account is not verified. Please sign into Threefold Dashboard or Connect mobile app to complete your KYC verification.",
     );
-
-  events.emit("logs", "Validating workloads");
-  await grid3.machines.twinDeploymentHandler.validate(twinDeployments);
-  await grid3.machines.twinDeploymentHandler.checkNodesCapacity(twinDeployments);
-  await grid3.machines.twinDeploymentHandler.checkFarmIps(twinDeployments);
+  try {
+    events.emit("logs", "Validating workloads");
+    await grid3.machines.twinDeploymentHandler.validate(twinDeployments);
+    await grid3.machines.twinDeploymentHandler.checkNodesCapacity(twinDeployments);
+    await grid3.machines.twinDeploymentHandler.checkFarmIps(twinDeployments);
+  } catch (error) {
+    events.emit("logs", "Error Validating workloads:" + error);
+  }
 
   const contracts: DeploymentResultContracts = {
     created: [],
