@@ -6,6 +6,7 @@ import {
   DeploymentResultContracts,
   events,
   FarmFilterOptions,
+  Features,
   FilterOptions,
   generateString,
   GridClient,
@@ -239,6 +240,7 @@ async function main() {
       availableFor: await grid3.twins.get_my_twin_id(),
       farmIds: farmIds,
       randomize: true,
+      features: [Features.yggdrasil],
     } as FilterOptions);
 
     console.time("Ping Nodes");
