@@ -130,7 +130,7 @@
                 disable-node-selection
                 require-domain
                 use-fqdn
-                :interfaces="supportedNetworksFeatures"
+                :interfaces="interfaceFeature"
                 v-model="selectionDetails"
               />
             </div>
@@ -250,7 +250,7 @@ export default {
     const valid = ref(false);
     const selectionDetails = ref<SelectionDetails>();
     const networks = ref<VMNetwork[]>([]);
-    const selectedIPAddress = ref<VMNetwork | null>(null);
+    const selectedIPAddress = ref<string>();
     const networkName = props.vm
       ? (props.vm.interfaces[0].network as string)
       : (props.k8s?.masters[0].interfaces[0].network as string);
@@ -268,7 +268,21 @@ export default {
     const availableK8SNodesNames = availableK8SNodes.map(node => node.name);
     const selectedK8SNodeName = ref(availableK8SNodesNames[0]);
     const selectedNode = ref();
-    const supportedNetworksFeatures = ref<NetworkFeatures[]>([]);
+    const interfaceFeature = computed<NetworkFeatures[]>(() => {
+      const net = networks.value.find(net => net.value == selectedIPAddress.value);
+      switch (net?.title) {
+        case NetworkInterfaces.PublicIPV6:
+          return [Features.ip];
+        case NetworkInterfaces.Planetary:
+          return [Features.yggdrasil];
+        case NetworkInterfaces.Mycelium:
+          return [Features.mycelium];
+        case NetworkInterfaces.WireGuard:
+          return [Features.wireguard];
+        default:
+          return [];
+      }
+    });
     const errorMessage = ref("");
 
     watch(selectedK8SNodeName, getSupportedNetworks, { deep: true });
@@ -287,7 +301,6 @@ export default {
       suggestName();
       await loadGateways();
       getSupportedNetworks();
-      getSupportedNetworksFeatures();
       updateHeaders();
     });
 
@@ -353,7 +366,7 @@ export default {
     async function deployGateway() {
       layout.value.setStatus("deploy");
       try {
-        const IP = selectedIPAddress.value as unknown as string;
+        const IP = selectedIPAddress.value as string;
 
         const gwConfig: DeployGatewayConfig = {
           subdomain: subdomain.value,
@@ -415,25 +428,6 @@ export default {
       }
     }
 
-    function getSupportedNetworksFeatures() {
-      networks.value.forEach(net => {
-        switch (net.title) {
-          case NetworkInterfaces.PublicIPV6:
-            supportedNetworksFeatures.value.push(Features.ip);
-            break;
-          case NetworkInterfaces.Planetary:
-            supportedNetworksFeatures.value.push(Features.yggdrasil);
-            break;
-          case NetworkInterfaces.Mycelium:
-            supportedNetworksFeatures.value.push(Features.mycelium);
-            break;
-          case NetworkInterfaces.WireGuard:
-            supportedNetworksFeatures.value.push(Features.wireguard);
-            break;
-        }
-      });
-    }
-
     function getSupportedNetworks() {
       (selectedNode.value = props.vm
         ? props.vm
@@ -451,18 +445,14 @@ export default {
       if (selectedNode.value.type === WorkloadTypes.zmachinelight) {
         addNetwork(NetworkInterfaces.Mycelium, myceliumIP);
       }
-      selectedIPAddress.value = networks.value[0];
+      selectedIPAddress.value = networks.value[0].value;
     }
 
     watch(
       selectedIPAddress,
       () => {
-        if (selectedIPAddress.value?.value) {
-          selectedIPAddress.value = selectedIPAddress.value.value as unknown as VMNetwork;
-        }
-
-        const IP = selectedIPAddress.value as unknown as string;
-        isWireGuard.value = networks.value.find(net => net.value === IP)?.title === NetworkInterfaces.WireGuard;
+        isWireGuard.value =
+          networks.value.find(net => net.value === selectedIPAddress.value)?.title === NetworkInterfaces.WireGuard;
       },
       { deep: true },
     );
@@ -524,7 +514,7 @@ export default {
       networkName,
       loadingGateways,
       gateways,
-      supportedNetworksFeatures,
+      interfaceFeature,
       failedToListGws,
       failedDomainDialog,
       requestDelete,
