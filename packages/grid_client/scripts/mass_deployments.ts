@@ -331,10 +331,18 @@ async function main() {
       });
 
       log(`Batch ${batch + 1} Summary:`);
-      log(`- Successful Deployments on Nodes: ${Array.from(batchSuccessfulNodes).join(", ")}`);
-      log(`- Failed Deployments on Nodes: ${Array.from(batchFailedNodes).join(", ")}`);
-      log(`- Successful Deployments: ${batchSuccessfulNodes.size}`);
-      log(`- Failed Deployments: ${batchFailedNodes.size}`);
+      log(
+        `- Successful Deployments on Nodes: ${
+          Array.from(batchSuccessfulNodes).length ? Array.from(batchSuccessfulNodes).join(", ") : "-"
+        }`,
+      );
+      log(
+        `- Failed Deployments on Nodes: ${
+          Array.from(batchFailedNodes).length ? Array.from(batchFailedNodes).join(", ") : "-"
+        }`,
+      );
+      log(`- Successful Deployments: ${batchSuccessfulNodes.size ?? 0}`);
+      log(`- Failed Deployments: ${batchFailedNodes.size ?? 0}`);
       log("---------------------------------------------");
     } else {
       log(`No deployments created for Batch ${batch + 1}`);
@@ -344,11 +352,19 @@ async function main() {
   console.timeEnd("Total Deployment Time");
 
   log("Final Summary:");
-  log(`- Total Successful Deployments: ${allSuccessfulNodes.length}`);
+  log(`- Total Successful Deployments: ${allSuccessfulNodes.length ?? 0}`);
   log(`- Total Failed Deployments: ${totalVMs - allSuccessfulNodes.length}`);
-  log(`- Offline Nodes: ${offlineNodes.join(", ")}`);
-  log(`- All Successful Deployments on Nodes: ${Array.from(allSuccessfulNodes).join(", ")}`);
-  log(`- All Failed Deployments on Nodes: ${Array.from(allFailedNodes).join(", ")}`);
+  log(`- Offline Nodes: ${offlineNodes.length ? offlineNodes.join(", ") : "-"}`);
+  log(
+    `- All Successful Deployments on Nodes: ${
+      Array.from(allSuccessfulNodes).length ? Array.from(allSuccessfulNodes).join(", ") : "-"
+    }`,
+  );
+  log(
+    `- All Failed Deployments on Nodes: ${
+      Array.from(allFailedNodes).length ? Array.from(allFailedNodes).join(", ") : "-"
+    }`,
+  );
 
   await grid3.disconnect();
 }
