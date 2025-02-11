@@ -9,8 +9,6 @@ import { Buffer } from "buffer";
 import MD5 from "crypto-js/md5";
 import * as PATH from "path";
 
-import { manual } from "@/utils/manual";
-
 import { TFClient } from "../clients/tf-grid/client";
 import { GridClientConfig } from "../config";
 import { formatErrorMessage } from "../helpers";
