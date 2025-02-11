@@ -1,6 +1,5 @@
 import { Keyring } from "@polkadot/keyring";
 import { waitReady } from "@polkadot/wasm-crypto";
-import { manual } from "@threefold/playground/src/utils/manual";
 import { TFChainError } from "@threefold/tfchain_client";
 import { Balance, ExtrinsicResult } from "@threefold/tfchain_client";
 import { BaseError, ValidationError } from "@threefold/types";
@@ -10,6 +9,7 @@ import { Buffer } from "buffer";
 import MD5 from "crypto-js/md5";
 import * as PATH from "path";
 
+import { manual } from "../../../playground/src/utils/manual";
 import { TFClient } from "../clients/tf-grid/client";
 import { GridClientConfig } from "../config";
 import { formatErrorMessage } from "../helpers";

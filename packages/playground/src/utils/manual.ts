@@ -27,7 +27,7 @@ export const manual = {
   minting_receipts: urlJoin(BASE, "/documentation/farmers/3node_building/minting_receipts.html"),
   minting_process: urlJoin(BASE, "/documentation/farmers/farming_optimization/minting_process.html"),
   minting_reports: urlJoin(BASE, "/documentation/dashboard/tfchain/tf_minting_reports.html"),
-  manual_legal_page: urlJoin(BASE, GITHUB.LEGAL_PATH, "/terms_conditions_all3.html"),
+  manual_legal_page: urlJoin("https://manual.grid.tf", GITHUB.LEGAL_PATH, "/terms_conditions_all3.html"),
   manual_raw_legal: urlJoin(GITHUB.RAW_BASE, GITHUB.LEGAL_PATH, "terms_conditions_all3.md"),
   manual_raw_legal_img: urlJoin(GITHUB.RAW_BASE, GITHUB.LEGAL_PATH, LEGAL_HEADER_IMG),
   manual_legal_base: urlJoin(BASE, GITHUB.LEGAL_PATH),
