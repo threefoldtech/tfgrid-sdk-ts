@@ -68,7 +68,7 @@ async function main() {
   const qsfsNode = await getNodeId(grid3, qsfsQueryOptions);
   const masterNode = await getNodeId(grid3, options);
   const workerNode = await getNodeId(grid3, { ...options, nodeExclude: [masterNode] });
-  const networkName = "net" + generateString(8);
+  const networkName = `net${name}`;
 
   //create qsfs object
   const qsfs: QSFSZDBSModel = {

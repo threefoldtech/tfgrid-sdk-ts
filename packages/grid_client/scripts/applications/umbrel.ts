@@ -39,7 +39,7 @@ async function main() {
   };
   const nodes = await grid3.capacity.filterNodes(vmQueryOptions);
   const vmNode = await pingNodes(grid3, nodes);
-  const networkName = "net" + generateString(8);
+  const networkName = `net${name}`;
 
   const vms: MachinesModel = {
     name,

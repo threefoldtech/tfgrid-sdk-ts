@@ -26,7 +26,7 @@ async function cancel(client, k8s) {
 async function main() {
   const name = "k8s" + generateString(8);
   const grid3 = await getClient(`kubernetes/${name}`);
-  const networkName = "net" + generateString(8);
+  const networkName = `net${name}`;
 
   const k: K8SModel = {
     name,

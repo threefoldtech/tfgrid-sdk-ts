@@ -33,7 +33,7 @@ async function cancel(client, vms) {
 
 async function main() {
   const name = "vm" + generateString(8);
-  const networName = "net" + generateString(8);
+  const networName = `net${name}`;
   const grid3 = await getClient(`vm/${name}`);
   const instanceCapacity = { cru: 2, mru: 4, sru: 100 }; // Update the instance capacity values according to your requirements.
 

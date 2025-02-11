@@ -39,7 +39,7 @@ async function deleteQsfs(client, qsfs) {
 
 async function main() {
   const name = "vm" + generateString(8);
-  const networName = "net" + generateString(8);
+  const networName = `net${name}`;
 
   const grid3 = await getClient(`vm/${name}`);
 

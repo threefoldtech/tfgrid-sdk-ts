@@ -27,7 +27,7 @@ async function cancel(client, vms) {
 async function main() {
   const name = "cr" + generateString(8);
   const grid3 = await getClient(`caprover/${name}`);
-  const networkName = "net" + generateString(8);
+  const networkName = `net${name}`;
 
   const vmQueryOptions: FilterOptions = {
     cru: 4,
