@@ -2,7 +2,7 @@
   <section>
     <h6 class="text-h5 mb-4 mt-2" v-if="!hideTitle">Domain Name</h6>
 
-    <input-tooltip tooltip="Use a custom domain">
+    <input-tooltip tooltip="Use a custom domain" align-center>
       <div>
         <VSwitch color="primary" inset label="Custom Domain" v-model="enableCustomDomain" hide-details />
       </div>
