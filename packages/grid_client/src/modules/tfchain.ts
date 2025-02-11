@@ -9,6 +9,8 @@ import { Buffer } from "buffer";
 import MD5 from "crypto-js/md5";
 import * as PATH from "path";
 
+import { manual } from "@/utils/manual";
+
 import { TFClient } from "../clients/tf-grid/client";
 import { GridClientConfig } from "../config";
 import { formatErrorMessage } from "../helpers";
@@ -478,7 +480,7 @@ class TFChain implements blockchainInterface {
     }
     await (
       await client.termsAndConditions.accept({
-        documentLink: "https://manual.grid.tf/knowledge_base/legal/terms_conditions_all3.html",
+        documentLink: manual.manual_legal_page,
       })
     ).apply();
     const ret = await (await client.twins.create({ relay })).apply();
