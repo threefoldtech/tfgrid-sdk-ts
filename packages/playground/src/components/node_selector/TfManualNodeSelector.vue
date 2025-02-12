@@ -138,7 +138,7 @@ export default {
         placeholderNode.value = node;
 
         if (node === undefined || node === null) {
-          throw `Node ${nodeId} is not on the grid`;
+          throw `Node ${nodeId} doesn't exist.`;
         }
 
         const features = getFeatures(gridStore, filters.value);
