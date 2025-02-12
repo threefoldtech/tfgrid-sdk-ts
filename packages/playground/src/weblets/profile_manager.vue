@@ -841,8 +841,11 @@ const replaceMarkdownLinks = (content: string, pattern: RegExp, baseUrl: string)
 };
 
 const processMarkdownContent = (content: string, baseUrl: string) => {
-  let processedContent = content.replace("./" + manual.legal_header_img, manual.manual_raw_legal_img);
-
+  let processedContent = content.replace(
+    "./" + manual.legal_header_img,
+    `${manual.manual_raw_legal_img}" class="info-legal-image`
+  );
+  
   const patterns = [/\[([^\]]+)\]\((\.\/[^)]+)\.md\)/g, /\[([^\]]+)\]\((\.\/[^)]+\/[^)]+)\.md\)/g];
 
   for (const pattern of patterns) {
