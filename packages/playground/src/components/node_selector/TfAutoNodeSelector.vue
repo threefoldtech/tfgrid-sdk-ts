@@ -61,6 +61,7 @@
                   v-model:node="loadedNodes[index]"
                   :selected="!validFilters || filtersUpdated ? false : $props.modelValue === node"
                   selectable
+                  @update:node="updateNode($event as NodeInfo)"
                   @node:select="bindModelValueAndValidate"
                   :status="
                     $props.modelValue === node
@@ -218,7 +219,11 @@ export default {
       },
       default: [],
     });
-
+    function updateNode(node: NodeInfo) {
+      console.log("updateNode", node);
+      console.log("_loadedNodes", loadedNodes.value);
+      _loadedNodes.value = loadedNodes.value.map(n => (n.nodeId === node.nodeId ? node : n));
+    }
     async function _setValidNode(oldNodeId?: number) {
       const node = await selectValidNode(
         gridStore,
@@ -386,7 +391,7 @@ export default {
       loadingError,
       filtersUpdated,
       nodeInputValidateTask,
-
+      updateNode,
       touched,
       bindModelValueAndValidate,
       bindStatus,
