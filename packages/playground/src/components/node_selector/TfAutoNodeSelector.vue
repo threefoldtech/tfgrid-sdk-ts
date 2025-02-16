@@ -221,6 +221,7 @@ export default {
 
     async function _setValidNode(oldNodeId?: number) {
       const node = await selectValidNode(
+        gridStore,
         props.getFarm,
         _loadedNodes.value,
         props.selectedMachines,
@@ -229,6 +230,7 @@ export default {
       );
 
       if (node) {
+        if (node?.dedicated && node.rentContractId === 0) return false;
         await props.loadFarm(node.farmId);
         bindModelValue(node);
         nodeInputValidateTask.value.run(node);
