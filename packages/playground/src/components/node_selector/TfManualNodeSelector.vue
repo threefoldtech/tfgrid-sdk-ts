@@ -136,11 +136,13 @@ export default {
         }
 
         placeholderNode.value = node;
-        const features = getFeatures(gridStore, filters.value);
-        let missingFeatures = features.filter(value => !node.features.includes(value as Features));
+
         if (node === undefined || node === null) {
-          throw `Node ${nodeId} is not on the grid`;
+          throw `Node ${nodeId} doesn't exist.`;
         }
+
+        const features = getFeatures(gridStore, filters.value);
+        let missingFeatures = features.filter(value => !node?.features.includes(value as Features));
 
         const [{ data: farms }, e1] = await resolveAsync(gridProxyClient.farms.list({ farmId: node.farmId }));
         if (e1) {
