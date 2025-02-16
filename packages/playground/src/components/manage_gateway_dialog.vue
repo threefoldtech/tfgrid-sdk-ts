@@ -415,14 +415,14 @@ export default {
         (networks.value = []);
       const { publicIP, planetary, myceliumIP, interfaces } = selectedNode.value;
 
-      if (props.vm && props.vm.type === WorkloadTypes.zmachine) {
+      if (selectedNode.value.type === WorkloadTypes.zmachine) {
         addNetwork(NetworkInterfaces.WireGuard, interfaces?.[0]?.ip);
         addNetwork(NetworkInterfaces.PublicIPV4, publicIP?.ip.split("/")[0]);
         addNetwork(NetworkInterfaces.Planetary, planetary);
         addNetwork(NetworkInterfaces.Mycelium, myceliumIP);
         addNetwork(NetworkInterfaces.PublicIPV6, publicIP?.ip6.split("/")[0]);
       }
-      if (props.vm && props.vm.type === WorkloadTypes.zmachinelight) {
+      if (selectedNode.value.type === WorkloadTypes.zmachinelight) {
         addNetwork(NetworkInterfaces.Mycelium, myceliumIP);
       }
       selectedIPAddress.value = networks.value[0];
