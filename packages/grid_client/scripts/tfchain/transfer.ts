@@ -1,4 +1,4 @@
-import { TfchainWalletTransferModel } from "../../src";
+import { generateString, TfchainWalletTransferModel } from "../../src";
 import { getClient } from "../client_loader";
 import { log } from "../utils";
 
@@ -12,8 +12,10 @@ async function transfer(client, transfer) {
 async function main() {
   const grid3 = await getClient();
   const target_address = "5F7ctVSmDXMM3yTQszZy47QgvNxaeUPPRz5p3oBaK9jTeNgf";
+  const name = generateString(10);
+
   const transferInfo: TfchainWalletTransferModel = {
-    name: "newacc",
+    name: name,
     address_dest: target_address,
     amount: 100,
   };

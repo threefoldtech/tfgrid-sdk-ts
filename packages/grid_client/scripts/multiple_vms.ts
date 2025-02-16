@@ -46,7 +46,7 @@ async function main() {
   const vms: MachinesModel = {
     name,
     network: {
-      name: name,
+      name: `net${name}`,
       ip_range: "10.238.0.0/16",
     },
     machines: [

@@ -1,4 +1,4 @@
-import { FilterOptions, GatewayFQDNModel } from "../src";
+import { FilterOptions, GatewayFQDNModel, generateString } from "../src";
 import { getClient } from "./client_loader";
 import { log } from "./utils";
 
@@ -26,6 +26,7 @@ async function cancel(client, gw) {
 // read more about the gateway types in this doc: https://github.com/threefoldtech/zos/tree/main/docs/internals/gateway
 async function main() {
   const grid3 = await getClient();
+  const name = generateString(10);
 
   const gatewayQueryOptions: FilterOptions = {
     gateway: true,
@@ -33,7 +34,7 @@ async function main() {
   };
 
   const gw: GatewayFQDNModel = {
-    name: "applyFQDN",
+    name: name,
     node_id: +(await grid3.capacity.filterNodes(gatewayQueryOptions))[0].nodeId,
     fqdn: "test.hamada.grid.tf",
     tls_passthrough: false,

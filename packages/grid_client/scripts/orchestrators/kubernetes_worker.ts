@@ -26,6 +26,7 @@ async function deleteWorker(client, worker) {
 }
 
 async function main() {
+  // User should change the name to an existing k8s cluster name, so the workers can be added to it.
   const name = "k8s" + generateString(8);
 
   const grid3 = await getClient(`kubernetes/${name}`);

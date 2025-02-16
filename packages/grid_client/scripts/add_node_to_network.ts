@@ -10,9 +10,11 @@ async function addNode(client: GridClient, node: NetworkAddNodeModel) {
 }
 
 async function main() {
-  const grid3: GridClient = await getClient("vm/vmu0sir");
+  // User should change the name to an existing vm.
+  const name = "vmu0sir";
+  const grid3: GridClient = await getClient(`vm/${name}`);
   const node: NetworkAddNodeModel = {
-    name: "wedtest",
+    name: `net${name}`,
     ipRange: "10.249.0.0/16",
     nodeId: 14,
     mycelium: true,

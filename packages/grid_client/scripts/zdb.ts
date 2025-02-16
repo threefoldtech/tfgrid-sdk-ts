@@ -38,7 +38,7 @@ async function main() {
     name,
     zdbs: [
       {
-        name: "hamada",
+        name: name,
         node_id: +(await grid3.capacity.filterNodes(zdbQueryOptions))[0].nodeId,
         mode: ZdbModes.user,
         disk_size: 1,

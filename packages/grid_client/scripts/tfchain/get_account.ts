@@ -1,4 +1,4 @@
-import { BlockchainGetModel } from "../../src";
+import { BlockchainGetModel, generateString } from "../../src";
 import { getClient } from "../client_loader";
 import { log } from "../utils";
 
@@ -11,8 +11,9 @@ async function getAccount(client, account) {
 
 async function main() {
   const grid3 = await getClient();
+  const name = generateString(10);
   const account: BlockchainGetModel = {
-    name: "newacc",
+    name: name,
   };
 
   //Get Account

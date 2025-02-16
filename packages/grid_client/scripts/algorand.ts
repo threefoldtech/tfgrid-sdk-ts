@@ -25,10 +25,11 @@ const hexMessage = message
   .map((letter, i) => message.charCodeAt(i).toString(16))
   .join("");
 const name = generateString(10);
+const nameimported = generateString(10);
 
 async function main() {
   const account: AlgorandAccountCreateModel = {
-    name: "myaccount",
+    name: nameimported,
   };
   const importedAccount: AlgorandAccountInitModel = {
     name: name,
@@ -50,7 +51,7 @@ async function main() {
     name: name,
   };
   const deleteAccount2: BlockchainDeleteModel = {
-    name: "myaccount",
+    name: nameimported,
   };
   const message: BlockchainSignModel = {
     content: hexMessage,

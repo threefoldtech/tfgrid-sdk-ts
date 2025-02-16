@@ -1,4 +1,4 @@
-import { TfchainDaoVoteModel, TfchainWalletInitModel } from "../../src";
+import { generateString, TfchainDaoVoteModel, TfchainWalletInitModel } from "../../src";
 import { getClient } from "../client_loader";
 import { log } from "../utils";
 
@@ -18,12 +18,14 @@ async function vote(client, vote) {
 
 async function main() {
   const grid3 = await getClient();
+  const name = generateString(10);
+
   const account: TfchainWalletInitModel = {
-    name: "harby",
+    name: name,
     secret: grid3.clientOptions.mnemonic,
   };
   const voteInfo: TfchainDaoVoteModel = {
-    name: "harby",
+    name: name,
     farmId: 246,
     hash: "0xa539b59dcf7ba10764a49c9effb88aea400d3c20f0071c3b85494423079757fe",
     approve: true,

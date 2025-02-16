@@ -45,7 +45,7 @@ async function cancel(client, vms, gw) {
 
 async function main() {
   const name = "gt" + generateString(8);
-  const networkName = "giteanetwork";
+  const networkName = `net${name}`;
   const grid3 = await getClient(`gitea/${name}`);
   const subdomain = "gt" + grid3.twinId + name;
   const instanceCapacity = { cru: 2, mru: 4, sru: 50 };

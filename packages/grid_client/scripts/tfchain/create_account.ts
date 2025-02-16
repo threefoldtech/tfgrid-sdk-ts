@@ -1,6 +1,6 @@
 import { default as urlParser } from "url-parse";
 
-import { TfchainCreateModel } from "../../src";
+import { generateString, TfchainCreateModel } from "../../src";
 import { getClient } from "../client_loader";
 import { log } from "../utils";
 
@@ -15,9 +15,11 @@ async function main() {
   const grid3 = await getClient();
   const urls = grid3.getDefaultUrls(grid3.clientOptions.network);
   const relay = urlParser(urls.relay).hostname;
+  const name = generateString(10);
+
   const account: TfchainCreateModel = {
     relay: relay,
-    name: "newacc",
+    name: name,
   };
 
   //Create Account

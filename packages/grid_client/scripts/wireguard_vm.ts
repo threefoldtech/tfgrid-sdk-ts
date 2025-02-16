@@ -1,4 +1,6 @@
-import { FilterOptions, GatewayNameModel, MachineModel, MachinesModel, NetworkModel } from "../src";
+import { generateAccount } from "algosdk";
+
+import { FilterOptions, GatewayNameModel, generateString, MachineModel, MachinesModel, NetworkModel } from "../src";
 import { config, getClient } from "./client_loader";
 import { log } from "./utils";
 
@@ -14,7 +16,7 @@ function createNetworkModel(gwNode: number, name: string): NetworkModel {
 }
 function createMachineModel(node: number) {
   return {
-    name: "testvm1",
+    name: `vm${generateString(10)}`,
     node_id: node,
     public_ip: false,
     planetary: true,

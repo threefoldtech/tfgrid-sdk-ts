@@ -1,4 +1,4 @@
-import { FilterOptions, GatewayNameModel } from "../src";
+import { FilterOptions, GatewayNameModel, generateString } from "../src";
 import { getClient } from "./client_loader";
 import { log } from "./utils";
 
@@ -33,7 +33,7 @@ async function main() {
   };
 
   const gw: GatewayNameModel = {
-    name: "test",
+    name: generateString(10),
     node_id: +(await grid3.capacity.filterNodes(gatewayQueryOptions))[0].nodeId,
     tls_passthrough: false,
     // the backends have to be in this format `http://ip:port` or `https://ip:port`, and the `ip` pingable from the node so using the ygg ip or public ip if available.
