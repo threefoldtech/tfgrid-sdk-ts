@@ -77,13 +77,29 @@
           <v-dialog v-model="showIPs" max-width="500" attach="#modals">
             <v-card>
               <v-card-title class="bg-primary">IPs range</v-card-title>
-              <v-card-text
+              <v-card-text>
+                <v-data-table
+                  :headers="[
+                    { title: 'Network', key: 'network' },
+                    { title: 'IP Addresses', key: 'ips' },
+                  ]"
+                  :items="[]"
+                  item-title="title"
+                  item-value="key"
+                  hover
+                  hide-default-footer
+                  show-select
+                  hide-no-data
+                  v-bind="$attrs"
+                ></v-data-table>
+              </v-card-text>
+              <!-- <v-card-text
                 >List of IPs:
                 <ul class="ml-5">
                   <li v-for="IP in IPs" :key="IP">{{ IP }} <v-icon @click="copy(IP)">mdi-content-copy</v-icon></li>
                 </ul>
               </v-card-text>
-              <v-card-actions> </v-card-actions>
+              <v-card-actions> </v-card-actions> -->
             </v-card>
           </v-dialog>
 
