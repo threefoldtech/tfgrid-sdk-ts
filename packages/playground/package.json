@@ -31,6 +31,7 @@
     "get-ip-range": "^4.0.1",
     "highlight.js": "^11.7.0",
     "ip": "^2.0.1",
+    "ip-cidr": "^4.0.2",
     "jspdf": "^2.5.2",
     "jspdf-autotable": "^3.8.2",
     "lodash": "^4.17.21",

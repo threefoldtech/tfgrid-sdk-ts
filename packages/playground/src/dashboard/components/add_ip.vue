@@ -83,7 +83,7 @@
                     { title: 'Network', key: 'network' },
                     { title: 'IP Addresses', key: 'ips' },
                   ]"
-                  :items="[]"
+                  :items="IPs"
                   item-title="title"
                   item-value="key"
                   hover
@@ -250,6 +250,8 @@ export default {
     function gatewayCheck() {
       const firstIP = publicIP?.value.split("/")[0];
       const lastIP = toPublicIP?.value.split("/")[0];
+      const firstIPMask = publicIP?.value.split("/")[1];
+      const lastIPMask = toPublicIP?.value.split("/")[1];
       let isRange = false;
 
       try {
@@ -272,7 +274,10 @@ export default {
 
       if (type.value !== IPType.single) {
         try {
+
+ 
           const range = getIPRange(firstIP, lastIP);
+          console.log(range);
           if (range.includes(gateway.value)) {
             return {
               message: "The gateway IP shouldn't be in the IPs range.",
