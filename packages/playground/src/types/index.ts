@@ -15,6 +15,13 @@ export type InputFilterType = {
   type: string;
 };
 
+export enum NetworkFeatures {
+  ip = "IP",
+  mycelium = "Mycelium",
+  wireguard = "Wireguard",
+  yggdrasil = "Planetary",
+}
+
 export type CPUBenchmark = {
   multi: number;
   single: number;
