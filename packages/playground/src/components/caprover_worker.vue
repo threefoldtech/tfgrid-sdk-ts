@@ -73,8 +73,10 @@ import type { CaproverWorker } from "../types";
 import { generateName } from "../utils/strings";
 import SelectSolutionFlavor from "./select_solution_flavor.vue";
 
+let id = 0;
 export function createWorker(name: string = generateName({ prefix: "wr" })): CaproverWorker {
   return {
+    _id: id++,
     name,
     ipv4: true,
     ipv6: false,

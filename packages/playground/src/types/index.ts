@@ -76,6 +76,7 @@ export interface K8SWorker {
 }
 
 export interface CaproverWorker {
+  _id: number;
   name: string;
   solution?: solutionFlavor;
   dedicated?: boolean;

@@ -65,7 +65,7 @@
     </template>
 
     <template #deploy>
-      <CaproverWorker v-model="worker" />
+      <CaproverWorker :key="worker._id" v-model="worker" />
     </template>
   </ManageWorkerDialog>
 
@@ -131,6 +131,7 @@ function calcDiskSize(disks: { size: number }[]) {
 
 const caproverData = ref<any>();
 function updateCaprover() {
+  worker.value = createWorker();
   if (!caproverData.value) return;
   emits("update:caprover", caproverData.value);
   caproverData.value = undefined;
