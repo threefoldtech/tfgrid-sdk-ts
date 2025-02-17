@@ -162,7 +162,7 @@ watch(
 function finalize(deployment: any) {
   layout.value.reloadDeploymentsList();
   layout.value.setStatus("success", "Successfully deployed an OpenWebUI instance.");
-  layout.value.openDialog(deployment, deploymentListEnvironments.wordpress);
+  layout.value.openDialog(deployment, deploymentListEnvironments.openwebui);
 }
 async function deploy() {
   layout.value.setStatus("deploy");
