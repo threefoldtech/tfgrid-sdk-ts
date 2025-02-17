@@ -125,9 +125,10 @@ import Networks from "../components/networks.vue";
 import type { K8SWorker } from "../types";
 import { generateName } from "../utils/strings";
 import RootFsSize from "./root_fs_size.vue";
-
+let id = 0;
 export function createWorker(name: string = generateName({ prefix: "wr" })): K8SWorker {
   return {
+    _id: id++,
     name,
     cpu: 1,
     memory: 4096,
