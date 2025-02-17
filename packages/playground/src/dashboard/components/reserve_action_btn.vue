@@ -37,7 +37,7 @@
       color="error"
       :loading="loadingUnreserveBtn"
       :disabled="disableButton"
-      v-if="reserved"
+      v-else
       @click.stop="removeReserve"
     >
       Unreserve
@@ -166,6 +166,7 @@ export default {
             disableButton.value = false;
             loadingReserveNode.value = false;
             emit("updateTable");
+            reserved.value = true;
           }, 20000);
         } else {
           createCustomToast("Please Login first to continue.", ToastType.danger);
