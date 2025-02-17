@@ -43,7 +43,6 @@
 
             <VAlert v-else type="error" text="No Nodes were found!" />
           </VContainer>
-
           <div
             ref="nodesContainer"
             :style="{
@@ -221,6 +220,7 @@ export default {
     });
     function updateNode(node: NodeInfo) {
       _loadedNodes.value = loadedNodes.value.map(n => (n.nodeId === node.nodeId ? node : n));
+      _setValidNode(node.nodeId);
     }
     async function _setValidNode(oldNodeId?: number) {
       const node = await selectValidNode(
