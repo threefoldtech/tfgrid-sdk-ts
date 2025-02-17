@@ -23,6 +23,7 @@ export interface SelectionDetailsFilters {
   certified?: boolean;
   dedicated?: boolean;
   rentedBy?: number;
+  rentedByMe?: boolean;
   rentable?: boolean;
   exclusiveFor?: string;
   rentable_or_rented_by?: number;
