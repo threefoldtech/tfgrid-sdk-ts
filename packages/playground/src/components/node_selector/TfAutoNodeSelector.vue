@@ -220,8 +220,6 @@ export default {
       default: [],
     });
     function updateNode(node: NodeInfo) {
-      console.log("updateNode", node);
-      console.log("_loadedNodes", loadedNodes.value);
       _loadedNodes.value = loadedNodes.value.map(n => (n.nodeId === node.nodeId ? node : n));
     }
     async function _setValidNode(oldNodeId?: number) {
