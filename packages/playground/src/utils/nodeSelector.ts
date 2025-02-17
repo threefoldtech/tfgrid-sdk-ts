@@ -186,6 +186,8 @@ export function normalizeNodeFilters(
   filters: SelectionDetailsFilters,
   options?: NormalizeNodeFiltersOptions,
 ): FilterOptions {
+  const bothRentalFiltersActive = filters.dedicated && filters.rentedBy;
+
   return {
     page: Math.max(1, options?.page || 1),
     size: options?.size,
@@ -207,9 +209,9 @@ export function normalizeNodeFilters(
     country: options?.location.country,
     gateway: options?.gateway,
     healthy: true,
-    rentable: filters.dedicated ? filters.dedicated : undefined,
-    rentedBy: filters.rentedBy ? options?.twinId : undefined,
-    rentableOrRentedBy: filters.dedicated ? options?.twinId : undefined,
+    rentable: bothRentalFiltersActive ? undefined : filters.dedicated || undefined,
+    rentedBy: bothRentalFiltersActive ? undefined : filters.rentedBy ? options?.twinId : undefined,
+    rentableOrRentedBy: bothRentalFiltersActive ? options?.twinId : undefined,
     planetary: filters.planetary,
     mycelium: filters.mycelium,
     wireguard: filters.wireguard,
