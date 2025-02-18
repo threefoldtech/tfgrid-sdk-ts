@@ -4,7 +4,6 @@
     :cpu="solution?.cpu"
     :memory="solution?.memory"
     :disk="disks.reduce((total, disk) => total + disk.size, solution?.disk + 2)"
-    :ipv4="ipv4"
     :dedicated="dedicated"
     :SelectedNode="selectionDetails?.node"
     :valid-filters="selectionDetails?.validFilters"
@@ -39,7 +38,6 @@
 
         <Networks
           required
-          v-model:ipv4="ipv4"
           v-model:ipv6="ipv6"
           v-model:planetary="planetary"
           v-model:mycelium="mycelium"
@@ -66,7 +64,6 @@
 
         <TfSelectionDetails
           :filters="{
-            ipv4,
             ipv6,
             hasGPU,
             certified,
@@ -130,7 +127,7 @@ const flist = ref<Flist>({
   value: "https://hub.grid.tf/idrnd.3bot/ubuntu-24.04_fullvm_oi.flist",
   entryPoint: "",
 });
-const { ipv4, ipv6, mycelium, planetary, wireguard } = useNetworks();
+const { ipv6, mycelium, planetary, wireguard } = useNetworks();
 const dedicated = ref(false);
 const certified = ref(false);
 const disks = ref<Disk[]>([]);
@@ -159,11 +156,11 @@ watch(
   { immediate: true },
 );
 
-function finalize(deployment: any) {
+function finalize(deployment: any, domain: string) {
   layout.value.reloadDeploymentsList();
   layout.value.setStatus(
     "success",
-    "Successfully deployed an Open WebUI instance. You might need to wait a couple of minutes for the installation to complete, e.g. if you see Bad Gateway when opening the webpage, simply wait and refresh the page.",
+    `Successfully deployed an Open WebUI instance. The domain URL is "${domain}". You might need to wait a couple of minutes for the installation to complete, e.g. if you see Bad Gateway when opening the webpage, simply wait and refresh the page.`,
   );
   layout.value.openDialog(deployment, deploymentListEnvironments.openwebui);
 }
@@ -199,7 +196,6 @@ async function deploy() {
           flist: flist.value!.value,
           entryPoint: flist.value!.entryPoint,
           disks: [...disks.value],
-          publicIpv4: ipv4.value,
           publicIpv6: ipv6.value,
           planetary: planetary.value,
           mycelium: mycelium.value,
@@ -231,7 +227,7 @@ async function deploy() {
       network: vm[0].interfaces[0].network,
     });
 
-    finalize(vm);
+    finalize(vm, domain);
   } catch (e) {
     layout.value.setStatus("deploy", "Rollbacking back due to fail to deploy gateway...");
 
