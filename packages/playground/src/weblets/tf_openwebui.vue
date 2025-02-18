@@ -161,7 +161,10 @@ watch(
 
 function finalize(deployment: any) {
   layout.value.reloadDeploymentsList();
-  layout.value.setStatus("success", "Successfully deployed an OpenWebUI instance.");
+  layout.value.setStatus(
+    "success",
+    "Successfully deployed an Open WebUI instance. You might need to wait a couple of minutes for the installation to complete, e.g. if you see Bad Gateway when opening the webpage, simply wait and refresh the page.",
+  );
   layout.value.openDialog(deployment, deploymentListEnvironments.openwebui);
 }
 async function deploy() {
@@ -200,10 +203,7 @@ async function deploy() {
           publicIpv6: ipv6.value,
           planetary: planetary.value,
           mycelium: mycelium.value,
-          envs: [
-            { key: "SSH_KEY", value: selectedSSHKeys.value },
-            { key: "OPENWEBUI_DOMAIN", value: domain },
-          ],
+          envs: [{ key: "SSH_KEY", value: selectedSSHKeys.value }],
           rootFilesystemSize: rootFilesystemSize.value,
           hasGPU: hasGPU.value,
           nodeId: selectionDetails.value?.node?.nodeId,
@@ -217,21 +217,8 @@ async function deploy() {
         accessNodeId: selectionDetails.value?.domain?.selectedDomain?.nodeId,
       },
     });
-
-    layout.value.reloadDeploymentsList();
-    layout.value.setStatus(
-      "success",
-      "Successfully deployed an Open WebUI instance. You might need to wait a couple of minutes for the installation to complete, e.g. if you see Bad Gateway when opening the webpage, simply wait and refresh the page.",
-    );
-    layout.value.openDialog(vm, deploymentListEnvironments.openwebui);
   } catch (e) {
     layout.value.setStatus("failed", normalizeError(e, "Failed to deploy an Open WebUI instance."));
-  }
-
-  if (!selectionDetails.value?.domain?.enableSelectedDomain) {
-    vm[0].customDomain = selectionDetails.value?.domain?.customDomain;
-    finalize(vm);
-    return;
   }
 
   try {
