@@ -316,7 +316,12 @@ export default {
     };
 
     const getDomainNode = (domain: GridGateway): string => {
-      const ip = extractDomainIP(domain.backends[0]);
+      let ip = "";
+      try {
+        ip = extractDomainIP(domain.backends[0]);
+      } catch (error) {
+        console.error(`Failed to extract IP from domain due to: ${error}`);
+      }
 
       const masterIps = getDeploymentIps(props.k8s!.masters[0]);
       const isMaster = masterIps.some(_ip => _ip === ip);
