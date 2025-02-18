@@ -89,6 +89,51 @@
 
         <div v-if="gatewayTab === 1">
           <form-validator v-model="valid">
+            <v-select
+              label="Select node"
+              class="mt-4"
+              :items="availableK8SNodesNames"
+              v-model="selectedK8SNodeName"
+              v-if="k8s"
+            />
+
+            <v-select label="Supported Interfaces" :items="networks" v-model="selectedIPAddress" />
+
+            <copy-input-wrapper #="{ props }" :data="networkName" v-if="isWireGuard">
+              <v-text-field label="Network name" v-model="networkName" readonly v-bind="props" />
+            </copy-input-wrapper>
+
+            <copy-input-wrapper #="{ props }" :data="(selectedIPAddress as any)">
+              <v-text-field :readonly="true" label="Selected IP Address" v-model="selectedIPAddress" v-bind="props" />
+            </copy-input-wrapper>
+
+            <input-validator :value="port" :rules="portRules" #="{ props }">
+              <v-text-field label="Port" v-model.number="port" type="number" v-bind="props" />
+            </input-validator>
+            <input-tooltip
+              tooltip="When enabled, the backend service will terminate the TLS traffic, otherwise the gateway service will do the TLS traffic termination."
+              :align-center="true"
+            >
+              <v-switch
+                label="TLS Passthrough"
+                hide-details
+                inset
+                density="compact"
+                variant="tonal"
+                color="primary"
+                v-model="passThrough"
+              />
+            </input-tooltip>
+            <div style="margin-top: -15px">
+              <TfSelectionDetails
+                :align-center="true"
+                disable-node-selection
+                require-domain
+                use-fqdn
+                :interfaces="interfaceFeature"
+                v-model="selectionDetails"
+              />
+            </div>
             <input-tooltip tooltip="Selecting custom domain sets subdomain as gateway name.">
               <input-validator
                 :value="subdomain"
@@ -99,46 +144,6 @@
                 <v-text-field label="Subdomain" v-model.trim="subdomain" v-bind="props" />
               </input-validator>
             </input-tooltip>
-
-            <div :style="{ marginTop: '-10px' }">
-              <TfSelectionDetails disable-node-selection require-domain use-fqdn v-model="selectionDetails" />
-            </div>
-
-            <input-validator :value="port" :rules="portRules" #="{ props }">
-              <v-text-field label="Port" v-model.number="port" type="number" v-bind="props" />
-            </input-validator>
-
-            <div :style="{ marginTop: '-10px' }">
-              <input-tooltip
-                tooltip="When enabled, the backend service will terminate the TLS traffic, otherwise the gateway service will do the TLS traffic termination."
-                inline
-              >
-                <v-switch
-                  label="TLS Passthrough"
-                  hide-details
-                  inset
-                  variant="tonal"
-                  color="primary"
-                  v-model="passThrough"
-                />
-              </input-tooltip>
-            </div>
-
-            <v-select
-              label="Select node"
-              class="mt-4"
-              :items="availableK8SNodesNames"
-              v-model="selectedK8SNodeName"
-              v-if="k8s"
-            />
-            <v-select label="Supported Interfaces" class="mt-4" :items="networks" v-model="selectedIPAddress" />
-            <copy-input-wrapper #="{ props }" :data="(selectedIPAddress as any)">
-              <v-text-field :readonly="true" label="Selected IP Address" v-model="selectedIPAddress" v-bind="props" />
-            </copy-input-wrapper>
-
-            <copy-input-wrapper #="{ props }" :data="networkName" v-if="isWireGuard">
-              <v-text-field label="Network name" v-model="networkName" readonly v-bind="props" />
-            </copy-input-wrapper>
           </form-validator>
         </div>
 
@@ -187,12 +192,12 @@
 </template>
 
 <script lang="ts">
-import { type GridClient, WorkloadTypes, type ZmachineData } from "@threefold/grid_client";
-import { onMounted, type PropType, ref, watch } from "vue";
+import { Features, type GridClient, WorkloadTypes, type ZmachineData } from "@threefold/grid_client";
+import { computed, onMounted, type PropType, ref, watch } from "vue";
 
 import { useGrid } from "../stores";
 import { ProjectName } from "../types";
-import type { SelectionDetails } from "../types/nodeSelector";
+import type { NetworkFeatures, SelectionDetails } from "../types/nodeSelector";
 import {
   type DeployGatewayConfig,
   deployGatewayName,
@@ -245,7 +250,7 @@ export default {
     const valid = ref(false);
     const selectionDetails = ref<SelectionDetails>();
     const networks = ref<VMNetwork[]>([]);
-    const selectedIPAddress = ref<VMNetwork | null>(null);
+    const selectedIPAddress = ref<string>();
     const networkName = props.vm
       ? (props.vm.interfaces[0].network as string)
       : (props.k8s?.masters[0].interfaces[0].network as string);
@@ -263,6 +268,21 @@ export default {
     const availableK8SNodesNames = availableK8SNodes.map(node => node.name);
     const selectedK8SNodeName = ref(availableK8SNodesNames[0]);
     const selectedNode = ref();
+    const interfaceFeature = computed<NetworkFeatures[]>(() => {
+      const net = networks.value.find(net => net.value == selectedIPAddress.value);
+      switch (net?.title) {
+        case NetworkInterfaces.PublicIPV6:
+          return [Features.ip];
+        case NetworkInterfaces.Planetary:
+          return [Features.yggdrasil];
+        case NetworkInterfaces.Mycelium:
+          return [Features.mycelium];
+        case NetworkInterfaces.WireGuard:
+          return [Features.wireguard];
+        default:
+          return [];
+      }
+    });
     const errorMessage = ref("");
 
     watch(selectedK8SNodeName, getSupportedNetworks, { deep: true });
@@ -346,7 +366,7 @@ export default {
     async function deployGateway() {
       layout.value.setStatus("deploy");
       try {
-        const IP = selectedIPAddress.value as unknown as string;
+        const IP = selectedIPAddress.value as string;
 
         const gwConfig: DeployGatewayConfig = {
           subdomain: subdomain.value,
@@ -425,18 +445,14 @@ export default {
       if (selectedNode.value.type === WorkloadTypes.zmachinelight) {
         addNetwork(NetworkInterfaces.Mycelium, myceliumIP);
       }
-      selectedIPAddress.value = networks.value[0];
+      selectedIPAddress.value = networks.value[0].value;
     }
 
     watch(
       selectedIPAddress,
       () => {
-        if (selectedIPAddress.value?.value) {
-          selectedIPAddress.value = selectedIPAddress.value.value as unknown as VMNetwork;
-        }
-
-        const IP = selectedIPAddress.value as unknown as string;
-        isWireGuard.value = networks.value.find(net => net.value === IP)?.title === NetworkInterfaces.WireGuard;
+        isWireGuard.value =
+          networks.value.find(net => net.value === selectedIPAddress.value)?.title === NetworkInterfaces.WireGuard;
       },
       { deep: true },
     );
@@ -498,6 +514,7 @@ export default {
       networkName,
       loadingGateways,
       gateways,
+      interfaceFeature,
       failedToListGws,
       failedDomainDialog,
       requestDelete,

@@ -1,4 +1,4 @@
-import type { FarmInfo, GPUCardInfo, NodeInfo } from "@threefold/grid_client";
+import type { FarmInfo, Features, GPUCardInfo, NodeInfo } from "@threefold/grid_client";
 
 export type Locations = {
   [region: string]: string[];
@@ -86,3 +86,5 @@ export interface SelectedMachine {
   disk: number;
   publicIp: boolean;
 }
+
+export type NetworkFeatures = Features.ipv4 | Features.ip | Features.yggdrasil | Features.wireguard | Features.mycelium;
