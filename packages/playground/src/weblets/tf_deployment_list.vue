@@ -567,29 +567,6 @@ function openDialog(project: string, item?: any): void {
 function clickOpenDialog(_: MouseEvent, { item }: any) {
   return openDialog(tabs[activeTab.value].value, item);
 }
-/**
- * Collect the deployment interfaces ips
- * @param item deployment data
- * @returns {string[]} list of strings
- */
-function getDeploymentIps(item: any): string[] {
-  const ips = [];
-  // wg ip
-  if (item.interfaces) {
-    for (const iface of item.interfaces) {
-      if (iface.ip) ips.push(iface.ip);
-    }
-  }
-  // public ip, ipv6
-  if (item.publicIP) {
-    if (item.publicIP.ip) ips.push(item.publicIP.ip.split("/")[0]);
-    if (item.publicIP.ip6) ips.push(item.publicIP.ip6.split("/")[0]);
-  }
-  if (item.planetary) ips.push(item.planetary);
-  if (item.myceliumIP) ips.push(item.myceliumIP);
-  return ips;
-}
-
 /* List Manager */
 const { uid } = getCurrentInstance() as { uid: number };
 const deploymentListManager = useDeploymentListManager();
@@ -613,6 +590,7 @@ import ManageK8SWorkerDialog from "../components/manage_k8s_worker_dialog.vue";
 import VmDeploymentTable from "../components/vm_deployment_table.vue";
 import { ProjectName } from "../types";
 import { createCustomToast, ToastType } from "../utils/custom_toast";
+import { getDeploymentIps } from "../utils/gateway";
 
 export default {
   name: "TfDeploymentList",
