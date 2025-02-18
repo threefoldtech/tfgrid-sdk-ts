@@ -220,7 +220,7 @@ async function deploy() {
   try {
     layout.value.setStatus("deploy", "Preparing to deploy gateway...");
 
-    await deployGatewayName(grid, selectionDetails.value.domain, {
+    await deployGatewayName(grid, selectionDetails.value?.domain, {
       subdomain,
       ip: vm[0].interfaces[0].ip,
       port: 8080,
