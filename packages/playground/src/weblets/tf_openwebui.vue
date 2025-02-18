@@ -199,7 +199,10 @@ async function deploy() {
           publicIpv6: ipv6.value,
           planetary: planetary.value,
           mycelium: mycelium.value,
-          envs: [{ key: "SSH_KEY", value: selectedSSHKeys.value }],
+          envs: [
+            { key: "SSH_KEY", value: selectedSSHKeys.value },
+            { key: "OPENWEBUI_DOMAIN", value: domain },
+          ],
           rootFilesystemSize: rootFilesystemSize.value,
           hasGPU: hasGPU.value,
           nodeId: selectionDetails.value?.node?.nodeId,

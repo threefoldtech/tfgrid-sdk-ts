@@ -205,6 +205,12 @@
             icon="mdi-eye-outline"
             @click="openDialog(tabs[activeTab].value, item)"
           />
+          <IconActionBtn
+            tooltip="Open Open WebUI"
+            color="anchor"
+            icon="mdi-web"
+            :href="'https://' + item.env.OPENWEBUI_DOMAIN"
+          />
         </template>
 
         <template #Nextcloud-actions="{ item }">
