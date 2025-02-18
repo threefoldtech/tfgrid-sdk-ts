@@ -148,7 +148,7 @@ export function extractDomainIP(domainBackend: string) {
   const ip = domainBackend.replace("https://", "").replace("http://", "");
   // Handle IPv6
   if (domainBackend.includes("[")) {
-    const ipAddress = ip.replace("[", "").split("]:")[0];
+    const ipAddress = ip.replace(/\[/g, "").split("]:")[0];
     if (!ipAddress) {
       throw new Error(`Invalid input "${domainBackend}": Invalid IPv6 address format.`);
     }
