@@ -31,9 +31,17 @@
       v-model:mycelium="$props.modelValue.mycelium"
       v-model:wireguard="$props.modelValue.wireguard"
     />
-
+    <!-- <input-tooltip inline tooltip="" :href="manual"> -->
+    <v-switch color="primary" inset label="Rented by me" v-model="$props.modelValue.rentedByMe" hide-details />
+    <!-- </input-tooltip> -->
     <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
-      <v-switch color="primary" inset label="Dedicated" v-model="$props.modelValue.dedicated" hide-details />
+      <v-switch
+        color="primary"
+        inset
+        label="Include rentable nodes"
+        v-model="$props.modelValue.dedicated"
+        hide-details
+      />
     </input-tooltip>
     <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
       <v-switch color="primary" inset label="Certified" v-model="$props.modelValue.certified" hide-details />
@@ -47,6 +55,7 @@
         ipv6: $props.modelValue.ipv6,
         certified: $props.modelValue.certified,
         dedicated: $props.modelValue.dedicated,
+        rentedByMe: $props.modelValue.rentedByMe,
         cpu: $props.modelValue.solution?.cpu,
         solutionDisk: $props.modelValue.solution?.disk,
         memory: $props.modelValue.solution?.memory,

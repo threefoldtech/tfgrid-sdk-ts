@@ -76,8 +76,17 @@
       v-model.number="$props.modelValue.rootFsSize"
     />
 
+    <!-- <input-tooltip inline tooltip="" :href="manual"> -->
+    <v-switch color="primary" inset label="Rented by me" v-model="$props.modelValue.rentedByMe" hide-details />
+    <!-- </input-tooltip> -->
     <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
-      <v-switch color="primary" inset label="Dedicated" v-model="$props.modelValue.dedicated" hide-details />
+      <v-switch
+        color="primary"
+        inset
+        label="Include rentable nodes"
+        v-model="$props.modelValue.dedicated"
+        hide-details
+      />
     </input-tooltip>
 
     <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
@@ -100,6 +109,7 @@
         ipv4: $props.modelValue.ipv4,
         certified: $props.modelValue.certified,
         dedicated: $props.modelValue.dedicated,
+        rentedByMe: $props.modelValue.rentedByMe,
         cpu: $props.modelValue.cpu,
         ssdDisks: [$props.modelValue.diskSize],
         memory: $props.modelValue.memory,
@@ -139,8 +149,8 @@ export function createWorker(name: string = generateName({ prefix: "wr" })): K8S
     wireguard: true,
     rootFsSize: 2,
     dedicated: false,
+    rentedByMe: false,
     certified: false,
-    rentedBy: undefined,
   };
 }
 

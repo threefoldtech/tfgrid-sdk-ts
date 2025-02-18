@@ -5,6 +5,7 @@
     :memory="solution?.memory"
     :disk="solution?.disk"
     :dedicated="dedicated"
+    :rentedByMe="rentedByMe"
     ipv4
     :SelectedNode="selectionDetails?.node"
     :valid-filters="selectionDetails?.validFilters"
@@ -46,8 +47,11 @@
         require-domain
       />
 
+      <!-- <input-tooltip inline tooltip="" :href="manual"> -->
+      <v-switch color="primary" inset label="Rented by me" v-model="rentedByMe" hide-details />
+      <!-- </input-tooltip> -->
       <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
-        <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
+        <v-switch color="primary" inset label="Include rentable nodes" v-model="dedicated" hide-details />
       </input-tooltip>
 
       <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
@@ -59,6 +63,7 @@
           ipv4: ipv4,
           certified,
           dedicated,
+          rentedByMe,
           cpu: solution?.cpu,
           memory: solution?.memory,
           solutionDisk: solution?.disk,
@@ -107,6 +112,7 @@ const flist: Flist = {
 };
 const { ipv4, ipv6, planetary, mycelium, wireguard } = useNetworks({ ipv4: true, ipv6: true });
 const dedicated = ref(false);
+const rentedByMe = ref(false);
 const certified = ref(false);
 const rootFilesystemSize = 2;
 const selectedSSHKeys = ref("");
@@ -170,7 +176,7 @@ async function deploy() {
             },
           ],
           nodeId: selectionDetails.value!.node!.nodeId,
-          rentedBy: dedicated.value ? grid!.twinId : undefined,
+          rentedByMe: rentedByMe.value,
           certified: certified.value,
         },
       ],

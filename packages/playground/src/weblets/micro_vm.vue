@@ -7,6 +7,7 @@
     :disk="disks.reduce((total, disk) => total + disk.size, solution?.disk ?? 0)"
     :ipv4="ipv4"
     :dedicated="dedicated"
+    :rentedByMe="rentedByMe"
     :SelectedNode="selectionDetails?.node"
     :valid-filters="selectionDetails?.validFilters"
     title-image="images/icons/vm.png"

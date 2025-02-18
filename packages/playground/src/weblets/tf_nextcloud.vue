@@ -6,6 +6,7 @@
     :disk="(solution?.disk ?? 0) + rootFilesystemSize"
     :ipv4="ipv4"
     :dedicated="dedicated"
+    :rentedByMe="rentedByMe"
     :SelectedNode="selectionDetails?.node"
     :valid-filters="selectionDetails?.validFilters"
     title-image="images/icons/nextcloud.png"
@@ -45,8 +46,11 @@
         require-domain
       />
 
+      <!-- <input-tooltip inline tooltip="" :href="manual"> -->
+      <v-switch color="primary" inset label="Rented by me" v-model="rentedByMe" hide-details />
+      <!-- </input-tooltip> -->
       <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
-        <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
+        <v-switch color="primary" inset label="Include rentable nodes" v-model="dedicated" hide-details />
       </input-tooltip>
 
       <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
@@ -59,6 +63,7 @@
           ipv6,
           certified,
           dedicated,
+          rentedByMe,
           cpu: solution?.cpu,
           solutionDisk: solution?.disk,
           memory: solution?.memory,
@@ -111,6 +116,7 @@ const flist: Flist = {
   entryPoint: "/sbin/zinit init",
 };
 const dedicated = ref(false);
+const rentedByMe = ref(false);
 const certified = ref(false);
 const { ipv4, ipv6, planetary, mycelium, wireguard } = useNetworks();
 const rootFilesystemSize = computed(() =>
@@ -186,7 +192,7 @@ async function deploy() {
             { key: "IPV4", value: String(ipv4.value) },
           ],
           nodeId: selectionDetails.value!.node!.nodeId,
-          rentedBy: dedicated.value ? grid!.twinId : undefined,
+          rentedByMe: rentedByMe.value,
           certified: certified.value,
           rootFilesystemSize: rootFilesystemSize.value,
         },
