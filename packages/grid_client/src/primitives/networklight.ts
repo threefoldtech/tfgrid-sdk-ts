@@ -31,7 +31,7 @@ interface NetworkMetadata {
 class ZNetworkLight {
   node: Node;
   capacity: Nodes;
-  NodeIds: number[];
+  NodeIds: number[] = [];
   deployments: Deployment[] = [];
   network: NetworkLight;
   contracts: Required<GqlNodeContract>[];
@@ -135,6 +135,7 @@ class ZNetworkLight {
 
     this.node = new Node();
     this.node.node_id = nodeId;
+    this.NodeIds.push(nodeId);
 
     return znet_light_workload;
   }
@@ -162,6 +163,10 @@ class ZNetworkLight {
       ip = Addr(subnet).mask(32).increment().increment();
     } else if (this.network["node_id"] === node_id) {
       ip = Addr(this.getNodeSubnet(node_id)).mask(32).increment().increment();
+      const reserved_ips = this.getNodeReservedIps(node_id);
+      while (reserved_ips.includes(ip.toString().split("/")[0])) {
+        ip = ip.increment();
+      }
     } else {
       throw new ValidationError("node_id or subnet must be specified.");
     }
