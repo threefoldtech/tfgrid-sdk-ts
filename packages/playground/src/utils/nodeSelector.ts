@@ -230,12 +230,11 @@ export async function validateRentContract(
       throw `Node ${node.nodeId} is not rented`;
     }
     if (node.rentContractId !== 0) {
-      const contractInfo = await gridStore.grid.contracts.get({
+      const { state } = await gridStore.grid.contracts.get({
         id: node.rentContractId,
       });
-      if (contractInfo.state.gracePeriod) {
-        const err = `You can't deploy on node ${node.nodeId}, its rent contract is in grace period.`;
-        throw err;
+      if (state.gracePeriod) {
+        throw `You can't deploy on node ${node.nodeId}, its rent contract is in grace period.`;
       }
     }
 

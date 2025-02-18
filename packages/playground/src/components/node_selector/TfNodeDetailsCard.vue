@@ -13,15 +13,7 @@
     "
     :flat="flat"
     v-bind="{
-      onClick: selectable
-        ? async () => {
-            if (status === 'Init' && node) {
-              $emit('node:select', (node as NodeInfo));
-            }
-            if(node?.dedicated && node.rentContractId === 0) return false
-            await validateRentContract(gridStore, node as NodeInfo);
-          }
-        : undefined,
+      onClick: selectable ? async () => await handleNodeClick() : undefined,
     }"
   >
     <template #loader>
@@ -364,6 +356,18 @@ export default {
       tftsNeeded();
     });
 
+    async function handleNodeClick() {
+      try {
+        if (props.status === "Init" && props.node) {
+          ctx.emit("node:select", props.node as NodeInfo);
+        }
+        if (props.node?.dedicated && props.node.rentContractId === 0) return false;
+        await validateRentContract(gridStore, props.node as NodeInfo);
+      } catch (error) {
+        return error;
+      }
+    }
+
     async function refreshStakingDiscount() {
       loadingStakingDiscount.value = true;
       if (props.node) {
@@ -622,6 +626,7 @@ export default {
       lastDeploymentTime,
       loadingdiscountTableItems,
       gridStore,
+      handleNodeClick,
     };
   },
 };
