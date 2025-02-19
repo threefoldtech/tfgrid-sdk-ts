@@ -6,7 +6,7 @@
     :disk="(solution?.disk ?? 0) + 10 + rootFilesystemSize"
     :ipv4="ipv4"
     :dedicated="dedicated"
-    :rentedByMe="rentedByMe"
+    :rentedBy="rentedBy"
     :SelectedNode="selectionDetails?.node"
     :valid-filters="selectionDetails?.validFilters"
     title-image="images/icons/umbrel.png"
@@ -103,7 +103,7 @@
           ipv6,
           certified,
           dedicated,
-          rentedByMe,
+          rentedBy,
           cpu: solution?.cpu,
           solutionDisk: solution?.disk,
           ssdDisks: [10],
@@ -158,6 +158,7 @@ const flist: Flist = {
 };
 const dedicated = ref(false);
 const rentedByMe = ref(false);
+const rentedBy = computed(() => (rentedByMe.value ? grid.twinId : undefined));
 const certified = ref(false);
 const rootFilesystemSize = computed(() =>
   calculateRootFileSystem({ CPUCores: solution.value?.cpu ?? 0, RAMInMegaBytes: solution.value?.memory ?? 0 }),
@@ -211,7 +212,7 @@ async function deploy() {
           ],
           rootFilesystemSize: rootFilesystemSize.value,
           nodeId: selectionDetails.value!.node!.nodeId,
-          rentedByMe: rentedByMe.value,
+          rentedBy: rentedBy.value,
           certified: certified.value,
         },
       ],

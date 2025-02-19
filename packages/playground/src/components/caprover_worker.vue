@@ -55,7 +55,7 @@
         ipv6: $props.modelValue.ipv6,
         certified: $props.modelValue.certified,
         dedicated: $props.modelValue.dedicated,
-        rentedByMe: $props.modelValue.rentedByMe,
+        rentedBy,
         cpu: $props.modelValue.solution?.cpu,
         solutionDisk: $props.modelValue.solution?.disk,
         memory: $props.modelValue.solution?.memory,
@@ -70,10 +70,11 @@
 </template>
 
 <script lang="ts">
-import { calculateRootFileSystem } from "@threefold/grid_client";
+import { calculateRootFileSystem, GridClient } from "@threefold/grid_client";
 import type AwaitLock from "await-lock";
 import { computed, type PropType } from "vue";
 
+import { useGrid } from "@/stores";
 import type { SelectedMachine } from "@/types/nodeSelector";
 import { manual } from "@/utils/manual";
 
@@ -123,6 +124,10 @@ export default {
     nodesLock: Object as PropType<AwaitLock>,
   },
   setup(props) {
+    const gridStore = useGrid();
+    const grid = gridStore.client as GridClient;
+    const rentedBy = computed(() => (props.modelValue.rentedByMe ? grid.twinId : undefined));
+
     const rootFilesystemSize = computed(() => {
       const { cpu = 0, memory = 0 } = props.modelValue.solution || {};
       return calculateRootFileSystem({
@@ -141,7 +146,7 @@ export default {
       }, [] as SelectedMachine[]);
     });
 
-    return { rootFilesystemSize, manual, selectedMachines };
+    return { rootFilesystemSize, manual, selectedMachines, rentedBy };
   },
 };
 </script>

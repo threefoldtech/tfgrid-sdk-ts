@@ -6,7 +6,7 @@
     :disk="disks.reduce((total, disk) => total + disk.size, rootFilesystemSize)"
     :ipv4="ipv4"
     :dedicated="dedicated"
-    :rentedByMe="rentedByMe"
+    :rentedBy="rentedBy"
     :SelectedNode="selectionDetails?.node"
     :valid-filters="selectionDetails?.validFilters"
     title-image="images/icons/nostr.png"
@@ -65,7 +65,7 @@
             ipv6,
             certified,
             dedicated,
-            rentedByMe,
+            rentedBy,
             cpu: solution?.cpu,
             ssdDisks: disks.map(disk => disk.size),
             solutionDisk: solution?.disk,
@@ -111,6 +111,7 @@ const { ipv4, ipv6, planetary, mycelium, wireguard } = useNetworks();
 const disks = ref<Disk[]>([]);
 const dedicated = ref(false);
 const rentedByMe = ref(false);
+const rentedBy = computed(() => (rentedByMe.value ? grid.twinId : undefined));
 const certified = ref(false);
 const rootFilesystemSize = computed(() => solution.value?.disk);
 const selectedSSHKeys = ref("");
@@ -172,7 +173,7 @@ async function deploy() {
           publicIpv6: ipv6.value,
           rootFilesystemSize: rootFilesystemSize.value,
           nodeId: selectionDetails.value?.node?.nodeId,
-          rentedByMe: rentedByMe.value,
+          rentedBy: rentedBy.value,
           certified: certified.value,
         },
       ],

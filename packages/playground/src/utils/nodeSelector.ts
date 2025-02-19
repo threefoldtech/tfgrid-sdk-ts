@@ -186,7 +186,7 @@ export function normalizeNodeFilters(
   filters: SelectionDetailsFilters,
   options?: NormalizeNodeFiltersOptions,
 ): FilterOptions {
-  const bothRentalFiltersActive = filters.dedicated && filters.rentedByMe;
+  const bothRentalFiltersActive = filters.dedicated && filters.rentedBy;
 
   return {
     page: Math.max(1, options?.page || 1),
@@ -210,7 +210,7 @@ export function normalizeNodeFilters(
     gateway: options?.gateway,
     healthy: true,
     rentable: bothRentalFiltersActive ? undefined : filters.dedicated || undefined,
-    rentedBy: bothRentalFiltersActive ? undefined : filters.rentedByMe ? options?.twinId : undefined,
+    rentedBy: bothRentalFiltersActive ? undefined : filters.rentedBy ? options?.twinId : undefined,
     rentableOrRentedBy: bothRentalFiltersActive ? options?.twinId : undefined,
     planetary: filters.planetary,
     mycelium: filters.mycelium,

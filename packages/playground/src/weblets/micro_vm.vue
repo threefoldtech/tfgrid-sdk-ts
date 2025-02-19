@@ -7,7 +7,7 @@
     :disk="disks.reduce((total, disk) => total + disk.size, solution?.disk ?? 0)"
     :ipv4="ipv4"
     :dedicated="dedicated"
-    :rentedByMe="rentedByMe"
+    :rentedBy="rentedBy"
     :SelectedNode="selectionDetails?.node"
     :valid-filters="selectionDetails?.validFilters"
     title-image="images/icons/vm.png"
@@ -74,7 +74,7 @@
             ipv6,
             certified,
             dedicated,
-            rentedByMe,
+            rentedBy,
             cpu: solution?.cpu,
             ssdDisks: disks.map(disk => disk.size),
             memory: solution?.memory,
@@ -192,7 +192,7 @@
 </template>
 
 <script lang="ts" setup>
-import { type Ref, ref, watch } from "vue";
+import { computed, type Ref, ref, watch } from "vue";
 
 import { manual } from "@/utils/manual";
 
@@ -257,6 +257,7 @@ const envs = ref<Env[]>([]);
 const disks = ref<Disk[]>([]);
 const dedicated = ref(false);
 const rentedByMe = ref(false);
+const rentedBy = computed(() => (rentedByMe.value ? grid.twinId : undefined));
 const certified = ref(false);
 const selectionDetails = ref<SelectionDetails>();
 const selectedSSHKeys = ref("");
@@ -313,7 +314,7 @@ async function deploy() {
           publicIpv6: ipv6.value,
           rootFilesystemSize: solution.value?.disk,
           nodeId: selectionDetails.value?.node?.nodeId,
-          rentedByMe: rentedByMe.value,
+          rentedBy: rentedBy.value,
           certified: certified.value,
         },
       ],

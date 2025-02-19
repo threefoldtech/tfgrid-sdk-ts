@@ -129,7 +129,6 @@ export interface Machine {
   hasGPU?: boolean;
   certified?: boolean;
   rentedBy?: number;
-  rentedByMe?: boolean;
   nodeId?: number;
 }
 

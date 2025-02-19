@@ -21,7 +21,7 @@
       )
     "
     :ipv4="true"
-    :rentedByMe="leader.rentedByMe"
+    :rentedBy="leader.rentedBy"
     :dedicated="leader.dedicated"
     :SelectedNode="leader.selectionDetails?.node"
     :valid-filters="leader.selectionDetails?.validFilters"
@@ -206,7 +206,7 @@ function normalizeCaproverWorker(worker: CW, envs: Env[]): Machine {
     ],
     envs,
     nodeId: worker.selectionDetails!.node!.nodeId,
-    rentedByMe: worker.rentedByMe,
+    rentedBy: worker.dedicated ? profileManager.profile?.twinId : undefined,
     certified: worker.certified,
   };
 }

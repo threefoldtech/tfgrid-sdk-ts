@@ -6,7 +6,7 @@
     :disk="solution?.disk + rootFilesystemSize"
     :ipv4="ipv4"
     :dedicated="dedicated"
-    :rentedByMe="rentedByMe"
+    :rentedBy="rentedBy"
     :SelectedNode="selectionDetails?.node"
     :valid-filters="selectionDetails?.validFilters"
     title-image="images/icons/taiga.png"
@@ -119,7 +119,7 @@
             ipv6,
             certified,
             dedicated,
-            rentedByMe,
+            rentedBy,
             cpu: solution?.cpu,
             solutionDisk: solution?.disk,
             memory: solution?.memory,
@@ -183,6 +183,7 @@ const flist: Flist = {
 };
 const dedicated = ref(false);
 const rentedByMe = ref(false);
+const rentedBy = computed(() => (rentedByMe.value ? grid.twinId : undefined));
 const certified = ref(false);
 const { ipv4, ipv6, planetary, mycelium, wireguard } = useNetworks();
 const smtp = ref(createSMTPServer());
@@ -264,7 +265,7 @@ async function deploy() {
               : []),
           ],
           nodeId: selectionDetails.value!.node!.nodeId,
-          rentedByMe: rentedByMe.value,
+          rentedBy: rentedBy.value,
           certified: certified.value,
         },
       ],

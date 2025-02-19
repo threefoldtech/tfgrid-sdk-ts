@@ -5,7 +5,7 @@
     :memory="solution?.memory"
     :disk="(solution?.disk ?? 0) + rootFilesystemSize"
     :dedicated="dedicated"
-    :rentedByMe="rentedByMe"
+    :rentedBy="rentedBy"
     :ipv4="ipv4"
     :SelectedNode="selectionDetails?.node"
     :valid-filters="selectionDetails?.validFilters"
@@ -86,7 +86,7 @@
             ipv6,
             certified,
             dedicated,
-            rentedByMe,
+            rentedBy,
             cpu: solution?.cpu,
             solutionDisk: solution?.disk,
             memory: solution?.memory,
@@ -148,6 +148,7 @@ const { ipv4, ipv6, planetary, mycelium, wireguard } = useNetworks({ ipv4: true 
 const smtp = ref(createSMTPServer());
 const dedicated = ref(false);
 const rentedByMe = ref(false);
+const rentedBy = computed(() => (rentedByMe.value ? grid.twinId : undefined));
 const certified = ref(false);
 const rootFilesystemSize = computed(() =>
   calculateRootFileSystem({ CPUCores: solution.value?.cpu ?? 0, RAMInMegaBytes: solution.value?.memory ?? 0 }),
@@ -220,7 +221,7 @@ async function deploy() {
             { key: "FLASK_SECRET_KEY", value: generatePassword(8) },
           ],
           nodeId: selectionDetails.value!.node!.nodeId,
-          rentedByMe: rentedByMe.value,
+          rentedBy: rentedBy.value,
           certified: certified.value,
         },
       ],

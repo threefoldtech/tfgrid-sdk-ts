@@ -109,7 +109,7 @@
         ipv4: $props.modelValue.ipv4,
         certified: $props.modelValue.certified,
         dedicated: $props.modelValue.dedicated,
-        rentedByMe: $props.modelValue.rentedByMe,
+        rentedBy,
         cpu: $props.modelValue.cpu,
         ssdDisks: [$props.modelValue.diskSize],
         memory: $props.modelValue.memory,
@@ -124,10 +124,11 @@
 </template>
 
 <script lang="ts">
-import { calculateRootFileSystem } from "@threefold/grid_client";
+import { calculateRootFileSystem, GridClient } from "@threefold/grid_client";
 import type AwaitLock from "await-lock";
 import { computed, type PropType } from "vue";
 
+import { useGrid } from "@/stores";
 import type { SelectedMachine } from "@/types/nodeSelector";
 import { manual } from "@/utils/manual";
 
@@ -149,7 +150,7 @@ export function createWorker(name: string = generateName({ prefix: "wr" })): K8S
     wireguard: true,
     rootFsSize: 2,
     dedicated: false,
-    rentedByMe: false,
+    rentedBy: undefined,
     certified: false,
   };
 }
@@ -184,6 +185,9 @@ export default {
     nodesLock: Object as PropType<AwaitLock>,
   },
   setup(props) {
+    const gridStore = useGrid();
+    const grid = gridStore.client as GridClient;
+    const rentedBy = computed(() => (props.modelValue.rentedByMe ? grid.twinId : undefined));
     const selectedMachines = computed(() => {
       return props.otherWorkers.reduce((res, worker) => {
         const machine = toMachine(worker);
@@ -194,7 +198,7 @@ export default {
       }, [] as SelectedMachine[]);
     });
 
-    return { calculateRootFileSystem, manual, selectedMachines };
+    return { calculateRootFileSystem, manual, selectedMachines, rentedBy };
   },
 };
 </script>

@@ -6,7 +6,7 @@
     :disk="storage + (type === 'indexer' ? 50 : 0)"
     :ipv4="ipv4"
     :dedicated="dedicated"
-    :rentedByMe="rentedByMe"
+    :rentedBy="rentedBy"
     :SelectedNode="selectionDetails?.node"
     :valid-filters="selectionDetails?.validFilters"
     title-image="images/icons/algorand.png"
@@ -95,7 +95,7 @@
           ipv6,
           certified,
           dedicated,
-          rentedByMe,
+          rentedBy,
           cpu,
           ssdDisks: [storage],
           solutionDisk: type === 'indexer' ? 50 : undefined,
@@ -149,6 +149,7 @@ const firstRound = ref(24000000);
 const lastRound = ref(26000000);
 const dedicated = ref(false);
 const rentedByMe = ref(false);
+const rentedBy = computed(() => (rentedByMe.value ? grid.twinId : undefined));
 const certified = ref(false);
 const rootFilesystemSize = computed(() => storage.value);
 const selectionDetails = ref<SelectionDetails>();
@@ -196,7 +197,7 @@ async function deploy() {
           mycelium: mycelium.value,
           planetary: planetary.value,
           nodeId: selectionDetails.value!.node!.nodeId,
-          rentedByMe: rentedByMe.value,
+          rentedBy: rentedBy.value,
           certified: certified.value,
 
           envs: [

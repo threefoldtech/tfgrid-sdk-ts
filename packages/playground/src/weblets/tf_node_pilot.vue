@@ -5,7 +5,7 @@
     :memory="solution?.memory"
     :disk="solution?.disk"
     :dedicated="dedicated"
-    :rentedByMe="rentedByMe"
+    :rentedBy="rentedBy"
     ipv4
     :SelectedNode="selectionDetails?.node"
     :valid-filters="selectionDetails?.validFilters"
@@ -63,7 +63,7 @@
           ipv4: ipv4,
           certified,
           dedicated,
-          rentedByMe,
+          rentedBy,
           cpu: solution?.cpu,
           memory: solution?.memory,
           solutionDisk: solution?.disk,
@@ -91,7 +91,7 @@
 </template>
 
 <script lang="ts" setup>
-import { type Ref, ref } from "vue";
+import { computed, type Ref, ref } from "vue";
 
 import { manual } from "@/utils/manual";
 
@@ -113,6 +113,7 @@ const flist: Flist = {
 const { ipv4, ipv6, planetary, mycelium, wireguard } = useNetworks({ ipv4: true, ipv6: true });
 const dedicated = ref(false);
 const rentedByMe = ref(false);
+const rentedBy = computed(() => (rentedByMe.value ? grid.twinId : undefined));
 const certified = ref(false);
 const rootFilesystemSize = 2;
 const selectedSSHKeys = ref("");
@@ -176,7 +177,7 @@ async function deploy() {
             },
           ],
           nodeId: selectionDetails.value!.node!.nodeId,
-          rentedByMe: rentedByMe.value,
+          rentedBy: rentedBy.value,
           certified: certified.value,
         },
       ],

@@ -5,7 +5,7 @@
     :memory="solution?.memory"
     :disk="disks.reduce((total, disk) => total + disk.size, solution?.disk + 2)"
     :ipv4="ipv4"
-    :rentedByMe="rentedByMe"
+    :rentedBy="rentedBy"
     :dedicated="dedicated"
     :SelectedNode="selectionDetails?.node"
     :valid-filters="selectionDetails?.validFilters"
@@ -80,7 +80,7 @@
             hasGPU,
             certified,
             dedicated,
-            rentedByMe,
+            rentedBy,
             cpu: solution?.cpu,
             ssdDisks: disks.map(disk => disk.size),
             solutionDisk: solution?.disk,
@@ -205,6 +205,7 @@ const rentedByMe = ref(false);
 const certified = ref(false);
 const disks = ref<Disk[]>([]);
 const hasGPU = ref(false);
+const rentedBy = computed(() => (rentedByMe.value ? grid.twinId : undefined));
 const rootFilesystemSize = computed(() =>
   flist.value?.name === "Ubuntu-24.04" || flist.value?.name === "Other" ? solution.value?.disk : 2,
 );
@@ -273,7 +274,7 @@ async function deploy() {
           hasGPU: hasGPU.value,
           nodeId: selectionDetails.value?.node?.nodeId,
           gpus: hasGPU.value ? selectionDetails.value?.gpuCards.map(card => card.id) : undefined,
-          rentedByMe: rentedByMe.value,
+          rentedBy: rentedBy.value,
           certified: certified.value,
         },
       ],

@@ -6,7 +6,7 @@
     :disk="rootFilesystemSize + dockerDiskSize"
     :ipv4="ipv4"
     :dedicated="dedicated"
-    :rentedByMe="rentedByMe"
+    :rentedBy="rentedBy"
     :SelectedNode="selectionDetails?.node"
     :valid-filters="selectionDetails?.validFilters"
     title-image="images/icons/presearch.png"
@@ -82,7 +82,7 @@
             ipv6,
             certified,
             dedicated,
-            rentedByMe,
+            rentedBy,
             cpu,
             ssdDisks: [dockerDiskSize],
             memory,
@@ -125,7 +125,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from "vue";
+import { computed, ref } from "vue";
 
 import { manual } from "@/utils/manual";
 
@@ -154,6 +154,7 @@ const flist: Flist = {
 };
 const dedicated = ref(false);
 const rentedByMe = ref(false);
+const rentedBy = computed(() => (rentedByMe.value ? grid.twinId : undefined));
 const certified = ref(false);
 const selectionDetails = ref<SelectionDetails>();
 const selectedSSHKeys = ref("");
@@ -211,7 +212,7 @@ async function deploy() {
           ],
           rootFilesystemSize,
           nodeId: selectionDetails.value!.node!.nodeId,
-          rentedByMe: rentedByMe.value,
+          rentedBy: rentedBy.value,
           certified: certified.value,
         },
       ],
