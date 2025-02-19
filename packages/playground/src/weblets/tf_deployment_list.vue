@@ -205,6 +205,10 @@
             icon="mdi-eye-outline"
             @click="openDialog(tabs[activeTab].value, item)"
           />
+
+          <IconActionBtn icon="mdi-cog" tooltip="Access Domain" @click="dialog = item.name" />
+
+          <ManageGatewayDialog v-if="dialog === item.name" :vm="item" @close="dialog = undefined" />
         </template>
 
         <template #Nextcloud-actions="{ item }">
