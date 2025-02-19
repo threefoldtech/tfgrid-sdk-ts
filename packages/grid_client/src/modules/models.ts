@@ -631,7 +631,7 @@ class FilterOptions {
   @Expose() @IsOptional() @IsInt() @Min(1) availableFor?: number;
   @Expose() @IsOptional() @IsInt() page?: number;
   @Expose() @IsOptional() @IsInt() size?: number;
-  @Expose() @IsOptional() @IsInt() rentedBy?: number;
+  @Expose() @IsOptional() @IsInt() @Min(1) rentedBy?: number;
   @Expose() @IsOptional() @IsBoolean() hasGPU?: boolean;
   @Expose() @IsOptional() @IsBoolean() rentable?: boolean;
   @Expose() @IsOptional() @IsBoolean() randomize?: boolean;
