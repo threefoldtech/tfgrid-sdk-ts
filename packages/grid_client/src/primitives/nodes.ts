@@ -372,6 +372,12 @@ class Nodes {
   async filterNodes(options: FilterOptions = {}, url = ""): Promise<NodeInfo[]> {
     let nodes: NodeInfo[] = [];
     url = url || this.proxyURL;
+    /* 
+    this is tmp solution to exclude node 11 and 259 on dev net only and should be removed when the issue is fixed; tracked in https://github.com/threefoldtech/tfgrid-sdk-ts/issues/3855
+    */
+    const TMP_EXCLUDED_NODES = [11, 259];
+    if (url.includes("dev"))
+      options.nodeExclude = options.nodeExclude ? [...options.nodeExclude, ...TMP_EXCLUDED_NODES] : TMP_EXCLUDED_NODES;
     options.features = this.getFeaturesFromFilters(options);
     const query = this.getNodeUrlQuery(options);
     nodes = await send("get", urlJoin(url, `/nodes?${query}`), "", {});
@@ -460,12 +466,13 @@ class Nodes {
       healthy: options.healthy,
       sort_by: SortBy.FreeCRU,
       sort_order: SortOrder.Desc,
+      node_id: options.nodeId,
+      rentable_or_rented_by: options.rentableOrRentedBy,
       features: options.features,
     };
 
     if (options.gateway) {
       params["ipv4"] = true;
-      params["ipv6"] = true;
       params["domain"] = true;
     }
     return convertObjectToQueryString(params);

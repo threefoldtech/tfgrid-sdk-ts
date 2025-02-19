@@ -128,7 +128,7 @@ export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
 
   const data = vms.map((vm, index) => {
     for (let i = 0; i < vm.length; i++) {
-      vm[i].billing = formatConsumption(consumptions[index] as number);
+      vm[i].billing = formatConsumption(consumptions[index]?.amountBilled as number);
       if (wireguards[index] && wireguards[index].length > 0) {
         vm[i].wireguard = wireguards[index][0];
       }
@@ -235,7 +235,7 @@ export async function loadK8s(grid: GridClient) {
     ),
   );
   const data = k8s.map((cluster, index) => {
-    cluster.masters[0].billing = formatConsumption(consumptions[index] as number);
+    cluster.masters[0].billing = formatConsumption(consumptions[index]?.amountBilled as number);
 
     if (wireguards && wireguards[index]) {
       cluster.wireguard = wireguards[index][0];

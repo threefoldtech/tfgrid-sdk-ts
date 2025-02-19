@@ -390,6 +390,10 @@ class ContractConsumption {
   @Expose() @IsInt() @Min(1) id: number;
 }
 
+class ContractDiscountPackage {
+  @Expose() @IsInt() @Min(1) id: number;
+}
+
 class ContractLockModel extends ContractConsumption {}
 
 class TwinCreateModel {
@@ -620,6 +624,7 @@ class FilterOptions {
   @Expose() @IsOptional() @IsInt({ each: true }) @Min(1, { each: true }) nodeExclude?: number[];
   @Expose() @IsOptional() @IsInt({ each: true }) @Min(1, { each: true }) farmIds?: number[];
   @Expose() @IsOptional() @IsInt() @Min(1) farmId?: number;
+  @Expose() @IsOptional() @IsInt() @Min(1) nodeId?: number;
   @Expose() @IsOptional() @IsString() farmName?: string;
   @Expose() @IsOptional() @IsString() country?: string;
   @Expose() @IsOptional() @IsString() city?: string;
@@ -635,6 +640,7 @@ class FilterOptions {
   @Expose() @IsOptional() @Transform(({ value }) => NodeStatus[value]) @IsEnum(NodeStatus) status?: NodeStatus;
   @Expose() @IsOptional() @IsString() region?: string;
   @Expose() @IsOptional() @IsBoolean() healthy?: boolean;
+  @Expose() @IsOptional() @IsInt() rentableOrRentedBy?: number;
   @Expose() @IsOptional() @IsBoolean() planetary?: boolean;
   @Expose() @IsOptional() @IsBoolean() mycelium?: boolean;
   @Expose() @IsOptional() @IsBoolean() wireguard?: boolean;
@@ -974,6 +980,7 @@ export {
   ContractsByTwinId,
   ContractsByAddress,
   ContractConsumption,
+  ContractDiscountPackage,
   ContractLockModel,
   TwinCreateModel,
   TwinGetModel,

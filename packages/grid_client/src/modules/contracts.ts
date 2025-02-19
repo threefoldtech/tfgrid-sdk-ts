@@ -10,7 +10,9 @@ import { GridClientError } from "@threefold/types";
 import * as PATH from "path";
 
 import {
+  Consumption,
   ContractsOverdue,
+  type DiscountLevel,
   GqlContracts,
   GqlNameContract,
   GqlNodeContract,
@@ -31,6 +33,7 @@ import {
   BatchCancelContractsModel,
   ContractCancelModel,
   ContractConsumption,
+  ContractDiscountPackage,
   ContractGetByNodeIdAndHashModel,
   ContractGetModel,
   ContractLockModel,
@@ -523,19 +526,32 @@ class Contracts {
   async setDedicatedNodeExtraFee(options: SetDedicatedNodeExtraFeesModel) {
     return (await this.client.contracts.setDedicatedNodeExtraFee(options)).apply();
   }
-
   /**
-   * Get contract consumption per hour in TFT.
-   *
-   * @param  {ContractConsumption} options
-   * @returns {Promise<number>}
+   * Get contract discount package
+   * @param {ContractDiscountPackage} options
+   * @returns {Promie<DiscountLevel>}
    * @decorators
    * - `@expose`: Exposes the method for external use.
    * - `@validateInput`: Validates the input options.
    */
   @expose
   @validateInput
-  async getConsumption(options: ContractConsumption): Promise<number> {
+  async getDiscountPackage(options: ContractDiscountPackage): Promise<DiscountLevel> {
+    return this.client.contracts.getDiscountPackage({ id: options.id, graphqlURL: this.config.graphqlURL });
+  }
+  /**
+   * Get the contract consumption details per hour in TFT.
+   *
+   * @param  {ContractConsumption} options - The contract consumption parameters.
+   * @returns {Promise<Consumption>} A promise resolving to the consumption details,
+   * including the amount billed and the discount received.
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   */
+  @expose
+  @validateInput
+  async getConsumption(options: ContractConsumption): Promise<Consumption> {
     return this.client.contracts.getConsumption({ id: options.id, graphqlURL: this.config.graphqlURL });
   }
 

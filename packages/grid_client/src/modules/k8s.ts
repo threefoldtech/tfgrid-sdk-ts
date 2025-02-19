@@ -143,13 +143,14 @@ class K8sModule extends BaseModule {
         throw new ValidationError(`Another master with the same name ${master.name} already exists.`);
       masters_names.push(master.name);
 
-      if (network) break;
       // Sets the network and contractMetadata based on the node's zos version
       const nodeTwinId = await this.capacity.getNodeTwinId(master.node_id);
       const features = await this.rmb.request([nodeTwinId], "zos.system.node_features_get", "", 20, 3);
       if (features.some(item => item.includes("zmachine-light") || item.includes("network-light"))) {
-        network = new ZNetworkLight(options.network.name, options.network.ip_range, this.config);
-        await network.load();
+        if (!network) {
+          network = new ZNetworkLight(options.network.name, options.network.ip_range, this.config);
+          await network.load();
+        }
         contractMetadata = JSON.stringify({
           version: 4,
           type: "kubernetes",
@@ -157,8 +158,10 @@ class K8sModule extends BaseModule {
           projectName: this.config.projectName || `kubernetes/${options.name}`,
         });
       } else {
-        network = new Network(options.network.name, options.network.ip_range, this.config);
-        await network.load();
+        if (!network) {
+          network = new Network(options.network.name, options.network.ip_range, this.config);
+          await network.load();
+        }
         contractMetadata = JSON.stringify({
           version: 3,
           type: "kubernetes",
@@ -219,12 +222,13 @@ class K8sModule extends BaseModule {
         throw new ValidationError(`Another worker with the same name ${worker.name} already exists.`);
       workers_names.push(worker.name);
 
-      if (network) break;
       const nodeTwinId = await this.capacity.getNodeTwinId(worker.node_id);
       const features = await this.rmb.request([nodeTwinId], "zos.system.node_features_get", "", 20, 3);
       if (features.some(item => item.includes("zmachine-light") || item.includes("network-light"))) {
-        network = new ZNetworkLight(options.network.name, options.network.ip_range, this.config);
-        await network.load();
+        if (!network) {
+          network = new ZNetworkLight(options.network.name, options.network.ip_range, this.config);
+          await network.load();
+        }
         contractMetadata = JSON.stringify({
           version: 4,
           type: "kubernetes",
@@ -232,8 +236,10 @@ class K8sModule extends BaseModule {
           projectName: this.config.projectName || `kubernetes/${options.name}`,
         });
       } else {
-        network = new Network(options.network.name, options.network.ip_range, this.config);
-        await network.load();
+        if (!network) {
+          network = new Network(options.network.name, options.network.ip_range, this.config);
+          await network.load();
+        }
         contractMetadata = JSON.stringify({
           version: 3,
           type: "kubernetes",
