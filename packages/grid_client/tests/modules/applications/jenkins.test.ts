@@ -110,6 +110,7 @@ test("TC2953 - Applications: Deploy Jenkins", async () => {
             mountpoint: mountPoint,
           },
         ],
+        // Changed flist from the Gitea one to the Jenkins one
         flist: "https://hub.grid.tf/tf-official-apps/jenkins-latest.flist",
         entrypoint: "/sbin/zinit init",
         public_ip: publicIp,
@@ -139,7 +140,8 @@ test("TC2953 - Applications: Deploy Jenkins", async () => {
   log(result);
 
   // Gateway Backend Configuration
-  const backends = ["http://[" + result[0].planetary + "]:80"];
+  // Changed port from 80 to 8080
+  const backends = ["http://[" + result[0].planetary + "]:8080"];
   log(backends);
 
   // Gateway Model
@@ -164,7 +166,8 @@ test("TC2953 - Applications: Deploy Jenkins", async () => {
   expect(gatewayResult[0].backends).toStrictEqual(backends);
 
   // Gateway reachability check
-  const site = "http://" + gatewayResult[0].domain + "/login?from=%2F";
+  // Updated the URL to use port 8080
+  const site = "http://" + gatewayResult[0].domain + ":8080";
   log(`Testing Gateway URL: ${site}`);
   let reachable = false;
 
