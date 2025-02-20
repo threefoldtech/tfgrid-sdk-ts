@@ -139,7 +139,7 @@ test("TC2953 - Applications: Deploy Jenkins", async () => {
   log(result);
 
   // Gateway Backend Configuration
-  const backends = ["http://[" + result[0].planetary + "]:8080"];
+  const backends = ["http://[" + result[0].planetary + "]:80"];
   log(backends);
 
   // Gateway Model
@@ -164,7 +164,7 @@ test("TC2953 - Applications: Deploy Jenkins", async () => {
   expect(gatewayResult[0].backends).toStrictEqual(backends);
 
   // Gateway reachability check
-  const site = "http://" + gatewayResult[0].domain + ":8080";
+  const site = "http://" + gatewayResult[0].domain + "/login?from=%2F";
   log(`Testing Gateway URL: ${site}`);
   let reachable = false;
 
