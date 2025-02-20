@@ -210,7 +210,7 @@ export function normalizeNodeFilters(
     gateway: options?.gateway,
     healthy: true,
     rentable: bothRentalFiltersActive ? undefined : filters.dedicated || undefined,
-    rentedBy: bothRentalFiltersActive ? undefined : filters.rentedBy ? options?.twinId : undefined,
+    rentedBy: bothRentalFiltersActive ? undefined : filters.rentedBy || undefined,
     rentableOrRentedBy: bothRentalFiltersActive ? options?.twinId : undefined,
     planetary: filters.planetary,
     mycelium: filters.mycelium,
