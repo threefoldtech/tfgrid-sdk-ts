@@ -253,17 +253,26 @@ export default {
       if (!_domain) return ValidatorStatus.Init;
 
       switch (true) {
-        case _domain.valid.value:
+        case _domain.valid as unknown as boolean:
           return ValidatorStatus.Valid;
-        case _domain.invalid.value:
+        case _domain.invalid as unknown as boolean:
           return ValidatorStatus.Invalid;
-        case _domain.pending.value:
+        case _domain.pending as unknown as boolean:
           return ValidatorStatus.Pending;
         default:
           return ValidatorStatus.Init;
       }
     });
-
+    // const status = computed(() => {
+    //   console.log(
+    //     domainFormRef.value?.valid,domainFormRef.value?.init,domainFormRef.value?.invalid,domainFormRef.value?.pending
+    //   )
+    //   if (!domainFormRef?.value) return ValidatorStatus.Init;
+    //   if (domainFormRef.value?.valid) return ValidatorStatus.Valid;
+    //   if (domainFormRef.value?.invalid) return ValidatorStatus.Invalid;
+    //   if (domainFormRef.value?.pending) return ValidatorStatus.Pending;
+    //   else return ValidatorStatus.Init;
+    // });
     watch(status, () => bindStatus(status.value), { immediate: true });
 
     return {
