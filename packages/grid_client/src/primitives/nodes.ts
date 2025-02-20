@@ -460,7 +460,7 @@ class Nodes {
       healthy: options.healthy,
       sort_by: SortBy.FreeCRU,
       sort_order: SortOrder.Desc,
-      rentableOrRentedBy: options.rentableOrRentedBy,
+      rentable_or_rented_by: options.rentableOrRentedBy,
       features: options.features,
     };
 
