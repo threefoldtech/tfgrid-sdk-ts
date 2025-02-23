@@ -303,26 +303,8 @@ export default {
 
     const nodeInputValidateTask = useAsync<boolean, string, [NodeInfo | undefined]>(
       async node => {
-        try {
-          if (node && node.rentContractId !== 0) {
-            const { state } = await gridStore.grid.contracts.get({
-              id: node?.rentContractId,
-            });
-            if (state.gracePeriod) {
-              const err = `You can't deploy on node ${node.nodeId}, its rent contract is in grace period.`;
-              throw err;
-            }
-          }
-        } catch (error) {
-          const err = normalizeError(
-            error,
-            "Something went wrong while checking status of the node. Please check your connection and try again.",
-          );
-          throw err;
-        }
-
         const nodeCapacityValid = await checkNodeCapacityPool(gridStore, node, props.filters);
-        const rentContractValid = props.filters.dedicated ? await validateRentContract(gridStore, node) : true;
+        const rentContractValid = await validateRentContract(gridStore, node);
 
         if (node && !isNodeValid(props.getFarm, node!, props.selectedMachines, filters.value)) {
           throw `Node (${node.nodeId}) is not valid.`;

@@ -357,14 +357,8 @@ export default {
     });
 
     async function handleNodeClick() {
-      try {
-        if (props.status === "Init" && props.node) {
-          ctx.emit("node:select", props.node as NodeInfo);
-        }
-        if (props.node?.dedicated && props.node.rentContractId === 0) return false;
-        await validateRentContract(gridStore, props.node as NodeInfo);
-      } catch (error) {
-        return error;
+      if (props.status === "Init" && props.node) {
+        ctx.emit("node:select", props.node as NodeInfo);
       }
     }
 

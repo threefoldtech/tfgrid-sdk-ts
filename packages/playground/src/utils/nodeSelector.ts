@@ -224,6 +224,7 @@ export async function validateRentContract(
   if (!node || !node.nodeId) {
     throw "Node ID is required.";
   }
+  if (node.dedicated && node.rentedByTwinId === 0 && !node.inDedicatedFarm) return true;
 
   try {
     if (node.dedicated && node.rentedByTwinId === 0 && node.inDedicatedFarm) {
