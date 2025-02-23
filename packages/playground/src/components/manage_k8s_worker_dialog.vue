@@ -6,6 +6,7 @@
     @close="$emit('close')"
     @deploy="deploy"
     @delete="onDelete"
+    @back="worker = createWorker()"
   >
     <template #title>Manage Kubernetes({{ data.deploymentName }}) Workers</template>
 
@@ -43,7 +44,7 @@
     </template>
 
     <template #deploy>
-      <K8SWorker v-model="worker" />
+      <K8SWorker :key="worker._id" v-model="worker" />
     </template>
   </ManageWorkerDialog>
 </template>

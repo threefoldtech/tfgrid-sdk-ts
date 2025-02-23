@@ -2,7 +2,7 @@
   <section>
     <h6 class="text-h5 mb-4 mt-2" v-if="!hideTitle">Domain Name</h6>
 
-    <input-tooltip tooltip="Use a custom domain">
+    <input-tooltip tooltip="Use a custom domain" align-center>
       <div>
         <VSwitch color="primary" inset label="Custom Domain" v-model="enableCustomDomain" hide-details />
       </div>
@@ -94,7 +94,7 @@
 </template>
 
 <script lang="ts">
-import type { FarmInfo, FilterOptions, NodeInfo } from "@threefold/grid_client";
+import { type FarmInfo, Features, type FilterOptions, type NodeInfo } from "@threefold/grid_client";
 import { noop } from "lodash";
 import { computed, getCurrentInstance, nextTick, onUnmounted, type PropType, ref, watch } from "vue";
 import { onMounted } from "vue";
@@ -106,7 +106,7 @@ import type { InputValidatorService } from "@/hooks/input_validator";
 import { useAsync, usePagination, useWatchDeep } from "../../hooks";
 import { useForm, ValidatorStatus } from "../../hooks/form_validator";
 import { useGrid } from "../../stores";
-import type { DomainInfo, SelectionDetailsFilters } from "../../types/nodeSelector";
+import type { DomainInfo, NetworkFeatures, SelectionDetailsFilters } from "../../types/nodeSelector";
 import { getNodePageCount, loadNodes } from "../../utils/nodeSelector";
 
 export default {
@@ -121,6 +121,11 @@ export default {
     hideTitle: Boolean,
     status: String as PropType<ValidatorStatus>,
     useFqdn: Boolean,
+    interfaces: {
+      type: Array as PropType<NetworkFeatures[]>,
+      required: false,
+      default: () => [],
+    },
   },
   emits: {
     "update:model-value": (domain?: DomainInfo) => true || domain,
@@ -148,6 +153,8 @@ export default {
       page: Math.max(1, pagination.value.page),
       farmId: enableCustomDomain.value ? props.farm?.farmId : undefined,
       availableFor: gridStore.client?.twinId,
+      features: props.interfaces.filter(i => i != Features.ip),
+      hasIPv6: props.interfaces.some(i => i === Features.ip) || undefined,
     }));
     const selectedDomain = ref<NodeInfo | null>(null);
     const loadDomains = () => domainsTask.value.run(gridStore, filters.value);

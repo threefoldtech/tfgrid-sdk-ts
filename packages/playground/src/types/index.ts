@@ -15,6 +15,13 @@ export type InputFilterType = {
   type: string;
 };
 
+export enum NetworkFeatures {
+  ip = "IP",
+  mycelium = "Mycelium",
+  wireguard = "Wireguard",
+  yggdrasil = "Planetary",
+}
+
 export type CPUBenchmark = {
   multi: number;
   single: number;
@@ -51,6 +58,7 @@ export interface FarmingProfileOptions {
   nuRequiredPerCu: number;
 }
 export interface K8SWorker {
+  _id: number;
   name: string;
   cpu: number;
   memory: number;
@@ -69,6 +77,7 @@ export interface K8SWorker {
 }
 
 export interface CaproverWorker {
+  _id: number;
   name: string;
   solution?: solutionFlavor;
   dedicated?: boolean;

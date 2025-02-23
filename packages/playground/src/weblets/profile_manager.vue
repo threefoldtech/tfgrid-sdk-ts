@@ -429,6 +429,7 @@ import { validateMnemonic } from "bip39";
 import Cryptr from "cryptr";
 import { marked } from "marked";
 import md5 from "md5";
+import urlJoin from "url-join";
 import { computed, onMounted, type Ref, ref, watch } from "vue";
 import { nextTick } from "vue";
 import { useTheme } from "vuetify";
@@ -832,45 +833,36 @@ function validateConfirmPassword(value: string) {
   }
 }
 
-function parseAcceptTermsImage(tempDiv: HTMLDivElement, url: string) {
-  const imageElements = tempDiv.querySelectorAll("img");
-  imageElements.forEach(imgElement => {
-    imgElement.setAttribute("src", url + "legal__legal_header_.jpg");
-    // Update the style of the image.
-    imgElement.setAttribute("class", "info-legal-image");
+const replaceMarkdownLinks = (content: string, pattern: RegExp, baseUrl: string) => {
+  return content.replace(pattern, (_, linkText, path) => {
+    const relativePath = path.replace("./", "");
+    return `[${linkText}](${urlJoin(baseUrl, `${relativePath}.html`)})`;
   });
-}
+};
 
-function parseAcceptTermsLink(tempDiv: HTMLDivElement) {
-  const url = "https://library.threefold.me/info/legal#";
-  const linkElements = tempDiv.querySelectorAll("a");
-  linkElements.forEach(linkElement => {
-    const currentDomainMatch = linkElement.href.match(/^(https?:\/\/[^\\/]+)/);
-    if (
-      (currentDomainMatch && linkElement.href.includes("localhost")) ||
-      (currentDomainMatch && linkElement.href.includes("dashboard")) // To update only internal links
-    ) {
-      const currentDomain = currentDomainMatch[1];
-      linkElement.href = linkElement.href.replace(currentDomain, url);
-    }
-  });
-}
+const processMarkdownContent = (content: string, baseUrl: string) => {
+  let processedContent = content.replace(
+    "./" + manual.legal_header_img,
+    `${manual.manual_raw_legal_img}" class="info-legal-image`
+  );
+  
+  const patterns = [/\[([^\]]+)\]\((\.\/[^)]+)\.md\)/g, /\[([^\]]+)\]\((\.\/[^)]+\/[^)]+)\.md\)/g];
+
+  for (const pattern of patterns) {
+    processedContent = replaceMarkdownLinks(processedContent, pattern, baseUrl);
+  }
+
+  return processedContent;
+};
+
 watch(openAcceptTerms, async () => {
   if (openAcceptTerms.value) {
     try {
-      const url = "https://library.threefold.me/info/legal/";
-      const response = await fetch(url + "readme.md");
+      const response = await fetch(manual.manual_raw_legal);
       const mdContent = await response.text();
-      const parsedContent = marked.parse(mdContent);
 
-      const tempDiv = document.createElement("div");
-      tempDiv.innerHTML = parsedContent;
-
-      parseAcceptTermsImage(tempDiv, url);
-      parseAcceptTermsLink(tempDiv);
-
-      const updatedHtmlContent = tempDiv.innerHTML;
-      acceptTermsContent.value = updatedHtmlContent;
+      const processedContent = processMarkdownContent(mdContent, manual.manual_legal_base);
+      acceptTermsContent.value = marked.parse(processedContent);
     } catch (error) {
       console.error("Error fetching or parsing Markdown content:", error);
     } finally {

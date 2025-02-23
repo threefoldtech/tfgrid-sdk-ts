@@ -43,7 +43,6 @@
 
             <VAlert v-else type="error" text="No Nodes were found!" />
           </VContainer>
-
           <div
             ref="nodesContainer"
             :style="{
@@ -61,6 +60,7 @@
                   v-model:node="loadedNodes[index]"
                   :selected="!validFilters || filtersUpdated ? false : $props.modelValue === node"
                   selectable
+                  @update:node="updateNode($event as NodeInfo)"
                   @node:select="bindModelValueAndValidate"
                   :status="
                     $props.modelValue === node
@@ -218,7 +218,10 @@ export default {
       },
       default: [],
     });
-
+    function updateNode(node: NodeInfo) {
+      _loadedNodes.value = loadedNodes.value.map(n => (n.nodeId === node.nodeId ? node : n));
+      _setValidNode(node.nodeId);
+    }
     async function _setValidNode(oldNodeId?: number) {
       const node = await selectValidNode(
         gridStore,
@@ -386,7 +389,7 @@ export default {
       loadingError,
       filtersUpdated,
       nodeInputValidateTask,
-
+      updateNode,
       touched,
       bindModelValueAndValidate,
       bindStatus,

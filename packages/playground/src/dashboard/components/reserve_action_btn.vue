@@ -99,7 +99,13 @@ export default {
     function removeReserve() {
       openUnreserveDialog.value = true;
     }
-
+    async function postActionHandler() {
+      notifyDelaying();
+      disableButton.value = true;
+      await new Promise(resolve => setTimeout(resolve, 20000));
+      const node = await gridStore.client.capacity.filterNodes({ nodeId: +props.node.nodeId });
+      emit("update:node", node[0]);
+    }
     async function unReserveNode() {
       loadingUnreserveNode.value = true;
       try {
@@ -118,13 +124,7 @@ export default {
           loadingUnreserveNode.value = false;
           openUnreserveDialog.value = false;
           loadingUnreserveBtn.value = true;
-          notifyDelaying();
-          disableButton.value = true;
-          setTimeout(() => {
-            disableButton.value = false;
-            loadingUnreserveBtn.value = false;
-            emit("updateTable");
-          }, 20000);
+          await postActionHandler();
         }
       } catch (e) {
         if (e instanceof InsufficientBalanceError) {
@@ -135,6 +135,9 @@ export default {
         }
         loadingUnreserveNode.value = false;
         openUnreserveDialog.value = false;
+      } finally {
+        disableButton.value = false;
+        loadingUnreserveNode.value = false;
       }
     }
 
@@ -148,13 +151,7 @@ export default {
           if (props.node.status === "standby") {
             createCustomToast(`It might take a while for node ${props.node.nodeId} status to be up`, ToastType.warning);
           }
-          notifyDelaying();
-          disableButton.value = true;
-          setTimeout(() => {
-            disableButton.value = false;
-            loadingReserveNode.value = false;
-            emit("updateTable");
-          }, 20000);
+          await postActionHandler();
         } else {
           createCustomToast("Please Login first to continue.", ToastType.danger);
         }
@@ -165,6 +162,8 @@ export default {
           console.log(e);
           createCustomToast("Failed to create rent contract.", ToastType.danger);
         }
+      } finally {
+        disableButton.value = false;
         loadingReserveNode.value = false;
       }
     }
