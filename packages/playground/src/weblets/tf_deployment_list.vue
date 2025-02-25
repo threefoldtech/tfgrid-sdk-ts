@@ -206,9 +206,12 @@
             @click="openDialog(tabs[activeTab].value, item)"
           />
 
-          <IconActionBtn icon="mdi-cog" tooltip="Access Domain" @click="dialog = item.name" />
-
-          <ManageGatewayDialog v-if="dialog === item.name" :vm="item" @close="dialog = undefined" />
+          <IconActionBtn
+            tooltip="Open Open WebUI"
+            color="anchor"
+            icon="mdi-web"
+            :href="'https://' + item.env.OPENWEBUI_DOMAIN"
+          />
         </template>
 
         <template #Nextcloud-actions="{ item }">

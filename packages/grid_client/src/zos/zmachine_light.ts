@@ -64,10 +64,10 @@ class ZmachineLight extends WorkloadData {
       out += key;
       out += "=";
       out += this.env[key];
-      if (this.gpu) {
-        for (const g of this.gpu) {
-          out += g;
-        }
+    }
+    if (this.gpu) {
+      for (const g of this.gpu) {
+        out += g;
       }
     }
     return out;
