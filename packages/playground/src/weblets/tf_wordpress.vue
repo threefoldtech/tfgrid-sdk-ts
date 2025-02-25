@@ -170,7 +170,7 @@ const email = ref(profileManager.profile?.email || "");
 const password = ref(generatePassword());
 const solution = ref() as Ref<SolutionFlavor>;
 const flist: Flist = {
-  value: "https://hub.grid.tf/tf-official-apps/tf-wordpress-latest.flist",
+  value: "https://hub.grid.tf/samir1.3bot/threefolddev-wordpress-latest.flist",
   entryPoint: "/sbin/zinit init",
 };
 const dedicated = ref(false);

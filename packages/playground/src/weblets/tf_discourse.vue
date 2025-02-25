@@ -154,7 +154,7 @@ const rootFilesystemSize = computed(() =>
   calculateRootFileSystem({ CPUCores: solution.value?.cpu ?? 0, RAMInMegaBytes: solution.value?.memory ?? 0 }),
 );
 const flist: Flist = {
-  value: "https://hub.grid.tf/tf-official-apps/forum-docker-v3.1.2.flist",
+  value: "https://hub.grid.tf/tf-official-apps/forum.flist",
   entryPoint: "/sbin/zinit init",
 };
 const selectedSSHKeys = ref("");

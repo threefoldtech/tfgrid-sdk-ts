@@ -171,7 +171,7 @@ const rootFilesystemSize = computed(() =>
   calculateRootFileSystem({ CPUCores: solution.value?.cpu ?? 0, RAMInMegaBytes: solution.value?.memory ?? 0 }),
 );
 const flist: Flist = {
-  value: "https://hub.grid.tf/tf-official-apps/funkwhale-dec21.flist",
+  value: "https://hub.grid.tf/tf-official-apps/funkwhale-1.4.0.flist",
   entryPoint: "/init.sh",
 };
 const dedicated = ref(false);
