@@ -67,13 +67,14 @@
         v-model:status="domainStatus"
         :use-fqdn="$props.useFqdn"
         v-if="requireDomain"
+        :interfaces="domainNameInterfaces"
       />
     </VExpandTransition>
   </section>
 </template>
 
 <script lang="ts">
-import type { FarmInfo, GPUCardInfo, NodeInfo } from "@threefold/grid_client";
+import { type FarmInfo, Features, type GPUCardInfo, type NodeInfo } from "@threefold/grid_client";
 import { type Farm, NodeStatus } from "@threefold/gridproxy_client";
 import type AwaitLock from "await-lock";
 import noop from "lodash/fp/noop.js";
@@ -86,6 +87,7 @@ import { useForm, ValidatorStatus } from "../../hooks/form_validator";
 import type { InputValidatorService } from "../../hooks/input_validator";
 import type {
   DomainInfo,
+  NetworkFeatures,
   SelectedLocation,
   SelectedMachine,
   SelectionDetails,
@@ -121,6 +123,10 @@ export default {
       type: Array as PropType<SelectedMachine[]>,
       default: () => [],
     },
+    interfaces: {
+      type: Array as PropType<NetworkFeatures[]>,
+      default: () => [],
+    },
     nodesLock: Object as PropType<AwaitLock>,
   },
   emits: {
@@ -145,6 +151,14 @@ export default {
     const domain = ref<DomainInfo>();
     const domainStatus = ref<ValidatorStatus>();
 
+    const domainNameInterfaces = computed((): NetworkFeatures[] => {
+      if (props.interfaces.length === 0) {
+        const interfaces: NetworkFeatures[] = [];
+        if (props.filters.wireguard) interfaces.push(Features.wireguard);
+        // only wireguard needed for now; we may add some other interfaces in the future
+        return interfaces;
+      } else return props.interfaces;
+    });
     const loadedFarms = new Map<number, Farm>();
     async function loadFarm(farmId: number) {
       if (loadedFarms.has(farmId)) {
@@ -254,6 +268,7 @@ export default {
       domain,
       domainStatus,
       selectionDetails,
+      domainNameInterfaces,
       NodeStatus,
       loadFarm,
       getFarm,

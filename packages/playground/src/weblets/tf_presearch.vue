@@ -6,6 +6,7 @@
     :disk="rootFilesystemSize + dockerDiskSize"
     :ipv4="ipv4"
     :dedicated="dedicated"
+    :rentedBy="rentedBy"
     :SelectedNode="selectionDetails?.node"
     :valid-filters="selectionDetails?.validFilters"
     title-image="images/icons/presearch.png"
@@ -65,8 +66,11 @@
           v-model:wireguard="wireguard"
         />
 
+        <!-- <input-tooltip inline tooltip="" :href="manual"> -->
+        <v-switch color="primary" inset label="Nodes rented by me (only)" v-model="rentedByMe" hide-details />
+        <!-- </input-tooltip> -->
         <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
-          <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
+          <v-switch color="primary" inset label="Rentable nodes" v-model="dedicated" hide-details />
         </input-tooltip>
         <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
           <v-switch color="primary" inset label="Certified" v-model="certified" hide-details />
@@ -78,6 +82,7 @@
             ipv6,
             certified,
             dedicated,
+            rentedBy,
             cpu,
             ssdDisks: [dockerDiskSize],
             memory,
@@ -120,7 +125,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from "vue";
+import { computed, ref } from "vue";
 
 import { manual } from "@/utils/manual";
 
@@ -148,6 +153,8 @@ const flist: Flist = {
   entryPoint: "/sbin/zinit init",
 };
 const dedicated = ref(false);
+const rentedByMe = ref(false);
+const rentedBy = computed(() => (rentedByMe.value ? grid.twinId : undefined));
 const certified = ref(false);
 const selectionDetails = ref<SelectionDetails>();
 const selectedSSHKeys = ref("");
@@ -205,7 +212,7 @@ async function deploy() {
           ],
           rootFilesystemSize,
           nodeId: selectionDetails.value!.node!.nodeId,
-          rentedBy: dedicated.value ? grid!.twinId : undefined,
+          rentedBy: rentedBy.value,
           certified: certified.value,
         },
       ],

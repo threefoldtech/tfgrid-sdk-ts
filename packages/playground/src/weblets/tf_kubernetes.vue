@@ -9,6 +9,7 @@
     :ipv4="master.ipv4"
     :certified="master.certified"
     :dedicated="master.dedicated"
+    :rentedBy="master.rentedBy"
     :SelectedNode="master.selectionDetails?.node"
     :valid-filters="master.selectionDetails?.validFilters"
     title-image="images/icons/kubernetes.png"

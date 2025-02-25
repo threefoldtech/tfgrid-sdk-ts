@@ -6,6 +6,7 @@
     :disk="solution?.disk"
     :ipv4="ipv4"
     :dedicated="dedicated"
+    :rentedBy="rentedBy"
     :SelectedNode="selectionDetails?.node"
     :valid-filters="selectionDetails?.validFilters"
     title-image="images/icons/jenkins.png"
@@ -78,8 +79,11 @@
         require-domain
       />
 
+      <!-- <input-tooltip inline tooltip="" :href="manual"> -->
+      <v-switch color="primary" inset label="Nodes rented by me (only)" v-model="rentedByMe" hide-details />
+      <!-- </input-tooltip> -->
       <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
-        <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
+        <v-switch color="primary" inset label="Rentable nodes" v-model="dedicated" hide-details />
       </input-tooltip>
 
       <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
@@ -92,6 +96,7 @@
           ipv6,
           certified,
           dedicated,
+          rentedBy,
           cpu: solution?.cpu,
           solutionDisk: solution?.disk,
           memory: solution?.memory,
@@ -148,6 +153,8 @@ const flist: Flist = {
   entryPoint: "/sbin/zinit init",
 };
 const dedicated = ref(false);
+const rentedByMe = ref(false);
+const rentedBy = computed(() => (rentedByMe.value ? grid.twinId : undefined));
 const certified = ref(false);
 const { ipv4, ipv6, mycelium, planetary, wireguard } = useNetworks();
 const selectionDetails = ref<SelectionDetails>();
@@ -213,7 +220,7 @@ async function deploy() {
             { key: "JENKINS_ADMIN_PASSWORD", value: password.value },
           ],
           nodeId: selectionDetails.value!.node!.nodeId,
-          rentedBy: dedicated.value ? grid!.twinId : undefined,
+          rentedBy: rentedBy.value,
           certified: certified.value,
           rootFilesystemSize: rootFilesystemSize.value,
         },

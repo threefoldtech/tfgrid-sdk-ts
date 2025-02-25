@@ -17,7 +17,7 @@ def before_test_setup(browser):
     farm_page.navigetor()
     return farm_page, farm_name
 
-@pytest.mark.skip(reason="https://github.com/threefoldtech/tfgrid-sdk-ts/issues/3676")
+
 def test_create_farm(browser):
     """
     Test Case: TC907-Create farm with valid name
@@ -133,7 +133,6 @@ def test_create_farm_invalid_name(browser):
 #     assert id_up == sorted_up
 
 
-@pytest.mark.skip(reason="https://github.com/threefoldtech/tfgrid-sdk-ts/issues/3676")
 def test_farmpayout_address(browser):
     """
     Test Case: TC915 - Add farm payout address
@@ -163,12 +162,12 @@ def test_farmpayout_address(browser):
     cases = [' ', 'dgdd', generate_string(), 'gdhjP6TF3UXYXTNEZ2P36J5FH7W4BJJQ4AYYAXC66I2Q2AH5B6O6Bcfg']
     for case in cases:
         assert farm_page.add_farmpayout_address(case).is_enabled()==False
-    case = "GCD2U5ESLGBA46ZXDVXQWBKHH7SVEW7F55GDO3MVUNHJOBM5DK5QCALQ"
+    case = "GANNTNPQTWLSNYG6BN2DOA2KU7QZUZPRRNCWTDGC3OBKFYO2P7W5MHNT"
     farm_page.wait_for_button(farm_page.add_farmpayout_address(case)).click()
     assert farm_page.wait_for('This action will be reflected in a bit')
     assert farm_page.wait_for('Address Added successfully!')
     assert farm_page.farmpayout_address_value()[:-3] in case
-    case = "GAK2AN6ZC4REV2GXZPTMJG2JKLRJQX746JNG7ACKNC4RSJE7ETAZSE7D"
+    case = "GCTJ3LEETC4Q3ELEEWEMAO3ND34K4HB4WL3ZMB6VJEMIFLP5EWSLEHGQ" ## Update with different address
     farm_page.wait_for_button(browser.find_element(*farm_page.add_v2_button)).click()
     farm_page.wait_for_button(farm_page.add_farmpayout_address(case)).click()
     assert farm_page.wait_for('This action will be reflected in a bit')
@@ -178,7 +177,7 @@ def test_farmpayout_address(browser):
     assert farm_page.farmpayout_address_value()[:-3] in case
 
 
-@pytest.mark.skip(reason="https://github.com/threefoldtech/tfgrid-sdk-ts/issues/3676")
+
 def test_ip(browser):
     """
     Test Case: TC1141 - Enter valid IP
@@ -237,7 +236,7 @@ def test_ip(browser):
     assert farm_page.wait_for('IP is deleted successfully!')
     assert farm_page.get_ip(ip, gateway) == (0,0)
 
-@pytest.mark.skip(reason="https://github.com/threefoldtech/tfgrid-sdk-ts/issues/3676")
+
 def test_gateway(browser):
     """
     Test Case: TC1142 - Enter valid Gateway
@@ -269,7 +268,6 @@ def test_gateway(browser):
     farm_page.close_ip()
 
 
-@pytest.mark.skip(reason="https://github.com/threefoldtech/tfgrid-sdk-ts/issues/3676")
 def test_range_ips(browser):
     """
     Test Case: TC1212 - Enter invalid to IP in add range of IPs
@@ -359,7 +357,6 @@ def test_range_ips(browser):
     assert farm_page.get_ip(gateway, 0) == (2,0)
 
 
-@pytest.mark.skip(reason="https://github.com/threefoldtech/tfgrid-sdk-ts/issues/3676")
 def test_farm_details(browser):
     """
     Test Case: TC914 - Farm Details
@@ -382,7 +379,7 @@ def test_farm_details(browser):
     farm_page.search_functionality(farm_name)
     assert farm_page.wait_for_farm_name(farm_name)
     farm_page.search_functionality("")
-    case = "GCD2U5ESLGBA46ZXDVXQWBKHH7SVEW7F55GDO3MVUNHJOBM5DK5QCALQ"
+    case = "GANNTNPQTWLSNYG6BN2DOA2KU7QZUZPRRNCWTDGC3OBKFYO2P7W5MHNT"
     farm_page.setup_farmpayout_address(farm_name)
     browser.find_element(*farm_page.add_v2_button).click()
     farm_page.wait_for_button(farm_page.add_farmpayout_address(case)).click()
