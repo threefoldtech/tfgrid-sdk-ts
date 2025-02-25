@@ -77,7 +77,15 @@
           <v-dialog v-model="showIPs" max-width="500" attach="#modals">
             <v-card>
               <v-card-title class="text-h5">IPs range</v-card-title>
-              <v-card-text v-for="(IP, i) in IPs" :key="IP">{{ i + 1 }}- {{ IP }}</v-card-text>
+              <v-card-text>
+                <ListTable
+                  :headers="[
+                    { title: 'Network', key: 'network', sortable: false },
+                    { title: 'Ip Addresses', key: 'ipsRangeTable', sortable: false },
+                  ]"
+                  :items="ipTable"
+                />
+              </v-card-text>
               <v-card-actions> </v-card-actions>
             </v-card>
           </v-dialog>
@@ -109,6 +117,7 @@ import { default as PrivateIp } from "private-ip";
 import { ref, watch } from "vue";
 
 import { gqlClient } from "@/clients";
+import ListTable from "@/list-table.vue";
 import { IPType } from "@/utils/types";
 
 import { useGrid } from "../../stores";
@@ -121,6 +130,7 @@ export default {
       required: true,
     },
   },
+  components: { ListTable },
   setup(_, context) {
     const gridStore = useGrid();
     const IPs = ref<string[]>();
@@ -137,6 +147,10 @@ export default {
     const publicIP = ref("");
     const toPublicIP = ref("");
     const gateway = ref("");
+    const network = ref("");
+    const ipsRangeTable = ref([]);
+
+    const ipTable = ref([]);
 
     const formValidator = ref();
 
@@ -267,14 +281,40 @@ export default {
       addIPs();
       showIPs.value = true;
     }
+    function ipToLong(ip) {
+      return ip.split(".").reduce((acc, octet) => (acc << 8) + +octet, 0) >>> 0;
+    }
 
+    function longToIp(long) {
+      return (long >>> 24) + "." + ((long >> 16) & 255) + "." + ((long >> 8) & 255) + "." + (long & 255);
+    }
+    function generateIpTable(startIp, endIp, sub) {
+      const startLong = ipToLong(startIp);
+      const endLong = ipToLong(endIp);
+
+      // Determine the subnet mask based on the provided CIDR
+      const mask = (0xffffffff << (32 - sub)) >>> 0; // Create subnet mask from CIDR
+      const networkBaseLong = startLong & mask; // Calculate network address using the mask
+
+      const networkBase = longToIp(networkBaseLong); // Convert back to dotted decimal format
+
+      ipsRangeTable.value = [];
+      for (let i = startLong; i <= endLong; i++) {
+        ipsRangeTable.value.push(longToIp(i));
+      }
+      network.value = `${networkBase}/${sub}`;
+      ipTable.value.push({
+        network: network.value, // Show the network in CIDR notation
+        ipsRangeTable: ipsRangeTable.value.join(", "),
+      });
+    }
     function addIPs() {
       const sub = publicIP.value.split("/")[1];
       const start = publicIP.value.split("/")[0];
       let end = toPublicIP.value.split("/")[0];
 
       if (type.value === IPType.single) end = start;
-
+      generateIpTable(start, end, sub);
       IPs.value = getIPRange(start, end);
       IPs.value.forEach((ip, i) => {
         IPs.value![i] = ip + "/" + sub;
@@ -330,6 +370,8 @@ export default {
     }
 
     return {
+      ipsRangeTable,
+      ipTable,
       showDialogue,
       valid,
       IPs,
