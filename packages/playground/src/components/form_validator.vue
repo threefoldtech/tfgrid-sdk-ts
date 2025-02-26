@@ -28,7 +28,20 @@ export default {
       }),
     );
     watch(valid, valid => emit("update:modelValue", valid), { immediate: true });
-
+    const invalid = computed(() => [...statusMap.value.values()].some(status => status === ValidatorStatus.Invalid));
+    const pending = computed(() => [...statusMap.value.values()].some(status => status === ValidatorStatus.Pending));
+    /**
+     * The validation is considered "init" if:
+     * - There are no invalid (`ValidatorStatus.Invalid`) statuses.
+     * - There are no pending (`ValidatorStatus.Pending`) statuses.
+     * - At least one status is `ValidatorStatus.Init`.
+     */
+    const init = computed(
+      () =>
+        !invalid.value &&
+        !pending.value &&
+        [...statusMap.value.values()].some(status => status === ValidatorStatus.Init),
+    );
     const form: FormValidatorService = {
       register(uid, service) {
         statusMap.value.set(uid, ValidatorStatus.Init);
@@ -72,8 +85,9 @@ export default {
       get: uid => serviceMap.value.get(uid),
 
       valid,
-      invalid: computed(() => [...statusMap.value.values()].some(status => status === ValidatorStatus.Invalid)),
-      pending: computed(() => [...statusMap.value.values()].some(status => status === ValidatorStatus.Pending)),
+      invalid,
+      pending,
+      init,
       validOnInit: props.validOnInit,
       inputs: computed(() => [...serviceMap.value.values()] as any),
     };

@@ -18,7 +18,7 @@ class FarmPage:
     create_button = (By.XPATH, "//button[.//span[text()='Create Farm']]")
     farm_name_text_field = (By.XPATH, "//label[text()='Farm name']/following-sibling::input")
     create_farm_button = (By.XPATH, "//button[.//span[text()='Create']]")
-    search_bar=(By.XPATH, "//label[text()='Search farm by ID or farm name']/following-sibling::input")
+    search_bar=(By.XPATH, "//label[text()='Search farm by name']/following-sibling::input")
     table = (By.XPATH, "//span[text()='Farm Name']/ancestor::table")
     details_arrow = (By.XPATH, '//table/tbody/tr/td[5]/button')
     farm_Id_arrow = (By.XPATH ,'//*[@id="app"]/div[1]/div[2]/div/div[1]/div[4]/div[1]/table/thead/tr/th[2]')
@@ -88,9 +88,9 @@ class FarmPage:
             self.browser.find_element(*self.search_bar).send_keys(Keys.DELETE)
             for char in farm_name:
                 self.browser.find_element(*self.search_bar).send_keys(char)
+            sleep(2)
             table = self.browser.find_element(*self.table).text
             tries -= 1
-            sleep(5)
             if table.count('NotCertified')>1:
                 continue
             if farm_name in table:
@@ -104,6 +104,9 @@ class FarmPage:
         for char in farm_name:
             self.browser.find_element(*self.search_bar).send_keys(char)
         table = self.browser.find_element(*self.table).text
+        if 'Loading items...' in table:
+            sleep(2)
+            table = self.browser.find_element(*self.table).text
         sleep(3)
         return table
 

@@ -1,6 +1,14 @@
 import urlJoin from "url-join";
 
 const BASE = window.env.MANUAL_URL;
+
+const GITHUB = {
+  RAW_BASE: "https://raw.githubusercontent.com/threefoldtech/info_grid/master/src",
+  LEGAL_PATH: "knowledge_base/legal",
+};
+
+const LEGAL_HEADER_IMG = "img/legal_header.jpg";
+
 export const manual = {
   dedicated_machines: urlJoin(BASE, "/documentation/dashboard/deploy/node_finder.html#dedicated-nodes"),
   tft_bridges: urlJoin(BASE, "/documentation/threefold_token/tft_bridges/tft_bridges.html"),
@@ -19,4 +27,8 @@ export const manual = {
   minting_receipts: urlJoin(BASE, "/documentation/farmers/3node_building/minting_receipts.html"),
   minting_process: urlJoin(BASE, "/documentation/farmers/farming_optimization/minting_process.html"),
   minting_reports: urlJoin(BASE, "/documentation/dashboard/tfchain/tf_minting_reports.html"),
+  manual_raw_legal: urlJoin(GITHUB.RAW_BASE, GITHUB.LEGAL_PATH, "terms_conditions_all3.md"),
+  manual_raw_legal_img: urlJoin(GITHUB.RAW_BASE, GITHUB.LEGAL_PATH, LEGAL_HEADER_IMG),
+  manual_legal_base: urlJoin(BASE, GITHUB.LEGAL_PATH),
+  legal_header_img: LEGAL_HEADER_IMG,
 };

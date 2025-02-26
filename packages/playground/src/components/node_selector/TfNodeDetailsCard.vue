@@ -13,15 +13,7 @@
     "
     :flat="flat"
     v-bind="{
-      onClick: selectable
-        ? async () => {
-            if (status === 'Init' && node) {
-              $emit('node:select', (node as NodeInfo));
-            }
-            if(node?.dedicated && node.rentContractId === 0) return false
-            await validateRentContract(gridStore, node as NodeInfo);
-          }
-        : undefined,
+      onClick: selectable ? async () => await handleNodeClick() : undefined,
     }"
   >
     <template #loader>
@@ -284,7 +276,7 @@
           v-if="node?.dedicated && node?.status !== 'down'"
           class="ml-4"
           :node="(node as GridNode)"
-          @updateTable="onReserveChange"
+          @update:node="$emit('update:node', $event as NodeInfo)"
         />
       </div>
     </template>
@@ -363,6 +355,12 @@ export default {
       tftMarketPrice.value = await calculator.tftPrice();
       tftsNeeded();
     });
+
+    async function handleNodeClick() {
+      if (props.status === "Init" && props.node) {
+        ctx.emit("node:select", props.node as NodeInfo);
+      }
+    }
 
     async function refreshStakingDiscount() {
       loadingStakingDiscount.value = true;
@@ -506,25 +504,6 @@ export default {
       }
     }
 
-    function onReserveChange() {
-      if (!props.node) {
-        return;
-      }
-
-      const n = { ...props.node } as NodeInfo | GridNode;
-      const gotReserved = n.rentedByTwinId === 0;
-
-      if (gotReserved) {
-        n.rentedByTwinId = profileManager.profile!.twinId;
-        n.rented = true;
-      } else {
-        n.rentedByTwinId = 0;
-        n.rented = false;
-      }
-      n.rentable = !n.rented;
-      ctx.emit("update:node", n);
-    }
-
     function getNodeStatusColor(status: string): string {
       if (status === "up") {
         return "success";
@@ -635,13 +614,13 @@ export default {
       capitalize,
       formatResourceSize,
       formatSpeed,
-      onReserveChange,
       getNodeStatusColor,
       validateRentContract,
       discountTableItems,
       lastDeploymentTime,
       loadingdiscountTableItems,
       gridStore,
+      handleNodeClick,
     };
   },
 };

@@ -49,7 +49,7 @@ class DashboardPage:
     nodes_stats = (By.XPATH, "//p[contains(@class, 'text-center') and following-sibling::p[text()='Nodes']]")
     countries_stats = (By.XPATH, "//p[contains(@class, 'text-center') and following-sibling::p[text()='Countries']]")
     cores_stats = (By.XPATH, "//p[contains(@class, 'text-center') and following-sibling::p[text()='Cores']]")
-    profile_button = (By.XPATH, '/html/body/div[1]/div/div/main/header[1]/div/div[3]/i')
+    profile_button = (By.CLASS_NAME, 'v-card')
     profile_label = (By.XPATH, '/html/body/div[1]/div/div/main/div/div[2]/div/div/div/div[1]/div/div[1]')
     qr_code_img = (By.XPATH, "//img[@alt='qrcode']")
     sidebar_manual = (By.XPATH, "//span[text()='Manual']")
