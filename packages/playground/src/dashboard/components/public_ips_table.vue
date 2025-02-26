@@ -1,9 +1,12 @@
 <template>
   <div>
-    <ListTable
+    <v-data-table-server
+      v-model="selectedItems"
       :headers="headers"
       :items="publicIps"
+      :items-length="publicIps.length"
       :loading="loading"
+      @update:options="getFarmByID(farmId)"
       :items-per-page-options="[
         { value: 5, title: '5' },
         { value: 10, title: '10' },
@@ -12,7 +15,8 @@
       ]"
       no-data-text="No IPs added on this farm"
       :deleting="isRemoving"
-      v-model="selectedItems"
+      show-select
+      return-object
     >
       <template v-slot:top>
         <v-alert>
@@ -29,21 +33,14 @@
       <template #[`item.contractId`]="{ item }">
         {{ item.contractId ?? "-" }}
       </template>
-    </ListTable>
+    </v-data-table-server>
+
     <div v-if="publicIps.length > 0" class="d-flex align-end justify-end">
-      <v-btn
-        class="ma-3"
-        color="error"
-        prepend-icon="mdi-delete"
-        :disabled="selectedItems.length === 0 || isRemoving"
-        @click="showDialogue = true"
-      >
-        Delete
-      </v-btn>
+      <v-btn class="my-3" color="error" prepend-icon="mdi-delete" @click="showDialogue = true"> Delete </v-btn>
     </div>
     <v-dialog v-model="showDialogue" max-width="600" attach="#modals">
       <v-card>
-        <v-card-title class="text-subtitle-1">
+        <v-card-title class="bg-primary text-subtitle-1">
           <strong>Delete the following IPs?</strong>
         </v-card-title>
         <v-card-text>
@@ -58,7 +55,7 @@
             text="Delete"
             :loading="isRemoving"
             color="error"
-            :disabled="isRemoving"
+            :disabled="selectedItems.length === 0 || isRemoving"
             @click="removeFarmIps"
           ></v-btn>
         </v-card-actions>
@@ -72,14 +69,12 @@ import type { RemoveFarmIPModel } from "@threefold/grid_client";
 import type { PublicIp } from "@threefold/tfchain_client";
 import { onMounted, ref, watch } from "vue";
 
-import ListTable from "@/components/list_table.vue";
 import { useGrid } from "@/stores";
 import { IPType } from "@/utils/types";
 
 import { createCustomToast, ToastType } from "../../utils/custom_toast";
 export default {
   name: "PublicIPsTable",
-  components: { ListTable },
   props: {
     farmId: {
       type: Number,
@@ -175,6 +170,7 @@ export default {
       removeFarmIps,
       selectedItems,
       loadingIps,
+      getFarmByID,
     };
   },
 };
