@@ -48,7 +48,7 @@
             <v-switch
               color="primary"
               inset
-              label="My Rented Nodes"
+              label="Rented By Me"
               v-model="filters.myRentedNodes"
               density="compact"
               hide-details
