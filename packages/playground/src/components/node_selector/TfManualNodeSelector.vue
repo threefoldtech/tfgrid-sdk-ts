@@ -168,10 +168,7 @@ export default {
           case props.filters.dedicated && !node.dedicated:
             throw `Node ${nodeId} is not dedicated`;
 
-          case props.filters.dedicated && node.rentedByTwinId === 0:
-            throw `Node ${nodeId} is not rented`;
-
-          case props.filters.dedicated && node.rentedByTwinId !== gridStore.client.twinId:
+          case props.filters.dedicated && node.rentedByTwinId && node.rentedByTwinId !== gridStore.client.twinId:
             throw `Node ${nodeId} is Dedicated, but rented by someone else`;
 
           case node.rentedByTwinId !== 0 && node.rentedByTwinId !== gridStore.client.twinId:
