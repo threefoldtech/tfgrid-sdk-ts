@@ -222,9 +222,9 @@ function addDisk() {
 }
 
 watch(
-  dedicated,
-  dedicated => {
-    if (dedicated === false) {
+  [dedicated, rentedByMe],
+  ([dedicated, rentedByMe]) => {
+    if (dedicated === false && rentedByMe === false) {
       hasGPU.value = dedicated;
     }
   },
@@ -236,6 +236,7 @@ watch(
   hasGPU => {
     if (hasGPU) {
       dedicated.value = true;
+      rentedByMe.value = true;
     }
   },
   { immediate: true },
