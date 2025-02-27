@@ -224,15 +224,19 @@ export function loadNodes(gridStore: ReturnType<typeof useGrid>, filters: Filter
 export async function validateRentContract(
   gridStore: ReturnType<typeof useGrid>,
   node: NodeInfo | undefined | null,
+  hasGpu?: boolean | undefined,
 ): Promise<true> | never {
   if (!node || !node.nodeId) {
     throw "Node ID is required.";
   }
-  if (node.dedicated && node.rentedByTwinId === 0 && !node.inDedicatedFarm) return true;
+  if (node.dedicated && node.rentedByTwinId === 0 && !node.inDedicatedFarm && !hasGpu) return true;
 
   try {
     if (node.dedicated && node.rentedByTwinId === 0 && node.inDedicatedFarm) {
       throw `Node ${node.nodeId} is not rented`;
+    }
+    if (node.dedicated && node.rentedByTwinId === 0 && hasGpu) {
+      throw `You have to rent node ${node.nodeId} before you can use its GPU capabilities`;
     }
     if (node.rentContractId !== 0) {
       const { state } = await gridStore.grid.contracts.get({

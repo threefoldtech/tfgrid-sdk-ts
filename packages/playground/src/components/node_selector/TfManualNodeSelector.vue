@@ -223,7 +223,7 @@ export default {
             throw `Node ${nodeId} doesn't have enough Storage`;
         }
 
-        await validateRentContract(gridStore, node);
+        await validateRentContract(gridStore, node, props.filters.hasGPU);
         await checkNodeCapacityPool(gridStore, node, props.filters);
 
         if (props.filters.ipv4) {
