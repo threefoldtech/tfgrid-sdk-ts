@@ -6,7 +6,10 @@
       :key="modelValue?.rentedByTwinId"
       flat
       :node="modelValue || placeholderNode"
-      @update:node="$emit('update:model-value', $event as any)"
+      @update:node="
+        $emit('update:model-value', $event as any);
+        validationTask.run(nodeId);
+      "
       :status="
         validationTask.loading
           ? 'Pending'
@@ -220,9 +223,6 @@ export default {
             throw `Node ${nodeId} doesn't have enough Storage`;
         }
 
-        await validateRentContract(gridStore, node, props.filters.hasGPU);
-        await checkNodeCapacityPool(gridStore, node, props.filters);
-
         if (props.filters.ipv4) {
           const ipsCount = props.selectedMachines.filter(m => m.publicIp && m.farmId === node.farmId).length + 1;
           if (ipsCount > 1) {
@@ -233,6 +233,8 @@ export default {
             }
           }
         }
+        await checkNodeCapacityPool(gridStore, node, props.filters);
+        await validateRentContract(gridStore, node, props.filters.hasGPU);
 
         bindModelValue(node);
         placeholderNode.value = undefined;
