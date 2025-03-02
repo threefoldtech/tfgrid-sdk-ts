@@ -6,7 +6,7 @@
       :items="publicIps"
       :items-length="publicIps.length"
       :loading="loading"
-      @update:options="getFarmByID(farmId)"
+      @update:options="getFarmPublicIp"
       :items-per-page-options="[
         { value: 5, title: '5' },
         { value: 10, title: '10' },
@@ -55,7 +55,7 @@
             text="Delete"
             :loading="isRemoving"
             color="error"
-            :disabled="selectedItems.length === 0 || isRemoving"
+            :disabled="isRemoving"
             @click="removeFarmIps"
           ></v-btn>
         </v-card-actions>
@@ -66,9 +66,10 @@
 
 <script lang="ts">
 import type { RemoveFarmIPModel } from "@threefold/grid_client";
-import type { PublicIp } from "@threefold/tfchain_client";
-import { onMounted, ref, watch } from "vue";
+import { type PublicIp } from "@threefold/gridproxy_client";
+import { ref, watch } from "vue";
 
+import { gridProxyClient } from "@/clients";
 import { useGrid } from "@/stores";
 import { IPType } from "@/utils/types";
 
@@ -104,6 +105,7 @@ export default {
       },
     ] as any;
     const publicIps = ref<PublicIp[]>([]);
+    const publicIpsCount = ref();
     const loading = ref(false);
     const loadingIps = ref(false);
     const showDialogue = ref(false);
@@ -114,21 +116,28 @@ export default {
     const isRemoving = ref(false);
     const selectedItems = ref<any[]>([]);
     const items = ref<RemoveFarmIPModel[]>([]);
+    const page = ref<number>(1);
+    const pageSize = ref(10);
 
-    onMounted(async () => {
-      await getFarmByID(props.farmId);
-    });
-
-    async function getFarmByID(id: number) {
+    async function getFarmPublicIp() {
       loadingIps.value = true;
       try {
-        const farm = await gridStore.grid.farms.getFarmByID({ id });
-        publicIps.value = farm.publicIps as unknown as PublicIp[];
+        const { data, count } = await gridProxyClient.publicIps.list({
+          retCount: true,
+          page: page.value,
+          size: pageSize.value,
+          free: true,
+          farmIds: props.farmId,
+        });
+        publicIps.value = data as PublicIp[];
+        publicIpsCount.value = count || publicIps.value.length;
       } catch (error) {
         createCustomToast(`Failed to get public IPs! ${error}`, ToastType.danger);
+      } finally {
+        loadingIps.value = false;
       }
-      loadingIps.value = false;
     }
+
     async function removeFarmIps() {
       try {
         isRemoving.value = true;
@@ -138,7 +147,7 @@ export default {
         }));
         await gridStore.grid.farms.removeFarmIps(items.value);
         createCustomToast("IP is deleted successfully!", ToastType.success);
-        await getFarmByID(props.farmId);
+        await getFarmPublicIp();
       } catch (error) {
         console.log(error);
         createCustomToast("Failed to delete IP!", ToastType.danger);
@@ -151,7 +160,7 @@ export default {
     watch(
       () => props.refreshPublicIPs,
       () => {
-        getFarmByID(props.farmId);
+        getFarmPublicIp();
       },
       { deep: true },
     );
@@ -170,7 +179,7 @@ export default {
       removeFarmIps,
       selectedItems,
       loadingIps,
-      getFarmByID,
+      getFarmPublicIp,
     };
   },
 };
