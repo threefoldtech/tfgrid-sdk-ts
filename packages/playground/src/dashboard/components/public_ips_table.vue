@@ -31,7 +31,7 @@
       </template>
 
       <template #[`item.contractId`]="{ item }">
-        {{ item.contractId ?? "-" }}
+        {{ item.contract_id ?? "-" }}
       </template>
     </v-data-table-server>
 
