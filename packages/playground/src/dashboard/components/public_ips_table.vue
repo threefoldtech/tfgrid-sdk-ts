@@ -66,7 +66,7 @@
 
 <script lang="ts">
 import type { RemoveFarmIPModel } from "@threefold/grid_client";
-import { type PublicIp } from "@threefold/gridproxy_client";
+import type { PublicIp } from "@threefold/gridproxy_client";
 import { ref, watch } from "vue";
 
 import { gridProxyClient } from "@/clients";
