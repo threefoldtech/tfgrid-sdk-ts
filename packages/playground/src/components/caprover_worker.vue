@@ -32,16 +32,10 @@
       v-model:wireguard="$props.modelValue.wireguard"
     />
     <!-- <input-tooltip inline tooltip="" :href="manual"> -->
-    <v-switch
-      color="primary"
-      inset
-      label="Nodes rented by me (only)"
-      v-model="$props.modelValue.rentedByMe"
-      hide-details
-    />
+    <v-switch color="primary" inset label="Rented By Me" v-model="$props.modelValue.rentedByMe" hide-details />
     <!-- </input-tooltip> -->
     <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
-      <v-switch color="primary" inset label="Rentable nodes" v-model="$props.modelValue.dedicated" hide-details />
+      <v-switch color="primary" inset label="Rentable" v-model="$props.modelValue.dedicated" hide-details />
     </input-tooltip>
     <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
       <v-switch color="primary" inset label="Certified" v-model="$props.modelValue.certified" hide-details />
