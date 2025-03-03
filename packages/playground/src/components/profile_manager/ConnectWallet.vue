@@ -124,9 +124,14 @@
           autocomplete="off"
         />
       </input-validator>
-
       <!-- Passwords -->
-      <WalletPassword id="password-input" v-model="password" mode="Create" :disabled="creatingAccount || connecting" />
+      <WalletPassword
+        id="password-input"
+        v-model="password"
+        @update:modelValue="confirmPassword ? confirmPasswordInput?.validate() : null"
+        mode="Create"
+        :disabled="creatingAccount || connecting"
+      />
       <PasswordInputWrapper id="confirm-password-wrapper" #="{ props: confirmPasswordInputProps }">
         <InputValidator
           id="confirm-password-validator"
@@ -198,7 +203,7 @@ const confirmPassword = ref("");
 const isValidForm = ref(false);
 const keypairType = ref(KeypairType.sr25519);
 const keyType = ["sr25519", "ed25519"];
-
+const confirmPasswordInput = useInputRef();
 const mnemonicInput = useInputRef();
 // loading
 const loadEmail = ref(false);
