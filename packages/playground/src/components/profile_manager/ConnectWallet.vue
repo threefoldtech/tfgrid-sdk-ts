@@ -36,6 +36,9 @@
                 >
                   <div v-bind="tooltipProps">
                     <VTextField
+                      readonly
+                      @focus="(event: Event) => (event.target as HTMLInputElement)?.removeAttribute('readonly')"
+                      @blur="(event: Event) => (event.target as HTMLInputElement)?.setAttribute('readonly', 'readonly')"
                       id="mnemonic-text-field"
                       :append-icon="enableReload && mnemonic !== '' ? 'mdi-reload' : ''"
                       label="Mnemonic or Hex Seed"
