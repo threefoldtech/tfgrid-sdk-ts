@@ -51,6 +51,27 @@ function IsAlphanumericExpectUnderscore(validationOptions?: ClassValidatorValida
     });
   };
 }
+
+function IsAlphanumericExpectDashAndUnderscore(validationOptions?: ClassValidatorValidationOptions) {
+  return function (object: any, propertyName: string) {
+    registerDecorator({
+      name: "IsAlphanumericExpectDashAndUnderscore",
+      target: object.constructor,
+      propertyName: propertyName,
+      options: validationOptions,
+      constraints: [`${propertyName} must contain only letters, numbers, dashes, and underscores`],
+      validator: {
+        validate(value: any) {
+          return /^[a-zA-Z0-9_-]+$/.test(value);
+        },
+        defaultMessage: buildMessage(
+          eachPrefix => eachPrefix + "$property must contain only letters, numbers, dashes, and underscores",
+          validationOptions,
+        ),
+      },
+    });
+  };
+}
 interface ValidationOptions {
   props?: boolean | string | string[];
   methods?: boolean | string | string[];
@@ -205,4 +226,5 @@ export {
   type ValidationOptions,
   ValidateMembers,
   IsAlphanumericExpectUnderscore,
+  IsAlphanumericExpectDashAndUnderscore,
 };

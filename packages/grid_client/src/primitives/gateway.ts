@@ -59,7 +59,7 @@ class GWPrimitive {
 
     const name_workload = new Workload();
     name_workload.version = version;
-    name_workload.name = name;
+    name_workload.name = name.replace(/-/g, "");
     name_workload.type = WorkloadTypes.gatewaynameproxy;
     name_workload.data = nameObj;
     name_workload.metadata = metadata;

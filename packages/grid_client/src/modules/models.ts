@@ -21,7 +21,7 @@ import {
   ValidateNested,
 } from "class-validator";
 
-import { Features, IsAlphanumericExpectUnderscore } from "../helpers";
+import { Features, IsAlphanumericExpectDashAndUnderscore, IsAlphanumericExpectUnderscore } from "../helpers";
 import { Deployment } from "../zos/deployment";
 import { ZdbModes } from "../zos/zdb";
 import { blockchainType } from "./blockchainInterface";
@@ -254,7 +254,7 @@ class QSFSZDBGetModel extends BaseGetDeleteModel {}
 class QSFSZDBDeleteModel extends BaseGetDeleteModel {}
 
 class BaseGatewayNameModel {
-  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
+  @Expose() @IsString() @IsNotEmpty() @IsAlphanumericExpectDashAndUnderscore() @MaxLength(NameLength) name: string;
 }
 
 class GatewayFQDNModel extends BaseGatewayNameModel {
@@ -361,7 +361,7 @@ class GetServiceContractModel {
   @Expose() @IsInt() @Min(1) serviceId: number;
 }
 class NameContractGetModel {
-  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
+  @Expose() @IsString() @IsNotEmpty() @IsAlphanumericExpectDashAndUnderscore() @MaxLength(NameLength) name: string;
 }
 
 class NodeContractUpdateModel {
