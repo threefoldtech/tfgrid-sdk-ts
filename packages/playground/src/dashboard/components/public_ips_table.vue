@@ -4,8 +4,9 @@
       v-model="selectedItems"
       :headers="headers"
       :items="publicIps"
-      :items-length="publicIps.length"
+      :items-length="publicIpsCount"
       :loading="loading"
+      v-model:items-per-page="pageSize"
       @update:options="getFarmPublicIp"
       :items-per-page-options="[
         { value: 5, title: '5' },
@@ -13,6 +14,7 @@
         { value: 20, title: '20' },
         { value: 50, title: '50' },
       ]"
+      v-model:page="page"
       no-data-text="No IPs added on this farm"
       :deleting="isRemoving"
       show-select
@@ -180,6 +182,9 @@ export default {
       selectedItems,
       loadingIps,
       getFarmPublicIp,
+      pageSize,
+      page,
+      publicIpsCount,
     };
   },
 };
