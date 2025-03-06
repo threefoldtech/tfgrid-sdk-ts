@@ -292,7 +292,7 @@ import { capitalize, computed, onMounted, type PropType, ref, watch } from "vue"
 
 import { gridProxyClient } from "@/clients";
 import ReserveBtn from "@/dashboard/components/reserve_action_btn.vue";
-import { ValidatorStatus } from "@/hooks/form_validator";
+import type { ValidatorStatus } from "@/hooks/form_validator";
 import type { SelectedMachine } from "@/types/nodeSelector";
 import toHumanDate from "@/utils/date";
 import type { discountItems } from "@/utils/get_nodes";
