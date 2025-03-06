@@ -51,6 +51,7 @@ import type { GridNode } from "@threefold/gridproxy_client";
 import { InsufficientBalanceError } from "@threefold/types";
 import { computed, type PropType, ref, watch } from "vue";
 
+import { ValidatorStatus } from "@/hooks/form_validator";
 import { useProfileManager } from "@/stores";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
 import { notifyDelaying } from "@/utils/notifications";
@@ -107,6 +108,7 @@ export default {
       emit("update:node", node[0]);
     }
     async function unReserveNode() {
+      emit("update:status", ValidatorStatus.Pending);
       loadingUnreserveNode.value = true;
       try {
         updateGrid(grid, { projectName: "" });
@@ -136,6 +138,7 @@ export default {
         loadingUnreserveNode.value = false;
         openUnreserveDialog.value = false;
       } finally {
+        emit("update:status", ValidatorStatus.Init);
         disableButton.value = false;
         loadingUnreserveNode.value = false;
       }
@@ -143,6 +146,7 @@ export default {
 
     async function reserveNode() {
       try {
+        emit("update:status", ValidatorStatus.Pending);
         if (profile.value) {
           loadingReserveNode.value = true;
           createCustomToast("Transaction Submitted", ToastType.info);
@@ -163,6 +167,7 @@ export default {
           createCustomToast("Failed to create rent contract.", ToastType.danger);
         }
       } finally {
+        emit("update:status", ValidatorStatus.Init);
         disableButton.value = false;
         loadingReserveNode.value = false;
       }
