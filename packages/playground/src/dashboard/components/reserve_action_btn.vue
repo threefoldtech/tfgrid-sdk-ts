@@ -108,7 +108,7 @@ export default {
       emit("update:node", node[0]);
     }
     async function unReserveNode() {
-      emit("update:status", ValidatorStatus.Pending);
+      emit("update:status", ValidatorStatus.Init);
       loadingUnreserveNode.value = true;
       try {
         updateGrid(grid, { projectName: "" });
@@ -138,7 +138,6 @@ export default {
         loadingUnreserveNode.value = false;
         openUnreserveDialog.value = false;
       } finally {
-        emit("update:status", ValidatorStatus.Init);
         disableButton.value = false;
         loadingUnreserveNode.value = false;
       }
@@ -146,7 +145,7 @@ export default {
 
     async function reserveNode() {
       try {
-        emit("update:status", ValidatorStatus.Pending);
+        emit("update:status", ValidatorStatus.Init);
         if (profile.value) {
           loadingReserveNode.value = true;
           createCustomToast("Transaction Submitted", ToastType.info);
@@ -167,7 +166,6 @@ export default {
           createCustomToast("Failed to create rent contract.", ToastType.danger);
         }
       } finally {
-        emit("update:status", ValidatorStatus.Init);
         disableButton.value = false;
         loadingReserveNode.value = false;
       }
