@@ -7,6 +7,7 @@
     :disk="disks.reduce((total, disk) => total + disk.size, solution?.disk ?? 0)"
     :ipv4="ipv4"
     :dedicated="dedicated"
+    :rentedBy="rentedBy"
     :SelectedNode="selectionDetails?.node"
     :valid-filters="selectionDetails?.validFilters"
     title-image="images/icons/vm.png"
@@ -54,8 +55,13 @@
           v-model:mycelium="mycelium"
           v-model:wireguard="wireguard"
         />
+
+        <!-- <input-tooltip inline tooltip="" :href="manual"> -->
+        <v-switch color="primary" inset label="Nodes rented by me (only)" v-model="rentedByMe" hide-details />
+        <!-- </input-tooltip> -->
+
         <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
-          <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
+          <v-switch color="primary" inset label="Rentable nodes" v-model="dedicated" hide-details />
         </input-tooltip>
 
         <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
@@ -68,6 +74,7 @@
             ipv6,
             certified,
             dedicated,
+            rentedBy,
             cpu: solution?.cpu,
             ssdDisks: disks.map(disk => disk.size),
             memory: solution?.memory,
@@ -185,7 +192,7 @@
 </template>
 
 <script lang="ts" setup>
-import { type Ref, ref, watch } from "vue";
+import { computed, type Ref, ref, watch } from "vue";
 
 import { manual } from "@/utils/manual";
 
@@ -249,6 +256,8 @@ const { ipv4, ipv6, planetary, mycelium, wireguard } = useNetworks();
 const envs = ref<Env[]>([]);
 const disks = ref<Disk[]>([]);
 const dedicated = ref(false);
+const rentedByMe = ref(false);
+const rentedBy = computed(() => (rentedByMe.value ? grid.twinId : undefined));
 const certified = ref(false);
 const selectionDetails = ref<SelectionDetails>();
 const selectedSSHKeys = ref("");
@@ -305,7 +314,7 @@ async function deploy() {
           publicIpv6: ipv6.value,
           rootFilesystemSize: solution.value?.disk,
           nodeId: selectionDetails.value?.node?.nodeId,
-          rentedBy: dedicated.value ? grid!.twinId : undefined,
+          rentedBy: rentedBy.value,
           certified: certified.value,
         },
       ],

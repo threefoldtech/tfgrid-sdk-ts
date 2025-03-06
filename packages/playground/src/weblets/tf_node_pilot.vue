@@ -5,6 +5,7 @@
     :memory="solution?.memory"
     :disk="solution?.disk"
     :dedicated="dedicated"
+    :rentedBy="rentedBy"
     ipv4
     :SelectedNode="selectionDetails?.node"
     :valid-filters="selectionDetails?.validFilters"
@@ -46,8 +47,11 @@
         require-domain
       />
 
+      <!-- <input-tooltip inline tooltip="" :href="manual"> -->
+      <v-switch color="primary" inset label="Nodes rented by me (only)" v-model="rentedByMe" hide-details />
+      <!-- </input-tooltip> -->
       <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
-        <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
+        <v-switch color="primary" inset label="Rentable nodes" v-model="dedicated" hide-details />
       </input-tooltip>
 
       <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
@@ -59,6 +63,7 @@
           ipv4: ipv4,
           certified,
           dedicated,
+          rentedBy,
           cpu: solution?.cpu,
           memory: solution?.memory,
           solutionDisk: solution?.disk,
@@ -86,7 +91,7 @@
 </template>
 
 <script lang="ts" setup>
-import { type Ref, ref } from "vue";
+import { computed, type Ref, ref } from "vue";
 
 import { manual } from "@/utils/manual";
 
@@ -107,6 +112,8 @@ const flist: Flist = {
 };
 const { ipv4, ipv6, planetary, mycelium, wireguard } = useNetworks({ ipv4: true, ipv6: true });
 const dedicated = ref(false);
+const rentedByMe = ref(false);
+const rentedBy = computed(() => (rentedByMe.value ? grid.twinId : undefined));
 const certified = ref(false);
 const rootFilesystemSize = 2;
 const selectedSSHKeys = ref("");
@@ -170,7 +177,7 @@ async function deploy() {
             },
           ],
           nodeId: selectionDetails.value!.node!.nodeId,
-          rentedBy: dedicated.value ? grid!.twinId : undefined,
+          rentedBy: rentedBy.value,
           certified: certified.value,
         },
       ],

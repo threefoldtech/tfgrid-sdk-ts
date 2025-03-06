@@ -6,6 +6,7 @@
     :disk="solution?.disk"
     :ipv4="ipv4"
     :dedicated="dedicated"
+    :rentedBy="rentedBy"
     :SelectedNode="selectionDetails?.node"
     :valid-filters="selectionDetails?.validFilters"
     title-image="images/icons/static_website.png"
@@ -71,8 +72,11 @@
         require-domain
       />
 
+      <!-- <input-tooltip inline tooltip="" :href="manual"> -->
+      <v-switch color="primary" inset label="Nodes rented by me (only)" v-model="rentedByMe" hide-details />
+      <!-- </input-tooltip> -->
       <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
-        <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
+        <v-switch color="primary" inset label="Rentable nodes" v-model="dedicated" hide-details />
       </input-tooltip>
 
       <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
@@ -85,6 +89,7 @@
           ipv6,
           certified,
           dedicated,
+          rentedBy,
           cpu: solution?.cpu,
           solutionDisk: solution?.disk,
           memory: solution?.memory,
@@ -117,7 +122,7 @@ import { computed, type Ref, ref } from "vue";
 import { manual } from "@/utils/manual";
 
 import { useLayout } from "../components/weblet_layout.vue";
-import { useProfileManager } from "../stores";
+import { useGrid, useProfileManager } from "../stores";
 import type { Flist, solutionFlavor as SolutionFlavor } from "../types";
 import { ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
@@ -144,6 +149,10 @@ const flist: Flist = {
   entryPoint: "/sbin/zinit init",
 };
 const dedicated = ref(false);
+const rentedByMe = ref(false);
+const gridStore = useGrid();
+const grid = gridStore.client as GridClient;
+const rentedBy = computed(() => (rentedByMe.value ? grid.twinId : undefined));
 const certified = ref(false);
 const rootFilesystemSize = computed(() =>
   calculateRootFileSystem({ CPUCores: solution.value?.cpu ?? 0, RAMInMegaBytes: solution.value?.memory ?? 0 }),
@@ -220,7 +229,7 @@ async function deploy() {
             { key: "STATICWEBSITE_DOMAIN", value: domain.value },
           ],
           nodeId: selectionDetails.value!.node!.nodeId,
-          rentedBy: dedicated.value ? grid!.twinId : undefined,
+          rentedBy: rentedBy.value,
           certified: certified.value,
           rootFilesystemSize: rootFilesystemSize.value,
         },

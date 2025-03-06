@@ -632,9 +632,9 @@ class FilterOptions {
   @Expose() @IsOptional() @IsInt() @Min(1) availableFor?: number;
   @Expose() @IsOptional() @IsInt() page?: number;
   @Expose() @IsOptional() @IsInt() size?: number;
+  @Expose() @IsOptional() @IsInt() @Min(1) rentedBy?: number;
   @Expose() @IsOptional() @IsBoolean() hasGPU?: boolean;
   @Expose() @IsOptional() @IsBoolean() rentable?: boolean;
-  @Expose() @IsOptional() @IsInt() @Min(1) rentedBy?: number;
   @Expose() @IsOptional() @IsBoolean() randomize?: boolean;
   @Expose() @IsOptional() @IsBoolean() ret_count?: boolean;
   @Expose() @IsOptional() @Transform(({ value }) => NodeStatus[value]) @IsEnum(NodeStatus) status?: NodeStatus;

@@ -5,6 +5,7 @@
     :memory="solution?.memory"
     :disk="disks.reduce((total, disk) => total + disk.size, solution?.disk + 2)"
     :ipv4="ipv4"
+    :rentedBy="rentedBy"
     :dedicated="dedicated"
     :SelectedNode="selectionDetails?.node"
     :valid-filters="selectionDetails?.validFilters"
@@ -61,8 +62,11 @@
         >
           <v-switch color="primary" inset label="GPU" v-model="hasGPU" hide-details />
         </input-tooltip>
+        <!-- <input-tooltip inline tooltip="" :href="manual"> -->
+        <v-switch color="primary" inset label="Nodes rented by me (only)" v-model="rentedByMe" hide-details />
+        <!-- </input-tooltip> -->
         <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
-          <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
+          <v-switch color="primary" inset label="Rentable nodes" v-model="dedicated" hide-details />
         </input-tooltip>
 
         <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
@@ -76,6 +80,7 @@
             hasGPU,
             certified,
             dedicated,
+            rentedBy,
             cpu: solution?.cpu,
             ssdDisks: disks.map(disk => disk.size),
             solutionDisk: solution?.disk,
@@ -196,9 +201,11 @@ const name = ref(generateName({ prefix: "vm" }));
 const flist = ref<Flist>();
 const { ipv4, ipv6, mycelium, planetary, wireguard } = useNetworks();
 const dedicated = ref(false);
+const rentedByMe = ref(false);
 const certified = ref(false);
 const disks = ref<Disk[]>([]);
 const hasGPU = ref(false);
+const rentedBy = computed(() => (rentedByMe.value ? grid.twinId : undefined));
 const rootFilesystemSize = computed(() =>
   flist.value?.name === "Ubuntu-24.04" || flist.value?.name === "Other" ? solution.value?.disk : 2,
 );
@@ -267,7 +274,7 @@ async function deploy() {
           hasGPU: hasGPU.value,
           nodeId: selectionDetails.value?.node?.nodeId,
           gpus: hasGPU.value ? selectionDetails.value?.gpuCards.map(card => card.id) : undefined,
-          rentedBy: dedicated.value ? grid!.twinId : undefined,
+          rentedBy: rentedBy.value,
           certified: certified.value,
         },
       ],

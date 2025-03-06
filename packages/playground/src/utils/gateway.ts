@@ -1,4 +1,10 @@
-import { type FilterOptions, GatewayFQDNModel, GatewayNameModel, type GridClient } from "@threefold/grid_client";
+import {
+  type FilterOptions,
+  GatewayFQDNModel,
+  GatewayNameModel,
+  type GridClient,
+  type ZmachineData,
+} from "@threefold/grid_client";
 import validator from "validator";
 
 import { SolutionCode } from "@/types";
@@ -120,4 +126,64 @@ export async function loadDeploymentGateways(grid: GridClient, options?: LoadDep
       .filter(filter as any) as GridGateway[],
     failedToList,
   };
+}
+
+/**
+ * Extracts the domain or IP address from a given URL.
+ * Supports both IPv4 and IPv6 addresses, handling protocols (http:// or https://).
+ *
+ * @param {string} domainBackend - The input URL or domain, possibly containing a protocol.
+ * @returns {string} - The extracted domain or IP address.
+ * @throws {Error} - Throws an error if the input is invalid:
+ *   - If the URL does not contain a domain or IP address.
+ *   - If the IPv6 address format is invalid.
+ *
+ * @example
+ * extractDomainIP("https://example.com:8080"); // Returns: "example.com"
+ * extractDomainIP("https://[::1]:8080"); // Returns: "::1"
+ * extractDomainIP("http://:8080"); // Throws an error: "Invalid input "<domain>": No domain or IP address found."
+ */
+
+export function extractDomainIP(domainBackend: string) {
+  const ip = domainBackend.replace("https://", "").replace("http://", "");
+  // Handle IPv6
+  if (domainBackend.includes("[")) {
+    const ipAddress = ip.replace(/\[/g, "").split("]:")[0];
+    if (!ipAddress) {
+      throw new Error(`Invalid input "${domainBackend}": Invalid IPv6 address format.`);
+    }
+    return ipAddress;
+  }
+
+  // Check for domain or IP address part
+  const result = ip.split(":")[0];
+
+  if (!result) {
+    throw new Error(`Invalid input "${domainBackend}": No domain or IP address found.`);
+  }
+
+  return result;
+}
+
+/**
+ * Collect the deployment interfaces ips
+ * @param item deployment data
+ * @returns {string[]} list of strings
+ */
+export function getDeploymentIps(item: ZmachineData | any): string[] {
+  const ips = [];
+  // wg ip
+  if (item.interfaces) {
+    for (const iface of item.interfaces) {
+      if (iface.ip) ips.push(iface.ip);
+    }
+  }
+  // public ip, ipv6
+  if (item.publicIP) {
+    if (item.publicIP.ip) ips.push(item.publicIP.ip.split("/")[0]);
+    if (item.publicIP.ip6) ips.push(item.publicIP.ip6.split("/")[0]);
+  }
+  if (item.planetary) ips.push(item.planetary);
+  if (item.myceliumIP) ips.push(item.myceliumIP);
+  return ips;
 }

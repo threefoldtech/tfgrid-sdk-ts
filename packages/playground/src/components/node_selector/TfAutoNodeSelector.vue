@@ -148,8 +148,8 @@ import { RequestError } from "@threefold/types";
 import type AwaitLock from "await-lock";
 import equals from "lodash/fp/equals.js";
 import { computed, nextTick, onMounted, onUnmounted, type PropType, ref } from "vue";
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import type { VCard } from "vuetify/components/VCard";
+
+import { normalizeError } from "@/utils/helpers";
 
 import { useAsync, usePagination, useWatchDeep } from "../../hooks";
 import { ValidatorStatus } from "../../hooks/form_validator";
@@ -167,7 +167,6 @@ import {
   validateRentContract,
 } from "../../utils/nodeSelector";
 import TfNodeDetailsCard from "./TfNodeDetailsCard.vue";
-
 export default {
   name: "TfAutoNodeSelector",
   components: { TfNodeDetailsCard },
@@ -304,16 +303,8 @@ export default {
 
     const nodeInputValidateTask = useAsync<boolean, string, [NodeInfo | undefined]>(
       async node => {
-        if (node && node?.rentContractId !== 0) {
-          const { state } = await gridStore.grid.contracts.get({
-            id: node?.rentContractId,
-          });
-          if (state.gracePeriod) {
-            return false;
-          }
-        }
         const nodeCapacityValid = await checkNodeCapacityPool(gridStore, node, props.filters);
-        const rentContractValid = props.filters.dedicated ? await validateRentContract(gridStore, node) : true;
+        const rentContractValid = await validateRentContract(gridStore, node);
 
         if (node && !isNodeValid(props.getFarm, node!, props.selectedMachines, filters.value)) {
           throw `Node (${node.nodeId}) is not valid.`;
