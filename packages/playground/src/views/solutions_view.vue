@@ -4,7 +4,7 @@
       <v-icon size="30" class="pr-3">mdi-lightbulb-on-outline</v-icon>
       <v-card-title class="pa-0">Labs</v-card-title>
     </v-card>
-    <v-text-field label="Search Lab" v-model="searchItem" class="mb-5" clearable></v-text-field>
+    <v-text-field label="Search for a lab" v-model="searchItem" class="mb-5" clearable></v-text-field>
     <ApplicationCards :cards="filteredCards" />
     <p v-if="filteredCards.length === 0" class="mx-3 mb-3">No solution was found with the provided search query.</p>
   </view-layout>
