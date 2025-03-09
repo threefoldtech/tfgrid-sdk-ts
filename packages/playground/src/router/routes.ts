@@ -53,6 +53,8 @@ enum OtherRoutes {
 
 enum ApplicationRoutes {
   BaseRoute = "/deploy/applications/",
+  Kubernetes = "/deploy/applications/kubernetes/",
+  CapRover = "/deploy/applications/caprover/",
   Peertube = "/deploy/applications/peertube/",
   StaticWebsite = "/deploy/applications/static_website/",
   Funkwhale = "/deploy/applications/funkwhale/",
@@ -84,7 +86,6 @@ const DashboardRoutes = {
   Farms: { ...FarmRoutes },
   Other: { ...OtherRoutes },
   VirtualMachines: { ...VirtualMachinesRoutes },
-  Orchestrators: { ...OrchestratorsRoutes },
 };
 
 export {
@@ -93,7 +94,6 @@ export {
   TFGridRoutes,
   TFChainRoutes,
   OtherRoutes,
-  OrchestratorsRoutes,
   FarmRoutes,
   DeployRoutes,
   ApplicationRoutes,
