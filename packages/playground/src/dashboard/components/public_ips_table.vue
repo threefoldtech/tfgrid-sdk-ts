@@ -164,7 +164,7 @@ export default {
     watch(
       () => props.refreshPublicIPs,
       () => {
-        getFarmPublicIp();
+        getFarmPublicIp(true);
       },
       { deep: true },
     );
