@@ -128,7 +128,7 @@ export default {
         title: "Domains",
         icon: "mdi-web-box",
         text: "Expose servers hosted on local machines or VMs to the public internet.",
-        route: DashboardRoutes.Deploy.Domains,
+        path: DashboardRoutes.Deploy.Domains,
       },
       {
         title: "Explore Grid Capacity",
