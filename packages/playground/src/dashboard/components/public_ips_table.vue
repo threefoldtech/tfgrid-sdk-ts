@@ -7,7 +7,7 @@
       :items-length="publicIpsCount"
       :loading="loading"
       v-model:items-per-page="pageSize"
-      @update:options="getFarmPublicIp"
+      @update:options="getFarmPublicIp(true)"
       :items-per-page-options="[
         { value: 5, title: '5' },
         { value: 10, title: '10' },
@@ -121,18 +121,20 @@ export default {
     const page = ref<number>(1);
     const pageSize = ref(10);
 
-    async function getFarmPublicIp() {
+    async function getFarmPublicIp(retCount = false) {
       loadingIps.value = true;
+      if (retCount) page.value = 1;
+
       try {
         const { data, count } = await gridProxyClient.publicIps.list({
-          retCount: true,
+          retCount,
           page: page.value,
           size: pageSize.value,
           free: true,
           farmIds: props.farmId,
         });
         publicIps.value = data as PublicIp[];
-        publicIpsCount.value = count || publicIps.value.length;
+        if (retCount) publicIpsCount.value = count || 0;
       } catch (error) {
         createCustomToast(`Failed to get public IPs! ${error}`, ToastType.danger);
       } finally {
@@ -149,7 +151,7 @@ export default {
         }));
         await gridStore.grid.farms.removeFarmIps(items.value);
         createCustomToast("IP is deleted successfully!", ToastType.success);
-        await getFarmPublicIp();
+        await getFarmPublicIp(true);
       } catch (error) {
         console.log(error);
         createCustomToast("Failed to delete IP!", ToastType.danger);
