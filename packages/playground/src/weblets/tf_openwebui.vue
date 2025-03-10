@@ -5,6 +5,7 @@
     :memory="solution?.memory"
     :disk="disks.reduce((total, disk) => total + disk.size, solution?.disk + 2)"
     :dedicated="dedicated"
+    :rentedBy="rentedBy"
     :SelectedNode="selectionDetails?.node"
     :valid-filters="selectionDetails?.validFilters"
     title-image="images/icons/openwebui.png"
@@ -54,8 +55,11 @@
         >
           <v-switch color="primary" inset label="GPU" v-model="hasGPU" hide-details />
         </input-tooltip>
+        <!-- <input-tooltip inline tooltip="" :href="manual"> -->
+        <v-switch color="primary" inset label="Rented By Me" v-model="rentedByMe" hide-details />
+        <!-- </input-tooltip> -->
         <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
-          <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
+          <v-switch color="primary" inset label="Rentable" v-model="dedicated" hide-details />
         </input-tooltip>
 
         <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
@@ -68,6 +72,7 @@
             hasGPU,
             certified,
             dedicated,
+            rentedBy,
             cpu: solution?.cpu,
             ssdDisks: disks.map(disk => disk.size),
             solutionDisk: solution?.disk,
@@ -129,6 +134,8 @@ const flist = ref<Flist>({
 });
 const { ipv6, mycelium, planetary, wireguard } = useNetworks();
 const dedicated = ref(false);
+const rentedByMe = ref(false);
+const rentedBy = computed(() => (rentedByMe.value ? grid.twinId : undefined));
 const certified = ref(false);
 const disks = ref<Disk[]>([]);
 const hasGPU = ref(false);
@@ -207,7 +214,7 @@ async function deploy() {
           hasGPU: hasGPU.value,
           nodeId: selectionDetails.value?.node?.nodeId,
           gpus: hasGPU.value ? selectionDetails.value?.gpuCards.map(card => card.id) : undefined,
-          rentedBy: dedicated.value ? grid!.twinId : undefined,
+          rentedBy: rentedBy.value,
           certified: certified.value,
         },
       ],
