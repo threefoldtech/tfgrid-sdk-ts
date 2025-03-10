@@ -745,6 +745,14 @@ function createDeployRoutes(): RouteRecordRaw[] {
           meta: { title: "Labs" },
           children: createApplicationsRoutes(),
         },
+        {
+          path: "/deploy/applications/:catchAll(.*)",
+          redirect: to => {
+            return {
+              path: `${DashboardRoutes.Deploy.Applications}${to.fullPath.split("/deploy/applications/")[1]}`,
+            };
+          },
+        },
 
         {
           path: DashboardRoutes.Deploy.YourContracts,
