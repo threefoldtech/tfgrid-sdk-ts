@@ -63,10 +63,10 @@
           <v-switch color="primary" inset label="GPU" v-model="hasGPU" hide-details />
         </input-tooltip>
         <!-- <input-tooltip inline tooltip="" :href="manual"> -->
-        <v-switch color="primary" inset label="Nodes rented by me (only)" v-model="rentedByMe" hide-details />
+        <v-switch color="primary" inset label="Rented By Me" v-model="rentedByMe" hide-details />
         <!-- </input-tooltip> -->
         <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
-          <v-switch color="primary" inset label="Rentable nodes" v-model="dedicated" hide-details />
+          <v-switch color="primary" inset label="Rentable" v-model="dedicated" hide-details />
         </input-tooltip>
 
         <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
@@ -222,9 +222,9 @@ function addDisk() {
 }
 
 watch(
-  dedicated,
-  dedicated => {
-    if (dedicated === false) {
+  [dedicated, rentedByMe],
+  ([dedicated, rentedByMe]) => {
+    if (dedicated === false && rentedByMe === false) {
       hasGPU.value = dedicated;
     }
   },
@@ -236,6 +236,7 @@ watch(
   hasGPU => {
     if (hasGPU) {
       dedicated.value = true;
+      rentedByMe.value = true;
     }
   },
   { immediate: true },

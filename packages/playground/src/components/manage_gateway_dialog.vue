@@ -439,9 +439,17 @@ export default {
       if (selectedNode.value.type === WorkloadTypes.zmachine) {
         addNetwork(NetworkInterfaces.WireGuard, interfaces?.[0]?.ip);
         addNetwork(NetworkInterfaces.PublicIPV4, publicIP?.ip.split("/")[0]);
-        addNetwork(NetworkInterfaces.Planetary, planetary);
-        addNetwork(NetworkInterfaces.Mycelium, myceliumIP);
-        addNetwork(NetworkInterfaces.PublicIPV6, publicIP?.ip6.split("/")[0]);
+        /**
+         * WARNING:
+         * Do not remove the following line!
+         * VMs only support IPv6 as a domain interface.
+         * For more details: https://github.com/threefoldtech/tf-images/issues/291
+         */
+        if (props?.vm) {
+          addNetwork(NetworkInterfaces.Planetary, planetary);
+          addNetwork(NetworkInterfaces.Mycelium, myceliumIP);
+          addNetwork(NetworkInterfaces.PublicIPV6, publicIP?.ip6.split("/")[0]);
+        }
       }
       if (selectedNode.value.type === WorkloadTypes.zmachinelight) {
         addNetwork(NetworkInterfaces.Mycelium, myceliumIP);
