@@ -129,7 +129,7 @@ const name = ref(generateName({ prefix: "oi" }));
 const domain = ref();
 const flist = ref<Flist>({
   name: "Ubuntu-24.04 Open WebUI Instance",
-  value: "https://hub.grid.tf/idrnd.3bot/ubuntu-24.04_fullvm_oi.flist",
+  value: "https://hub.grid.tf/tf-official-apps/threefoldtech-ubuntu-24.04_fullvm_oi.flist",
   entryPoint: "",
 });
 const { ipv6, mycelium, planetary, wireguard } = useNetworks();
