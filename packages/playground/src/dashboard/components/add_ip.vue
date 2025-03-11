@@ -84,7 +84,11 @@
                     { title: 'IP Addresses', key: 'ipsRangeTable', sortable: false },
                   ]"
                   :items="ipTable"
-                />
+                  hide-default-footer
+                  hide-no-data
+                >
+                  <template #bottom></template
+                ></v-data-table>
               </v-card-text>
               <v-card-actions class="justify-end mb-1 mr-2">
                 <v-btn @click="showIPs = false" color="anchor">Close</v-btn></v-card-actions
