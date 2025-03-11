@@ -277,13 +277,12 @@ const hasClient = computed(() => !!gridStore.client);
 // eslint-disable-next-line no-undef
 const permanent = ref(window.innerWidth > 980);
 const openSidebar = ref(permanent.value);
-const toolbarExtended = computed(() => {
-  if (!permanent) {
-    return true;
+const toolbarExtended = ref(false);
+watch(permanent, value => {
+  if (value) {
+    toolbarExtended.value = false;
   }
-  return false;
 });
-
 function setSidebarOnResize() {
   permanent.value =
     window.innerWidth >
@@ -334,9 +333,6 @@ function navigateToHome() {
 onMounted(async () => {
   await (window.$$appLoader || noop)();
   openProfile.value = true;
-  if (!permanent.value) {
-    toolbarExtended.value = true;
-  }
 });
 
 watch(hasClient, () => setTimeouts());

@@ -58,7 +58,7 @@
 </template>
 
 <script lang="ts">
-import { type PropType } from "vue";
+import type { PropType } from "vue";
 import { computed, toRef } from "vue";
 
 import type { Indexed } from "@/clients";
