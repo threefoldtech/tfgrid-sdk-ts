@@ -78,15 +78,17 @@
             <v-card>
               <v-card-title class="text-h5">IPs range</v-card-title>
               <v-card-text>
-                <ListTable
+                <v-data-table
                   :headers="[
                     { title: 'Network', key: 'network', sortable: false },
-                    { title: 'Ip Addresses', key: 'ipsRangeTable', sortable: false },
+                    { title: 'IP Addresses', key: 'ipsRangeTable', sortable: false },
                   ]"
                   :items="ipTable"
                 />
               </v-card-text>
-              <v-card-actions> </v-card-actions>
+              <v-card-actions class="justify-end mb-1 mr-2">
+                <v-btn @click="showIPs = false" color="anchor">Close</v-btn></v-card-actions
+              >
             </v-card>
           </v-dialog>
 
@@ -117,7 +119,6 @@ import { default as PrivateIp } from "private-ip";
 import { ref, watch } from "vue";
 
 import { gqlClient } from "@/clients";
-import ListTable from "@/list-table.vue";
 import { IPType } from "@/utils/types";
 
 import { useGrid } from "../../stores";
@@ -130,7 +131,7 @@ export default {
       required: true,
     },
   },
-  components: { ListTable },
+
   setup(_, context) {
     const gridStore = useGrid();
     const IPs = ref<string[]>();
@@ -303,8 +304,9 @@ export default {
         ipsRangeTable.value.push(longToIp(i));
       }
       network.value = `${networkBase}/${sub}`;
+      ipTable.value = [];
       ipTable.value.push({
-        network: network.value, // Show the network in CIDR notation
+        network: network.value,
         ipsRangeTable: ipsRangeTable.value.join(", "),
       });
     }
