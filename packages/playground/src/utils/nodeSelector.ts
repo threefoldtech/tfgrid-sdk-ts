@@ -19,7 +19,6 @@ import type {
   SelectionDetailsFilters,
   SelectionDetailsFiltersValidators,
 } from "../types/nodeSelector";
-import { createCustomToast, ToastType } from "./custom_toast";
 import { normalizeError } from "./helpers";
 
 export interface GetLocationsConfig {
@@ -186,6 +185,8 @@ export function normalizeNodeFilters(
   filters: SelectionDetailsFilters,
   options?: NormalizeNodeFiltersOptions,
 ): FilterOptions {
+  const bothRentalFiltersActive = filters.dedicated && filters.rentedBy;
+
   return {
     page: Math.max(1, options?.page || 1),
     size: options?.size,
@@ -201,13 +202,15 @@ export function normalizeNodeFilters(
     publicIPs: filters.ipv4 || undefined,
     hasIPv6: filters.ipv6 || undefined,
     hasGPU: filters.hasGPU || undefined,
-    rentedBy: filters.dedicated ? options?.twinId : undefined,
     certified: filters.certified || undefined,
-    availableFor: options?.twinId,
+    availableFor: filters.dedicated ? undefined : options?.twinId,
     region: options?.location.region ? options?.location.region : options?.location.subregion,
     country: options?.location.country,
     gateway: options?.gateway,
     healthy: true,
+    rentable: bothRentalFiltersActive ? undefined : filters.dedicated || undefined,
+    rentedBy: bothRentalFiltersActive ? undefined : filters.rentedBy || undefined,
+    rentableOrRentedBy: bothRentalFiltersActive ? options?.twinId : undefined,
     planetary: filters.planetary,
     mycelium: filters.mycelium,
     wireguard: filters.wireguard,
@@ -221,21 +224,26 @@ export function loadNodes(gridStore: ReturnType<typeof useGrid>, filters: Filter
 export async function validateRentContract(
   gridStore: ReturnType<typeof useGrid>,
   node: NodeInfo | undefined | null,
+  hasGpu?: boolean | undefined,
 ): Promise<true> | never {
   if (!node || !node.nodeId) {
     throw "Node ID is required.";
   }
+  if (node.dedicated && node.rentedByTwinId === 0 && !node.inDedicatedFarm && !hasGpu) return true;
 
   try {
+    if (node.dedicated && node.rentedByTwinId === 0 && node.inDedicatedFarm) {
+      throw `Node ${node.nodeId} is not rented`;
+    }
+    if (node.dedicated && node.rentedByTwinId === 0 && hasGpu) {
+      throw `You have to rent node ${node.nodeId} before you can use its GPU capabilities`;
+    }
     if (node.rentContractId !== 0) {
-      const contractInfo = await gridStore.grid.contracts.get({
+      const { state } = await gridStore.grid.contracts.get({
         id: node.rentContractId,
       });
-      if (contractInfo.state.gracePeriod) {
-        createCustomToast(
-          `You can't deploy on node ${node.nodeId}, its rent contract is in grace period.`,
-          ToastType.danger,
-        );
+      if (state.gracePeriod) {
+        throw `You can't deploy on node ${node.nodeId}, its rent contract is in grace period.`;
       }
     }
 

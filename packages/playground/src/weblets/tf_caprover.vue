@@ -21,6 +21,7 @@
       )
     "
     :ipv4="true"
+    :rentedBy="leader.rentedBy"
     :dedicated="leader.dedicated"
     :SelectedNode="leader.selectionDetails?.node"
     :valid-filters="leader.selectionDetails?.validFilters"

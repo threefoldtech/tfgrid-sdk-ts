@@ -48,7 +48,7 @@
             <v-switch
               color="primary"
               inset
-              label="My Rented Nodes"
+              label="Rented By Me"
               v-model="filters.myRentedNodes"
               density="compact"
               hide-details
@@ -570,7 +570,7 @@ export default {
     const isDialogOpened = ref<boolean>(false);
 
     const route = useRoute();
-
+    const rentableOrRentedBy = computed(() => filters.value.rentable && filters.value.myRentedNodes);
     async function loadNodes(retCount = false) {
       _nodes.value = [];
       loading.value = true;
@@ -597,14 +597,19 @@ export default {
             totalCru: +filters.value.minCRU || undefined,
             hasGpu: filters.value.gpu || undefined,
             domain: filters.value.gateway || undefined,
+            ipv4: filters.value.gateway || undefined,
             freeIps: +filters.value.publicIPs || undefined,
             dedicated: filters.value.dedicated || undefined,
             sortBy: SortBy.Status,
             sortOrder: SortOrder.Asc,
             numGpu: +filters.value.numGpu || undefined,
-            rentable: filters.value.rentable ? filters.value.rentable : undefined,
+            rentable: filters.value.rentable && !rentableOrRentedBy.value ? filters.value.rentable : undefined,
             hasIPv6: filters.value.ipv6 ? filters.value.ipv6 : undefined,
-            rentedBy: filters.value.myRentedNodes && profileManager.profile ? profileManager.profile.twinId : undefined,
+            rentableOrRentedBy: rentableOrRentedBy.value ? profileManager.profile?.twinId : undefined,
+            rentedBy:
+              filters.value.myRentedNodes && profileManager.profile && !rentableOrRentedBy.value
+                ? profileManager.profile.twinId
+                : undefined,
           },
           { loadFarm: true },
         );

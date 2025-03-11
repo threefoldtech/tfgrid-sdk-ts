@@ -19,6 +19,7 @@ export interface FormValidatorService {
   valid: ComputedRef<boolean>;
   invalid: ComputedRef<boolean>;
   pending: ComputedRef<boolean>;
+  init: ComputedRef<boolean>;
   validOnInit: boolean;
   inputs: ComputedRef<InputValidatorService[]>;
 }

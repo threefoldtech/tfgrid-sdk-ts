@@ -79,6 +79,9 @@ export interface GqlContracts {
 export interface GqlConsumption extends GqlContracts {
   contractBillReports: GqlContractBillReports[];
 }
+export interface GqlDiscountPackage {
+  contractBillReports: GqlContractBillReports[];
+}
 
 export interface GqlContractBillReports {
   id: string;
@@ -103,6 +106,15 @@ export interface ListMyContractOptions {
 }
 
 export interface GetConsumptionOptions {
+  graphqlURL: string;
+  id: number;
+}
+export interface Consumption {
+  amountBilled: number;
+  discountReceived: DiscountLevel;
+}
+
+export interface GetDiscountPackageOptions {
   graphqlURL: string;
   id: number;
 }
@@ -251,19 +263,51 @@ class TFContracts extends Contracts {
       throw err;
     }
   }
-
   /**
-   * Get contract consumption per hour in TFT.
+   * Get contract discount package
+   * @param {GetDiscountPackageOptions} options
+   * @returns {Promie<DiscountLevel>}
+   */
+  async getDiscountPackage(options: GetDiscountPackageOptions): Promise<DiscountLevel> {
+    const gqlClient = new Graphql(options.graphqlURL);
+
+    const body = `query getConsumption($contractId: BigInt!){
+            contractBillReports(where: {contractID_eq: $contractId} , orderBy: timestamp_DESC, limit:1) {
+                discountReceived
+
+            }
+          }`;
+
+    try {
+      const response = await gqlClient.query(body, { contractId: options.id });
+
+      const gqlDiscountPackage: GqlDiscountPackage = response["data"] as GqlDiscountPackage;
+      const billReports = gqlDiscountPackage.contractBillReports;
+      if (billReports.length === 0) {
+        return "None";
+      } else {
+        const discountPackage = billReports[0].discountReceived;
+        return discountPackage;
+      }
+    } catch (err) {
+      (err as Error).message = formatErrorMessage(`Error getting discount package for contract ${options.id}.`, err);
+      throw err;
+    }
+  }
+  /**
+   *  Get the contract consumption details per hour in TFT.
    *
    * @param  {GetConsumptionOptions} options
-   * @returns {Promise<number>}
+   * @returns {Promise<Consumption>} A promise resolving to the consumption details,
+   * including the amount billed and the discount received.
    */
-  async getConsumption(options: GetConsumptionOptions): Promise<number> {
+  async getConsumption(options: GetConsumptionOptions): Promise<Consumption> {
     const gqlClient = new Graphql(options.graphqlURL);
     const body = `query getConsumption($contractId: BigInt!){
             contractBillReports(where: {contractID_eq: $contractId}, limit: 2 , orderBy: timestamp_DESC) {
                 amountBilled
                 timestamp
+                discountReceived
             }
             nodeContracts(where: {contractID_eq: $contractId}) {
                 createdAt
@@ -280,7 +324,10 @@ class TFContracts extends Contracts {
       const gqlConsumption: GqlConsumption = response["data"] as GqlConsumption;
       const billReports = gqlConsumption.contractBillReports;
       if (billReports.length === 0) {
-        return 0;
+        return {
+          amountBilled: 0,
+          discountReceived: "None",
+        };
       } else {
         let duration = 1;
         const amountBilled = new Decimal(billReports[0].amountBilled);
@@ -300,10 +347,13 @@ class TFContracts extends Contracts {
             }
           }
         }
-        return amountBilled
-          .div(duration || 1)
-          .div(10 ** 7)
-          .toNumber();
+        return {
+          amountBilled: amountBilled
+            .div(duration || 1)
+            .div(10 ** 7)
+            .toNumber(),
+          discountReceived: billReports[0].discountReceived,
+        };
       }
     } catch (err) {
       (err as Error).message = formatErrorMessage(`Error getting consumption for contract ${options.id}.`, err);

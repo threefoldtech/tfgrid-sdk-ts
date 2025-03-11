@@ -6,7 +6,10 @@
       :key="modelValue?.rentedByTwinId"
       flat
       :node="modelValue || placeholderNode"
-      @update:node="$emit('update:model-value', $event as any)"
+      @update:node="
+        $emit('update:model-value', $event as any);
+        validationTask.run(nodeId);
+      "
       :status="
         validationTask.loading
           ? 'Pending'
@@ -62,6 +65,7 @@ import { gridProxyClient } from "../../clients";
 import { useAsync, useWatchDeep } from "../../hooks";
 import { ValidatorStatus } from "../../hooks/form_validator";
 import { useGrid } from "../../stores";
+import { NetworkFeatures } from "../../types";
 import type { SelectedMachine, SelectionDetailsFilters } from "../../types/nodeSelector";
 import { normalizeError } from "../../utils/helpers";
 import {
@@ -135,11 +139,13 @@ export default {
         }
 
         placeholderNode.value = node;
-        const features = getFeatures(gridStore, filters.value);
-        const missingFeatures = features.filter(value => !node.features.includes(value as Features));
+
         if (node === undefined || node === null) {
-          throw `Node ${nodeId} is not on the grid`;
+          throw `Node ${nodeId} doesn't exist.`;
         }
+
+        const features = getFeatures(gridStore, filters.value);
+        let missingFeatures = features.filter(value => !node?.features.includes(value as Features));
 
         const [{ data: farms }, e1] = await resolveAsync(gridProxyClient.farms.list({ farmId: node.farmId }));
         if (e1) {
@@ -165,10 +171,7 @@ export default {
           case props.filters.dedicated && !node.dedicated:
             throw `Node ${nodeId} is not dedicated`;
 
-          case props.filters.dedicated && node.rentedByTwinId === 0:
-            throw `Node ${nodeId} is not rented`;
-
-          case props.filters.dedicated && node.rentedByTwinId !== gridStore.client.twinId:
+          case props.filters.dedicated && node.rentedByTwinId && node.rentedByTwinId !== gridStore.client.twinId:
             throw `Node ${nodeId} is Dedicated, but rented by someone else`;
 
           case node.rentedByTwinId !== 0 && node.rentedByTwinId !== gridStore.client.twinId:
@@ -177,7 +180,14 @@ export default {
           case props.filters.ipv4 && farms[0].publicIps.every(p => p.contract_id !== 0):
             throw `Node ${nodeId} is not assigned to a PublicIP`;
           case missingFeatures.length > 0:
-            throw `Node ${nodeId} doesn't support [ ${missingFeatures} ] features`;
+            missingFeatures = missingFeatures.filter(feature => feature !== "ipv4");
+
+            throw `Node ${nodeId} does not support ${missingFeatures
+              .slice(0, -1)
+              .map(feature => NetworkFeatures[feature as keyof typeof NetworkFeatures])
+              .join(", ")}${missingFeatures.length > 1 ? " or " : ""}${
+              NetworkFeatures[missingFeatures[missingFeatures.length - 1] as keyof typeof NetworkFeatures]
+            } Feature${missingFeatures.length > 1 ? "s" : ""}. Please check compatibility or upgrade the node.`;
         }
 
         const args = [nodeId, "proxy", gridStore.client.config.proxyURL] as const;
@@ -213,9 +223,6 @@ export default {
             throw `Node ${nodeId} doesn't have enough Storage`;
         }
 
-        await validateRentContract(gridStore, node);
-        await checkNodeCapacityPool(gridStore, node, props.filters);
-
         if (props.filters.ipv4) {
           const ipsCount = props.selectedMachines.filter(m => m.publicIp && m.farmId === node.farmId).length + 1;
           if (ipsCount > 1) {
@@ -226,6 +233,8 @@ export default {
             }
           }
         }
+        await checkNodeCapacityPool(gridStore, node, props.filters);
+        await validateRentContract(gridStore, node, props.filters.hasGPU);
 
         bindModelValue(node);
         placeholderNode.value = undefined;
