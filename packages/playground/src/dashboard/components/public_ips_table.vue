@@ -5,7 +5,7 @@
       :headers="headers"
       :items="publicIps"
       :items-length="publicIpsCount"
-      :loading="loading"
+      :loading="loadingIps"
       v-model:items-per-page="pageSize"
       @update:options="getFarmPublicIp(true)"
       :items-per-page-options="[
@@ -14,7 +14,6 @@
         { value: 20, title: '20' },
         { value: 50, title: '50' },
       ]"
-      v-model:page="page"
       no-data-text="No IPs added on this farm"
       :deleting="isRemoving"
       show-select
@@ -38,7 +37,15 @@
     </v-data-table-server>
 
     <div v-if="publicIps.length > 0" class="d-flex align-end justify-end">
-      <v-btn class="my-3" color="error" prepend-icon="mdi-delete" @click="showDialogue = true"> Delete </v-btn>
+      <v-btn
+        class="my-3"
+        color="error"
+        :disabled="selectedItems.length == 0 || isRemoving"
+        prepend-icon="mdi-delete"
+        @click="showDialogue = true"
+      >
+        Delete
+      </v-btn>
     </div>
     <v-dialog v-model="showDialogue" max-width="600" attach="#modals">
       <v-card>
@@ -57,7 +64,7 @@
             text="Delete"
             :loading="isRemoving"
             color="error"
-            :disabled="isRemoving"
+            :disabled="selectedItems.length == 0 || isRemoving"
             @click="removeFarmIps"
           ></v-btn>
         </v-card-actions>
@@ -108,7 +115,6 @@ export default {
     ] as any;
     const publicIps = ref<PublicIp[]>([]);
     const publicIpsCount = ref();
-    const loading = ref(false);
     const loadingIps = ref(false);
     const showDialogue = ref(false);
     const type = ref(IPType.single);
@@ -122,10 +128,9 @@ export default {
     const pageSize = ref(10);
 
     async function getFarmPublicIp(retCount = false) {
-      loadingIps.value = true;
       if (retCount) page.value = 1;
-
       try {
+        loadingIps.value = true;
         const { data, count } = await gridProxyClient.publicIps.list({
           retCount,
           page: page.value,
@@ -145,13 +150,17 @@ export default {
     async function removeFarmIps() {
       try {
         isRemoving.value = true;
+        loadingIps.value = true;
         items.value = selectedItems.value.map(item => ({
           ip: item.ip,
           farmId: props.farmId,
         }));
         await gridStore.grid.farms.removeFarmIps(items.value);
-        createCustomToast("IP is deleted successfully!", ToastType.success);
-        await getFarmPublicIp(true);
+        setTimeout(async () => {
+          await getFarmPublicIp(true);
+          createCustomToast("IP is deleted successfully!", ToastType.success);
+          loadingIps.value = false;
+        }, 20000);
       } catch (error) {
         console.log(error);
         createCustomToast("Failed to delete IP!", ToastType.danger);
@@ -164,7 +173,10 @@ export default {
     watch(
       () => props.refreshPublicIPs,
       () => {
-        getFarmPublicIp(true);
+        loadingIps.value = true;
+        setTimeout(async () => {
+          await getFarmPublicIp(true);
+        }, 20000);
       },
       { deep: true },
     );
@@ -177,7 +189,6 @@ export default {
       publicIP,
       toPublicIP,
       gateway,
-      loading,
       showDialogue,
       isRemoving,
       removeFarmIps,
