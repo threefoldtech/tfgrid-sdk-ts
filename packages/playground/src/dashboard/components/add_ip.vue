@@ -153,9 +153,9 @@ export default {
     const toPublicIP = ref("");
     const gateway = ref("");
     const network = ref("");
-    const ipsRangeTable = ref([]);
+    const ipsRangeTable = ref<string[]>([]);
 
-    const ipTable = ref([]);
+    const ipTable = ref<any[]>([]);
 
     const formValidator = ref();
 
@@ -286,14 +286,14 @@ export default {
       addIPs();
       showIPs.value = true;
     }
-    function ipToLong(ip) {
-      return ip.split(".").reduce((acc, octet) => (acc << 8) + +octet, 0) >>> 0;
+    function ipToLong(ip: string) {
+      return ip.split(".").reduce((acc: number, octet: string | number) => (acc << 8) + +octet, 0) >>> 0;
     }
 
-    function longToIp(long) {
+    function longToIp(long: number) {
       return (long >>> 24) + "." + ((long >> 16) & 255) + "." + ((long >> 8) & 255) + "." + (long & 255);
     }
-    function generateIpTable(startIp, endIp, sub) {
+    function generateIpTable(startIp: string, endIp: string, sub: any) {
       const startLong = ipToLong(startIp);
       const endLong = ipToLong(endIp);
 

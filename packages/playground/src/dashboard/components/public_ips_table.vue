@@ -119,7 +119,7 @@ export default {
       },
     ] as any;
     const publicIps = ref<PublicIp[]>([]);
-    const ips = ref([]);
+    const ips = ref<any[]>([]);
     const loading = ref(false);
     const loadingIps = ref(false);
     const showDialogue = ref(false);
