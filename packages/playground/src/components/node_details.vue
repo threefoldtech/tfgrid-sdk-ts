@@ -1,6 +1,6 @@
 <template>
   <v-dialog
-    v-model="dialog"
+    v-model="$props.openDialog"
     @update:modelValue="(val:boolean) => closeDialog(val)"
     @click:outside="() => $emit('close-dialog', false)"
     transition="dialog-bottom-transition"
@@ -173,12 +173,9 @@ export default {
     }
 
     watch(() => props.nodeId, requestNode);
-    const dialog = computed(() => props.openDialog);
 
     return {
       NodeStatus,
-
-      dialog,
       node,
       loading,
       isError,
