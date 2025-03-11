@@ -373,9 +373,9 @@ class Nodes {
     let nodes: NodeInfo[] = [];
     url = url || this.proxyURL;
     /* 
-    this is tmp solution to exclude node 11 and 259 on dev net only and should be removed when the issue is fixed; tracked in https://github.com/threefoldtech/tfgrid-sdk-ts/issues/3855
+    this is tmp solution to exclude node 259 on dev net only and should be removed when the issue is fixed; tracked in https://github.com/threefoldtech/tfgrid-sdk-ts/issues/3855
     */
-    const TMP_EXCLUDED_NODES = [11, 259];
+    const TMP_EXCLUDED_NODES = [259];
     if (url.includes("dev"))
       options.nodeExclude = options.nodeExclude ? [...options.nodeExclude, ...TMP_EXCLUDED_NODES] : TMP_EXCLUDED_NODES;
     options.features = this.getFeaturesFromFilters(options);
