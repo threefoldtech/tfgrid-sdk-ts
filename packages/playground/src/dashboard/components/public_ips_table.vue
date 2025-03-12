@@ -7,7 +7,13 @@
       :items-length="publicIpsCount"
       :loading="loadingIps"
       v-model:items-per-page="pageSize"
-      @update:options="getFarmPublicIp(true)"
+      @update:options="
+        (options: any ) => {
+          page = options.page;
+          pageSize = options.itemsPerPage;
+          getFarmPublicIp(true, { page, size: pageSize });
+        }
+      "
       :items-per-page-options="[
         { value: 5, title: '5' },
         { value: 10, title: '10' },
@@ -76,7 +82,7 @@
 <script lang="ts">
 import type { RemoveFarmIPModel } from "@threefold/grid_client";
 import type { PublicIp } from "@threefold/gridproxy_client";
-import { ref, watch } from "vue";
+import { onMounted, ref, watch } from "vue";
 
 import { gridProxyClient } from "@/clients";
 import { useGrid } from "@/stores";
@@ -125,16 +131,15 @@ export default {
     const selectedItems = ref<any[]>([]);
     const items = ref<RemoveFarmIPModel[]>([]);
     const page = ref<number>(1);
-    const pageSize = ref(10);
+    const pageSize = ref(5);
 
-    async function getFarmPublicIp(retCount = false) {
-      if (retCount) page.value = 1;
+    async function getFarmPublicIp(retCount = false, options = { page: 1, size: 10 }) {
       try {
         loadingIps.value = true;
         const { data, count } = await gridProxyClient.publicIps.list({
           retCount,
-          page: page.value,
-          size: pageSize.value,
+          page: options.page,
+          size: options.size,
           free: true,
           farmIds: props.farmId,
         });
@@ -157,7 +162,7 @@ export default {
         }));
         await gridStore.grid.farms.removeFarmIps(items.value);
         setTimeout(async () => {
-          await getFarmPublicIp(true);
+          await getFarmPublicIp(false, { page: page.value, size: pageSize.value });
           createCustomToast("IP is deleted successfully!", ToastType.success);
           loadingIps.value = false;
         }, 20000);
@@ -175,12 +180,11 @@ export default {
       () => {
         loadingIps.value = true;
         setTimeout(async () => {
-          await getFarmPublicIp(true);
+          await getFarmPublicIp(false, { page: page.value, size: pageSize.value });
         }, 20000);
       },
       { deep: true },
     );
-
     return {
       gridStore,
       headers,
