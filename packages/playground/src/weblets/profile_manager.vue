@@ -103,11 +103,11 @@
             >
               <VTextField :label="'Your Mnemonic'" readonly v-model="profileManager.profile.mnemonic" v-bind="props" />
             </PasswordInputWrapper>
-            <CopyInputWrapper :data="profileManager.profile.hexSeed" #="{ props }">
+            <PasswordInputWrapper #="{ props }">
               <input-tooltip tooltip=" Please use this hex seed to import your wallet in Threefold Connect">
                 <VTextField label="Your Hex Seed" readonly v-model="profileManager.profile.hexSeed" v-bind="props" />
               </input-tooltip>
-            </CopyInputWrapper>
+            </PasswordInputWrapper>
 
             <CopyInputWrapper :data="profileManager.profile.twinId.toString()" #="{ props }">
               <VTextField label="Twin ID" readonly v-model="profileManager.profile.twinId" v-bind="props" />

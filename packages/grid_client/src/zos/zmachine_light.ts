@@ -44,7 +44,7 @@ class ZmachineLight extends WorkloadData {
   @Expose() @Type(() => ZmachineLightNetwork) @ValidateNested() network: ZmachineLightNetwork;
   @Expose() @IsInt() @Min(0) @Max(10 * 1024 ** 4) size: number; // in bytes
   @Expose() @Type(() => ComputeCapacity) @ValidateNested() compute_capacity: ComputeCapacity;
-  @Expose() @Type(() => Mount) @ValidateNested({ each: true }) mounts: Mount[];
+  @Expose() @Type(() => Mount) @IsOptional() @ValidateNested({ each: true }) mounts: Mount[];
   @Expose() @IsString() @IsDefined() entrypoint: string;
   @Expose() env: Record<string, string>;
   @Expose() @Transform(({ value }) => (value ? true : false)) @IsBoolean() corex: boolean;

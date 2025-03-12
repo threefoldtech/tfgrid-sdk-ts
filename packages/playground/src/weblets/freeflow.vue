@@ -58,10 +58,10 @@
         require-domain
       />
       <!-- <input-tooltip inline tooltip="" :href="manual"> -->
-      <v-switch color="primary" inset label="Nodes rented by me (only)" v-model="rentedByMe" hide-details />
+      <v-switch color="primary" inset label="Rented By Me" v-model="rentedByMe" hide-details />
       <!-- </input-tooltip> -->
       <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
-        <v-switch color="primary" inset label="Rentable nodes" v-model="dedicated" hide-details />
+        <v-switch color="primary" inset label="Rentable" v-model="dedicated" hide-details />
       </input-tooltip>
 
       <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
