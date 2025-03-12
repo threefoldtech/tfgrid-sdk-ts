@@ -199,7 +199,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
           path: [
             { title: "Deploy" },
             {
-              title: "Applications",
+              title: "Labs",
               disabled: false,
               to: DashboardRoutes.Deploy.Applications,
             },
