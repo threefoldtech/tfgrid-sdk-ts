@@ -62,7 +62,7 @@ enum ApplicationRoutes {
   Discourse = "/deploy/labs/discourse/",
   Taiga = "/deploy/labs/taiga/",
   Owncloud = "/deploy/labs/owncloud/",
-  Openwebui = "/deploy/applications/openwebui/",
+  Openwebui = "/deploy/laps/openwebui/",
   Nextcloud = "/deploy/labs/nextcloud/",
   Presearch = "/deploy/labs/presearch/",
   Subsquid = "/deploy/labs/subsquid/",
