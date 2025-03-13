@@ -20,13 +20,19 @@
           </v-col>
           <v-col class="mr-3 d-flex justify-end align-center">
             <v-select
-              chips
               density="compact"
               hide-details="auto"
               v-model="cardId"
               :items="cardsIds"
               variant="outlined"
-            />
+              v-model:menu="menu"
+            >
+              <template v-slot:selection="{ item }">
+                <v-chip>
+                  {{ item.title }}
+                </v-chip>
+              </template>
+            </v-select>
             <v-icon class="ml-1" :icon="'mdi-content-copy'" @click="copy(cardId)" />
           </v-col>
         </v-row>
@@ -56,6 +62,7 @@ export default {
   },
 
   setup(props) {
+    const menu = ref<boolean>(false);
     const loading = ref<boolean>(false);
     const gpuFields = ref<NodeDetailsCard[]>([]);
     const cardsIds = ref<string[]>([]);
@@ -110,6 +117,7 @@ export default {
       cardId,
       selectedCard,
       copy,
+      menu,
     };
   },
 };
