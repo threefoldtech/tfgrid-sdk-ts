@@ -8,7 +8,7 @@
   >
     <template #gpu-hint-message>
       <div class="mb-3">
-        <v-chip class="d-flex justify-center ma-4 mt-1" color="info">
+        <v-chip class="d-flex justify-center mb-3 mt-1" color="info">
           Select a GPU card ID from the below selection to load its data.
         </v-chip>
         <v-row class="bb-gray">
