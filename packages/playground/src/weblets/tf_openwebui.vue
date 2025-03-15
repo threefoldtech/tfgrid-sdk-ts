@@ -55,9 +55,11 @@
         >
           <v-switch color="primary" inset label="GPU" v-model="hasGPU" hide-details />
         </input-tooltip>
-        <v-switch color="primary" inset label="Rented By Me" v-model="$props.modelValue.rentedByMe" hide-details />
+        
+        <v-switch color="primary" inset label="Rented By Me" v-model="rentedByMe" hide-details />
+        
         <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
-        <v-switch color="primary" inset label="Rentable" v-model="$props.modelValue.dedicated" hide-details />
+          <v-switch color="primary" inset label="Rentable" v-model="dedicated" hide-details />
         </input-tooltip>
 
         <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
@@ -84,6 +86,7 @@
           v-model="selectionDetails"
         />
 
+        
         <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
       </template>
     </d-tabs>
