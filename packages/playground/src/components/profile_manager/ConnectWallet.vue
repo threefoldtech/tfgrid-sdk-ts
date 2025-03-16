@@ -1,5 +1,5 @@
 <template>
-  <form id="wallet-form" @submit.prevent="storeAndLogin()">
+  <form id="wallet-form" @submit.prevent="storeAndLogin()" class="pa-4">
     <FormValidator id="form-validator" v-model="isValidForm">
       <v-alert id="mnemonic-warning" type="warning" variant="tonal" class="mb-6">
         <p :style="{ maxWidth: '880px' }">

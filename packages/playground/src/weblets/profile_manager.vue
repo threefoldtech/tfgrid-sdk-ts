@@ -228,7 +228,7 @@ async function mounted() {
 }
 
 const loginTab = { title: "Login", value: "login" };
-const registerTab = { title: "Register", value: "register" };
+const registerTab = { title: "Connect Your Wallet", value: "register" };
 function getTabs() {
   if (isStoredCredentials()) {
     activeTab.value = 0;
