@@ -231,6 +231,7 @@ const loginTab = { title: "Login", value: "login" };
 const registerTab = { title: "Register", value: "register" };
 function getTabs() {
   if (isStoredCredentials()) {
+    activeTab.value = 0;
     return [loginTab, registerTab];
   }
   return [registerTab];
