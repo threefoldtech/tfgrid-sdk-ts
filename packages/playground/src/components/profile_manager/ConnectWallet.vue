@@ -72,7 +72,7 @@
             text="Using different keypair types will lead to a completely different account."
           >
             <template #activator="{ props }">
-              <v-autocomplete
+              <v-select
                 id="keypair-select"
                 label="Keypair Type"
                 v-bind="props"
