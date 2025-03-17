@@ -4,7 +4,7 @@ import { FilterOptions, GatewayNameModel, generateString, MachineModel, Machines
 import { config, getClient } from "./client_loader";
 import { log } from "./utils";
 
-const name = "newVMs";
+const name = "wgvm" + generateString(8);
 
 function createNetworkModel(gwNode: number, name: string): NetworkModel {
   return {
