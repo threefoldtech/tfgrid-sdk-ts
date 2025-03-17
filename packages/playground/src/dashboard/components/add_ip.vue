@@ -76,20 +76,41 @@
           </v-card-text>
           <v-dialog v-model="showIPs" max-width="500" attach="#modals">
             <v-card>
-              <v-card-title class="text-h5">IPs range</v-card-title>
+              <v-card-title class="bg-primary">IPs range</v-card-title>
               <v-card-text>
-                <v-data-table
-                  :headers="[
-                    { title: 'Network', key: 'network', sortable: false },
-                    { title: 'IP Addresses', key: 'ipsRangeTable', sortable: false },
-                  ]"
-                  :items="ipTable"
-                  hide-default-footer
-                  hide-no-data
-                >
-                  <template #bottom></template
-                ></v-data-table>
+                <v-row>
+                  <v-col sm="12">
+                    <v-list density="compact">
+                      <v-list-item
+                        ><v-row
+                          ><v-col><p>Network:</p></v-col
+                          ><v-col
+                            ><p>{{ network }}</p></v-col
+                          ></v-row
+                        ></v-list-item
+                      >
+                      <v-list-item>
+                        <v-row
+                          ><v-col>IP Addresses:</v-col
+                          ><v-col
+                            ><v-chip-group>
+                              <v-chip
+                                :style="{ 'pointer-events': 'none', color: 'teal' }"
+                                color="teal"
+                                v-for="ip in ipsRangeTable"
+                                :key="ip"
+                                >{{ ip }}</v-chip
+                              >
+                            </v-chip-group></v-col
+                          ></v-row
+                        >
+                      </v-list-item>
+                    </v-list>
+                  </v-col>
+                </v-row>
+                <v-divider></v-divider>
               </v-card-text>
+
               <v-card-actions class="justify-end mb-1 mr-2">
                 <v-btn @click="showIPs = false" color="anchor">Close</v-btn></v-card-actions
               >
@@ -154,9 +175,6 @@ export default {
     const gateway = ref("");
     const network = ref("");
     const ipsRangeTable = ref<string[]>([]);
-
-    const ipTable = ref<any[]>([]);
-
     const formValidator = ref();
 
     watch(
@@ -308,11 +326,6 @@ export default {
         ipsRangeTable.value.push(longToIp(i));
       }
       network.value = `${networkBase}/${sub}`;
-      ipTable.value = [];
-      ipTable.value.push({
-        network: network.value,
-        ipsRangeTable: ipsRangeTable.value.join(", "),
-      });
     }
     function addIPs() {
       const sub = publicIP.value.split("/")[1];
@@ -377,8 +390,8 @@ export default {
 
     return {
       ipsRangeTable,
-      ipTable,
       showDialogue,
+      network,
       valid,
       IPs,
       items,
