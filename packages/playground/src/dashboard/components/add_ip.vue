@@ -74,13 +74,13 @@
             </form-validator>
             <v-divider />
           </v-card-text>
-          <v-dialog v-model="showIPs" max-width="500" attach="#modals">
+          <v-dialog v-model="showIPs" max-width="600" attach="#modals">
             <v-card>
               <v-card-title class="bg-primary">IPs range</v-card-title>
               <v-card-text>
                 <v-row>
                   <v-col sm="12">
-                    <v-list density="compact">
+                    <v-list class="my-5">
                       <v-list-item
                         ><v-row
                           ><v-col><p>Network:</p></v-col
@@ -90,10 +90,10 @@
                         ></v-list-item
                       >
                       <v-list-item>
-                        <v-row
-                          ><v-col>IP Addresses:</v-col
-                          ><v-col
-                            ><v-chip-group>
+                        <v-row>
+                          <v-col>IP Addresses:</v-col>
+                          <v-col>
+                            <v-chip-group column>
                               <v-chip
                                 :style="{ 'pointer-events': 'none', color: 'teal' }"
                                 color="teal"
