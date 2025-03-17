@@ -79,11 +79,11 @@
               <v-card-title class="bg-primary">IPs range</v-card-title>
               <v-card-text>
                 <v-row>
-                  <v-col sm="12">
+                  <v-col>
                     <v-list class="my-5">
                       <v-list-item
                         ><v-row
-                          ><v-col><p>Network:</p></v-col
+                          ><v-col sm="4"><p>Network:</p></v-col
                           ><v-col
                             ><p>{{ network }}</p></v-col
                           ></v-row
@@ -91,7 +91,7 @@
                       >
                       <v-list-item>
                         <v-row>
-                          <v-col>IP Addresses:</v-col>
+                          <v-col sm="4">IP Addresses:</v-col>
                           <v-col>
                             <v-chip-group column>
                               <v-chip
