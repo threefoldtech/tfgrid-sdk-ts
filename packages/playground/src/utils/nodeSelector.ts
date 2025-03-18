@@ -400,6 +400,11 @@ export async function getNodeGpuCards(gridStore: ReturnType<typeof useGrid>, nod
   return cards || [];
 }
 
+export async function getNodeAvailableGpuCards(gridStore: ReturnType<typeof useGrid>, node: NodeInfo) {
+  const cards = await getNodeGpuCards(gridStore, node);
+  return cards.filter(card => card.contract == 0);
+}
+
 export async function resolveAsync<T>(promise: Promise<T>): Promise<[T, null]>;
 export async function resolveAsync<T, E>(promise: Promise<T>): Promise<[null, E]>;
 export async function resolveAsync(promise: Promise<any>): Promise<any> {

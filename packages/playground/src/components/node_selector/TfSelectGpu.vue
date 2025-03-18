@@ -41,7 +41,7 @@ import type { InputValidatorService } from "@/hooks/input_validator";
 import { useAsync, useWatchDeep } from "../../hooks";
 import { useForm, ValidatorStatus } from "../../hooks/form_validator";
 import { useGrid } from "../../stores";
-import { getNodeGpuCards } from "../../utils/nodeSelector";
+import { getNodeAvailableGpuCards } from "../../utils/nodeSelector";
 
 export default {
   name: "TfSelectGpu",
@@ -58,7 +58,7 @@ export default {
   setup(props, ctx) {
     const gridStore = useGrid();
     const input = ref<HTMLElement>();
-    const cardsTask = useAsync(getNodeGpuCards, { default: [] });
+    const cardsTask = useAsync(getNodeAvailableGpuCards, { default: [] });
 
     onUnmounted(() => {
       bindModelValue();
