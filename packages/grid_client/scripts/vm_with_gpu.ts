@@ -1,4 +1,5 @@
 import { FilterOptions, MachinesModel } from "../src";
+import { flists } from "../src/helpers/flists";
 import { config, getClient } from "./client_loader";
 import { log } from "./utils";
 
@@ -72,7 +73,7 @@ async function main() {
         cpu: 8,
         memory: 1024 * 16,
         rootfs_size: 0,
-        flist: "https://hub.grid.tf/tf-official-vms/ubuntu-22.04.flist",
+        flist: flists.microVMs.find(flist => flist.name == "Ubuntu-22.04")?.flist,
         entrypoint: "/",
         env: {
           SSH_KEY: config.ssh_key,

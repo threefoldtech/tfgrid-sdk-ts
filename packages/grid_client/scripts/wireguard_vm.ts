@@ -1,4 +1,5 @@
 import { FilterOptions, GatewayNameModel, MachineModel, MachinesModel, NetworkModel } from "../src";
+import { flists } from "../src/helpers/flists";
 import { config, getClient } from "./client_loader";
 import { log } from "./utils";
 
@@ -23,7 +24,7 @@ function createMachineModel(node: number) {
     memory: 1024 * 2,
     rootfs_size: 0,
     disks: [],
-    flist: "https://hub.grid.tf/tf-official-apps/threefoldtech-ubuntu-22.04.flist",
+    flist: flists.microVMs.find(flist => flist.name == "Ubuntu-22.04")?.flist,
     entrypoint: "/usr/bin/python3 -m http.server --bind ::",
     env: {
       SSH_KEY: config.ssh_key,

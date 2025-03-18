@@ -207,49 +207,7 @@ import { generateName } from "../utils/strings";
 const layout = useLayout();
 const tabs = ref();
 
-const images = [
-  {
-    name: "Ubuntu-24.04",
-    flist: "https://hub.grid.tf/tf-official-vms/ubuntu-24.04-latest.flist",
-    entryPoint: "/sbin/zinit init",
-  },
-  {
-    name: "Ubuntu-23.10",
-    flist: "https://hub.grid.tf/tf-official-vms/ubuntu-23.10-mycelium.flist",
-    entryPoint: "/sbin/zinit init",
-  },
-  {
-    name: "Ubuntu-22.04",
-    flist: "https://hub.grid.tf/tf-official-apps/threefoldtech-ubuntu-22.04.flist",
-    entryPoint: "/sbin/zinit init",
-  },
-  {
-    name: "Arch",
-    flist: "https://hub.grid.tf/tf-official-vms/arch-mycelium.flist",
-    entryPoint: "/sbin/zinit init",
-  },
-  {
-    name: "Debian-12",
-    flist: "https://hub.grid.tf/tf-official-apps/threefoldtech-debian-12.flist",
-    entryPoint: "/sbin/zinit init",
-  },
-  {
-    name: "Alpine-3",
-    flist: "https://hub.grid.tf/tf-official-apps/threefoldtech-alpine-3.flist",
-    entryPoint: "/entrypoint.sh",
-  },
-  {
-    name: "CentOS-8",
-    flist: "https://hub.grid.tf/tf-official-apps/threefoldtech-centos-8.flist",
-    entryPoint: "/entrypoint.sh",
-  },
-  {
-    name: "Nixos",
-    flist: "https://hub.grid.tf/tf-official-vms/nixos-micro-latest.flist",
-    entryPoint: "/entrypoint.sh",
-  },
-];
-
+const images = flists.microVMs as VmImage[];
 const name = ref(generateName({ prefix: "vm" }));
 const flist = ref<Flist>();
 const { ipv4, ipv6, planetary, mycelium, wireguard } = useNetworks();
@@ -336,9 +294,10 @@ watch(selectedSSHKeys, layoutMount, { deep: true });
 </script>
 
 <script lang="ts">
-import type { GridClient } from "@threefold/grid_client";
+import { flists, type GridClient } from "@threefold/grid_client";
 
 import ExpandableLayout from "../components/expandable_layout.vue";
+import type { VmImage } from "../components/select_vm_image.vue";
 import SelectVmImage from "../components/select_vm_image.vue";
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";

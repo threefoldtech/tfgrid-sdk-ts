@@ -1,4 +1,5 @@
 import { FilterOptions, MachinesModel } from "../../src";
+import { flists } from "../../src/helpers/flists";
 import { config, getClient } from "../client_loader";
 import { log, pingNodes } from "../utils";
 
@@ -63,8 +64,8 @@ async function main() {
         cpu: instanceCapacity.cru,
         memory: 1024 * instanceCapacity.mru,
         rootfs_size: 0,
-        flist: "https://hub.grid.tf/tf-official-apps/presearch-v2.3.flist",
-        entrypoint: "/sbin/zinit init",
+        flist: flists.presearch.value,
+        entrypoint: flists.presearch.entryPoint,
         env: {
           SSH_KEY: config.ssh_key,
           //Presearch Registeration Code.

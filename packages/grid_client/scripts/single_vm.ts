@@ -1,4 +1,5 @@
 import { GridClient, MachinesModel } from "../src";
+import { flists } from "../src/helpers/flists";
 import { type ZmachineData } from "../src/helpers/types";
 import { config, getClient } from "./client_loader";
 import { log } from "./utils";
@@ -53,7 +54,7 @@ async function main() {
         cpu: 1,
         memory: 1024 * 2,
         rootfs_size: 0,
-        flist: "https://hub.grid.tf/tf-official-apps/base:latest.flist",
+        flist: flists.microVMs.find(flist => flist.name == "Ubuntu-24.04")!.flist,
         entrypoint: "/sbin/zinit init",
         env: {
           SSH_KEY: config.ssh_key,

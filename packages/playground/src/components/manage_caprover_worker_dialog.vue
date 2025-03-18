@@ -158,8 +158,8 @@ async function deploy(layout: any) {
           mountPoint: "/var/lib/docker",
         },
       ],
-      flist: "https://hub.grid.tf/tf-official-apps/tf-caprover-latest.flist",
-      entryPoint: "/sbin/zinit init",
+      flist: flists.caprover.value,
+      entryPoint: flists.caprover.entryPoint,
       farmId: worker.value.selectionDetails!.farm?.farmId,
       farmName: worker.value.selectionDetails!.farm?.name,
       country: worker.value.selectionDetails!.location?.country,
@@ -219,7 +219,7 @@ async function onDelete(cb: (workers: any[]) => void) {
 </script>
 
 <script lang="ts">
-import { calculateRootFileSystem, type GridClient } from "@threefold/grid_client";
+import { calculateRootFileSystem, flists, type GridClient } from "@threefold/grid_client";
 
 import CaproverWorker, { createWorker } from "../components/caprover_worker.vue";
 import ListTable from "../components/list_table.vue";
