@@ -528,3 +528,29 @@ export async function checkNodeCapacityPool(
     throw err;
   }
 }
+/**
+ * Checks the availability of at least one GPU card on a specified node.
+ *
+ * @param {ReturnType<typeof useGrid>} gridStore - The grid store instance used to retrieve GPU card availability.
+ * @param {NodeInfo} node - The node to check for available GPU cards.
+ * @returns {Promise<true>} Resolves to `true` if at least one GPU card is available.
+ * @throws {Error} Throws an error if no GPU cards are available or if an unexpected issue occurs.
+ */
+export async function checkGpuCardAvailability(
+  gridStore: ReturnType<typeof useGrid>,
+  node: NodeInfo,
+): Promise<true> | never {
+  try {
+    const cards = await getNodeAvailableGpuCards(gridStore, node);
+    if (cards.length === 0) {
+      throw "No available GPU cards on the selected node.";
+    }
+    return true;
+  } catch (error) {
+    const err = normalizeError(
+      error,
+      "Something went wrong while checking status of the GPU card. Please check your connection and try again.",
+    );
+    throw err;
+  }
+}
