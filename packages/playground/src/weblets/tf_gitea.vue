@@ -238,7 +238,8 @@ function updateSSHkeyEnv(selectedKeys: string) {
 </script>
 
 <script lang="ts">
-import { flists, type GridClient, VM } from "@threefold/grid_client";
+import type { GridClient, VM } from "@threefold/grid_client";
+import { flists } from "@threefold/grid_client";
 
 import SmtpServer, { createSMTPServer } from "../components/smtp_server.vue";
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
