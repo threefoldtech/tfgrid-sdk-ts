@@ -15,7 +15,7 @@
           bindModelValue($event);
           bindStatus($event.length === 0 ? ValidatorStatus.Invalid : ValidatorStatus.Valid);
         "
-        :items="(cardsTask.data as GPUCardInfo[]).filter(card => $props.modelValue.some(c => c.id === card.id+1))"
+        :items="(cardsTask.data as GPUCardInfo[])"
         item-title="device"
         :loading="cardsTask.loading"
         :error="!!cardsTask.error"
