@@ -10,6 +10,7 @@
         class="w-100"
         multiple
         :model-value="$props.modelValue"
+        item-value="id"
         @update:model-value="
           bindModelValue($event);
           bindStatus($event.length === 0 ? ValidatorStatus.Invalid : ValidatorStatus.Valid);
