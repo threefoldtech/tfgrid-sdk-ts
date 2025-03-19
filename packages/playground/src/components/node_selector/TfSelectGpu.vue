@@ -4,7 +4,7 @@
     <input-tooltip
       tooltip="Please select at least one card from the available GPU cards. Note that if you have a deployment that already uses certain cards, they will not appear in the selection area. You have the option to select one or more cards.."
     >
-      <VAutocomplete
+      <VSelect
         label="GPU Cards"
         placeholder="Select GPU Cards"
         class="w-100"
@@ -15,13 +15,14 @@
           bindModelValue($event);
           bindStatus($event.length === 0 ? ValidatorStatus.Invalid : ValidatorStatus.Valid);
         "
-        :items="(cardsTask.data as GPUCardInfo[])"
+        :items="(cardsTask.data as GPUCardInfo[]).filter(card => $props.modelValue.some(c => c.id === card.id+1))"
         item-title="device"
         :loading="cardsTask.loading"
         :error="!!cardsTask.error"
         :error-messages="
           $props.status === ValidatorStatus.Invalid ? 'Please select at least 1 GPU card.' : cardsTask.error?.message
         "
+        no-data-text="No GPU cards available on the selected node."
         return-object
         :disabled="!$props.validNode"
         :hint="$props.validNode ? undefined : 'Please select a valid node to load its GPU cards.'"
