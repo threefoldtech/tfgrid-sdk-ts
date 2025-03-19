@@ -62,6 +62,7 @@
                   selectable
                   @update:node="updateNode($event as NodeInfo)"
                   @node:select="bindModelValueAndValidate"
+                  @update:status="bindStatus($event as ValidatorStatus)"
                   :status="
                     $props.modelValue === node
                       ? nodeInputValidateTask.loading
