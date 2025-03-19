@@ -288,7 +288,7 @@ async function _loadValidNodes(
 
   while (page !== -1) {
     const nodes = await loadNodes(gridStore, { ...filters, page });
-    const checks = await Promise.allSettled(nodes.map(n => checkNodeCapacityPool(gridStore, n, selectionFitlers)));
+    const checks = await Promise.allSettled(nodes.map(n => _checkNodeCapacityAndGpu(gridStore, n, selectionFitlers)));
     const validNodes = checks.map((c, i) => (c.status === "fulfilled" ? nodes[i] : null)).filter(Boolean) as NodeInfo[];
 
     if (validNodes.length > 0) {
@@ -299,6 +299,17 @@ async function _loadValidNodes(
   }
 
   return [];
+}
+
+async function _checkNodeCapacityAndGpu(
+  gridStore: ReturnType<typeof useGrid>,
+  node: NodeInfo,
+  selectionFitlers: SelectionDetailsFilters,
+) {
+  await checkNodeCapacityPool(gridStore, node, selectionFitlers);
+  if (selectionFitlers.hasGPU) {
+    await checkGpuCardAvailability(gridStore, node);
+  }
 }
 
 type GetFarmFn = (farmId: number) => Farm | undefined;
