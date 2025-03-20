@@ -4,26 +4,25 @@
       <v-card-title class="text-center">TFT Transfer</v-card-title>
 
       <!-- From Address -->
-      <v-text-field v-model="fromAddress" label="From (name: zee)" variant="outlined" readonly></v-text-field>
+      <v-text-field v-model="fromAddress" label="Stellar Account Seed" variant="outlined"></v-text-field>
 
       <!-- To Address -->
-      <v-text-field v-model="toAddress" label="To" variant="outlined" density="compact"></v-text-field>
+      <v-text-field v-model="toAddress" label="Solana Associated Token Address" variant="outlined"></v-text-field>
 
       <!-- Amount Input -->
       <v-text-field
         v-model="amount"
         label="Amount"
         variant="outlined"
-        density="compact"
         type="number"
         :rules="[validateAmount]"
       ></v-text-field>
 
       <!-- Transfer Fee -->
-      <p class="text-caption text-grey-darken-1">Transfer Fee: {{ transferFee }} TFT</p>
+      <p class="text-caption text-grey-darken-1 mb-2">Transfer Fee: {{ transferFee }} TFT</p>
 
       <!-- Submit Button -->
-      <v-btn block color="primary" @click="submitForm" :disabled="!isValidTransaction"> Submit </v-btn>
+      <v-btn block color="primary" @click.prevent="submitForm" :disabled="!isValidTransaction"> Submit </v-btn>
     </v-card>
   </v-container>
 </template>
@@ -31,24 +30,24 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 
-const fromAddress = ref("5GNU4aqL9JPj79hUDyPrPPTCpaMcd3LRAmyXvvW");
+import { transferTFT } from "../services/stellar";
+
+const fromAddress = ref("");
 const toAddress = ref("");
-const amount = ref(0);
-const balance = 0.85;
-const transferFee = 1.01;
+const amount = ref(1);
+const transferFee = 50.01;
 
 const validateAmount = (value: number) => {
   if (!value || value <= 0) return "Amount must be greater than 0";
-  if (value + transferFee > balance) return "Insufficient balance";
   return true;
 };
 
 const isValidTransaction = computed(() => {
-  return toAddress.value && amount.value > 0 && amount.value + transferFee <= balance;
+  return toAddress.value && amount.value > 0;
 });
 
-const submitForm = () => {
-  alert(`Transferring ${amount.value} TFT to ${toAddress.value}`);
+const submitForm = async () => {
+  await transferTFT(fromAddress.value, toAddress.value, amount.value.toString());
 };
 </script>
 
