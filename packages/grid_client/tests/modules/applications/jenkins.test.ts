@@ -68,7 +68,7 @@ test("TC2953 - Applications: Deploy Jenkins", async () => {
 
   // GatewayNode Selection
   const gatewayNodes = await gridClient.capacity.filterNodes({
-    features: [Features.wireguard, Features.mycelium],
+    features: [Features.yggdrasil, Features.mycelium],
     gateway: true,
     farmId: 1,
     availableFor: await gridClient.twins.get_my_twin_id(),
@@ -78,7 +78,7 @@ test("TC2953 - Applications: Deploy Jenkins", async () => {
 
   // Node Selection
   const nodes = await gridClient.capacity.filterNodes({
-    features: [Features.wireguard, Features.mycelium],
+    features: [Features.yggdrasil, Features.mycelium],
     cru: cpu,
     mru: memory,
     sru: rootfsSize + diskSize,
