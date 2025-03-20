@@ -28,7 +28,7 @@
   </v-container>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { computed, ref } from "vue";
 
 const fromAddress = ref("5GNU4aqL9JPj79hUDyPrPPTCpaMcd3LRAmyXvvW");
@@ -37,7 +37,7 @@ const amount = ref(0);
 const balance = 0.85;
 const transferFee = 1.01;
 
-const validateAmount = value => {
+const validateAmount = (value: number) => {
   if (!value || value <= 0) return "Amount must be greater than 0";
   if (value + transferFee > balance) return "Insufficient balance";
   return true;
