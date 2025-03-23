@@ -166,7 +166,7 @@ import { ValidationError } from "@threefold/types";
 import { contains } from "cidr-tools";
 import { isEqual } from "lodash";
 import { default as PrivateIp } from "private-ip";
-import { onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 
 import type { RuleReturn } from "@/components/input_validator.vue";
 import { useFormRef } from "@/hooks/form_validator";
@@ -193,7 +193,11 @@ export default {
     const showClearDialogue = ref(false);
     const isRemoving = ref(false);
     const isSaving = ref(false);
-    const isConfigChanged = ref(false);
+    const isConfigChanged = computed(() => {
+      return !isEqual(defualtNodeConfig.value, config.value);
+    });
+
+    ref(false);
     const formRef = useFormRef();
     const grid = useGrid();
 
