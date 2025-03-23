@@ -10,6 +10,7 @@
         class="w-100"
         multiple
         :model-value="$props.modelValue"
+        item-value="id"
         @update:model-value="
           bindModelValue($event);
           bindStatus($event.length === 0 ? ValidatorStatus.Invalid : ValidatorStatus.Valid);
@@ -23,7 +24,7 @@
         "
         return-object
         :disabled="!$props.validNode"
-        :hint="$props.validNode ? undefined : 'Please select a valid node to load it\'s GPU cards.'"
+        :hint="$props.validNode ? undefined : 'Please select a valid node to load its GPU cards.'"
         :persistent-hint="!$props.validNode"
         @update:menu="opened => !opened && $props.modelValue.length === 0 && bindStatus(ValidatorStatus.Invalid)"
       />

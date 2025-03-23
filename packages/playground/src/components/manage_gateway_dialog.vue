@@ -201,6 +201,8 @@ import type { NetworkFeatures, SelectionDetails } from "../types/nodeSelector";
 import {
   type DeployGatewayConfig,
   deployGatewayName,
+  extractDomainIP,
+  getDeploymentIps,
   type GridGateway,
   loadDeploymentGateways,
 } from "../utils/gateway";
@@ -314,23 +316,22 @@ export default {
     };
 
     const getDomainNode = (domain: GridGateway): string => {
-      const extractIP = (input: string) => input.replace("https://", "").replace("http://", "").split(":")[0];
+      let ip = "";
+      try {
+        ip = extractDomainIP(domain.backends[0]);
+      } catch (error) {
+        console.error(`Failed to extract IP from domain due to: ${error}`);
+      }
 
-      const IP = extractIP(domain.backends[0]);
-
-      const isMatchingIP = (ip: string) => ip === IP;
-
-      const isMaster =
-        isMatchingIP(props.k8s!.masters[0].interfaces[0].ip) ||
-        (props.k8s!.masters[0].publicIP && isMatchingIP(props.k8s!.masters[0].publicIP.ip.split("/")[0]));
+      const masterIps = getDeploymentIps(props.k8s!.masters[0]);
+      const isMaster = masterIps.some(_ip => _ip === ip);
 
       if (isMaster) {
         return props.k8s!.masters[0].name;
       }
 
-      const worker = props.k8s!.workers.find(
-        (worker: ZmachineData) =>
-          isMatchingIP(worker.interfaces[0].ip) || (worker.publicIP && isMatchingIP(worker.publicIP.ip.split("/")[0])),
+      const worker = props.k8s!.workers.find((worker: ZmachineData) =>
+        getDeploymentIps(worker).some(_ip => _ip === ip),
       );
 
       return worker ? worker.name : "-";
@@ -438,9 +439,17 @@ export default {
       if (selectedNode.value.type === WorkloadTypes.zmachine) {
         addNetwork(NetworkInterfaces.WireGuard, interfaces?.[0]?.ip);
         addNetwork(NetworkInterfaces.PublicIPV4, publicIP?.ip.split("/")[0]);
-        addNetwork(NetworkInterfaces.Planetary, planetary);
-        addNetwork(NetworkInterfaces.Mycelium, myceliumIP);
-        addNetwork(NetworkInterfaces.PublicIPV6, publicIP?.ip6.split("/")[0]);
+        /**
+         * WARNING:
+         * Do not remove the following line!
+         * VMs only support IPv6 as a domain interface.
+         * For more details: https://github.com/threefoldtech/tf-images/issues/291
+         */
+        if (props?.vm) {
+          addNetwork(NetworkInterfaces.Planetary, planetary);
+          addNetwork(NetworkInterfaces.Mycelium, myceliumIP);
+          addNetwork(NetworkInterfaces.PublicIPV6, publicIP?.ip6.split("/")[0]);
+        }
       }
       if (selectedNode.value.type === WorkloadTypes.zmachinelight) {
         addNetwork(NetworkInterfaces.Mycelium, myceliumIP);

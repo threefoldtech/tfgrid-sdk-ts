@@ -9,22 +9,24 @@
     </input-tooltip>
 
     <div ref="input">
-      <VForm v-model="domainNameValid">
+      <form-validator ref="domainFormRef">
         <VExpandTransition>
           <input-tooltip tooltip="Domain Name that will point to this instance" v-if="enableCustomDomain">
-            <VTextField
-              ref="customDomainInput"
-              label="Custom Domain"
-              placeholder="Your custom domain"
-              v-model="customDomain"
-              @vue:mounted="customDomain && ($refs.customDomainInput as VInput).validate()"
-              validate-on="input"
+            <InputValidator
               :rules="[
-                d => (d ? true : 'Domain name is required.'),
-                d => validators.isFQDN('Please provide a valid domain name.')(d)?.message || true,
+                validators.required('Domain name is required.'),
+                validators.isFQDN('Please provide a valid domain name.'),
               ]"
-              @blur="($refs.customDomainInput as VInput).validate()"
-            />
+              v-model:value="customDomain"
+              ref="customInputRef"
+              #="{ props }"
+              ><VTextField
+                v-bind="props"
+                label="Custom Domain"
+                placeholder="Your custom domain"
+                v-model="customDomain"
+              />
+            </InputValidator>
           </input-tooltip>
         </VExpandTransition>
 
@@ -33,42 +35,48 @@
             tooltip="Creates a subdomain for your instance on the selected domain to be able to access your instance from the browser."
             v-if="!disableSelectedDomain"
           >
-            <VAutocomplete
+            <InputValidator
+              #="{ props }"
               ref="domainInput"
-              validate-on="input"
-              label="Select domain"
-              placeholder="Select a domain"
-              :items="loadedDomains"
-              :loading="domainsTask.loading"
-              item-title="publicConfig.domain"
-              v-model="selectedDomain"
-              :error-messages="domainsTask.error?.message"
-              @vue:mounted="selectedDomain && ($refs.domainInput as VInput).validate()"
-              :rules="[d => (d ? true : 'Domain is required.')]"
-              @update:menu="opened => !opened && $nextTick().then(() => ($refs.domainInput as VInput).validate())"
-              @blur="$nextTick().then(() => ($refs.domainInput as VInput).validate())"
-              return-object
+              :rules="[validators.required('Domain is required.')]"
+              :value="(selectedDomain as INode)"
             >
-              <template #append-item v-if="pagination.page !== -1">
-                <VContainer>
-                  <VBtn
-                    @click="loadDomains"
-                    block
-                    color="secondary"
-                    variant="tonal"
-                    :loading="domainsTask.loading"
-                    prepend-icon="mdi-reload"
-                  >
-                    Load More Domains
-                  </VBtn>
-                </VContainer>
-              </template>
-              <template v-slot:append>
-                <v-slide-x-reverse-transition mode="out-in">
-                  <v-icon icon="mdi-reload" @click="reloadDomains"></v-icon>
-                </v-slide-x-reverse-transition>
-              </template>
-            </VAutocomplete>
+              <VAutocomplete
+                v-bind="props"
+                validate-on="input"
+                label="Select domain"
+                placeholder="Select a domain"
+                :items="loadedDomains"
+                :loading="domainsTask.loading"
+                item-title="publicConfig.domain"
+                v-model="selectedDomain"
+                :error-messages="[
+                  ...props?.errorMessages,
+                  ...(domainsTask.error?.message ? [domainsTask.error.message] : []),
+                ]"
+                return-object
+              >
+                <template #append-item v-if="pagination.page !== -1">
+                  <VContainer>
+                    <VBtn
+                      @click="loadDomains"
+                      block
+                      color="secondary"
+                      variant="tonal"
+                      :loading="domainsTask.loading"
+                      prepend-icon="mdi-reload"
+                    >
+                      Load More Domains
+                    </VBtn>
+                  </VContainer>
+                </template>
+                <template v-slot:append>
+                  <v-slide-x-reverse-transition mode="out-in">
+                    <v-icon icon="mdi-reload" @click="reloadDomains"></v-icon>
+                  </v-slide-x-reverse-transition>
+                </template>
+              </VAutocomplete>
+            </InputValidator>
           </input-tooltip>
         </VExpandTransition>
 
@@ -88,7 +96,7 @@
           <span class="font-weight-bold">{{ customDomain }}</span> pointing to
           <span class="font-weight-bold">{{ selectedDomain.publicConfig.ipv4.split("/")[0] }}</span>
         </v-alert>
-      </VForm>
+      </form-validator>
     </div>
   </section>
 </template>
@@ -101,12 +109,14 @@ import { onMounted } from "vue";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { VInput } from "vuetify/components/VInput";
 
-import type { InputValidatorService } from "@/hooks/input_validator";
+import { type InputValidatorService, useInputRef } from "@/hooks/input_validator";
 
 import { useAsync, usePagination, useWatchDeep } from "../../hooks";
-import { useForm, ValidatorStatus } from "../../hooks/form_validator";
+import { useForm, useFormRef, ValidatorStatus } from "../../hooks/form_validator";
 import { useGrid } from "../../stores";
 import type { DomainInfo, NetworkFeatures, SelectionDetailsFilters } from "../../types/nodeSelector";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type { INode } from "../../utils/filter_nodes";
 import { getNodePageCount, loadNodes } from "../../utils/nodeSelector";
 
 export default {
@@ -159,11 +169,12 @@ export default {
     const selectedDomain = ref<NodeInfo | null>(null);
     const loadDomains = () => domainsTask.value.run(gridStore, filters.value);
 
+    const domainInput = useInputRef();
     const reloadDomains = async (_filters: FilterOptions = filters.value) => {
+      domainInput.value?.reset();
       if (selectedDomain.value) {
         selectedDomain.value = null;
         bindModelValue();
-        bindStatus();
       }
       await pageCountTask.value.run(gridStore, _filters);
       pagination.value.reset(pageCountTask.value.data as number);
@@ -184,11 +195,7 @@ export default {
       { immediate: true, deep: true, ignoreFields: ["page"] },
     );
     const customDomain = ref("");
-
-    const domainNameValid = ref<boolean | null>(null);
-    watch(domainNameValid, valid => {
-      bindStatus(valid === null ? ValidatorStatus.Init : valid ? ValidatorStatus.Valid : ValidatorStatus.Invalid);
-    });
+    const domainFormRef = useFormRef();
 
     const disableSelectedDomain = computed(() => enableCustomDomain.value && props.filters.ipv4 === true);
     const useFQDN = computed(() => enableCustomDomain.value && (props.useFqdn || props.filters.ipv4 === false));
@@ -228,12 +235,12 @@ export default {
     };
 
     onMounted(() => {
+      bindStatus();
       loadDomains();
       form?.register(uid.toString(), fakeService);
     });
     onUnmounted(() => form?.unregister(uid.toString()));
 
-    onMounted(bindStatus);
     function bindStatus(status?: ValidatorStatus): void {
       const s = status || ValidatorStatus.Init;
       fakeService.status = s;
@@ -241,11 +248,27 @@ export default {
       ctx.emit("update:status", s);
     }
 
+    const status = computed(() => {
+      const _domain = domainFormRef?.value;
+      if (!_domain) return ValidatorStatus.Init;
+
+      switch (true) {
+        case _domain.valid as unknown as boolean:
+          return ValidatorStatus.Valid;
+        case _domain.invalid as unknown as boolean:
+          return ValidatorStatus.Invalid;
+        case _domain.pending as unknown as boolean:
+          return ValidatorStatus.Pending;
+        default:
+          return ValidatorStatus.Init;
+      }
+    });
+
+    watch(status, () => bindStatus(status.value), { immediate: true });
+
     return {
       pagination,
       input,
-
-      domainNameValid,
 
       enableCustomDomain,
       customDomain,
@@ -256,6 +279,8 @@ export default {
       loadDomains,
       reloadDomains,
 
+      domainFormRef,
+      domainInput,
       disableSelectedDomain,
       useFQDN,
     };

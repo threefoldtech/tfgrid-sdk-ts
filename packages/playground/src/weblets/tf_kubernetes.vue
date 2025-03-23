@@ -9,6 +9,7 @@
     :ipv4="master.ipv4"
     :certified="master.certified"
     :dedicated="master.dedicated"
+    :rentedBy="master.rentedBy"
     :SelectedNode="master.selectionDetails?.node"
     :valid-filters="master.selectionDetails?.validFilters"
     title-image="images/icons/kubernetes.png"
@@ -112,7 +113,7 @@ const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
 
 function addWorker() {
-  workers.value.push(createWorker());
+  workers.value.unshift(createWorker());
 }
 
 async function deploy() {

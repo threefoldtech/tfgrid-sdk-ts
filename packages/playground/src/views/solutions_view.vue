@@ -2,9 +2,9 @@
   <view-layout>
     <v-card color="primary" class="d-flex justify-center items-center mb-4 pa-3 text-center">
       <v-icon size="30" class="pr-3">mdi-lightbulb-on-outline</v-icon>
-      <v-card-title class="pa-0">Applications</v-card-title>
+      <v-card-title class="pa-0">Labs</v-card-title>
     </v-card>
-    <v-text-field label="Search Applications" v-model="searchItem" class="mb-5" clearable></v-text-field>
+    <v-text-field label="Search for a lab" v-model="searchItem" class="mb-5" clearable></v-text-field>
     <ApplicationCards :cards="filteredCards" />
     <p v-if="filteredCards.length === 0" class="mx-3 mb-3">No solution was found with the provided search query.</p>
   </view-layout>
@@ -24,6 +24,20 @@ export default {
   },
   setup() {
     let cards: ApplicationCard[] = [
+      {
+        title: "Kubernetes",
+        excerpt:
+          "Kubernetes is the standard container orchestration tool. On the TF grid, Kubernetes clusters can be deployed out of the box. We have implemented K3S, a full-blown Kubernetes offering that uses only half of the memory footprint.",
+        icon: "kubernetes.png",
+        route: DashboardRoutes.Applications.Kubernetes,
+      },
+      {
+        title: "CapRover",
+        excerpt:
+          "CapRover is an extremely easy to use app/database deployment & web server manager for your NodeJS, Python, PHP, ASP.NET, Ruby, MySQL, MongoDB, Postgres, WordPress (and etc…) applications!",
+        icon: "caprover.png",
+        route: DashboardRoutes.Applications.CapRover,
+      },
       {
         title: "Nostr",
         excerpt:
