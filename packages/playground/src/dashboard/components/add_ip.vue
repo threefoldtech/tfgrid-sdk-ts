@@ -93,7 +93,9 @@
                         <v-row>
                           <v-col sm="4">IP Addresses:</v-col>
                           <v-col>
-                            <v-chip color="teal" v-for="ip in ipsRangeTable" :key="ip" class="ma-1">{{ ip }}</v-chip>
+                            <v-chip type="warning" variant="tonal" v-for="ip in ipsRangeTable" :key="ip" class="ma-1">{{
+                              ip
+                            }}</v-chip>
                           </v-col></v-row
                         >
                       </v-list-item>
