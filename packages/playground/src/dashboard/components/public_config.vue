@@ -193,17 +193,15 @@ export default {
     const showClearDialogue = ref(false);
     const isRemoving = ref(false);
     const isSaving = ref(false);
-    const isConfigChanged = computed(() => {
-      return !isEqual(defualtNodeConfig.value, config.value);
-    });
-
-    ref(false);
     const formRef = useFormRef();
     const grid = useGrid();
 
     const defualtNodeConfig = ref<PublicConfig>(publicConfigInitializer());
     const config = ref<PublicConfig>(publicConfigInitializer());
-
+    const isConfigChanged = computed(() => {
+      formRef.value?.validate();
+      return !isEqual(defualtNodeConfig.value, config.value);
+    });
     function publicConfigInitializer(): PublicConfig {
       return { ipv4: "", ipv6: "", gw4: "", gw6: "", domain: "" };
     }
@@ -211,16 +209,6 @@ export default {
     onMounted(async () => {
       await getPublicConfig();
     });
-
-    watch(
-      () => ({ ...config.value }),
-      (old, newValue) => {
-        isConfigChanged.value =
-          !isEqual(defualtNodeConfig.value, config.value) ||
-          (!isEqual(defualtNodeConfig.value, config.value) && !isEqual(old, newValue));
-        formRef.value?.validate();
-      },
-    );
 
     async function getPublicConfig() {
       try {
