@@ -276,6 +276,7 @@
           v-if="node?.dedicated && node?.status !== 'down'"
           class="ml-4"
           :node="(node as GridNode)"
+          @update:status="$emit('update:status', $event as ValidatorStatus)"
           @update:node="$emit('update:node', $event as NodeInfo)"
         />
       </div>
@@ -291,6 +292,7 @@ import { capitalize, computed, onMounted, type PropType, ref, watch } from "vue"
 
 import { gridProxyClient } from "@/clients";
 import ReserveBtn from "@/dashboard/components/reserve_action_btn.vue";
+import type { ValidatorStatus } from "@/hooks/form_validator";
 import type { SelectedMachine } from "@/types/nodeSelector";
 import toHumanDate from "@/utils/date";
 import type { discountItems } from "@/utils/get_nodes";
@@ -320,6 +322,7 @@ export default {
   emits: {
     "node:select": (node: NodeInfo) => true || node,
     "update:node": (node: NodeInfo | GridNode) => true || node,
+    "update:status": (status: ValidatorStatus) => status,
   },
   setup(props, ctx) {
     const profileManagerController = useProfileManagerController();

@@ -10,6 +10,10 @@
         $emit('update:model-value', $event as any);
         validationTask.run(nodeId);
       "
+      @update:status="
+        $emit('update:status', $event as ValidatorStatus);
+        validationTask.reset();
+      "
       :status="
         validationTask.loading
           ? 'Pending'
