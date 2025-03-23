@@ -38,6 +38,7 @@
               v-model="filters.rentable"
               density="compact"
               hide-details
+              @change="handleRentableChange()"
             />
           </TfFilter>
 
@@ -546,18 +547,21 @@ export default {
       ipv6: false,
       myRentedNodes: false,
     });
-    const oldNodeStatus = ref();
-    watch(
-      () => filters.value.rentable,
-      rentable => {
-        if (rentable) {
-          oldNodeStatus.value = filters.value.status;
-          filters.value.status = UnifiedNodeStatus.UpStandby;
-        } else {
-          filters.value.status = oldNodeStatus.value;
-        }
-      },
-    );
+    const oldNodeStatus = computed(() => {
+      return filters.value.status;
+    });
+
+    const nodeStatus = computed(() => {
+      if (filters.value.rentable) {
+        return UnifiedNodeStatus.UpStandby;
+      } else {
+        return oldNodeStatus.value;
+      }
+    });
+
+    const handleRentableChange = () => {
+      filters.value.status = nodeStatus.value;
+    };
     const loading = ref<boolean>(true);
     const _nodes = ref<GridNode[]>([]);
 
@@ -666,6 +670,7 @@ export default {
       page,
       error,
       loadNodes,
+      handleRentableChange,
     };
   },
 };
