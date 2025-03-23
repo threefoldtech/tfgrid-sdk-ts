@@ -93,16 +93,8 @@
                         <v-row>
                           <v-col sm="4">IP Addresses:</v-col>
                           <v-col>
-                            <v-chip-group column>
-                              <v-chip
-                                :style="{ 'pointer-events': 'none', color: 'teal' }"
-                                color="teal"
-                                v-for="ip in ipsRangeTable"
-                                :key="ip"
-                                >{{ ip }}</v-chip
-                              >
-                            </v-chip-group></v-col
-                          ></v-row
+                            <v-chip color="teal" v-for="ip in ipsRangeTable" :key="ip" class="ma-1">{{ ip }}</v-chip>
+                          </v-col></v-row
                         >
                       </v-list-item>
                     </v-list>
