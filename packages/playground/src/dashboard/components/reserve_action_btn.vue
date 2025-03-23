@@ -79,23 +79,13 @@ export default {
     const loadingUnreserveBtn = ref(false);
     const loadingReserveNode = ref(false);
     const disableButton = ref(false);
-    const hasInsufficientBalance = ref(false);
     const balance = profileManagerController.balance;
     const freeBalance = computed(() => balance.value?.free ?? 0);
     const gridStore = useGrid();
     const grid = gridStore.client as GridClient;
-
-    watch(
-      freeBalance,
-      (newFreeBalance, _) => {
-        if (newFreeBalance < 2) {
-          hasInsufficientBalance.value = true;
-        } else {
-          hasInsufficientBalance.value = false;
-        }
-      },
-      { immediate: true },
-    );
+    const hasInsufficientBalance = computed(() => {
+      return freeBalance.value < 2;
+    });
 
     function removeReserve() {
       openUnreserveDialog.value = true;
