@@ -9,9 +9,11 @@
   },
   "dependencies": {
     "@mdi/font": "^7.4.47",
+    "@solana/web3.js": "^1.98.0",
     "@stellar/stellar-sdk": "^13.1.0",
     "@vitejs/plugin-vue": "^5.2.3",
     "bs58": "^6.0.0",
+    "qrcode": "^1.5.4",
     "vue": "^3.5.13",
     "vuetify": "^3.7.18"
   },
