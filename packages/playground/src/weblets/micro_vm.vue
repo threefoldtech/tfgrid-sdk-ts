@@ -330,9 +330,8 @@ async function deploy() {
 
 function updateSSHkeyEnv(selectedKeys: string) {
   selectedSSHKeys.value = selectedKeys;
+  layoutMount();
 }
-
-watch(selectedSSHKeys, layoutMount, { deep: true });
 </script>
 
 <script lang="ts">
