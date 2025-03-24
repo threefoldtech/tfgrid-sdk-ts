@@ -157,8 +157,12 @@ const selectedSSHKeys = ref("");
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
 
-watch(firstRound, () => lastRoundInput.value.validate(lastRound.value.toString()));
-
+const isValid = computed(() => {
+  if (firstRound.value) {
+    return lastRoundInput.value.validate(lastRound.value.toString());
+  }
+  return false;
+});
 async function deploy() {
   layout.value.setStatus("deploy");
 
