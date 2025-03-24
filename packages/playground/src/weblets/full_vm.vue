@@ -150,7 +150,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, type Ref, ref, watchEffect } from "vue";
+import { computed, type Ref, ref, watch } from "vue";
 
 import { manual } from "@/utils/manual";
 
@@ -225,7 +225,7 @@ function addDisk() {
   });
 }
 
-watchEffect(() => {
+watch(() => {
   if (GPUToggled.value) {
     dedicated.value = true;
     rentedByMe.value = true;
