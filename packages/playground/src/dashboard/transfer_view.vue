@@ -146,13 +146,13 @@ const receptTwinFromTwinID = ref<Twin>();
 const balance = profileManagerController.balance;
 const freeBalance = computed(() => balance.value?.free ?? 0);
 
-watch(freeBalance, async () => {
+const computedValidation = computed(() => {
   if (transferAmount.value) {
-    await amountRef.value?.reset();
+    amountRef.value?.reset();
     amountRef.value?.validate();
   }
+  return null; // or some meaningful return value if needed
 });
-
 const tick = ref(0);
 function isSameTwinID(value: string) {
   if (parseInt(value.trim()) == profile.value?.twinId) {
