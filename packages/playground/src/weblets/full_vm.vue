@@ -225,8 +225,8 @@ function addDisk() {
   });
 }
 
-watch(() => {
-  if (GPUToggled.value) {
+watch(GPUToggled, GPUToggled => {
+  if (GPUToggled) {
     dedicated.value = true;
     rentedByMe.value = true;
   }
