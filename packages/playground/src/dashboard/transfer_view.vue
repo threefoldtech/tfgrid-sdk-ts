@@ -123,7 +123,7 @@
 import { Keyring } from "@polkadot/keyring";
 import type { Twin } from "@threefold/tfchain_client";
 import { TwinNotExistError } from "@threefold/types";
-import { computed, ref, watch } from "vue";
+import { computed, ref } from "vue";
 
 import { useProfileManagerController } from "../components/profile_manager_controller.vue";
 import { useGrid, useProfileManager } from "../stores";

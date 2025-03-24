@@ -49,7 +49,7 @@
 import type { GridClient } from "@threefold/grid_client";
 import type { GridNode } from "@threefold/gridproxy_client";
 import { InsufficientBalanceError } from "@threefold/types";
-import { computed, type PropType, ref, watch } from "vue";
+import { computed, type PropType, ref } from "vue";
 
 import { ValidatorStatus } from "@/hooks/form_validator";
 import { useProfileManager } from "@/stores";

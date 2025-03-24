@@ -92,7 +92,7 @@
 
 <script lang="ts" setup>
 import { calculateRootFileSystem, type GridClient } from "@threefold/grid_client";
-import { computed, type Ref, ref, watch } from "vue";
+import { computed, type Ref, ref } from "vue";
 
 import { manual } from "@/utils/manual";
 

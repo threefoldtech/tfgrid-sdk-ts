@@ -166,9 +166,8 @@ import { ValidationError } from "@threefold/types";
 import { contains } from "cidr-tools";
 import { isEqual } from "lodash";
 import { default as PrivateIp } from "private-ip";
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref } from "vue";
 
-import type { RuleReturn } from "@/components/input_validator.vue";
 import { useFormRef } from "@/hooks/form_validator";
 import { useGrid } from "@/stores";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";

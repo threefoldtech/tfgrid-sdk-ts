@@ -104,7 +104,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, type Ref, ref, watch } from "vue";
+import { computed, type Ref, ref } from "vue";
 
 import { manual } from "@/utils/manual";
 
