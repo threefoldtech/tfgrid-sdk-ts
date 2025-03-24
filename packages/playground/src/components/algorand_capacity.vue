@@ -100,9 +100,19 @@ const cpu = ref(8);
 const memory = ref(16384);
 const storage = ref(100);
 
-watch(cpu, cpu => emits("update:cpu", cpu), { immediate: true });
-watch(memory, memory => emits("update:memory", memory), { immediate: true });
-watch(storage, storage => emits("update:storage", storage), { immediate: true });
+const emitResourceUpdates = () => {
+  emits("update:cpu", cpu.value);
+  emits("update:memory", memory.value);
+  emits("update:storage", storage.value);
+};
+
+watch(
+  () => [cpu.value, memory.value, storage.value],
+  () => {
+    emitResourceUpdates();
+  },
+  { immediate: true },
+);
 
 watch(
   () => [props.network, props.type] as const,
@@ -111,6 +121,7 @@ watch(
     cpu.value = min.cpu;
     memory.value = min.memory;
     storage.value = min.storage;
+    emitResourceUpdates();
   },
 );
 
