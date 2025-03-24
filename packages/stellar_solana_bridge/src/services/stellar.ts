@@ -8,7 +8,7 @@ const STELLAR_HORIZON = "https://horizon.stellar.org";
 const server = new StellarSdk.Horizon.Server(STELLAR_HORIZON);
 // ThreeFold Bridge Details
 export const BRIDGE_ADDRESS = "GAC65XJVXMBPHKGVWRR4ZX6MA66I4JAOEAIMOVRIXALL3NO67UYMIWMZ";
-export const TFT_ASSET = new Asset("TFT", "GBOVQKJYHXRR3DX6NOX2RRYFRCUMSADGDESTDNBDS6CDVLGVESRTAC47");
+const TFT_ASSET = new Asset("TFT", "GBOVQKJYHXRR3DX6NOX2RRYFRCUMSADGDESTDNBDS6CDVLGVESRTAC47");
 
 export const transferTFT = async (senderSecret: string, solanaRecipientAddress: string, amount: string) => {
   const senderKeypair = Keypair.fromSecret(senderSecret);

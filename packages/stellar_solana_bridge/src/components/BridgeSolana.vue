@@ -2,7 +2,7 @@
   <v-container class="d-flex h-screen flex-column align-center justify-center">
     <v-img :src="Logo" width="200" max-height="100" class="mx-auto" />
     <v-form class="my-2" v-model="valid" @submit.prevent="submitForm">
-      <v-card class="mx-auto" width="400" flat>
+      <v-card class="mx-auto bg-transparent" width="400" flat>
         <!-- Solana Address -->
         <v-text-field
           v-model="toAddress"
@@ -16,14 +16,14 @@
         <v-text-field v-model="amount" label="Amount" variant="outlined" type="number" :rules="amountRules" />
       </v-card>
       <v-expand-transition>
-        <v-card v-if="isValidTransaction" flat>
+        <v-card class="bg-transparent" v-if="isValidTransaction" flat>
           <v-card-subtitle class="text-center my-5">
             Enter the folllowing information manually Or scan the QR code with ThreeFold Connect
           </v-card-subtitle>
           <div class="border mt-5 mb-2 pa-5">
             <v-row>
               <v-col cols="12" md="6">
-                <v-card width="400" class="mx-auto pa-5" flat>
+                <v-card width="400" class="mx-auto pa-5 bg-transparent" flat>
                   <v-card-title>Enter your Steller Account Seed:</v-card-title>
                   <!-- Steller Address -->
                   <v-text-field
@@ -39,6 +39,7 @@
                     color="primary"
                     type="submit"
                     class="my-2"
+                    :loading="loading"
                     :disabled="!valid && !validateStellarSeed(fromAddress)"
                   >
                     Send
@@ -47,7 +48,7 @@
               </v-col>
               <v-divider vertical></v-divider>
               <v-col cols="12" md="6">
-                <v-card width="400" flat>
+                <v-card width="400" class="bg-transparent" flat>
                   <v-img :src="QRSrc" alt="qrcode" width="200" class="mx-auto" />
                   <v-card-text class="mt-4">
                     <p><strong>Destination:</strong> {{ BRIDGE_ADDRESS }}</p>
@@ -63,6 +64,18 @@
         </v-card>
       </v-expand-transition>
     </v-form>
+
+    <v-dialog max-width="500" v-model="isActive">
+      <v-card>
+        <v-card-text> {{ confirmMessage }} </v-card-text>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+
+          <v-btn text="Close" @click="isActive = false"></v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -84,6 +97,10 @@ const transferFee = 50.01;
 const QRSrc = ref();
 const memoHash = ref();
 const valid = ref(false);
+const loading = ref(false);
+const isActive = ref(false);
+const confirmMessage = ref("");
+
 const stellarSeedRules = computed(() => [
   (v: string) => !!v || "Stellar seed is required",
   (v: string) => validateStellarSeed(v) || "Invalid Stellar secret seed",
@@ -110,15 +127,26 @@ const validateSolanaAddressBasic = (address: string) => {
 
 const amountRules = computed(() => [
   (v: number) => !!v || "Amount is required",
-  (v: number) => v > 0 || "Must be greater than 0",
+  (v: number) => v > transferFee || `Must be greater than ${transferFee} TFT`,
 ]);
 
 const isValidTransaction = computed(() => {
-  return validateSolanaAddressBasic(toAddress.value) && amount.value > 0;
+  return validateSolanaAddressBasic(toAddress.value) && amount.value > transferFee;
 });
 
 const submitForm = async () => {
-  await transferTFT(fromAddress.value, toAddress.value, amount.value.toString());
+  loading.value = true;
+  try {
+    const { successful } = await transferTFT(fromAddress.value, toAddress.value, amount.value.toString());
+    if (!successful) return;
+    loading.value = false;
+    isActive.value = true;
+    confirmMessage.value = "Your transaction is sent successfully";
+  } catch (error: any) {
+    loading.value = false;
+    isActive.value = true;
+    confirmMessage.value = error.response.data.title;
+  }
 };
 
 const generateMemoHashFromSolanaAddress = (solanaRecipientAddress: string) => {
@@ -161,8 +189,3 @@ export default {
   name: "BridgeSolana",
 };
 </script>
-<style scoped>
-.v-card {
-  background-color: transparent;
-}
-</style>
