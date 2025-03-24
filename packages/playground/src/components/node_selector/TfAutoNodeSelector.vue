@@ -127,6 +127,8 @@
         <VAlert
           type="error"
           variant="elevated"
+          v-model="alertErr"
+          @click="alertErr = !alertErr"
           v-if="!filtersUpdated && nodeInputValidateTask.error"
           :style="{
             position: 'absolute',
@@ -135,7 +137,7 @@
             zIndex: 9,
           }"
           :text="nodeInputValidateTask.error"
-          closable
+          dismissable
         />
       </div>
     </input-tooltip>
@@ -196,6 +198,7 @@ export default {
   setup(props, ctx) {
     const gridStore = useGrid();
     const _loadedNodes = ref<NodeInfo[]>([]);
+    const alertErr = ref(true);
     const loadedNodes = computed(() => {
       return _loadedNodes.value.filter(
         node =>
@@ -385,7 +388,7 @@ export default {
       touched,
       bindModelValueAndValidate,
       bindStatus,
-
+      alertErr,
       nodesContainer,
     };
   },
