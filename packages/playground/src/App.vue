@@ -331,6 +331,9 @@ function navigateToHome() {
 onMounted(async () => {
   await (window.$$appLoader || noop)();
   openProfile.value = true;
+  if (!permanent.value) {
+    toolbarExtended.value = true;
+  }
 });
 
 watch(hasClient, () => setTimeouts());
