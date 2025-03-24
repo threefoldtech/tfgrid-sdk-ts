@@ -12,20 +12,40 @@
 </template>
 
 <script lang="ts" setup>
-import { computed } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useTheme } from "vuetify";
 
 import { LocalStorageSettingsKey } from "@/utils/settings";
 
 const theme = useTheme();
 
+const isLight = ref(false);
+
 const light = computed(() => {
-  return theme.global.name.value == "light";
+  return isLight.value;
 });
-function changeTheme() {
-  theme.global.name.value == "dark" ? (theme.global.name.value = "light") : (theme.global.name.value = "dark");
-  localStorage.setItem(LocalStorageSettingsKey.THEME_KEY, theme.global.name.value);
+
+const updateLocalStorage = (newTheme: string) => {
+  localStorage.setItem(LocalStorageSettingsKey.THEME_KEY, newTheme);
+};
+
+function setTheme(themeName: string) {
+  theme.global.name.value = themeName;
+  updateLocalStorage(themeName);
+  isLight.value = themeName === "light";
 }
+
+function changeTheme() {
+  const newTheme = isLight.value ? "dark" : "light";
+  setTheme(newTheme);
+}
+
+onMounted(() => {
+  const storedTheme = localStorage.getItem(LocalStorageSettingsKey.THEME_KEY);
+  if (storedTheme) {
+    setTheme(storedTheme);
+  }
+});
 </script>
 
 <script lang="ts">
