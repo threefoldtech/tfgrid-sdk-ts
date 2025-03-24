@@ -161,7 +161,7 @@
             @click="loadDeployments"
           />
         </div>
-        <p v-else v-text="'No ' + projectName + ' deployments found on this account.'" />
+        <p v-else v-text="'No ' + projectTitle + ' deployments found on this account.'" />
       </template>
     </ListTable>
   </div>
@@ -181,6 +181,7 @@ const profileManager = useProfileManager();
 
 const props = defineProps<{
   projectName: string;
+  projectTitle: string;
   modelValue: any[];
   deleting: boolean;
   hideSSH?: boolean;
@@ -222,6 +223,7 @@ async function loadDomains() {
 }
 
 async function loadDeployments() {
+  console.log(props.projectTitle);
   if (props.projectName.toLowerCase() === ProjectName.Domains.toLowerCase()) {
     return loadDomains();
   }
