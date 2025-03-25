@@ -1,5 +1,18 @@
 <template>
-  <v-container class="d-flex h-screen flex-column align-center justify-center">
+  <div class="alert">
+    <v-alert
+      v-model="alert"
+      border="start"
+      type="info"
+      close-label="Close Alert"
+      color="primary"
+      variant="tonal"
+      closable
+    >
+      This bridge currently only supports Stellar to Solana transfers.
+    </v-alert>
+  </div>
+  <v-container class="d-flex h-screen flex-column align-center justify-center mt-2">
     <v-form class="my-2" v-model="valid" @submit.prevent="submitForm">
       <v-img :src="Logo" width="200" max-height="100" class="mx-auto mb-5" />
       <v-card class="mx-auto bg-transparent" width="400" flat>
@@ -64,25 +77,26 @@
               </v-col>
             </v-row>
           </div>
+          <v-row>
+            <v-col>
+              <div class="d-flex justify-center align-center mt-4">
+                <p class="mr-3">Don't have the app? Download it now</p>
+                <a
+                  v-for="app in apps"
+                  :key="app.alt"
+                  :style="{ cursor: 'pointer', width: '9rem' }"
+                  class="mx-2"
+                  :title="app.alt"
+                  v-html="app.src"
+                  :href="app.url"
+                  target="_blank"
+                />
+              </div>
+            </v-col>
+          </v-row>
         </v-card>
       </v-expand-transition>
     </v-form>
-    <v-row>
-      <v-col>
-        <div class="d-flex justify-center align-center mt-4">
-          <a
-            v-for="app in apps"
-            :key="app.alt"
-            :style="{ cursor: 'pointer', width: '9rem' }"
-            class="mx-2"
-            :title="app.alt"
-            v-html="app.src"
-            :href="app.url"
-            target="_blank"
-          />
-        </div>
-      </v-col>
-    </v-row>
     <v-dialog max-width="500" v-model="isActive">
       <v-card>
         <v-card-text> {{ confirmMessage }} </v-card-text>
@@ -118,6 +132,7 @@ const valid = ref(false);
 const loading = ref(false);
 const isActive = ref(false);
 const confirmMessage = ref("");
+const alert = ref(true);
 const apps = [
   {
     src: `<img width="140"  src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Google_Play_Store_badge_EN.svg/128px-Google_Play_Store_badge_EN.svg.png?20220907104002">`,
@@ -236,5 +251,12 @@ export default {
   transform: translate(-50%, -50%);
   padding: 8px;
   font-weight: bold;
+}
+
+.alert {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
 }
 </style>
