@@ -3,6 +3,7 @@
     ref="layout"
     :cpu="solution?.cpu"
     :memory="solution?.memory"
+    :ipv4="ipv4"
     :disk="disks.reduce((total, disk) => total + disk.size, solution?.disk + 2)"
     :dedicated="dedicated"
     :rentedBy="rentedBy"
@@ -39,6 +40,7 @@
 
         <Networks
           required
+          v-model:ipv4="ipv4"
           v-model:ipv6="ipv6"
           v-model:planetary="planetary"
           v-model:mycelium="mycelium"
@@ -68,6 +70,7 @@
 
         <TfSelectionDetails
           :filters="{
+            ipv4,
             ipv6,
             hasGPU,
             certified,
@@ -132,7 +135,7 @@ const flist = ref<Flist>({
   value: "https://hub.grid.tf/tf-official-apps/threefoldtech-ubuntu-24.04_fullvm_oi.flist",
   entryPoint: "",
 });
-const { ipv6, mycelium, planetary, wireguard } = useNetworks();
+const { ipv4, ipv6, mycelium, planetary, wireguard } = useNetworks();
 const dedicated = ref(false);
 const rentedByMe = ref(false);
 const rentedBy = computed(() => (rentedByMe.value ? grid.twinId : undefined));
@@ -204,6 +207,7 @@ async function deploy() {
           flist: flist.value!.value,
           entryPoint: flist.value!.entryPoint,
           disks: [...disks.value],
+          publicIpv4: ipv4.value,
           publicIpv6: ipv6.value,
           planetary: planetary.value,
           mycelium: mycelium.value,
@@ -228,13 +232,19 @@ async function deploy() {
     layout.value.setStatus("failed", normalizeError(e, "Failed to deploy an Open WebUI instance."));
   }
 
+  if (selectionDetails.value!.domain!.enabledCustomDomain && ipv4.value) {
+    vm[0].customDomain = selectionDetails.value!.domain!.customDomain;
+    finalize(vm, domain);
+    return;
+  }
+
   try {
     layout.value.setStatus("deploy", "Preparing to deploy gateway...");
 
     await deployGatewayName(grid, selectionDetails.value?.domain, {
       subdomain,
       ip: vm[0].interfaces[0].ip,
-      port: 8080,
+      port: 80,
       network: vm[0].interfaces[0].network,
     });
 
