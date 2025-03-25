@@ -1,7 +1,7 @@
 <template>
   <v-container class="d-flex h-screen flex-column align-center justify-center">
-    <v-img :src="Logo" width="200" max-height="100" class="mx-auto" />
     <v-form class="my-2" v-model="valid" @submit.prevent="submitForm">
+      <v-img :src="Logo" width="200" max-height="100" class="mx-auto mb-5" />
       <v-card class="mx-auto bg-transparent" width="400" flat>
         <!-- Solana Address -->
         <v-text-field
@@ -14,17 +14,20 @@
 
         <!-- Amount Input -->
         <v-text-field v-model="amount" label="Amount" variant="outlined" type="number" :rules="amountRules" />
+        <p class="d-flex align-center text-caption text-grey-darken-1">
+          <v-icon class="mr-1">mdi-information-outline</v-icon> Transfer Fee: {{ transferFee }} TFT
+        </p>
       </v-card>
       <v-expand-transition>
         <v-card class="bg-transparent" v-if="isValidTransaction" flat>
           <v-card-subtitle class="text-center my-5">
-            Enter the folllowing information manually Or scan the QR code with ThreeFold Connect
+            Enter the following information manually <strong>OR</strong> scan the QR code with Threefold Connect app
           </v-card-subtitle>
           <div class="border mt-5 mb-2 pa-5">
             <v-row>
-              <v-col cols="12" md="6">
+              <v-col>
                 <v-card width="400" class="mx-auto pa-5 bg-transparent" flat>
-                  <v-card-title>Enter your Steller Account Seed:</v-card-title>
+                  <div class="text-subtitle-1 text-medium-emphasis mb-3">Enter your Steller Account Seed:</div>
                   <!-- Steller Address -->
                   <v-text-field
                     v-model="fromAddress"
@@ -46,8 +49,11 @@
                   </v-btn>
                 </v-card>
               </v-col>
-              <v-divider vertical></v-divider>
-              <v-col cols="12" md="6">
+              <v-col class="divider-container" cols="auto">
+                <v-divider vertical></v-divider>
+                <span class="divider-text text-grey-darken-1">OR</span>
+              </v-col>
+              <v-col>
                 <v-card width="400" class="bg-transparent" flat>
                   <v-img :src="QRSrc" alt="qrcode" width="200" class="mx-auto" />
                   <v-card-text class="mt-4">
@@ -58,13 +64,25 @@
               </v-col>
             </v-row>
           </div>
-          <p class="d-flex align-center text-caption text-grey-darken-1">
-            <v-icon class="mr-1">mdi-information-outline</v-icon> Transfer Fee: {{ transferFee }} TFT
-          </p>
         </v-card>
       </v-expand-transition>
     </v-form>
-
+    <v-row>
+      <v-col>
+        <div class="d-flex justify-center align-center mt-4">
+          <a
+            v-for="app in apps"
+            :key="app.alt"
+            :style="{ cursor: 'pointer', width: '9rem' }"
+            class="mx-2"
+            :title="app.alt"
+            v-html="app.src"
+            :href="app.url"
+            target="_blank"
+          />
+        </div>
+      </v-col>
+    </v-row>
     <v-dialog max-width="500" v-model="isActive">
       <v-card>
         <v-card-text> {{ confirmMessage }} </v-card-text>
@@ -91,16 +109,27 @@ import Logo from "../assets/logo_tft.png";
 import { BRIDGE_ADDRESS, transferTFT } from "../services/stellar";
 
 const fromAddress = ref("");
-const toAddress = ref("");
+const toAddress = ref();
 const amount = ref();
-const transferFee = 50.01;
+const transferFee = 50;
 const QRSrc = ref();
 const memoHash = ref();
 const valid = ref(false);
 const loading = ref(false);
 const isActive = ref(false);
 const confirmMessage = ref("");
-
+const apps = [
+  {
+    src: `<img width="140"  src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Google_Play_Store_badge_EN.svg/128px-Google_Play_Store_badge_EN.svg.png?20220907104002">`,
+    alt: "Threefold Connect on Google Play Store",
+    url: "https://play.google.com/store/apps/details?id=org.jimber.threebotlogin&hl=en&gl=US",
+  },
+  {
+    src: `<img width="128"  src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Download_on_the_App_Store_RGB_blk.svg/128px-Download_on_the_App_Store_RGB_blk.svg.png?20180317110059"/>`,
+    alt: "Threefold Connect on Apple App Store",
+    url: "https://apps.apple.com/us/app/threefold-connect/id1459845885",
+  },
+];
 const stellarSeedRules = computed(() => [
   (v: string) => !!v || "Stellar seed is required",
   (v: string) => validateStellarSeed(v) || "Invalid Stellar secret seed",
@@ -146,6 +175,9 @@ const submitForm = async () => {
     loading.value = false;
     isActive.value = true;
     confirmMessage.value = error.response.data.title;
+  } finally {
+    toAddress.value = undefined;
+    amount.value = null;
   }
 };
 
@@ -189,3 +221,20 @@ export default {
   name: "BridgeSolana",
 };
 </script>
+
+<style>
+.divider-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.divider-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 8px;
+  font-weight: bold;
+}
+</style>

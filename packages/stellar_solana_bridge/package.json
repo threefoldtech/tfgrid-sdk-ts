@@ -1,5 +1,5 @@
 {
-  "name": "stellar_solana_bridge",
+  "name": "@threefold/tft_solana",
   "version": "2.7.0",
   "private": true,
   "scripts": {
