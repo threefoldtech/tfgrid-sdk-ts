@@ -12,11 +12,8 @@ FROM nginx:1.27-alpine
 
 # serve the build files using nginx
 COPY --from=build /app/packages/stellar_solana_bridge/dist /usr/share/nginx/html
-COPY --from=build /app/packages/stellar_solana_bridge/scripts/build-env.sh /usr/share/nginx/html
 
 WORKDIR /usr/share/nginx/html
-RUN apk add --no-cache bash
-RUN chmod +x build-env.sh
 
 EXPOSE 80
-CMD ["/bin/bash", "-c", "/usr/share/nginx/html/build-env.sh && nginx -g \"daemon off;\""]
+CMD ["/bin/bash", "-c", "nginx -g \"daemon off;\""]

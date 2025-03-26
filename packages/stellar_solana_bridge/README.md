@@ -1,5 +1,31 @@
-# Vue 3 + TypeScript + Vite
+# Stellar to Solana Bridge
 
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+This project provides a user-friendly interface for transferring tokens from the Stellar network to the Solana network. The bridge currently supports transfers from Stellar to Solana only.
 
-Learn more about the recommended Project Setup and IDE Support in the [Vue Docs TypeScript Guide](https://vuejs.org/guide/typescript/overview.html#project-setup).
+## Features
+
+- **QR Code Generation**: Users can scan a QR code with the Threefold Connect app to facilitate the transfer.
+
+## Installation
+
+To run this project locally, follow these steps:
+
+1. **Clone the repository**:
+
+```bash
+    git clone https://github.com/threefoldtech/tfgrid-sdk-ts/packages/stellar_solana_bridge
+    cd stellar-solana-bridge
+```
+
+2. **Install dependencies**:
+
+```bash
+   yarn install
+```
+
+3. **Run the application**:
+
+````bash
+    yarn dev
+    ```
+````
