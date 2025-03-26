@@ -12,7 +12,7 @@
       class="mb-0"
       style="max-height: 64px"
     >
-      This bridge currently only supports Stellar to Solana transfers.
+      This bridge currently supports only Stellar to Solana transfers.
     </v-alert>
 
     <v-container class="d-flex flex-grow-1 align-center justify-center">
