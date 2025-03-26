@@ -16,9 +16,7 @@ export const transferTFT = async (senderSecret: string, solanaRecipientAddress: 
 
   // Convert Solana address to 32-byte memo
   const solanaAddressBytes = bs58.decode(solanaRecipientAddress);
-  if (solanaAddressBytes.length !== 32) {
-    throw new Error("Invalid Solana address length");
-  }
+
   const memoHash = Memo.hash(Buffer.from(solanaAddressBytes));
 
   const transaction = new TransactionBuilder(senderAccount, {

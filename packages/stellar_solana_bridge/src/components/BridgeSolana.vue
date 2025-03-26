@@ -1,6 +1,7 @@
 <template>
-  <div class="alert">
+  <div class="d-flex flex-column h-screen">
     <v-alert
+      transition="fade-transition"
       v-model="alert"
       border="start"
       type="info"
@@ -8,107 +9,110 @@
       color="primary"
       variant="tonal"
       closable
+      class="mb-0"
+      max-height="64"
     >
       This bridge currently only supports Stellar to Solana transfers.
     </v-alert>
-  </div>
-  <v-container class="d-flex h-screen flex-column align-center justify-center mt-2">
-    <v-form class="my-2" v-model="valid" @submit.prevent="submitForm">
-      <v-img :src="Logo" width="200" max-height="100" class="mx-auto mb-5" />
-      <v-card class="mx-auto bg-transparent" width="400" flat>
-        <!-- Solana Address -->
-        <v-text-field
-          v-model="toAddress"
-          class="my-2"
-          label="Solana Associated Token Address"
-          variant="outlined"
-          :rules="solanaATARules"
-        />
 
-        <!-- Amount Input -->
-        <v-text-field v-model="amount" label="Amount" variant="outlined" type="number" :rules="amountRules" />
-        <p class="d-flex align-center text-caption text-grey-darken-1">
-          <v-icon class="mr-1">mdi-information-outline</v-icon> Transfer Fee: {{ transferFee }} TFT
-        </p>
-      </v-card>
-      <v-expand-transition>
-        <v-card class="bg-transparent" v-if="isValidTransaction" flat>
-          <v-card-subtitle class="text-center my-5">
-            Enter the following information manually <strong>OR</strong> scan the QR code with Threefold Connect app
-          </v-card-subtitle>
-          <div class="border mt-5 mb-2 pa-5">
+    <v-container class="d-flex flex-grow-1 align-center justify-center">
+      <v-form class="my-2" v-model="valid" @submit.prevent="submitForm">
+        <v-img :src="Logo" width="200" max-height="100" class="mx-auto mb-5" />
+        <v-card class="mx-auto bg-transparent" width="400" flat>
+          <!-- Solana Address -->
+          <v-text-field
+            v-model="toAddress"
+            class="my-2"
+            label="Solana Associated Token Address"
+            variant="outlined"
+            :rules="solanaATARules"
+          />
+
+          <!-- Amount Input -->
+          <v-text-field v-model="amount" label="Amount" variant="outlined" type="number" :rules="amountRules" />
+          <p class="d-flex align-center text-caption text-grey-darken-1">
+            <v-icon class="mr-1">mdi-information-outline</v-icon> Transfer Fee: {{ transferFee }} TFT
+          </p>
+        </v-card>
+        <v-expand-transition>
+          <v-card class="bg-transparent" v-if="isValidTransaction" flat>
+            <v-card-subtitle class="text-center my-5">
+              Enter the following information manually <strong>OR</strong> scan the QR code with Threefold Connect app
+            </v-card-subtitle>
+            <div class="border mt-5 mb-2 pa-5">
+              <v-row>
+                <v-col>
+                  <v-card width="400" class="mx-auto pa-5 bg-transparent" flat>
+                    <div class="text-subtitle-1 text-medium-emphasis mb-3">Enter your Stellar Account Seed:</div>
+                    <!-- Stellar Address -->
+                    <v-text-field
+                      v-model="fromAddress"
+                      type="password"
+                      label="Stellar Account Seed"
+                      variant="outlined"
+                      :rules="stellarSeedRules"
+                    />
+                    <!-- Submit Button -->
+                    <v-btn
+                      block
+                      color="primary"
+                      type="submit"
+                      class="my-2"
+                      :loading="loading"
+                      :disabled="!valid && !validateStellarSeed(fromAddress)"
+                    >
+                      Send
+                    </v-btn>
+                  </v-card>
+                </v-col>
+                <v-col class="divider-container" cols="auto">
+                  <v-divider vertical></v-divider>
+                  <span class="divider-text text-grey-darken-1">OR</span>
+                </v-col>
+                <v-col>
+                  <v-card width="400" class="bg-transparent" flat>
+                    <v-img :src="QRSrc" alt="qrcode" width="200" class="mx-auto" />
+                    <v-card-text class="mt-4">
+                      <p><strong>Destination:</strong> {{ BRIDGE_ADDRESS }}</p>
+                      <p><strong>Memo Hash:</strong> {{ memoHash }}</p>
+                    </v-card-text>
+                  </v-card>
+                </v-col>
+              </v-row>
+            </div>
             <v-row>
               <v-col>
-                <v-card width="400" class="mx-auto pa-5 bg-transparent" flat>
-                  <div class="text-subtitle-1 text-medium-emphasis mb-3">Enter your Steller Account Seed:</div>
-                  <!-- Steller Address -->
-                  <v-text-field
-                    v-model="fromAddress"
-                    type="password"
-                    label="Stellar Account Seed"
-                    variant="outlined"
-                    :rules="stellarSeedRules"
+                <div class="d-flex justify-center align-center mt-4">
+                  <p class="mr-3">Don't have the app? Download it now</p>
+                  <a
+                    v-for="app in apps"
+                    :key="app.alt"
+                    :style="{ cursor: 'pointer', width: '9rem' }"
+                    class="mx-2"
+                    :title="app.alt"
+                    v-html="app.src"
+                    :href="app.url"
+                    target="_blank"
                   />
-                  <!-- Submit Button -->
-                  <v-btn
-                    block
-                    color="primary"
-                    type="submit"
-                    class="my-2"
-                    :loading="loading"
-                    :disabled="!valid && !validateStellarSeed(fromAddress)"
-                  >
-                    Send
-                  </v-btn>
-                </v-card>
-              </v-col>
-              <v-col class="divider-container" cols="auto">
-                <v-divider vertical></v-divider>
-                <span class="divider-text text-grey-darken-1">OR</span>
-              </v-col>
-              <v-col>
-                <v-card width="400" class="bg-transparent" flat>
-                  <v-img :src="QRSrc" alt="qrcode" width="200" class="mx-auto" />
-                  <v-card-text class="mt-4">
-                    <p><strong>Destination:</strong> {{ BRIDGE_ADDRESS }}</p>
-                    <p><strong>Memo Hash:</strong> {{ memoHash }}</p>
-                  </v-card-text>
-                </v-card>
+                </div>
               </v-col>
             </v-row>
-          </div>
-          <v-row>
-            <v-col>
-              <div class="d-flex justify-center align-center mt-4">
-                <p class="mr-3">Don't have the app? Download it now</p>
-                <a
-                  v-for="app in apps"
-                  :key="app.alt"
-                  :style="{ cursor: 'pointer', width: '9rem' }"
-                  class="mx-2"
-                  :title="app.alt"
-                  v-html="app.src"
-                  :href="app.url"
-                  target="_blank"
-                />
-              </div>
-            </v-col>
-          </v-row>
+          </v-card>
+        </v-expand-transition>
+      </v-form>
+      <v-dialog max-width="500" v-model="isActive">
+        <v-card>
+          <v-card-text> {{ confirmMessage }} </v-card-text>
+
+          <v-card-actions>
+            <v-spacer></v-spacer>
+
+            <v-btn text="Close" @click="isActive = false"></v-btn>
+          </v-card-actions>
         </v-card>
-      </v-expand-transition>
-    </v-form>
-    <v-dialog max-width="500" v-model="isActive">
-      <v-card>
-        <v-card-text> {{ confirmMessage }} </v-card-text>
-
-        <v-card-actions>
-          <v-spacer></v-spacer>
-
-          <v-btn text="Close" @click="isActive = false"></v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-  </v-container>
+      </v-dialog>
+    </v-container>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -157,8 +161,17 @@ const validateStellarSeed = (seed: string) => {
 const solanaATARules = computed(() => [
   (v: string) => !!v || "Address is required",
   (v: string) => validateSolanaAddressBasic(v) || "Invalid Solana address",
-  (v: string) => v.length === 44 || "Must be 44 characters",
+  (v: string) => solanaAddressBytes(v) || "Invalid Solana address length",
 ]);
+
+const solanaAddressBytes = (address: string) => {
+  try {
+    const solanaDecodedAddress = bs58.decode(address);
+    return solanaDecodedAddress.length === 32;
+  } catch {
+    return false;
+  }
+};
 
 const validateSolanaAddressBasic = (address: string) => {
   try {
@@ -218,7 +231,7 @@ const generateQRcode = async () => {
 watch(
   [toAddress, amount],
   async value => {
-    if (value && validateSolanaAddressBasic(toAddress.value)) {
+    if (value && validateSolanaAddressBasic(toAddress.value) && solanaAddressBytes(toAddress.value)) {
       try {
         memoHash.value = generateMemoHashFromSolanaAddress(toAddress.value);
         await generateQRcode();
@@ -251,12 +264,5 @@ export default {
   transform: translate(-50%, -50%);
   padding: 8px;
   font-weight: bold;
-}
-
-.alert {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
 }
 </style>
