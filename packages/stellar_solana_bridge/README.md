@@ -28,3 +28,9 @@ To run this project locally, follow these steps:
 ```bash
     yarn dev
 ```
+
+3. **Build the application**:
+
+```bash
+    yarn build
+```
