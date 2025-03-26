@@ -14,6 +14,7 @@ FROM nginx:1.27-alpine
 COPY --from=build /app/packages/stellar_solana_bridge/dist /usr/share/nginx/html
 
 WORKDIR /usr/share/nginx/html
+RUN apk add --no-cache bash
 
 EXPOSE 80
 CMD ["/bin/bash", "-c", "nginx -g \"daemon off;\""]
