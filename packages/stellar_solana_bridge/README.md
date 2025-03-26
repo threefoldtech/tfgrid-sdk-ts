@@ -13,8 +13,8 @@ To run this project locally, follow these steps:
 1. **Clone the repository**:
 
 ```bash
-    git clone https://github.com/threefoldtech/tfgrid-sdk-ts/packages/stellar_solana_bridge
-    cd stellar-solana-bridge
+    git clone https://github.com/threefoldtech/tfgrid-sdk-ts.git
+    cd packages/stellar_solana_bridge/
 ```
 
 2. **Install dependencies**:
@@ -25,6 +25,6 @@ To run this project locally, follow these steps:
 
 3. **Run the application**:
 
-````bash
+```bash
     yarn dev
-````
+```
