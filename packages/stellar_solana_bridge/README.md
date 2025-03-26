@@ -1,4 +1,4 @@
-# Stellar to Solana Bridge
+# Stellar-Solana Bridge
 
 This project provides a user-friendly interface for transferring tokens from the Stellar network to the Solana network. The bridge currently supports transfers from Stellar to Solana only.
 
