@@ -1,4 +1,4 @@
-name: TFT Solana Docker Build/Push
+name: Stellar-Solana bridge Docker build/push
 on:
   release:
     types: [published]
