@@ -27,5 +27,4 @@ To run this project locally, follow these steps:
 
 ````bash
     yarn dev
-    ```
 ````
