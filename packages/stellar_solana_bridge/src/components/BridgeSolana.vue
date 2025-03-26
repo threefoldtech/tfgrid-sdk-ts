@@ -1,5 +1,5 @@
 <template>
-  <div class="d-flex flex-column h-screen">
+  <div class="d-flex flex-column" style="min-height: 100vh">
     <v-alert
       transition="fade-transition"
       v-model="alert"
@@ -10,7 +10,7 @@
       variant="tonal"
       closable
       class="mb-0"
-      max-height="64"
+      style="max-height: 64px"
     >
       This bridge currently only supports Stellar to Solana transfers.
     </v-alert>
