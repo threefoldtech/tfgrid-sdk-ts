@@ -15,7 +15,7 @@ ifeq ($(project), playground)
 else ifeq ($(project), dashboard)
 	cd packages/dashboard && yarn serve
 else ifeq ($(project), stellar_solana_bridge)
-	cd packages/stellar_solana_bridge && yarn serve
+	cd packages/stellar_solana_bridge && yarn dev
 endif
 
 build:
