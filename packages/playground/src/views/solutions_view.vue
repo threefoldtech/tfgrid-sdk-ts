@@ -9,12 +9,25 @@
       No solution was found with the provided search query.
     </p>
 
-    <v-card class="my-5 pa-5" color="primary" v-if="filteredOrchCards.length > 0"
-      ><v-card-title class="text-center">Orchestrators</v-card-title>
+    <v-card class="my-5 pa-5" v-if="filteredOrchCards.length > 0"
+      ><v-card-title
+        class="mb-2"
+        :style="{
+          fontSize: '1.25rem',
+        }"
+        >Orchestrators</v-card-title
+      >
       <ApplicationCards :cards="filteredOrchCards" />
     </v-card>
-    <v-card class="my-5 pa-5" color="primary" v-if="filteredAppCards.length > 0"
-      ><v-card-title class="text-center">Applications</v-card-title>
+    <v-divider class="my-4"></v-divider>
+    <v-card class="my-5 pa-5" v-if="filteredAppCards.length > 0"
+      ><v-card-title
+        class="mb-2"
+        :style="{
+          fontSize: '1.25rem',
+        }"
+        >Applications</v-card-title
+      >
       <ApplicationCards :cards="filteredAppCards" />
     </v-card>
   </view-layout>
