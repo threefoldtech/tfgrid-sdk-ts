@@ -135,6 +135,7 @@
             bottom: '31px',
             right: '31px',
             zIndex: 9,
+            cursor: 'pointer',
           }"
           :text="nodeInputValidateTask.error"
           dismissable
