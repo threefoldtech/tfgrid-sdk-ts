@@ -9,7 +9,7 @@
       No solution was found with the provided search query.
     </p>
 
-    <v-card class="my-5 pa-5" v-if="filteredOrchCards.length > 0"
+    <v-card class="my-5" variant="text" v-if="filteredOrchCards.length > 0"
       ><v-card-title
         class="mb-2"
         :style="{
@@ -20,7 +20,7 @@
       <ApplicationCards :cards="filteredOrchCards" />
     </v-card>
     <v-divider class="my-4" v-if="filteredAppCards.length && filteredOrchCards.length"></v-divider>
-    <v-card class="my-5 pa-5" v-if="filteredAppCards.length > 0"
+    <v-card class="my-5" variant="text" v-if="filteredAppCards.length > 0"
       ><v-card-title
         class="mb-2"
         :style="{
