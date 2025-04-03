@@ -9,7 +9,7 @@
       </v-alert>
       <v-alert id="ed25519-warning" variant="tonal" type="info" class="mb-6" v-if="keypairType === KeypairType.ed25519">
         <p>
-          Please note that generation or activation of ed25519 Keys isn't supported, you can only import pre-existing
+          Please note that generating or activating of ed25519 Keys isn't supported, you can only import pre-existing
           ones.
         </p>
       </v-alert>
@@ -346,7 +346,7 @@ async function storeAndLogin() {
     if (e instanceof TwinNotExistError) {
       isNonActiveMnemonic.value = true;
       if (keypairType.value === KeypairType.ed25519) {
-        createOrActivateError.value = "Activation ed25519 Keys isn't supported, you can only import pre-existing ones.";
+        createOrActivateError.value = "Generating new ed25519 keys is not supported. You can only import existing keys.";
         return;
       }
 
