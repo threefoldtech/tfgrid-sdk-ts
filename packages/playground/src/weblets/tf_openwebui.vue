@@ -171,7 +171,7 @@ function finalize(deployment: any, domain: string) {
   layout.value.reloadDeploymentsList();
   layout.value.setStatus(
     "success",
-    `Successfully deployed an Open WebUI instance. The domain URL is "${domain}". You might need to wait a couple of minutes for the installation to complete, e.g. if you see Bad Gateway when opening the webpage, simply wait and refresh the page.`,
+    `Successfully deployed an Open WebUI instance. You might need to wait a couple of minutes for the installation to complete, e.g. if you see Bad Gateway when opening the webpage, simply wait and refresh the page.`,
   );
   layout.value.openDialog(deployment, deploymentListEnvironments.openwebui);
 }
