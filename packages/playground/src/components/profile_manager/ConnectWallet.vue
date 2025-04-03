@@ -50,6 +50,7 @@
                       }"
                       autocomplete="off"
                       :disabled="creatingAccount || connecting"
+                      @update:model-value="isNonActiveMnemonic = false && clearErrors"
                       @click:append="reloadValidation"
                       ref="mnemonicRef"
                     >
@@ -252,14 +253,15 @@ async function getEmail(grid: GridClient) {
 const clearErrors = () => {
   createOrActivateError.value = "";
   storeAndLoginError.value = "";
+  enableReload.value = false;
 };
 
 function reloadValidation() {
+  clearErrors();
   enableReload.value = false;
   mnemonicInput.value.validate();
 }
 const validateMnemonicInput = async (input: string) => {
-  clearErrors();
   isNonActiveMnemonic.value = false;
   if (
     validateMnemonic(input) ||
