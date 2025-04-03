@@ -51,6 +51,7 @@ import type { GridNode } from "@threefold/gridproxy_client";
 import { InsufficientBalanceError } from "@threefold/types";
 import { computed, type PropType, ref, watch } from "vue";
 
+import { ValidatorStatus } from "@/hooks/form_validator";
 import { useProfileManager } from "@/stores";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
 import { notifyDelaying } from "@/utils/notifications";
@@ -107,6 +108,7 @@ export default {
       emit("update:node", node[0]);
     }
     async function unReserveNode() {
+      emit("update:status", ValidatorStatus.Init);
       loadingUnreserveNode.value = true;
       try {
         updateGrid(grid, { projectName: "" });
@@ -143,6 +145,7 @@ export default {
 
     async function reserveNode() {
       try {
+        emit("update:status", ValidatorStatus.Init);
         if (profile.value) {
           loadingReserveNode.value = true;
           createCustomToast("Transaction Submitted", ToastType.info);

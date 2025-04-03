@@ -4,12 +4,13 @@
     <input-tooltip
       tooltip="Please select at least one card from the available GPU cards. Note that if you have a deployment that already uses certain cards, they will not appear in the selection area. You have the option to select one or more cards.."
     >
-      <VAutocomplete
+      <VSelect
         label="GPU Cards"
         placeholder="Select GPU Cards"
         class="w-100"
         multiple
         :model-value="$props.modelValue"
+        item-value="id"
         @update:model-value="
           bindModelValue($event);
           bindStatus($event.length === 0 ? ValidatorStatus.Invalid : ValidatorStatus.Valid);
@@ -21,6 +22,7 @@
         :error-messages="
           $props.status === ValidatorStatus.Invalid ? 'Please select at least 1 GPU card.' : cardsTask.error?.message
         "
+        no-data-text="No GPU cards available on the selected node."
         return-object
         :disabled="!$props.validNode"
         :hint="$props.validNode ? undefined : 'Please select a valid node to load its GPU cards.'"
@@ -41,7 +43,7 @@ import type { InputValidatorService } from "@/hooks/input_validator";
 import { useAsync, useWatchDeep } from "../../hooks";
 import { useForm, ValidatorStatus } from "../../hooks/form_validator";
 import { useGrid } from "../../stores";
-import { getNodeGpuCards } from "../../utils/nodeSelector";
+import { getNodeAvailableGpuCards } from "../../utils/nodeSelector";
 
 export default {
   name: "TfSelectGpu",
@@ -58,7 +60,7 @@ export default {
   setup(props, ctx) {
     const gridStore = useGrid();
     const input = ref<HTMLElement>();
-    const cardsTask = useAsync(getNodeGpuCards, { default: [] });
+    const cardsTask = useAsync(getNodeAvailableGpuCards, { default: [] });
 
     onUnmounted(() => {
       bindModelValue();
