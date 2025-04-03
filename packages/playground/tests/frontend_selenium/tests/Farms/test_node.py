@@ -34,6 +34,9 @@ def test_node_page(browser):
     node_page, grid_proxy = before_test_setup(browser)
     nodes = grid_proxy.get_twin_node(str(node_page.twin_id))
     for node in nodes:
+        time.sleep(2)
+        page = browser.page_source
+        time.sleep(2)
         assert str(node['nodeId']) in browser.page_source
 
 
