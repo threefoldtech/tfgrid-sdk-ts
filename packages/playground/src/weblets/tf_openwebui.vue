@@ -117,7 +117,6 @@ import type { solutionFlavor as SolutionFlavor } from "../types";
 import { type Flist, ProjectName } from "../types";
 import { deployVM, type Disk } from "../utils/deploy_vm";
 import { deployGatewayName, getSubdomain, rollbackDeployment } from "../utils/gateway";
-import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
 import { generateName } from "../utils/strings";
 
@@ -125,11 +124,9 @@ const selectionDetails = ref<SelectionDetails>();
 
 const layout = useLayout();
 const profileManager = useProfileManager();
-const tabs = ref();
 const solution = ref() as Ref<SolutionFlavor>;
 const selectedSSHKeys = ref("");
 const name = ref(generateName({ prefix: "oi" }));
-const domain = ref();
 const flist = ref<Flist>({
   name: "Ubuntu-24.04 Open WebUI Instance",
   value: "https://hub.grid.tf/tf-official-apps/threefoldtech-ubuntu-24.04_fullvm_oi.flist",
