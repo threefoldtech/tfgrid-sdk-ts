@@ -232,7 +232,7 @@ async function deploy() {
     layout.value.setStatus("failed", normalizeError(e, "Failed to deploy an Open WebUI instance."));
   }
 
-  if (selectionDetails.value!.domain!.enabledCustomDomain && ipv4.value) {
+  if (!selectionDetails.value?.domain?.enableSelectedDomain) {
     vm[0].customDomain = selectionDetails.value!.domain!.customDomain;
     finalize(vm, domain);
     return;
