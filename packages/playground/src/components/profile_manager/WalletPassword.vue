@@ -59,12 +59,7 @@ const props = defineProps({
 const passwordInput = ref(null);
 function validatePassword(value: string) {
   if (props.mode === "Create") return;
-  if (!localStorage.getItem(window.env.WALLET_KEY)) {
-    return {
-      message: "We couldn't find a matching wallet for this password. Please connect your wallet first.",
-    };
-  }
-  if (getCredentials().passwordHash !== md5(value)) {
+  if (!localStorage.getItem(window.env.WALLET_KEY) || getCredentials().passwordHash !== md5(value)) {
     return {
       message: "We couldn't find a matching wallet for this password. Please connect your wallet first.",
     };
