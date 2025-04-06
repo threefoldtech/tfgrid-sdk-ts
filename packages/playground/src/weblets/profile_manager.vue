@@ -368,11 +368,11 @@
                 :disabled="activating || creatingAccount || activatingAccount"
               />
             </PasswordInputWrapper>
-            <CopyInputWrapper :data="profileManager.profile.hexSeed" #="{ props }">
+            <PasswordInputWrapper #="{ props }">
               <input-tooltip tooltip=" Please use this hex seed to import your wallet in Threefold Connect">
                 <VTextField label="Your Hex Seed" readonly v-model="profileManager.profile.hexSeed" v-bind="props" />
               </input-tooltip>
-            </CopyInputWrapper>
+            </PasswordInputWrapper>
 
             <CopyInputWrapper :data="profileManager.profile.twinId.toString()" #="{ props }">
               <VTextField label="Twin ID" readonly v-model="profileManager.profile.twinId" v-bind="props" />
@@ -843,9 +843,9 @@ const replaceMarkdownLinks = (content: string, pattern: RegExp, baseUrl: string)
 const processMarkdownContent = (content: string, baseUrl: string) => {
   let processedContent = content.replace(
     "./" + manual.legal_header_img,
-    `${manual.manual_raw_legal_img}" class="info-legal-image`
+    `${manual.manual_raw_legal_img}" class="info-legal-image`,
   );
-  
+
   const patterns = [/\[([^\]]+)\]\((\.\/[^)]+)\.md\)/g, /\[([^\]]+)\]\((\.\/[^)]+\/[^)]+)\.md\)/g];
 
   for (const pattern of patterns) {

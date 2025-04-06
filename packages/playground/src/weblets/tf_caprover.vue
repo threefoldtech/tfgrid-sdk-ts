@@ -177,7 +177,7 @@ async function deploy() {
 }
 
 function addWorker() {
-  workers.value.push(createWorker());
+  workers.value.unshift(createWorker());
 }
 
 function normalizeCaproverWorker(worker: CW, envs: Env[]): Machine {

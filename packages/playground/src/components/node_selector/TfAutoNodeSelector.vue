@@ -62,6 +62,7 @@
                   selectable
                   @update:node="updateNode($event as NodeInfo)"
                   @node:select="bindModelValueAndValidate"
+                  @update:status="bindStatus($event as ValidatorStatus)"
                   :status="
                     $props.modelValue === node
                       ? nodeInputValidateTask.loading
@@ -304,7 +305,7 @@ export default {
     const nodeInputValidateTask = useAsync<boolean, string, [NodeInfo | undefined]>(
       async node => {
         const nodeCapacityValid = await checkNodeCapacityPool(gridStore, node, props.filters);
-        const rentContractValid = await validateRentContract(gridStore, node);
+        const rentContractValid = await validateRentContract(gridStore, node, props.filters.hasGPU);
 
         if (node && !isNodeValid(props.getFarm, node!, props.selectedMachines, filters.value)) {
           throw `Node (${node.nodeId}) is not valid.`;
