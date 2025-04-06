@@ -94,7 +94,6 @@
               <CopyReadonlyInput label="Monitoring URL" :data="grafanaURL" :loading="isLoading" />
             </v-form>
             <v-form readonly v-else>
-              <CopyReadonlyInput label="Name" :data="data.name" />
               <CopyReadonlyInput label="IP" :data="data[0].workloads[0].data.backends.join(', ')" />
               <CopyReadonlyInput
                 label="Domain"
@@ -161,7 +160,6 @@ const activeTab = ref(0);
 const grafanaURL = ref("");
 const gpuInfo = ref("");
 const contracts = computed(() => {
-  console.table(Array.isArray(props.data) ? props.data : [props.data]);
   if (!props.data) return [];
   if ("masters" in props.data) return [...props.data.masters, ...props.data.workers];
   return Array.isArray(props.data) ? props.data : [props.data];
