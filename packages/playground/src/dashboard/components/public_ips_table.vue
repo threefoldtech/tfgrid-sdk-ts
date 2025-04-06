@@ -82,7 +82,7 @@
 <script lang="ts">
 import type { RemoveFarmIPModel } from "@threefold/grid_client";
 import type { PublicIp } from "@threefold/gridproxy_client";
-import { onMounted, ref, watch } from "vue";
+import { ref, watch } from "vue";
 
 import { gridProxyClient } from "@/clients";
 import { useGrid } from "@/stores";
@@ -140,7 +140,6 @@ export default {
           retCount,
           page: options.page,
           size: options.size,
-          free: true,
           farmIds: props.farmId,
         });
         publicIps.value = data as PublicIp[];
@@ -162,7 +161,7 @@ export default {
         }));
         await gridStore.grid.farms.removeFarmIps(items.value);
         setTimeout(async () => {
-          await getFarmPublicIp(false, { page: page.value, size: pageSize.value });
+          await getFarmPublicIp(true, { page: page.value, size: pageSize.value });
           createCustomToast("IP is deleted successfully!", ToastType.success);
           loadingIps.value = false;
         }, 20000);
@@ -180,7 +179,7 @@ export default {
       () => {
         loadingIps.value = true;
         setTimeout(async () => {
-          await getFarmPublicIp(false, { page: page.value, size: pageSize.value });
+          await getFarmPublicIp(true, { page: page.value, size: pageSize.value });
         }, 20000);
       },
       { deep: true },
