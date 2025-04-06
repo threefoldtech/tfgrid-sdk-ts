@@ -1,6 +1,7 @@
 <template>
+  <VAlert type="warning" v-if="network == 'main'" class="my-2">To create your Farm, use the TF Connect App.</VAlert>
   <v-container>
-    <v-row class="text-center flex justify-center">
+    <v-row class="text-center flex justify-center mt-4">
       <v-btn
         color="secondary"
         class="text-subtitle-1 px-6 mr-2"
@@ -9,7 +10,12 @@
         >Bootstrap Node Image</v-btn
       >
 
-      <v-btn variant="elevated" class="text-subtitle-1 px-6" @click="showDialogue = true" :disabled="isCreating"
+      <v-btn
+        variant="elevated"
+        class="text-subtitle-1 px-6"
+        v-if="network !== 'main'"
+        @click="showDialogue = true"
+        :disabled="isCreating"
         >Create Farm</v-btn
       >
     </v-row>
@@ -65,6 +71,7 @@ export default {
     const gridStore = useGrid();
     const valid = ref(false);
     const farmName = ref("");
+    const network = process.env.NETWORK || (window as any).env.NETWORK;
 
     async function createFarm() {
       try {
@@ -101,6 +108,7 @@ export default {
       farmName,
       createFarm,
       validateFarmName,
+      network,
     };
   },
 };
