@@ -3,29 +3,12 @@
     <v-dialog model-value @update:model-value="$emit('close')" scrollable attach="#modals">
       <v-card>
         <v-card-title class="d-flex flex-column" v-if="!onlyJson">
-          <div class="d-flex justify-center">
+          <div class="d-flex justify-center my-4">
             <v-btn-toggle divided v-model="showType" mandatory>
               <v-btn> details </v-btn>
               <v-btn> JSON</v-btn>
             </v-btn-toggle>
           </div>
-          <v-tabs v-model="activeTab" align-tabs="center" class="my-4 mx-auto" v-if="showType === 0">
-            <v-tab
-              v-for="(item, index) in contracts"
-              :key="item.contractId"
-              variant="tonal"
-              color="secondary"
-              class="mx-2"
-            >
-              <v-tooltip location="bottom" :text="getTooltipText(item, index)" :disabled="!hasMaster(item)">
-                <template #activator="{ props }">
-                  <span v-bind="props" class="text-lowercase">{{
-                    contracts && contracts.length === 1 && "name" in contracts ? (contracts as any).name : item.name
-                  }}</span>
-                </template>
-              </v-tooltip>
-            </v-tab>
-          </v-tabs>
         </v-card-title>
         <v-card-text>
           <template v-if="showType === 0">
@@ -178,6 +161,7 @@ const activeTab = ref(0);
 const grafanaURL = ref("");
 const gpuInfo = ref("");
 const contracts = computed(() => {
+  console.table(Array.isArray(props.data) ? props.data : [props.data]);
   if (!props.data) return [];
   if ("masters" in props.data) return [...props.data.masters, ...props.data.workers];
   return Array.isArray(props.data) ? props.data : [props.data];
