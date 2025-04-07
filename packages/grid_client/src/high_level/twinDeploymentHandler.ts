@@ -103,7 +103,9 @@ class TwinDeploymentHandler {
     const node_id = await this.nodes.getNodeIdFromContractId(contract_id, this.config.substrateURL);
 
     const now = new Date().getTime();
-    while (new Date().getTime() < now + timeout * 1000 * 60) {
+    const timeoutInSeconds = timeout * 60;
+
+    while (new Date().getTime() < now + timeoutInSeconds * 1000) {
       const deployment = await this.getDeployment(contract_id);
       if (deployment.workloads.length !== twinDeployment.deployment.workloads.length) {
         await new Promise(f => setTimeout(f, 2000));
@@ -125,7 +127,9 @@ class TwinDeploymentHandler {
       }
       await new Promise(f => setTimeout(f, 2000));
     }
-    throw new TimeoutError(`Deployment with contract_id: ${contract_id} failed to be ready after ${timeout} minutes.`);
+    throw new TimeoutError(
+      `Deployment with contract_id: ${contract_id} failed to be ready after ${timeoutInSeconds} seconds.`,
+    );
   }
 
   async waitForDeployments(twinDeployments: TwinDeployment[], timeout = this.config.deploymentTimeoutMinutes) {
