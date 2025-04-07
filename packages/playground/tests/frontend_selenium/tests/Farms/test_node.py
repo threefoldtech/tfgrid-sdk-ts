@@ -3,7 +3,7 @@ from pages.node import NodePage
 from utils.grid_proxy import GridProxy
 from pages.dashboard import DashboardPage
 from datetime import datetime
-import random, string
+import random, string, secrets
 import math
 import time
 
@@ -203,8 +203,16 @@ def test_add_config(browser):
     old_ipv4 = nodes[rand_node]['publicConfig']['ipv4']
     node_page.setup_config(node_id)
     new_ipv4 = '125.25.25.25/25'
-    new_domain_name = 'tf.grid'+ random.choice(string.ascii_letters)
-    node_page.wait_for_button(node_page.add_config_input(new_ipv4, '125.25.25.24', '2600:1f13:0d15:95:00::/64', '2600:1f13:0d15:95:00::1', new_domain_name)).click()
+    new_domain_name = 'tf.grid'+ secrets.choice(string.ascii_letters)
+    node_page.wait_for_button(
+    node_page.add_config_input(
+        new_ipv4,
+        '125.25.25.24',
+        '2600:1f13:0d15:95:00::/64',
+        '2600:1f13:0d15:95:00::1',
+        new_domain_name
+        )
+        ).click()
     node_page.wait_for('Public config saved successfully.')
     counter = 0
     while(old_ipv4 != new_ipv4):
