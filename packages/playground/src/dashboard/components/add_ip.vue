@@ -138,6 +138,7 @@ import { default as PrivateIp } from "private-ip";
 import { ref, watch } from "vue";
 
 import { gqlClient } from "@/clients";
+import { ipToLong, longToIp } from "@/utils/ip";
 import { IPType } from "@/utils/types";
 
 import { useGrid } from "../../stores";
@@ -298,13 +299,7 @@ export default {
       addIPs();
       showIPs.value = true;
     }
-    function ipToLong(ip: string) {
-      return ip.split(".").reduce((acc: number, octet: string | number) => (acc << 8) + +octet, 0) >>> 0;
-    }
 
-    function longToIp(long: number) {
-      return (long >>> 24) + "." + ((long >> 16) & 255) + "." + ((long >> 8) & 255) + "." + (long & 255);
-    }
     function generateIpTable(startIp: string, endIp: string, sub: any) {
       const startLong = ipToLong(startIp);
       const endLong = ipToLong(endIp);
