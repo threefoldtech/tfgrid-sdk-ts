@@ -25,7 +25,7 @@ def test_validate_homepage_links(browser):
     """
     dashboard_page = before_test_setup(browser)
     assert dashboard_page.navigate_to_find_more() == ('https://threefold.io/')
-    assert dashboard_page.navigate_to_explore_capacity() == ('https://stats.grid.tf/')
+    assert dashboard_page.navigate_to_explore_capacity() == (Base.stats)
     assert dashboard_page.navigate_to_learn_about_grid() == ('https://manual.grid.tf/')
 
 

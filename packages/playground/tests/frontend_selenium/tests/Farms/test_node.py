@@ -3,7 +3,7 @@ from pages.node import NodePage
 from utils.grid_proxy import GridProxy
 from pages.dashboard import DashboardPage
 from datetime import datetime
-import random
+import random, string
 import math
 import time
 
@@ -33,11 +33,10 @@ def test_node_page(browser):
     """
     node_page, grid_proxy = before_test_setup(browser)
     nodes = grid_proxy.get_twin_node(str(node_page.twin_id))
+    node_page.node_details()
     for node in nodes:
-        time.sleep(2)
         page = browser.page_source
-        time.sleep(2)
-        assert str(node['nodeId']) in browser.page_source
+        assert str(node['nodeId']) in page
 
 
 # def test_search_node(browser):
@@ -204,7 +203,7 @@ def test_add_config(browser):
     old_ipv4 = nodes[rand_node]['publicConfig']['ipv4']
     node_page.setup_config(node_id)
     new_ipv4 = '125.25.25.25/25'
-    node_page.wait_for_button(node_page.add_config_input(new_ipv4, '125.25.25.24', '2600:1f13:0d15:95:00::/64', '2600:1f13:0d15:95:00::1', 'tf.grid')).click()
+    node_page.wait_for_button(node_page.add_config_input(new_ipv4, '125.25.25.24', '2600:1f13:0d15:95:00::/64', '2600:1f13:0d15:95:00::1', 'tf.grid'+ random.choice(string.ascii_letters))).click()
     node_page.wait_for('Public config saved successfully.')
     counter = 0
     while(old_ipv4 != new_ipv4):

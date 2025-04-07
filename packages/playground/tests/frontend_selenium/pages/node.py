@@ -21,7 +21,7 @@ class NodePage:
     node_page = (By.XPATH, "//*[contains(text(), 'Your Nodes')]")
     search_node_input = (By.XPATH, '/html/body/div[1]/div[1]/div[3]/div/div/div[5]/div/div[1]/div/div[1]/div/input')
     node_table = (By.XPATH, "//span[text()='Node ID']/ancestor::table/tbody/tr")
-    node_id = (By.XPATH , "//*[contains(text(), 'Node ID')]")
+    node_id = (By.XPATH, "//*[contains(text(), 'Node ID')]")
     farm_id = (By.XPATH, '//*[@id="app"]/div[1]/div[2]/div/div[1]/div[5]/div[2]/div[1]/div[1]/table/thead/tr/th[3]')
     country = (By.XPATH, "//*[contains(text(), 'Country')]")
     serial_number = (By.XPATH, "//*[contains(text(), 'Serial Number')]")
@@ -131,8 +131,10 @@ class NodePage:
         return status
     
     def node_details(self):
-        time.sleep(6)
-        self.browser.find_element(*self.node_id).click()
+        node_element = self.browser.find_element(*self.node_id)
+        WebDriverWait(self.browser, 30).until(EC.element_to_be_clickable(node_element))
+        self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", node_element)
+        node_element.click()
         nodes = []
         for i in range(1, len(self.browser.find_elements(*self.node_table))+1):
             self.browser.execute_script("window.scrollTo(0,document.body.scrollHeight)")
@@ -172,9 +174,12 @@ class NodePage:
     def setup_config(self, node_id):
         for i in range(1, len(self.browser.find_elements(*self.node_table))+1):
             for l in range (1, 10):
-                text1 = self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i)}]/td[1]").text
-                if text1==str(node_id):
-                    self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i)}]/td[6]/span[1]/i").click()
+                table_element = self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i)}]/td[1]")
+                if table_element.text==str(node_id):
+                    config_element = self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i)}]/td[6]/span[1]/i")
+                    WebDriverWait(self.browser, 30).until(EC.element_to_be_clickable(config_element))
+                    self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", config_element)
+                    config_element.click()
                     WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.id_label))
                     return
                 time.sleep(2)
@@ -214,9 +219,16 @@ class NodePage:
     
     def setup_fee(self, node_id):
         for i in range(1, len(self.browser.find_elements(*self.node_table))+1):
-            if (self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i)}]/td[1]").text==str(node_id)):
-                self.browser.find_element(By.XPATH, self.table_xpath+ '['+ str(i) +']/td[6]/span[2]/i').click()
-                WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.fee_id))
+            for l in range (1, 10):
+                table_element = self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i)}]/td[1]")
+                if table_element.text==str(node_id):
+                    fee_element = self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i)}]/td[6]/span[2]/i")
+                    WebDriverWait(self.browser, 30).until(EC.element_to_be_clickable(fee_element))
+                    self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", fee_element)
+                    fee_element.click()
+                    WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.fee_id))
+                    return
+                time.sleep(2)
 
     def set_fee(self, fee):
         self.browser.find_element(*self.fee_input).send_keys(Keys.CONTROL + "a")

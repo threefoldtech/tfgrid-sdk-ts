@@ -3,6 +3,7 @@ from pages.dashboard import DashboardPage
 from utils.grid_proxy import GridProxy
 from pages.bridge import BridgePage
 import pytest
+from utils.base import Base
 
 #  Time required for the run (11 cases) is approximately 3 minutes.
 
@@ -110,8 +111,7 @@ def test_check_deposit(browser):
     grid_proxy = GridProxy(browser)
     twin_id, amount_text, bridge_address = bridge_page.check_deposit()
     assert bridge_page.wait_for(amount_text)
-    assert bridge_address == 'GBNOTAYUMXVO5QDYWYO2SOCOYIJ3XFIP65GKOQN7H65ZZSO6BK4SLWSC'
-    # assert bridge_address == 'GDHJP6TF3UXYXTNEZ2P36J5FH7W4BJJQ4AYYAXC66I2Q2AH5B6O6BCFG'
+    assert bridge_address == Base.bridge_address
     assert bridge_page.wait_for('Add twin ID as memo text or you will lose your tokens')
     user_address = bridge_page.twin_address()
     assert grid_proxy.get_twin_address(twin_id[twin_id.find('_')+1:]) == user_address
