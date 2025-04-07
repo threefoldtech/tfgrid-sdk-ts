@@ -173,7 +173,7 @@ class NodePage:
     
     def setup_config(self, node_id):
         for i in range(1, len(self.browser.find_elements(*self.node_table))+1):
-            for l in range (1, 10):
+            for _ in range (1, 10):
                 table_element = self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i)}]/td[1]")
                 if table_element.text==str(node_id):
                     config_element = self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i)}]/td[6]/span[1]/i")
@@ -219,7 +219,7 @@ class NodePage:
     
     def setup_fee(self, node_id):
         for i in range(1, len(self.browser.find_elements(*self.node_table))+1):
-            for l in range (1, 10):
+            for _ in range (1, 10):
                 table_element = self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i)}]/td[1]")
                 if table_element.text==str(node_id):
                     fee_element = self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i)}]/td[6]/span[2]/i")

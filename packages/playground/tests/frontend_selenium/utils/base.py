@@ -5,7 +5,7 @@ class Base:
     config.read('Config.ini')
     port = config['Base']['port']
     net = config['Base']['net']
-    
+
     if str(net).lower() == 'main':
         bridge_address = 'GBNOTAYUMXVO5QDYWYO2SOCOYIJ3XFIP65GKOQN7H65ZZSO6BK4SLWSC'
         base_url = 'https://dashboard.grid.tf/'
@@ -37,4 +37,4 @@ class Base:
         gridproxy_url = 'https://gridproxy.' + str(net) + '.grid.tf/'
 
     else:
-        raise('%s is not a valid network; please enter a valid network in Config.ini ["main","test", "qa", "staging", "dev"]' %str(net))
+        raise ValueError('[%s] is not a valid network; please enter a valid network in Config.ini ["main","test", "qa", "staging", "dev"]' % str(net))
