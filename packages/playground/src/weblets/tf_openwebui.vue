@@ -164,7 +164,7 @@ watch(
   { immediate: true },
 );
 
-function finalize(deployment: any, domain: string) {
+function finalize(deployment: any) {
   layout.value.reloadDeploymentsList();
   layout.value.setStatus(
     "success",
@@ -231,7 +231,7 @@ async function deploy() {
 
   if (!selectionDetails.value?.domain?.enableSelectedDomain) {
     vm[0].customDomain = selectionDetails.value!.domain!.customDomain;
-    finalize(vm, domain);
+    finalize(vm);
     return;
   }
 
@@ -245,7 +245,7 @@ async function deploy() {
       network: vm[0].interfaces[0].network,
     });
 
-    finalize(vm, domain);
+    finalize(vm);
   } catch (e) {
     layout.value.setStatus("deploy", "Rollbacking back due to fail to deploy gateway...");
 
