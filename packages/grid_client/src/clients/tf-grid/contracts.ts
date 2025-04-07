@@ -105,6 +105,16 @@ export interface ListMyContractOptions {
   nodeId?: number;
 }
 
+/**
+ * Parameters used to list contracts on a specific node.
+ */
+export interface ListNodeContractsOnNode {
+  proxyURL: string;
+  nodeId: number;
+  stateList?: ContractState[];
+  numberOfPublicIPs?: number;
+}
+
 export interface GetConsumptionOptions {
   graphqlURL: string;
   id: number;
@@ -433,16 +443,21 @@ class TFContracts extends Contracts {
   }
 
   /**
-   * List all the grace period contracts on a node
-   * @param {number} nodeId rented node to list its contracts
-   * @param {GridProxyClient} proxy
-   * @returns {Contract[]}
+   * Lists all contracts deployed on a specific node.
+   * @description
+   * This method interacts with the Grid Proxy to fetch contracts associated with a given node ID,
+   * optionally filtering them by contract state and number of public IPs.
+   *
+   * @param options - The parameters used to filter the contracts, including proxy URL, node ID,
+   *                  optional list of contract states, and optional number of public IPs.
+   * @returns A promise that resolves to an array of `Contract` objects matching the criteria.
    */
-  private async getNodeContractsOnRentedNode(nodeId: number, proxy: GridProxyClient): Promise<Contract[]> {
+  async getNodeContractsOnNode(options: ListNodeContractsOnNode): Promise<Contract[]> {
+    const proxy = new GridProxyClient(options.proxyURL);
     return await this.listAllContracts(proxy, {
-      nodeId,
-      state: [ContractState.GracePeriod],
-      numberOfPublicIps: 1,
+      nodeId: options.nodeId,
+      state: options.stateList || [ContractState.Created, ContractState.GracePeriod],
+      numberOfPublicIps: options.numberOfPublicIPs,
     });
   }
 
@@ -473,7 +488,12 @@ class TFContracts extends Contracts {
    * the IPV4 cost to add to the estimated cost of the rent contract.
    */
   private async getContractsCostOnRentedNode(nodeId: number, proxy: GridProxyClient): Promise<Decimal> {
-    const contracts = await this.getNodeContractsOnRentedNode(nodeId, proxy);
+    const contracts = await this.getNodeContractsOnNode({
+      proxyURL: proxy.uri,
+      nodeId,
+      stateList: [ContractState.GracePeriod],
+      numberOfPublicIPs: 1,
+    });
 
     if (contracts.length == 0) return new Decimal(0);
     const costPromises = contracts.reduce((acc: Promise<Decimal>[], contract) => {
