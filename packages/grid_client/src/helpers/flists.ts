@@ -93,7 +93,7 @@ export const flists = {
     entryPoint: "/sbin/zinit init",
   },
   funkwhale: {
-    value: "https://hub.grid.tf/tf-official-apps/funkwhale-dec21.flist",
+    value: "https://hub.grid.tf/tf-official-apps/funkwhale-1.4.0.flist",
     entryPoint: "/init.sh",
   },
   gitea: {
