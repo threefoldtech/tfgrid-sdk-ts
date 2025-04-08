@@ -431,9 +431,8 @@
           </template>
           <template v-if="item.length > 0">
             <template v-for="props in item" :key="props.name">
-              <v-chip class="ma-3">
-                {{ props.workloads[0].result.data.fqdn || props.workloads[0].data.fqdn }}
-              </v-chip>
+              <v-chip class="ma-3"> {{ props.workloads[0].result.data.fqdn || props.workloads[0].data.fqdn }} </v-chip
+              >tests/modules/applications/nodepilot.test.ts
             </template>
           </template>
           <v-chip class="ma-3" v-else>
