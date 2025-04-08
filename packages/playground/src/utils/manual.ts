@@ -3,11 +3,11 @@ import urlJoin from "url-join";
 const BASE = window.env.MANUAL_URL;
 
 const GITHUB = {
-  RAW_BASE: "https://raw.githubusercontent.com/threefoldtech/info_grid/refs/heads/development-split",
+  RAW_BASE: "https://raw.githubusercontent.com/threefoldtech/info_grid/refs/heads/development",
   LEGAL_PATH: "/labs/docs/knowledge_base/terms_conditions_all3/",
 };
 
-const LEGAL_HEADER_IMG = "img/legal.jpg";
+const LEGAL_HEADER_IMG = "img/legal_header.jpg";
 
 export const manual = {
   dedicated_machines: urlJoin(BASE, "/labs/documentation/dashboard/deploy/node_finder#dedicated-nodes"),
