@@ -413,16 +413,10 @@ const routes: AppRoute[] = [
         tooltip: "Deploy your Virtal Machine instances.",
       },
       {
-        title: "Orchestrators",
-        icon: "mdi-group",
-        route: DashboardRoutes.Deploy.Orchestrators,
-        tooltip: "Deploy your orchestrator instances.",
-      },
-      {
-        title: "Applications",
+        title: "Labs",
         icon: "mdi-lightbulb-on-outline",
         route: DashboardRoutes.Deploy.Applications,
-        tooltip: "Deploy ready applications on the ThreeFold grid.",
+        tooltip: "Deploy ready labs on the ThreeFold grid.",
         releaseDate: new Date("2024-11-13"),
       },
       {

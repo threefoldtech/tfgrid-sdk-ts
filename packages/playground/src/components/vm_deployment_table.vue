@@ -151,7 +151,7 @@
 
       <template #no-data-text>
         <div v-if="failedDeploymentList.length > 0" class="text-center">
-          <p v-text="'Couldn\'t load any of your ' + projectName + ' deployments.'" />
+          <p v-text="'Couldn\'t load any of your ' + projectTitle + ' deployments.'" />
           <VBtn
             class="mt-4"
             variant="outlined"
@@ -161,7 +161,7 @@
             @click="loadDeployments"
           />
         </div>
-        <p v-else v-text="'No ' + projectName + ' deployments found on this account.'" />
+        <p v-else v-text="'No ' + projectTitle + ' deployments found on this account.'" />
       </template>
     </ListTable>
   </div>
@@ -181,6 +181,7 @@ const profileManager = useProfileManager();
 
 const props = defineProps<{
   projectName: string;
+  projectTitle: string;
   modelValue: any[];
   deleting: boolean;
   hideSSH?: boolean;
