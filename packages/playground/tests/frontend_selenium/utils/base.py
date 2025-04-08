@@ -24,17 +24,17 @@ class Base:
         stats = 'https://stats.' + str(net) + '.grid.tf/'
         gridproxy_url = 'https://gridproxy.' + str(net) + '.grid.tf/'
 
-    elif str(net).lower() == 'staging':
-        bridge_address = 'GDHJP6TF3UXYXTNEZ2P36J5FH7W4BJJQ4AYYAXC66I2Q2AH5B6O6BCFG'
-        base_url = 'https://staging.dashboard.dev.grid.tf/'
-        stats = 'https://stats.dev.grid.tf/'
-        gridproxy_url = 'https://gridproxy.dev.grid.tf/'
-
     elif str(net).lower() == 'dev':
         bridge_address = 'GDHJP6TF3UXYXTNEZ2P36J5FH7W4BJJQ4AYYAXC66I2Q2AH5B6O6BCFG'
-        base_url = 'http://localhost:' + str(port) + '/'
+        base_url = 'https://staging.dashboard.dev.grid.tf/'
         stats = 'https://stats.' + str(net) + '.grid.tf/'
         gridproxy_url = 'https://gridproxy.' + str(net) + '.grid.tf/'
 
+    elif str(net).lower() == 'local':
+        bridge_address = 'GDHJP6TF3UXYXTNEZ2P36J5FH7W4BJJQ4AYYAXC66I2Q2AH5B6O6BCFG'
+        base_url = 'http://localhost:' + str(port) + '/'
+        stats = 'https://stats.dev.grid.tf/'
+        gridproxy_url = 'https://gridproxy.dev.grid.tf/'
+
     else:
-        raise ValueError('[%s] is not a valid network; please enter a valid network in Config.ini ["main","test", "qa", "staging", "dev"]' % str(net))
+        raise ValueError('[%s] is not a valid network; please enter a valid network in Config.ini ["main","test", "qa", "dev", "local"]' % str(net))
