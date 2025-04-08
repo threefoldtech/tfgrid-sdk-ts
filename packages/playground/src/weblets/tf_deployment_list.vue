@@ -432,7 +432,7 @@
           <template v-if="item.length > 0">
             <template v-for="props in item" :key="props.name">
               <v-chip class="ma-3">
-                {{ props.workloads[0].result.data.fqdn }}
+                {{ props.workloads[0].result.data.fqdn || props.workloads[0].data.fqdn }}
               </v-chip>
             </template>
           </template>

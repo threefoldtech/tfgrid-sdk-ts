@@ -125,7 +125,9 @@ async function deploy() {
     layout.value.setStatus("deploy", "Preparing to deploy gateway...");
 
     const gateway: any = await deployGatewayName(grid, selectionDetails.value?.domain, {
-      subdomain: subdomain.value,
+      subdomain: selectionDetails.value?.domain?.enabledCustomDomain
+        ? subdomain.value.replace(/-/g, "")
+        : subdomain.value,
       ip: ip.value,
       port: port.value,
       tlsPassthrough: passThrough.value,
