@@ -127,9 +127,10 @@ class TwinDeploymentHandler {
       }
       await new Promise(f => setTimeout(f, 2000));
     }
-    throw new TimeoutError(
-      `Deployment with contract_id: ${contract_id} failed to be ready after ${timeoutInSeconds} seconds.`,
-    );
+
+    const timeoutMessage = timeout > 1 ? `${timeout} minutes` : `${timeoutInSeconds} seconds`;
+
+    throw new TimeoutError(`Deployment with contract_id: ${contract_id} failed to be ready after ${timeoutMessage}.`);
   }
 
   async waitForDeployments(twinDeployments: TwinDeployment[], timeout = this.config.deploymentTimeoutMinutes) {
