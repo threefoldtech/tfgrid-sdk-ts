@@ -214,8 +214,28 @@
       </v-card-actions>
     </v-card>
   </v-dialog>
+  <DeleteContractsDialog
+    :layout="layout"
+    :grid="props.grid"
+    :deletingDialog="deletingDialog"
+    @close="deletingDialog = false"
+    :selected-contracts="selectedContracts"
+    @update:delete-loading="deleting = $event"
+    @update:deleted-contracts="
+      console.log($props.contracts.value.filter(c => !$event.includes(c.contract_id)));
+      $emit(
+        'update:deleted-contracts',
+        $props.contracts.value.filter(c => !$event.includes(c.contract_id)),
+      );
 
-  <v-dialog width="800" v-model="deletingDialog" attach="#modals">
+      selectedContracts = [];
+    "
+    @update:selected-contracts="
+      console.log($event);
+      selectedContracts = $event;
+    "
+  />
+  <!-- <v-dialog width="800" v-model="deletingDialog" attach="#modals">
     <v-card>
       <v-card-title class="bg-primary"> Delete the following contracts? </v-card-title>
       <v-alert class="ma-4" type="warning" variant="tonal"
@@ -235,7 +255,7 @@
         <v-btn color="error" @click="onDelete"> Delete </v-btn>
       </v-card-actions>
     </v-card>
-  </v-dialog>
+  </v-dialog> -->
 
   <v-dialog width="800" v-model="unlockDialog" attach="#modals">
     <v-card>
@@ -428,6 +448,11 @@ const selectedLockedContracts = computed(() => {
 const selectedRentContracts = computed(() => {
   const contractsSet = new Set<number>();
   selectedContracts.value.forEach(contract => {
+    if (contract.type == ContractType.Rent) {
+      contractsSet.add(contract.contract_id);
+      return;
+    }
+    console.log("contract", contract);
     const rentContract = rentContracts.value[contract.details.nodeId];
     if (contract.type == ContractType.Node && rentContract) {
       contractsSet.add(rentContract);
@@ -436,6 +461,7 @@ const selectedRentContracts = computed(() => {
 
   return Array.from(contractsSet);
 });
+
 const selectedLockedAmount = ref(0);
 // Function to show details of a contract
 async function showDetails(value: any) {
@@ -560,32 +586,32 @@ function exportData() {
 const onClickRow = (_: any, data: any) => showDetails(data.item);
 
 // Function to handle contract deletion
-async function onDelete() {
-  deletingDialog.value = false;
-  deleting.value = true;
+// async function onDelete() {
+//   deletingDialog.value = false;
+//   deleting.value = true;
 
-  try {
-    await props.grid?.contracts.batchCancelContracts({
-      ids: selectedContracts.value.map(c => c.contract_id),
-    });
-    const contracts = props.contracts.value.filter(c => !selectedContracts.value.includes(c));
-    emits("update:deleted-contracts", contracts);
-    selectedContracts.value = [];
-  } catch (e) {
-    if (e instanceof DeploymentKeyDeletionError) {
-      selectedContracts.value = [];
-      createCustomToast("Failed to delete some keys, You don't have enough tokens", ToastType.danger);
-    } else if (e instanceof TFChainError && e.keyError === "NodeHasActiveContracts") {
-      layout.value.setStatus(
-        "failed",
-        "Some of the chosen rent contracts could not be deleted as there are active contracts linked to the rented node. Please ensure that any active contracts associated with a rented node are removed before attempting to delete its rent contract.",
-      );
-    } else {
-      layout.value.setStatus("failed", normalizeError(e, `Failed to delete some of the selected contracts.`));
-    }
-  }
-  deleting.value = false;
-}
+//   try {
+//     await props.grid?.contracts.batchCancelContracts({
+//       ids: selectedContracts.value.map(c => c.contract_id),
+//     });
+//     const contracts = props.contracts.value.filter(c => !selectedContracts.value.includes(c));
+//     emits("update:deleted-contracts", contracts);
+//     selectedContracts.value = [];
+//   } catch (e) {
+//     if (e instanceof DeploymentKeyDeletionError) {
+//       selectedContracts.value = [];
+//       createCustomToast("Failed to delete some keys, You don't have enough tokens", ToastType.danger);
+//     } else if (e instanceof TFChainError && e.keyError === "NodeHasActiveContracts") {
+//       layout.value.setStatus(
+//         "failed",
+//         "Some of the chosen rent contracts could not be deleted as there are active contracts linked to the rented node. Please ensure that any active contracts associated with a rented node are removed before attempting to delete its rent contract.",
+//       );
+//     } else {
+//       layout.value.setStatus("failed", normalizeError(e, `Failed to delete some of the selected contracts.`));
+//     }
+//   }
+//   deleting.value = false;
+// }
 
 // function to unlock grace period contracts
 async function unlockContract(contractId: number[]) {
@@ -631,8 +657,11 @@ defineExpose({
 </script>
 
 <script lang="ts">
+import DeleteContractsDialog from "./delete_contracts_dialog.vue";
 export default defineComponent({
   name: "TfContractsList",
-  components: {},
+  components: {
+    DeleteContractsDialog,
+  },
 });
 </script>
