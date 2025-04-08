@@ -1,5 +1,8 @@
 <template>
-  <VAlert type="warning" v-if="network == 'main'" class="my-2">To create your Farm, use the TF Connect App.</VAlert>
+  <VAlert type="info" v-if="network == 'main'" class="my-2"
+    >To create your Farm, use the
+    <a :href="manual.tf_connect_installation" class="app-link" target="_blank">TF Connect App</a>.</VAlert
+  >
   <v-container>
     <v-row class="text-center flex justify-center mt-4">
       <v-btn
@@ -57,12 +60,12 @@
 <script lang="ts">
 import { ref } from "vue";
 
+import { manual } from "@/utils/manual";
 import { notifyDelaying } from "@/utils/notifications";
 
 import { gridProxyClient } from "../../clients";
 import { useGrid } from "../../stores";
 import { createCustomToast, ToastType } from "../../utils/custom_toast";
-
 export default {
   name: "CreateFarm",
   setup(_, context) {
@@ -109,6 +112,7 @@ export default {
       createFarm,
       validateFarmName,
       network,
+      manual,
     };
   },
 };
