@@ -168,7 +168,7 @@ function finalize(deployment: any) {
   layout.value.reloadDeploymentsList();
   layout.value.setStatus(
     "success",
-    `Successfully deployed an Open WebUI instance. You might need to wait a couple of minutes for the installation to complete, e.g. if you see Bad Gateway when opening the webpage, simply wait and refresh the page.`,
+    `Successfully deployed an Open WebUI instance. Please keep in mind that the installation may take a few minutes to finish. If you encounter a "Bad Gateway" message while accessing the webpage, just wait a moment and refresh the page.`,
   );
   layout.value.openDialog(deployment, deploymentListEnvironments.openwebui);
 }
