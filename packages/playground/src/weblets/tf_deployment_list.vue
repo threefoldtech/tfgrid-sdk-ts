@@ -522,7 +522,7 @@ async function onDelete(k8s = false) {
         if (projectNameLower === ProjectName.Domains.toLowerCase()) {
           await deleteGatewayDeployment(
             updateGrid(grid, { projectName: projectNameLower }),
-            item[0].workloads[0].data.name as string,
+            item[0].workloads[0].data.name ? (item[0].workloads[0].data.name as string) : item[0].workloads[0].name,
           );
         } else {
           await deleteDeployment(updateGrid(grid!, { projectName: item.projectName }), {
