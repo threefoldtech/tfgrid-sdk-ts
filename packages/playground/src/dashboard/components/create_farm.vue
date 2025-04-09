@@ -1,6 +1,6 @@
 <template>
   <VAlert type="info" v-if="network == 'main'" class="my-2"
-    >To create your Farm, use the
+    >To create a Farm, use the
     <a :href="manual.tf_connect_installation" class="app-link" target="_blank">TF Connect App</a>.</VAlert
   >
   <v-container>
