@@ -168,7 +168,15 @@ const selectionDetails = ref<SelectionDetails>();
 const layout = useLayout();
 const tabs = ref();
 const solution = ref() as Ref<SolutionFlavor>;
-const images: VmImage[] = flists.fullVMs;
+const images: VmImage[] = Object.entries(flists)
+  .filter(([key]) => key.startsWith("fullVMs"))
+  .map(([key, value]) => value)
+  .filter(isVMFlist)
+  .map(({ name, flist, entryPoint }) => ({
+    name,
+    flist,
+    entryPoint,
+  }));
 
 const selectedSSHKeys = ref("");
 const name = ref(generateName({ prefix: "vm" }));
@@ -280,6 +288,11 @@ import { deploymentListEnvironments } from "../constants";
 import type { SelectionDetails } from "../types/nodeSelector";
 import { updateGrid } from "../utils/grid";
 
+export function isVMFlist(value: any): value is VmImage {
+  return (
+    value && typeof value.name === "string" && typeof value.flist === "string" && typeof value.entryPoint === "string"
+  );
+}
 export default {
   name: "FullVm",
   components: {
