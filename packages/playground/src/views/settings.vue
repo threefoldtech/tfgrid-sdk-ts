@@ -160,9 +160,8 @@
           ></v-text-field>
         </input-validator>
         <v-card-actions class="justify-end mb-3 mx-3">
-          <v-btn :disabled="!isValidTimeout || isCurrentTimeout()" @click="UpdateTimeout" class="justify-end ml-auto"
-            >Update</v-btn
-          ></v-card-actions
+          <v-btn color="anchor" @click="resetTimeouts">Reset</v-btn>
+          <v-btn :disabled="!isValidTimeout || isCurrentTimeout()" @click="UpdateTimeout">Update</v-btn></v-card-actions
         >
       </form-validator>
     </v-card>
@@ -318,6 +317,12 @@ export default {
       }
     }
 
+    function resetTimeouts() {
+      selectedQueryTimeout.value = 120;
+      selectedDeploymentTimeout.value = 600;
+      createCustomToast("Timeouts have been reset to default values", ToastType.success);
+    }
+
     return {
       themes,
       selectedTheme,
@@ -337,6 +342,7 @@ export default {
       isCurrentTheme,
       isCurrentTimeout,
       confirmPasswordInput,
+      resetTimeouts,
     };
   },
 };
