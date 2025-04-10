@@ -64,8 +64,8 @@ async function main() {
         cpu: instanceCapacity.cru,
         memory: 1024 * instanceCapacity.mru,
         rootfs_size: 0,
-        flist: flists.algorand.value,
-        entrypoint: flists.algorand.entryPoint,
+        flist: flists.ALGORAND.value,
+        entrypoint: flists.ALGORAND.entryPoint,
         env: {
           SSH_KEY: config.ssh_key,
           // Select a network to work against.

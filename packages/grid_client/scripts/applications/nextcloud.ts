@@ -92,8 +92,8 @@ async function main() {
         cpu: instanceCapacity.cru,
         memory: 1024 * instanceCapacity.mru,
         rootfs_size: 0,
-        flist: flists.nextcloud.value,
-        entrypoint: flists.nextcloud.entryPoint,
+        flist: flists.NEXTCLOUD.value,
+        entrypoint: flists.NEXTCLOUD.entryPoint,
         env: {
           SSH_KEY: config.ssh_key,
           NEXTCLOUD_DOMAIN: domain,

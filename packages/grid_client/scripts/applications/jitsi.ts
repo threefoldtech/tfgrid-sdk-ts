@@ -91,8 +91,8 @@ async function main() {
         cpu: instanceCapacity.cru,
         memory: 1024 * instanceCapacity.mru,
         rootfs_size: 0,
-        flist: flists.jitsi.value,
-        entrypoint: flists.jitsi.entryPoint,
+        flist: flists.JITSI.value,
+        entrypoint: flists.JITSI.entryPoint,
         env: {
           SSH_KEY: config.ssh_key,
           JITSI_HOSTNAME: domain,

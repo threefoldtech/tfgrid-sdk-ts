@@ -92,8 +92,8 @@ async function main() {
         cpu: instanceCapacity.cru,
         memory: 1024 * instanceCapacity.mru,
         rootfs_size: 0,
-        flist: flists.subsquid.value,
-        entrypoint: flists.subsquid.entryPoint,
+        flist: flists.SUBSQUID.value,
+        entrypoint: flists.SUBSQUID.entryPoint,
         env: {
           SSH_KEY: config.ssh_key,
           SUBSQUID_WEBSERVER_HOSTNAME: domain,

@@ -92,8 +92,8 @@ async function main() {
         cpu: instanceCapacity.cru,
         memory: 1024 * instanceCapacity.mru,
         rootfs_size: 0,
-        flist: flists.staticwebsite.value,
-        entrypoint: flists.staticwebsite.entryPoint,
+        flist: flists.STATICWEBSITE.value,
+        entrypoint: flists.STATICWEBSITE.entryPoint,
         env: {
           SSH_KEY: config.ssh_key,
           STATICWEBSITE_DOMAIN: domain,

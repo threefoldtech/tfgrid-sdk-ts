@@ -92,8 +92,8 @@ async function main() {
         cpu: instanceCapacity.cru,
         memory: 1024 * instanceCapacity.mru,
         rootfs_size: 0,
-        flist: flists.peertube.value,
-        entrypoint: flists.peertube.entryPoint,
+        flist: flists.PEERTUBE.value,
+        entrypoint: flists.PEERTUBE.entryPoint,
         env: {
           SSH_KEY: config.ssh_key,
           PEERTUBE_WEBSERVER_HOSTNAME: domain,

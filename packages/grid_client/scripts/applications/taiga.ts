@@ -92,8 +92,8 @@ async function main() {
         cpu: instanceCapacity.cru,
         memory: 1024 * instanceCapacity.mru,
         rootfs_size: 0,
-        flist: flists.taiga.value,
-        entrypoint: flists.taiga.entryPoint,
+        flist: flists.TAIGA.value,
+        entrypoint: flists.TAIGA.entryPoint,
         env: {
           SSH_KEY: config.ssh_key,
           DOMAIN_NAME: domain,

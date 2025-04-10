@@ -91,8 +91,8 @@ async function main() {
         cpu: instanceCapacity.cru,
         memory: 1024 * instanceCapacity.mru,
         rootfs_size: 0,
-        flist: flists.jenkins.value,
-        entrypoint: flists.jenkins.entryPoint,
+        flist: flists.JENKINS.value,
+        entrypoint: flists.JENKINS.entryPoint,
         env: {
           SSH_KEY: config.ssh_key,
           JENKINS_HOSTNAME: domain,

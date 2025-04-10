@@ -64,8 +64,8 @@ async function main() {
         cpu: instanceCapacity.cru,
         memory: 1024 * instanceCapacity.mru,
         rootfs_size: 0,
-        flist: flists.presearch.value,
-        entrypoint: flists.presearch.entryPoint,
+        flist: flists.PRESEARCH.value,
+        entrypoint: flists.PRESEARCH.entryPoint,
         env: {
           SSH_KEY: config.ssh_key,
           //Presearch Registeration Code.

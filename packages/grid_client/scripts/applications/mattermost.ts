@@ -94,8 +94,8 @@ async function main() {
         cpu: instanceCapacity.cru,
         memory: 1024 * instanceCapacity.mru,
         rootfs_size: 0,
-        flist: flists.mattermost.value,
-        entrypoint: flists.mattermost.entryPoint,
+        flist: flists.MATTERMOST.value,
+        entrypoint: flists.MATTERMOST.entryPoint,
         env: {
           SSH_KEY: config.ssh_key,
           MATTERMOST_DOMAIN: domain,

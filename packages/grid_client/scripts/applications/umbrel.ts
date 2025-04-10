@@ -70,8 +70,8 @@ async function main() {
         cpu: instanceCapacity.cru,
         memory: 1024 * instanceCapacity.mru,
         rootfs_size: 0,
-        flist: flists.umbrel.value,
-        entrypoint: flists.umbrel.entryPoint,
+        flist: flists.UMBREL.value,
+        entrypoint: flists.UMBREL.entryPoint,
         env: {
           SSH_KEY: config.ssh_key,
           UMBREL_DISK: "/umbrelDisk",

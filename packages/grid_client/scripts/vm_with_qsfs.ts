@@ -115,7 +115,7 @@ async function main() {
         cpu: 1,
         memory: 1024,
         rootfs_size: 0,
-        flist: flists.microVMs.find(flist => flist.name == "Ubuntu-24.04")!.flist,
+        flist: flists.MICROVMS_UBUNTU_24.flist,
         entrypoint: "/sbin/zinit init",
         env: {
           SSH_KEY: config.ssh_key,

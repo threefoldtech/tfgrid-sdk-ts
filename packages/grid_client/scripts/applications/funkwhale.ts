@@ -92,8 +92,8 @@ async function main() {
         cpu: instanceCapacity.cru,
         memory: 1024 * instanceCapacity.mru,
         rootfs_size: 0,
-        flist: flists.funkwhale.value,
-        entrypoint: flists.funkwhale.entryPoint,
+        flist: flists.FUNKWHALE.value,
+        entrypoint: flists.FUNKWHALE.entryPoint,
         env: {
           SSH_KEY: config.ssh_key,
           FUNKWHALE_HOSTNAME: domain,

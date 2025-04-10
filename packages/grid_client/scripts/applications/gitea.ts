@@ -94,8 +94,8 @@ async function main() {
         cpu: instanceCapacity.cru,
         memory: 1024 * instanceCapacity.mru,
         rootfs_size: 0,
-        flist: flists.gitea.value,
-        entrypoint: flists.gitea.entryPoint,
+        flist: flists.GITEA.value,
+        entrypoint: flists.GITEA.entryPoint,
         env: {
           SSH_KEY: config.ssh_key,
           GITEA__HOSTNAME: domain,

@@ -93,8 +93,8 @@ async function main() {
         cpu: instanceCapacity.cru,
         memory: 1024 * instanceCapacity.mru,
         rootfs_size: 0,
-        flist: flists.wordpress.value,
-        entrypoint: flists.wordpress.entryPoint,
+        flist: flists.WORDPRESS.value,
+        entrypoint: flists.WORDPRESS.entryPoint,
         env: {
           SSH_KEY: config.ssh_key,
           WP_URL: domain,

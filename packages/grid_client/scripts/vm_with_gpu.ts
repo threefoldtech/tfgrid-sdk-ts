@@ -73,7 +73,7 @@ async function main() {
         cpu: 8,
         memory: 1024 * 16,
         rootfs_size: 0,
-        flist: flists.microVMs.find(flist => flist.name == "Ubuntu-22.04")?.flist,
+        flist: flists.MICROVMS_UBUNTU_22.flist,
         entrypoint: "/",
         env: {
           SSH_KEY: config.ssh_key,

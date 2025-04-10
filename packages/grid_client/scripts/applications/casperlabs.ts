@@ -92,8 +92,8 @@ async function main() {
         cpu: instanceCapacity.cru,
         memory: 1024 * instanceCapacity.mru,
         rootfs_size: 0,
-        flist: flists.casperlabs.value,
-        entrypoint: flists.casperlabs.entryPoint,
+        flist: flists.CASPERLABS.value,
+        entrypoint: flists.CASPERLABS.entryPoint,
         env: {
           SSH_KEY: config.ssh_key,
           CASPERLABS_HOSTNAME: domain,

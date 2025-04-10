@@ -62,8 +62,8 @@ async function main() {
         cpu: 4,
         memory: 1024 * 4,
         rootfs_size: 0,
-        flist: flists.caprover.value,
-        entrypoint: flists.caprover.entryPoint,
+        flist: flists.CAPROVER.value,
+        entrypoint: flists.CAPROVER.entryPoint,
         env: {
           PUBLIC_KEY: config.ssh_key,
           SWM_NODE_MODE: "leader",

@@ -70,8 +70,8 @@ async function main() {
         cpu: instanceCapacity.cru,
         memory: 1024 * instanceCapacity.mru,
         rootfs_size: 2,
-        flist: flists.nodePilot.value,
-        entrypoint: flists.nodePilot.entryPoint,
+        flist: flists.NODEPILOT.value,
+        entrypoint: flists.NODEPILOT.entryPoint,
         env: {
           SSH_KEY: config.ssh_key,
         },
