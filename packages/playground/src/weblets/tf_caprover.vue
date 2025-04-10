@@ -135,7 +135,7 @@ const workers = ref<CW[]>([]);
 const selectedSSHKeys = ref("");
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
-const flist: Flist = flists.caprover;
+const flist: Flist = flists.CAPROVER;
 
 async function deploy() {
   layout.value.setStatus("deploy");

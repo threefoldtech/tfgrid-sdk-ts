@@ -169,7 +169,7 @@ const layout = useLayout();
 const tabs = ref();
 const solution = ref() as Ref<SolutionFlavor>;
 const images: VmImage[] = Object.entries(flists)
-  .filter(([key]) => key.startsWith("fullVMs"))
+  .filter(([key]) => key.startsWith("FULLVMS"))
   .map(([key, value]) => value)
   .filter(isVMFlist)
   .map(({ name, flist, entryPoint }) => ({

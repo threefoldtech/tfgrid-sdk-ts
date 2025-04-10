@@ -148,7 +148,7 @@ const rootFilesystemSize = calculateRootFileSystem({ CPUCores: cpu, RAMInMegaByt
 const dockerDiskSize = 10;
 const privateRestoreKey = ref("");
 const publicRestoreKey = ref("");
-const flist: Flist = flists.presearch;
+const flist: Flist = flists.PRESEARCH;
 const dedicated = ref(false);
 const rentedByMe = ref(false);
 const rentedBy = computed(() => (rentedByMe.value ? grid.twinId : undefined));

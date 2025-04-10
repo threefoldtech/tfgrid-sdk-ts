@@ -106,7 +106,7 @@ const name = ref(generateName({ prefix: "np" }));
 const selectionDetails = ref<SelectionDetails>();
 
 const solution = ref() as Ref<SolutionFlavor>;
-const flist: Flist = flists.nodePilot;
+const flist: Flist = flists.NODEPILOT;
 const { ipv4, ipv6, planetary, mycelium, wireguard } = useNetworks({ ipv4: true, ipv6: true });
 const dedicated = ref(false);
 const rentedByMe = ref(false);

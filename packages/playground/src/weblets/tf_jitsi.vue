@@ -112,7 +112,7 @@ const profileManager = useProfileManager();
 const { ipv4, ipv6, mycelium, planetary, wireguard } = useNetworks();
 const name = ref(generateName({ prefix: "jt" }));
 const solution = ref() as Ref<SolutionFlavor>;
-const flist: Flist = flists.jitsi;
+const flist: Flist = flists.JITSI;
 const dedicated = ref(false);
 const rentedByMe = ref(false);
 const rentedBy = computed(() => (rentedByMe.value ? grid.twinId : undefined));

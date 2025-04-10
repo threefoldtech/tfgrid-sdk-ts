@@ -177,7 +177,7 @@ const username = ref("admin");
 const password = ref(generatePassword());
 const email = ref(profileManager.profile?.email || "");
 const solution = ref() as Ref<SolutionFlavor>;
-const flist: Flist = flists.taiga;
+const flist: Flist = flists.TAIGA;
 const dedicated = ref(false);
 const rentedByMe = ref(false);
 const rentedBy = computed(() => (rentedByMe.value ? grid.twinId : undefined));

@@ -169,7 +169,7 @@ const username = ref("admin");
 const email = ref(profileManager.profile?.email || "");
 const password = ref(generatePassword());
 const solution = ref() as Ref<SolutionFlavor>;
-const flist: Flist = flists.wordpress;
+const flist: Flist = flists.WORDPRESS;
 const dedicated = ref(false);
 const rentedByMe = ref(false);
 const rentedBy = computed(() => (rentedByMe.value ? grid.twinId : undefined));

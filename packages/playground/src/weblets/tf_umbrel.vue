@@ -152,7 +152,7 @@ const username = ref("admin");
 const password = ref(generatePassword());
 const { ipv4, ipv6, planetary, mycelium, wireguard } = useNetworks();
 const solution = ref() as Ref<SolutionFlavor>;
-const flist: Flist = flists.umbrel;
+const flist: Flist = flists.UMBREL;
 const dedicated = ref(false);
 const rentedByMe = ref(false);
 const rentedBy = computed(() => (rentedByMe.value ? grid.twinId : undefined));

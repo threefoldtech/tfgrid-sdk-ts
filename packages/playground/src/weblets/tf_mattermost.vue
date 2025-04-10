@@ -122,7 +122,7 @@ const selectionDetails = ref<SelectionDetails>();
 
 const name = ref(generateName({ prefix: "mm" }));
 const solution = ref() as Ref<SolutionFlavor>;
-const flist: Flist = flists.mattermost;
+const flist: Flist = flists.MATTERMOST;
 const dedicated = ref(false);
 const rentedByMe = ref(false);
 const rentedBy = computed(() => (rentedByMe.value ? grid.twinId : undefined));

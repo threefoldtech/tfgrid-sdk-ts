@@ -128,7 +128,7 @@ const name = ref(generateName({ prefix: "ss" }));
 const endpoint = ref("");
 const { ipv4, ipv6, planetary, mycelium, wireguard } = useNetworks();
 const solution = ref() as Ref<SolutionFlavor>;
-const flist: Flist = flists.subsquid;
+const flist: Flist = flists.SUBSQUID;
 const dedicated = ref(false);
 const rentedByMe = ref(false);
 const rentedBy = computed(() => (rentedByMe.value ? grid.twinId : undefined));

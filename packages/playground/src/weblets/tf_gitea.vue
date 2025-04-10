@@ -133,7 +133,7 @@ const smtp = ref(createSMTPServer());
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
 const profileManager = useProfileManager();
-const flist: Flist = flists.gitea;
+const flist: Flist = flists.GITEA;
 
 function finalize(deployment: any) {
   layout.value.reloadDeploymentsList();

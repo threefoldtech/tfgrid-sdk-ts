@@ -213,7 +213,7 @@ const selectionDetails = ref<SelectionDetails>();
 const selectedSSHKeys = ref("");
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
-const flist: Flist = flists.tfrobot;
+const flist: Flist = flists.TFROBOT;
 
 function layoutMount() {
   if (envs.value.length > 0) {

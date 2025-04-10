@@ -143,7 +143,7 @@ const domain = ref();
 
 const { ipv4, ipv6, planetary, mycelium, wireguard } = useNetworks();
 const solution = ref() as Ref<SolutionFlavor>;
-const flist: Flist = flists.staticwebsite;
+const flist: Flist = flists.STATICWEBSITE;
 const dedicated = ref(false);
 const rentedByMe = ref(false);
 const gridStore = useGrid();

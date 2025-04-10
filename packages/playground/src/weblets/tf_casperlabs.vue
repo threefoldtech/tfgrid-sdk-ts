@@ -112,7 +112,7 @@ const selectionDetails = ref<SelectionDetails>();
 
 const name = ref(generateName({ prefix: "cl" }));
 const solution = ref() as Ref<SolutionFlavor>;
-const flist: Flist = flists.casperlabs;
+const flist: Flist = flists.CASPERLABS;
 const dedicated = ref(false);
 const rentedByMe = ref(false);
 const rentedBy = computed(() => (rentedByMe.value ? grid.twinId : undefined));

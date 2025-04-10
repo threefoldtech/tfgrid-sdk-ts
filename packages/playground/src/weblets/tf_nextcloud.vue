@@ -111,7 +111,7 @@ const selectionDetails = ref<SelectionDetails>();
 
 const name = ref(generateName({ prefix: "nc" }));
 const solution = ref() as Ref<SolutionFlavor>;
-const flist: Flist = flists.nextcloud;
+const flist: Flist = flists.NEXTCLOUD;
 const dedicated = ref(false);
 const rentedByMe = ref(false);
 const rentedBy = computed(() => (rentedByMe.value ? grid.twinId : undefined));

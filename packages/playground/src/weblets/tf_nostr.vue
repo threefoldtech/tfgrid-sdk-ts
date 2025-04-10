@@ -118,7 +118,7 @@ const selectedSSHKeys = ref("");
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
 const profileManager = useProfileManager();
-const flist: Flist = flists.nostr;
+const flist: Flist = flists.NOSTR;
 
 function finalize(deployment: any) {
   layout.value.reloadDeploymentsList();

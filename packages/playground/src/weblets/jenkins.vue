@@ -147,7 +147,7 @@ const solution = ref() as Ref<SolutionFlavor>;
 const rootFilesystemSize = computed(() =>
   calculateRootFileSystem({ CPUCores: solution.value?.cpu ?? 0, RAMInMegaBytes: solution.value?.memory ?? 0 }),
 );
-const flist: Flist = flists.jenkins;
+const flist: Flist = flists.JENKINS;
 const dedicated = ref(false);
 const rentedByMe = ref(false);
 const rentedBy = computed(() => (rentedByMe.value ? grid.twinId : undefined));

@@ -134,7 +134,7 @@ import { generateName } from "../utils/strings";
 
 const layout = useLayout();
 const lastRoundInput = ref();
-const flist: Flist = flists.algorand;
+const flist: Flist = flists.ALGORAND;
 const name = ref(generateName({ prefix: "al" }));
 const { ipv4, ipv6, planetary, mycelium, wireguard } = useNetworks();
 const cpu = ref() as Ref<number>;

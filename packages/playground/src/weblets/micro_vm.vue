@@ -208,7 +208,7 @@ const layout = useLayout();
 const tabs = ref();
 
 const images: VmImage[] = Object.entries(flists)
-  .filter(([key]) => key.startsWith("microVMs"))
+  .filter(([key]) => key.startsWith("MICROVMS"))
   .map(([key, value]) => value)
   .filter(isVMFlist)
   .map(({ name, flist, entryPoint }) => ({
