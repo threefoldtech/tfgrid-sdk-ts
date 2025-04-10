@@ -168,7 +168,7 @@ const selectionDetails = ref<SelectionDetails>();
 const layout = useLayout();
 const tabs = ref();
 const solution = ref() as Ref<SolutionFlavor>;
-const images: VmImage[] = Object.entries(flists)
+const images: VmImage[] = Object.entries(Flists)
   .filter(([key]) => key.startsWith("FULLVMS"))
   .map(([key, value]) => value)
   .filter(isVMFlist)
@@ -278,7 +278,7 @@ function updateSSHkeyEnv(selectedKeys: string) {
 </script>
 
 <script lang="ts">
-import { flists, type GridClient } from "@threefold/grid_client";
+import { Flists, type GridClient } from "@threefold/grid_client";
 
 import ExpandableLayout from "../components/expandable_layout.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";

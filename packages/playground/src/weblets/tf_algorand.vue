@@ -134,7 +134,7 @@ import { generateName } from "../utils/strings";
 
 const layout = useLayout();
 const lastRoundInput = ref();
-const flist: Flist = flists.ALGORAND;
+const flist: Flist = Flists.ALGORAND;
 const name = ref(generateName({ prefix: "al" }));
 const { ipv4, ipv6, planetary, mycelium, wireguard } = useNetworks();
 const cpu = ref() as Ref<number>;
@@ -220,7 +220,7 @@ function updateSSHkeyEnv(selectedKeys: string) {
 </script>
 
 <script lang="ts">
-import { flists, type GridClient } from "@threefold/grid_client";
+import { Flists, type GridClient } from "@threefold/grid_client";
 
 import AlgorandCapacity from "../components/algorand_capacity.vue";
 import Networks, { useNetworks } from "../components/networks.vue";

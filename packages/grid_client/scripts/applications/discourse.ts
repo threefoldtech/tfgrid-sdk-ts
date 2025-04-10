@@ -2,7 +2,7 @@ import { Buffer } from "buffer";
 import TweetNACL from "tweetnacl";
 
 import { Features, FilterOptions, GatewayNameModel, MachinesModel } from "../../src";
-import { flists } from "../../src/helpers/flists";
+import { Flists } from "../../src/helpers/flists";
 import { config, getClient } from "../client_loader";
 import { log, pingNodes } from "../utils";
 
@@ -100,8 +100,8 @@ async function main() {
         cpu: instanceCapacity.cru,
         memory: 1024 * instanceCapacity.mru,
         rootfs_size: 0,
-        flist: flists.DISCOURSE.value,
-        entrypoint: flists.DISCOURSE.entryPoint,
+        flist: Flists.DISCOURSE.value,
+        entrypoint: Flists.DISCOURSE.entryPoint,
         env: {
           SSH_KEY: config.ssh_key,
           DISCOURSE_HOSTNAME: domain,

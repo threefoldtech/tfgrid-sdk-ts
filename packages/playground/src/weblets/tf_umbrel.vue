@@ -152,7 +152,7 @@ const username = ref("admin");
 const password = ref(generatePassword());
 const { ipv4, ipv6, planetary, mycelium, wireguard } = useNetworks();
 const solution = ref() as Ref<SolutionFlavor>;
-const flist: Flist = flists.UMBREL;
+const flist: Flist = Flists.UMBREL;
 const dedicated = ref(false);
 const rentedByMe = ref(false);
 const rentedBy = computed(() => (rentedByMe.value ? grid.twinId : undefined));
@@ -229,7 +229,7 @@ function updateSSHkeyEnv(selectedKeys: string) {
 </script>
 
 <script lang="ts">
-import { calculateRootFileSystem, flists, type GridClient } from "@threefold/grid_client";
+import { calculateRootFileSystem, Flists, type GridClient } from "@threefold/grid_client";
 
 import { updateGrid } from "@/utils/grid";
 

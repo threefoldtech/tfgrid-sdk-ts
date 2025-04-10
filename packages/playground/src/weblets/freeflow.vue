@@ -98,7 +98,7 @@
 </template>
 
 <script lang="ts" setup>
-import { calculateRootFileSystem, flists, type GridClient } from "@threefold/grid_client";
+import { calculateRootFileSystem, Flists, type GridClient } from "@threefold/grid_client";
 import { computed, onMounted, type Ref, ref } from "vue";
 
 import { manual } from "@/utils/manual";
@@ -115,7 +115,7 @@ const layout = useLayout();
 const selectionDetails = ref<SelectionDetails>();
 const threebotName = ref<string>("");
 const solution = ref() as Ref<SolutionFlavor>;
-const flist: Flist = flists.FREEFLOW;
+const flist: Flist = Flists.FREEFLOW;
 const disks = ref<Disk[]>([]);
 const dedicated = ref(false);
 const rentedByMe = ref(false);

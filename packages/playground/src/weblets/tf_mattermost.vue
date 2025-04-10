@@ -102,7 +102,7 @@
 </template>
 
 <script lang="ts" setup>
-import { calculateRootFileSystem, flists, type GridClient } from "@threefold/grid_client";
+import { calculateRootFileSystem, Flists, type GridClient } from "@threefold/grid_client";
 import { computed, type Ref, ref } from "vue";
 
 import { manual } from "@/utils/manual";
@@ -122,7 +122,7 @@ const selectionDetails = ref<SelectionDetails>();
 
 const name = ref(generateName({ prefix: "mm" }));
 const solution = ref() as Ref<SolutionFlavor>;
-const flist: Flist = flists.MATTERMOST;
+const flist: Flist = Flists.MATTERMOST;
 const dedicated = ref(false);
 const rentedByMe = ref(false);
 const rentedBy = computed(() => (rentedByMe.value ? grid.twinId : undefined));

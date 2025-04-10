@@ -1,5 +1,5 @@
 import { Features, FilterOptions, GatewayNameModel, MachinesModel } from "../../src";
-import { flists } from "../../src/helpers/flists";
+import { Flists } from "../../src/helpers/flists";
 import { config, getClient } from "../client_loader";
 import { log, pingNodes } from "../utils";
 
@@ -94,8 +94,8 @@ async function main() {
         cpu: instanceCapacity.cru,
         memory: 1024 * instanceCapacity.mru,
         rootfs_size: 0,
-        flist: flists.MATTERMOST.value,
-        entrypoint: flists.MATTERMOST.entryPoint,
+        flist: Flists.MATTERMOST.value,
+        entrypoint: Flists.MATTERMOST.entryPoint,
         env: {
           SSH_KEY: config.ssh_key,
           MATTERMOST_DOMAIN: domain,

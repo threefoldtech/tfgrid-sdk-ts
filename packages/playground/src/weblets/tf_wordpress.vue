@@ -145,7 +145,7 @@
 </template>
 
 <script lang="ts" setup>
-import { calculateRootFileSystem, flists, type GridClient } from "@threefold/grid_client";
+import { calculateRootFileSystem, Flists, type GridClient } from "@threefold/grid_client";
 import { computed, type Ref, ref } from "vue";
 
 import { updateGrid } from "@/utils/grid";
@@ -169,7 +169,7 @@ const username = ref("admin");
 const email = ref(profileManager.profile?.email || "");
 const password = ref(generatePassword());
 const solution = ref() as Ref<SolutionFlavor>;
-const flist: Flist = flists.WORDPRESS;
+const flist: Flist = Flists.WORDPRESS;
 const dedicated = ref(false);
 const rentedByMe = ref(false);
 const rentedBy = computed(() => (rentedByMe.value ? grid.twinId : undefined));

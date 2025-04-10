@@ -1,5 +1,5 @@
 import { Features, FilterOptions, generateRandomHexSeed, MachinesModel } from "../src";
-import { flists } from "../src/helpers/flists";
+import { Flists } from "../src/helpers/flists";
 import { config, getClient } from "./client_loader";
 import { log, pingNodes } from "./utils";
 
@@ -90,7 +90,7 @@ async function main() {
         cpu: instanceCapacity.cru,
         memory: 1024 * instanceCapacity.mru,
         rootfs_size: 0,
-        flist: flists.MICROVMS_UBUNTU_24.flist,
+        flist: Flists.MICROVMS_UBUNTU_24.flist,
         entrypoint: "/sbin/zinit init",
         env: {
           SSH_KEY: config.ssh_key,

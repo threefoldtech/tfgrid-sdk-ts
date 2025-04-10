@@ -213,7 +213,7 @@ const selectionDetails = ref<SelectionDetails>();
 const selectedSSHKeys = ref("");
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
-const flist: Flist = flists.TFROBOT;
+const flist: Flist = Flists.TFROBOT;
 
 function layoutMount() {
   if (envs.value.length > 0) {
@@ -287,7 +287,7 @@ watch(selectedSSHKeys, layoutMount, { deep: true });
 </script>
 
 <script lang="ts">
-import { flists, type GridClient } from "@threefold/grid_client";
+import { Flists, type GridClient } from "@threefold/grid_client";
 
 import ExpandableLayout from "../components/expandable_layout.vue";
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";

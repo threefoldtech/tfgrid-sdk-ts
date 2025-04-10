@@ -1,5 +1,5 @@
 import { FilterOptions, MachinesModel } from "../../src";
-import { flists } from "../../src/helpers/flists";
+import { Flists } from "../../src/helpers/flists";
 import { config, getClient } from "../client_loader";
 import { log, pingNodes } from "../utils";
 
@@ -64,8 +64,8 @@ async function main() {
         cpu: instanceCapacity.cru,
         memory: 1024 * instanceCapacity.mru,
         rootfs_size: 0,
-        flist: flists.PRESEARCH.value,
-        entrypoint: flists.PRESEARCH.entryPoint,
+        flist: Flists.PRESEARCH.value,
+        entrypoint: Flists.PRESEARCH.entryPoint,
         env: {
           SSH_KEY: config.ssh_key,
           //Presearch Registeration Code.
