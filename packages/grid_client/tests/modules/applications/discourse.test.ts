@@ -1,5 +1,7 @@
 import axios from "axios";
+import { Buffer } from "buffer";
 import { setTimeout } from "timers/promises";
+import TweetNACL from "tweetnacl";
 
 import {
   Features,
@@ -28,6 +30,11 @@ beforeAll(async () => {
 
 //Private IP Regex
 const ipRegex = /(^127\.)|(^10\.)|(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1]\.)|(^192\.168\.)/;
+
+function generatePubKey(): string {
+  const keypair = TweetNACL.box.keyPair();
+  return Buffer.from(keypair.publicKey).toString("base64");
+}
 
 test.skip("TC2690 - Applications: Deploy Discourse", async () => {
   /**********************************************
@@ -121,7 +128,7 @@ test.skip("TC2690 - Applications: Deploy Discourse", async () => {
         env: {
           SSH_KEY: config.ssh_key,
           DISCOURSE_HOSTNAME: domain,
-          THREEBOT_PRIVATE_KEY: "PLACEHOLDER_KEY",
+          THREEBOT_PRIVATE_KEY: generatePubKey(),
           DISCOURSE_DEVELOPER_EMAILS: "admin123@dis.course",
           DISCOURSE_SMTP_ADDRESS: "smtp.gmail.com",
           DISCOURSE_SMTP_PORT: "587",
