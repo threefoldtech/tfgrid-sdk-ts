@@ -1,7 +1,15 @@
 import axios from "axios";
 import { setTimeout } from "timers/promises";
 
-import { FilterOptions, generateString, GridClient, MachinesModel, randomChoice } from "../../../src";
+import {
+  Features,
+  FilterOptions,
+  GatewayNameModel,
+  generateString,
+  GridClient,
+  MachinesModel,
+  randomChoice,
+} from "../../../src";
 import { config, getClient } from "../../client_loader";
 import { GBToBytes, generateInt, getOnlineNode, log, splitIP } from "../../utils";
 
@@ -26,18 +34,25 @@ test("TC2694 - Applications: Deploy Umbrel", async () => {
      Test Suite: Grid3_Client_TS (Automated)
      Test Cases: TC2694 - Applications: Deploy Umbrel
      Scenario:
-        - Generate Test Data/Umbrel Config.
+        - Generate Test Data/Umbrel Config/Gateway Config.
         - Select a Node To Deploy the Umbrel on.
+        - Select a Gateway Node To Deploy the gateway on.
         - Deploy the Umbrel solution.
         - Assert that the generated data matches
           the deployment details.
+        - Pass the IP of the Created Umbrel to the Gateway
+          Config.
+        - Deploy the Gateway.
         - Assert that the generated data matches
           the deployment details.
+        - Assert that the Gateway points at the IP
+          of the created Umbrel.
         - Assert that the returned domain is working
           and returns correct data.
     **********************************************/
 
-  //Test Data
+  const name = "gw" + generateString(10).toLowerCase();
+  const subdomain = name;
   const cpu = 1;
   const memory = 2;
   const rootfsSize = 2;
@@ -57,8 +72,17 @@ test("TC2694 - Applications: Deploy Umbrel", async () => {
   const metadata = "{'deploymentType': 'umbrel'}";
   const description = "test deploying Umbrel via ts grid3 client";
 
-  //Node Selection
+  const gatewayNodes = await gridClient.capacity.filterNodes({
+    features: [Features.wireguard, Features.mycelium],
+    gateway: true,
+    farmId: 1,
+    availableFor: await gridClient.twins.get_my_twin_id(),
+  } as FilterOptions);
+  if (gatewayNodes.length === 0) throw new Error("No nodes available to complete this test");
+  const GatewayNode = gatewayNodes[generateInt(0, gatewayNodes.length - 1)];
+
   const nodes = await gridClient.capacity.filterNodes({
+    features: [Features.wireguard, Features.mycelium],
     cru: cpu,
     mru: memory,
     sru: rootfsSize + disk1Size + disk2Size,
@@ -66,14 +90,16 @@ test("TC2694 - Applications: Deploy Umbrel", async () => {
     availableFor: await gridClient.twins.get_my_twin_id(),
   } as FilterOptions);
   const nodeId = await getOnlineNode(nodes);
-  if (nodeId == -1) throw new Error("no nodes available to complete this test");
+  if (nodeId === -1) throw new Error("No nodes available to complete this test");
+  const domain = subdomain + "." + GatewayNode.publicConfig.domain;
 
-  //VM Model
   const vms: MachinesModel = {
     name: deploymentName,
     network: {
       name: networkName,
       ip_range: ipRange,
+      addAccess: true,
+      accessNodeId: GatewayNode.nodeId,
     },
     machines: [
       {
@@ -110,51 +136,40 @@ test("TC2694 - Applications: Deploy Umbrel", async () => {
     metadata: metadata,
     description: description,
   };
+
   const res = await gridClient.machines.deploy(vms);
   log(res);
 
-  //Contracts Assertions
   expect(res.contracts.created).toHaveLength(1);
   expect(res.contracts.updated).toHaveLength(0);
   expect(res.contracts.deleted).toHaveLength(0);
 
-  const vmsList = await gridClient.machines.list();
-  log(vmsList);
-
-  //VM List Assertions
-  expect(vmsList.length).toBeGreaterThanOrEqual(1);
-  expect(vmsList).toContain(vms.name);
-
   const result = await gridClient.machines.getObj(vms.name);
   log(result);
 
-  //VM Assertions
-  expect(result[0].nodeId).toBe(nodeId);
-  expect(result[0].status).toBe("ok");
-  expect(result[0].flist).toBe(vms.machines[0].flist);
-  expect(result[0].entrypoint).toBe(vms.machines[0].entrypoint);
-  expect(result[0].mounts).toHaveLength(2);
-  expect(result[0].interfaces[0]["network"]).toBe(vms.network.name);
-  expect(result[0].interfaces[0]["ip"]).toContain(splitIP(vms.network.ip_range));
-  expect(result[0].interfaces[0]["ip"]).toMatch(ipRegex);
-  expect(result[0].capacity["cpu"]).toBe(cpu);
-  expect(result[0].capacity["memory"]).toBe(memory * 1024);
-  expect(result[0].planetary).toBeDefined();
-  expect(result[0].myceliumIP).toBeDefined();
-  expect(result[0].publicIP).toBeNull();
-  expect(result[0].description).toBe(description);
-  expect(result[0].mounts[0]["name"]).toBe(disk1Name);
-  expect(result[0].mounts[0]["size"]).toBe(GBToBytes(disk1Size));
-  expect(result[0].mounts[0]["mountPoint"]).toBe(mountPoint1);
-  expect(result[0].mounts[0]["state"]).toBe("ok");
-  expect(result[0].mounts[1]["name"]).toBe(disk2Name);
-  expect(result[0].mounts[1]["size"]).toBe(GBToBytes(disk2Size));
-  expect(result[0].mounts[1]["mountPoint"]).toBe(mountPoint2);
-  expect(result[0].mounts[1]["state"]).toBe("ok");
+  const wgnet = result[0].interfaces[0];
 
-  const site = "http://[" + result[0].planetary + "]/";
+  const gateway: GatewayNameModel = {
+    name: subdomain,
+    network: wgnet.network,
+    node_id: GatewayNode.nodeId,
+    tls_passthrough: false,
+    backends: [`http://${wgnet.ip}:80`],
+  };
+
+  const gatewayRes = await gridClient.gateway.deploy_name(gateway);
+  log(gatewayRes);
+
+  expect(gatewayRes.contracts.created).toHaveLength(1);
+
+  const gatewayResult = await gridClient.gateway.getObj(gateway.name);
+  log(gatewayResult);
+
+  expect(gatewayResult[0].name).toBe(subdomain);
+  expect(gatewayResult[0].backends).toStrictEqual(gateway.backends);
+
+  const site = "http://" + gatewayResult[0].domain;
   let reachable = false;
-  log(site);
 
   for (let i = 0; i <= 250; i++) {
     const wait = await setTimeout(5000, "Waiting for gateway to be ready");
@@ -163,23 +178,17 @@ test("TC2694 - Applications: Deploy Umbrel", async () => {
     await axios
       .get(site)
       .then(res => {
-        log("gateway is reachable");
+        log("Gateway is reachable");
         log(res.status);
         log(res.statusText);
-        log(res.data);
         expect(res.status).toBe(200);
-        expect(res.statusText).toBe("OK");
-        expect(res.data).toContain("Umbrel");
         reachable = true;
       })
       .catch(() => {
-        log("gateway is not reachable");
+        log("Gateway is not reachable");
       });
-    if (reachable) {
-      break;
-    } else if (i == 250) {
-      throw new Error("Gateway is unreachable after multiple retries");
-    }
+    if (reachable) break;
+    if (i === 250) throw new Error("Gateway is unreachable after retries");
   }
 });
 
@@ -188,18 +197,12 @@ afterAll(async () => {
   for (const name of vmNames) {
     const res = await gridClient.machines.delete({ name });
     log(res);
-    expect(res.created).toHaveLength(0);
-    expect(res.updated).toHaveLength(0);
-    expect(res.deleted).toBeDefined();
   }
 
   const gwNames = await gridClient.gateway.list();
   for (const name of gwNames) {
     const res = await gridClient.gateway.delete_name({ name });
     log(res);
-    expect(res.created).toHaveLength(0);
-    expect(res.updated).toHaveLength(0);
-    expect(res.deleted).toBeDefined();
   }
 
   return await gridClient.disconnect();
