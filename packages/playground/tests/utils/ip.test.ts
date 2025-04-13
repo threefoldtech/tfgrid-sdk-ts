@@ -51,8 +51,7 @@ describe("longToIp", () => {
     expect(longToIp(2886729728)).toBe("172.16.0.0");
   });
 
-  // Testing the result of the function by converting back to long
-  it("should correctly convert back to long", () => {
+  it("should correctly convert long to ip", () => {
     const ip = "192.168.1.1";
     const long = 3232235777;
     expect(longToIp(long)).toBe(ip);
