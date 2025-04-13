@@ -760,6 +760,114 @@ test("TC1230 - VM: Deploy Multiple VMs on Different Nodes", async () => {
     maxIterations++;
   }
 });
+test("TC3850 - VM: Deploy a ZOS3 Lite VM with Mycelium", async () => {
+  /**********************************************
+     Test Suite: Grid3_Client_TS (Automated)
+     Test Case:  TC3850 - VM: Deploy a ZOS3 Lite VM with Mycelium
+     Description:
+       This test deploys a VM on a node with ZOS3 Lite (ZmachineLight & NetworkLight)
+       and verifies the deployment over Mycelium.
+
+     Steps:
+       1. Generate random test config (name, resources, env).
+       2. Filter nodes with ZOS3 Lite compatible features.
+       3. Deploy a VM with Mycelium enabled.
+       4. Verify deployment and network configurations.
+       5. SSH into VM over Mycelium and verify ENV variable.
+       6. Clean up: delete the VM deployment.
+    **********************************************/
+
+  // Test Data
+  const cpu = 2;
+  const memory = 1024;
+  const rootfsSize = 1;
+  const networkName = generateString(10);
+  const vmName = generateString(10);
+  const ipRange = "10.249.0.0/16";
+  const envVarValue = generateString(20);
+
+  // Node Selection with ZOS3 Lite filters
+  const filter: FilterOptions = {
+    cru: cpu,
+    mru: memory / 1024,
+    sru: rootfsSize,
+    farmName: "LiriaFarm",
+    availableFor: await gridClient.twins.get_my_twin_id(),
+    features: [Features.zmachinelight, Features.networklight, Features.mycelium],
+    nodeExclude: [259],
+  };
+
+  const nodes = await gridClient.capacity.filterNodes(filter);
+  const nodeId = await getOnlineNode(nodes);
+  if (nodeId == -1) throw new Error("No suitable node found for ZOS3 Lite VM test");
+
+  // VM Definition
+  const vms: MachinesModel = {
+    name: deploymentName,
+    network: {
+      name: networkName,
+      ip_range: ipRange,
+    },
+    machines: [
+      {
+        name: vmName,
+        node_id: nodeId,
+        cpu,
+        memory,
+        rootfs_size: rootfsSize,
+        disks: [],
+        flist: "https://hub.grid.tf/tf-official-apps/base:latest.flist",
+        entrypoint: "/sbin/zinit init",
+        public_ip: false,
+        planetary: true,
+        mycelium: true,
+        env: {
+          SSH_KEY: config.ssh_key,
+          TEST_KEY: envVarValue,
+        },
+      },
+    ],
+    metadata: "",
+    description: "ZOS3 Lite VM with Mycelium network test",
+  };
+
+  // Deploy
+  const res = await gridClient.machines.deploy(vms);
+  log(res);
+
+  // Contracts Assertions
+  expect(res.contracts.created).toHaveLength(1);
+  expect(res.contracts.updated).toHaveLength(0);
+  expect(res.contracts.deleted).toHaveLength(0);
+
+  // Fetch Deployment
+  const result = await gridClient.machines.getObj(vms.name);
+  log(result);
+
+  // Deployment Assertions
+  expect(result[0].nodeId).toBe(nodeId);
+  expect(result[0].myceliumIP).toBeDefined();
+  expect(result[0].interfaces[0].ip).toMatch(ipRegex);
+  expect(result[0].interfaces[0].ip).toContain(splitIP(ipRange));
+  expect(result[0].description).toBe(vms.description);
+
+  // SSH to VM via Mycelium
+  const ssh = await RemoteRun(result[0].myceliumIP, "root");
+  try {
+    await ssh.execCommand("cat /proc/1/environ").then(res => {
+      log(res.stdout);
+      expect(res.stdout).toContain(envVarValue);
+    });
+  } finally {
+    await ssh.dispose();
+  }
+});
+
+afterAll(async () => {
+  const res = await gridClient.machines.delete({ name: deploymentName });
+  log(res);
+  await gridClient.disconnect();
+});
 
 afterAll(async () => {
   const vmNames = await gridClient.machines.list();
