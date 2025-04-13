@@ -62,11 +62,11 @@ jobs:
         run: |
           yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/dynamic_single_vm.ts
 
-          - name: Run test single ZOS3 lite vm with mycelium
-          id: zos3lite
-          if: always()
-          run: |
-            yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/single_vm_zos3_lite.ts
+      - name: Run test single ZOS3 lite vm with mycelium
+        id: zos3lite
+        if: always()
+        run: |
+          yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/single_vm_zos3_lite.ts
 
       - name: Run test multiple vms
         id: multiple_vm
