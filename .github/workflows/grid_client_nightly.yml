@@ -62,6 +62,12 @@ jobs:
         run: |
           yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/dynamic_single_vm.ts
 
+          - name: Run test single ZOS3 lite vm with mycelium
+          id: zos3lite
+          if: always()
+          run: |
+            yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/single_vm_zos3_lite.ts
+
       - name: Run test multiple vms
         id: multiple_vm
         if: always()
@@ -145,6 +151,7 @@ jobs:
             > **Details on failed run**: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
             - **Dynamic Single Vm**: ${{ steps.single_vm.outcome }}
+            - **ZOS3 Lite Mycelium**: ${{ steps.zos3lite.outcome }}
             - **Multiple Vm**: ${{ steps.multiple_vm.outcome }}
             - **Kubernetes**: ${{ steps.k8s.outcome }}
             - **Vmq QSFS**: skipped https://github.com/threefoldtech/tfgrid-sdk-ts/issues/3611

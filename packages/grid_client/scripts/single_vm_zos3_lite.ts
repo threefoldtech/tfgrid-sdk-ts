@@ -36,6 +36,7 @@ async function main() {
     availableFor: grid3.twinId,
     features: [Features.zmachinelight, Features.networklight, Features.mycelium],
     nodeExclude: [259],
+    farmName: "LiriaFarm",
   };
   const nodes = await grid3.capacity.filterNodes(vmQueryOptions);
   const vmNode = await pingNodes(grid3, nodes);
