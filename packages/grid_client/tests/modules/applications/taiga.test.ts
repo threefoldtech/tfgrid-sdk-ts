@@ -70,17 +70,15 @@ test("TC2691 - Applications: Deploy Taiga", async () => {
   const metadata = "{'deploymentType': 'taiga'}";
   const description = "test deploying Taiga via ts grid3 client";
 
-  //GatewayNode Selection
   const gatewayNodes = await gridClient.capacity.filterNodes({
     features: [Features.wireguard, Features.mycelium],
     gateway: true,
     farmId: 1,
     availableFor: await gridClient.twins.get_my_twin_id(),
   } as FilterOptions);
-  if (gatewayNodes.length == 0) throw new Error("no nodes available to complete this test");
+  if (gatewayNodes.length === 0) throw new Error("No nodes available to complete this test");
   const GatewayNode = gatewayNodes[generateInt(0, gatewayNodes.length - 1)];
 
-  //Node Selection
   const nodes = await gridClient.capacity.filterNodes({
     features: [Features.wireguard, Features.mycelium],
     cru: cpu,
@@ -90,10 +88,9 @@ test("TC2691 - Applications: Deploy Taiga", async () => {
     availableFor: await gridClient.twins.get_my_twin_id(),
   } as FilterOptions);
   const nodeId = await getOnlineNode(nodes);
-  if (nodeId == -1) throw new Error("no nodes available to complete this test");
+  if (nodeId === -1) throw new Error("No nodes available to complete this test");
   const domain = subdomain + "." + GatewayNode.publicConfig.domain;
 
-  //VM Model
   const vms: MachinesModel = {
     name: deploymentName,
     network: {
@@ -137,39 +134,70 @@ test("TC2691 - Applications: Deploy Taiga", async () => {
   const res = await gridClient.machines.deploy(vms);
   log(res);
 
-  //Contracts Assertions
+  // Do not remove: Contracts Assertions
   expect(res.contracts.created).toHaveLength(1);
   expect(res.contracts.updated).toHaveLength(0);
   expect(res.contracts.deleted).toHaveLength(0);
 
+  // Do not remove: VM Assertions
+  const vmsList = await gridClient.machines.list();
+  log(vmsList);
+
+  expect(vmsList.length).toBeGreaterThanOrEqual(1);
+  expect(vmsList).toContain(vms.name);
+
   const result = await gridClient.machines.getObj(vms.name);
   log(result);
 
-  // Get WG interface details
+  expect(result[0].nodeId).toBe(nodeId);
+  expect(result[0].status).toBe("ok");
+  expect(result[0].flist).toBe(vms.machines[0].flist);
+  expect(result[0].entrypoint).toBe(vms.machines[0].entrypoint);
+  expect(result[0].mounts).toHaveLength(1);
+  expect(result[0].interfaces[0]["network"]).toBe(vms.network.name);
+  expect(result[0].interfaces[0]["ip"]).toContain(splitIP(vms.network.ip_range));
+  expect(result[0].interfaces[0]["ip"]).toMatch(ipRegex);
+  expect(result[0].capacity["cpu"]).toBe(cpu);
+  expect(result[0].capacity["memory"]).toBe(memory * 1024);
+  expect(result[0].planetary).toBeDefined();
+  expect(result[0].myceliumIP).toBeDefined();
+  expect(result[0].publicIP).toBeNull();
+  expect(result[0].description).toBe(description);
+  expect(result[0].mounts[0]["name"]).toBe(diskName);
+  expect(result[0].mounts[0]["size"]).toBe(GBToBytes(diskSize));
+  expect(result[0].mounts[0]["mountPoint"]).toBe(mountPoint);
+  expect(result[0].mounts[0]["state"]).toBe("ok");
+
   const wgnet = result[0].interfaces[0];
 
-  // Deploy Gateway
   const gateway: GatewayNameModel = {
     name: subdomain,
     network: wgnet.network,
     node_id: GatewayNode.nodeId,
     tls_passthrough: false,
-    backends: [`http://${wgnet.ip}:8080`],
+    backends: [`http://${wgnet.ip}:9000`],
   };
 
   const gatewayRes = await gridClient.gateway.deploy_name(gateway);
   log(gatewayRes);
 
-  // Gateway Assertions
+  // Do not remove: Gateway Contracts Assertions
   expect(gatewayRes.contracts.created).toHaveLength(1);
+  expect(gatewayRes.contracts.updated).toHaveLength(0);
+  expect(gatewayRes.contracts.deleted).toHaveLength(0);
+  expect(gatewayRes.contracts.created[0].contractType.nodeContract.nodeId).toBe(GatewayNode.nodeId);
 
+  // Do not remove: Gateway Assertions
   const gatewayResult = await gridClient.gateway.getObj(gateway.name);
   log(gatewayResult);
 
   expect(gatewayResult[0].name).toBe(subdomain);
   expect(gatewayResult[0].backends).toStrictEqual(gateway.backends);
+  expect(gatewayResult[0].status).toBe("ok");
+  expect(gatewayResult[0].type).toContain("name");
+  expect(gatewayResult[0].domain).toContain(name);
+  expect(gatewayResult[0].tls_passthrough).toBe(gateway.tls_passthrough);
 
-  // Use HTTP for the reachability check
   const site = "http://" + gatewayResult[0].domain;
   let reachable = false;
 
@@ -184,6 +212,7 @@ test("TC2691 - Applications: Deploy Taiga", async () => {
         log(res.status);
         log(res.statusText);
         expect(res.status).toBe(200);
+        expect(res.data).toContain("Taiga is a project management platform");
         reachable = true;
       })
       .catch(() => {

@@ -28,15 +28,15 @@ beforeAll(async () => {
   return gridClient;
 });
 
-//Private IP Regex
-const ipRegex = /(^127\.)|(^10\.)|(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1]\.)|(^192\.168\.)/;
-
 function generatePubKey(): string {
   const keypair = TweetNACL.box.keyPair();
   return Buffer.from(keypair.publicKey).toString("base64");
 }
 
-test.skip("TC2690 - Applications: Deploy Discourse", async () => {
+//Private IP Regex
+const ipRegex = /(^127\.)|(^10\.)|(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1]\.)|(^192\.168\.)/;
+
+test("TC2690 - Applications: Deploy Discourse", async () => {
   /**********************************************
      Test Suite: Grid3_Client_TS (Automated)
      Test Cases: TC2690 - Applications: Deploy Discourse
@@ -83,7 +83,7 @@ test.skip("TC2690 - Applications: Deploy Discourse", async () => {
     farmId: 1,
     availableFor: await gridClient.twins.get_my_twin_id(),
   } as FilterOptions);
-  if (gatewayNodes.length == 0) throw new Error("no nodes available to complete this test");
+  if (gatewayNodes.length === 0) throw new Error("No nodes available to complete this test");
   const GatewayNode = gatewayNodes[generateInt(0, gatewayNodes.length - 1)];
 
   const nodes = await gridClient.capacity.filterNodes({
@@ -95,7 +95,7 @@ test.skip("TC2690 - Applications: Deploy Discourse", async () => {
     availableFor: await gridClient.twins.get_my_twin_id(),
   } as FilterOptions);
   const nodeId = await getOnlineNode(nodes);
-  if (nodeId == -1) throw new Error("no nodes available to complete this test");
+  if (nodeId === -1) throw new Error("No nodes available to complete this test");
   const domain = subdomain + "." + GatewayNode.publicConfig.domain;
 
   const vms: MachinesModel = {
@@ -146,12 +146,39 @@ test.skip("TC2690 - Applications: Deploy Discourse", async () => {
   const res = await gridClient.machines.deploy(vms);
   log(res);
 
+  // Do not remove: Contracts Assertions
   expect(res.contracts.created).toHaveLength(1);
   expect(res.contracts.updated).toHaveLength(0);
   expect(res.contracts.deleted).toHaveLength(0);
 
+  // Do not remove: VM Assertions
+  const vmsList = await gridClient.machines.list();
+  log(vmsList);
+
+  expect(vmsList.length).toBeGreaterThanOrEqual(1);
+  expect(vmsList).toContain(vms.name);
+
   const result = await gridClient.machines.getObj(vms.name);
   log(result);
+
+  expect(result[0].nodeId).toBe(nodeId);
+  expect(result[0].status).toBe("ok");
+  expect(result[0].flist).toBe(vms.machines[0].flist);
+  expect(result[0].entrypoint).toBe(vms.machines[0].entrypoint);
+  expect(result[0].mounts).toHaveLength(1);
+  expect(result[0].interfaces[0]["network"]).toBe(vms.network.name);
+  expect(result[0].interfaces[0]["ip"]).toContain(splitIP(vms.network.ip_range));
+  expect(result[0].interfaces[0]["ip"]).toMatch(ipRegex);
+  expect(result[0].capacity["cpu"]).toBe(cpu);
+  expect(result[0].capacity["memory"]).toBe(memory * 1024);
+  expect(result[0].planetary).toBeDefined();
+  expect(result[0].myceliumIP).toBeDefined();
+  expect(result[0].publicIP).toBeNull();
+  expect(result[0].description).toBe(description);
+  expect(result[0].mounts[0]["name"]).toBe(diskName);
+  expect(result[0].mounts[0]["size"]).toBe(GBToBytes(diskSize));
+  expect(result[0].mounts[0]["mountPoint"]).toBe(mountPoint);
+  expect(result[0].mounts[0]["state"]).toBe("ok");
 
   const wgnet = result[0].interfaces[0];
 
@@ -159,20 +186,29 @@ test.skip("TC2690 - Applications: Deploy Discourse", async () => {
     name: subdomain,
     network: wgnet.network,
     node_id: GatewayNode.nodeId,
-    tls_passthrough: false,
+    tls_passthrough: tlsPassthrough,
     backends: [`http://${wgnet.ip}:88`],
   };
 
   const gatewayRes = await gridClient.gateway.deploy_name(gateway);
   log(gatewayRes);
 
+  // Do not remove: Gateway Contracts Assertions
   expect(gatewayRes.contracts.created).toHaveLength(1);
+  expect(gatewayRes.contracts.updated).toHaveLength(0);
+  expect(gatewayRes.contracts.deleted).toHaveLength(0);
+  expect(gatewayRes.contracts.created[0].contractType.nodeContract.nodeId).toBe(GatewayNode.nodeId);
 
+  // Do not remove: Gateway Assertions
   const gatewayResult = await gridClient.gateway.getObj(gateway.name);
   log(gatewayResult);
 
   expect(gatewayResult[0].name).toBe(subdomain);
   expect(gatewayResult[0].backends).toStrictEqual(gateway.backends);
+  expect(gatewayResult[0].status).toBe("ok");
+  expect(gatewayResult[0].type).toContain("name");
+  expect(gatewayResult[0].domain).toContain(name);
+  expect(gatewayResult[0].tls_passthrough).toBe(tlsPassthrough);
 
   const site = "http://" + gatewayResult[0].domain;
   let reachable = false;
@@ -188,6 +224,7 @@ test.skip("TC2690 - Applications: Deploy Discourse", async () => {
         log(res.status);
         log(res.statusText);
         expect(res.status).toBe(200);
+        expect(res.data).toContain("Congratulations, you installed Discourse!");
         reachable = true;
       })
       .catch(() => {

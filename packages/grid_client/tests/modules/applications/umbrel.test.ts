@@ -40,15 +40,12 @@ test("TC2694 - Applications: Deploy Umbrel", async () => {
         - Deploy the Umbrel solution.
         - Assert that the generated data matches
           the deployment details.
-        - Pass the IP of the Created Umbrel to the Gateway
-          Config.
+        - Pass the IP of the Created Umbrel to the Gateway Config.
         - Deploy the Gateway.
         - Assert that the generated data matches
           the deployment details.
-        - Assert that the Gateway points at the IP
-          of the created Umbrel.
-        - Assert that the returned domain is working
-          and returns correct data.
+        - Assert that the Gateway points at the IP of the created Umbrel.
+        - Assert that the returned domain is working and returns correct data.
     **********************************************/
 
   const name = "gw" + generateString(10).toLowerCase();
@@ -140,12 +137,43 @@ test("TC2694 - Applications: Deploy Umbrel", async () => {
   const res = await gridClient.machines.deploy(vms);
   log(res);
 
+  // Do not remove: Contracts Assertions
   expect(res.contracts.created).toHaveLength(1);
   expect(res.contracts.updated).toHaveLength(0);
   expect(res.contracts.deleted).toHaveLength(0);
 
+  // Do not remove: VM Assertions
+  const vmsList = await gridClient.machines.list();
+  log(vmsList);
+
+  expect(vmsList.length).toBeGreaterThanOrEqual(1);
+  expect(vmsList).toContain(vms.name);
+
   const result = await gridClient.machines.getObj(vms.name);
   log(result);
+
+  expect(result[0].nodeId).toBe(nodeId);
+  expect(result[0].status).toBe("ok");
+  expect(result[0].flist).toBe(vms.machines[0].flist);
+  expect(result[0].entrypoint).toBe(vms.machines[0].entrypoint);
+  expect(result[0].mounts).toHaveLength(2);
+  expect(result[0].interfaces[0]["network"]).toBe(vms.network.name);
+  expect(result[0].interfaces[0]["ip"]).toContain(splitIP(vms.network.ip_range));
+  expect(result[0].interfaces[0]["ip"]).toMatch(ipRegex);
+  expect(result[0].capacity["cpu"]).toBe(cpu);
+  expect(result[0].capacity["memory"]).toBe(memory * 1024);
+  expect(result[0].planetary).toBeDefined();
+  expect(result[0].myceliumIP).toBeDefined();
+  expect(result[0].publicIP).toBeNull();
+  expect(result[0].description).toBe(description);
+  expect(result[0].mounts[0]["name"]).toBe(disk1Name);
+  expect(result[0].mounts[0]["size"]).toBe(GBToBytes(disk1Size));
+  expect(result[0].mounts[0]["mountPoint"]).toBe(mountPoint1);
+  expect(result[0].mounts[0]["state"]).toBe("ok");
+  expect(result[0].mounts[1]["name"]).toBe(disk2Name);
+  expect(result[0].mounts[1]["size"]).toBe(GBToBytes(disk2Size));
+  expect(result[0].mounts[1]["mountPoint"]).toBe(mountPoint2);
+  expect(result[0].mounts[1]["state"]).toBe("ok");
 
   const wgnet = result[0].interfaces[0];
 
@@ -160,13 +188,22 @@ test("TC2694 - Applications: Deploy Umbrel", async () => {
   const gatewayRes = await gridClient.gateway.deploy_name(gateway);
   log(gatewayRes);
 
+  // Do not remove: Gateway Contracts Assertions
   expect(gatewayRes.contracts.created).toHaveLength(1);
+  expect(gatewayRes.contracts.updated).toHaveLength(0);
+  expect(gatewayRes.contracts.deleted).toHaveLength(0);
+  expect(gatewayRes.contracts.created[0].contractType.nodeContract.nodeId).toBe(GatewayNode.nodeId);
 
+  // Do not remove: Gateway Assertions
   const gatewayResult = await gridClient.gateway.getObj(gateway.name);
   log(gatewayResult);
 
   expect(gatewayResult[0].name).toBe(subdomain);
   expect(gatewayResult[0].backends).toStrictEqual(gateway.backends);
+  expect(gatewayResult[0].status).toBe("ok");
+  expect(gatewayResult[0].type).toContain("name");
+  expect(gatewayResult[0].domain).toContain(name);
+  expect(gatewayResult[0].tls_passthrough).toBe(gateway.tls_passthrough);
 
   const site = "http://" + gatewayResult[0].domain;
   let reachable = false;
