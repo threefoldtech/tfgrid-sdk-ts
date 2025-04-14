@@ -146,12 +146,12 @@ test("TC2690 - Applications: Deploy Discourse", async () => {
   const res = await gridClient.machines.deploy(vms);
   log(res);
 
-  // Do not remove: Contracts Assertions
+  // Contracts Assertions
   expect(res.contracts.created).toHaveLength(1);
   expect(res.contracts.updated).toHaveLength(0);
   expect(res.contracts.deleted).toHaveLength(0);
 
-  // Do not remove: VM Assertions
+  // VM Assertions
   const vmsList = await gridClient.machines.list();
   log(vmsList);
 
@@ -193,13 +193,13 @@ test("TC2690 - Applications: Deploy Discourse", async () => {
   const gatewayRes = await gridClient.gateway.deploy_name(gateway);
   log(gatewayRes);
 
-  // Do not remove: Gateway Contracts Assertions
+  // Gateway Contracts Assertions
   expect(gatewayRes.contracts.created).toHaveLength(1);
   expect(gatewayRes.contracts.updated).toHaveLength(0);
   expect(gatewayRes.contracts.deleted).toHaveLength(0);
   expect(gatewayRes.contracts.created[0].contractType.nodeContract.nodeId).toBe(GatewayNode.nodeId);
 
-  // Do not remove: Gateway Assertions
+  // Gateway Assertions
   const gatewayResult = await gridClient.gateway.getObj(gateway.name);
   log(gatewayResult);
 
