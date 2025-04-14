@@ -223,7 +223,7 @@
           "
           @update:sort="
             sort => {
-              loadContracts(table.type, { sort });
+              loadContracts(table.type);
             }
           "
         />
@@ -293,7 +293,7 @@ const nodeIDs = computed(() => {
 });
 // To avoid multiple requests
 const cachedNodeIDs = ref<number[]>([]);
-
+const sortOptions: { key: string; order: "asc" | "desc" }[] = [{ key: "created_at", order: "desc" }];
 onMounted(loadContracts);
 
 async function _normalizeContracts(
@@ -347,7 +347,7 @@ async function loadContractsByType(
   }
 }
 
-async function loadContracts(type?: ContractType, options?: { sort: { key: string; order: "asc" | "desc" }[] }) {
+async function loadContracts(type?: ContractType) {
   lockedContracts.value = undefined;
   totalCost.value = undefined;
   totalCostUSD.value = undefined;
@@ -361,20 +361,20 @@ async function loadContracts(type?: ContractType, options?: { sort: { key: strin
     if (type) {
       switch (type) {
         case ContractType.Name:
-          await loadContractsByType(ContractType.Name, nameContracts, options);
+          await loadContractsByType(ContractType.Name, nameContracts, { sort: sortOptions });
           break;
         case ContractType.Node:
-          await loadContractsByType(ContractType.Node, nodeContracts, options);
+          await loadContractsByType(ContractType.Node, nodeContracts, { sort: sortOptions });
           break;
         case ContractType.Rent:
-          await loadContractsByType(ContractType.Rent, rentContracts, options);
+          await loadContractsByType(ContractType.Rent, rentContracts, { sort: sortOptions });
           break;
       }
     } else {
       await Promise.all([
-        loadContractsByType(ContractType.Name, nameContracts, options),
-        loadContractsByType(ContractType.Node, nodeContracts, options),
-        loadContractsByType(ContractType.Rent, rentContracts, options),
+        loadContractsByType(ContractType.Name, nameContracts, { sort: sortOptions }),
+        loadContractsByType(ContractType.Node, nodeContracts, { sort: sortOptions }),
+        loadContractsByType(ContractType.Rent, rentContracts, { sort: sortOptions }),
       ]);
     }
     const failedContractsLength = failedContracts.value.length;

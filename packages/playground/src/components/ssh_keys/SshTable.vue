@@ -12,6 +12,7 @@
         show-select
         :no-data-text="capitalize(`No keys found.`)"
         v-model="selectedKeys"
+        :sort-by="sortBy"
         :loading="loading"
         :headers="headers"
         :items="sshKeys"
@@ -193,6 +194,7 @@ export default defineComponent({
       //   sortable: false,
       // },
     ];
+    const sortBy = ref([{ key: "createdAt", order: "desc" }]);
 
     const deleteSelected = () => {
       const ids: number[] = [];
@@ -217,6 +219,7 @@ export default defineComponent({
       itemsPerPage,
       theme,
       AppThemeSelection,
+      sortBy,
       capitalize,
       deleteSelected,
       deleteKey,
