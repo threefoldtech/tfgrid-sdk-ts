@@ -50,5 +50,3 @@ export class PublicIpBuilder extends AbstractBuilder<PublicIpQuery> {
     });
   }
 }
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface PublicIpBuilder extends BuilderMethods<PublicIpQuery, PublicIpBuilder> {}
