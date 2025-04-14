@@ -1,75 +1,76 @@
-const eslint = require('@eslint/js');
-const tseslint = require('@typescript-eslint/eslint-plugin');
-const tsparser = require('@typescript-eslint/parser');
-const prettierPlugin = require('eslint-plugin-prettier');
-const simpleImportSort = require('eslint-plugin-simple-import-sort');
-const svelte3 = require('eslint-plugin-svelte3');
-const cypressPlugin = require('eslint-plugin-cypress');
-const vuePlugin = require('eslint-plugin-vue');
-const globals = require('globals');
+const eslint = require("@eslint/js");
+const tseslint = require("@typescript-eslint/eslint-plugin");
+const tsparser = require("@typescript-eslint/parser");
+const prettierPlugin = require("eslint-plugin-prettier");
+const simpleImportSort = require("eslint-plugin-simple-import-sort");
+const svelte3 = require("eslint-plugin-svelte3");
+const cypressPlugin = require("eslint-plugin-cypress");
+const vuePlugin = require("eslint-plugin-vue");
+const globals = require("globals");
 
 module.exports = [
   {
-    files: ['**/*.{js,mjs,cjs,jsx,mjsx,ts,tsx,mtsx}'],
+    files: ["**/*.{js,mjs,cjs,jsx,mjsx,ts,tsx,mtsx}"],
     ...eslint.configs.recommended,
     languageOptions: {
       ecmaVersion: 2021,
-      sourceType: 'module',
+      sourceType: "module",
       parser: tsparser,
       globals: {
         ...globals.browser,
         ...globals.es2021,
-        ...globals.node
-      }
+        ...globals.node,
+      },
     },
     plugins: {
-      '@typescript-eslint': tseslint,
+      "@typescript-eslint": tseslint,
       prettier: prettierPlugin,
-      'simple-import-sort': simpleImportSort,
+      "simple-import-sort": simpleImportSort,
       cypress: cypressPlugin,
-      vue: vuePlugin
+      vue: vuePlugin,
     },
     rules: {
       ...tseslint.configs.recommended.rules,
       ...vuePlugin.configs.essential.rules,
-      'no-console': 'off',
-      'no-async-promise-executor': 'off',
-      'prettier/prettier': 'warn',
-      '@typescript-eslint/no-var-requires': 'off',
-      'simple-import-sort/imports': 'error',
-      'prefer-spread': 'off',
-      '@typescript-eslint/no-explicit-any': 'off',
-      'vue/multi-word-component-names': 'off',
-      'vue/no-v-text-v-html-on-component': 'off',
-      '@typescript-eslint/no-empty-function': 'off',
-      'vue/no-v-for-template-key': 'off',
-      'vue/no-multiple-template-root': 'off',
-      'vue/no-v-model-argument': 'off',
-      '@typescript-eslint/ban-ts-comment': 'off',
-      '@typescript-eslint/no-non-null-assertion': 'off'
-    }
+      "no-console": "off",
+      "no-async-promise-executor": "off",
+      "prettier/prettier": "warn",
+      "@typescript-eslint/no-var-requires": "off",
+      "simple-import-sort/imports": "error",
+      "prefer-spread": "off",
+
+      "@typescript-eslint/no-explicit-any": "off",
+      "vue/multi-word-component-names": "off",
+      "vue/no-v-text-v-html-on-component": "off",
+      "@typescript-eslint/no-empty-function": "off",
+      "vue/no-v-for-template-key": "off",
+      "vue/no-multiple-template-root": "off",
+      "vue/no-v-model-argument": "off",
+      "@typescript-eslint/ban-ts-comment": "off",
+      "@typescript-eslint/no-non-null-assertion": "off",
+    },
   },
   {
-    files: ['**/*.svelte', '**/__tests__/*.{j,t}s?(x)', '**/tests/unit/**/*.spec.{j,t}s?(x)'],
+    files: ["**/*.svelte", "**/__tests__/*.{j,t}s?(x)", "**/tests/unit/**/*.spec.{j,t}s?(x)"],
     plugins: { svelte3 },
     processor: svelte3,
     languageOptions: {
       globals: {
-        ...globals.jest
-      }
-    }
+        ...globals.jest,
+      },
+    },
   },
   {
     ignores: [
-      '**/node_modules/**',
-      '**/dist/**',
-      '**/docs/**',
-      '/packages/rmb_direct_client/lib/types/lib/**',
-      'packages/stats/public/build/*',
-      'packages/UI/*.config.js',
-      'packages/UI/src/index.css',
-      '*.config.*',
-      '*global.css',
-    ]
-  }
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/docs/**",
+      "/packages/rmb_direct_client/lib/types/lib/**",
+      "packages/stats/public/build/*",
+      "packages/UI/*.config.js",
+      "packages/UI/src/index.css",
+      "*.config.*",
+      "*global.css",
+    ],
+  },
 ];
