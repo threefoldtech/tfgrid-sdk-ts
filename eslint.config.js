@@ -11,7 +11,6 @@ const globals = require("globals");
 module.exports = [
   {
     files: ["**/*.{js,mjs,cjs,jsx,mjsx,ts,tsx,mtsx}"],
-    ...eslint.configs.recommended,
     languageOptions: {
       ecmaVersion: 2021,
       sourceType: "module",
@@ -48,6 +47,22 @@ module.exports = [
       "vue/no-v-model-argument": "off",
       "@typescript-eslint/ban-ts-comment": "off",
       "@typescript-eslint/no-non-null-assertion": "off",
+      "@typescript-eslint/no-restricted-types": [
+        "error",
+        {
+          types: {
+            "{}": "Use `unknown` instead.",
+            Function: "Use specific function types instead.",
+            Object: "Use `Record<string, unknown>` or specific object types instead.",
+            String: "Use `string` instead.",
+            Number: "Use `number` instead.",
+            Boolean: "Use `boolean` instead.",
+          },
+        },
+      ],
+      "@typescript-eslint/no-empty-object-type": "error",
+      "@typescript-eslint/no-unsafe-function-type": "error",
+      "@typescript-eslint/no-wrapper-object-types": "error",
     },
   },
   {
