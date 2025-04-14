@@ -12,7 +12,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@jimber/pkid": "1.0.5",
+    "@jimber/pkid": "1.0.4",
     "@noble/secp256k1": "^1.7.1",
     "@threefold/gridproxy_client": "2.8.0-rc1",
     "@threefold/monitoring": "2.8.0-rc1",
