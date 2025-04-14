@@ -160,7 +160,7 @@
           ></v-text-field>
         </input-validator>
         <v-card-actions class="justify-end mb-3 mx-3">
-          <v-btn color="anchor" @click="resetTimeouts">Reset</v-btn>
+          <v-btn :disabled="isDefault" color="anchor" @click="resetTimeouts">Reset</v-btn>
           <v-btn :disabled="!isValidTimeout || isCurrentTimeout()" @click="UpdateTimeout">Update</v-btn></v-card-actions
         >
       </form-validator>
@@ -169,7 +169,7 @@
 </template>
 <script lang="ts">
 import type { GridClient } from "@threefold/grid_client";
-import { nextTick, onMounted, ref, watch } from "vue";
+import { computed, nextTick, onMounted, ref, watch } from "vue";
 import { useTheme } from "vuetify";
 
 import { useFormRef } from "@/hooks/form_validator";
@@ -238,9 +238,30 @@ export default {
       selectedDeploymentTimeout.value = currentDeploymentTimeout.value;
     });
 
+    const isDefault = computed(() => {
+      return selectedQueryTimeout.value == 120 && selectedDeploymentTimeout.value == 600;
+    });
+
     function isCurrentTheme() {
       return selectedTheme.value == currentTheme.value;
     }
+
+    watch(
+      selectedQueryTimeout,
+      newVal => {
+        selectedQueryTimeout.value = newVal;
+      },
+      { immediate: true },
+    );
+
+    watch(
+      selectedDeploymentTimeout,
+      newVal => {
+        selectedDeploymentTimeout.value = newVal;
+      },
+      { immediate: true },
+    );
+
     function UpdateTheme() {
       switch (selectedTheme.value) {
         case ThemeInterface.Dark:
@@ -317,10 +338,10 @@ export default {
       }
     }
 
-    function resetTimeouts() {
+    async function resetTimeouts() {
       selectedQueryTimeout.value = 120;
       selectedDeploymentTimeout.value = 600;
-      createCustomToast("Timeouts have been reset to default values", ToastType.success);
+      await UpdateTimeout();
     }
 
     return {
@@ -343,6 +364,7 @@ export default {
       isCurrentTimeout,
       confirmPasswordInput,
       resetTimeouts,
+      isDefault,
     };
   },
 };
