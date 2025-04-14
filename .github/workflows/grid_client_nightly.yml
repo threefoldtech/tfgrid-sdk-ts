@@ -74,6 +74,12 @@ jobs:
         run: |
           yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/multiple_vms.ts
 
+      - name: Run test multiple vms
+        id: multiple_zos3_lite_vm
+        if: always()
+        run: |
+          yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/multiple_vms_zos_3_lite.ts
+
       - name: Run test kubernetes
         id: k8s
         if: always()
