@@ -113,7 +113,7 @@ const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
 
 function addWorker() {
-  workers.value.push(createWorker());
+  workers.value.unshift(createWorker());
 }
 
 async function deploy() {

@@ -3,9 +3,7 @@
     <v-data-table-server
       v-model="selectedItems"
       :headers="headers"
-      :items="publicIps"
       :items-length="publicIpsCount"
-      :loading="loadingIps"
       v-model:items-per-page="pageSize"
       @update:options="
         (options: any ) => {
@@ -14,6 +12,8 @@
           getFarmPublicIp(true, { page, size: pageSize });
         }
       "
+      :items="ips"
+      :loading="loading"
       :items-per-page-options="[
         { value: 5, title: '5' },
         { value: 10, title: '10' },
@@ -33,6 +33,9 @@
       <template #[`item.ip`]="{ item }">
         {{ item.ip || "-" }}
       </template>
+      <template #[`item.network`]="{ item }">
+        {{ item.network || "-" }}
+      </template>
       <template #[`item.gateway`]="{ item }">
         {{ item.gateway || "-" }}
       </template>
@@ -42,7 +45,7 @@
       </template>
     </v-data-table-server>
 
-    <div v-if="publicIps.length > 0" class="d-flex align-end justify-end">
+    <div v-if="ips.length > 0" class="d-flex align-end justify-end">
       <v-btn
         class="my-3"
         color="error"
@@ -82,7 +85,9 @@
 <script lang="ts">
 import type { RemoveFarmIPModel } from "@threefold/grid_client";
 import type { PublicIp } from "@threefold/gridproxy_client";
-import { ref, watch } from "vue";
+// import type { PublicIp } from "@threefold/tfchain_client";
+import * as ip from "ip";
+import { onMounted, ref, watch } from "vue";
 
 import { gridProxyClient } from "@/clients";
 import { useGrid } from "@/stores";
@@ -102,9 +107,15 @@ export default {
     const gridStore = useGrid();
     const headers = [
       {
-        title: "IP",
+        title: "IP Address",
         align: "center",
         key: "ip",
+        sortable: false,
+      },
+      {
+        title: "Network",
+        align: "center",
+        key: "network",
         sortable: false,
       },
       {
@@ -119,9 +130,10 @@ export default {
         key: "contractId",
       },
     ] as any;
-    const publicIps = ref<PublicIp[]>([]);
     const publicIpsCount = ref();
-    const loadingIps = ref(false);
+    const publicIps = ref<PublicIp[]>([]);
+    const ips = ref<any[]>([]);
+    const loading = ref(false);
     const showDialogue = ref(false);
     const type = ref(IPType.single);
     const publicIP = ref();
@@ -135,7 +147,7 @@ export default {
 
     async function getFarmPublicIp(retCount = false, options = { page: 1, size: 10 }) {
       try {
-        loadingIps.value = true;
+        loading.value = true;
         const { data, count } = await gridProxyClient.publicIps.list({
           retCount,
           page: options.page,
@@ -144,17 +156,26 @@ export default {
         });
         publicIps.value = data as PublicIp[];
         if (retCount) publicIpsCount.value = count || 0;
+        // add networks
+        publicIps.value.forEach(item => {
+          ips.value.push({
+            ip: item.ip,
+            gateway: item.gateway,
+            contract_id: item.contract_id,
+            network: ip.cidrSubnet(item.ip).networkAddress,
+          });
+        });
       } catch (error) {
         createCustomToast(`Failed to get public IPs! ${error}`, ToastType.danger);
       } finally {
-        loadingIps.value = false;
+        loading.value = false;
       }
     }
 
     async function removeFarmIps() {
       try {
         isRemoving.value = true;
-        loadingIps.value = true;
+        loading.value = true;
         items.value = selectedItems.value.map(item => ({
           ip: item.ip,
           farmId: props.farmId,
@@ -163,7 +184,7 @@ export default {
         setTimeout(async () => {
           await getFarmPublicIp(true, { page: page.value, size: pageSize.value });
           createCustomToast("IP is deleted successfully!", ToastType.success);
-          loadingIps.value = false;
+          loading.value = false;
         }, 20000);
       } catch (error) {
         console.log(error);
@@ -177,7 +198,7 @@ export default {
     watch(
       () => props.refreshPublicIPs,
       () => {
-        loadingIps.value = true;
+        loading.value = true;
         setTimeout(async () => {
           await getFarmPublicIp(true, { page: page.value, size: pageSize.value });
         }, 20000);
@@ -187,7 +208,6 @@ export default {
     return {
       gridStore,
       headers,
-      publicIps,
       type,
       publicIP,
       toPublicIP,
@@ -196,11 +216,12 @@ export default {
       isRemoving,
       removeFarmIps,
       selectedItems,
-      loadingIps,
       getFarmPublicIp,
       pageSize,
       page,
       publicIpsCount,
+      ips,
+      loading,
     };
   },
 };
