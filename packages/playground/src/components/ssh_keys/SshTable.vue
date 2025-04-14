@@ -142,6 +142,11 @@ import { useTheme } from "vuetify";
 import type { SSHKeyData, VDataTableHeader } from "@/types";
 import { AppThemeSelection } from "@/utils/app_theme";
 
+interface SortItems {
+  key: string;
+  order: boolean | "desc" | "asc" | undefined;
+}
+
 export default defineComponent({
   props: {
     sshKeys: {
@@ -194,7 +199,7 @@ export default defineComponent({
       //   sortable: false,
       // },
     ];
-    const sortBy = ref([{ key: "createdAt", order: "desc" }]);
+    const sortBy = ref<SortItems[]>([{ key: "createdAt", order: "desc" }]);
 
     const deleteSelected = () => {
       const ids: number[] = [];
