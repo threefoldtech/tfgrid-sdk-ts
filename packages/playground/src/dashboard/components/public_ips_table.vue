@@ -2,7 +2,7 @@
   <div>
     <ListTable
       :headers="headers"
-      :items="publicIps"
+      :items="ips"
       :loading="loading"
       :items-per-page-options="[
         { value: 5, title: '5' },
@@ -21,6 +21,9 @@
       </template>
       <template #[`item.ip`]="{ item }">
         {{ item.ip || "-" }}
+      </template>
+      <template #[`item.network`]="{ item }">
+        {{ item.network || "-" }}
       </template>
       <template #[`item.gateway`]="{ item }">
         {{ item.gateway || "-" }}
@@ -70,6 +73,7 @@
 <script lang="ts">
 import type { RemoveFarmIPModel } from "@threefold/grid_client";
 import type { PublicIp } from "@threefold/tfchain_client";
+import * as ip from "ip";
 import { onMounted, ref, watch } from "vue";
 
 import ListTable from "@/components/list_table.vue";
@@ -91,9 +95,15 @@ export default {
     const gridStore = useGrid();
     const headers = [
       {
-        title: "IP",
+        title: "IP Address",
         align: "center",
         key: "ip",
+        sortable: false,
+      },
+      {
+        title: "Network",
+        align: "center",
+        key: "network",
         sortable: false,
       },
       {
@@ -109,6 +119,7 @@ export default {
       },
     ] as any;
     const publicIps = ref<PublicIp[]>([]);
+    const ips = ref<any[]>([]);
     const loading = ref(false);
     const loadingIps = ref(false);
     const showDialogue = ref(false);
@@ -129,6 +140,15 @@ export default {
       try {
         const farm = await gridStore.grid.farms.getFarmByID({ id });
         publicIps.value = farm.publicIps as unknown as PublicIp[];
+        // add networks
+        publicIps.value.forEach(item => {
+          ips.value.push({
+            ip: item.ip,
+            gateway: item.gateway,
+            contractId: item.contractId,
+            network: ip.cidrSubnet(item.ip).networkAddress,
+          });
+        });
       } catch (error) {
         createCustomToast(`Failed to get public IPs! ${error}`, ToastType.danger);
       }
@@ -175,6 +195,7 @@ export default {
       removeFarmIps,
       selectedItems,
       loadingIps,
+      ips,
     };
   },
 };

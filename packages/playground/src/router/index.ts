@@ -821,6 +821,9 @@ const mainRoutes: RouteRecordRaw[] = [
 const router = createRouter({
   history: createWebHashHistory(),
   routes: mainRoutes,
+  scrollBehavior(to, from, savedPosition) {
+    window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+  },
 });
 
 /* Guard to verify monitor is completed */

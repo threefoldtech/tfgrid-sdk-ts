@@ -74,11 +74,40 @@
             </form-validator>
             <v-divider />
           </v-card-text>
-          <v-dialog v-model="showIPs" max-width="500" attach="#modals">
+          <v-dialog v-model="showIPs" max-width="600" attach="#modals">
             <v-card>
-              <v-card-title class="text-h5">IPs range</v-card-title>
-              <v-card-text v-for="(IP, i) in IPs" :key="IP">{{ i + 1 }}- {{ IP }}</v-card-text>
-              <v-card-actions> </v-card-actions>
+              <v-card-title class="bg-primary">IPs range</v-card-title>
+              <v-card-text>
+                <v-row>
+                  <v-col>
+                    <v-list class="my-5">
+                      <v-list-item
+                        ><v-row
+                          ><v-col sm="4"><p>Network:</p></v-col
+                          ><v-col
+                            ><p>{{ network }}</p></v-col
+                          ></v-row
+                        ></v-list-item
+                      >
+                      <v-list-item>
+                        <v-row>
+                          <v-col sm="4">IP Addresses:</v-col>
+                          <v-col>
+                            <v-chip type="warning" variant="tonal" v-for="ip in ipsRangeTable" :key="ip" class="ma-1">{{
+                              ip
+                            }}</v-chip>
+                          </v-col></v-row
+                        >
+                      </v-list-item>
+                    </v-list>
+                  </v-col>
+                </v-row>
+                <v-divider></v-divider>
+              </v-card-text>
+
+              <v-card-actions class="justify-end mb-1 mr-2">
+                <v-btn @click="showIPs = false" color="anchor">Close</v-btn></v-card-actions
+              >
             </v-card>
           </v-dialog>
 
@@ -109,6 +138,7 @@ import { default as PrivateIp } from "private-ip";
 import { ref, watch } from "vue";
 
 import { gqlClient } from "@/clients";
+import { ipToLong, longToIp } from "@/utils/ip";
 import { IPType } from "@/utils/types";
 
 import { useGrid } from "../../stores";
@@ -121,6 +151,7 @@ export default {
       required: true,
     },
   },
+
   setup(_, context) {
     const gridStore = useGrid();
     const IPs = ref<string[]>();
@@ -137,7 +168,8 @@ export default {
     const publicIP = ref("");
     const toPublicIP = ref("");
     const gateway = ref("");
-
+    const network = ref("");
+    const ipsRangeTable = ref<string[]>([]);
     const formValidator = ref();
 
     watch(
@@ -268,13 +300,29 @@ export default {
       showIPs.value = true;
     }
 
+    function generateIpTable(startIp: string, endIp: string, sub: any) {
+      const startLong = ipToLong(startIp);
+      const endLong = ipToLong(endIp);
+
+      // Determine the subnet mask based on the provided CIDR
+      const mask = (0xffffffff << (32 - sub)) >>> 0; // Create subnet mask from CIDR
+      const networkBaseLong = startLong & mask; // Calculate network address using the mask
+
+      const networkBase = longToIp(networkBaseLong); // Convert back to dotted decimal format
+
+      ipsRangeTable.value = [];
+      for (let i = startLong; i <= endLong; i++) {
+        ipsRangeTable.value.push(longToIp(i));
+      }
+      network.value = `${networkBase}/${sub}`;
+    }
     function addIPs() {
       const sub = publicIP.value.split("/")[1];
       const start = publicIP.value.split("/")[0];
       let end = toPublicIP.value.split("/")[0];
 
       if (type.value === IPType.single) end = start;
-
+      generateIpTable(start, end, sub);
       IPs.value = getIPRange(start, end);
       IPs.value.forEach((ip, i) => {
         IPs.value![i] = ip + "/" + sub;
@@ -330,7 +378,9 @@ export default {
     }
 
     return {
+      ipsRangeTable,
       showDialogue,
+      network,
       valid,
       IPs,
       items,
