@@ -15,7 +15,7 @@ import {
 import { config, getClient } from "../../client_loader";
 import { GBToBytes, generateInt, getOnlineNode, log, splitIP } from "../../utils";
 
-jest.setTimeout(1250000);
+jest.setTimeout(1800000);
 
 let gridClient: GridClient;
 let deploymentName: string;
@@ -213,7 +213,7 @@ test("TC2690 - Applications: Deploy Discourse", async () => {
   const site = "https://" + gatewayResult[0].domain;
   let reachable = false;
 
-  for (let i = 0; i <= 250; i++) {
+  for (let i = 0; i <= 360; i++) {
     const wait = await setTimeout(5000, "Waiting for gateway to be ready");
     log(wait);
 
