@@ -3,14 +3,13 @@ const tseslint = require("@typescript-eslint/eslint-plugin");
 const tsparser = require("@typescript-eslint/parser");
 const prettierPlugin = require("eslint-plugin-prettier");
 const simpleImportSort = require("eslint-plugin-simple-import-sort");
-const svelte3 = require("eslint-plugin-svelte3");
 const cypressPlugin = require("eslint-plugin-cypress");
 const vuePlugin = require("eslint-plugin-vue");
 const globals = require("globals");
 
 module.exports = [
   {
-    files: ["**/*.{js,mjs,cjs,jsx,mjsx,ts,tsx,mtsx}"],
+    files: ["**/*.{js,ts,tsx,vue}"],
     languageOptions: {
       ecmaVersion: 2021,
       sourceType: "module",
@@ -66,24 +65,12 @@ module.exports = [
     },
   },
   {
-    files: ["**/*.svelte", "**/__tests__/*.{j,t}s?(x)", "**/tests/unit/**/*.spec.{j,t}s?(x)"],
-    plugins: { svelte3 },
-    processor: svelte3,
-    languageOptions: {
-      globals: {
-        ...globals.jest,
-      },
-    },
-  },
-  {
     ignores: [
       "**/node_modules/**",
       "**/dist/**",
       "**/docs/**",
       "/packages/rmb_direct_client/lib/types/lib/**",
       "packages/stats/public/build/*",
-      "packages/UI/*.config.js",
-      "packages/UI/src/index.css",
       "*.config.*",
       "*global.css",
     ],
