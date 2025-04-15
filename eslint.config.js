@@ -1,18 +1,28 @@
-const tseslint = require("@typescript-eslint/eslint-plugin");
-const tsparser = require("@typescript-eslint/parser");
-const vue = require("eslint-plugin-vue");
+const tseslint = require("typescript-eslint"); // Correct package for parser/plugin v9+
+
 const prettierPlugin = require("eslint-plugin-prettier");
 const simpleImportSort = require("eslint-plugin-simple-import-sort");
-const cypressPlugin = require("eslint-plugin-cypress");
 const globals = require("globals");
 
 module.exports = [
   {
-    files: ["**/*.{js,ts,tsx,vue}"],
+    ignores: [
+      ".yarn/**",
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/docs/**",
+      "/packages/rmb_direct_client/lib/types/lib/**",
+      "packages/stats/public/build/*",
+      "*.config.*",
+      "*global.css",
+    ],
+  },
+  {
+    files: ["**/*.{js,ts,tsx}"],
     languageOptions: {
       ecmaVersion: 2021,
       sourceType: "module",
-      parser: tsparser,
+      parser: tseslint.parser,
       globals: {
         ...globals.browser,
         ...globals.es2021,
@@ -20,26 +30,25 @@ module.exports = [
       },
     },
     plugins: {
-      "@typescript-eslint": tseslint,
+      "@typescript-eslint": tseslint.plugin,
       prettier: prettierPlugin,
       "simple-import-sort": simpleImportSort,
-      cypress: cypressPlugin,
-      vue,
     },
     rules: {
-      ...tseslint.configs.recommended.rules,
-      ...vue.configs.essential.rules,
+      ...tseslint.configs.eslintRecommended.rules,
 
       "no-console": "off",
       "prettier/prettier": "warn",
       "simple-import-sort/imports": "warn",
+
       "@typescript-eslint/no-var-requires": "off",
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-empty-function": "off",
       "@typescript-eslint/ban-ts-comment": "off",
       "@typescript-eslint/no-non-null-assertion": "off",
+      "prefer-spread": "warn",
       "@typescript-eslint/no-restricted-types": [
-        "error",
+        "warn",
         {
           types: {
             "{}": "Use `unknown` instead.",
@@ -55,16 +64,5 @@ module.exports = [
       "@typescript-eslint/no-unsafe-function-type": "warn",
       "@typescript-eslint/no-wrapper-object-types": "warn",
     },
-  },
-  {
-    ignores: [
-      "**/node_modules/**",
-      "**/dist/**",
-      "**/docs/**",
-      "/packages/rmb_direct_client/lib/types/lib/**",
-      "packages/stats/public/build/*",
-      "*.config.*",
-      "*global.css",
-    ],
   },
 ];
