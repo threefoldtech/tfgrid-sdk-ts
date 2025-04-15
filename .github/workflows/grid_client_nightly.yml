@@ -159,6 +159,7 @@ jobs:
             - **Dynamic Single Vm**: ${{ steps.single_vm.outcome }}
             - **ZOS3 Lite Mycelium**: ${{ steps.zos3lite.outcome }}
             - **Multiple Vm**: ${{ steps.multiple_vm.outcome }}
+            - **Multiple Vm**: ${{ steps.multiple_zos3_lite_vm.outcome }}
             - **Kubernetes**: ${{ steps.k8s.outcome }}
             - **Vmq QSFS**: skipped https://github.com/threefoldtech/tfgrid-sdk-ts/issues/3611
             - **Kubernetes QSFS**: skipped https://github.com/threefoldtech/tfgrid-sdk-ts/issues/3611
