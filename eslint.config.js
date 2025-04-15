@@ -1,8 +1,13 @@
-const tseslint = require("typescript-eslint"); // Correct package for parser/plugin v9+
-
+const tseslint = require("typescript-eslint");
+const pluginVue = require("eslint-plugin-vue");
 const prettierPlugin = require("eslint-plugin-prettier");
 const simpleImportSort = require("eslint-plugin-simple-import-sort");
 const globals = require("globals");
+
+const { defineConfigWithVueTs, vueTsConfigs } = require("@vue/eslint-config-typescript");
+
+// This returns an ARRAY of config objects optimized for Vue+TS
+const vueTsGeneratedConfigs = defineConfigWithVueTs(pluginVue.configs["flat/recommended"], vueTsConfigs.recommended);
 
 module.exports = [
   {
@@ -65,4 +70,5 @@ module.exports = [
       "@typescript-eslint/no-wrapper-object-types": "warn",
     },
   },
+  ...vueTsGeneratedConfigs,
 ];
