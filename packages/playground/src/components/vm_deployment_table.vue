@@ -57,20 +57,32 @@
 
     <AccessDeploymentAlert v-if="!hideSSH" />
 
-    <InputTooltip
-      v-if="props.projectName.toLowerCase() === 'vm'"
-      tooltip="Didn't find your deployments in the list? Enable to show all deployments."
-      inline
-    >
-      <VSwitch
-        inset
-        color="primary"
-        label="Show All Deployments"
-        v-model="showAllDeployments"
-        @update:model-value="loadDeployments"
-      />
-    </InputTooltip>
+    <div class="d-flex justify-space-between">
+      <InputTooltip
+        v-if="props.projectName.toLowerCase() === 'vm'"
+        tooltip="Didn't find your deployments in the list? Enable to show all deployments."
+        inline
+      >
+        <VSwitch
+          inset
+          color="primary"
+          label="Show All Deployments"
+          v-model="showAllDeployments"
+          @update:model-value="loadDeployments"
+        />
+      </InputTooltip>
 
+      <VBtn
+        v-if="showAllDeployments"
+        :disabled="loading"
+        class="mt-4"
+        variant="outlined"
+        color="secondary"
+        prepend-icon="mdi-reload"
+        text="Reload"
+        @click="loadDeployments"
+      />
+    </div>
     <ListTable
       :headers="filteredHeaders"
       :items="showAllDeployments ? items : items.filter(i => !i.fromAnotherClient)"
