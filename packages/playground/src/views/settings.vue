@@ -160,7 +160,7 @@
           ></v-text-field>
         </input-validator>
         <v-card-actions class="justify-end mb-3 mx-3">
-          <v-btn :disabled="isDefault" color="anchor" @click="resetTimeouts">Reset</v-btn>
+          <v-btn :disabled="isDefault || !isCurrentTimeout()" color="anchor" @click="resetTimeouts">Reset</v-btn>
           <v-btn :disabled="!isValidTimeout || isCurrentTimeout()" @click="UpdateTimeout">Update</v-btn></v-card-actions
         >
       </form-validator>
