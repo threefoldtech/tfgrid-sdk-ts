@@ -18,6 +18,13 @@ const vueTsGeneratedConfigs = defineConfigWithVueTs(pluginVue.configs["flat/reco
     "vue/no-dupe-keys": "warn",
   },
 });
+
+// Ensure Vue config is applied last and only to .vue files
+const vueConfig = vueTsGeneratedConfigs.map(config => ({
+  ...config,
+  files: ["**/*.vue"],
+}));
+
 module.exports = [
   {
     ignores: [
@@ -79,5 +86,5 @@ module.exports = [
       "@typescript-eslint/no-wrapper-object-types": "warn",
     },
   },
-  ...vueTsGeneratedConfigs,
+  ...vueConfig,
 ];
