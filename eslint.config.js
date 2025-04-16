@@ -7,8 +7,17 @@ const globals = require("globals");
 const { defineConfigWithVueTs, vueTsConfigs } = require("@vue/eslint-config-typescript");
 
 // This returns an ARRAY of config objects optimized for Vue+TS
-const vueTsGeneratedConfigs = defineConfigWithVueTs(pluginVue.configs["flat/recommended"], vueTsConfigs.recommended);
-
+const vueTsGeneratedConfigs = defineConfigWithVueTs(pluginVue.configs["flat/recommended"], vueTsConfigs.recommended, {
+  rules: {
+    "@typescript-eslint/no-explicit-any": "warn",
+    "vue/multi-word-component-names": "warn",
+    "vue/no-v-text-v-html-on-component": "off",
+    "@typescript-eslint/no-unused-expressions": "warn",
+    "@typescript-eslint/no-unused-vars": `warn`,
+    "@typescript-eslint/no-duplicate-enum-values": "warn",
+    "vue/no-dupe-keys": "warn",
+  },
+});
 module.exports = [
   {
     ignores: [
