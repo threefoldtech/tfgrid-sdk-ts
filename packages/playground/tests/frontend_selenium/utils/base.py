@@ -38,7 +38,7 @@ class Base:
 
     else:
         raise ValueError('[%s] is not a valid network; please enter a valid network in Config.ini ["main","test", "qa", "dev", "local"]' % str(net))
-    
+
     if str(net).lower() in ('main', 'test'):
         farm_payout_address1 = 'GCT2YESPSO5DLDQF6OKQZHVDVAUA7WIHOSV47WT6R2N636TBGS5XVVI6'
         farm_payout_address2 = 'GAGXCUJVK77C7XRMU66NU2GBALDFRQHCJGJ44VONUPIYNYNYETU56ICO'
