@@ -477,7 +477,7 @@ export default {
     }
 
     const cruText = computed(() =>
-      props.node ? `${props.node.used_resources.cru} / ${props.node.total_resources.cru} (Cores)` : "",
+      props.node ? `${Math.ceil(props.node.used_resources.cru)} / ${props.node.total_resources.cru} (Cores)` : "",
     );
     const mruText = computed(normalizeBytesResource("mru"));
     const sruText = computed(normalizeBytesResource("sru"));
