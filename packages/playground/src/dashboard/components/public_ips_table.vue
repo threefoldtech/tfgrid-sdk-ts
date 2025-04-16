@@ -85,9 +85,8 @@
 <script lang="ts">
 import type { RemoveFarmIPModel } from "@threefold/grid_client";
 import type { PublicIp } from "@threefold/gridproxy_client";
-// import type { PublicIp } from "@threefold/tfchain_client";
 import * as ip from "ip";
-import { onMounted, ref, watch } from "vue";
+import { ref, watch } from "vue";
 
 import { gridProxyClient } from "@/clients";
 import { useGrid } from "@/stores";
@@ -156,7 +155,8 @@ export default {
         });
         publicIps.value = data as PublicIp[];
         if (retCount) publicIpsCount.value = count || 0;
-        // add networks
+        ips.value = [];
+        // Add networks
         publicIps.value.forEach(item => {
           ips.value.push({
             ip: item.ip,
