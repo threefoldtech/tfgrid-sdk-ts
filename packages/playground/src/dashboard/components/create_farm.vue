@@ -1,6 +1,10 @@
 <template>
+  <VAlert type="info" v-if="network == 'main'" class="my-2"
+    >To create a Farm, use the
+    <a :href="manual.tf_connect_installation" class="app-link" target="_blank">TF Connect App</a>.</VAlert
+  >
   <v-container>
-    <v-row class="text-center flex justify-center">
+    <v-row class="text-center flex justify-center mt-4">
       <v-btn
         color="secondary"
         class="text-subtitle-1 px-6 mr-2"
@@ -9,7 +13,12 @@
         >Bootstrap Node Image</v-btn
       >
 
-      <v-btn variant="elevated" class="text-subtitle-1 px-6" @click="showDialogue = true" :disabled="isCreating"
+      <v-btn
+        variant="elevated"
+        class="text-subtitle-1 px-6"
+        v-if="network !== 'main'"
+        @click="showDialogue = true"
+        :disabled="isCreating"
         >Create Farm</v-btn
       >
     </v-row>
@@ -51,12 +60,12 @@
 <script lang="ts">
 import { ref } from "vue";
 
+import { manual } from "@/utils/manual";
 import { notifyDelaying } from "@/utils/notifications";
 
 import { gridProxyClient } from "../../clients";
 import { useGrid } from "../../stores";
 import { createCustomToast, ToastType } from "../../utils/custom_toast";
-
 export default {
   name: "CreateFarm",
   setup(_, context) {
@@ -65,6 +74,7 @@ export default {
     const gridStore = useGrid();
     const valid = ref(false);
     const farmName = ref("");
+    const network = process.env.NETWORK || (window as any).env.NETWORK;
 
     async function createFarm() {
       try {
@@ -101,6 +111,8 @@ export default {
       farmName,
       createFarm,
       validateFarmName,
+      network,
+      manual,
     };
   },
 };
