@@ -246,22 +246,6 @@ export default {
       return selectedTheme.value == currentTheme.value;
     }
 
-    watch(
-      selectedQueryTimeout,
-      newVal => {
-        selectedQueryTimeout.value = newVal;
-      },
-      { immediate: true },
-    );
-
-    watch(
-      selectedDeploymentTimeout,
-      newVal => {
-        selectedDeploymentTimeout.value = newVal;
-      },
-      { immediate: true },
-    );
-
     function UpdateTheme() {
       switch (selectedTheme.value) {
         case ThemeInterface.Dark:
