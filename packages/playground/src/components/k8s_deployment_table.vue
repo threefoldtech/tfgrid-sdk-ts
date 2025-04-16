@@ -58,7 +58,10 @@
 
     <AccessDeploymentAlert />
 
-    <div class="d-flex justify-space-between">
+    <div
+      class="d-flex"
+      :class="[props.projectName.toLowerCase() === 'kubernetes' ? 'justify-space-between' : 'flex-row-reverse']"
+    >
       <InputTooltip tooltip="Didn't find your deployments in the list? Enable to show all deployments." inline>
         <VSwitch
           inset
@@ -70,9 +73,8 @@
       </InputTooltip>
 
       <VBtn
-        v-if="showAllDeployments"
         :disabled="loading"
-        class="mt-4"
+        :class="[props.projectName.toLowerCase() === 'kubernetes' ? 'mt-4' : 'my-4']"
         variant="outlined"
         color="secondary"
         prepend-icon="mdi-reload"

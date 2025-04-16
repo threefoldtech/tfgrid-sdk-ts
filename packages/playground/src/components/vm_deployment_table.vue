@@ -57,7 +57,10 @@
 
     <AccessDeploymentAlert v-if="!hideSSH" />
 
-    <div class="d-flex justify-space-between">
+    <div
+      class="d-flex"
+      :class="[props.projectName.toLowerCase() === 'vm' ? 'justify-space-between' : 'flex-row-reverse']"
+    >
       <InputTooltip
         v-if="props.projectName.toLowerCase() === 'vm'"
         tooltip="Didn't find your deployments in the list? Enable to show all deployments."
@@ -73,9 +76,8 @@
       </InputTooltip>
 
       <VBtn
-        v-if="showAllDeployments"
         :disabled="loading"
-        class="mt-4"
+        :class="[props.projectName.toLowerCase() === 'vm' ? 'mt-4' : 'my-4']"
         variant="outlined"
         color="secondary"
         prepend-icon="mdi-reload"
