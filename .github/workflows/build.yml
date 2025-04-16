@@ -7,12 +7,12 @@ on:
   push:
     branches: 
       - development
-      - development_2.7
+      - development_upgrades
 
   pull_request:
     branches: 
       - development
-      - development_2.7
+      - development_upgrades
 
 jobs:
   build:
