@@ -172,7 +172,7 @@ const rootFilesystemSize = computed(() =>
 );
 const flist: Flist = {
   value: "https://hub.grid.tf/tf-official-apps/funkwhale-1.4.0.flist",
-  entryPoint: "/init.sh",
+  entryPoint: "/sbin/zinit init",
 };
 const dedicated = ref(false);
 const rentedByMe = ref(false);
