@@ -94,7 +94,7 @@ export const Flists = {
   },
   FUNKWHALE: {
     value: "https://hub.grid.tf/tf-official-apps/funkwhale-1.4.0.flist",
-    entryPoint: "/init.sh",
+    entryPoint: "/sbin/zinit init",
   },
   GITEA: {
     value: "https://hub.grid.tf/tf-official-apps/gitea-mycelium.flist",
