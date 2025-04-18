@@ -57,9 +57,9 @@
         >
           <v-switch color="primary" inset label="GPU" v-model="hasGPU" hide-details />
         </input-tooltip>
-        
+
         <v-switch color="primary" inset label="Rented By Me" v-model="rentedByMe" hide-details />
-        
+
         <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
           <v-switch color="primary" inset label="Rentable" v-model="dedicated" hide-details />
         </input-tooltip>
@@ -89,7 +89,6 @@
           v-model="selectionDetails"
         />
 
-        
         <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
       </template>
     </d-tabs>
@@ -164,14 +163,6 @@ watch(
   { immediate: true },
 );
 
-function finalize(deployment: any) {
-  layout.value.reloadDeploymentsList();
-  layout.value.setStatus(
-    "success",
-    `Successfully deployed an Open WebUI instance. Please keep in mind that the installation may take a few minutes to finish. If you encounter a "Bad Gateway" message while accessing the webpage, just wait a moment and refresh the page.`,
-  );
-  layout.value.openDialog(deployment, deploymentListEnvironments.openwebui);
-}
 async function deploy() {
   layout.value.setStatus("deploy");
 
@@ -196,6 +187,7 @@ async function deploy() {
 
     vm = await deployVM(grid!, {
       name: name.value,
+      projectName: projectName, // Explicitly set projectName
       machines: [
         {
           name: name.value,
@@ -215,7 +207,10 @@ async function deploy() {
           rootFilesystemSize: rootFilesystemSize.value,
           hasGPU: hasGPU.value,
           nodeId: selectionDetails.value?.node?.nodeId,
-          gpus: hasGPU.value ? selectionDetails.value?.gpuCards.map(card => card.id) : undefined,
+          gpus:
+            hasGPU.value && selectionDetails.value?.gpuCards && Array.isArray(selectionDetails.value.gpuCards)
+              ? selectionDetails.value.gpuCards.map(card => card.id)
+              : undefined,
           rentedBy: rentedBy.value,
           certified: certified.value,
         },
@@ -225,13 +220,32 @@ async function deploy() {
         accessNodeId: selectionDetails.value?.domain?.selectedDomain?.nodeId,
       },
     });
+
+    // Ensure proper metadata for OpenWebUI deployments with GPU
+    if (hasGPU.value && vm && vm.length > 0) {
+      vm.forEach(deployment => {
+        deployment.projectName = projectName;
+        deployment.type = "vm";
+        if (!deployment.env) {
+          deployment.env = {};
+        }
+        deployment.env.OPENWEBUI_DOMAIN = domain;
+      });
+    }
   } catch (e) {
     layout.value.setStatus("failed", normalizeError(e, "Failed to deploy an Open WebUI instance."));
+    return;
   }
 
+  // If no domain is needed, handle directly
   if (!selectionDetails.value?.domain?.enableSelectedDomain) {
     vm[0].customDomain = selectionDetails.value!.domain!.customDomain;
-    finalize(vm);
+    layout.value.reloadDeploymentsList();
+    layout.value.setStatus(
+      "success",
+      `Successfully deployed an Open WebUI instance. Please keep in mind that the installation may take a few minutes to finish. If you encounter a "Bad Gateway" message while accessing the webpage, just wait a moment and refresh the page.`,
+    );
+    layout.value.openDialog(vm, deploymentListEnvironments.openwebui);
     return;
   }
 
@@ -245,7 +259,13 @@ async function deploy() {
       network: vm[0].interfaces[0].network,
     });
 
-    finalize(vm);
+    // Direct approach for successful gateway deployment
+    layout.value.reloadDeploymentsList();
+    layout.value.setStatus(
+      "success",
+      `Successfully deployed an Open WebUI instance. Please keep in mind that the installation may take a few minutes to finish. If you encounter a "Bad Gateway" message while accessing the webpage, just wait a moment and refresh the page.`,
+    );
+    layout.value.openDialog(vm, deploymentListEnvironments.openwebui);
   } catch (e) {
     layout.value.setStatus("deploy", "Rollbacking back due to fail to deploy gateway...");
 
