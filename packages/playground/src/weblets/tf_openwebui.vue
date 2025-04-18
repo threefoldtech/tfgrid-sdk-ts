@@ -187,7 +187,7 @@ async function deploy() {
 
     vm = await deployVM(grid!, {
       name: name.value,
-      projectName: projectName, // Explicitly set projectName
+      projectName: projectName,
       machines: [
         {
           name: name.value,
@@ -221,7 +221,6 @@ async function deploy() {
       },
     });
 
-    // Ensure proper metadata for OpenWebUI deployments with GPU
     if (hasGPU.value && vm && vm.length > 0) {
       vm.forEach(deployment => {
         deployment.projectName = projectName;
@@ -237,7 +236,6 @@ async function deploy() {
     return;
   }
 
-  // If no domain is needed, handle directly
   if (!selectionDetails.value?.domain?.enableSelectedDomain) {
     vm[0].customDomain = selectionDetails.value!.domain!.customDomain;
     layout.value.reloadDeploymentsList();
@@ -259,7 +257,6 @@ async function deploy() {
       network: vm[0].interfaces[0].network,
     });
 
-    // Direct approach for successful gateway deployment
     layout.value.reloadDeploymentsList();
     layout.value.setStatus(
       "success",
