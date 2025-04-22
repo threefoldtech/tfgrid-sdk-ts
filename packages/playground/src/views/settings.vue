@@ -296,8 +296,8 @@ export default {
     // This function only resets the input field values to defaults.
     // User still needs to click Update button to apply these changes.
     function ResetTimeoutToDefault() {
-      selectedQueryTimeout.value = 30;
-      selectedDeploymentTimeout.value = 300;
+      selectedQueryTimeout.value = 120;
+      selectedDeploymentTimeout.value = 600;
     }
 
     async function UpdateTimeout() {
