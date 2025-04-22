@@ -1,6 +1,6 @@
 import { ExtrinsicResult } from "@threefold/tfchain_client";
 import { RequestError, ValidationError } from "@threefold/types";
-import { default as AlgoSdk } from "algosdk";
+import { default as AlgoSdk, SuggestedParams } from "algosdk";
 import axios from "axios";
 import * as PATH from "path";
 import urlJoin from "url-join";
@@ -29,7 +29,7 @@ import {
 } from "./models";
 
 class Algorand implements blockchainInterface {
-  baseUrl = "http://node.testnet.algoexplorerapi.io/";
+  baseUrl = "https://testnet-api.algonode.cloud/";
   backendStorage: BackendStorage;
   fileName = "algorand.json";
   tfClient: TFClient;
@@ -125,7 +125,7 @@ class Algorand implements blockchainInterface {
       const account = await AlgoSdk.mnemonicToSecretKey(data[name]);
       accounts.push({
         name: name,
-        public_key: account.addr,
+        public_key: account.addr.toString(),
         blockchain_type: blockchainType.algorand,
       });
     }
@@ -201,7 +201,7 @@ class Algorand implements blockchainInterface {
     await this.save(options.name, account_mnemonic);
     return {
       name: options.name,
-      public_key: account.addr,
+      public_key: account.addr.toString(),
       mnemonic: account_mnemonic,
       blockchain_type: blockchainType.algorand,
     };
@@ -226,7 +226,7 @@ class Algorand implements blockchainInterface {
   async init(options: AlgorandAccountInitModel): Promise<string> {
     const account = await AlgoSdk.mnemonicToSecretKey(options.secret);
     await this.save(options.name, options.secret);
-    return account.addr;
+    return account.addr.toString();
   }
 
   /**
@@ -249,10 +249,10 @@ class Algorand implements blockchainInterface {
   async assets(options: BlockchainGetModel): Promise<BlockchainAssetsModel> {
     const account_mnemonics = await this.get({ name: options.name });
     const account = await AlgoSdk.mnemonicToSecretKey(account_mnemonics.mnemonic);
-    const assets = await this.assetsByAddress({ address: account.addr });
+    const assets = await this.assetsByAddress({ address: account.addr.toString() });
     return {
       name: options.name,
-      public_key: account.addr,
+      public_key: account.addr.toString(),
       blockchain_type: blockchainType.algorand,
       assets: assets ?? [],
     };
@@ -314,7 +314,7 @@ class Algorand implements blockchainInterface {
 
     return {
       name: options.name,
-      public_key: account.addr,
+      public_key: account.addr.toString(),
       mnemonic: mnemonic,
       blockchain_type: blockchainType.algorand,
     };
@@ -384,25 +384,36 @@ class Algorand implements blockchainInterface {
   async createTransaction(options: AlgorandCreateTransactionModel): Promise<AlgoSdk.Transaction> {
     const params_fetched = await axios.get(urlJoin(this.baseUrl, `v2/transactions/params`)).then(res => res.data);
     console.log("transaction params fetched");
-    const request_params = {
-      flatFee: true,
+
+    const genesisHashUint8Array = new Uint8Array(Buffer.from(params_fetched["genesis-hash"], "base64"));
+
+    const request_params: SuggestedParams = {
       fee: 1000,
-      firstRound: params_fetched["last-round"],
-      lastRound: params_fetched["last-round"] + 1000,
+      firstValid: params_fetched["last-round"],
+      lastValid: params_fetched["last-round"] + 1000,
       genesisID: params_fetched["genesis-id"],
-      genesisHash: params_fetched["genesis-hash"],
+      genesisHash: genesisHashUint8Array,
+      minFee: params_fetched["min-fee"],
     };
-    const note = AlgoSdk.encodeObj(options.description as unknown as Record<string | number | symbol, any>);
+
+    let note;
+    if (options.description) {
+      const noteStr = JSON.stringify(options.description);
+      note = new Uint8Array(Buffer.from(noteStr));
+    } else {
+      note = undefined;
+    }
+
     const accountMnemonics = await this.get({ name: options.name });
-    const account = AlgoSdk.mnemonicToSecretKey(accountMnemonics.mnemonic);
-    const txn = AlgoSdk.makePaymentTxnWithSuggestedParams(
-      account.addr,
-      options.address_dest,
-      options.amount,
-      undefined,
-      note,
-      request_params,
-    );
+    const account = AlgoSdk.mnemonicToSecretKey(accountMnemonics.mnemonic!);
+
+    const txn = AlgoSdk.makePaymentTxnWithSuggestedParamsFromObject({
+      sender: account.addr,
+      receiver: options.address_dest,
+      amount: options.amount,
+      note: note,
+      suggestedParams: request_params,
+    });
     console.log("transaction binary built");
 
     return txn;
@@ -424,19 +435,34 @@ class Algorand implements blockchainInterface {
   @expose
   @validateInput
   async pay(options: AlgorandTransferModel): Promise<any> {
-    const txn = await this.createTransaction(options);
-
-    console.log("transaction binary built", txn);
-
-    const signedTxn = await this.sign_txn({ txn: txn, name: options.name });
-
-    console.log("transaction signed");
-
     try {
-      const submitted_txn = await axios.post(urlJoin(this.baseUrl, `v2/transactions`), signedTxn?.blob);
-      return submitted_txn.data;
+      const txn = await this.createTransaction(options);
+      console.log("transaction binary built", txn);
+
+      const accountMnemonicsFromName = await this.get({ name: options.name });
+      if (!accountMnemonicsFromName.mnemonic) {
+        throw new ValidationError(`Could not find mnemonic for account ${options.name}`);
+      }
+      const account = AlgoSdk.mnemonicToSecretKey(accountMnemonicsFromName.mnemonic);
+
+      const signedTxn = AlgoSdk.signTransaction(txn, account.sk);
+      console.log("transaction signed");
+
+      const txnBytes = Buffer.from(signedTxn.blob);
+
+      const response = await axios.post(urlJoin(this.baseUrl, "v2/transactions"), txnBytes, {
+        headers: {
+          "Content-Type": "application/x-binary",
+        },
+        responseType: "json",
+      });
+
+      return response.data;
     } catch (error) {
-      throw new RequestError(error.response.data.message, error.response.status);
+      throw new RequestError(
+        error.response?.data?.message || error.message || "Transaction submission failed",
+        error.response?.status || 400,
+      );
     }
   }
 }
