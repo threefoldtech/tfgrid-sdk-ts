@@ -6,7 +6,6 @@ STELLAR_NETWORK="${STELLAR_NETWORK:=test}"
 TIMEOUT="${TIMEOUT:=10000}"
 PAGE_SIZE="${PAGE_SIZE:=20}"
 MINTING_URL="https://alpha.minting.tfchain.grid.tf"
-MANUAL_URL="${MANUAL_URL:-https://www.manual.grid.tf}"
 ENABLE_TELEMETRY=false
 STELLAR_ENV_Vars=(
     STELLAR_HORIZON_URL
@@ -26,6 +25,7 @@ case $MODE in
         STELLAR_NETWORK="${STELLAR_NETWORK:-test}"
         KYC_URL="${KYC_URL:-https://kyc.dev.grid.tf}"
         SENTRY_DSN="https://b9af6796f176d1f02837a06f0da3caee@dev.sentry.grid.tf/2"
+        MANUAL_URL="${MANUAL_URL:-https://manual.dev.grid.tf}"
     ;;
     "qa")
         GRAPHQL_URL="${GRAPHQL_URL:-"https://graphql.qa.grid.tf/graphql,https://graphql.02.qa.grid.tf/graphql"}"
@@ -38,6 +38,7 @@ case $MODE in
         STELLAR_NETWORK="${STELLAR_NETWORK:-test}"
         KYC_URL="${KYC_URL:-https://kyc.qa.grid.tf}"
         SENTRY_DSN="https://b9af6796f176d1f02837a06f0da3caee@dev.sentry.grid.tf/2"
+        MANUAL_URL="${MANUAL_URL:-https://manual.grid.tf}"
     ;;
     "test")
         GRAPHQL_URL="${GRAPHQL_URL:-"https://graphql.test.grid.tf/graphql,https://graphql.02.test.grid.tf/graphql"}"
@@ -50,6 +51,7 @@ case $MODE in
         STELLAR_NETWORK="${STELLAR_NETWORK:-main}"
         KYC_URL="${KYC_URL:-https://kyc.test.grid.tf}"
         SENTRY_DSN="https://b9af6796f176d1f02837a06f0da3caee@dev.sentry.grid.tf/2"
+        MANUAL_URL="${MANUAL_URL:-https://manual.grid.tf}"
     ;;
     "main")
         GRAPHQL_URL="${GRAPHQL_URL:-"https://graphql.grid.tf/graphql,https://graphql.02.grid.tf/graphql"}"
@@ -62,6 +64,7 @@ case $MODE in
         STELLAR_NETWORK="${STELLAR_NETWORK:-main}"
         KYC_URL="${KYC_URL:-https://kyc.grid.tf}"
         SENTRY_DSN="https://598bcc658bd99042ab429166035f8278@sentry.grid.tf/2"
+        MANUAL_URL="${MANUAL_URL:-https://manual.grid.tf}"
     ;;
     *)
         echo "Unknown 'MODE' selected! Acceptable modes are [dev | qa | test | main ]"
