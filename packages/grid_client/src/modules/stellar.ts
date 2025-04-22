@@ -1,9 +1,9 @@
+import { default as StellarSdk } from "@stellar/stellar-sdk";
 import { ExtrinsicResult } from "@threefold/tfchain_client";
 import { GridClientError, RequestError, ValidationError } from "@threefold/types";
 import axios, { AxiosError } from "axios";
 import { Buffer } from "buffer";
 import * as PATH from "path";
-import { default as StellarSdk } from "stellar-sdk";
 
 import { TFClient } from "../clients/tf-grid/client";
 import { GridClientConfig } from "../config";
@@ -27,7 +27,7 @@ import {
 } from ".";
 import blockchainInterface, { blockchainType } from "./blockchainInterface";
 
-const server = new StellarSdk.Server("https://horizon-testnet.stellar.org");
+const server = new StellarSdk.Horizon.Server("https://horizon-testnet.stellar.org");
 
 class Stellar implements blockchainInterface {
   fileName = "stellar.json";
