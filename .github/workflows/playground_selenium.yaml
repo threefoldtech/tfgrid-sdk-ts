@@ -2,38 +2,69 @@ name: Playground Selenium Tests
 
 on:
   workflow_dispatch:
+    inputs:
+      network:
+        description: "Select the target environment for Selenium tests"
+        required: true
+        type: choice
+        default: "dev"
+        options:
+          - "local"
+          - "dev"
+          - "qa"
+          - "test"
+          - "main"
   schedule:
     - cron: "0 6 * * *"
 
 jobs:
   selenium-run:
     runs-on: ubuntu-latest
+    env:
+      NETWORK: ${{ github.event.inputs.network }}
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Setting up Python
+
+      - name: Set up Python 3.10
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
-      - name: Installing all necessary packages
-        run: pip install -r  packages/playground/tests/frontend_selenium/requirements.txt
-      - name: Node install
+
+      - name: Install Python dependencies
+        run: |
+          pip install -r packages/playground/tests/frontend_selenium/requirements.txt
+          pip install pytest-html
+
+      - name: Set up Node.js 18
         uses: actions/setup-node@v4
         with:
           node-version: 18
-      - name: Yarn install
-        run: yarn install
-      - name: Lerna Build
-        run: yarn lerna run build
-      - name: Yarn Serve
+
+      - name: Install JS dependencies & build
+        run: |
+          yarn install
+          yarn lerna run build
+
+      - name: Start playground server
         run: make run project=playground &
-      - name: Wait for localhost
+
+      - name: Wait for server to be ready
         run: sleep 60
-      - name: Run tests
+
+      - name: Run Selenium tests
         working-directory: ./packages/playground/tests/frontend_selenium
         env:
           TFCHAIN_MNEMONICS: ${{ secrets.TFCHAIN_MNEMONICS }}
           TFCHAIN_NODE_MNEMONICS: ${{ secrets.TFCHAIN_NODE_MNEMONICS }}
           STELLAR_ADDRESS: ${{ secrets.STELLAR_ADDRESS }}
           EMAIL: ${{ secrets.EMAIL }}
-        run: python -m pytest -v
+          NETWORK: ${{ env.NETWORK }}
+        run: |
+          python -m pytest -v --html=report.html
+
+      - name: Upload HTML report
+        uses: actions/upload-artifact@v3
+        with:
+          name: selenium-report-${{ env.NETWORK }}
+          path: packages/playground/tests/frontend_selenium/report.html
