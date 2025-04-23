@@ -56,7 +56,7 @@
                 ]"
                 return-object
               >
-                <template #append-item v-if="pagination.page !== -1">
+                <template #append-item v-if="pagination.page !== -1 && loadedDomains.length === size">
                   <VContainer>
                     <VBtn
                       @click="loadDomains"
@@ -104,14 +104,11 @@
 <script lang="ts">
 import { type FarmInfo, Features, type FilterOptions, type NodeInfo } from "@threefold/grid_client";
 import { noop } from "lodash";
-import { computed, getCurrentInstance, nextTick, onUnmounted, type PropType, ref, watch } from "vue";
-import { onMounted } from "vue";
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import type { VInput } from "vuetify/components/VInput";
+import { computed, getCurrentInstance, nextTick, onMounted, onUnmounted, type PropType, ref, watch } from "vue";
 
 import { type InputValidatorService, useInputRef } from "@/hooks/input_validator";
 
-import { useAsync, usePagination, useWatchDeep } from "../../hooks";
+import { useAsync, usePagination } from "../../hooks";
 import { useForm, useFormRef, ValidatorStatus } from "../../hooks/form_validator";
 import { useGrid } from "../../stores";
 import type { DomainInfo, NetworkFeatures, SelectionDetailsFilters } from "../../types/nodeSelector";
@@ -157,9 +154,11 @@ export default {
     const pagination = usePagination();
 
     const enableCustomDomain = ref(false);
+    const size = ref(window.env.PAGE_SIZE);
+    const initialized = ref(false);
     const filters = computed<FilterOptions>(() => ({
       gateway: true,
-      size: window.env.PAGE_SIZE,
+      size: size.value,
       page: Math.max(1, pagination.value.page),
       farmId: enableCustomDomain.value ? props.farm?.farmId : undefined,
       availableFor: gridStore.client?.twinId,
@@ -182,35 +181,42 @@ export default {
       loadedDomains.value = [];
       return loadDomains();
     };
-    let previousFilters = JSON.stringify(filters.value);
-    useWatchDeep(
-      filters,
-      newFilters => {
-        const currentFilters = JSON.stringify(newFilters);
-        if (currentFilters !== previousFilters) {
-          reloadDomains();
-          previousFilters = currentFilters;
-        }
+
+    watch(
+      [() => props.farm?.farmId, () => gridStore.client?.twinId, () => props.interfaces],
+      () => {
+        if (!initialized.value) return;
+        loadDomains();
       },
-      { immediate: true, deep: true, ignoreFields: ["page"] },
+      { deep: true },
     );
+
+    onMounted(() => {
+      initialized.value = true;
+      loadDomains();
+    });
+
     const customDomain = ref("");
     const domainFormRef = useFormRef();
 
     const disableSelectedDomain = computed(() => enableCustomDomain.value && props.filters.ipv4 === true);
     const useFQDN = computed(() => enableCustomDomain.value && (props.useFqdn || props.filters.ipv4 === false));
 
-    const domain = computed<DomainInfo>(() => {
-      return {
-        selectedDomain: disableSelectedDomain.value ? null : selectedDomain.value,
-        enableSelectedDomain: !disableSelectedDomain.value,
-        enabledCustomDomain: enableCustomDomain.value,
-        customDomain: enableCustomDomain.value ? customDomain.value : "",
-        useFQDN: useFQDN.value,
-      };
-    });
+    const domain = computed<DomainInfo>(() => ({
+      selectedDomain: disableSelectedDomain.value ? null : selectedDomain.value,
+      enableSelectedDomain: !disableSelectedDomain.value,
+      enabledCustomDomain: enableCustomDomain.value,
+      customDomain: enableCustomDomain.value ? customDomain.value : "",
+      useFQDN: useFQDN.value,
+    }));
 
-    useWatchDeep(domain, bindModelValue, { immediate: true, deep: true });
+    watch(
+      domain,
+      newDomain => {
+        bindModelValue(newDomain);
+      },
+      { immediate: true },
+    );
 
     onUnmounted(() => {
       bindModelValue();
@@ -278,6 +284,7 @@ export default {
       selectedDomain,
       loadDomains,
       reloadDomains,
+      size,
 
       domainFormRef,
       domainInput,
