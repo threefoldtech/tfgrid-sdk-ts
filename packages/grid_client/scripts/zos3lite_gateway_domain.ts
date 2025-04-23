@@ -6,14 +6,39 @@ async function deployVM(client: GridClient, vms: MachinesModel) {
   const res = await client.machines.deploy(vms);
   log("================= Deploying VM =================");
   log(res);
-  return res;
+  log("================= Deploying VM =================");
 }
 
 async function deployGateway(client: GridClient, gw: GatewayNameModel) {
   const res = await client.gateway.deploy_name(gw);
   log("================= Deploying Gateway =================");
   log(res);
-  return res;
+  log("================= Deploying Gateway =================");
+}
+
+async function getDeployment(client: GridClient, name: string) {
+  const res = await client.machines.getObj(name);
+  log("================= Getting VM Deployment =================");
+  log(res);
+  log("================= Getting VM Deployment =================");
+
+  const resGW = await client.gateway.getObj(name);
+  log("================= Getting Gateway Deployment =================");
+  log(resGW);
+  log(`https://${resGW[0].domain}`);
+  log("================= Getting Gateway Deployment =================");
+}
+
+async function cancel(client: GridClient, name: string, subdomain: string) {
+  const resVM = await client.machines.delete({ name });
+  log("================= Canceling VM Deployment =================");
+  log(resVM);
+  log("================= Canceling VM Deployment =================");
+
+  const resGW = await client.gateway.delete_name({ name: subdomain });
+  log("================= Canceling Gateway Deployment =================");
+  log(resGW);
+  log("================= Canceling Gateway Deployment =================");
 }
 
 async function main() {
@@ -43,7 +68,7 @@ async function main() {
     machines: [
       {
         name: "testvm11",
-        node_id: nodeId!,
+        node_id: nodeId,
         disks: [{ name: "newDisk11", size: 5, mountpoint: "/newDisk1" }],
         public_ip: false,
         public_ip6: false,
@@ -61,54 +86,38 @@ async function main() {
     description: "ZOS3 Lite VM for gateway test",
   };
 
-  // Deploy the VM
-  const vmResult = await deployVM(grid3, vms);
+  //Deploy VM
+  await deployVM(grid3, vms);
 
-  // Extract the deployed VM's Mycelium IP
   const vm = (await grid3.machines.getObj(vms.name))[0];
-  const vmIP = vm.interfaces[0].ip;
+  const vmIP = vm.myceliumIP;
 
   const gatewayOptions: FilterOptions = {
     gateway: true,
+    features: [Features.mycelium],
     availableFor: grid3.twinId,
   };
 
-  const gatewayNodes = await grid3.capacity.filterNodes(gatewayOptions);
-  const gatewayNodeId = await pingNodes(grid3, gatewayNodes);
-  const gatewayNode = gatewayNodes.find(n => n.nodeId === gatewayNodeId);
+  const gatewayNode = { nodeId };
 
-  const gateway: GatewayNameModel = {
+  const gw: GatewayNameModel = {
     name: subdomain,
-    network: vm.interfaces[0].network,
+    network: vmIP,
     node_id: gatewayNode!.nodeId,
     tls_passthrough: false,
-    backends: [`http://${vmIP}:80`], // change port if different inside container
+    backends: [`http://[${vmIP}]:80`],
   };
 
-  // Deploy the Gateway
-  const gwRes = await deployGateway(grid3, gateway);
+  //Deploy gateway
+  await deployGateway(grid3, gw);
 
-  // Ping the domain
-  const domainURL = `https://${gwRes[0].domain}`;
-  log(`Trying to ping domain: ${domainURL}`);
+  //Get the deployment
+  await getDeployment(grid3, vms.name);
 
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 5000);
+  //Uncomment the line below to cancel the deployment
+  // await cancel(grid3, vms.name, subdomain);
 
-  try {
-    const res = await fetch(domainURL, {
-      method: "GET",
-      signal: controller.signal,
-    });
-    clearTimeout(timeout);
-    if (!res.ok) throw new Error(`Unexpected status: ${res.status}`);
-    log(`✅ Domain is reachable: ${domainURL}`);
-  } catch (e) {
-    log(`❌ Failed to ping domain: ${e.message}`);
-    throw e;
-  }
-
-  await grid3.disconnect();
+  grid3.disconnect();
 }
 
 main();
