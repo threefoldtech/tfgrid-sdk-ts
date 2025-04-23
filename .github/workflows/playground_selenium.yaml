@@ -3,17 +3,21 @@ name: Playground Selenium Tests
 on:
   workflow_dispatch:
     inputs:
+      branch:
+        description: "Select which Git branch to run against"
+        required: true
+        default: "development"
       network:
-        description: "Select the target environment for Selenium tests"
+        description: "Select the target environment"
         required: true
         type: choice
         default: "dev"
         options:
-          - "local"
-          - "dev"
-          - "qa"
-          - "test"
-          - "main"
+          - local
+          - dev
+          - qa
+          - test
+          - main
   schedule:
     - cron: "0 6 * * *"
 
@@ -22,9 +26,12 @@ jobs:
     runs-on: ubuntu-latest
     env:
       NETWORK: ${{ github.event.inputs.network }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch }}
 
       - name: Set up Python 3.10
         uses: actions/setup-python@v5
@@ -39,9 +46,10 @@ jobs:
       - name: Set up Node.js 18
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: "18"
 
       - name: Install JS dependencies & build
+        if: ${{ github.event.inputs.network == 'local' }}
         run: |
           yarn install
           yarn lerna run build
