@@ -106,6 +106,7 @@
 </template>
 
 <script lang="ts" setup>
+import { APP_FLISTS } from "@threefold/common";
 import { calculateRootFileSystem, type GridClient } from "@threefold/grid_client";
 import { computed, type Ref, ref } from "vue";
 
@@ -128,10 +129,7 @@ const name = ref(generateName({ prefix: "ss" }));
 const endpoint = ref("");
 const { ipv4, ipv6, planetary, mycelium, wireguard } = useNetworks();
 const solution = ref() as Ref<SolutionFlavor>;
-const flist: Flist = {
-  value: "https://hub.grid.tf/tf-official-apps/subsquid-latest.flist",
-  entryPoint: "/sbin/zinit init",
-};
+const flist: Flist = APP_FLISTS.SUBSQUID;
 const dedicated = ref(false);
 const rentedByMe = ref(false);
 const rentedBy = computed(() => (rentedByMe.value ? grid.twinId : undefined));

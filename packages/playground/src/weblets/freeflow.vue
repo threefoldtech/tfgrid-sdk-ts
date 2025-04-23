@@ -28,7 +28,7 @@
         <input-tooltip
           tooltip="
           To locate your 3Bot name, please follow these steps:
-          
+
           1. Open the ThreeFold Connect app on your device.
           2. Access the app's settings section.
           3. Within the settings, you will find your registered 3Bot name.
@@ -98,6 +98,7 @@
 </template>
 
 <script lang="ts" setup>
+import { APP_FLISTS } from "@threefold/common";
 import { calculateRootFileSystem, type GridClient } from "@threefold/grid_client";
 import { computed, onMounted, type Ref, ref } from "vue";
 
@@ -138,10 +139,7 @@ onMounted(() => {
     mountPoint: "/disk",
   });
 
-  flist.value = {
-    value: "https://hub.grid.tf/lennertapp2.3bot/threefoldjimber-freeflow-latest.flist",
-    entryPoint: "/sbin/zinit init",
-  };
+  flist.value = APP_FLISTS.FREEFLOW;
 });
 
 function finalize(deployment: any) {

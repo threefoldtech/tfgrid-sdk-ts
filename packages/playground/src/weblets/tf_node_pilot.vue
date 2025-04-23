@@ -91,6 +91,7 @@
 </template>
 
 <script lang="ts" setup>
+import { APP_FLISTS } from "@threefold/common";
 import { computed, type Ref, ref } from "vue";
 
 import { manual } from "@/utils/manual";
@@ -106,10 +107,7 @@ const name = ref(generateName({ prefix: "np" }));
 const selectionDetails = ref<SelectionDetails>();
 
 const solution = ref() as Ref<SolutionFlavor>;
-const flist: Flist = {
-  value: "https://hub.grid.tf/tf-official-vms/node-pilot-zdbfs.flist",
-  entryPoint: "/",
-};
+const flist: Flist = APP_FLISTS.NODE_PILOT;
 const { ipv4, ipv6, planetary, mycelium, wireguard } = useNetworks({ ipv4: true, ipv6: true });
 const dedicated = ref(false);
 const rentedByMe = ref(false);

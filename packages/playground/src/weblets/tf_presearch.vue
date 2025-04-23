@@ -125,6 +125,7 @@
 </template>
 
 <script lang="ts" setup>
+import { APP_FLISTS } from "@threefold/common";
 import { computed, ref } from "vue";
 
 import { manual } from "@/utils/manual";
@@ -148,10 +149,7 @@ const rootFilesystemSize = calculateRootFileSystem({ CPUCores: cpu, RAMInMegaByt
 const dockerDiskSize = 10;
 const privateRestoreKey = ref("");
 const publicRestoreKey = ref("");
-const flist: Flist = {
-  value: "https://hub.grid.tf/tf-official-apps/presearch-v2.3.flist",
-  entryPoint: "/sbin/zinit init",
-};
+const flist: Flist = APP_FLISTS.PRESEARCH;
 const dedicated = ref(false);
 const rentedByMe = ref(false);
 const rentedBy = computed(() => (rentedByMe.value ? grid.twinId : undefined));

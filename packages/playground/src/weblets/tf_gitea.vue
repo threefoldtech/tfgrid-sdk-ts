@@ -104,6 +104,7 @@
 </template>
 
 <script lang="ts" setup>
+import { APP_FLISTS } from "@threefold/common";
 import { computed, type Ref, ref, watch } from "vue";
 
 import { manual } from "@/utils/manual";
@@ -172,8 +173,8 @@ async function deploy() {
           name: name.value,
           cpu: solution.value.cpu,
           memory: solution.value.memory,
-          flist: "https://hub.grid.tf/tf-official-apps/gitea-mycelium.flist",
-          entryPoint: "/sbin/zinit init",
+          flist: APP_FLISTS.GITEA.value,
+          entryPoint: APP_FLISTS.GITEA.entryPoint,
           disks: disks.value,
           envs: [
             {

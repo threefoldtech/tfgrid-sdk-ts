@@ -141,6 +141,7 @@
 </template>
 
 <script lang="ts" setup>
+import { APP_FLISTS } from "@threefold/common";
 import { calculateRootFileSystem, type GridClient } from "@threefold/grid_client";
 import { computed, type Ref, ref, watch } from "vue";
 
@@ -164,10 +165,7 @@ const name = ref(generateName({ prefix: "oc" }));
 const username = ref("admin");
 const password = ref(generatePassword());
 const solution = ref() as Ref<SolutionFlavor>;
-const flist: Flist = {
-  value: "https://hub.grid.tf/tf-official-apps/owncloud-10.9.1.flist",
-  entryPoint: "/sbin/zinit init",
-};
+const flist: Flist = APP_FLISTS.OWNCLOUD;
 const dedicated = ref(false);
 const rentedByMe = ref(false);
 const rentedBy = computed(() => (rentedByMe.value ? grid.twinId : undefined));

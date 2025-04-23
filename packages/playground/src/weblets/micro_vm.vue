@@ -192,6 +192,7 @@
 </template>
 
 <script lang="ts" setup>
+import { VM_IMAGES } from "@threefold/common";
 import { computed, type Ref, ref, watch } from "vue";
 
 import { manual } from "@/utils/manual";
@@ -210,43 +211,43 @@ const tabs = ref();
 const images = [
   {
     name: "Ubuntu-24.04",
-    flist: "https://hub.grid.tf/tf-official-vms/ubuntu-24.04-latest.flist",
-    entryPoint: "/sbin/zinit init",
+    flist: VM_IMAGES.UBUNTU_24_04_MICRO.value,
+    entryPoint: VM_IMAGES.UBUNTU_24_04_MICRO.entryPoint,
   },
   {
     name: "Ubuntu-23.10",
-    flist: "https://hub.grid.tf/tf-official-vms/ubuntu-23.10-mycelium.flist",
-    entryPoint: "/sbin/zinit init",
+    flist: VM_IMAGES.UBUNTU_23_10_MICRO.value,
+    entryPoint: VM_IMAGES.UBUNTU_23_10_MICRO.entryPoint,
   },
   {
     name: "Ubuntu-22.04",
-    flist: "https://hub.grid.tf/tf-official-apps/threefoldtech-ubuntu-22.04.flist",
-    entryPoint: "/sbin/zinit init",
+    flist: VM_IMAGES.UBUNTU_22_04_MICRO.value,
+    entryPoint: VM_IMAGES.UBUNTU_22_04_MICRO.entryPoint,
   },
   {
     name: "Arch",
-    flist: "https://hub.grid.tf/tf-official-vms/arch-mycelium.flist",
-    entryPoint: "/sbin/zinit init",
+    flist: VM_IMAGES.ARCH_MICRO.value,
+    entryPoint: VM_IMAGES.ARCH_MICRO.entryPoint,
   },
   {
     name: "Debian-12",
-    flist: "https://hub.grid.tf/tf-official-apps/threefoldtech-debian-12.flist",
-    entryPoint: "/sbin/zinit init",
+    flist: VM_IMAGES.DEBIAN_12_MICRO.value,
+    entryPoint: VM_IMAGES.DEBIAN_12_MICRO.entryPoint,
   },
   {
     name: "Alpine-3",
-    flist: "https://hub.grid.tf/tf-official-apps/threefoldtech-alpine-3.flist",
-    entryPoint: "/entrypoint.sh",
+    flist: VM_IMAGES.ALPINE_3_MICRO.value,
+    entryPoint: VM_IMAGES.ALPINE_3_MICRO.entryPoint,
   },
   {
     name: "CentOS-8",
-    flist: "https://hub.grid.tf/tf-official-apps/threefoldtech-centos-8.flist",
-    entryPoint: "/entrypoint.sh",
+    flist: VM_IMAGES.CENTOS_8_MICRO.value,
+    entryPoint: VM_IMAGES.CENTOS_8_MICRO.entryPoint,
   },
   {
     name: "Nixos",
-    flist: "https://hub.grid.tf/tf-official-vms/nixos-micro-latest.flist",
-    entryPoint: "/entrypoint.sh",
+    flist: VM_IMAGES.NIXOS_MICRO.value,
+    entryPoint: VM_IMAGES.NIXOS_MICRO.entryPoint,
   },
 ];
 

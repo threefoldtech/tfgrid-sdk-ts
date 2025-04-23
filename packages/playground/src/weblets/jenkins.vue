@@ -124,6 +124,7 @@
 </template>
 
 <script lang="ts" setup>
+import { APP_FLISTS } from "@threefold/common";
 import { calculateRootFileSystem, type GridClient } from "@threefold/grid_client";
 import { computed, type Ref, ref } from "vue";
 
@@ -148,10 +149,7 @@ const solution = ref() as Ref<SolutionFlavor>;
 const rootFilesystemSize = computed(() =>
   calculateRootFileSystem({ CPUCores: solution.value?.cpu ?? 0, RAMInMegaBytes: solution.value?.memory ?? 0 }),
 );
-const flist: Flist = {
-  value: "https://hub.grid.tf/tf-official-apps/jenkins-latest.flist",
-  entryPoint: "/sbin/zinit init",
-};
+const flist: Flist = APP_FLISTS.JENKINS;
 const dedicated = ref(false);
 const rentedByMe = ref(false);
 const rentedBy = computed(() => (rentedByMe.value ? grid.twinId : undefined));

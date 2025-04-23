@@ -93,6 +93,7 @@
 </template>
 
 <script lang="ts" setup>
+import { APP_FLISTS } from "@threefold/common";
 import { calculateRootFileSystem, type GridClient } from "@threefold/grid_client";
 import { computed, type Ref, ref } from "vue";
 
@@ -112,10 +113,7 @@ const profileManager = useProfileManager();
 const { ipv4, ipv6, mycelium, planetary, wireguard } = useNetworks();
 const name = ref(generateName({ prefix: "jt" }));
 const solution = ref() as Ref<SolutionFlavor>;
-const flist: Flist = {
-  value: "https://hub.grid.tf/tf-official-apps/jitsi-latest.flist",
-  entryPoint: "/sbin/zinit init",
-};
+const flist: Flist = APP_FLISTS.JITSI;
 const dedicated = ref(false);
 const rentedByMe = ref(false);
 const rentedBy = computed(() => (rentedByMe.value ? grid.twinId : undefined));

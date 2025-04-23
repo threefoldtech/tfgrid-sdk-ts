@@ -102,6 +102,7 @@
 </template>
 
 <script lang="ts" setup>
+import { APP_FLISTS } from "@threefold/common";
 import { calculateRootFileSystem, type GridClient } from "@threefold/grid_client";
 import { computed, type Ref, ref, watch } from "vue";
 
@@ -122,10 +123,7 @@ const selectionDetails = ref<SelectionDetails>();
 
 const name = ref(generateName({ prefix: "mm" }));
 const solution = ref() as Ref<SolutionFlavor>;
-const flist: Flist = {
-  value: "https://hub.grid.tf/tf-official-apps/mattermost-latest.flist",
-  entryPoint: "/sbin/zinit init",
-};
+const flist: Flist = APP_FLISTS.MATTERMOST;
 const dedicated = ref(false);
 const rentedByMe = ref(false);
 const rentedBy = computed(() => (rentedByMe.value ? grid.twinId : undefined));

@@ -1,3 +1,5 @@
+import { APP_FLISTS } from "@threefold/common";
+
 import { events } from "../helpers/events";
 import { VMHL } from "../high_level//machine";
 import { MyceliumNetworkModel, QSFSDiskModel } from "../modules/models";
@@ -6,8 +8,6 @@ import { ZNetworkLight } from "../primitives/networklight";
 import { Deployment } from "../zos/deployment";
 import { WorkloadTypes } from "../zos/workload";
 import { HighLevelBase } from "./base";
-
-const Flist = "https://hub.grid.tf/tf-official-apps/threefolddev-k3s-v1.31.0.flist";
 
 class KubernetesHL extends HighLevelBase {
   async add_master(
@@ -58,7 +58,7 @@ class KubernetesHL extends HighLevelBase {
     return await machine.create(
       name,
       nodeId,
-      Flist,
+      APP_FLISTS.KUBERNETES.value,
       cpu,
       memory,
       rootfs_size,
@@ -137,7 +137,7 @@ class KubernetesHL extends HighLevelBase {
     return await machine.create(
       name,
       nodeId,
-      masterFlist ? masterFlist : Flist,
+      masterFlist ? masterFlist : APP_FLISTS.KUBERNETES.value,
       cpu,
       memory,
       rootfs_size,

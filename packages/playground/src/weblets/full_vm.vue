@@ -109,8 +109,8 @@
             :value="disks[index].name"
             :rules="[
               validators.required('Disk name is required.'),
-              (name: string) => validators.isAlpha('Name must start with an alphabetical character.')(name[0]), 
-              validators.minLength('Disk name minimum length is 2 characters.', 2), 
+              (name: string) => validators.isAlpha('Name must start with an alphabetical character.')(name[0]),
+              validators.minLength('Disk name minimum length is 2 characters.', 2),
               validators.isAlphanumeric('Disk name only accepts alphanumeric characters.'),
               validators.maxLength('Disk name maximum length is 35 characters.', 35),
             ]"
@@ -150,6 +150,7 @@
 </template>
 
 <script lang="ts" setup>
+import { VM_IMAGES } from "@threefold/common";
 import { computed, type Ref, ref, watch } from "vue";
 
 import { manual } from "@/utils/manual";
@@ -171,28 +172,28 @@ const solution = ref() as Ref<SolutionFlavor>;
 const images: VmImage[] = [
   {
     name: "Ubuntu-24.04",
-    flist: "https://hub.grid.tf/tf-official-vms/ubuntu-24.04-full.flist",
-    entryPoint: "",
+    flist: VM_IMAGES.UBUNTU_24_04_FULL.value,
+    entryPoint: VM_IMAGES.UBUNTU_24_04_FULL.entryPoint,
   },
   {
     name: "Ubuntu-22.04",
-    flist: "https://hub.grid.tf/tf-official-vms/ubuntu-22.04.flist",
-    entryPoint: "/init.sh",
+    flist: VM_IMAGES.UBUNTU_22_04_FULL.value,
+    entryPoint: VM_IMAGES.UBUNTU_22_04_FULL.entryPoint,
   },
   {
     name: "Ubuntu-20.04",
-    flist: "https://hub.grid.tf/tf-official-vms/ubuntu-20.04-lts.flist",
-    entryPoint: "/init.sh",
+    flist: VM_IMAGES.UBUNTU_20_04_FULL.value,
+    entryPoint: VM_IMAGES.UBUNTU_20_04_FULL.entryPoint,
   },
   {
     name: "Ubuntu-18.04",
-    flist: "https://hub.grid.tf/tf-official-vms/ubuntu-18.04-lts.flist",
-    entryPoint: "/init.sh",
+    flist: VM_IMAGES.UBUNTU_18_04_FULL.value,
+    entryPoint: VM_IMAGES.UBUNTU_18_04_FULL.entryPoint,
   },
   {
     name: "Nixos-22.11",
-    flist: "https://hub.grid.tf/tf-official-vms/nixos-22.11.flist",
-    entryPoint: "/init.sh",
+    flist: VM_IMAGES.NIXOS_22_11_FULL.value,
+    entryPoint: VM_IMAGES.NIXOS_22_11_FULL.entryPoint,
   },
 ];
 

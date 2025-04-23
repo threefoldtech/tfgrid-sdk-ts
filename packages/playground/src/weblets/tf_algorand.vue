@@ -122,6 +122,7 @@
 </template>
 
 <script lang="ts" setup>
+import { APP_FLISTS } from "@threefold/common";
 import { computed, type Ref, ref, watch } from "vue";
 
 import { manual } from "@/utils/manual";
@@ -134,10 +135,7 @@ import { generateName } from "../utils/strings";
 
 const layout = useLayout();
 const lastRoundInput = ref();
-const flist: Flist = {
-  value: "https://hub.grid.tf/tf-official-apps/algorand-latest.flist",
-  entryPoint: "/sbin/zinit init",
-};
+const flist: Flist = APP_FLISTS.ALGORAND;
 const name = ref(generateName({ prefix: "al" }));
 const { ipv4, ipv6, planetary, mycelium, wireguard } = useNetworks();
 const cpu = ref() as Ref<number>;

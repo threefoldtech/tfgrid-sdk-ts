@@ -1,3 +1,5 @@
+import { VM_IMAGES } from "@threefold/common";
+
 import {
   FarmFilterOptions,
   FilterOptions,
@@ -123,8 +125,8 @@ async function main() {
       vm.cpu = cru;
       vm.memory = mru;
       vm.rootfs_size = rootFs;
-      vm.flist = "https://hub.grid.tf/tf-official-apps/base:latest.flist";
-      vm.entrypoint = "/sbin/zinit init";
+      vm.flist = VM_IMAGES.BASE.value;
+      vm.entrypoint = VM_IMAGES.BASE.entryPoint;
       vm.env = {
         SSH_KEY: config.ssh_key,
       };

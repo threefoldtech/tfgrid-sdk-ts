@@ -1,3 +1,5 @@
+import { VM_IMAGES } from "@threefold/common";
+
 import { FilterOptions, MachinesModel, QSFSZDBSModel } from "../src";
 import { config, getClient } from "./client_loader";
 import { log } from "./utils";
@@ -114,8 +116,8 @@ async function main() {
         cpu: 1,
         memory: 1024,
         rootfs_size: 0,
-        flist: "https://hub.grid.tf/tf-official-apps/base:latest.flist",
-        entrypoint: "/sbin/zinit init",
+        flist: VM_IMAGES.BASE.value,
+        entrypoint: VM_IMAGES.BASE.entryPoint,
         env: {
           SSH_KEY: config.ssh_key,
         },

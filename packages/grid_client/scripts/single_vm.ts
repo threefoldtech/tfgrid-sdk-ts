@@ -1,3 +1,5 @@
+import { VM_IMAGES } from "@threefold/common";
+
 import { GridClient, MachinesModel } from "../src";
 import { type ZmachineData } from "../src/helpers/types";
 import { config, getClient } from "./client_loader";
@@ -53,8 +55,8 @@ async function main() {
         cpu: 1,
         memory: 1024 * 2,
         rootfs_size: 0,
-        flist: "https://hub.grid.tf/tf-official-apps/base:latest.flist",
-        entrypoint: "/sbin/zinit init",
+        flist: VM_IMAGES.BASE.value,
+        entrypoint: VM_IMAGES.BASE.entryPoint,
         env: {
           SSH_KEY: config.ssh_key,
         },

@@ -145,6 +145,7 @@
 </template>
 
 <script lang="ts" setup>
+import { APP_FLISTS } from "@threefold/common";
 import { calculateRootFileSystem, type GridClient } from "@threefold/grid_client";
 import { computed, type Ref, ref } from "vue";
 
@@ -169,10 +170,8 @@ const username = ref("admin");
 const email = ref(profileManager.profile?.email || "");
 const password = ref(generatePassword());
 const solution = ref() as Ref<SolutionFlavor>;
-const flist: Flist = {
-  value: "https://hub.grid.tf/tf-official-apps/tf-wordpress-latest.flist",
-  entryPoint: "/sbin/zinit init",
-};
+// Using the centralized flist registry
+const flist: Flist = APP_FLISTS.WORDPRESS;
 const dedicated = ref(false);
 const rentedByMe = ref(false);
 const rentedBy = computed(() => (rentedByMe.value ? grid.twinId : undefined));

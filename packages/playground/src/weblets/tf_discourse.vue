@@ -121,6 +121,7 @@
 </template>
 
 <script lang="ts" setup>
+import { APP_FLISTS } from "@threefold/common";
 import { calculateRootFileSystem, type GridClient } from "@threefold/grid_client";
 import { Buffer } from "buffer";
 import TweetNACL from "tweetnacl";
@@ -153,10 +154,7 @@ const certified = ref(false);
 const rootFilesystemSize = computed(() =>
   calculateRootFileSystem({ CPUCores: solution.value?.cpu ?? 0, RAMInMegaBytes: solution.value?.memory ?? 0 }),
 );
-const flist: Flist = {
-  value: "https://hub.grid.tf/tf-official-apps/forum-docker-v3.1.2.flist",
-  entryPoint: "/sbin/zinit init",
-};
+const flist: Flist = APP_FLISTS.DISCOURSE;
 const selectedSSHKeys = ref("");
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
