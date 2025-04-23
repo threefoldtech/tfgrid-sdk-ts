@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Features, FilterOptions, generateRandomHexSeed, GridClient, MachinesDeleteModel, MachinesModel } from "../src";
 import { config, getClient } from "./client_loader";
 import { log, pingNodes } from "./utils";
@@ -16,6 +17,7 @@ async function getDeployment(client, vms) {
   log("================= Getting deployment information =================");
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function cancel(client, vms) {
   const resultVM = await client.machines.delete(vms);
   log("================= Canceling the deployment =================");

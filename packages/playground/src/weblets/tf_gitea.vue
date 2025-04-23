@@ -104,8 +104,8 @@
 </template>
 
 <script lang="ts" setup>
-import { APP_FLISTS } from "@threefold/common";
-import { computed, type Ref, ref, watch } from "vue";
+import { APP_FLISTS, type GridClient } from "@threefold/grid_client";
+import { computed, type Ref, ref } from "vue";
 
 import { manual } from "@/utils/manual";
 
@@ -238,7 +238,7 @@ function updateSSHkeyEnv(selectedKeys: string) {
 </script>
 
 <script lang="ts">
-import type { GridClient, VM } from "@threefold/grid_client";
+import type { VM } from "@threefold/grid_client";
 
 import SmtpServer, { createSMTPServer } from "../components/smtp_server.vue";
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";

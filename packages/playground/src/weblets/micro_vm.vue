@@ -192,7 +192,7 @@
 </template>
 
 <script lang="ts" setup>
-import { VM_IMAGES } from "@threefold/common";
+import { type GridClient, VM_IMAGES } from "@threefold/grid_client";
 import { computed, type Ref, ref, watch } from "vue";
 
 import { manual } from "@/utils/manual";
@@ -335,10 +335,7 @@ function updateSSHkeyEnv(selectedKeys: string) {
 
 watch(selectedSSHKeys, layoutMount, { deep: true });
 </script>
-
 <script lang="ts">
-import type { GridClient } from "@threefold/grid_client";
-
 import ExpandableLayout from "../components/expandable_layout.vue";
 import SelectVmImage from "../components/select_vm_image.vue";
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";

@@ -1,5 +1,4 @@
-import { APP_FLISTS } from "@threefold/common";
-
+import { APP_FLISTS } from "../constants/flist-registry";
 import { events } from "../helpers/events";
 import { VMHL } from "../high_level//machine";
 import { MyceliumNetworkModel, QSFSDiskModel } from "../modules/models";
@@ -67,8 +66,10 @@ class KubernetesHL extends HighLevelBase {
       publicIp6,
       planetary,
       mycelium,
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       myceliumSeed!,
       network,
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       myceliumNetworkSeeds!,
       "/sbin/zinit init",
       env,

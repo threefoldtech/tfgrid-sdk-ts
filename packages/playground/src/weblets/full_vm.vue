@@ -150,7 +150,7 @@
 </template>
 
 <script lang="ts" setup>
-import { VM_IMAGES } from "@threefold/common";
+import { type GridClient, VM_IMAGES } from "@threefold/grid_client";
 import { computed, type Ref, ref, watch } from "vue";
 
 import { manual } from "@/utils/manual";
@@ -295,10 +295,7 @@ function updateSSHkeyEnv(selectedKeys: string) {
   selectedSSHKeys.value = selectedKeys;
 }
 </script>
-
 <script lang="ts">
-import type { GridClient } from "@threefold/grid_client";
-
 import ExpandableLayout from "../components/expandable_layout.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import SelectVmImage, { type VmImage } from "../components/select_vm_image.vue";

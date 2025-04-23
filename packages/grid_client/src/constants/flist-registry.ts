@@ -84,7 +84,7 @@ export const VM_IMAGES = {
     entryPoint: "/init.sh",
     description: "NixOS 22.11 Full VM",
   },
-
+  
   // Base images
   BASE: {
     value: "https://hub.grid.tf/tf-official-apps/base:latest.flist",

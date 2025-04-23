@@ -122,7 +122,7 @@
 </template>
 
 <script lang="ts" setup>
-import { APP_FLISTS } from "@threefold/common";
+import { APP_FLISTS, type GridClient } from "@threefold/grid_client";
 import { computed, type Ref, ref, watch } from "vue";
 
 import { manual } from "@/utils/manual";
@@ -221,8 +221,6 @@ function updateSSHkeyEnv(selectedKeys: string) {
 </script>
 
 <script lang="ts">
-import type { GridClient } from "@threefold/grid_client";
-
 import AlgorandCapacity from "../components/algorand_capacity.vue";
 import Networks, { useNetworks } from "../components/networks.vue";
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";

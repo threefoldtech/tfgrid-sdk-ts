@@ -49,6 +49,7 @@ async function getRentableNodes(client: GridClient) {
 }
 
 // Unreserve a node
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function unreserve(client: GridClient, nodeId: number) {
   const unreserved = await client.nodes.unreserve({ nodeId });
   log("================= Unreserved Node =================");

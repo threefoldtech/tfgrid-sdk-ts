@@ -1,6 +1,4 @@
-import { VM_IMAGES } from "@threefold/common";
-
-import { GridClient, MachinesModel } from "../src";
+import { GridClient, MachinesModel, VM_IMAGES } from "../src";
 import { type ZmachineData } from "../src/helpers/types";
 import { config, getClient } from "./client_loader";
 import { log } from "./utils";
@@ -20,6 +18,7 @@ async function getDeployment(client: GridClient, name: string): Promise<Zmachine
   return res;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function cancel(client: GridClient, name: string) {
   const res = await client.machines.delete({ name: name });
   log("================= Canceling the deployment =================");

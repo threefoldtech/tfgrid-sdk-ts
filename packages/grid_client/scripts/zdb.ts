@@ -16,6 +16,7 @@ async function getDeployment(client, zdb) {
   log("================= Getting deployment information =================");
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function cancel(client, zdb) {
   const res = await client.zdbs.delete(zdb);
   log("================= Canceling the deployment =================");

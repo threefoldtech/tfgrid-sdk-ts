@@ -116,8 +116,7 @@
 </template>
 
 <script lang="ts" setup>
-import { APP_FLISTS } from "@threefold/common";
-import { calculateRootFileSystem, type GridClient } from "@threefold/grid_client";
+import { APP_FLISTS, calculateRootFileSystem, type GridClient } from "@threefold/grid_client";
 import { computed, type Ref, ref } from "vue";
 
 import { manual } from "@/utils/manual";

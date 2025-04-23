@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { generateRandomHexSeed, GridClient, MachinesDeleteModel, MachinesModel } from "../src";
 import { config, getClient } from "./client_loader";
 import { log } from "./utils";
@@ -16,6 +17,7 @@ async function getDeployment(client: GridClient, name: string) {
   log("================= Getting deployment information =================");
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function cancel(client: GridClient, options: MachinesDeleteModel) {
   const res = await client.machines.delete(options);
   log("================= Canceling the deployment =================");

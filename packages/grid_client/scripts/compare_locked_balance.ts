@@ -1,6 +1,7 @@
 import TFGridGqlClient from "@threefold/graphql_client";
 import { ContractState } from "@threefold/gridproxy_client";
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { BalanceGetModel, GridClient } from "../src";
 import { getClient } from "./client_loader";
 

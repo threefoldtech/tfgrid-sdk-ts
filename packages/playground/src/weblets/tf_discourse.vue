@@ -121,8 +121,7 @@
 </template>
 
 <script lang="ts" setup>
-import { APP_FLISTS } from "@threefold/common";
-import { calculateRootFileSystem, type GridClient } from "@threefold/grid_client";
+import { APP_FLISTS, calculateRootFileSystem, type GridClient } from "@threefold/grid_client";
 import { Buffer } from "buffer";
 import TweetNACL from "tweetnacl";
 import { computed, type Ref, ref, watch } from "vue";
