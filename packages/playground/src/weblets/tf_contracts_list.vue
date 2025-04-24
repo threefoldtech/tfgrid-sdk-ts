@@ -79,7 +79,7 @@
       </v-row>
     </template>
     <template #text>
-      <strong v-if="totalCost != undefined" class="text-primary">
+      <strong v-if="totalCost" class="text-primary">
         <input-tooltip
           inline
           :alignCenter="true"
@@ -465,12 +465,47 @@ const nodeStatus = computed(() => {
 // Calculate the total cost of contracts
 async function getTotalCost() {
   totalCost.value = 0;
-  for (const contract of contracts.value) {
-    totalCost.value = +new Decimal(totalCost.value).add(contract.consumption?.valueOf() || 0);
+
+  try {
+    const nodeResponse = await gridProxyClient.contracts.list({
+      twinId: profileManager.profile!.twinId,
+      state: [ContractState.Created, ContractState.GracePeriod],
+      type: ContractType.Node,
+      retCount: true,
+    });
+
+    const nameResponse = await gridProxyClient.contracts.list({
+      twinId: profileManager.profile!.twinId,
+      state: [ContractState.Created, ContractState.GracePeriod],
+      type: ContractType.Name,
+      retCount: true,
+    });
+
+    const rentResponse = await gridProxyClient.contracts.list({
+      twinId: profileManager.profile!.twinId,
+      state: [ContractState.Created, ContractState.GracePeriod],
+      type: ContractType.Rent,
+      retCount: true,
+    });
+
+    const allNodeContracts = await _normalizeContracts(nodeResponse.data, ContractType.Node);
+    const allNameContracts = await _normalizeContracts(nameResponse.data, ContractType.Name);
+    const allRentContracts = await _normalizeContracts(rentResponse.data, ContractType.Rent);
+
+    const allContracts = [...allNodeContracts, ...allNameContracts, ...allRentContracts];
+    for (const contract of allContracts) {
+      const consumption =
+        contract.consumption !== undefined && contract.consumption !== null ? contract.consumption.valueOf() : 0;
+      totalCost.value = +new Decimal(totalCost.value).add(consumption);
+    }
+
+    totalCost.value = +totalCost.value.toFixed(3);
+    const TFTInUSD = await queryClient.tftPrice.get();
+    totalCostUSD.value = totalCost.value * (TFTInUSD / 1000);
+  } catch (error: any) {
+    loadingErrorMessage.value = `Error calculating total cost: ${error.message}`;
+    createCustomToast(loadingErrorMessage.value, ToastType.danger, {});
   }
-  totalCost.value = +totalCost.value.toFixed(3);
-  const TFTInUSD = await queryClient.tftPrice.get();
-  totalCostUSD.value = totalCost.value * (TFTInUSD / 1000);
 }
 
 // Handle updates when contracts are deleted
