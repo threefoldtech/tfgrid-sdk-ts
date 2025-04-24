@@ -1,8 +1,8 @@
 <template>
   <section>
     <VBtn
-      variant="tonal"
-      color="secondary"
+      variant="elevated"
+      color="primary"
       class="mb-4"
       size="x-large"
       block
