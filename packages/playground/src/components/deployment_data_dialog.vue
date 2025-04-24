@@ -62,6 +62,7 @@
               <CopyReadonlyInput label="Network Name" :data="contract.interfaces[0].network" />
               <CopyReadonlyInput label="CPU (vCores)" :data="contract.capacity.cpu" />
               <CopyReadonlyInput label="Memory (MB)" :data="contract.capacity.memory" />
+              <CopyReadonlyInput label="SSD (GB)" :data="getStorage(contract.rootfs_size)" />
               <CopyReadonlyInput
                 v-for="disk of contract.mounts"
                 :key="disk.name"
@@ -216,6 +217,10 @@ function getValue(key: string) {
   const transform = (props.environments || ({} as any))[key]?.transform || _transform;
   return transform(value);
 }
+
+const getStorage = (disk: number) => {
+  return Math.ceil(disk / (1024 * 1024 * 1024));
+};
 
 async function getGrafanaUrl() {
   isLoading.value = true;
