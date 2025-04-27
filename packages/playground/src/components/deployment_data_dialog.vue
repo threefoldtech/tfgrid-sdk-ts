@@ -64,6 +64,11 @@
               <CopyReadonlyInput label="Memory (MB)" :data="contract.capacity.memory" />
               <CopyReadonlyInput label="Total Storage (GB)" :data="getTotalStorage(contract)" />
               <CopyReadonlyInput
+                v-if="contract.mounts.length > 0"
+                label="Root Filesystem (GB)"
+                :data="getStorage(contract.rootfs_size)"
+              />
+              <CopyReadonlyInput
                 v-for="disk of contract.mounts"
                 :key="disk.name"
                 :label="getDiskLabel(contract, disk)"
