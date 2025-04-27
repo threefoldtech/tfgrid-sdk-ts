@@ -2,6 +2,16 @@ import { FilterOptions, GridClient, MachinesModel } from "../src";
 import { config, getClient } from "./client_loader";
 import { log, pingNodes } from "./utils";
 
+// Random string generator
+function randomString(length = 6) {
+  const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
+  let result = "";
+  for (let i = 0; i < length; i++) {
+    result += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return result;
+}
+
 async function deploy(client: GridClient, vms: MachinesModel) {
   const res = await client.machines.deploy(vms);
   log("================= Deploying VM =================");
@@ -30,7 +40,7 @@ async function getNodeId(client: GridClient, options: FilterOptions) {
 }
 
 async function main() {
-  const name = "monVMS2";
+  const name = `monvm_${randomString(5)}`;
   const grid3 = await getClient(`vm/${name}`);
 
   const vmQueryOptions: FilterOptions = {
@@ -51,7 +61,7 @@ async function main() {
     },
     machines: [
       {
-        name: "testvm1",
+        name: `testvm1_${randomString(4)}`,
         node_id: nodeId!,
         disks: [
           {
@@ -74,7 +84,7 @@ async function main() {
         },
       },
       {
-        name: "testvm2",
+        name: `testvm2_${randomString(4)}`,
         node_id: nodeId!,
         disks: [
           {
@@ -107,7 +117,7 @@ async function main() {
   //Get the deployment
   await getDeployment(grid3, name);
 
-  // //Uncomment the line below to cancel the deployment
+  // Uncomment the line below to cancel the deployment
   // await cancel(grid3, name);
 
   await grid3.disconnect();
