@@ -234,13 +234,18 @@ afterAll(async () => {
   for (const name of vmNames) {
     const res = await gridClient.machines.delete({ name });
     log(res);
+    expect(res.created).toHaveLength(0);
+    expect(res.updated).toHaveLength(0);
+    expect(res.deleted).toBeDefined();
   }
 
   const gwNames = await gridClient.gateway.list();
   for (const name of gwNames) {
     const res = await gridClient.gateway.delete_name({ name });
     log(res);
+    expect(res.created).toHaveLength(0);
+    expect(res.updated).toHaveLength(0);
+    expect(res.deleted).toBeDefined();
   }
-
   return await gridClient.disconnect();
 }, 130000);
