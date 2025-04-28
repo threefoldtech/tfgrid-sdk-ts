@@ -77,7 +77,7 @@ def test_get_tft(browser):
     # twin_page.get_tft() # Get TFT button was removed from dashboard
     # assert '/html' in browser.page_source
     # NO checking as devnet don't direct to TF Connect page https://gettft.com/auth/login?next_url=/gettft/shop/#/buy
-    assert twin_page.press_locked_info() == 'https://manual.grid.tf/documentation/developers/tfchain/tfchain.html#contract-locking'
+    assert twin_page.press_locked_info() == 'https://manual.dev.grid.tf/labs/documentation/developers/tfchain/#contract-locking'
 
 @pytest.mark.skip(reason="https://github.com/threefoldtech/tfgrid-sdk-ts/issues/3751")
 def test_twin_links(browser):
@@ -92,6 +92,6 @@ def test_twin_links(browser):
       Result: User should be navigated to the Manuak and Connect pages.
     """
     twin_page = before_test_setup(browser)
-    assert twin_page.connect_manual_link() == 'https://www.manual.grid.tf/documentation/threefold_token/storing_tft/tf_connect_app.html'
+    assert twin_page.connect_manual_link() == 'https://www.manual.dev.grid.tf/labs/documentation/threefold_token/storing_tft/tf_connect_app/'
     assert twin_page.get_connect_google_link() == 'https://play.google.com/store/apps/details?id=org.jimber.threebotlogin&hl=en&gl=US'
     assert twin_page.get_connect_apple_link() == 'https://apps.apple.com/us/app/threefold-connect/id1459845885'

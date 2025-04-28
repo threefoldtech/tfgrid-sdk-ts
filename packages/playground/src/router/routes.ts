@@ -46,7 +46,7 @@ enum TFChainRoutes {
 }
 
 enum OtherRoutes {
-  Manual = "https://manual.grid.tf/",
+  Manual = "https://manual.dev.grid.tf/",
   HomePage = "/",
   Settings = "/settings",
 }

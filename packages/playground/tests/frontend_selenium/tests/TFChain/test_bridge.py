@@ -91,8 +91,8 @@ def test_how_it_done(browser):
       Result: it will go to link
     """
     bridge_page = before_test_setup(browser)
-    assert bridge_page.how_it_done() in 'https://manual.grid.tf/documentation/threefold_token/tft_bridges/tfchain_stellar_bridge.html'
-    assert bridge_page.deposite_learn_more() in 'https://manual.grid.tf/documentation/threefold_token/tft_bridges/tft_bridges.html'
+    assert bridge_page.how_it_done() in 'https://manual.dev.grid.tf/labs/documentation/threefold_token/tft_bridges/tfchain_stellar_bridge/'
+    assert bridge_page.deposite_learn_more() in 'https://manual.dev.grid.tf/labs/documentation/threefold_token/tft_bridges/'
 
 
 def test_check_deposit(browser):
