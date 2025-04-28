@@ -51,6 +51,7 @@ test("TC2691 - Applications: Deploy Taiga", async () => {
           and returns correct data.
     **********************************************/
 
+  //Test Data
   const name = "gw" + generateString(10).toLowerCase();
   const subdomain = name;
   const tlsPassthrough = false;
@@ -70,6 +71,7 @@ test("TC2691 - Applications: Deploy Taiga", async () => {
   const metadata = "{'deploymentType': 'taiga'}";
   const description = "test deploying Taiga via ts grid3 client";
 
+  //GatewayNode Selection
   const gatewayNodes = await gridClient.capacity.filterNodes({
     features: [Features.wireguard, Features.mycelium],
     gateway: true,
@@ -91,6 +93,7 @@ test("TC2691 - Applications: Deploy Taiga", async () => {
   if (nodeId === -1) throw new Error("No nodes available to complete this test");
   const domain = subdomain + "." + GatewayNode.publicConfig.domain;
 
+  //VM Model
   const vms: MachinesModel = {
     name: deploymentName,
     network: {
@@ -142,7 +145,6 @@ test("TC2691 - Applications: Deploy Taiga", async () => {
   // VM Assertions
   const vmsList = await gridClient.machines.list();
   log(vmsList);
-
   expect(vmsList.length).toBeGreaterThanOrEqual(1);
   expect(vmsList).toContain(vms.name);
 
@@ -170,6 +172,7 @@ test("TC2691 - Applications: Deploy Taiga", async () => {
 
   const wgnet = result[0].interfaces[0];
 
+  //Name Gateway Model
   const gateway: GatewayNameModel = {
     name: subdomain,
     network: wgnet.network,
@@ -198,7 +201,7 @@ test("TC2691 - Applications: Deploy Taiga", async () => {
   expect(gatewayResult[0].domain).toContain(name);
   expect(gatewayResult[0].tls_passthrough).toBe(gateway.tls_passthrough);
 
-  const site = "http://" + gatewayResult[0].domain;
+  const site = "https://" + gatewayResult[0].domain;
   let reachable = false;
 
   for (let i = 0; i <= 250; i++) {
@@ -228,13 +231,18 @@ afterAll(async () => {
   for (const name of vmNames) {
     const res = await gridClient.machines.delete({ name });
     log(res);
+    expect(res.created).toHaveLength(0);
+    expect(res.updated).toHaveLength(0);
+    expect(res.deleted).toBeDefined();
   }
 
   const gwNames = await gridClient.gateway.list();
   for (const name of gwNames) {
     const res = await gridClient.gateway.delete_name({ name });
     log(res);
+    expect(res.created).toHaveLength(0);
+    expect(res.updated).toHaveLength(0);
+    expect(res.deleted).toBeDefined();
   }
-
   return await gridClient.disconnect();
 }, 130000);
