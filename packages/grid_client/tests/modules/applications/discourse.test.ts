@@ -58,6 +58,7 @@ test("TC2690 - Applications: Deploy Discourse", async () => {
           and returns correct data.
     **********************************************/
 
+  //Test Data
   const name = "gw" + generateString(10).toLowerCase();
   const subdomain = name;
   const tlsPassthrough = false;
@@ -77,6 +78,7 @@ test("TC2690 - Applications: Deploy Discourse", async () => {
   const metadata = "{'deploymentType': 'discourse'}";
   const description = "test deploying Discourse via ts grid3 client";
 
+  //GatewayNode Selection
   const gatewayNodes = await gridClient.capacity.filterNodes({
     features: [Features.wireguard, Features.mycelium],
     gateway: true,
@@ -86,6 +88,7 @@ test("TC2690 - Applications: Deploy Discourse", async () => {
   if (gatewayNodes.length === 0) throw new Error("No nodes available to complete this test");
   const GatewayNode = gatewayNodes[generateInt(0, gatewayNodes.length - 1)];
 
+  //Node Selection
   const nodes = await gridClient.capacity.filterNodes({
     features: [Features.wireguard, Features.mycelium],
     cru: cpu,
@@ -98,6 +101,7 @@ test("TC2690 - Applications: Deploy Discourse", async () => {
   if (nodeId === -1) throw new Error("No nodes available to complete this test");
   const domain = subdomain + "." + GatewayNode.publicConfig.domain;
 
+  //VM Model
   const vms: MachinesModel = {
     name: deploymentName,
     network: {
@@ -182,6 +186,7 @@ test("TC2690 - Applications: Deploy Discourse", async () => {
 
   const wgnet = result[0].interfaces[0];
 
+  //Name Gateway Model
   const gateway: GatewayNameModel = {
     name: subdomain,
     network: wgnet.network,
@@ -202,7 +207,7 @@ test("TC2690 - Applications: Deploy Discourse", async () => {
   // Gateway Assertions
   const gatewayResult = await gridClient.gateway.getObj(gateway.name);
   log(gatewayResult);
-
+  expect(gatewayResult[0].name).toBe(name);
   expect(gatewayResult[0].name).toBe(subdomain);
   expect(gatewayResult[0].backends).toStrictEqual(gateway.backends);
   expect(gatewayResult[0].status).toBe("ok");
@@ -240,12 +245,18 @@ afterAll(async () => {
   for (const name of vmNames) {
     const res = await gridClient.machines.delete({ name });
     log(res);
+    expect(res.created).toHaveLength(0);
+    expect(res.updated).toHaveLength(0);
+    expect(res.deleted).toBeDefined();
   }
 
   const gwNames = await gridClient.gateway.list();
   for (const name of gwNames) {
     const res = await gridClient.gateway.delete_name({ name });
     log(res);
+    expect(res.created).toHaveLength(0);
+    expect(res.updated).toHaveLength(0);
+    expect(res.deleted).toBeDefined();
   }
 
   return await gridClient.disconnect();
