@@ -70,7 +70,7 @@ onMounted(async () => {
 const processMarkdownContent = (content: string, baseUrl: string) => {
   // Remove frontmatter if present
   let processedContent = content.replace(/^---\s*\ntitle:[^\n]*\nsidebar_position:[^\n]*\n---\s*\n/m, "");
-  
+
   // Replace image path
   processedContent = processedContent.replace(
     /!\[legal\]\(\.\/(img\/legal_header\.jpg)\)/,
@@ -78,22 +78,23 @@ const processMarkdownContent = (content: string, baseUrl: string) => {
   );
 
   const patterns = [
-    /\[([^\]]+)\]\((\.\/[^)]+)\)/g,            
-    /\[([^\]]+)\]\((\.\/[^)]+\/[^)]+)\)/g,     
-    /\[([^\]]+)\]\((\.\/[^)]+)\.md\)/g,        
-    /\[([^\]]+)\]\((\.\/[^)]+\/[^)]+)\.md\)/g  
+    /\[([^\]]+)\]\((\.\/[^)]+)\)/g,
+    /\[([^\]]+)\]\((\.\/[^)]+\/[^)]+)\)/g,
+    /\[([^\]]+)\]\((\.\/[^)]+)\.md\)/g,
+    /\[([^\]]+)\]\((\.\/[^)]+\/[^)]+)\.md\)/g,
   ];
-  
+
   for (const pattern of patterns) {
     processedContent = replaceMarkdownLinks(processedContent, pattern, baseUrl);
   }
-  
+
   return processedContent;
 };
 const replaceMarkdownLinks = (content: string, pattern: RegExp, baseUrl: string) => {
   return content.replace(pattern, (_, linkText, path) => {
     const relativePath = path.replace("./", "");
-    return `[${linkText}](${urlJoin(baseUrl, `${relativePath}.html`)})`;
+    const correctedBaseUrl = baseUrl.replace("/docs", "");
+    return `[${linkText}](${urlJoin(correctedBaseUrl, relativePath)})`;
   });
 };
 </script>
