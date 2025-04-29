@@ -160,7 +160,13 @@
           ></v-text-field>
         </input-validator>
         <v-card-actions class="justify-end mb-3 mx-3">
-          <v-btn :disabled="!isValidTimeout || isCurrentTimeout()" @click="UpdateTimeout" class="justify-end ml-auto"
+          <v-tooltip location="top">
+            <template #activator="{ props: tooltipProps }">
+              <v-btn @click="ResetTimeoutToDefault" class="mr-2" v-bind="tooltipProps">Set Default Values</v-btn>
+            </template>
+            <span>Sets query timeout to 30s and deployment timeout to 300s. Click Update to apply.</span>
+          </v-tooltip>
+          <v-btn :disabled="!isValidTimeout || isCurrentTimeout()" @click="UpdateTimeout" class="justify-end"
             >Update</v-btn
           ></v-card-actions
         >
@@ -287,6 +293,13 @@ export default {
         currentDeploymentTimeout.value == selectedDeploymentTimeout.value
       );
     }
+    // This function only resets the input field values to defaults.
+    // User still needs to click Update button to apply these changes.
+    function ResetTimeoutToDefault() {
+      selectedQueryTimeout.value = 120;
+      selectedDeploymentTimeout.value = 600;
+    }
+
     async function UpdateTimeout() {
       try {
         const client = gridStore.client as GridClient;
@@ -334,6 +347,7 @@ export default {
       passFormRef,
       UpdatePassword,
       UpdateTimeout,
+      ResetTimeoutToDefault,
       isCurrentTheme,
       isCurrentTimeout,
       confirmPasswordInput,

@@ -14,6 +14,7 @@
     >
       <VmDeploymentTable
         :projectName="tabs[activeTab].value"
+        :projectTitle="tabs[activeTab].title"
         v-model="selectedItems"
         :deleting="deleting"
         :hideSSH="hideSSH"

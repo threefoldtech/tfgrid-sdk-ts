@@ -25,8 +25,8 @@ def test_validate_homepage_links(browser):
     """
     dashboard_page = before_test_setup(browser)
     assert dashboard_page.navigate_to_find_more() == ('https://threefold.io/')
-    assert dashboard_page.navigate_to_explore_capacity() == ( 'https://stats.' + Base.net + '.grid.tf/')
-    assert dashboard_page.navigate_to_learn_about_grid() == ('https://www.manual.grid.tf/')
+    assert dashboard_page.navigate_to_explore_capacity() == (Base.stats)
+    assert dashboard_page.navigate_to_learn_about_grid() == ('https://manual.grid.tf/')
 
 
 def test_tft_price(browser):
@@ -152,7 +152,7 @@ def test_account_validation(browser):
     assert dashboard_page.wait_for('Passwords should match')
     dashboard_page.click_button(dashboard_page.connect_your_wallet(get_email(), '123456'))
     dashboard_page.open_profile()
-    assert dashboard_page.manual_link() == 'https://www.manual.grid.tf/documentation/dashboard/wallet_connector.html'
+    assert dashboard_page.manual_link() == 'https://manual.grid.tf/documentation/dashboard/wallet_connector.html'
     assert dashboard_page.get_mnemonic() == get_seed()
     assert dashboard_page.get_email() == get_email()
     assert grid_proxy.get_twin_address(dashboard_page.get_id()) == dashboard_page.get_address()
@@ -182,7 +182,7 @@ def test_login_links(browser):
     dashboard_page.import_account(get_seed())
     dashboard_page.click_button(dashboard_page.connect_your_wallet(get_email(), password))
     dashboard_page.open_profile()
-    assert dashboard_page.manual_link() == 'https://www.manual.grid.tf/documentation/dashboard/wallet_connector.html'
-    assert dashboard_page.connect_manual_link() == 'https://www.manual.grid.tf/documentation/threefold_token/storing_tft/tf_connect_app.html'
+    assert dashboard_page.manual_link() == 'https://manual.grid.tf/documentation/dashboard/wallet_connector.html'
+    assert dashboard_page.connect_manual_link() == 'https://manual.grid.tf/documentation/threefold_token/storing_tft/tf_connect_app.html'
     assert dashboard_page.get_connect_google_link() == 'https://play.google.com/store/apps/details?id=org.jimber.threebotlogin&hl=en&gl=US'
     assert dashboard_page.get_connect_apple_link() == 'https://apps.apple.com/us/app/threefold-connect/id1459845885'

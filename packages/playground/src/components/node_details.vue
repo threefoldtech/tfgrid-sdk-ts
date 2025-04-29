@@ -155,8 +155,7 @@ export default {
           router.replace({ query });
         } catch (_) {
           isLiveStats.value = false;
-          errorLoadingStatsMessage.value =
-            "The node appears like it's up but it is physically down maybe because it's gone to offline mode.";
+          errorLoadingStatsMessage.value = "The node is up but possibly offline/sleeping.";
           nodeOptions.loadStats = false;
           try {
             const _node: GridNode = await getNode(props.nodeId, nodeOptions);
