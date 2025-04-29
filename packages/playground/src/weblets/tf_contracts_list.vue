@@ -516,7 +516,7 @@ const baseTableHeaders: VDataTableHeader = [
 const nodeTableHeaders: VDataTableHeader = [
   { title: "PLACEHOLDER", key: "data-table-select" },
   { title: "ID", key: "contract_id", sortable: true },
-  { title: "Type", key: "deploymentType", sortable: false },
+  { title: "Workload Type", key: "deploymentType", sortable: false },
   {
     title: "Solution",
     key: "solution",
