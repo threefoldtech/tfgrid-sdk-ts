@@ -1,5 +1,5 @@
+import StellarSdk from "@stellar/stellar-sdk";
 import type { GridClient } from "@threefold/grid_client";
-import StellarSdk from "stellar-sdk";
 import validator from "validator";
 import type { Options } from "validator/lib/isBoolean";
 import type { IsEmailOptions } from "validator/lib/isEmail";
@@ -794,7 +794,7 @@ export function isValidDecimalNumber(length: number, msg: string) {
 export async function isValidStellarAddress(
   target: string,
 ): Promise<import("@/components/input_validator.vue").RuleReturn> {
-  const server = new StellarSdk.Server(window.env.STELLAR_HORIZON_URL);
+  const server = new StellarSdk.Horizon.Server(window.env.STELLAR_HORIZON_URL);
   try {
     // check if the account provided exists on stellar
     const account = await server.loadAccount(target);
