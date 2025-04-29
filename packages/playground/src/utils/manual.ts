@@ -4,7 +4,7 @@ const BASE = window.env.MANUAL_URL;
 
 const GITHUB = {
   RAW_BASE: "https://raw.githubusercontent.com/threefoldtech/info_grid/refs/heads/development",
-  LEGAL_PATH: "/labs/docs/knowledge_base/terms_conditions_all3/",
+  LEGAL_PATH: "labs/docs/knowledge_base/terms_conditions_all3/",
 };
 
 const LEGAL_HEADER_IMG = "img/legal_header.jpg";
