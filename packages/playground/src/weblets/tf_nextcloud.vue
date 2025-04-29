@@ -112,7 +112,7 @@ const selectionDetails = ref<SelectionDetails>();
 const name = ref(generateName({ prefix: "nc" }));
 const solution = ref() as Ref<SolutionFlavor>;
 const flist: Flist = {
-  value: "https://hub.grid.tf/tf-official-apps/threefoldtech-nextcloudaio-latest.flist",
+  value: "https://hub.grid.tf/tf-official-apps/nextcloud.flist",
   entryPoint: "/sbin/zinit init",
 };
 const dedicated = ref(false);

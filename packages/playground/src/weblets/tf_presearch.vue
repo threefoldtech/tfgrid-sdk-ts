@@ -149,7 +149,7 @@ const dockerDiskSize = 10;
 const privateRestoreKey = ref("");
 const publicRestoreKey = ref("");
 const flist: Flist = {
-  value: "https://hub.grid.tf/tf-official-apps/presearch-v2.3.flist",
+  value: "https://hub.grid.tf/tf-official-apps/presearch.flist",
   entryPoint: "/sbin/zinit init",
 };
 const dedicated = ref(false);

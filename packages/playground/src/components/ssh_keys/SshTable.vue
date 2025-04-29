@@ -12,6 +12,7 @@
         show-select
         :no-data-text="capitalize(`No keys found.`)"
         v-model="selectedKeys"
+        :sort-by="sortBy"
         :loading="loading"
         :headers="headers"
         :items="sshKeys"
@@ -141,6 +142,11 @@ import { useTheme } from "vuetify";
 import type { SSHKeyData, VDataTableHeader } from "@/types";
 import { AppThemeSelection } from "@/utils/app_theme";
 
+interface SortItems {
+  key: string;
+  order: boolean | "desc" | "asc" | undefined;
+}
+
 export default defineComponent({
   props: {
     sshKeys: {
@@ -184,15 +190,13 @@ export default defineComponent({
         title: "Key Fingerprint",
         key: "fingerPrint",
       },
-
-      // TODO: Update the below `Column` to make the user activate/deactivate more than one key.
-      // after fixing this issue: https://github.com/threefoldtech/tf-images/issues/231
-      // {
-      //   title: "Active",
-      //   key: "activation",
-      //   sortable: false,
-      // },
+      {
+        title: "Active",
+        key: "activation",
+        sortable: false,
+      },
     ];
+    const sortBy = ref<SortItems[]>([{ key: "createdAt", order: "desc" }]);
 
     const deleteSelected = () => {
       const ids: number[] = [];
@@ -217,6 +221,7 @@ export default defineComponent({
       itemsPerPage,
       theme,
       AppThemeSelection,
+      sortBy,
       capitalize,
       deleteSelected,
       deleteKey,

@@ -53,6 +53,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
           ],
         },
         requireSSH: true,
+        publicPath: false,
       },
     },
     {
@@ -76,6 +77,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
           ],
         },
         requireSSH: true,
+        publicPath: false,
       },
     },
     {
@@ -98,6 +100,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
             },
           ],
         },
+        publicPath: false,
       },
     },
     {
@@ -120,6 +123,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
             },
           ],
         },
+        publicPath: false,
       },
     },
     {
@@ -142,6 +146,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
             },
           ],
         },
+        publicPath: false,
       },
     },
     {
@@ -164,6 +169,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
             },
           ],
         },
+        publicPath: false,
       },
     },
     {
@@ -186,6 +192,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
             },
           ],
         },
+        publicPath: false,
       },
     },
     // {
@@ -208,6 +215,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
     //         },
     //       ],
     //     },
+    //     publicPath: false,
     //   },
     // },
     {
@@ -230,6 +238,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
             },
           ],
         },
+        publicPath: false,
       },
     },
     {
@@ -252,6 +261,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
             },
           ],
         },
+        publicPath: false,
       },
     },
     {
@@ -274,6 +284,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
             },
           ],
         },
+        publicPath: false,
       },
     },
     {
@@ -296,6 +307,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
             },
           ],
         },
+        publicPath: false,
       },
     },
     {
@@ -318,6 +330,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
             },
           ],
         },
+        publicPath: false,
       },
     },
     {
@@ -340,6 +353,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
             },
           ],
         },
+        publicPath: false,
       },
     },
     {
@@ -362,6 +376,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
             },
           ],
         },
+        publicPath: false,
       },
     },
     {
@@ -384,6 +399,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
             },
           ],
         },
+        publicPath: false,
       },
     },
     {
@@ -406,6 +422,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
             },
           ],
         },
+        publicPath: false,
       },
     },
 
@@ -429,6 +446,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
             },
           ],
         },
+        publicPath: false,
       },
     },
     // Commented for now and will be user later.
@@ -452,6 +470,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
     //         },
     //       ],
     //     },
+    //     publicPath: false,
     //   },
     // },
     {
@@ -474,6 +493,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
             },
           ],
         },
+        publicPath: false,
       },
     },
     {
@@ -496,6 +516,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
             },
           ],
         },
+        publicPath: false,
       },
     },
     {
@@ -518,6 +539,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
             },
           ],
         },
+        publicPath: false,
       },
     },
     {
@@ -540,6 +562,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
             },
           ],
         },
+        publicPath: false,
       },
     },
   ];
@@ -668,7 +691,7 @@ function createDeployRoutes(): RouteRecordRaw[] {
             {
               path: "",
               component: () => import("../views/vms_view.vue"),
-              meta: { title: "Virtual Machines" },
+              meta: { title: "Virtual Machines", publicPath: true },
             },
             {
               path: DashboardRoutes.VirtualMachines.FullVirtualMachine,
@@ -742,7 +765,7 @@ function createDeployRoutes(): RouteRecordRaw[] {
 
         {
           path: DashboardRoutes.Deploy.Applications,
-          meta: { title: "Labs" },
+          meta: { title: "Labs", publicPath: true },
           children: createApplicationsRoutes(),
         },
         {

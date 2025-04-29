@@ -129,7 +129,7 @@ const endpoint = ref("");
 const { ipv4, ipv6, planetary, mycelium, wireguard } = useNetworks();
 const solution = ref() as Ref<SolutionFlavor>;
 const flist: Flist = {
-  value: "https://hub.grid.tf/tf-official-apps/subsquid-latest.flist",
+  value: "https://hub.grid.tf/tf-official-apps/subsquid.flist",
   entryPoint: "/sbin/zinit init",
 };
 const dedicated = ref(false);
