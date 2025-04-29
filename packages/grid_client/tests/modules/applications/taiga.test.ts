@@ -52,7 +52,7 @@ test("TC2691 - Applications: Deploy Taiga", async () => {
     **********************************************/
 
   //Test Data
-  const name = "gw" + generateString(10).toLowerCase();
+  const name = "tg" + generateString(10).toLowerCase();
   const subdomain = name;
   const tlsPassthrough = false;
   const cpu = 2;
