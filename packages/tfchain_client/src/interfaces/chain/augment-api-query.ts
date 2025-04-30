@@ -9,7 +9,8 @@ import type { ApiTypes, AugmentedQuery, QueryableStorageEntry } from "@polkadot/
 import type { Bytes, Option, U8aFixed, Vec, bool, u128, u16, u32, u64, u8 } from "@polkadot/types-codec";
 import type { AnyNumber, ITuple } from "@polkadot/types-codec/types";
 import type { AccountId32, Call, H256 } from "@polkadot/types/interfaces/runtime";
-import type {
+import type { Observable } from "@polkadot/types/types";
+import {
   FrameSupportDispatchPerDispatchClassWeight,
   FrameSystemAccountInfo,
   FrameSystemEventRecord,
@@ -54,7 +55,6 @@ import type {
   TfchainSupportNode,
   TfchainSupportNodePower,
 } from "@polkadot/types/lookup";
-import type { Observable } from "@polkadot/types/types";
 
 export type __AugmentedQuery<ApiType extends ApiTypes> = AugmentedQuery<ApiType, () => unknown>;
 export type __QueryableStorageEntry<ApiType extends ApiTypes> = QueryableStorageEntry<ApiType>;

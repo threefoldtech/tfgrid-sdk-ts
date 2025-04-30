@@ -25,7 +25,7 @@ import type {
 import type { AnyNumber, Codec } from "@polkadot/types-codec/types";
 import type { ExtrinsicOrHash, ExtrinsicStatus } from "@polkadot/types/interfaces/author";
 import type { EpochAuthorship } from "@polkadot/types/interfaces/babe";
-import type { BeefySignedCommitment } from "@polkadot/types/interfaces/beefy";
+import type { BeefyVersionedFinalityProof } from "@polkadot/types/interfaces/beefy";
 import type { BlockHash } from "@polkadot/types/interfaces/chain";
 import type { PrefixedStorageKey } from "@polkadot/types/interfaces/childstate";
 import type { AuthorityId } from "@polkadot/types/interfaces/consensus";
@@ -35,7 +35,7 @@ import type {
   ContractCallRequest,
   ContractExecResult,
   ContractInstantiateResult,
-  InstantiateRequest,
+  InstantiateRequestV1,
 } from "@polkadot/types/interfaces/contracts";
 import type { BlockStats } from "@polkadot/types/interfaces/dev";
 import type { CreatedBlock } from "@polkadot/types/interfaces/engine";
@@ -61,9 +61,9 @@ import type {
   JustificationNotification,
   ReportedRoundStates,
 } from "@polkadot/types/interfaces/grandpa";
-import type { MmrLeafBatchProof, MmrLeafProof } from "@polkadot/types/interfaces/mmr";
+import type { MmrHash, MmrLeafBatchProof } from "@polkadot/types/interfaces/mmr";
 import type { StorageKind } from "@polkadot/types/interfaces/offchain";
-import type { FeeDetails, RuntimeDispatchInfo } from "@polkadot/types/interfaces/payment";
+import type { FeeDetails, RuntimeDispatchInfoV1 } from "@polkadot/types/interfaces/payment";
 import type { RpcMethods } from "@polkadot/types/interfaces/rpc";
 import type {
   AccountId,
@@ -157,9 +157,9 @@ declare module "@polkadot/rpc-core/types/jsonrpc" {
        **/
       getFinalizedHead: AugmentedRpc<() => Observable<H256>>;
       /**
-       * Returns the block most recently finalized by BEEFY, alongside side its justification.
+       * Returns the block most recently finalized by BEEFY, alongside its justification.
        **/
-      subscribeJustifications: AugmentedRpc<() => Observable<BeefySignedCommitment>>;
+      subscribeJustifications: AugmentedRpc<() => Observable<BeefyVersionedFinalityProof>>;
     };
     chain: {
       /**
@@ -257,6 +257,7 @@ declare module "@polkadot/rpc-core/types/jsonrpc" {
     };
     contracts: {
       /**
+       * @deprecated Use the runtime interface `api.call.contractsApi.call` instead
        * Executes a call to a contract
        **/
       call: AugmentedRpc<
@@ -270,6 +271,7 @@ declare module "@polkadot/rpc-core/types/jsonrpc" {
         ) => Observable<ContractExecResult>
       >;
       /**
+       * @deprecated Use the runtime interface `api.call.contractsApi.getStorage` instead
        * Returns the value under a specified storage key in a contract
        **/
       getStorage: AugmentedRpc<
@@ -280,27 +282,21 @@ declare module "@polkadot/rpc-core/types/jsonrpc" {
         ) => Observable<Option<Bytes>>
       >;
       /**
+       * @deprecated Use the runtime interface `api.call.contractsApi.instantiate` instead
        * Instantiate a new contract
        **/
       instantiate: AugmentedRpc<
         (
           request:
-            | InstantiateRequest
-            | {
-                origin?: any;
-                value?: any;
-                gasLimit?: any;
-                storageDepositLimit?: any;
-                code?: any;
-                data?: any;
-                salt?: any;
-              }
+            | InstantiateRequestV1
+            | { origin?: any; value?: any; gasLimit?: any; code?: any; data?: any; salt?: any }
             | string
             | Uint8Array,
           at?: BlockHash | string | Uint8Array,
         ) => Observable<ContractInstantiateResult>
       >;
       /**
+       * @deprecated Not available in newer versions of the contracts interfaces
        * Returns the projected time a given contract will be able to sustain paying its rent
        **/
       rentProjection: AugmentedRpc<
@@ -310,6 +306,7 @@ declare module "@polkadot/rpc-core/types/jsonrpc" {
         ) => Observable<Option<BlockNumber>>
       >;
       /**
+       * @deprecated Use the runtime interface `api.call.contractsApi.uploadCode` instead
        * Upload new code without instantiating a contract from it
        **/
       uploadCode: AugmentedRpc<
@@ -502,7 +499,7 @@ declare module "@polkadot/rpc-core/types/jsonrpc" {
        * Returns the number of transactions sent from given address at given time (block number).
        **/
       getTransactionCount: AugmentedRpc<
-        (hash: H256 | string | Uint8Array, number?: BlockNumber | AnyNumber | Uint8Array) => Observable<U256>
+        (address: H160 | string | Uint8Array, number?: BlockNumber | AnyNumber | Uint8Array) => Observable<U256>
       >;
       /**
        * Returns transaction receipt by transaction hash.
@@ -636,19 +633,35 @@ declare module "@polkadot/rpc-core/types/jsonrpc" {
     };
     mmr: {
       /**
-       * Generate MMR proof for the given leaf indices.
-       **/
-      generateBatchProof: AugmentedRpc<
-        (
-          leafIndices: Vec<u64> | (u64 | AnyNumber | Uint8Array)[],
-          at?: BlockHash | string | Uint8Array,
-        ) => Observable<MmrLeafProof>
-      >;
-      /**
-       * Generate MMR proof for given leaf index.
+       * Generate MMR proof for the given block numbers.
        **/
       generateProof: AugmentedRpc<
-        (leafIndex: u64 | AnyNumber | Uint8Array, at?: BlockHash | string | Uint8Array) => Observable<MmrLeafBatchProof>
+        (
+          blockNumbers: Vec<u64> | (u64 | AnyNumber | Uint8Array)[],
+          bestKnownBlockNumber?: u64 | AnyNumber | Uint8Array,
+          at?: BlockHash | string | Uint8Array,
+        ) => Observable<MmrLeafBatchProof>
+      >;
+      /**
+       * Get the MMR root hash for the current best block.
+       **/
+      root: AugmentedRpc<(at?: BlockHash | string | Uint8Array) => Observable<MmrHash>>;
+      /**
+       * Verify an MMR proof
+       **/
+      verifyProof: AugmentedRpc<
+        (
+          proof: MmrLeafBatchProof | { blockHash?: any; leaves?: any; proof?: any } | string | Uint8Array,
+        ) => Observable<bool>
+      >;
+      /**
+       * Verify an MMR proof statelessly given an mmr_root
+       **/
+      verifyProofStateless: AugmentedRpc<
+        (
+          root: MmrHash | string | Uint8Array,
+          proof: MmrLeafBatchProof | { blockHash?: any; leaves?: any; proof?: any } | string | Uint8Array,
+        ) => Observable<bool>
       >;
     };
     net: {
@@ -666,6 +679,15 @@ declare module "@polkadot/rpc-core/types/jsonrpc" {
       version: AugmentedRpc<() => Observable<Text>>;
     };
     offchain: {
+      /**
+       * Clear offchain local storage under given key and prefix
+       **/
+      localStorageClear: AugmentedRpc<
+        (
+          kind: StorageKind | "PERSISTENT" | "LOCAL" | number | Uint8Array,
+          key: Bytes | string | Uint8Array,
+        ) => Observable<Null>
+      >;
       /**
        * Get offchain local storage under given key and prefix
        **/
@@ -688,19 +710,21 @@ declare module "@polkadot/rpc-core/types/jsonrpc" {
     };
     payment: {
       /**
+       * @deprecated Use `api.call.transactionPaymentApi.queryFeeDetails` instead
        * Query the detailed fee of a given encoded extrinsic
        **/
       queryFeeDetails: AugmentedRpc<
         (extrinsic: Bytes | string | Uint8Array, at?: BlockHash | string | Uint8Array) => Observable<FeeDetails>
       >;
       /**
+       * @deprecated Use `api.call.transactionPaymentApi.queryInfo` instead
        * Retrieves the fee information for an encoded extrinsic
        **/
       queryInfo: AugmentedRpc<
         (
           extrinsic: Bytes | string | Uint8Array,
           at?: BlockHash | string | Uint8Array,
-        ) => Observable<RuntimeDispatchInfo>
+        ) => Observable<RuntimeDispatchInfoV1>
       >;
     };
     rpc: {
@@ -779,6 +803,7 @@ declare module "@polkadot/rpc-core/types/jsonrpc" {
         ) => Observable<u64>
       >;
       /**
+       * @deprecated Use `api.rpc.state.getKeysPaged` to retrieve keys
        * Retrieves the keys with a certain prefix
        **/
       getKeys: AugmentedRpc<
@@ -803,6 +828,7 @@ declare module "@polkadot/rpc-core/types/jsonrpc" {
        **/
       getMetadata: AugmentedRpc<(at?: BlockHash | string | Uint8Array) => Observable<Metadata>>;
       /**
+       * @deprecated Use `api.rpc.state.getKeysPaged` to retrieve keys
        * Returns the keys with prefix, leave empty to get all the keys (deprecated: Use getKeysPaged)
        **/
       getPairs: AugmentedRpc<
