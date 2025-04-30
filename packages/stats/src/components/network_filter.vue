@@ -88,7 +88,7 @@ const selectedNetworks = ref(["dev", "main", "test"]);
 
 onMounted(() => emits("update:modelValue", selectedNetworks.value));
 
-function updateNetworks(event: Event | undefined, index: number) {
+function updateNetworks(event: boolean | null, index: number) {
   const network = networks.value[index].label.toLowerCase() as any;
   if (event) {
     if (!selectedNetworks.value.includes(network)) {
