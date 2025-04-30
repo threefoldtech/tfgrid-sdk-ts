@@ -1,9 +1,10 @@
-import { getSharedSecret, utils } from "@noble/secp256k1";
+import { sha256 } from "@noble/hashes/sha2";
+import { getSharedSecret } from "@noble/secp256k1";
 import { KeyringPair } from "@polkadot/keyring/types";
 import { mnemonicToMiniSecret } from "@polkadot/util-crypto";
 import { isAddress } from "@polkadot/util-crypto";
 import { ValidationError } from "@threefold/types";
-import { mnemonicToSeedSync, validateMnemonic } from "bip39";
+import { validateMnemonic } from "bip39";
 import { Buffer } from "buffer";
 export enum KPType {
   sr25519 = "sr25519",
@@ -33,5 +34,5 @@ export function createShared(pubKey: Uint8Array, hexSeedOrMnemonic: string) {
   }
 
   const pointX = getSharedSecret(privateKey, pubKey);
-  return utils.sha256(pointX.slice(1, 33));
+  return sha256(pointX.slice(1, 33));
 }
