@@ -467,7 +467,9 @@ class Network {
 
   getPublicKey(privateKey: string): string {
     const privKey = Buffer.from(privateKey, "base64");
-    const keypair = TweetNACL.box.keyPair.fromSecretKey(privKey);
+    // Convert Buffer to Uint8Array to satisfy the type requirements
+    const uint8Array = new Uint8Array(privKey);
+    const keypair = TweetNACL.box.keyPair.fromSecretKey(uint8Array);
     return Buffer.from(keypair.publicKey).toString("base64");
   }
 
