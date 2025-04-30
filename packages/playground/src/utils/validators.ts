@@ -631,7 +631,7 @@ export function isRFC3339(msg: string) {
 
 export function isRgbColor(msg: string, includePercentValues?: boolean) {
   return (value: string) => {
-    if (!validator.isRgbColor(value, includePercentValues)) {
+    if (!validator.isRgbColor(value, includePercentValues ? { includePercentValues } : undefined)) {
       return { message: msg, isRgbColor: includePercentValues || true };
     }
   };
