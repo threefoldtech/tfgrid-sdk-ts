@@ -402,7 +402,7 @@ async function loadCost(profile: { mnemonic: string }) {
     mru: typeof props.memory === "number" ? (props.memory ?? 0) / 1024 : 0,
     hru: 0,
     ipv4u: props.ipv4,
-    certified: props.SelectedNode?.certificationType === "Certified" ?? false,
+    certified: props.SelectedNode?.certificationType === "Certified",
   });
   await getIPv1Price(grid!);
   usd.value = props.dedicated ? dedicatedPrice : sharedPrice;
