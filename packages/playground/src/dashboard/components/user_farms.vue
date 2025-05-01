@@ -96,7 +96,11 @@
                 <form-validator v-model="valid">
                   <input-validator
                     :value="address"
-                    :rules="[validators.required('Address is required.'), customStellarValidation]"
+                    :rules="[
+                      validators.required('Address is required.'),
+                      customStellarValidation,
+                      isStellarAddressUsed,
+                    ]"
                     :async-rules="[validators.isValidStellarAddress]"
                     #="{ props }"
                   >
@@ -269,6 +273,23 @@ export default {
       return undefined;
     }
 
+    function isStellarAddressUsed() {
+      if (!expanded.value || expanded.value.length === 0) return undefined;
+      const farmId = expanded.value[0].farmId;
+      if (!farms.value) return undefined;
+      else {
+        const farm_with_same_address = farms.value.find(
+          farm => farm.farmId === farmId && farm.stellarAddress === address.value,
+        );
+        if (farm_with_same_address) {
+          isValidAddress.value = false;
+          return {
+            message: "Address is already used by this farm.",
+          };
+        }
+      }
+    }
+
     const copy = (address: string) => {
       navigator.clipboard.writeText(address);
       createCustomToast("Copied!", ToastType.success);
@@ -365,6 +386,7 @@ export default {
       getUserFarms,
       setStellarAddress,
       customStellarValidation,
+      isStellarAddressUsed,
       getFarmDetails,
       downloadFarmReceipts,
       handleIpAdded,
