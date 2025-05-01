@@ -348,9 +348,11 @@ async function loadContractsByType(
 }
 
 async function loadContracts(type?: ContractType, options?: { sort: { key: string; order: "asc" | "desc" }[] }) {
+  if (!type) {
+    totalCost.value = undefined;
+    totalCostUSD.value = undefined;
+  }
   lockedContracts.value = undefined;
-  totalCost.value = undefined;
-  totalCostUSD.value = undefined;
   loadingErrorMessage.value = undefined;
   loadingTablesMessage.value = undefined;
   nodeInfo.value = {};
@@ -386,7 +388,9 @@ async function loadContracts(type?: ContractType, options?: { sort: { key: strin
     contracts.value = [...nodeContracts.value, ...nameContracts.value, ...rentContracts.value];
 
     // Update the total cost of the contracts.
-    await getTotalCost();
+    if (!type) {
+      await getTotalCost();
+    }
     // Get the node info e.g. node status.
     nodeInfo.value = await getNodeInfo(nodeIDs.value, cachedNodeIDs.value);
     cachedNodeIDs.value.push(...nodeIDs.value);
