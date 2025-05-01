@@ -2,9 +2,9 @@ import { ContractsClient } from "./contracts";
 import { FarmsClient } from "./farms";
 import { GatewaysClient } from "./gateways";
 import { NodesClient } from "./nodes";
+import { PublicIpsClient } from "./public_ips";
 import { StatsClient } from "./stats";
 import { TwinsClient } from "./twins";
-
 export default class GridProxyClient {
   private readonly __uri: string;
 
@@ -20,6 +20,7 @@ export default class GridProxyClient {
     this.twins = new TwinsClient(this.__uri);
     this.nodes = new NodesClient(this.__uri, this.farms, this.twins);
     this.stats = new StatsClient(this.__uri);
+    this.publicIps = new PublicIpsClient(this.__uri);
   }
 
   public contracts: ContractsClient;
@@ -28,4 +29,5 @@ export default class GridProxyClient {
   public nodes: NodesClient;
   public stats: StatsClient;
   public twins: TwinsClient;
+  public publicIps: PublicIpsClient;
 }

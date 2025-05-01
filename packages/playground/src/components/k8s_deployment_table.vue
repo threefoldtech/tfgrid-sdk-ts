@@ -224,12 +224,7 @@ export default {
   },
   data() {
     return {
-      sortBy: [
-        { key: "name", order: "asc" },
-        { key: "workersLength", order: "asc" },
-        { key: "billing", order: "asc" },
-        { key: "created", order: "asc" },
-      ],
+      sortBy: [{ key: "created", order: "desc" }],
     };
   },
 };

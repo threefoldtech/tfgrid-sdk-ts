@@ -355,7 +355,7 @@ export default {
           });
         }
         context.emit("ip-added-successfully");
-        createCustomToast("IP is added successfully.", ToastType.success);
+        createCustomToast("IP is added successfully. It may takes a few seconds to reflect", ToastType.success);
         showDialogue.value = false;
       } catch (error) {
         if (error instanceof TFChainError && error.keyError === "IpExists") {
