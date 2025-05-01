@@ -163,12 +163,11 @@
 <script lang="ts">
 import type { PublicConfig } from "@threefold/grid_client";
 import { ValidationError } from "@threefold/types";
-import { contains } from "cidr-tools";
+import CidrTools from "cidr-tools";
 import { isEqual } from "lodash";
 import { default as PrivateIp } from "private-ip";
 import { onMounted, ref, watch } from "vue";
 
-import type { RuleReturn } from "@/components/input_validator.vue";
 import { useFormRef } from "@/hooks/form_validator";
 import { useGrid } from "@/stores";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
@@ -332,9 +331,9 @@ export default {
 
       try {
         if (type === "ipv4") {
-          isRange = contains(config.value.ipv4, config.value.gw4);
+          isRange = CidrTools.containsCidr(config.value.ipv4, config.value.gw4);
         } else {
-          isRange = contains(config.value.ipv6, config.value.gw6);
+          isRange = CidrTools.containsCidr(config.value.ipv6, config.value.gw6);
         }
       } catch {
         isRange = false;

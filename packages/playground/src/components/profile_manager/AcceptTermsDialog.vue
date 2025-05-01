@@ -59,7 +59,7 @@ onMounted(async () => {
     const response = await fetch(manual.manual_raw_legal);
     const mdContent = await response.text();
     const processedContent = processMarkdownContent(mdContent, manual.manual_legal_base);
-    acceptTermsContent.value = marked.parse(processedContent);
+    acceptTermsContent.value = await marked.parse(processedContent);
   } catch (error) {
     console.error(error);
     emit("onError", "Something went wrong while loading terms and conditions, please try again");
