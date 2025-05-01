@@ -168,6 +168,7 @@ import { isEqual } from "lodash";
 import { default as PrivateIp } from "private-ip";
 import { onMounted, ref, watch } from "vue";
 
+import type { RuleReturn } from "@/components/input_validator.vue";
 import { useFormRef } from "@/hooks/form_validator";
 import { useGrid } from "@/stores";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
