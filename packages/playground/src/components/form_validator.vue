@@ -43,11 +43,14 @@ export default {
         [...statusMap.value.values()].some(status => status === ValidatorStatus.Init),
     );
     const form: FormValidatorService = {
-      register(uid, service) {
+      register(uid: string, service: InputValidatorService) {
         statusMap.value.set(uid, ValidatorStatus.Init);
-        serviceMap.value.set(uid, service);
+        serviceMap.value.set(uid, {
+          ...service,
+          $el: service.$el?.value,
+        });
       },
-      unregister(uid) {
+      unregister(uid: string) {
         statusMap.value.delete(uid);
         serviceMap.value.delete(uid);
       },
@@ -57,7 +60,7 @@ export default {
         return valids.every(valid => valid);
       },
 
-      updateStatus(uid, status) {
+      updateStatus(uid: string, status: ValidatorStatus) {
         if (statusMap.value.get(uid) !== status) {
           statusMap.value.set(uid, status);
         }
@@ -67,8 +70,11 @@ export default {
           const input =
             el instanceof HTMLElement
               ? el
-              : el && typeof el === "object" && "value" in el && el.value instanceof HTMLElement
-              ? el.value
+              : el &&
+                typeof el === "object" &&
+                "value" in el &&
+                (el as { value: HTMLElement }).value instanceof HTMLElement
+              ? (el as { value: HTMLElement }).value
               : null;
 
           if (input) {
@@ -82,7 +88,7 @@ export default {
         [...serviceMap.value.values()].map(({ reset }) => reset());
       },
 
-      get: uid => serviceMap.value.get(uid),
+      get: (uid: string) => serviceMap.value.get(uid) as InputValidatorService | undefined,
 
       valid,
       invalid,
