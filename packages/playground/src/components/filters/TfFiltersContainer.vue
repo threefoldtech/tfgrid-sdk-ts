@@ -45,7 +45,7 @@
               class="d-inline pa-1"
               v-text="changed ? 'Apply' : 'Clear'"
               flat
-              :color="$vuetify.theme.global.name === 'light' ? 'info' : undefined"
+              :color="!theme.global.current.value.dark ? 'info' : undefined"
             />
             {{ changed ? "in order to reload your data." : "to reset your selected filters." }}
           </span>
@@ -80,6 +80,7 @@
 import { onUnmounted } from "vue";
 import { computed, type ComputedRef, inject, onMounted, provide, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import { useTheme } from "vuetify";
 
 const key = Symbol("key:filters-container");
 
@@ -108,6 +109,7 @@ export default {
   setup(_, ctx) {
     const router = useRouter();
     const route = useRoute();
+    const theme = useTheme();
     const filters = ref(new Map<string, ComputedRef<FilterService>>());
 
     const valid = ref(false);
@@ -183,7 +185,7 @@ export default {
 
     typeof breakpoint === "number" && onResize();
 
-    return { empty, changed, clear, apply, valid, collapsible, filterOpened };
+    return { empty, changed, clear, apply, valid, collapsible, filterOpened, theme };
   },
 };
 </script>
