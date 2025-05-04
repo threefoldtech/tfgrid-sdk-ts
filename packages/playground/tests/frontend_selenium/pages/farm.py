@@ -80,7 +80,7 @@ class FarmPage:
             self.browser.find_element(*self.farm_name_text_field).send_keys(char)
 
     def search_functionality(self, farm_name):
-        tries = 3
+        tries = 5
         table = 'No data available'
         while('No data available' in table and tries > 0):
             sleep(5)

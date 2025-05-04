@@ -31,7 +31,7 @@ class DashboardPage:
     password_input = (By.XPATH, "(//input[@size='1' and @type='password'])[2]")
     confirm_password_input = (By.XPATH, "(//input[@size='1' and @type='password'])[3]")
     generate_account_button = (By.XPATH, "//button[.//span[text()=' create account ']]")
-    connect_button = (By.XPATH, "//button[.//span[text()='Connect']]")
+    connect_button = (By.XPATH, "//button[.//span[normalize-space()='Connect']]")
     logout_button = (By.XPATH, "/html/body/div[1]/div/div/main/header[1]/div/div[3]/button")
     login_button = (By.XPATH, "//button[.//span[text()='Login']]")
     login_password_input = (By.XPATH, "//label[text()='Password']/following-sibling::input")
@@ -82,10 +82,12 @@ class DashboardPage:
         self.browser.find_element(*self.confirm_password_input).send_keys(Keys.CONTROL + "a")
         self.browser.find_element(*self.confirm_password_input).send_keys(Keys.DELETE)
         self.browser.find_element(*self.confirm_password_input).send_keys(password)
+        WebDriverWait(self.browser, 30).until(EC.element_to_be_clickable(self.connect_button))
         return self.browser.find_element(*self.connect_button)
 
     def logout_account(self):
         time.sleep(3)
+        # webdriver.ActionChains(self.browser).send_keys(Keys.ESCAPE).perform()
         while True:
             try:
                 self.wait_for_button(self.browser.find_element(*self.logout_button)).click()
@@ -103,6 +105,7 @@ class DashboardPage:
         self.browser.find_element(*self.login_password_input).send_keys(Keys.CONTROL + "a")
         self.browser.find_element(*self.login_password_input).send_keys(Keys.DELETE)
         self.browser.find_element(*self.login_password_input).send_keys(password)
+        WebDriverWait(self.browser, 30).until(EC.element_to_be_clickable(self.login_button))
         return self.browser.find_element(*self.login_button)
 
     def create_account(self):
@@ -173,7 +176,7 @@ class DashboardPage:
     
     def open_profile(self):
         WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.profile_label))
-        self.browser.find_element(*self.profile_button).click()
+        # self.browser.find_element(*self.profile_button).click() #by default now the profile page popup no need to click
         WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.qr_code_img))
         WebDriverWait(self.browser, 30).until(EC.presence_of_element_located((By.XPATH, "//*[contains(text(), 'TFChain Wallet')]")))
         time.sleep(3)
