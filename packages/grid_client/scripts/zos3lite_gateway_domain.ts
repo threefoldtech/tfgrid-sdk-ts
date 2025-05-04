@@ -1,3 +1,4 @@
+import { generateName } from "../../playground/src/utils/strings";
 import { Features, FilterOptions, GatewayNameModel } from "../src";
 import { getClient } from "./client_loader";
 import { log } from "./utils";
@@ -26,6 +27,7 @@ async function cancel(client, gw) {
 // read more about the gateway types in this doc: https://github.com/threefoldtech/zos/tree/main/docs/internals/gateway
 async function main() {
   const grid3 = await getClient();
+  const gatewayName = generateName({ prefix: "gw" });
 
   const gatewayQueryOptions: FilterOptions = {
     gateway: true,
@@ -34,7 +36,7 @@ async function main() {
   };
 
   const gw: GatewayNameModel = {
-    name: "test",
+    name: gatewayName,
     node_id: +(await grid3.capacity.filterNodes(gatewayQueryOptions))[0].nodeId,
     tls_passthrough: false,
     // the backends have to be in this format `http://ip:port` or `https://ip:port`, and the `ip` pingable from the node so using the ygg ip or public ip if available.

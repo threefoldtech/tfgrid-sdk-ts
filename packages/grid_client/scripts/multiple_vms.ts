@@ -1,16 +1,7 @@
+import { generateName } from "../../playground/src/utils/strings";
 import { FilterOptions, GridClient, MachinesModel } from "../src";
 import { config, getClient } from "./client_loader";
 import { log, pingNodes } from "./utils";
-
-// Random string generator
-function randomString(length = 6) {
-  const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
-  let result = "";
-  for (let i = 0; i < length; i++) {
-    result += chars[Math.floor(Math.random() * chars.length)];
-  }
-  return result;
-}
 
 async function deploy(client: GridClient, vms: MachinesModel) {
   const res = await client.machines.deploy(vms);
@@ -40,7 +31,13 @@ async function getNodeId(client: GridClient, options: FilterOptions) {
 }
 
 async function main() {
-  const name = `monvm_${randomString(5)}`;
+  const name = generateName({ prefix: "vm" });
+  const networkName = generateName({ prefix: "nw" });
+  const machine1Name = generateName({ prefix: "machine" });
+  const machine2Name = generateName({ prefix: "machine" });
+  const disk1Name = generateName({ prefix: "disk" });
+  const disk2Name = generateName({ prefix: "disk" });
+
   const grid3 = await getClient(`vm/${name}`);
 
   const vmQueryOptions: FilterOptions = {
@@ -56,16 +53,16 @@ async function main() {
   const vms: MachinesModel = {
     name,
     network: {
-      name: "monNetwork",
+      name: networkName,
       ip_range: "10.238.0.0/16",
     },
     machines: [
       {
-        name: `testvm1_${randomString(4)}`,
+        name: machine1Name,
         node_id: nodeId!,
         disks: [
           {
-            name: "newDisk1",
+            name: disk1Name,
             size: 5,
             mountpoint: "/newDisk1",
           },
@@ -84,11 +81,11 @@ async function main() {
         },
       },
       {
-        name: `testvm2_${randomString(4)}`,
+        name: machine2Name,
         node_id: nodeId!,
         disks: [
           {
-            name: "newDisk2",
+            name: disk2Name,
             size: 5,
             mountpoint: "/newDisk2",
           },

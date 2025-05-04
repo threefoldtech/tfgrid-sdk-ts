@@ -1,3 +1,4 @@
+import { generateName } from "../../playground/src/utils/strings";
 import { GridClient, MachinesModel } from "../src";
 import { type ZmachineData } from "../src/helpers/types";
 import { config, getClient } from "./client_loader";
@@ -26,22 +27,26 @@ async function cancel(client: GridClient, name: string) {
 }
 
 async function main() {
-  const name = "newVMS";
+  const name = generateName({ prefix: "vm" });
+  const networkName = generateName({ prefix: "nw" });
+  const machineName = generateName({ prefix: "machine" });
+  const diskName = generateName({ prefix: "disk" });
+
   const grid3 = await getClient(`vm/${name}`);
 
   const vms: MachinesModel = {
     name,
     network: {
-      name: "wedtest",
+      name: networkName,
       ip_range: "10.249.0.0/16",
     },
     machines: [
       {
-        name: "testvm",
+        name: machineName,
         node_id: 11,
         disks: [
           {
-            name: "wedDisk",
+            name: diskName,
             size: 8,
             mountpoint: "/testdisk",
           },
