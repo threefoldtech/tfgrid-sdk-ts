@@ -62,18 +62,29 @@ const emits = defineEmits<{ (event: "update:model-value", value?: Flist): void }
 const image = ref<VmImage>(props.images[0]);
 const name = computed(() => image.value.name);
 
-const flist = computed(() => {
-  if (name.value != "Other") {
+const flist = computed({
+  get() {
+    if (name.value != "Other") {
+      return image.value.flist;
+    }
+
     return image.value.flist;
-  }
-  return "";
+  },
+  set(newValue) {
+    image.value.flist = newValue;
+  },
 });
 
-const entryPoint = computed(() => {
-  if (name.value != "Other") {
+const entryPoint = computed({
+  get() {
+    if (name.value != "Other") {
+      return image.value.entryPoint;
+    }
     return image.value.entryPoint;
-  }
-  return "";
+  },
+  set(value) {
+    image.value.entryPoint = value;
+  },
 });
 
 watch(
