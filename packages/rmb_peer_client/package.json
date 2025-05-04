@@ -14,10 +14,10 @@
   "dependencies": {
     "redis": "^4.7.0",
     "typescript": "^5.8.3",
-    "uuid4": "^2.0.2"
+    "uuid4": "^2.0.3"
   },
   "devDependencies": {
-    "@types/uuid4": "^2.0.0",
+    "@types/uuid4": "^2.0.3",
     "ts-node": "^10.9.2"
   },
   "main": "./dist/index.js",

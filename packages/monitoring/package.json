@@ -30,7 +30,7 @@
     "@threefold/tfchain_client": "2.8.0-rc1",
     "@threefold/types": "2.8.0-rc1",
     "chalk": "5.4.1",
-    "ts-node": "^10.9.1",
+    "ts-node": "^10.9.2",
     "typescript": "^5.8.3",
     "url-join": "^5.0.0"
   },
