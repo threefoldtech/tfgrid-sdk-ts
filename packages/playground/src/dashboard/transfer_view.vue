@@ -158,6 +158,7 @@ watch(
   () => {
     transferAmount.value = undefined;
     amountRef.value?.reset();
+    tick.value++;
   },
   { immediate: true },
 );
