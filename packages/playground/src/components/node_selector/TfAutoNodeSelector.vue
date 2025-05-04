@@ -127,9 +127,8 @@
         <VAlert
           type="error"
           variant="elevated"
-          v-model="alertErr"
-          @click="alertErr = !alertErr"
-          v-if="!filtersUpdated && nodeInputValidateTask.error"
+          v-if="visibleAlert && !filtersUpdated && nodeInputValidateTask.error"
+          @click="visibleAlert = !visibleAlert"
           :style="{
             position: 'absolute',
             bottom: '31px',
@@ -151,7 +150,7 @@ import type { Farm } from "@threefold/gridproxy_client";
 import { RequestError } from "@threefold/types";
 import type AwaitLock from "await-lock";
 import equals from "lodash/fp/equals.js";
-import { computed, nextTick, onMounted, onUnmounted, type PropType, ref } from "vue";
+import { computed, nextTick, onMounted, onUnmounted, onUpdated, type PropType, ref } from "vue";
 
 import { normalizeError } from "@/utils/helpers";
 
@@ -199,7 +198,9 @@ export default {
   setup(props, ctx) {
     const gridStore = useGrid();
     const _loadedNodes = ref<NodeInfo[]>([]);
-    const alertErr = ref(true);
+    const visibleAlert = ref(true);
+    onUpdated(() => (visibleAlert.value = true));
+
     const loadedNodes = computed(() => {
       return _loadedNodes.value.filter(
         node =>
@@ -389,7 +390,7 @@ export default {
       touched,
       bindModelValueAndValidate,
       bindStatus,
-      alertErr,
+      visibleAlert,
       nodesContainer,
     };
   },
