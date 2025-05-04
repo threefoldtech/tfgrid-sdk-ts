@@ -20,7 +20,7 @@ jobs:
       - name: Node install
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
       - name: Yarn install
         run: yarn install
       - name: Lerna Build

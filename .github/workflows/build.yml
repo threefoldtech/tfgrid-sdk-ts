@@ -7,7 +7,6 @@ on:
   push:
     branches: 
       - development
-      - development_upgrades
 
   pull_request:
     branches: 
