@@ -157,7 +157,7 @@ watch(
   activeTab,
   () => {
     transferAmount.value = undefined;
-    amountRef.value.reset();
+    amountRef.value?.reset();
   },
   { immediate: true },
 );
