@@ -153,6 +153,15 @@ watch(freeBalance, async () => {
   }
 });
 
+watch(
+  activeTab,
+  () => {
+    transferAmount.value = undefined;
+    amountRef.value.reset();
+  },
+  { immediate: true },
+);
+
 const tick = ref(0);
 function isSameTwinID(value: string) {
   if (parseInt(value.trim()) == profile.value?.twinId) {
