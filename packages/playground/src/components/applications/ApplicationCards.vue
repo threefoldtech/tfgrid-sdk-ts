@@ -24,7 +24,12 @@
                   lineHeight: 1,
                 }"
               />
-              <v-card-title class="d-inline-block">
+              <v-card-title
+                class="d-inline-block"
+                :style="{
+                  fontSize: '1rem',
+                }"
+              >
                 {{ card.title }}
                 <v-chip v-for="tag in card.tags" :key="tag" class="ml-2 pulse-animation">
                   {{ tag }}
