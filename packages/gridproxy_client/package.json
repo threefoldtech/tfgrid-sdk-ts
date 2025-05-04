@@ -12,12 +12,7 @@
   "files": [
     "/dist"
   ],
-  "repository": { 
-    "type": "git",
-    "url": "https://github.com/threefoldtech/tfgrid-sdk-ts.git",
-    "directory": "packages/gridproxy_client"
-  },
-  "homepage": "https://github.com/threefoldtech/tfgrid-sdk-ts/blob/development/packages/gridproxy_client/README.md",
+  "repository": "git@github.com:MohamedElmdary/gridproxy_client.git",
   "author": "MohamedElmdary <engm5081@gmail.com>",
   "license": "MIT",
   "private": false,
