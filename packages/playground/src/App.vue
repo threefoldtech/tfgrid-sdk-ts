@@ -110,7 +110,7 @@
         </div>
       </v-navigation-drawer>
 
-      <v-main :style="{ paddingTop: navbarConfig ? '140px' : '70px' }">
+      <v-main :style="{ paddingTop: navbarConfig && hasActiveProfile ? '140px' : '70px' }">
         <v-toolbar
           :extended="toolbarExtended"
           extension-height="auto"
@@ -413,16 +413,10 @@ const routes: AppRoute[] = [
         tooltip: "Deploy your Virtal Machine instances.",
       },
       {
-        title: "Orchestrators",
-        icon: "mdi-group",
-        route: DashboardRoutes.Deploy.Orchestrators,
-        tooltip: "Deploy your orchestrator instances.",
-      },
-      {
-        title: "Applications",
+        title: "Labs",
         icon: "mdi-lightbulb-on-outline",
         route: DashboardRoutes.Deploy.Applications,
-        tooltip: "Deploy ready applications on the ThreeFold grid.",
+        tooltip: "Deploy ready labs on the ThreeFold grid.",
         releaseDate: new Date("2024-11-13"),
       },
       {
@@ -624,14 +618,6 @@ export default {
 .v-theme--light .v-btn--disabled,
 .v-theme--dark .v-btn--disabled {
   color: #7b7b7b !important;
-}
-body {
-  overflow: auto;
-  height: 100vh;
-}
-
-html {
-  overflow: hidden;
 }
 
 @media only screen and (max-width: 600px) {

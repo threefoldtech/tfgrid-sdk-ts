@@ -8,7 +8,7 @@
   >
     <template #gpu-hint-message>
       <div class="mb-3">
-        <v-chip class="d-flex justify-center ma-4 mt-1" color="info">
+        <v-chip class="d-flex justify-center mb-3 mt-1" color="info">
           Select a GPU card ID from the below selection to load its data.
         </v-chip>
         <v-row class="bb-gray">
@@ -20,13 +20,19 @@
           </v-col>
           <v-col class="mr-3 d-flex justify-end align-center">
             <v-select
-              chips
               density="compact"
               hide-details="auto"
               v-model="cardId"
               :items="cardsIds"
               variant="outlined"
-            />
+              v-model:menu="menu"
+            >
+              <template v-slot:selection="{ item }">
+                <v-chip>
+                  {{ item.title }}
+                </v-chip>
+              </template>
+            </v-select>
             <v-icon class="ml-1" :icon="'mdi-content-copy'" @click="copy(cardId)" />
           </v-col>
         </v-row>
@@ -56,6 +62,7 @@ export default {
   },
 
   setup(props) {
+    const menu = ref<boolean>(false);
     const loading = ref<boolean>(false);
     const gpuFields = ref<NodeDetailsCard[]>([]);
     const cardsIds = ref<string[]>([]);
@@ -110,6 +117,7 @@ export default {
       cardId,
       selectedCard,
       copy,
+      menu,
     };
   },
 };

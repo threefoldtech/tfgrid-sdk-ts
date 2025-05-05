@@ -223,7 +223,7 @@
           "
           @update:sort="
             sort => {
-              loadContracts(table.type, { sort });
+              loadContracts(table.type);
             }
           "
         />
@@ -293,7 +293,7 @@ const nodeIDs = computed(() => {
 });
 // To avoid multiple requests
 const cachedNodeIDs = ref<number[]>([]);
-
+const sortOptions: { key: string; order: "asc" | "desc" }[] = [{ key: "created_at", order: "desc" }];
 onMounted(loadContracts);
 
 async function _normalizeContracts(
@@ -347,7 +347,7 @@ async function loadContractsByType(
   }
 }
 
-async function loadContracts(type?: ContractType, options?: { sort: { key: string; order: "asc" | "desc" }[] }) {
+async function loadContracts(type?: ContractType) {
   lockedContracts.value = undefined;
   totalCost.value = undefined;
   totalCostUSD.value = undefined;
@@ -361,20 +361,20 @@ async function loadContracts(type?: ContractType, options?: { sort: { key: strin
     if (type) {
       switch (type) {
         case ContractType.Name:
-          await loadContractsByType(ContractType.Name, nameContracts, options);
+          await loadContractsByType(ContractType.Name, nameContracts, { sort: sortOptions });
           break;
         case ContractType.Node:
-          await loadContractsByType(ContractType.Node, nodeContracts, options);
+          await loadContractsByType(ContractType.Node, nodeContracts, { sort: sortOptions });
           break;
         case ContractType.Rent:
-          await loadContractsByType(ContractType.Rent, rentContracts, options);
+          await loadContractsByType(ContractType.Rent, rentContracts, { sort: sortOptions });
           break;
       }
     } else {
       await Promise.all([
-        loadContractsByType(ContractType.Name, nameContracts, options),
-        loadContractsByType(ContractType.Node, nodeContracts, options),
-        loadContractsByType(ContractType.Rent, rentContracts, options),
+        loadContractsByType(ContractType.Name, nameContracts, { sort: sortOptions }),
+        loadContractsByType(ContractType.Node, nodeContracts, { sort: sortOptions }),
+        loadContractsByType(ContractType.Rent, rentContracts, { sort: sortOptions }),
       ]);
     }
     const failedContractsLength = failedContracts.value.length;
@@ -514,7 +514,9 @@ const baseTableHeaders: VDataTableHeader = [
 
 // Define specific table headers for each contract type
 const nodeTableHeaders: VDataTableHeader = [
-  ...baseTableHeaders,
+  { title: "PLACEHOLDER", key: "data-table-select" },
+  { title: "ID", key: "contract_id", sortable: true },
+  { title: "Workload Type", key: "deploymentType", sortable: false },
   {
     title: "Solution",
     key: "solution",
@@ -524,7 +526,9 @@ const nodeTableHeaders: VDataTableHeader = [
       { title: "Name", key: "solutionName", sortable: false },
     ],
   },
-  { title: "Type", key: "deploymentType", sortable: false },
+  { title: "State", key: "state", sortable: false },
+  { title: "Billing Rate", key: "consumption", sortable: false },
+  { title: "Created At", key: "created_at", sortable: true },
   { title: "Expiration", key: "expiration", sortable: false },
   { title: "Farm ID", key: "farm_id", sortable: false },
   {

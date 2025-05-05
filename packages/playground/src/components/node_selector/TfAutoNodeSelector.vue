@@ -1,8 +1,8 @@
 <template>
   <section>
     <VBtn
-      variant="tonal"
-      color="secondary"
+      variant="elevated"
+      color="primary"
       class="mb-4"
       size="x-large"
       block
@@ -43,7 +43,6 @@
 
             <VAlert v-else type="error" text="No Nodes were found!" />
           </VContainer>
-
           <div
             ref="nodesContainer"
             :style="{
@@ -61,7 +60,9 @@
                   v-model:node="loadedNodes[index]"
                   :selected="!validFilters || filtersUpdated ? false : $props.modelValue === node"
                   selectable
+                  @update:node="updateNode($event as NodeInfo)"
                   @node:select="bindModelValueAndValidate"
+                  @update:status="bindStatus($event as ValidatorStatus)"
                   :status="
                     $props.modelValue === node
                       ? nodeInputValidateTask.loading
@@ -148,8 +149,8 @@ import { RequestError } from "@threefold/types";
 import type AwaitLock from "await-lock";
 import equals from "lodash/fp/equals.js";
 import { computed, nextTick, onMounted, onUnmounted, type PropType, ref } from "vue";
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import type { VCard } from "vuetify/components/VCard";
+
+import { normalizeError } from "@/utils/helpers";
 
 import { useAsync, usePagination, useWatchDeep } from "../../hooks";
 import { ValidatorStatus } from "../../hooks/form_validator";
@@ -167,7 +168,6 @@ import {
   validateRentContract,
 } from "../../utils/nodeSelector";
 import TfNodeDetailsCard from "./TfNodeDetailsCard.vue";
-
 export default {
   name: "TfAutoNodeSelector",
   components: { TfNodeDetailsCard },
@@ -218,7 +218,10 @@ export default {
       },
       default: [],
     });
-
+    function updateNode(node: NodeInfo) {
+      _loadedNodes.value = loadedNodes.value.map(n => (n.nodeId === node.nodeId ? node : n));
+      _setValidNode(node.nodeId);
+    }
     async function _setValidNode(oldNodeId?: number) {
       const node = await selectValidNode(
         gridStore,
@@ -301,16 +304,8 @@ export default {
 
     const nodeInputValidateTask = useAsync<boolean, string, [NodeInfo | undefined]>(
       async node => {
-        if (node && node?.rentContractId !== 0) {
-          const { state } = await gridStore.grid.contracts.get({
-            id: node?.rentContractId,
-          });
-          if (state.gracePeriod) {
-            return false;
-          }
-        }
         const nodeCapacityValid = await checkNodeCapacityPool(gridStore, node, props.filters);
-        const rentContractValid = props.filters.dedicated ? await validateRentContract(gridStore, node) : true;
+        const rentContractValid = await validateRentContract(gridStore, node, props.filters.hasGPU);
 
         if (node && !isNodeValid(props.getFarm, node!, props.selectedMachines, filters.value)) {
           throw `Node (${node.nodeId}) is not valid.`;
@@ -386,7 +381,7 @@ export default {
       loadingError,
       filtersUpdated,
       nodeInputValidateTask,
-
+      updateNode,
       touched,
       bindModelValueAndValidate,
       bindStatus,

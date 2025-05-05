@@ -624,6 +624,7 @@ class FilterOptions {
   @Expose() @IsOptional() @IsInt({ each: true }) @Min(1, { each: true }) nodeExclude?: number[];
   @Expose() @IsOptional() @IsInt({ each: true }) @Min(1, { each: true }) farmIds?: number[];
   @Expose() @IsOptional() @IsInt() @Min(1) farmId?: number;
+  @Expose() @IsOptional() @IsInt() @Min(1) nodeId?: number;
   @Expose() @IsOptional() @IsString() farmName?: string;
   @Expose() @IsOptional() @IsString() country?: string;
   @Expose() @IsOptional() @IsString() city?: string;
@@ -631,9 +632,9 @@ class FilterOptions {
   @Expose() @IsOptional() @IsInt() @Min(1) availableFor?: number;
   @Expose() @IsOptional() @IsInt() page?: number;
   @Expose() @IsOptional() @IsInt() size?: number;
+  @Expose() @IsOptional() @IsInt() @Min(1) rentedBy?: number;
   @Expose() @IsOptional() @IsBoolean() hasGPU?: boolean;
   @Expose() @IsOptional() @IsBoolean() rentable?: boolean;
-  @Expose() @IsOptional() @IsInt() @Min(1) rentedBy?: number;
   @Expose() @IsOptional() @IsBoolean() randomize?: boolean;
   @Expose() @IsOptional() @IsBoolean() ret_count?: boolean;
   @Expose() @IsOptional() @Transform(({ value }) => NodeStatus[value]) @IsEnum(NodeStatus) status?: NodeStatus;

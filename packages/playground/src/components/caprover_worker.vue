@@ -31,9 +31,11 @@
       v-model:mycelium="$props.modelValue.mycelium"
       v-model:wireguard="$props.modelValue.wireguard"
     />
-
+    <!-- <input-tooltip inline tooltip="" :href="manual"> -->
+    <v-switch color="primary" inset label="Rented By Me" v-model="$props.modelValue.rentedByMe" hide-details />
+    <!-- </input-tooltip> -->
     <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
-      <v-switch color="primary" inset label="Dedicated" v-model="$props.modelValue.dedicated" hide-details />
+      <v-switch color="primary" inset label="Rentable" v-model="$props.modelValue.dedicated" hide-details />
     </input-tooltip>
     <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
       <v-switch color="primary" inset label="Certified" v-model="$props.modelValue.certified" hide-details />
@@ -47,6 +49,7 @@
         ipv6: $props.modelValue.ipv6,
         certified: $props.modelValue.certified,
         dedicated: $props.modelValue.dedicated,
+        rentedBy,
         cpu: $props.modelValue.solution?.cpu,
         solutionDisk: $props.modelValue.solution?.disk,
         memory: $props.modelValue.solution?.memory,
@@ -61,10 +64,11 @@
 </template>
 
 <script lang="ts">
-import { calculateRootFileSystem } from "@threefold/grid_client";
+import { calculateRootFileSystem, GridClient } from "@threefold/grid_client";
 import type AwaitLock from "await-lock";
 import { computed, type PropType } from "vue";
 
+import { useGrid } from "@/stores";
 import type { SelectedMachine } from "@/types/nodeSelector";
 import { manual } from "@/utils/manual";
 
@@ -73,8 +77,10 @@ import type { CaproverWorker } from "../types";
 import { generateName } from "../utils/strings";
 import SelectSolutionFlavor from "./select_solution_flavor.vue";
 
+let id = 0;
 export function createWorker(name: string = generateName({ prefix: "wr" })): CaproverWorker {
   return {
+    _id: id++,
     name,
     ipv4: true,
     ipv6: false,
@@ -114,6 +120,10 @@ export default {
     nodesLock: Object as PropType<AwaitLock>,
   },
   setup(props) {
+    const gridStore = useGrid();
+    const grid = gridStore.client as GridClient;
+    const rentedBy = computed(() => (props.modelValue.rentedByMe ? grid.twinId : undefined));
+
     const rootFilesystemSize = computed(() => {
       const { cpu = 0, memory = 0 } = props.modelValue.solution || {};
       return calculateRootFileSystem({
@@ -132,7 +142,7 @@ export default {
       }, [] as SelectedMachine[]);
     });
 
-    return { rootFilesystemSize, manual, selectedMachines };
+    return { rootFilesystemSize, manual, selectedMachines, rentedBy };
   },
 };
 </script>

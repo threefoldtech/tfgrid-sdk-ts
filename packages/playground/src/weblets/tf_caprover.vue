@@ -21,6 +21,7 @@
       )
     "
     :ipv4="true"
+    :rentedBy="leader.rentedBy"
     :dedicated="leader.dedicated"
     :SelectedNode="leader.selectionDetails?.node"
     :valid-filters="leader.selectionDetails?.validFilters"
@@ -176,7 +177,7 @@ async function deploy() {
 }
 
 function addWorker() {
-  workers.value.push(createWorker());
+  workers.value.unshift(createWorker());
 }
 
 function normalizeCaproverWorker(worker: CW, envs: Env[]): Machine {

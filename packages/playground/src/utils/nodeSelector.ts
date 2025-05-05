@@ -19,7 +19,6 @@ import type {
   SelectionDetailsFilters,
   SelectionDetailsFiltersValidators,
 } from "../types/nodeSelector";
-import { createCustomToast, ToastType } from "./custom_toast";
 import { normalizeError } from "./helpers";
 
 export interface GetLocationsConfig {
@@ -186,6 +185,8 @@ export function normalizeNodeFilters(
   filters: SelectionDetailsFilters,
   options?: NormalizeNodeFiltersOptions,
 ): FilterOptions {
+  const bothRentalFiltersActive = filters.dedicated && filters.rentedBy;
+
   return {
     page: Math.max(1, options?.page || 1),
     size: options?.size,
@@ -207,7 +208,9 @@ export function normalizeNodeFilters(
     country: options?.location.country,
     gateway: options?.gateway,
     healthy: true,
-    rentableOrRentedBy: filters.dedicated ? options?.twinId : undefined,
+    rentable: bothRentalFiltersActive ? undefined : filters.dedicated || undefined,
+    rentedBy: bothRentalFiltersActive ? undefined : filters.rentedBy || undefined,
+    rentableOrRentedBy: bothRentalFiltersActive ? options?.twinId : undefined,
     planetary: filters.planetary,
     mycelium: filters.mycelium,
     wireguard: filters.wireguard,
@@ -221,24 +224,26 @@ export function loadNodes(gridStore: ReturnType<typeof useGrid>, filters: Filter
 export async function validateRentContract(
   gridStore: ReturnType<typeof useGrid>,
   node: NodeInfo | undefined | null,
+  hasGpu?: boolean | undefined,
 ): Promise<true> | never {
   if (!node || !node.nodeId) {
     throw "Node ID is required.";
   }
+  if (node.dedicated && node.rentedByTwinId === 0 && !node.inDedicatedFarm && !hasGpu) return true;
 
   try {
-    if (node.dedicated && node.rentedByTwinId === 0) {
+    if (node.dedicated && node.rentedByTwinId === 0 && node.inDedicatedFarm) {
       throw `Node ${node.nodeId} is not rented`;
     }
+    if (node.dedicated && node.rentedByTwinId === 0 && hasGpu) {
+      throw `You have to rent node ${node.nodeId} before you can use its GPU capabilities`;
+    }
     if (node.rentContractId !== 0) {
-      const contractInfo = await gridStore.grid.contracts.get({
+      const { state } = await gridStore.grid.contracts.get({
         id: node.rentContractId,
       });
-      if (contractInfo.state.gracePeriod) {
-        createCustomToast(
-          `You can't deploy on node ${node.nodeId}, its rent contract is in grace period.`,
-          ToastType.danger,
-        );
+      if (state.gracePeriod) {
+        throw `You can't deploy on node ${node.nodeId}, its rent contract is in grace period.`;
       }
     }
 
@@ -283,7 +288,7 @@ async function _loadValidNodes(
 
   while (page !== -1) {
     const nodes = await loadNodes(gridStore, { ...filters, page });
-    const checks = await Promise.allSettled(nodes.map(n => checkNodeCapacityPool(gridStore, n, selectionFitlers)));
+    const checks = await Promise.allSettled(nodes.map(n => _checkNodeCapacityAndGpu(gridStore, n, selectionFitlers)));
     const validNodes = checks.map((c, i) => (c.status === "fulfilled" ? nodes[i] : null)).filter(Boolean) as NodeInfo[];
 
     if (validNodes.length > 0) {
@@ -294,6 +299,17 @@ async function _loadValidNodes(
   }
 
   return [];
+}
+
+async function _checkNodeCapacityAndGpu(
+  gridStore: ReturnType<typeof useGrid>,
+  node: NodeInfo,
+  selectionFitlers: SelectionDetailsFilters,
+) {
+  await checkNodeCapacityPool(gridStore, node, selectionFitlers);
+  if (selectionFitlers.hasGPU) {
+    await checkGpuCardAvailability(gridStore, node);
+  }
 }
 
 type GetFarmFn = (farmId: number) => Farm | undefined;
@@ -393,6 +409,11 @@ export async function getNodeGpuCards(gridStore: ReturnType<typeof useGrid>, nod
   // cards might return as null if not supported or something went wrong
   const cards = await gridStore.client.zos.getNodeGPUInfo(node);
   return cards || [];
+}
+
+export async function getNodeAvailableGpuCards(gridStore: ReturnType<typeof useGrid>, node: NodeInfo) {
+  const cards = await getNodeGpuCards(gridStore, node);
+  return cards.filter(card => card.contract == 0);
 }
 
 export async function resolveAsync<T>(promise: Promise<T>): Promise<[T, null]>;
@@ -515,6 +536,32 @@ export async function checkNodeCapacityPool(
       );
     }
 
+    throw err;
+  }
+}
+/**
+ * Checks the availability of at least one GPU card on a specified node.
+ *
+ * @param {ReturnType<typeof useGrid>} gridStore - The grid store instance used to retrieve GPU card availability.
+ * @param {NodeInfo} node - The node to check for available GPU cards.
+ * @returns {Promise<true>} Resolves to `true` if at least one GPU card is available.
+ * @throws {Error} Throws an error if no GPU cards are available or if an unexpected issue occurs.
+ */
+export async function checkGpuCardAvailability(
+  gridStore: ReturnType<typeof useGrid>,
+  node: NodeInfo,
+): Promise<true> | never {
+  try {
+    const cards = await getNodeAvailableGpuCards(gridStore, node);
+    if (cards.length === 0) {
+      throw "No available GPU cards on the selected node.";
+    }
+    return true;
+  } catch (error) {
+    const err = normalizeError(
+      error,
+      "Something went wrong while checking status of the GPU card. Please check your connection and try again.",
+    );
     throw err;
   }
 }

@@ -13,15 +13,7 @@
     "
     :flat="flat"
     v-bind="{
-      onClick: selectable
-        ? async () => {
-            if (status === 'Init' && node) {
-              $emit('node:select', (node as NodeInfo));
-            }
-            if(node?.dedicated && node.rentContractId === 0) return false
-            await validateRentContract(gridStore, node as NodeInfo);
-          }
-        : undefined,
+      onClick: selectable ? async () => await handleNodeClick() : undefined,
     }"
   >
     <template #loader>
@@ -284,7 +276,8 @@
           v-if="node?.dedicated && node?.status !== 'down'"
           class="ml-4"
           :node="(node as GridNode)"
-          @updateTable="onReserveChange"
+          @update:status="$emit('update:status', $event as ValidatorStatus)"
+          @update:node="$emit('update:node', $event as NodeInfo)"
         />
       </div>
     </template>
@@ -299,6 +292,7 @@ import { capitalize, computed, onMounted, type PropType, ref, watch } from "vue"
 
 import { gridProxyClient } from "@/clients";
 import ReserveBtn from "@/dashboard/components/reserve_action_btn.vue";
+import type { ValidatorStatus } from "@/hooks/form_validator";
 import type { SelectedMachine } from "@/types/nodeSelector";
 import toHumanDate from "@/utils/date";
 import type { discountItems } from "@/utils/get_nodes";
@@ -328,6 +322,7 @@ export default {
   emits: {
     "node:select": (node: NodeInfo) => true || node,
     "update:node": (node: NodeInfo | GridNode) => true || node,
+    "update:status": (status: ValidatorStatus) => status,
   },
   setup(props, ctx) {
     const profileManagerController = useProfileManagerController();
@@ -363,6 +358,12 @@ export default {
       tftMarketPrice.value = await calculator.tftPrice();
       tftsNeeded();
     });
+
+    async function handleNodeClick() {
+      if (props.status === "Init" && props.node) {
+        ctx.emit("node:select", props.node as NodeInfo);
+      }
+    }
 
     async function refreshStakingDiscount() {
       loadingStakingDiscount.value = true;
@@ -475,9 +476,17 @@ export default {
       }
     }
 
-    const cruText = computed(() =>
-      props.node ? `${props.node.used_resources.cru} / ${props.node.total_resources.cru} (Cores)` : "",
-    );
+    const cruText = computed(() => {
+      if (!props.node) return;
+
+      const displayUsedCores =
+        props.node.used_resources.cru > props.node.total_resources.cru
+          ? `${props.node.total_resources.cru}+`
+          : props.node.used_resources.cru;
+
+      return `${displayUsedCores} / ${props.node.total_resources.cru} (Cores)`;
+    });
+
     const mruText = computed(normalizeBytesResource("mru"));
     const sruText = computed(normalizeBytesResource("sru"));
     const hruText = computed(normalizeBytesResource("hru"));
@@ -504,25 +513,6 @@ export default {
       } catch (err) {
         console.error(err);
       }
-    }
-
-    function onReserveChange() {
-      if (!props.node) {
-        return;
-      }
-
-      const n = { ...props.node } as NodeInfo | GridNode;
-      const gotReserved = n.rentedByTwinId === 0;
-
-      if (gotReserved) {
-        n.rentedByTwinId = profileManager.profile!.twinId;
-        n.rented = true;
-      } else {
-        n.rentedByTwinId = 0;
-        n.rented = false;
-      }
-      n.rentable = !n.rented;
-      ctx.emit("update:node", n);
     }
 
     function getNodeStatusColor(status: string): string {
@@ -635,13 +625,13 @@ export default {
       capitalize,
       formatResourceSize,
       formatSpeed,
-      onReserveChange,
       getNodeStatusColor,
       validateRentContract,
       discountTableItems,
       lastDeploymentTime,
       loadingdiscountTableItems,
       gridStore,
+      handleNodeClick,
     };
   },
 };

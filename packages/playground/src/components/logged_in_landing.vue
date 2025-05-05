@@ -119,16 +119,16 @@ export default {
         path: DashboardRoutes.Deploy.VirtualMachines,
       },
       {
-        title: "Deploy Applications",
+        title: "Deploy Labs",
         icon: "mdi-lightbulb-on-outline",
         text: "Deploy from a wide range of in demand solutions such as Algorand, Funkwhale, Wordpress, Discourse and much more!",
         path: DashboardRoutes.Deploy.Applications,
       },
       {
-        title: "Deploy Orchestrators",
-        icon: "mdi-group",
-        text: "Deploy Kubernetes clusters out of the box or Caprover app/database deployment & web server manager on the Threefold Grid.",
-        path: DashboardRoutes.Deploy.Orchestrators,
+        title: "Domains",
+        icon: "mdi-web-box",
+        text: "Expose servers hosted on local machines or VMs to the public internet.",
+        path: DashboardRoutes.Deploy.Domains,
       },
       {
         title: "Explore Grid Capacity",

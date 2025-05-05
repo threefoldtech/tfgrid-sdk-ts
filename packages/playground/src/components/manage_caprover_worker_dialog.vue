@@ -32,6 +32,7 @@
         :loading="false"
         :deleting="deleting"
         v-model="selectedWorkers"
+        :sort-by="sortBy"
       >
         <template #[`item.index`]="{ item }">
           {{ data.indexOf(item) + 1 }}
@@ -65,7 +66,7 @@
     </template>
 
     <template #deploy>
-      <CaproverWorker v-model="worker" />
+      <CaproverWorker :key="worker._id" v-model="worker" />
     </template>
   </ManageWorkerDialog>
 
@@ -124,13 +125,14 @@ const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
 
 const worker = ref(createWorker());
-
+const sortBy = ref([{ key: "created", order: "desc" }]);
 function calcDiskSize(disks: { size: number }[]) {
   return disks.reduce((t, d) => t + d.size, 0) / 1024 ** 3;
 }
 
 const caproverData = ref<any>();
 function updateCaprover() {
+  worker.value = createWorker();
   if (!caproverData.value) return;
   emits("update:caprover", caproverData.value);
   caproverData.value = undefined;

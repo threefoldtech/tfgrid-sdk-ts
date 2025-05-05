@@ -2,11 +2,34 @@
   <view-layout>
     <v-card color="primary" class="d-flex justify-center items-center mb-4 pa-3 text-center">
       <v-icon size="30" class="pr-3">mdi-lightbulb-on-outline</v-icon>
-      <v-card-title class="pa-0">Applications</v-card-title>
+      <v-card-title class="pa-0">Labs</v-card-title>
     </v-card>
-    <v-text-field label="Search Applications" v-model="searchItem" class="mb-5" clearable></v-text-field>
-    <ApplicationCards :cards="filteredCards" />
-    <p v-if="filteredCards.length === 0" class="mx-3 mb-3">No solution was found with the provided search query.</p>
+    <v-text-field label="Search for a lab" v-model="searchItem" class="mb-5" clearable></v-text-field>
+    <p v-if="filteredAppCards.length === 0 && filteredOrchCards.length === 0" class="mx-3 mb-3">
+      No solution was found with the provided search query.
+    </p>
+
+    <v-card class="my-5" variant="text" v-if="filteredOrchCards.length > 0"
+      ><v-card-title
+        class="mb-2"
+        :style="{
+          fontSize: '1.25rem',
+        }"
+        >Orchestrators</v-card-title
+      >
+      <ApplicationCards :cards="filteredOrchCards" />
+    </v-card>
+    <v-divider class="my-4" v-if="filteredAppCards.length && filteredOrchCards.length"></v-divider>
+    <v-card class="my-5" variant="text" v-if="filteredAppCards.length > 0"
+      ><v-card-title
+        class="mb-2"
+        :style="{
+          fontSize: '1.25rem',
+        }"
+        >Applications</v-card-title
+      >
+      <ApplicationCards :cards="filteredAppCards" />
+    </v-card>
   </view-layout>
 </template>
 
@@ -23,7 +46,23 @@ export default {
     ApplicationCards,
   },
   setup() {
-    let cards: ApplicationCard[] = [
+    let orch_cards: ApplicationCard[] = [
+      {
+        title: "Kubernetes",
+        excerpt:
+          "Kubernetes is the standard container orchestration tool. On the TF grid, Kubernetes clusters can be deployed out of the box. We have implemented K3S, a full-blown Kubernetes offering that uses only half of the memory footprint.",
+        icon: "kubernetes.png",
+        route: DashboardRoutes.Applications.Kubernetes,
+      },
+      {
+        title: "CapRover",
+        excerpt:
+          "CapRover is an extremely easy to use app/database deployment & web server manager for your NodeJS, Python, PHP, ASP.NET, Ruby, MySQL, MongoDB, Postgres, WordPress (and etc…) applications!",
+        icon: "caprover.png",
+        route: DashboardRoutes.Applications.CapRover,
+      },
+    ];
+    let app_cards: ApplicationCard[] = [
       {
         title: "Nostr",
         excerpt:
@@ -165,17 +204,22 @@ export default {
         releaseDate: new Date("2024-11-13"),
       },
     ];
-    cards = cards.sort((a, b) => a.title.localeCompare(b.title));
-
+    app_cards = app_cards.sort((a, b) => a.title.localeCompare(b.title));
+    orch_cards = orch_cards.sort((a, b) => a.title.localeCompare(b.title));
     const searchItem = ref("");
-    const filteredCards = computed(() =>
-      cards.filter(n => n.title.toLocaleLowerCase().includes(searchItem.value.toLocaleLowerCase())),
+    const filteredAppCards = computed(() =>
+      app_cards.filter(n => n.title.toLocaleLowerCase().includes(searchItem.value.toLocaleLowerCase())),
+    );
+    const filteredOrchCards = computed(() =>
+      orch_cards.filter(n => n.title.toLocaleLowerCase().includes(searchItem.value.toLocaleLowerCase())),
     );
 
     return {
-      cards,
+      app_cards,
+      orch_cards,
       searchItem,
-      filteredCards,
+      filteredAppCards,
+      filteredOrchCards,
     };
   },
 };

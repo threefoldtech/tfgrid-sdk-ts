@@ -76,8 +76,11 @@
       v-model.number="$props.modelValue.rootFsSize"
     />
 
+    <!-- <input-tooltip inline tooltip="" :href="manual"> -->
+    <v-switch color="primary" inset label="Rented By Me" v-model="$props.modelValue.rentedByMe" hide-details />
+    <!-- </input-tooltip> -->
     <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
-      <v-switch color="primary" inset label="Dedicated" v-model="$props.modelValue.dedicated" hide-details />
+      <v-switch color="primary" inset label="Rentable" v-model="$props.modelValue.dedicated" hide-details />
     </input-tooltip>
 
     <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
@@ -100,6 +103,7 @@
         ipv4: $props.modelValue.ipv4,
         certified: $props.modelValue.certified,
         dedicated: $props.modelValue.dedicated,
+        rentedBy,
         cpu: $props.modelValue.cpu,
         ssdDisks: [$props.modelValue.diskSize],
         memory: $props.modelValue.memory,
@@ -114,10 +118,11 @@
 </template>
 
 <script lang="ts">
-import { calculateRootFileSystem } from "@threefold/grid_client";
+import { calculateRootFileSystem, GridClient } from "@threefold/grid_client";
 import type AwaitLock from "await-lock";
 import { computed, type PropType } from "vue";
 
+import { useGrid } from "@/stores";
 import type { SelectedMachine } from "@/types/nodeSelector";
 import { manual } from "@/utils/manual";
 
@@ -125,9 +130,10 @@ import Networks from "../components/networks.vue";
 import type { K8SWorker } from "../types";
 import { generateName } from "../utils/strings";
 import RootFsSize from "./root_fs_size.vue";
-
+let id = 0;
 export function createWorker(name: string = generateName({ prefix: "wr" })): K8SWorker {
   return {
+    _id: id++,
     name,
     cpu: 1,
     memory: 4096,
@@ -139,8 +145,8 @@ export function createWorker(name: string = generateName({ prefix: "wr" })): K8S
     wireguard: true,
     rootFsSize: 2,
     dedicated: false,
-    certified: false,
     rentedBy: undefined,
+    certified: false,
   };
 }
 
@@ -174,6 +180,9 @@ export default {
     nodesLock: Object as PropType<AwaitLock>,
   },
   setup(props) {
+    const gridStore = useGrid();
+    const grid = gridStore.client as GridClient;
+    const rentedBy = computed(() => (props.modelValue.rentedByMe ? grid.twinId : undefined));
     const selectedMachines = computed(() => {
       return props.otherWorkers.reduce((res, worker) => {
         const machine = toMachine(worker);
@@ -184,7 +193,7 @@ export default {
       }, [] as SelectedMachine[]);
     });
 
-    return { calculateRootFileSystem, manual, selectedMachines };
+    return { calculateRootFileSystem, manual, selectedMachines, rentedBy };
   },
 };
 </script>

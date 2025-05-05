@@ -14,8 +14,8 @@ ifeq ($(project), playground)
 	cd packages/playground && yarn dev
 else ifeq ($(project), dashboard)
 	cd packages/dashboard && yarn serve
-else ifeq ($(project), UI)
-	cd packages/UI && yarn dev
+else ifeq ($(project), stellar_solana_bridge)
+	cd packages/stellar_solana_bridge && yarn dev
 endif
 
 build:
@@ -45,8 +45,8 @@ else ifeq ($(project), graphql_client)
 	cd packages/graphql_client && yarn build
 else ifeq ($(project), gridproxy_client)
 	cd packages/gridproxy_client && yarn build
-else ifeq ($(project), UI)
-	cd packages/UI && yarn build
+else ifeq ($(project), stellar_solana_bridge)
+	cd packages/stellar_solana_bridge && yarn build
 else
 	yarn lerna run build --no-private
 endif

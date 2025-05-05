@@ -32,7 +32,54 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
       path: DashboardRoutes.Applications.BaseRoute,
       component: () => import("../views/solutions_view.vue"),
     },
-
+    {
+      path: DashboardRoutes.Applications.Kubernetes,
+      component: () => import("../views/kubernetes_view.vue"),
+      meta: {
+        title: "Kubernetes",
+        info: { page: "info/kubernetes.md" },
+        navbarConfig: {
+          back: true,
+          path: [
+            { title: "Deploy" },
+            {
+              title: "Labs",
+              disabled: false,
+              to: DashboardRoutes.Deploy.Applications,
+            },
+            {
+              title: "Kubernetes",
+            },
+          ],
+        },
+        requireSSH: true,
+        publicPath: false,
+      },
+    },
+    {
+      path: DashboardRoutes.Applications.CapRover,
+      component: () => import("../views/caprover_view.vue"),
+      meta: {
+        title: "Caprover",
+        info: { page: "info/caprover.md" },
+        navbarConfig: {
+          back: true,
+          path: [
+            { title: "Deploy" },
+            {
+              title: "Labs",
+              disabled: false,
+              to: DashboardRoutes.Deploy.Applications,
+            },
+            {
+              title: "Caprover",
+            },
+          ],
+        },
+        requireSSH: true,
+        publicPath: false,
+      },
+    },
     {
       path: DashboardRoutes.Applications.Peertube,
       component: () => import("../views/peertube_view.vue"),
@@ -44,7 +91,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
           path: [
             { title: "Deploy" },
             {
-              title: "Applications",
+              title: "Labs",
               disabled: false,
               to: DashboardRoutes.Deploy.Applications,
             },
@@ -53,6 +100,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
             },
           ],
         },
+        publicPath: false,
       },
     },
     {
@@ -66,7 +114,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
           path: [
             { title: "Deploy" },
             {
-              title: "Applications",
+              title: "Labs",
               disabled: false,
               to: DashboardRoutes.Deploy.Applications,
             },
@@ -75,6 +123,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
             },
           ],
         },
+        publicPath: false,
       },
     },
     {
@@ -88,7 +137,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
           path: [
             { title: "Deploy" },
             {
-              title: "Applications",
+              title: "Labs",
               disabled: false,
               to: DashboardRoutes.Deploy.Applications,
             },
@@ -97,6 +146,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
             },
           ],
         },
+        publicPath: false,
       },
     },
     {
@@ -110,7 +160,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
           path: [
             { title: "Deploy" },
             {
-              title: "Applications",
+              title: "Labs",
               disabled: false,
               to: DashboardRoutes.Deploy.Applications,
             },
@@ -119,6 +169,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
             },
           ],
         },
+        publicPath: false,
       },
     },
     {
@@ -132,7 +183,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
           path: [
             { title: "Deploy" },
             {
-              title: "Applications",
+              title: "Labs",
               disabled: false,
               to: DashboardRoutes.Deploy.Applications,
             },
@@ -141,6 +192,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
             },
           ],
         },
+        publicPath: false,
       },
     },
     // {
@@ -154,7 +206,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
     //       path: [
     //         { title: "Deploy" },
     //         {
-    //           title: "Applications",
+    //           title: "Labs",
     //           disabled: false,
     //           to: DashboardRoutes.Deploy.Applications,
     //         },
@@ -163,6 +215,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
     //         },
     //       ],
     //     },
+    //     publicPath: false,
     //   },
     // },
     {
@@ -176,7 +229,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
           path: [
             { title: "Deploy" },
             {
-              title: "Applications",
+              title: "Labs",
               disabled: false,
               to: DashboardRoutes.Deploy.Applications,
             },
@@ -185,6 +238,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
             },
           ],
         },
+        publicPath: false,
       },
     },
     {
@@ -198,7 +252,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
           path: [
             { title: "Deploy" },
             {
-              title: "Applications",
+              title: "Labs",
               disabled: false,
               to: DashboardRoutes.Deploy.Applications,
             },
@@ -207,6 +261,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
             },
           ],
         },
+        publicPath: false,
       },
     },
     {
@@ -220,7 +275,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
           path: [
             { title: "Deploy" },
             {
-              title: "Applications",
+              title: "Labs",
               disabled: false,
               to: DashboardRoutes.Deploy.Applications,
             },
@@ -229,6 +284,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
             },
           ],
         },
+        publicPath: false,
       },
     },
     {
@@ -242,7 +298,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
           path: [
             { title: "Deploy" },
             {
-              title: "Applications",
+              title: "Labs",
               disabled: false,
               to: DashboardRoutes.Deploy.Applications,
             },
@@ -251,6 +307,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
             },
           ],
         },
+        publicPath: false,
       },
     },
     {
@@ -264,7 +321,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
           path: [
             { title: "Deploy" },
             {
-              title: "Applications",
+              title: "Labs",
               disabled: false,
               to: DashboardRoutes.Deploy.Applications,
             },
@@ -273,6 +330,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
             },
           ],
         },
+        publicPath: false,
       },
     },
     {
@@ -286,7 +344,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
           path: [
             { title: "Deploy" },
             {
-              title: "Applications",
+              title: "Labs",
               disabled: false,
               to: DashboardRoutes.Deploy.Applications,
             },
@@ -295,6 +353,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
             },
           ],
         },
+        publicPath: false,
       },
     },
     {
@@ -308,7 +367,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
           path: [
             { title: "Deploy" },
             {
-              title: "Applications",
+              title: "Labs",
               disabled: false,
               to: DashboardRoutes.Deploy.Applications,
             },
@@ -317,6 +376,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
             },
           ],
         },
+        publicPath: false,
       },
     },
     {
@@ -330,7 +390,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
           path: [
             { title: "Deploy" },
             {
-              title: "Applications",
+              title: "Labs",
               disabled: false,
               to: DashboardRoutes.Deploy.Applications,
             },
@@ -339,6 +399,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
             },
           ],
         },
+        publicPath: false,
       },
     },
     {
@@ -352,7 +413,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
           path: [
             { title: "Deploy" },
             {
-              title: "Applications",
+              title: "Labs",
               disabled: false,
               to: DashboardRoutes.Deploy.Applications,
             },
@@ -361,6 +422,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
             },
           ],
         },
+        publicPath: false,
       },
     },
 
@@ -375,7 +437,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
           path: [
             { title: "Deploy" },
             {
-              title: "Applications",
+              title: "Labs",
               disabled: false,
               to: DashboardRoutes.Deploy.Applications,
             },
@@ -384,6 +446,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
             },
           ],
         },
+        publicPath: false,
       },
     },
     // Commented for now and will be user later.
@@ -398,7 +461,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
     //       path: [
     //         { title: "Deploy" },
     //         {
-    //           title: "Applications",
+    //           title: "Labs",
     //           disabled: false,
     //           to: DashboardRoutes.Deploy.Applications,
     //         },
@@ -407,6 +470,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
     //         },
     //       ],
     //     },
+    //     publicPath: false,
     //   },
     // },
     {
@@ -420,7 +484,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
           path: [
             { title: "Deploy" },
             {
-              title: "Applications",
+              title: "Labs",
               disabled: false,
               to: DashboardRoutes.Deploy.Applications,
             },
@@ -429,6 +493,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
             },
           ],
         },
+        publicPath: false,
       },
     },
     {
@@ -442,7 +507,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
           path: [
             { title: "Deploy" },
             {
-              title: "Applications",
+              title: "Labs",
               disabled: false,
               to: DashboardRoutes.Deploy.Applications,
             },
@@ -451,6 +516,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
             },
           ],
         },
+        publicPath: false,
       },
     },
     {
@@ -464,7 +530,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
           path: [
             { title: "Deploy" },
             {
-              title: "Applications",
+              title: "Labs",
               disabled: false,
               to: DashboardRoutes.Deploy.Applications,
             },
@@ -473,6 +539,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
             },
           ],
         },
+        publicPath: false,
       },
     },
     {
@@ -486,7 +553,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
           path: [
             { title: "Deploy" },
             {
-              title: "Applications",
+              title: "Labs",
               disabled: false,
               to: DashboardRoutes.Deploy.Applications,
             },
@@ -495,6 +562,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
             },
           ],
         },
+        publicPath: false,
       },
     },
   ];
@@ -623,7 +691,7 @@ function createDeployRoutes(): RouteRecordRaw[] {
             {
               path: "",
               component: () => import("../views/vms_view.vue"),
-              meta: { title: "Virtual Machines" },
+              meta: { title: "Virtual Machines", publicPath: true },
             },
             {
               path: DashboardRoutes.VirtualMachines.FullVirtualMachine,
@@ -681,63 +749,32 @@ function createDeployRoutes(): RouteRecordRaw[] {
           children: [
             {
               path: "",
-              component: () => import("../views/orchestrators_view.vue"),
-              meta: { title: "Orchestrators" },
+              redirect: DashboardRoutes.Deploy.Applications,
             },
 
             {
-              path: DashboardRoutes.Orchestrators.Kubernetes,
-              component: () => import("../views/kubernetes_view.vue"),
-              meta: {
-                title: "Kubernetes",
-                info: { page: "info/kubernetes.md" },
-                navbarConfig: {
-                  back: true,
-                  path: [
-                    { title: "Deploy" },
-                    {
-                      title: "Orchestrators",
-                      disabled: false,
-                      to: DashboardRoutes.Deploy.Orchestrators,
-                    },
-                    {
-                      title: "Kubernetes",
-                    },
-                  ],
-                },
-                requireSSH: true,
-              },
+              path: "/deploy/orchestrators/kubernetes",
+              redirect: DashboardRoutes.Applications.Kubernetes,
             },
             {
-              path: DashboardRoutes.Orchestrators.CapRover,
-              component: () => import("../views/caprover_view.vue"),
-              meta: {
-                title: "Caprover",
-                info: { page: "info/caprover.md" },
-                navbarConfig: {
-                  back: true,
-                  path: [
-                    { title: "Deploy" },
-                    {
-                      title: "Orchestrators",
-                      disabled: false,
-                      to: DashboardRoutes.Deploy.Orchestrators,
-                    },
-                    {
-                      title: "Caprover",
-                    },
-                  ],
-                },
-                requireSSH: true,
-              },
+              path: "/deploy/orchestrators/caprover/",
+              redirect: DashboardRoutes.Applications.CapRover,
             },
           ],
         },
 
         {
           path: DashboardRoutes.Deploy.Applications,
-          meta: { title: "Applications" },
+          meta: { title: "Labs", publicPath: true },
           children: createApplicationsRoutes(),
+        },
+        {
+          path: "/deploy/applications/:catchAll(.*)",
+          redirect: to => {
+            return {
+              path: `${DashboardRoutes.Deploy.Applications}${to.fullPath.split("/deploy/applications/")[1]}`,
+            };
+          },
         },
 
         {
@@ -807,6 +844,9 @@ const mainRoutes: RouteRecordRaw[] = [
 const router = createRouter({
   history: createWebHashHistory(),
   routes: mainRoutes,
+  scrollBehavior(to, from, savedPosition) {
+    window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+  },
 });
 
 /* Guard to verify monitor is completed */
