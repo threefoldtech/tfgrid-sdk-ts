@@ -2,6 +2,7 @@ import {
   BlockchainDeleteModel,
   BlockchainGetModel,
   BlockchainSignModel,
+  generateString,
   StellarWalletBalanceByAddressModel,
   StellarWalletCreateModel,
   StellarWalletInitModel,
@@ -84,31 +85,32 @@ async function deleteAccount(client, account) {
 
 async function main() {
   const grid3 = await getClient();
+  const account1Name = generateString(10);
+  const account2Name = generateString(10);
 
   const createAccount: StellarWalletCreateModel = {
-    name: "stellarTest",
+    name: account1Name,
   };
-
   const account: StellarWalletInitModel = {
-    name: "stellarTest2",
+    name: account2Name,
     secret: "SBCWGJ4A4IHDUUXPASQBL7VKGZGNRMVNV66GO5P6FU6Q4NDKHIHZFRKI",
   };
 
   const getAccount: BlockchainGetModel = {
-    name: "stellarTest2",
+    name: account2Name,
   };
 
   const signMessage: BlockchainSignModel = {
-    name: "stellarTest2",
+    name: account2Name,
     content: "message",
   };
 
   const deleteAccount1: BlockchainDeleteModel = {
-    name: "stellarTest",
+    name: account1Name,
   };
 
   const deleteAccount2: BlockchainDeleteModel = {
-    name: "stellarTest2",
+    name: account2Name,
   };
 
   //Create account
@@ -140,10 +142,10 @@ async function main() {
 
   //Pay
   const transaction: StellarWalletTransferModel = {
-    name: "stellarTest2",
+    name: account2Name,
     address_dest: created_account.public_key,
     amount: 1,
-    description: "paytest",
+    description: generateString(10),
     asset: "XLM",
   };
 
