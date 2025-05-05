@@ -1,6 +1,6 @@
 import { ComputeCapacity } from "../zos/computecapacity";
 import { Workload, WorkloadTypes } from "../zos/workload";
-import { Mount, Zmachine, ZmachineNetwork, ZNetworkInterface } from "../zos/zmachine";
+import { Mount, MyceliumIP, Zmachine, ZmachineNetwork, ZNetworkInterface } from "../zos/zmachine";
 import { MachineInterface, ZmachineLight, ZmachineLightNetwork } from "../zos/zmachine_light";
 
 class VMPrimitive {
@@ -30,10 +30,10 @@ class VMPrimitive {
     zmachine_network.public_ip = public_ip;
 
     if (mycelium) {
-      zmachine_network.mycelium = {
-        hex_seed: myceliumSeed,
-        network: networkName,
-      };
+      const myceliumIP = new MyceliumIP();
+      myceliumIP.network = networkName;
+      myceliumIP.hex_seed = myceliumSeed;
+      zmachine_network.mycelium = myceliumIP;
     }
     return zmachine_network;
   }
