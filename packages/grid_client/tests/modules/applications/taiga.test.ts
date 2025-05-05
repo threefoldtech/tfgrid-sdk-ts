@@ -20,7 +20,7 @@ let deploymentName: string;
 
 beforeAll(async () => {
   gridClient = await getClient();
-  deploymentName = "tg" + generateString(10);
+  deploymentName = "tg" + gridClient.twinId + generateString(5);
   gridClient.clientOptions.projectName = `taiga/${deploymentName}`;
   gridClient._connect();
   return gridClient;
@@ -177,7 +177,7 @@ test("TC2691 - Applications: Deploy Taiga", async () => {
     name: subdomain,
     network: wgnet.network,
     node_id: GatewayNode.nodeId,
-    tls_passthrough: false,
+    tls_passthrough: tlsPassthrough,
     backends: [`http://${wgnet.ip}:9000`],
   };
 

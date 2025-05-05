@@ -20,7 +20,7 @@ let deploymentName: string;
 
 beforeAll(async () => {
   gridClient = await getClient();
-  deploymentName = "cl" + generateString(10);
+  deploymentName = "cl" + gridClient.twinId + generateString(5);
   gridClient.clientOptions.projectName = `casperlabs/${deploymentName}`;
   gridClient._connect();
   return gridClient;

@@ -22,7 +22,7 @@ let deploymentName: string;
 
 beforeAll(async () => {
   gridClient = await getClient();
-  deploymentName = "dc" + generateString(10);
+  deploymentName = "dc" + gridClient.twinId + generateString(5);
   gridClient.clientOptions.projectName = `discourse/${deploymentName}`;
   gridClient._connect();
   return gridClient;

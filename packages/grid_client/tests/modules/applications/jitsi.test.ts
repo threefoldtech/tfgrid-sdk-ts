@@ -20,7 +20,7 @@ let deploymentName: string;
 
 beforeAll(async () => {
   gridClient = await getClient();
-  deploymentName = "jitsi" + generateString(10);
+  deploymentName = "jitsi" + gridClient.twinId + generateString(5);
   gridClient.clientOptions.projectName = `jitsi/${deploymentName}`;
   gridClient._connect();
   return gridClient;
