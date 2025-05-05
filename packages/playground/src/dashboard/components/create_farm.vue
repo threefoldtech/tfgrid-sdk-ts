@@ -13,14 +13,24 @@
         >Bootstrap Node Image</v-btn
       >
 
-      <v-btn
-        variant="elevated"
-        class="text-subtitle-1 px-6"
-        v-if="network !== 'main'"
-        @click="showDialogue = true"
-        :disabled="isCreating"
-        >Create Farm</v-btn
+      <v-tooltip
+        text="You must acquire a minimum of 2 TFTs in order to create a farm."
+        location="bottom"
+        :disabled="!notEnoughBalance"
       >
+        <template #activator="{ props }">
+          <span v-bind="props">
+            <v-btn
+              variant="elevated"
+              class="text-subtitle-1 px-6"
+              v-if="network !== 'main'"
+              @click="showDialogue = true"
+              :disabled="isCreating || notEnoughBalance"
+              >Create Farm</v-btn
+            >
+          </span>
+        </template>
+      </v-tooltip>
     </v-row>
 
     <v-container v-if="showDialogue">
@@ -58,12 +68,13 @@
 </template>
 
 <script lang="ts">
-import { ref } from "vue";
+import { ref, watchEffect } from "vue";
 
 import { manual } from "@/utils/manual";
 import { notifyDelaying } from "@/utils/notifications";
 
 import { gridProxyClient } from "../../clients";
+import { useProfileManagerController } from "../../components/profile_manager_controller.vue";
 import { useGrid } from "../../stores";
 import { createCustomToast, ToastType } from "../../utils/custom_toast";
 export default {
@@ -75,8 +86,14 @@ export default {
     const valid = ref(false);
     const farmName = ref("");
     const network = process.env.NETWORK || (window as any).env.NETWORK;
+    const profileManagerController = useProfileManagerController();
+    const notEnoughBalance = ref(false);
+    watchEffect(async () => {
+      notEnoughBalance.value = await checkBalance();
+    });
 
     async function createFarm() {
+      ``;
       try {
         isCreating.value = true;
         await gridStore.grid.farms.create({ name: farmName.value });
@@ -104,6 +121,16 @@ export default {
         return { message: "Farm name already exists!" };
       }
     }
+
+    async function checkBalance() {
+      await profileManagerController.reloadBalance();
+      const freeBalance = profileManagerController.balance.value?.free;
+
+      if (freeBalance && freeBalance < 2) {
+        return true;
+      }
+    }
+
     return {
       showDialogue,
       isCreating,
@@ -113,6 +140,8 @@ export default {
       validateFarmName,
       network,
       manual,
+      checkBalance,
+      notEnoughBalance,
     };
   },
 };
