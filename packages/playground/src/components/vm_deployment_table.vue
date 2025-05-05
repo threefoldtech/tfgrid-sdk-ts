@@ -335,6 +335,7 @@ const filteredHeaders = computed(() => {
     ProjectName.Presearch,
     ProjectName.Umbrel,
     ProjectName.Nextcloud,
+    ProjectName.Openwebui,
     ProjectName.Funkwhale,
     ProjectName.Casperlabs,
     ProjectName.Mattermost,

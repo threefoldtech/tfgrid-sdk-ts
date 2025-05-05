@@ -89,6 +89,11 @@ export const deploymentListEnvironments = {
     MATTERMOST_DOMAIN: false,
   },
 
+  openwebui: {
+    SSH_KEY: _ssh,
+    OPENWEBUI_DOMAIN: "Open WebUI Domain",
+  },
+
   owncloud: {
     SSH_KEY: _ssh,
     OWNCLOUD_DOMAIN: "Owncloud Domain",
