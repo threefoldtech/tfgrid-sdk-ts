@@ -3,14 +3,9 @@ name: Playground Selenium Tests
 on:
   workflow_dispatch:
     inputs:
-      branch:
-        description: "Select which Git branch to run against"
-        required: true
-        default: "development"
       network:
-        description: "Select the target environment"
+        description: "Target environment"
         required: true
-        type: choice
         default: "dev"
         options:
           - local
@@ -18,20 +13,27 @@ on:
           - qa
           - test
           - main
+      local_build:
+        description: "Build & serve dashboard locally?"
+        required: false
+        type: boolean
+        default: false
+
   schedule:
     - cron: "0 6 * * *"
 
 jobs:
-  selenium-run:
+  selenium:
     runs-on: ubuntu-latest
+
+    # fall back to 'dev' and 'false' when triggered by schedule
     env:
-      NETWORK: ${{ github.event.inputs.network }}
+      NETWORK: ${{ github.event.inputs.network  || 'dev' }}
+      LOCAL_BUILD: ${{ github.event.inputs.local_build || false }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.inputs.branch }}
 
       - name: Set up Python 3.10
         uses: actions/setup-python@v5
@@ -46,18 +48,21 @@ jobs:
       - name: Set up Node.js 18
         uses: actions/setup-node@v4
         with:
-          node-version: "18"
+          node-version: 18
 
-      - name: Install JS dependencies & build
-        if: ${{ github.event.inputs.network == 'local' }}
+      # Only build & serve locally when local_build=true
+      - name: Install JS deps & build dashboard
+        if: ${{ env.LOCAL_BUILD == 'true' }}
         run: |
           yarn install
           yarn lerna run build
 
-      - name: Start playground server
+      - name: Start local dashboard
+        if: ${{ env.LOCAL_BUILD == 'true' }}
         run: make run project=playground &
 
-      - name: Wait for server to be ready
+      - name: Wait for local server
+        if: ${{ env.LOCAL_BUILD == 'true' }}
         run: sleep 60
 
       - name: Run Selenium tests
@@ -68,8 +73,10 @@ jobs:
           STELLAR_ADDRESS: ${{ secrets.STELLAR_ADDRESS }}
           EMAIL: ${{ secrets.EMAIL }}
           NETWORK: ${{ env.NETWORK }}
+          # Decide which URL to hit
+          DASHBOARD_URL: ${{ env.LOCAL_BUILD == 'true' && 'http://localhost:8080' || format('https://dashboard-%s.grid.tf', env.NETWORK) }}
         run: |
-          python -m pytest -v --html=report.html
+          python -m pytest -v --html=report.html --base-url="$DASHBOARD_URL"
 
       - name: Upload HTML report
         uses: actions/upload-artifact@v3
