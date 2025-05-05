@@ -1,5 +1,4 @@
-import { generateName } from "../../playground/src/utils/strings";
-import { Features, FilterOptions, GatewayNameModel } from "../src";
+import { Features, FilterOptions, GatewayNameModel, generateString } from "../src";
 import { getClient } from "./client_loader";
 import { log } from "./utils";
 
@@ -27,7 +26,7 @@ async function cancel(client, gw) {
 // read more about the gateway types in this doc: https://github.com/threefoldtech/zos/tree/main/docs/internals/gateway
 async function main() {
   const grid3 = await getClient();
-  const gatewayName = generateName({ prefix: "gw" });
+  const gatewayName = "gw" + generateString(6);
 
   const gatewayQueryOptions: FilterOptions = {
     gateway: true,

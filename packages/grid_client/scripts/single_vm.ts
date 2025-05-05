@@ -1,5 +1,4 @@
-import { generateName } from "../../playground/src/utils/strings";
-import { GridClient, MachinesModel } from "../src";
+import { generateString, GridClient, MachinesModel } from "../src";
 import { type ZmachineData } from "../src/helpers/types";
 import { config, getClient } from "./client_loader";
 import { log } from "./utils";
@@ -27,10 +26,10 @@ async function cancel(client: GridClient, name: string) {
 }
 
 async function main() {
-  const name = generateName({ prefix: "vm" });
-  const networkName = generateName({ prefix: "nw" });
-  const machineName = generateName({ prefix: "machine" });
-  const diskName = generateName({ prefix: "disk" });
+  const name = "vm" + generateString(6);
+  const networkName = "nw" + generateString(6);
+  const machineName = "machine" + generateString(6);
+  const diskName = "disk" + generateString(6);
 
   const grid3 = await getClient(`vm/${name}`);
 

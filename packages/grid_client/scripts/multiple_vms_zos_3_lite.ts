@@ -1,5 +1,12 @@
-import { generateName } from "../../playground/src/utils/strings";
-import { Features, FilterOptions, generateRandomHexSeed, GridClient, MachinesDeleteModel, MachinesModel } from "../src";
+import {
+  Features,
+  FilterOptions,
+  generateRandomHexSeed,
+  generateString,
+  GridClient,
+  MachinesDeleteModel,
+  MachinesModel,
+} from "../src";
 import { config, getClient } from "./client_loader";
 import { log, pingNodes } from "./utils";
 
@@ -31,12 +38,12 @@ async function getNodeId(client: GridClient, options: FilterOptions) {
 }
 
 async function main() {
-  const name = generateName({ prefix: "vm" });
-  const networkName = generateName({ prefix: "nw" });
-  const machine1Name = generateName({ prefix: "machine" });
-  const machine2Name = generateName({ prefix: "machine" });
-  const disk1Name = generateName({ prefix: "disk" });
-  const disk2Name = generateName({ prefix: "disk" });
+  const name = "vm" + generateString(6);
+  const networkName = "nw" + generateString(6);
+  const machine1Name = "machine" + generateString(6);
+  const machine2Name = "machine" + generateString(6);
+  const disk1Name = "disk" + generateString(6);
+  const disk2Name = "disk" + generateString(6);
 
   const grid3 = await getClient(`vm/${name}`);
 
