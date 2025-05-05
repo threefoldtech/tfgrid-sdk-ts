@@ -58,8 +58,8 @@
     <AccessDeploymentAlert v-if="!hideSSH" />
 
     <div
-      class="d-flex"
-      :class="[props.projectName.toLowerCase() === 'vm' ? 'justify-space-between' : 'flex-row-reverse']"
+      class="d-flex flex-column flex-sm-row"
+      :class="[props.projectName.toLowerCase() === 'vm' ? 'justify-sm-space-between' : 'flex-sm-row-reverse']"
     >
       <InputTooltip
         v-if="props.projectName.toLowerCase() === 'vm'"
@@ -77,12 +77,12 @@
 
       <VBtn
         :disabled="loading"
-        :class="[props.projectName.toLowerCase() === 'vm' ? 'mt-4' : 'my-4']"
         variant="outlined"
         color="secondary"
         prepend-icon="mdi-reload"
         text="Reload"
         @click="loadDeployments"
+        class="my-4"
       />
     </div>
     <ListTable

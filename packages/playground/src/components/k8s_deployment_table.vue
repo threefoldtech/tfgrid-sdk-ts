@@ -59,8 +59,8 @@
     <AccessDeploymentAlert />
 
     <div
-      class="d-flex"
-      :class="[props.projectName.toLowerCase() === 'kubernetes' ? 'justify-space-between' : 'flex-row-reverse']"
+      class="d-flex flex-column flex-sm-row"
+      :class="[props.projectName.toLowerCase() === 'kubernetes' ? 'justify-sm-space-between' : 'flex-sm-row-reverse']"
     >
       <InputTooltip tooltip="Didn't find your deployments in the list? Enable to show all deployments." inline>
         <VSwitch
@@ -74,12 +74,12 @@
 
       <VBtn
         :disabled="loading"
-        :class="[props.projectName.toLowerCase() === 'kubernetes' ? 'mt-4' : 'my-4']"
         variant="outlined"
         color="secondary"
         prepend-icon="mdi-reload"
         text="Reload"
         @click="loadDeployments"
+        class="my-4"
       />
     </div>
     <ListTable
