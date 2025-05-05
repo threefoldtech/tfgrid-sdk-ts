@@ -1,10 +1,10 @@
-const tseslint = require("typescript-eslint");
-const pluginVue = require("eslint-plugin-vue");
-const prettierPlugin = require("eslint-plugin-prettier");
-const simpleImportSort = require("eslint-plugin-simple-import-sort");
-const globals = require("globals");
+import tseslint from "typescript-eslint";
+import pluginVue from "eslint-plugin-vue";
+import prettierPlugin from "eslint-plugin-prettier";
+import simpleImportSort from "eslint-plugin-simple-import-sort";
+import globals from "globals";
 
-const { defineConfigWithVueTs, vueTsConfigs } = require("@vue/eslint-config-typescript");
+import { defineConfigWithVueTs, vueTsConfigs } from "@vue/eslint-config-typescript";
 
 // This returns an ARRAY of config objects optimized for Vue+TS
 const vueTsGeneratedConfigs = defineConfigWithVueTs(pluginVue.configs["flat/recommended"], vueTsConfigs.recommended, {
@@ -25,7 +25,7 @@ const vueConfig = vueTsGeneratedConfigs.map(config => ({
   files: ["**/*.vue"],
 }));
 
-module.exports = [
+export default [
   {
     ignores: [
       ".yarn/**",
