@@ -195,6 +195,28 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
         publicPath: false,
       },
     },
+    {
+      path: DashboardRoutes.Applications.Openwebui,
+      component: () => import("../views/openwebui_view.vue"),
+      meta: {
+        title: "Open WebUI",
+        info: { page: "info/openwebui.md" },
+        navbarConfig: {
+          back: true,
+          path: [
+            { title: "Deploy" },
+            {
+              title: "Labs",
+              disabled: false,
+              to: DashboardRoutes.Deploy.Applications,
+            },
+            {
+              title: "Open WebUI",
+            },
+          ],
+        },
+      },
+    },
     // {
     //   path: DashboardRoutes.Applications.Owncloud,
     //   component: () => import("../views/owncloud_view.vue"),

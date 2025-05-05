@@ -30,7 +30,8 @@
           <span v-text="text" class="text-caption font-weight-bold text-info" />
           <VSpacer />
         </template>
-        <p class="font-weight-bold text-primary" v-text="total === 0 ? 'N/A' : usagePrecentage + ' %'" />
+        <p class="font-weight-bold text-primary" v-text="usageText" />
+
         <InputTooltip
           v-if="name === 'CPU'"
           tooltip="CPU can be greater than 100% due to overprovisioning."
@@ -62,7 +63,14 @@ export default {
       return isNaN(q) ? 0 : q;
     });
 
-    return { usagePrecentage };
+    const usageText = computed(() => {
+      if (props.total === 0) {
+        return "N/A";
+      }
+      return usagePrecentage.value > 100 ? "100+ %" : `${usagePrecentage.value} %`;
+    });
+
+    return { usagePrecentage, usageText };
   },
 };
 </script>
