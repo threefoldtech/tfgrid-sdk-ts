@@ -225,6 +225,10 @@ test("TC2847 - VM: Deploy a VM With Mycelium", async () => {
   const metadata = "{'deploymentType': 'vm'}";
   const description = "test deploying VM with Mycelium via ts grid3 client";
   const envVarValue = generateString(30);
+  const { execSync, spawn } = require("child_process");
+  const fs = require("fs");
+  const os = require("os");
+  const path = require("path");
 
   //Node Selection
   let nodes;
@@ -326,6 +330,32 @@ test("TC2847 - VM: Deploy a VM With Mycelium", async () => {
   expect(result[0].myceliumIP).toBeDefined();
   expect(result[0].publicIP).toBeNull();
   expect(result[0].description).toBe(description);
+
+  // Download Mycelium if not already present
+  const myceliumBinPath = path.join(os.tmpdir(), "mycelium");
+  if (!fs.existsSync(myceliumBinPath)) {
+    log("Downloading Mycelium...");
+    execSync(
+      `curl -L https://github.com/threefoldtech/mycelium/releases/download/v0.6.0/mycelium-x86_64-unknown-linux-musl.tar.gz -o ${myceliumBinPath}.tar.gz`,
+    );
+    execSync(`tar -xzf ${myceliumBinPath}.tar.gz -C ${os.tmpdir()}`);
+    fs.chmodSync(myceliumBinPath, 0o755); // Make it executable
+  }
+
+  // Run Mycelium in background
+  log("Starting Mycelium...");
+  const myceliumProcess = spawn(
+    myceliumBinPath,
+    ["--peers", "tcp://188.40.132.242:9651", "quic://185.69.166.8:9651", "--tun-name", "utun9"],
+    {
+      detached: true,
+      stdio: "ignore",
+    },
+  );
+  myceliumProcess.unref();
+
+  // Give time for Mycelium to initialize
+  await new Promise(resolve => setTimeout(resolve, 5000));
 
   const host = result[0].myceliumIP;
   const user = "root";
@@ -759,6 +789,143 @@ test("TC1230 - VM: Deploy Multiple VMs on Different Nodes", async () => {
 
     maxIterations++;
   }
+});
+test("TC3850 - VM: Deploy a ZOS3 Lite VM with Mycelium", async () => {
+  /**********************************************
+     Test Suite: Grid3_Client_TS (Automated)
+     Test Case:  TC3850 - VM: Deploy a ZOS3 Lite VM with Mycelium
+     Description:
+       This test deploys a VM on a node with ZOS3 Lite (ZmachineLight & NetworkLight)
+       and verifies the deployment over Mycelium.
+
+     Steps:
+       1. Generate random test config (name, resources, env).
+       2. Filter nodes with ZOS3 Lite compatible features.
+       3. Deploy a VM with Mycelium enabled.
+       4. Verify deployment and network configurations.
+       5. SSH into VM over Mycelium and verify ENV variable.
+       6. Clean up: delete the VM deployment.
+    **********************************************/
+
+  // Test Data
+  const cpu = 2;
+  const memory = 1024;
+  const rootfsSize = 1;
+  const networkName = generateString(10);
+  const vmName = generateString(10);
+  const ipRange = "10.249.0.0/16";
+  const envVarValue = generateString(20);
+  const { execSync, spawn } = require("child_process");
+  const fs = require("fs");
+  const os = require("os");
+  const path = require("path");
+
+  // Node Selection with ZOS3 Lite filters
+  const filter: FilterOptions = {
+    cru: cpu,
+    mru: memory / 1024,
+    sru: rootfsSize,
+    farmName: "LiriaFarm",
+    availableFor: await gridClient.twins.get_my_twin_id(),
+    features: [Features.zmachinelight, Features.networklight, Features.mycelium],
+    nodeExclude: [259],
+  };
+
+  const nodes = await gridClient.capacity.filterNodes(filter);
+  const nodeId = await getOnlineNode(nodes);
+  if (nodeId == -1) throw new Error("No suitable node found for ZOS3 Lite VM test");
+
+  // VM Definition
+  const vms: MachinesModel = {
+    name: deploymentName,
+    network: {
+      name: networkName,
+      ip_range: ipRange,
+    },
+    machines: [
+      {
+        name: vmName,
+        node_id: nodeId,
+        cpu,
+        memory,
+        rootfs_size: rootfsSize,
+        disks: [],
+        flist: "https://hub.grid.tf/tf-official-apps/base:latest.flist",
+        entrypoint: "/sbin/zinit init",
+        public_ip: false,
+        planetary: true,
+        mycelium: true,
+        env: {
+          SSH_KEY: config.ssh_key,
+          TEST_KEY: envVarValue,
+        },
+      },
+    ],
+    metadata: "",
+    description: "ZOS3 Lite VM with Mycelium network test",
+  };
+
+  // Deploy
+  const res = await gridClient.machines.deploy(vms);
+  log(res);
+
+  // Contracts Assertions
+  expect(res.contracts.created).toHaveLength(2);
+  expect(res.contracts.updated).toHaveLength(0);
+  expect(res.contracts.deleted).toHaveLength(0);
+
+  // Fetch Deployment
+  const result = await gridClient.machines.getObj(vms.name);
+  log(result);
+
+  // Deployment Assertions
+  expect(result[0].nodeId).toBe(nodeId);
+  expect(result[0].myceliumIP).toBeDefined();
+  expect(result[0].interfaces[0].ip).toMatch(ipRegex);
+  expect(result[0].interfaces[0].ip).toContain(splitIP(ipRange));
+  expect(result[0].description).toBe(vms.description);
+
+  // Download Mycelium if not already present
+  const myceliumBinPath = path.join(os.tmpdir(), "mycelium");
+  if (!fs.existsSync(myceliumBinPath)) {
+    log("Downloading Mycelium...");
+    execSync(
+      `curl -L https://github.com/threefoldtech/mycelium/releases/download/v0.6.0/mycelium-x86_64-unknown-linux-musl.tar.gz -o ${myceliumBinPath}.tar.gz`,
+    );
+    execSync(`tar -xzf ${myceliumBinPath}.tar.gz -C ${os.tmpdir()}`);
+    fs.chmodSync(myceliumBinPath, 0o755); // Make it executable
+  }
+
+  // Run Mycelium in background
+  log("Starting Mycelium...");
+  const myceliumProcess = spawn(
+    myceliumBinPath,
+    ["--peers", "tcp://188.40.132.242:9651", "quic://185.69.166.8:9651", "--tun-name", "utun9"],
+    {
+      detached: true,
+      stdio: "ignore",
+    },
+  );
+  myceliumProcess.unref();
+
+  // Give time for Mycelium to initialize
+  await new Promise(resolve => setTimeout(resolve, 5000));
+  // SSH to VM via Mycelium
+  const ssh = await RemoteRun(result[0].myceliumIP, "root");
+  try {
+    await ssh.execCommand("cat /proc/1/environ").then(res => {
+      log(res.stdout);
+      expect(res.stdout).toContain(envVarValue);
+    });
+  } finally {
+    await ssh.dispose();
+  }
+});
+
+afterAll(async () => {
+  const res = await gridClient.machines.delete({ name: deploymentName });
+  log(res);
+  await gridClient.disconnect();
 });
 
 afterAll(async () => {
