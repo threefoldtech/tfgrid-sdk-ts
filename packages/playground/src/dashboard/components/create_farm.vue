@@ -129,6 +129,7 @@ export default {
       if (freeBalance && freeBalance < 2) {
         return true;
       }
+      return false;
     }
 
     return {
