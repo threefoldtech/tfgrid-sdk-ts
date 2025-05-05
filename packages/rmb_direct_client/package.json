@@ -23,7 +23,7 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
-    "@noble/secp256k1": "^2.2.3",
+    "@noble/secp256k1": "^1.7.1",
     "@polkadot/api": "^15.9.2",
     "@threefold/tfchain_client": "2.8.0-rc1",
     "@threefold/types": "2.8.0-rc1",
