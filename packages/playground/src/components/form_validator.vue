@@ -1,5 +1,5 @@
 <template>
-  <slot></slot>
+  <slot />
 </template>
 
 <script lang="ts">
@@ -43,12 +43,10 @@ export default {
         [...statusMap.value.values()].some(status => status === ValidatorStatus.Init),
     );
     const form: FormValidatorService = {
-      register(uid: string, service: InputValidatorService) {
+      register(uid: string, service) {
         statusMap.value.set(uid, ValidatorStatus.Init);
-        serviceMap.value.set(uid, {
-          ...service,
-          $el: service.$el?.value,
-        });
+        // @ts-expect-error: Service might not fully implement
+        serviceMap.value.set(uid, service);
       },
       unregister(uid: string) {
         statusMap.value.delete(uid);
@@ -71,11 +69,11 @@ export default {
             el instanceof HTMLElement
               ? el
               : el &&
-                typeof el === "object" &&
-                "value" in el &&
-                (el as { value: HTMLElement }).value instanceof HTMLElement
-              ? (el as { value: HTMLElement }).value
-              : null;
+                  typeof el === "object" &&
+                  "value" in el &&
+                  (el as { value: HTMLElement }).value instanceof HTMLElement
+                ? (el as { value: HTMLElement }).value
+                : null;
 
           if (input) {
             input.classList.remove("weblet-layout-error");
