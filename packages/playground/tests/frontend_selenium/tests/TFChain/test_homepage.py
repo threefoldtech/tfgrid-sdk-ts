@@ -114,9 +114,10 @@ def test_create_account(browser):
     """
     dashboard_page = before_test_setup(browser)
     password = generate_string()
-    connect_button = dashboard_page.connect_your_wallet(get_email(), password)
     dashboard_page.create_account()
     dashboard_page.accept_terms_conditions()
+    assert dashboard_page.wait_for('Mnemonic or Hex Seed is valid.')
+    connect_button = dashboard_page.connect_your_wallet(get_email(), password)
     dashboard_page.click_button(connect_button)
     dashboard_page.logout_account()
     assert dashboard_page.wait_for_button(dashboard_page.login_account(password)).is_enabled() == True
@@ -156,7 +157,11 @@ def test_account_validation(browser):
     assert dashboard_page.wait_for('Passwords should match')
     dashboard_page.click_button(dashboard_page.connect_your_wallet(get_email(), '123456'))
     dashboard_page.open_profile()
-    assert dashboard_page.manual_link() == 'https://manual.grid.tf/documentation/dashboard/wallet_connector.html'
+    if Base.net == 'dev':
+        manual_link = 'https://www.manual.grid.tf/documentation/dashboard/wallet_connector.html'
+    else:    
+        manual_link = 'https://manual.grid.tf/documentation/dashboard/wallet_connector.html'
+    assert dashboard_page.manual_link() == manual_link
     assert dashboard_page.get_mnemonic() == get_seed()
     assert dashboard_page.get_email() == get_email()
     assert grid_proxy.get_twin_address(dashboard_page.get_id()) == dashboard_page.get_address()

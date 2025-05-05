@@ -26,15 +26,15 @@ class DashboardPage:
     tft_info_button = (By.XPATH, '/html/body/div[1]/div/div/main/header/div/div[2]/div/div/div/a/span[3]/i')
     stellar_tft_price_label = (By.XPATH, "//dt[text()='Current price:']/following-sibling::dd/span[1]")
     stellar_tft_price_change_label = (By.XPATH, "//span[contains(@class, 'price-change') and @aria-label]")
-    mnemonic_input = (By.XPATH, "//input[@placeholder='Please insert your Mnemonic or Hex Seed']")
-    email_input = (By.XPATH, "//input[@placeholder='email@example.com']")
+    mnemonic_input = (By.ID, "mnemonic-text-field")
+    email_input = (By.ID, "email-text-field")
     password_input = (By.XPATH, "(//input[@size='1' and @type='password'])[2]")
-    confirm_password_input = (By.XPATH, "(//input[@size='1' and @type='password'])[3]")
+    confirm_password_input = (By.ID, "confirm-password-text-field")
     generate_account_button = (By.XPATH, "//button[.//span[text()=' create account ']]")
     connect_button = (By.XPATH, "//button[.//span[normalize-space()='Connect']]")
     logout_button = (By.XPATH, "/html/body/div[1]/div/div/main/header[1]/div/div[3]/button")
-    login_button = (By.XPATH, "//button[.//span[text()='Login']]")
-    login_password_input = (By.XPATH, "//label[text()='Password']/following-sibling::input")
+    login_button = (By.XPATH, "//button[normalize-space()='Login']")
+    login_password_input = (By.ID, "wallet-password__text-field")
     accept_terms_condition_button = (By.XPATH, "//button[.//span[text()='Accept terms and conditions']]")
     connect_manual_button = (By.XPATH,"//*[contains(text(), 'Threefold Connect')]")
     connect_google_button = (By.XPATH, "//a[@title='Threefold Connect on Google Play Store']")
@@ -73,21 +73,26 @@ class DashboardPage:
             WebDriverWait(self.browser, 60).until(EC.element_to_be_clickable(self.email_input))
 
     def connect_your_wallet(self, email, password):
-        self.browser.find_element(*self.email_input).send_keys(Keys.CONTROL + "a")
-        self.browser.find_element(*self.email_input).send_keys(Keys.DELETE)
-        self.browser.find_element(*self.email_input).send_keys(email)
+        element = WebDriverWait(self.browser, 10).until(EC.presence_of_element_located(self.email_input))
+        for i in range(10):
+            if element.is_enabled():
+                self.browser.find_element(*self.email_input).send_keys(Keys.CONTROL + "a")
+                self.browser.find_element(*self.email_input).send_keys(Keys.DELETE)
+                self.browser.find_element(*self.email_input).send_keys(email)
+            else:
+                time.sleep(3)
         self.browser.find_element(*self.password_input).send_keys(Keys.CONTROL + "a")
         self.browser.find_element(*self.password_input).send_keys(Keys.DELETE)
         self.browser.find_element(*self.password_input).send_keys(password)
         self.browser.find_element(*self.confirm_password_input).send_keys(Keys.CONTROL + "a")
         self.browser.find_element(*self.confirm_password_input).send_keys(Keys.DELETE)
         self.browser.find_element(*self.confirm_password_input).send_keys(password)
-        WebDriverWait(self.browser, 30).until(EC.element_to_be_clickable(self.connect_button))
+        # WebDriverWait(self.browser, 30).until(EC.element_to_be_clickable(self.connect_button))
         return self.browser.find_element(*self.connect_button)
 
     def logout_account(self):
         time.sleep(3)
-        # webdriver.ActionChains(self.browser).send_keys(Keys.ESCAPE).perform()
+        webdriver.ActionChains(self.browser).send_keys(Keys.ESCAPE).perform()
         while True:
             try:
                 self.wait_for_button(self.browser.find_element(*self.logout_button)).click()
@@ -105,7 +110,7 @@ class DashboardPage:
         self.browser.find_element(*self.login_password_input).send_keys(Keys.CONTROL + "a")
         self.browser.find_element(*self.login_password_input).send_keys(Keys.DELETE)
         self.browser.find_element(*self.login_password_input).send_keys(password)
-        WebDriverWait(self.browser, 30).until(EC.element_to_be_clickable(self.login_button))
+        # WebDriverWait(self.browser, 30).until(EC.element_to_be_clickable(self.login_button))
         return self.browser.find_element(*self.login_button)
 
     def create_account(self):
@@ -116,8 +121,7 @@ class DashboardPage:
         self.browser.find_element(*self.iframe_load_label).click()
         webdriver.ActionChains(self.browser).send_keys(Keys.PAGE_DOWN).perform()
         self.browser.find_element(*self.accept_terms_condition_button).click()
-        WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.generate_account_button))
-        WebDriverWait(self.browser, 30).until(EC.element_to_be_clickable(self.password_input))
+        WebDriverWait(self.browser, 60).until(EC.visibility_of_element_located(self.generate_account_button))
 
     def click_button(self, button):
         WebDriverWait(self.browser, 60).until(EC.element_to_be_clickable(button))
