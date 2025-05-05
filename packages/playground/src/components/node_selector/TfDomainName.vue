@@ -114,7 +114,7 @@ import { useGrid } from "../../stores";
 import type { DomainInfo, NetworkFeatures, SelectionDetailsFilters } from "../../types/nodeSelector";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { INode } from "../../utils/filter_nodes";
-import { loadNodes } from "../../utils/nodeSelector";
+import { getNodePageCount, loadNodes } from "../../utils/nodeSelector";
 
 export default {
   name: "TfDomainName",
@@ -146,15 +146,11 @@ export default {
     const domainsTask = useAsync(loadNodes, {
       onAfterTask({ data }) {
         loadedDomains.value = loadedDomains.value.concat(data as NodeInfo[]);
-        if (pagination.value.page === 1 && loadedDomains.value.length > 0) {
-          const estimatedTotalPages = loadedDomains.value.length === size.value ? 2 : 1;
-          pagination.value.reset(estimatedTotalPages);
-        } else {
-          pagination.value.next();
-        }
+        pagination.value.next();
       },
       default: [],
     });
+    const pageCountTask = useAsync(getNodePageCount, { default: 1 });
     const pagination = usePagination();
 
     const enableCustomDomain = ref(false);
@@ -179,8 +175,9 @@ export default {
         selectedDomain.value = null;
         bindModelValue();
       }
+      await pageCountTask.value.run(gridStore, filters.value);
+      pagination.value.reset(pageCountTask.value.data as number);
       loadedDomains.value = [];
-      pagination.value.reset(1);
       await nextTick();
       return loadDomains();
     };
