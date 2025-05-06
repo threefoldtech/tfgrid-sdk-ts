@@ -1,8 +1,8 @@
 <template>
   <section>
     <VBtn
-      variant="tonal"
-      color="secondary"
+      variant="elevated"
+      color="primary"
       class="mb-4"
       size="x-large"
       block
@@ -62,6 +62,7 @@
                   selectable
                   @update:node="updateNode($event as NodeInfo)"
                   @node:select="bindModelValueAndValidate"
+                  @update:status="bindStatus($event as ValidatorStatus)"
                   :status="
                     $props.modelValue === node
                       ? nodeInputValidateTask.loading
@@ -126,15 +127,17 @@
         <VAlert
           type="error"
           variant="elevated"
-          v-if="!filtersUpdated && nodeInputValidateTask.error"
+          v-if="visibleAlert && !filtersUpdated && nodeInputValidateTask.error"
+          @click="visibleAlert = !visibleAlert"
           :style="{
             position: 'absolute',
             bottom: '31px',
             right: '31px',
             zIndex: 9,
+            cursor: 'pointer',
           }"
           :text="nodeInputValidateTask.error"
-          closable
+          dismissable
         />
       </div>
     </input-tooltip>
@@ -147,7 +150,7 @@ import type { Farm } from "@threefold/gridproxy_client";
 import { RequestError } from "@threefold/types";
 import type AwaitLock from "await-lock";
 import equals from "lodash/fp/equals.js";
-import { computed, nextTick, onMounted, onUnmounted, type PropType, ref } from "vue";
+import { computed, nextTick, onMounted, onUnmounted, onUpdated, type PropType, ref } from "vue";
 
 import { normalizeError } from "@/utils/helpers";
 
@@ -195,6 +198,9 @@ export default {
   setup(props, ctx) {
     const gridStore = useGrid();
     const _loadedNodes = ref<NodeInfo[]>([]);
+    const visibleAlert = ref(true);
+    onUpdated(() => (visibleAlert.value = true));
+
     const loadedNodes = computed(() => {
       return _loadedNodes.value.filter(
         node =>
@@ -384,7 +390,7 @@ export default {
       touched,
       bindModelValueAndValidate,
       bindStatus,
-
+      visibleAlert,
       nodesContainer,
     };
   },

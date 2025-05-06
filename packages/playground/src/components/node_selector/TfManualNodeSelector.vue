@@ -10,6 +10,10 @@
         $emit('update:model-value', $event as any);
         validationTask.run(nodeId);
       "
+      @update:status="
+        $emit('update:status', $event as ValidatorStatus);
+        validationTask.reset();
+      "
       :status="
         validationTask.loading
           ? 'Pending'
@@ -69,6 +73,7 @@ import { NetworkFeatures } from "../../types";
 import type { SelectedMachine, SelectionDetailsFilters } from "../../types/nodeSelector";
 import { normalizeError } from "../../utils/helpers";
 import {
+  checkGpuCardAvailability,
   checkNodeCapacityPool,
   normalizeNodeFilters,
   release,
@@ -235,6 +240,7 @@ export default {
         }
         await checkNodeCapacityPool(gridStore, node, props.filters);
         await validateRentContract(gridStore, node, props.filters.hasGPU);
+        if (props.filters.hasGPU) await checkGpuCardAvailability(gridStore, node);
 
         bindModelValue(node);
         placeholderNode.value = undefined;

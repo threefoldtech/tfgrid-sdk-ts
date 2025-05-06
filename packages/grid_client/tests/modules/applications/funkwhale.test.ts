@@ -20,7 +20,7 @@ let deploymentName: string;
 
 beforeAll(async () => {
   gridClient = await getClient();
-  deploymentName = "fw" + generateString(10);
+  deploymentName = "fw" + gridClient.twinId + generateString(5);
   gridClient.clientOptions.projectName = `funkwhale/${deploymentName}`;
   gridClient._connect();
   return gridClient;

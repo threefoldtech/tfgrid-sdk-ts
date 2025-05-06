@@ -216,6 +216,7 @@ const images: VmImage[] = Object.entries(Flists)
     flist,
     entryPoint,
   }));
+
 const name = ref(generateName({ prefix: "vm" }));
 const flist = ref<Flist>();
 const { ipv4, ipv6, planetary, mycelium, wireguard } = useNetworks();

@@ -5,7 +5,7 @@
       <v-card-title class="pa-0">Farms</v-card-title>
     </v-card>
 
-    <CreateFarm class="mt-4" @farm-created="handleFarmCreated" />
+    <CreateFarm @farm-created="handleFarmCreated" />
     <UserFarms :ref="el => (userFarms = el)" :reloadFarms="farmsReload" />
     <UserNodes />
   </div>

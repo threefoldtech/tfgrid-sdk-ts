@@ -14,6 +14,7 @@
     >
       <VmDeploymentTable
         :projectName="tabs[activeTab].value"
+        :projectTitle="tabs[activeTab].title"
         v-model="selectedItems"
         :deleting="deleting"
         :hideSSH="hideSSH"
@@ -197,6 +198,21 @@
             @click="openDialog(tabs[activeTab].value, item)"
           />
           <IconActionBtn tooltip="Visit" icon="mdi-web" color="anchor" :href="'https://' + item.env.OWNCLOUD_DOMAIN" />
+        </template>
+
+        <template #Openwebui-actions="{ item }">
+          <IconActionBtn
+            tooltip="Show Details"
+            icon="mdi-eye-outline"
+            @click="openDialog(tabs[activeTab].value, item)"
+          />
+
+          <IconActionBtn
+            tooltip="Open Open WebUI"
+            color="anchor"
+            icon="mdi-web"
+            :href="'https://' + item.env.OPENWEBUI_DOMAIN"
+          />
         </template>
 
         <template #Nextcloud-actions="{ item }">
@@ -470,6 +486,7 @@ const tabs: Tab[] = [
   { title: "Discourse", value: "Discourse", imgPath: "images/icons/discourse.png" },
   { title: "Taiga", value: "Taiga", imgPath: "images/icons/taiga.png" },
   { title: "Owncloud", value: "Owncloud", imgPath: "images/icons/owncloud.png" },
+  { title: "Open WebUI", value: "Openwebui", imgPath: "images/icons/openwebui.png" },
   { title: "Nextcloud", value: "Nextcloud", imgPath: "images/icons/nextcloud.png" },
   { title: "Presearch", value: "Presearch", imgPath: "images/icons/presearch.png" },
   { title: "Subsquid", value: "Subsquid", imgPath: "images/icons/subsquid.png" },
