@@ -61,6 +61,7 @@
         @click="
           contractsTable.forEach(t => t.reset());
           loadContracts();
+          getTotalCost();
         "
         :disabled="totalCost === undefined"
       >
@@ -79,7 +80,7 @@
       </v-row>
     </template>
     <template #text>
-      <strong v-if="totalCost != undefined" class="text-primary">
+      <strong v-if="totalCost" class="text-primary">
         <input-tooltip
           inline
           :alignCenter="true"
@@ -223,7 +224,7 @@
           "
           @update:sort="
             sort => {
-              loadContracts(table.type);
+              loadContracts(table.type, { sort });
             }
           "
         />
@@ -293,8 +294,10 @@ const nodeIDs = computed(() => {
 });
 // To avoid multiple requests
 const cachedNodeIDs = ref<number[]>([]);
-const sortOptions: { key: string; order: "asc" | "desc" }[] = [{ key: "created_at", order: "desc" }];
-onMounted(loadContracts);
+onMounted(() => {
+  loadContracts();
+  getTotalCost();
+});
 
 async function _normalizeContracts(
   contracts: Contract[],
@@ -347,9 +350,11 @@ async function loadContractsByType(
   }
 }
 
-async function loadContracts(type?: ContractType) {
-  lockedContracts.value = undefined;
-  totalCost.value = undefined;
+async function loadContracts(type?: ContractType, options?: { sort: { key: string; order: "asc" | "desc" }[] }) {
+  if (!type) {
+    lockedContracts.value = undefined;
+    totalCost.value = undefined;
+  }
   totalCostUSD.value = undefined;
   loadingErrorMessage.value = undefined;
   loadingTablesMessage.value = undefined;
@@ -361,20 +366,20 @@ async function loadContracts(type?: ContractType) {
     if (type) {
       switch (type) {
         case ContractType.Name:
-          await loadContractsByType(ContractType.Name, nameContracts, { sort: sortOptions });
+          await loadContractsByType(ContractType.Name, nameContracts, options);
           break;
         case ContractType.Node:
-          await loadContractsByType(ContractType.Node, nodeContracts, { sort: sortOptions });
+          await loadContractsByType(ContractType.Node, nodeContracts, options);
           break;
         case ContractType.Rent:
-          await loadContractsByType(ContractType.Rent, rentContracts, { sort: sortOptions });
+          await loadContractsByType(ContractType.Rent, rentContracts, options);
           break;
       }
     } else {
       await Promise.all([
-        loadContractsByType(ContractType.Name, nameContracts, { sort: sortOptions }),
-        loadContractsByType(ContractType.Node, nodeContracts, { sort: sortOptions }),
-        loadContractsByType(ContractType.Rent, rentContracts, { sort: sortOptions }),
+        loadContractsByType(ContractType.Name, nameContracts, options),
+        loadContractsByType(ContractType.Node, nodeContracts, options),
+        loadContractsByType(ContractType.Rent, rentContracts, options),
       ]);
     }
     const failedContractsLength = failedContracts.value.length;
@@ -385,8 +390,6 @@ async function loadContracts(type?: ContractType) {
     await getContractsLockDetails();
     contracts.value = [...nodeContracts.value, ...nameContracts.value, ...rentContracts.value];
 
-    // Update the total cost of the contracts.
-    await getTotalCost();
     // Get the node info e.g. node status.
     nodeInfo.value = await getNodeInfo(nodeIDs.value, cachedNodeIDs.value);
     cachedNodeIDs.value.push(...nodeIDs.value);
@@ -465,12 +468,47 @@ const nodeStatus = computed(() => {
 // Calculate the total cost of contracts
 async function getTotalCost() {
   totalCost.value = 0;
-  for (const contract of contracts.value) {
-    totalCost.value = +new Decimal(totalCost.value).add(contract.consumption?.valueOf() || 0);
+
+  try {
+    const nodeResponse = await gridProxyClient.contracts.list({
+      twinId: profileManager.profile!.twinId,
+      state: [ContractState.Created, ContractState.GracePeriod],
+      type: ContractType.Node,
+      retCount: true,
+    });
+
+    const nameResponse = await gridProxyClient.contracts.list({
+      twinId: profileManager.profile!.twinId,
+      state: [ContractState.Created, ContractState.GracePeriod],
+      type: ContractType.Name,
+      retCount: true,
+    });
+
+    const rentResponse = await gridProxyClient.contracts.list({
+      twinId: profileManager.profile!.twinId,
+      state: [ContractState.Created, ContractState.GracePeriod],
+      type: ContractType.Rent,
+      retCount: true,
+    });
+
+    const allNodeContracts = await _normalizeContracts(nodeResponse.data, ContractType.Node);
+    const allNameContracts = await _normalizeContracts(nameResponse.data, ContractType.Name);
+    const allRentContracts = await _normalizeContracts(rentResponse.data, ContractType.Rent);
+
+    const allContracts = [...allNodeContracts, ...allNameContracts, ...allRentContracts];
+    for (const contract of allContracts) {
+      const consumption =
+        contract.consumption !== undefined && contract.consumption !== null ? contract.consumption.valueOf() : 0;
+      totalCost.value = +new Decimal(totalCost.value).add(consumption);
+    }
+
+    totalCost.value = +totalCost.value.toFixed(3);
+    const TFTInUSD = await queryClient.tftPrice.get();
+    totalCostUSD.value = totalCost.value * (TFTInUSD / 1000);
+  } catch (error: any) {
+    loadingErrorMessage.value = `Error calculating total cost: ${error.message}`;
+    createCustomToast(loadingErrorMessage.value, ToastType.danger, {});
   }
-  totalCost.value = +totalCost.value.toFixed(3);
-  const TFTInUSD = await queryClient.tftPrice.get();
-  totalCostUSD.value = totalCost.value * (TFTInUSD / 1000);
 }
 
 // Handle updates when contracts are deleted
@@ -514,9 +552,7 @@ const baseTableHeaders: VDataTableHeader = [
 
 // Define specific table headers for each contract type
 const nodeTableHeaders: VDataTableHeader = [
-  { title: "PLACEHOLDER", key: "data-table-select" },
-  { title: "ID", key: "contract_id", sortable: true },
-  { title: "Workload Type", key: "deploymentType", sortable: false },
+  ...baseTableHeaders,
   {
     title: "Solution",
     key: "solution",
@@ -526,9 +562,7 @@ const nodeTableHeaders: VDataTableHeader = [
       { title: "Name", key: "solutionName", sortable: false },
     ],
   },
-  { title: "State", key: "state", sortable: false },
-  { title: "Billing Rate", key: "consumption", sortable: false },
-  { title: "Created At", key: "created_at", sortable: true },
+  { title: "Type", key: "deploymentType", sortable: false },
   { title: "Expiration", key: "expiration", sortable: false },
   { title: "Farm ID", key: "farm_id", sortable: false },
   {
