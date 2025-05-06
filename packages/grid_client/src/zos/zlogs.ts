@@ -2,12 +2,13 @@ import { Expose } from "class-transformer";
 import { ValidateMembers } from "../helpers";
 import { WorkloadData, WorkloadDataResult } from "./workload_base";
 import { WorkloadTypes } from "./workload";
+import { IsString } from "class-validator";
 
 @ValidateMembers()
 class Zlogs extends WorkloadData {
   @Expose() readonly __type: string = "zlogs";
-  public zmachine: string;
-  public output: string;
+  @Expose() @IsString() zmachine: string;
+  @Expose() @IsString() public output: string;
 
   public challenge(): string {
     let out = "";
