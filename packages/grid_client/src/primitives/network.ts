@@ -192,11 +192,10 @@ class Network {
           validateHexSeed(myceliumNetworkSeed.seed, 32);
           seed = myceliumNetworkSeed.seed;
         }
-
-        network.mycelium = {
-          hex_key: seed,
-          peers: [],
-        };
+        const myceliumInstance = new Mycelium();
+        myceliumInstance.hex_key = seed;
+        myceliumInstance.peers;
+        network.mycelium = myceliumInstance;
         this.getUpdatedNetwork(network);
         this.updateNetworkDeployments();
 
