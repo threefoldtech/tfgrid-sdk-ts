@@ -41,7 +41,7 @@ async function main() {
   const name = "k8s" + generateString(8);
   const grid3 = await getClient(`kubernetes/${name}`);
 
-  const qsfs_name = "testQsfsK8sq1";
+  const qsfs_name = generateString(10);
   const disk_size = 1;
   const count = 8;
   const options: FilterOptions = {
@@ -75,22 +75,22 @@ async function main() {
     name: qsfs_name,
     count,
     node_ids: [qsfsNode],
-    password: "mypassword1",
+    password: generateString(10),
     disk_size,
-    description: "my qsfs test",
+    description: generateString(10),
     metadata: "",
   };
 
   const k: K8SModel = {
     name,
-    secret: "secret",
+    secret: generateString(10),
     network: {
       name: networkName,
       ip_range: "10.238.0.0/16",
     },
     masters: [
       {
-        name: "master",
+        name: generateString(10),
         node_id: masterNode,
         cpu: 1,
         memory: 1024,
@@ -103,11 +103,11 @@ async function main() {
         qsfs_disks: [
           {
             qsfs_zdbs_name: qsfs_name,
-            name: "testQsfsK8sd1",
+            name: generateString(10),
             minimal_shards: 2,
             expected_shards: 4,
-            encryption_key: "hamada",
-            prefix: "hamada",
+            encryption_key: generateString(5),
+            prefix: generateString(5),
             cache: 1,
             mountpoint: "/myqsfsdisk",
           },
@@ -116,7 +116,7 @@ async function main() {
     ],
     workers: [
       {
-        name: "worker",
+        name: generateString(10),
         node_id: workerNode,
         cpu: 1,
         memory: 1024,

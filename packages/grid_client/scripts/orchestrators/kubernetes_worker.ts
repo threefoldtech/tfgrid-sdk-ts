@@ -41,7 +41,7 @@ async function main() {
 
   const worker: AddWorkerModel = {
     deployment_name: name,
-    name: "worker2",
+    name: generateString(10),
     node_id: +(await grid3.capacity.filterNodes(workerQueryOptions))[0].nodeId,
     cpu: 2,
     memory: 1024,

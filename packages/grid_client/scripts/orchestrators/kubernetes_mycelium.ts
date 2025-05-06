@@ -52,7 +52,7 @@ async function main() {
     },
     masters: [
       {
-        name: "masterMy",
+        name: generateString(10),
         node_id: 153,
         cpu: 1,
         memory: 1024,
@@ -67,7 +67,7 @@ async function main() {
     ],
     workers: [
       {
-        name: "worker1",
+        name: generateString(10),
         node_id: 31,
         cpu: 1,
         memory: 1024,
