@@ -23,51 +23,50 @@ on:
     - cron: "0 6 * * *"
 
 jobs:
-  selenium:
+  selenium-run:
     runs-on: ubuntu-latest
 
-    # Fall back to 'dev' (default) and 'false' when triggered by schedule
     env:
+      # Fallbacks for scheduled runs
       NETWORK: ${{ github.event.inputs.network || 'dev' }}
       LOCAL_BUILD: ${{ github.event.inputs.local_build || 'false' }}
 
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Python 3.10
+      - name: Setting up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
 
-      - name: Install Python dependencies
+      - name: Installing Python packages
         run: |
           pip install -r packages/playground/tests/frontend_selenium/requirements.txt
           pip install pytest-html
 
-      - name: Set up Node.js 18
+      - name: Node install
         uses: actions/setup-node@v4
         with:
           node-version: 18
 
-      # Only build and serve dashboard locally when local_build=true
-      - name: Install JS dependencies
+      - name: Yarn install
         if: ${{ env.LOCAL_BUILD == 'true' }}
         run: yarn install
 
-      - name: Build dashboard with Lerna
+      - name: Lerna Build
         if: ${{ env.LOCAL_BUILD == 'true' }}
         run: yarn lerna run build
 
-      - name: Start local dashboard
+      - name: Yarn Serve
         if: ${{ env.LOCAL_BUILD == 'true' }}
         run: make run project=playground &
 
-      - name: Wait for local server
+      - name: Wait for localhost
         if: ${{ env.LOCAL_BUILD == 'true' }}
         run: sleep 60
 
-      - name: Run Selenium tests
+      - name: Run tests
         working-directory: ./packages/playground/tests/frontend_selenium
         env:
           TFCHAIN_MNEMONICS: ${{ secrets.TFCHAIN_MNEMONICS }}
@@ -77,6 +76,7 @@ jobs:
           NETWORK: ${{ env.NETWORK }}
           DASHBOARD_URL: ${{ env.LOCAL_BUILD == 'true' && 'http://localhost:8080' || format('https://dashboard-%s.grid.tf', env.NETWORK) }}
         run: |
+          echo "Running against: $DASHBOARD_URL"
           python -m pytest -v --html=report.html --base-url="$DASHBOARD_URL"
 
       - name: Upload HTML report
