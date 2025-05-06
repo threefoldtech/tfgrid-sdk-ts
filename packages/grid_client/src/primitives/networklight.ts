@@ -14,7 +14,7 @@ import { formatErrorMessage, generateRandomHexSeed } from "../helpers/utils";
 import { validateHexSeed } from "../helpers/validator";
 import { MyceliumNetworkModel } from "../modules";
 import { BackendStorage } from "../storage/backend";
-import { NetworkLight } from "../zos";
+import { Mycelium, NetworkLight } from "../zos";
 import { Deployment } from "../zos/deployment";
 import { Workload, WorkloadTypes } from "../zos/workload";
 import { DeploymentFactory } from "./deployment";
@@ -42,7 +42,11 @@ class ZNetworkLight {
   rmb: RMB;
   tfClient: TFClient;
 
-  constructor(public name: string, public ipRange: string, public config: GridClientConfig) {
+  constructor(
+    public name: string,
+    public ipRange: string,
+    public config: GridClientConfig,
+  ) {
     if (Addr(ipRange).prefix !== 16) {
       this.ipRange = Addr(ipRange).mask(16);
       this.ipRange = this.ipRange.toString();
@@ -115,10 +119,10 @@ class ZNetworkLight {
         validateHexSeed(seed, 32);
       }
 
-      znet_light.mycelium = {
-        hex_key: seed,
-        peers: [],
-      };
+      const myceliumInstance = new Mycelium();
+      myceliumInstance.hex_key = seed;
+      myceliumInstance.peers = [];
+      znet_light.mycelium = myceliumInstance;
     }
 
     this.network = znet_light;
@@ -220,11 +224,10 @@ class ZNetworkLight {
           validateHexSeed(myceliumNetworkSeed.seed, 32);
           seed = myceliumNetworkSeed.seed;
         }
-
-        this.network.mycelium = {
-          hex_key: seed,
-          peers: [],
-        };
+        const myceliumInstance = new Mycelium();
+        myceliumInstance.hex_key = seed;
+        myceliumInstance.peers = [];
+        this.network.mycelium = myceliumInstance;
         this.getUpdatedNetwork(this.network);
         this.updateNetworkDeployments();
 

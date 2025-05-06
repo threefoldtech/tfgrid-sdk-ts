@@ -1,15 +1,15 @@
 import { plainToClass } from "class-transformer";
 
-import { NetworkLight } from "../../src";
+import { Mycelium, NetworkLight } from "../../src";
 let networkLight: NetworkLight;
 
 beforeEach(() => {
   networkLight = new NetworkLight();
   networkLight.subnet = "192.168.0.0/16";
-  networkLight.mycelium = {
-    hex_key: "abc123",
-    peers: ["peer1", "peer2"],
-  };
+  const myceliumInstance = new Mycelium();
+  myceliumInstance.hex_key = "abc123";
+  myceliumInstance.peers = ["peer1", "peer2"];
+  networkLight.mycelium = myceliumInstance;
 });
 
 describe("NetworkLight Class Tests", () => {

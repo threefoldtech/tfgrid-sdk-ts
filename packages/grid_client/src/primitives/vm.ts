@@ -1,3 +1,4 @@
+import { Mycelium } from "../zos";
 import { ComputeCapacity } from "../zos/computecapacity";
 import { Workload, WorkloadTypes } from "../zos/workload";
 import { Mount, MyceliumIP, Zmachine, ZmachineNetwork, ZNetworkInterface } from "../zos/zmachine";
@@ -103,10 +104,10 @@ class VMLightPrimitive {
     zmachine_lightnetwork.interfaces = [this._createNetworkInterface(networkName, ip)];
 
     if (mycelium) {
-      zmachine_lightnetwork.mycelium = {
-        hex_seed: myceliumSeed,
-        network: networkName,
-      };
+      const myceliumInstance = new MyceliumIP();
+      myceliumInstance.hex_seed = myceliumSeed;
+      myceliumInstance.network = networkName;
+      zmachine_lightnetwork.mycelium = myceliumInstance;
     }
     return zmachine_lightnetwork;
   }

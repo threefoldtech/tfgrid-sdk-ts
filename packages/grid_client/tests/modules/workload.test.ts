@@ -83,10 +83,11 @@ const createDataInstance = (type: WorkloadTypes) => {
           ip: "10.20.2.2",
         },
       ];
-      network.mycelium = {
-        network: "mycelium_net",
-        hex_seed: "abc123",
-      };
+      const myceliumInstance = new MyceliumIP();
+      myceliumInstance.hex_seed = "abc123";
+      myceliumInstance.network = "mycelium_net";
+
+      network.mycelium = myceliumInstance;
 
       instance.flist = "https://hub.grid.tf/tf-official-vms/ubuntu-22.04.flist";
       instance.network = network;
