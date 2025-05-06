@@ -4,11 +4,11 @@ on:
   workflow_dispatch:
     inputs:
       network:
-        description: "Target environment"
+        description: "Select the target environment"
         required: true
+        type: choice
         default: "dev"
         options:
-          - local
           - dev
           - qa
           - test
@@ -26,7 +26,7 @@ jobs:
   selenium:
     runs-on: ubuntu-latest
 
-    # fall back to 'dev' and 'false' when triggered by schedule
+    # fall back to 'dev' and 'false' when triggered by schedule (dev is default value)
     env:
       NETWORK: ${{ github.event.inputs.network  || 'dev' }}
       LOCAL_BUILD: ${{ github.event.inputs.local_build || false }}
@@ -50,7 +50,7 @@ jobs:
         with:
           node-version: 18
 
-      # Only build & serve locally when local_build=true
+      # Only builds & serve locally when local_build=true
       - name: Install JS deps & build dashboard
         if: ${{ env.LOCAL_BUILD == 'true' }}
         run: |
@@ -73,7 +73,6 @@ jobs:
           STELLAR_ADDRESS: ${{ secrets.STELLAR_ADDRESS }}
           EMAIL: ${{ secrets.EMAIL }}
           NETWORK: ${{ env.NETWORK }}
-          # Decide which URL to hit
           DASHBOARD_URL: ${{ env.LOCAL_BUILD == 'true' && 'http://localhost:8080' || format('https://dashboard-%s.grid.tf', env.NETWORK) }}
         run: |
           python -m pytest -v --html=report.html --base-url="$DASHBOARD_URL"
