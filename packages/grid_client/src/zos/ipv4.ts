@@ -4,6 +4,7 @@ import { Expose } from "class-transformer";
 
 import { WorkloadData, WorkloadDataResult } from "./workload_base";
 class PublicIPv4 extends WorkloadData {
+  @Expose() readonly __type: string = "ipv4";
   challenge(): string {
     return "";
   }
