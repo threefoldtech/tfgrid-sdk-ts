@@ -8,29 +8,29 @@ export const Flists = {
   FULLVMS_UBUNTU_22: {
     name: "Ubuntu-22.04",
     flist: "https://hub.grid.tf/tf-official-vms/ubuntu-22.04.flist",
-    entryPoint: "/init.sh",
+    entryPoint: "",
   },
   FULLVMS_UBUNTU_20: {
     name: "Ubuntu-20.04",
     flist: "https://hub.grid.tf/tf-official-vms/ubuntu-20.04-lts.flist",
-    entryPoint: "/init.sh",
+    entryPoint: "",
   },
   FULLVMS_UBUNTU_18: {
     name: "Ubuntu-18.04",
     flist: "https://hub.grid.tf/tf-official-vms/ubuntu-18.04-lts.flist",
-    entryPoint: "/init.sh",
+    entryPoint: "",
   },
   FULLVMS_NIXOS_22: {
     name: "Nixos-22.11",
     flist: "https://hub.grid.tf/tf-official-vms/nixos-22.11.flist",
-    entryPoint: "/init.sh",
+    entryPoint: "",
   },
 
   // MicroVMs
   MICROVMS_UBUNTU_24: {
     name: "Ubuntu-24.04",
     flist: "https://hub.grid.tf/tf-official-vms/ubuntu-24.04-latest.flist",
-    entryPoint: "/sbin/zinit init",
+    entryPoint: "zinit init",
   },
   MICROVMS_UBUNTU_23: {
     name: "Ubuntu-23.10",
@@ -39,27 +39,27 @@ export const Flists = {
   },
   MICROVMS_UBUNTU_22: {
     name: "Ubuntu-22.04",
-    flist: "https://hub.grid.tf/tf-official-apps/threefoldtech-ubuntu-22.04.flist",
-    entryPoint: "/sbin/zinit init",
+    flist: "https://hub.grid.tf/tf-official-vms/ubuntu-22.04.flist",
+    entryPoint: "zinit init",
   },
   MICROVMS_ARCH: {
     name: "Arch",
-    flist: "https://hub.grid.tf/tf-official-vms/arch-mycelium.flist",
+    flist: "https://hub.grid.tf/tf-official-apps/arch_mycelium.flist",
     entryPoint: "/sbin/zinit init",
   },
   MICROVMS_DEBIAN_12: {
     name: "Debian-12",
-    flist: "https://hub.grid.tf/tf-official-apps/threefoldtech-debian-12.flist",
-    entryPoint: "/sbin/zinit init",
+    flist: "https://hub.grid.tf/tf-official-apps/debian12.flist",
+    entryPoint: "zinit init",
   },
   MICROVMS_ALPINE_3: {
     name: "Alpine-3",
-    flist: "https://hub.grid.tf/tf-official-apps/threefoldtech-alpine-3.flist",
+    flist: "https://hub.grid.tf/tf-official-apps/alpine3.flist",
     entryPoint: "/entrypoint.sh",
   },
-  MICROVMS_CENTOS_8: {
-    name: "CentOS-8",
-    flist: "https://hub.grid.tf/tf-official-apps/threefoldtech-centos-8.flist",
+  MICROVMS_CENTOS_9: {
+    name: "CentOS-9",
+    flist: "https://hub.grid.tf/tf-official-apps/centos-stream9.flist",
     entryPoint: "/entrypoint.sh",
   },
   MICROVMS_NIXOS: {
@@ -89,7 +89,7 @@ export const Flists = {
     entryPoint: "/sbin/zinit init",
   },
   DISCOURSE: {
-    value: "https://hub.grid.tf/tf-official-apps/forum-docker-v3.1.2.flist",
+    value: "https://hub.grid.tf/tf-official-apps/forum.flist",
     entryPoint: "/sbin/zinit init",
   },
   FUNKWHALE: {
@@ -109,7 +109,7 @@ export const Flists = {
     entryPoint: "/sbin/zinit init",
   },
   NEXTCLOUD: {
-    value: "https://hub.grid.tf/tf-official-apps/threefoldtech-nextcloudaio-latest.flist",
+    value: "https://hub.grid.tf/tf-official-apps/nextcloud.flist",
     entryPoint: "/sbin/zinit init",
   },
   NODEPILOT: {
@@ -125,11 +125,11 @@ export const Flists = {
     entryPoint: "/sbin/zinit init",
   },
   PEERTUBE: {
-    value: "https://hub.grid.tf/tf-official-apps/peertube-v3.1.1.flist",
+    value: "https://hub.grid.tf/tf-official-apps/peertube-latest.flist",
     entryPoint: "/sbin/zinit init",
   },
   PRESEARCH: {
-    value: "https://hub.grid.tf/tf-official-apps/presearch-v2.3.flist",
+    value: "https://hub.grid.tf/tf-official-apps/presearch.flist",
     entryPoint: "/sbin/zinit init",
   },
   STATICWEBSITE: {
@@ -137,7 +137,7 @@ export const Flists = {
     entryPoint: "/sbin/zinit init",
   },
   SUBSQUID: {
-    value: "https://hub.grid.tf/tf-official-apps/subsquid-latest.flist",
+    value: "https://hub.grid.tf/tf-official-apps/subsquid.flist",
     entryPoint: "/sbin/zinit init",
   },
   TAIGA: {
