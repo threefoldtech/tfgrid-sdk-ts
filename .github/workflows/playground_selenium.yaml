@@ -27,7 +27,6 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      # Fallback for scheduled runs
       NETWORK: ${{ github.event.inputs.network || 'dev' }}
       LOCAL_BUILD: ${{ github.event.inputs.local_build || 'false' }}
 
@@ -58,7 +57,7 @@ jobs:
         if: ${{ env.LOCAL_BUILD == 'true' }}
         run: yarn lerna run build
 
-      - name: Yarn Serve
+      - name: Serve Dashboard
         if: ${{ env.LOCAL_BUILD == 'true' }}
         run: make run project=playground &
 
@@ -74,7 +73,10 @@ jobs:
           STELLAR_ADDRESS: ${{ secrets.STELLAR_ADDRESS }}
           EMAIL: ${{ secrets.EMAIL }}
           NETWORK: ${{ env.NETWORK }}
-          DASHBOARD_URL: ${{ env.LOCAL_BUILD == 'true' && 'http://localhost:8080' || format('https://dashboard.%s.grid.tf', env.NETWORK) }}
+          DASHBOARD_URL: >-
+            ${{ env.LOCAL_BUILD == 'true' && 'http://localhost:8080' || (
+              env.NETWORK == 'main' && 'https://dashboard.grid.tf' || format('https://dashboard.%s.grid.tf', env.NETWORK)
+            ) }}
         run: |
           echo "Running against: $DASHBOARD_URL"
           python -m pytest -v --html=report.html --base-url="$DASHBOARD_URL"
