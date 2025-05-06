@@ -133,7 +133,7 @@ const smtp = ref(createSMTPServer());
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
 const profileManager = useProfileManager();
-const flist: Flist = Flists.GITEA;
+const flist: Flist = FLISTS.GITEA;
 
 function finalize(deployment: any) {
   layout.value.reloadDeploymentsList();
@@ -239,7 +239,7 @@ function updateSSHkeyEnv(selectedKeys: string) {
 
 <script lang="ts">
 import type { GridClient, VM } from "@threefold/grid_client";
-import { Flists } from "@threefold/grid_client";
+import { FLISTS } from "@threefold/grid_client";
 
 import SmtpServer, { createSMTPServer } from "../components/smtp_server.vue";
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";

@@ -207,7 +207,7 @@ import { isVMFlist } from "./full_vm.vue";
 const layout = useLayout();
 const tabs = ref();
 
-const images: VmImage[] = Object.entries(Flists)
+const images: VmImage[] = Object.entries(FLISTS)
   .filter(([key]) => key.startsWith("MICROVMS"))
   .map(([key, value]) => value)
   .filter(isVMFlist)
@@ -303,7 +303,7 @@ watch(selectedSSHKeys, layoutMount, { deep: true });
 </script>
 
 <script lang="ts">
-import { Flists, type GridClient } from "@threefold/grid_client";
+import { FLISTS, type GridClient } from "@threefold/grid_client";
 
 import ExpandableLayout from "../components/expandable_layout.vue";
 import type { VmImage } from "../components/select_vm_image.vue";

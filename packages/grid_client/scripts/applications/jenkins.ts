@@ -1,5 +1,5 @@
 import { FilterOptions, GatewayNameModel, MachinesModel } from "../../src";
-import { Flists } from "../../src/helpers/flists";
+import { FLISTS } from "../../src/helpers/flists";
 import { config, getClient } from "../client_loader";
 import { log, pingNodes } from "../utils";
 
@@ -91,8 +91,8 @@ async function main() {
         cpu: instanceCapacity.cru,
         memory: 1024 * instanceCapacity.mru,
         rootfs_size: 0,
-        flist: Flists.JENKINS.value,
-        entrypoint: Flists.JENKINS.entryPoint,
+        flist: FLISTS.JENKINS.value,
+        entrypoint: FLISTS.JENKINS.entryPoint,
         env: {
           SSH_KEY: config.ssh_key,
           JENKINS_HOSTNAME: domain,

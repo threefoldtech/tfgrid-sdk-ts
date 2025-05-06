@@ -1,5 +1,5 @@
 import { Features, FilterOptions, GatewayNameModel, MachinesModel } from "../../src";
-import { Flists } from "../../src/helpers/flists";
+import { FLISTS } from "../../src/helpers/flists";
 import { config, getClient } from "../client_loader";
 import { log, pingNodes } from "../utils";
 
@@ -92,8 +92,8 @@ async function main() {
         cpu: instanceCapacity.cru,
         memory: 1024 * instanceCapacity.mru,
         rootfs_size: 0,
-        flist: Flists.PEERTUBE.value,
-        entrypoint: Flists.PEERTUBE.entryPoint,
+        flist: FLISTS.PEERTUBE.value,
+        entrypoint: FLISTS.PEERTUBE.entryPoint,
         env: {
           SSH_KEY: config.ssh_key,
           PEERTUBE_WEBSERVER_HOSTNAME: domain,

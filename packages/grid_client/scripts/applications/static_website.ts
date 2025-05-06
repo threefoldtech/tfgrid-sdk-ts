@@ -1,5 +1,5 @@
 import { Features, FilterOptions, GatewayNameModel, GridClient, MachinesModel, NodeInfo } from "../../src";
-import { Flists } from "../../src/helpers/flists";
+import { FLISTS } from "../../src/helpers/flists";
 import { config, getClient } from "../client_loader";
 import { log, pingNodes } from "../utils";
 
@@ -92,8 +92,8 @@ async function main() {
         cpu: instanceCapacity.cru,
         memory: 1024 * instanceCapacity.mru,
         rootfs_size: 0,
-        flist: Flists.STATICWEBSITE.value,
-        entrypoint: Flists.STATICWEBSITE.entryPoint,
+        flist: FLISTS.STATICWEBSITE.value,
+        entrypoint: FLISTS.STATICWEBSITE.entryPoint,
         env: {
           SSH_KEY: config.ssh_key,
           STATICWEBSITE_DOMAIN: domain,

@@ -1,5 +1,5 @@
 import { Features, FilterOptions, MachinesModel } from "../../src";
-import { Flists } from "../../src/helpers/flists";
+import { FLISTS } from "../../src/helpers/flists";
 import { config, getClient } from "../client_loader";
 import { log } from "../utils";
 
@@ -60,8 +60,8 @@ async function main() {
         cpu: 4,
         memory: 1024 * 4,
         rootfs_size: 0,
-        flist: Flists.CAPROVER.value,
-        entrypoint: Flists.CAPROVER.entryPoint,
+        flist: FLISTS.CAPROVER.value,
+        entrypoint: FLISTS.CAPROVER.entryPoint,
         env: {
           // These env. vars needed to be changed based on the leader node.
           PUBLIC_KEY: config.ssh_key,

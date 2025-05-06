@@ -1,5 +1,5 @@
 import { generateRandomHexSeed, GridClient, MachinesDeleteModel, MachinesModel } from "../src";
-import { Flists } from "../src/helpers/flists";
+import { FLISTS } from "../src/helpers/flists";
 import { config, getClient } from "./client_loader";
 import { log } from "./utils";
 
@@ -77,8 +77,8 @@ async function main() {
         cpu: 1,
         memory: 1024 * 2,
         rootfs_size: 0,
-        flist: Flists.MICROVMS_UBUNTU_24.flist,
-        entrypoint: Flists.MICROVMS_UBUNTU_24.entryPoint,
+        flist: FLISTS.MICROVMS_UBUNTU_24.flist,
+        entrypoint: FLISTS.MICROVMS_UBUNTU_24.entryPoint,
         env: {
           SSH_KEY: config.ssh_key,
         },

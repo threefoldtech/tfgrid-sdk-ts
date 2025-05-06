@@ -1,4 +1,4 @@
-export const Flists = {
+export const FLISTS = {
   // FullVMs
   FULLVMS_UBUNTU_24: {
     name: "Ubuntu-24.04",

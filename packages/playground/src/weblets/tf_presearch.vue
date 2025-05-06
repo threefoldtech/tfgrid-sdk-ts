@@ -148,7 +148,7 @@ const rootFilesystemSize = calculateRootFileSystem({ CPUCores: cpu, RAMInMegaByt
 const dockerDiskSize = 10;
 const privateRestoreKey = ref("");
 const publicRestoreKey = ref("");
-const flist: Flist = Flists.PRESEARCH;
+const flist: Flist = FLISTS.PRESEARCH;
 const dedicated = ref(false);
 const rentedByMe = ref(false);
 const rentedBy = computed(() => (rentedByMe.value ? grid.twinId : undefined));
@@ -229,7 +229,7 @@ function updateSSHkeyEnv(selectedKeys: string) {
 </script>
 
 <script lang="ts">
-import { calculateRootFileSystem, Flists, type GridClient } from "@threefold/grid_client";
+import { calculateRootFileSystem, FLISTS, type GridClient } from "@threefold/grid_client";
 
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";

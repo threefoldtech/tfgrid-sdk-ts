@@ -1,5 +1,5 @@
 import { FilterOptions, GatewayNameModel, MachineModel, MachinesModel, NetworkModel } from "../src";
-import { Flists } from "../src/helpers/flists";
+import { FLISTS } from "../src/helpers/flists";
 import { config, getClient } from "./client_loader";
 import { log } from "./utils";
 
@@ -24,8 +24,8 @@ function createMachineModel(node: number) {
     memory: 1024 * 2,
     rootfs_size: 0,
     disks: [],
-    flist: Flists.MICROVMS_UBUNTU_22.flist,
-    entrypoint: Flists.MICROVMS_UBUNTU_22.entryPoint,
+    flist: FLISTS.MICROVMS_UBUNTU_22.flist,
+    entrypoint: FLISTS.MICROVMS_UBUNTU_22.entryPoint,
     env: {
       SSH_KEY: config.ssh_key,
     },

@@ -135,7 +135,7 @@ const workers = ref<CW[]>([]);
 const selectedSSHKeys = ref("");
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
-const flist: Flist = Flists.CAPROVER;
+const flist: Flist = FLISTS.CAPROVER;
 
 async function deploy() {
   layout.value.setStatus("deploy");
@@ -218,7 +218,7 @@ function updateSSHkeyEnv(selectedKeys: string) {
 </script>
 
 <script lang="ts">
-import { calculateRootFileSystem, Flists, type GridClient } from "@threefold/grid_client";
+import { calculateRootFileSystem, FLISTS, type GridClient } from "@threefold/grid_client";
 import AwaitLock from "await-lock";
 import { markRaw } from "vue";
 

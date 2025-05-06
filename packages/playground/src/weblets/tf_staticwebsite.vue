@@ -116,7 +116,7 @@
 </template>
 
 <script lang="ts" setup>
-import { calculateRootFileSystem, Flists, type GridClient } from "@threefold/grid_client";
+import { calculateRootFileSystem, FLISTS, type GridClient } from "@threefold/grid_client";
 import { computed, type Ref, ref } from "vue";
 
 import { manual } from "@/utils/manual";
@@ -143,7 +143,7 @@ const domain = ref();
 
 const { ipv4, ipv6, planetary, mycelium, wireguard } = useNetworks();
 const solution = ref() as Ref<SolutionFlavor>;
-const flist: Flist = Flists.STATICWEBSITE;
+const flist: Flist = FLISTS.STATICWEBSITE;
 const dedicated = ref(false);
 const rentedByMe = ref(false);
 const gridStore = useGrid();
