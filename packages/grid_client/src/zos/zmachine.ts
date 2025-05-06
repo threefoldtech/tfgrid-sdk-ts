@@ -62,7 +62,7 @@ class Mount {
 
 @ValidateMembers()
 class Zmachine extends WorkloadData {
-  @Expose() readonly __type: WorkloadTypes = WorkloadTypes.zmachine;
+  @Expose() __type: WorkloadTypes = WorkloadTypes.zmachine;
   @Expose() @IsString() @IsNotEmpty() @IsUrl() flist: string;
   @Expose() @Type(() => ZmachineNetwork) @ValidateNested() network: ZmachineNetwork;
   @Expose() @IsInt() @Min(0) @Max(10 * 1024 ** 4) size: number; // in bytes

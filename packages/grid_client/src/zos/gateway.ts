@@ -7,7 +7,7 @@ import { WorkloadTypes } from ".";
 
 @ValidateMembers()
 class GatewayFQDNProxy extends WorkloadData {
-  @Expose() readonly __type: WorkloadTypes = WorkloadTypes.gatewayfqdnproxy;
+  @Expose() __type: WorkloadTypes = WorkloadTypes.gatewayfqdnproxy;
   @Expose() @IsFQDN() fqdn: string;
   @Expose() @IsBoolean() tls_passthrough: boolean;
   @Expose() @ArrayNotEmpty() @IsUrl({ protocols: ["http", "https"] }, { each: true }) backends: string[];
@@ -26,7 +26,7 @@ class GatewayFQDNProxy extends WorkloadData {
 }
 @ValidateMembers()
 class GatewayNameProxy extends WorkloadData {
-  @Expose() readonly __type: WorkloadTypes = WorkloadTypes.gatewaynameproxy;
+  @Expose() __type: WorkloadTypes = WorkloadTypes.gatewaynameproxy;
   @Expose() @IsString() @IsNotEmpty() name: string;
   @Expose() @IsBoolean() tls_passthrough: boolean;
   @Expose() @ArrayNotEmpty() @IsUrl({ protocols: ["http", "https"] }, { each: true }) backends: string[];

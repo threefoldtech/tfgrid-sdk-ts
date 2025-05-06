@@ -7,7 +7,7 @@ import { WorkloadTypes } from "./workload";
 
 @ValidateMembers()
 class Zmount extends WorkloadData {
-  @Expose() readonly __type: WorkloadTypes = WorkloadTypes.zmount;
+  @Expose() __type: WorkloadTypes = WorkloadTypes.zmount;
   @Expose() @IsInt() @Min(100 * 1024 ** 2) @Max(10 * 1024 ** 4) size: number; // in bytes
 
   challenge(): string {

@@ -41,7 +41,7 @@ class ZmachineLightNetwork {
 }
 @ValidateMembers()
 class ZmachineLight extends WorkloadData {
-  @Expose() readonly __type: WorkloadTypes = WorkloadTypes.zmachinelight;
+  @Expose() __type: WorkloadTypes = WorkloadTypes.zmachinelight;
   @Expose() @IsString() @IsNotEmpty() @IsUrl() flist: string;
   @Expose() @Type(() => ZmachineLightNetwork) @ValidateNested() network: ZmachineLightNetwork;
   @Expose() @IsInt() @Min(0) @Max(10 * 1024 ** 4) size: number; // in bytes

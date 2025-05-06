@@ -12,7 +12,7 @@ class Mycelium {
 
 @ValidateMembers()
 class NetworkLight extends WorkloadData {
-  @Expose() readonly __type: WorkloadTypes = WorkloadTypes.networklight;
+  @Expose() __type: WorkloadTypes = WorkloadTypes.networklight;
   @Expose() @IsString() @IsNotEmpty() subnet: string;
   @Expose() @IsOptional() @Type(() => Mycelium) @ValidateNested() mycelium?: Mycelium;
 

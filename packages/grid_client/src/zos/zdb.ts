@@ -12,7 +12,7 @@ enum ZdbModes {
 
 @ValidateMembers()
 class Zdb extends WorkloadData {
-  @Expose() readonly __type: WorkloadTypes = WorkloadTypes.zdb;
+  @Expose() __type: WorkloadTypes = WorkloadTypes.zdb;
   @Expose() @IsInt() @Min(1) size: number; // in bytes
   @Expose() @Transform(({ value }) => ZdbModes[value]) @IsEnum(ZdbModes) mode: ZdbModes = ZdbModes.seq;
   @Expose() @IsString() @IsNotEmpty() password: string;

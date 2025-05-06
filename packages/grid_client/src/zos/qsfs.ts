@@ -109,7 +109,7 @@ class QuantumSafeFSConfig {
 
 @ValidateMembers()
 class QuantumSafeFS extends WorkloadData {
-  @Expose() readonly __type: WorkloadTypes = WorkloadTypes.qsfs;
+  @Expose() __type: WorkloadTypes = WorkloadTypes.qsfs;
   @Expose() @IsInt() @Min(250 * 1024 ** 2) cache: number;
   @Expose() @Type(() => QuantumSafeFSConfig) @ValidateNested() config: QuantumSafeFSConfig;
 

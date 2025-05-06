@@ -7,7 +7,7 @@ import { WorkloadTypes } from ".";
 
 @ValidateMembers()
 class PublicIP extends WorkloadData {
-  @Expose() readonly __type: WorkloadTypes = WorkloadTypes.ip;
+  @Expose() __type: WorkloadTypes = WorkloadTypes.ip;
   @Expose() @IsBoolean() v4: boolean;
   @Expose() @IsBoolean() v6: boolean;
   challenge(): string {
