@@ -31,9 +31,9 @@ class DashboardPage:
     password_input = (By.XPATH, "(//input[@size='1' and @type='password'])[2]")
     confirm_password_input = (By.ID, "confirm-password-text-field")
     generate_account_button = (By.XPATH, "//button[.//span[text()=' create account ']]")
-    connect_button = (By.XPATH, "//button[.//span[normalize-space()='Connect']]")
+    connect_button = (By.ID, "connect-btn")
     logout_button = (By.XPATH, "/html/body/div[1]/div/div/main/header[1]/div/div[3]/button")
-    login_button = (By.XPATH, "//button[normalize-space()='Login']")
+    login_button = (By.ID, "wallet-login-tab__login-button")
     login_password_input = (By.ID, "wallet-password__text-field")
     accept_terms_condition_button = (By.XPATH, "//button[.//span[text()='Accept terms and conditions']]")
     connect_manual_button = (By.XPATH,"//*[contains(text(), 'Threefold Connect')]")
@@ -87,12 +87,11 @@ class DashboardPage:
         self.browser.find_element(*self.confirm_password_input).send_keys(Keys.CONTROL + "a")
         self.browser.find_element(*self.confirm_password_input).send_keys(Keys.DELETE)
         self.browser.find_element(*self.confirm_password_input).send_keys(password)
-        # WebDriverWait(self.browser, 30).until(EC.element_to_be_clickable(self.connect_button))
         return self.browser.find_element(*self.connect_button)
 
     def logout_account(self):
         time.sleep(3)
-        webdriver.ActionChains(self.browser).send_keys(Keys.ESCAPE).perform()
+        self.press_esc_key()
         while True:
             try:
                 self.wait_for_button(self.browser.find_element(*self.logout_button)).click()
@@ -106,12 +105,16 @@ class DashboardPage:
         self.browser.switch_to.window(self.browser.window_handles[0])
         WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.profile_load_label))
     
-    def login_account(self, password):
+    def login_account(self, password, validation=False):
         self.browser.find_element(*self.login_password_input).send_keys(Keys.CONTROL + "a")
         self.browser.find_element(*self.login_password_input).send_keys(Keys.DELETE)
         self.browser.find_element(*self.login_password_input).send_keys(password)
-        # WebDriverWait(self.browser, 30).until(EC.element_to_be_clickable(self.login_button))
-        return self.browser.find_element(*self.login_button)
+        if validation:
+            assert WebDriverWait(self.browser, 30).until(EC.element_to_be_clickable(self.login_button)).is_enabled() == True
+            self.browser.find_element(*self.login_button).click()
+            self.open_profile(True)
+        else:
+            return self.browser.find_element(*self.login_button)
 
     def create_account(self):
         self.browser.find_element(*self.generate_account_button).click()
@@ -178,12 +181,12 @@ class DashboardPage:
         stats.append(int(self.browser.find_element(*self.cores_stats).text))
         return stats
     
-    def open_profile(self):
+    def open_profile(self, click=False):
         WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.profile_label))
-        # self.browser.find_element(*self.profile_button).click() #by default now the profile page popup no need to click
+        if click:
+            self.browser.find_element(*self.profile_button).click() #by default now the profile page popup when connect no need to click
         WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.qr_code_img))
         WebDriverWait(self.browser, 30).until(EC.presence_of_element_located((By.XPATH, "//*[contains(text(), 'TFChain Wallet')]")))
-        time.sleep(3)
     
     def get_link(self):
         WebDriverWait(self.browser, 30).until(EC.number_of_windows_to_be(2))
@@ -242,5 +245,5 @@ class DashboardPage:
         return button
     
     def wait_for(self, keyword):
-        WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located((By.XPATH, "//*[contains(text(), '"+ keyword +"')]")))
+        WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located((By.XPATH, f'//*[contains(text(), "{keyword}")]')))
         return True

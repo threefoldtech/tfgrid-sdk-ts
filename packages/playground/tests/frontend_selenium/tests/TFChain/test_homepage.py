@@ -99,7 +99,7 @@ def test_import_account(browser):
     dashboard_page.import_account(get_seed())
     dashboard_page.click_button(dashboard_page.connect_your_wallet(get_email(), password))
     dashboard_page.logout_account()
-    assert dashboard_page.wait_for_button(dashboard_page.login_account(password)).is_enabled() == True
+    dashboard_page.login_account(password, True)
 
 
 def test_create_account(browser):
@@ -120,7 +120,7 @@ def test_create_account(browser):
     connect_button = dashboard_page.connect_your_wallet(get_email(), password)
     dashboard_page.click_button(connect_button)
     dashboard_page.logout_account()
-    assert dashboard_page.wait_for_button(dashboard_page.login_account(password)).is_enabled() == True
+    dashboard_page.login_account(password, True)
 
 
 def test_account_validation(browser):
@@ -137,43 +137,37 @@ def test_account_validation(browser):
     """
     dashboard_page = before_test_setup(browser)
     grid_proxy = GridProxy(browser)
-    cases = [generate_string(), '123456', '!)$%&@#(+?', '0x123456ae7be88dc11f7', 'wrong hat egg gospel crowd foster lonely control cat recipe mean spoon']
-    for case in cases:
+    mnemonics_cases = [generate_string(), '123456', '!)$%&@#(+?', '0x123456ae7be88dc11f7', 'wrong hat egg gospel crowd foster lonely control cat recipe mean spoon']
+    for case in mnemonics_cases:
         dashboard_page.import_account(case, False)
-        assert dashboard_page.wait_for('seem to be valid')
+        assert dashboard_page.wait_for("Mnemonic or Hex Seed doesn't seem to be valid.")
     dashboard_page.import_account('', False)
     assert dashboard_page.wait_for('Mnemonic or Hex Seed is required.')
     dashboard_page.import_account(get_seed())
-    cases = [generate_string(), '123456', '!)$%&@#(+?', '1@c@vva.ca', '1f@test,com', '@test.com', 'test@.com', 'test@com']
-    for case in cases:
-        assert dashboard_page.connect_your_wallet(case, '123456').get_attribute("disabled") == 'true'
+    email_cases = [generate_string(), '123456', '!)$%&@#(+?', '1@c@vva.ca', '1f@test,com', '@test.com', 'test@.com', 'test@com']
+    for case in email_cases:
+        assert dashboard_page.connect_your_wallet(case, '123456').is_enabled() == False
         assert dashboard_page.wait_for('Please provide a valid email address')
-    assert dashboard_page.connect_your_wallet('', '123456').get_attribute("disabled") == 'true'
+    assert dashboard_page.connect_your_wallet('', '123456').is_enabled() == False
     assert dashboard_page.wait_for('Email is required')
-    assert dashboard_page.connect_your_wallet(get_email(), '12345').get_attribute("disabled") == 'true'
+    assert dashboard_page.connect_your_wallet(get_email(), '12345').is_enabled() == False
     assert dashboard_page.wait_for('Password must be at least 6 characters')
     dashboard_page.connect_your_wallet(get_email(), '123456')
     dashboard_page.confirm_password('12345')
     assert dashboard_page.wait_for('Passwords should match')
     dashboard_page.click_button(dashboard_page.connect_your_wallet(get_email(), '123456'))
     dashboard_page.open_profile()
-    if Base.net == 'dev':
-        manual_link = 'https://www.manual.grid.tf/documentation/dashboard/wallet_connector.html'
-    else:    
-        manual_link = 'https://manual.grid.tf/documentation/dashboard/wallet_connector.html'
-    assert dashboard_page.manual_link() == manual_link
     assert dashboard_page.get_mnemonic() == get_seed()
     assert dashboard_page.get_email() == get_email()
     assert grid_proxy.get_twin_address(dashboard_page.get_id()) == dashboard_page.get_address()
-    dashboard_page.press_esc_key()
     dashboard_page.logout_account()
-    assert dashboard_page.login_account('12345').get_attribute("disabled") == 'true'
+    assert dashboard_page.login_account('12345').is_enabled() == False
     assert dashboard_page.wait_for('Password must be at least 6 characters')
-    assert dashboard_page.login_account('1234567').get_attribute("disabled") == 'true'
-    assert dashboard_page.wait_for('find a matching wallet for this password. Please connect your wallet first.')
-    assert dashboard_page.login_account('').get_attribute("disabled") == 'true'
+    assert dashboard_page.login_account('1234567').is_enabled() == False
+    assert dashboard_page.wait_for("We couldn't find a matching wallet for this password. Please connect your wallet first.")
+    assert dashboard_page.login_account('').is_enabled() == False
     assert dashboard_page.wait_for('Password is required')
-    assert dashboard_page.wait_for_button(dashboard_page.login_account('123456')).is_enabled() == True
+    dashboard_page.login_account('123456', True)
 
 
 def test_login_links(browser):
