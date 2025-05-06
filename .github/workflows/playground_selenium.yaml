@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      # Fallbacks for scheduled runs
+      # Fallback for scheduled runs
       NETWORK: ${{ github.event.inputs.network || 'dev' }}
       LOCAL_BUILD: ${{ github.event.inputs.local_build || 'false' }}
 
@@ -35,17 +35,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setting up Python
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
 
-      - name: Installing Python packages
+      - name: Install Python packages
         run: |
           pip install -r packages/playground/tests/frontend_selenium/requirements.txt
           pip install pytest-html
 
-      - name: Node install
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 18
@@ -62,11 +62,11 @@ jobs:
         if: ${{ env.LOCAL_BUILD == 'true' }}
         run: make run project=playground &
 
-      - name: Wait for localhost
+      - name: Wait for local server
         if: ${{ env.LOCAL_BUILD == 'true' }}
         run: sleep 60
 
-      - name: Run tests
+      - name: Run Selenium tests
         working-directory: ./packages/playground/tests/frontend_selenium
         env:
           TFCHAIN_MNEMONICS: ${{ secrets.TFCHAIN_MNEMONICS }}
@@ -80,7 +80,7 @@ jobs:
           python -m pytest -v --html=report.html --base-url="$DASHBOARD_URL"
 
       - name: Upload HTML report
-        uses: actions/upload-artifact@v3.1.0
+        uses: actions/upload-artifact@v4
         with:
           name: selenium-report-${{ env.NETWORK }}
           path: packages/playground/tests/frontend_selenium/report.html
