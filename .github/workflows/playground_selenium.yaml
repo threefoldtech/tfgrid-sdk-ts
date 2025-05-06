@@ -26,10 +26,10 @@ jobs:
   selenium:
     runs-on: ubuntu-latest
 
-    # fall back to 'dev' and 'false' when triggered by schedule (dev is default value)
+    # Fall back to 'dev' (default) and 'false' when triggered by schedule
     env:
-      NETWORK: ${{ github.event.inputs.network  || 'dev' }}
-      LOCAL_BUILD: ${{ github.event.inputs.local_build || false }}
+      NETWORK: ${{ github.event.inputs.network || 'dev' }}
+      LOCAL_BUILD: ${{ github.event.inputs.local_build || 'false' }}
 
     steps:
       - name: Checkout repository
@@ -50,12 +50,14 @@ jobs:
         with:
           node-version: 18
 
-      # Only builds & serve locally when local_build=true
-      - name: Install JS deps & build dashboard
+      # Only build and serve dashboard locally when local_build=true
+      - name: Install JS dependencies
         if: ${{ env.LOCAL_BUILD == 'true' }}
-        run: |
-          yarn install
-          yarn lerna run build
+        run: yarn install
+
+      - name: Build dashboard with Lerna
+        if: ${{ env.LOCAL_BUILD == 'true' }}
+        run: yarn lerna run build
 
       - name: Start local dashboard
         if: ${{ env.LOCAL_BUILD == 'true' }}
@@ -78,7 +80,7 @@ jobs:
           python -m pytest -v --html=report.html --base-url="$DASHBOARD_URL"
 
       - name: Upload HTML report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v3.1.0
         with:
           name: selenium-report-${{ env.NETWORK }}
           path: packages/playground/tests/frontend_selenium/report.html
