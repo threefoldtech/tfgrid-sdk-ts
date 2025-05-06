@@ -56,7 +56,7 @@
                 ]"
                 return-object
               >
-                <template #append-item v-if="pagination.page !== -1 && loadedDomains.length === size">
+                <template #append-item v-if="pagination.page !== -1">
                   <VContainer>
                     <VBtn
                       @click="loadDomains"
@@ -155,7 +155,6 @@ export default {
 
     const enableCustomDomain = ref(false);
     const size = ref(window.env.PAGE_SIZE);
-    const initialized = ref(false);
     const filters = computed<FilterOptions>(() => ({
       gateway: true,
       size: size.value,
@@ -185,14 +184,12 @@ export default {
     watch(
       [() => props.farm?.farmId, () => gridStore.client?.twinId, () => props.interfaces],
       () => {
-        if (!initialized.value) return;
         loadDomains();
       },
       { deep: true },
     );
 
     onMounted(() => {
-      initialized.value = true;
       loadDomains();
     });
 
