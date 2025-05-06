@@ -65,24 +65,18 @@ jobs:
         if: ${{ env.LOCAL_BUILD == 'true' }}
         run: sleep 60
 
+      - name: Set Config.ini values dynamically
+        run: |
+          echo "[Base]" > Config.ini
+          echo "port=5173" >> Config.ini
+          echo "net=${{ env.LOCAL_BUILD == 'true' && 'local' || env.NETWORK }}" >> Config.ini
+          echo "[Utils]" >> Config.ini
+          echo "seed=${{ secrets.TFCHAIN_MNEMONICS }}" >> Config.ini
+          echo "node_seed=${{ secrets.TFCHAIN_NODE_MNEMONICS }}" >> Config.ini
+          echo "address=${{ secrets.STELLAR_ADDRESS }}" >> Config.ini
+          echo "email=${{ secrets.EMAIL }}" >> Config.ini
+        working-directory: ./packages/playground/tests/frontend_selenium
+
       - name: Run Selenium tests
         working-directory: ./packages/playground/tests/frontend_selenium
-        env:
-          TFCHAIN_MNEMONICS: ${{ secrets.TFCHAIN_MNEMONICS }}
-          TFCHAIN_NODE_MNEMONICS: ${{ secrets.TFCHAIN_NODE_MNEMONICS }}
-          STELLAR_ADDRESS: ${{ secrets.STELLAR_ADDRESS }}
-          EMAIL: ${{ secrets.EMAIL }}
-          NETWORK: ${{ env.NETWORK }}
-          DASHBOARD_URL: >-
-            ${{ env.LOCAL_BUILD == 'true' && 'http://localhost:8080' || (
-              env.NETWORK == 'main' && 'https://dashboard.grid.tf' || format('https://dashboard.%s.grid.tf', env.NETWORK)
-            ) }}
-        run: |
-          echo "Running against: $DASHBOARD_URL"
-          python -m pytest -v --html=report.html --base-url="$DASHBOARD_URL"
-
-      - name: Upload HTML report
-        uses: actions/upload-artifact@v4
-        with:
-          name: selenium-report-${{ env.NETWORK }}
-          path: packages/playground/tests/frontend_selenium/report.html
+        run: python -m pytest -v
