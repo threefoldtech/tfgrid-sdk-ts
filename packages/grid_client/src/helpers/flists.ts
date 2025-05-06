@@ -30,7 +30,7 @@ export const Flists = {
   MICROVMS_UBUNTU_24: {
     name: "Ubuntu-24.04",
     flist: "https://hub.grid.tf/tf-official-vms/ubuntu-24.04-latest.flist",
-    entryPoint: "zinit init",
+    entryPoint: "/sbin/zinit init",
   },
   MICROVMS_UBUNTU_23: {
     name: "Ubuntu-23.10",
@@ -39,18 +39,18 @@ export const Flists = {
   },
   MICROVMS_UBUNTU_22: {
     name: "Ubuntu-22.04",
-    flist: "https://hub.grid.tf/tf-official-vms/ubuntu-22.04.flist",
-    entryPoint: "zinit init",
+    flist: "https://hub.grid.tf/tf-official-apps/threefoldtech-ubuntu-22.04.flist",
+    entryPoint: "/sbin/zinit init",
   },
   MICROVMS_ARCH: {
     name: "Arch",
-    flist: "https://hub.grid.tf/tf-official-apps/arch_mycelium.flist",
+    flist: "https://hub.grid.tf/petep.3bot/archlinux_20240101.0.204074.flist",
     entryPoint: "/sbin/zinit init",
   },
   MICROVMS_DEBIAN_12: {
     name: "Debian-12",
     flist: "https://hub.grid.tf/tf-official-apps/debian12.flist",
-    entryPoint: "zinit init",
+    entryPoint: "/sbin/zinit init",
   },
   MICROVMS_ALPINE_3: {
     name: "Alpine-3",
@@ -64,7 +64,7 @@ export const Flists = {
   },
   MICROVMS_NIXOS: {
     name: "Nixos",
-    flist: "https://hub.grid.tf/tf-official-vms/nixos-micro-latest.flist",
+    flist: "https://hub.grid.tf/tf-official-vms/nixos-22.11.flist",
     entryPoint: "/entrypoint.sh",
   },
 
