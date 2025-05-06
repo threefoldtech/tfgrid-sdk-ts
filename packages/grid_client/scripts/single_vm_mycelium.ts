@@ -78,7 +78,7 @@ async function main() {
         memory: 1024 * 2,
         rootfs_size: 0,
         flist: Flists.MICROVMS_UBUNTU_24.flist,
-        entrypoint: "/sbin/zinit init",
+        entrypoint: Flists.MICROVMS_UBUNTU_24.entryPoint,
         env: {
           SSH_KEY: config.ssh_key,
         },

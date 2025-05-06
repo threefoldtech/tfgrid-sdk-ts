@@ -74,7 +74,7 @@ async function main() {
         memory: 1024 * 16,
         rootfs_size: 0,
         flist: Flists.MICROVMS_UBUNTU_22.flist,
-        entrypoint: "/",
+        entrypoint: Flists.MICROVMS_UBUNTU_22.entryPoint,
         env: {
           SSH_KEY: config.ssh_key,
         },

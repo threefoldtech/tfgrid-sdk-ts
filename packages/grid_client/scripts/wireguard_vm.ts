@@ -25,7 +25,7 @@ function createMachineModel(node: number) {
     rootfs_size: 0,
     disks: [],
     flist: Flists.MICROVMS_UBUNTU_22.flist,
-    entrypoint: "/usr/bin/python3 -m http.server --bind ::",
+    entrypoint: Flists.MICROVMS_UBUNTU_22.entryPoint,
     env: {
       SSH_KEY: config.ssh_key,
     },
