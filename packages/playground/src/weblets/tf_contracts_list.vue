@@ -89,7 +89,7 @@
           {{ totalCost }} TFT/hour ≈ {{ totalCost === 0 ? 0 : (totalCost * 24 * 30).toFixed(3) }} TFT/month
         </input-tooltip>
       </strong>
-      <small v-else> loading total cost... </small>
+      <small v-else> loading total cost...</small>
     </template>
   </v-card>
   <!-- locked amount Dialog -->
@@ -210,6 +210,8 @@
           @update:unlock-contracts="loadContracts"
           @update:deleted-contracts="onDeletedContracts"
           @update:lock-details="getContractsLockDetails"
+          @update:load-contracts="loadContracts"
+          @update:get-total-cost="getTotalCost"
           @update:page="
             newPage => {
               table.page.value = newPage;
@@ -421,9 +423,9 @@ async function unlockAllContracts() {
     createCustomToast(loadingTablesMessage.value, ToastType.info);
     setTimeout(() => {
       loadContracts();
-      getTotalCost();
       loadingTablesMessage.value = undefined;
     }, 30000);
+    getTotalCost();
     unlockDialog.value = false;
   } catch (e) {
     loadingErrorMessage.value = `Failed to unlock contract your contracts`;
@@ -442,9 +444,9 @@ async function deleteAll() {
     loadingTablesMessage.value =
       "The contracts have been successfully deleted. Please note that all tables will be reloaded in 30 seconds.";
     createCustomToast(loadingTablesMessage.value, ToastType.info);
-    setTimeout(() => {
-      loadContracts();
-      getTotalCost();
+    setTimeout(async () => {
+      await loadContracts();
+      await getTotalCost();
       loadingTablesMessage.value = undefined;
     }, 30000);
   } catch (e) {
@@ -501,11 +503,10 @@ async function onDeletedContracts(_contracts: NormalizedContract[]) {
   createCustomToast(loadingTablesMessage.value, ToastType.info);
   setTimeout(() => {
     loadContracts();
-    getTotalCost();
     loadingTablesMessage.value = undefined;
   }, 30000);
+  getTotalCost();
   contracts.value = [...rentContracts.value, ...nameContracts.value, ...nodeContracts.value];
-  totalCost.value = undefined;
 }
 async function getContractsLockDetails() {
   lockedContracts.value = await grid.contracts.getTotalOverdue();

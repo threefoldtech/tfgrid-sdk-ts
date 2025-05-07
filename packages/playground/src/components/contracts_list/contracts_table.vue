@@ -386,6 +386,8 @@ const emits = defineEmits([
   "update:page",
   "update:size",
   "update:sort",
+  "update:load-contracts",
+  "update:get-total-cost",
 ]);
 
 function updatePage(page: number) {
@@ -571,6 +573,10 @@ async function onDelete() {
     const contracts = props.contracts.value.filter(c => !selectedContracts.value.includes(c));
     emits("update:deleted-contracts", contracts);
     selectedContracts.value = [];
+    setTimeout(() => {
+      emits("update:load-contracts");
+      emits("update:get-total-cost");
+    }, 30000);
   } catch (e) {
     if (e instanceof DeploymentKeyDeletionError) {
       selectedContracts.value = [];
