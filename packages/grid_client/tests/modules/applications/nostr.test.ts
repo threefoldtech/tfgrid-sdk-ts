@@ -21,7 +21,7 @@ let deploymentName: string;
 beforeAll(async () => {
   gridClient = await getClient();
   // Use "ns" prefix to indicate a Nostr deployment
-  deploymentName = "ns" + generateString(10);
+  deploymentName = "ns" + gridClient.twinId + generateString(5);
   gridClient.clientOptions.projectName = `nostr/${deploymentName}`;
   gridClient._connect();
   return gridClient;

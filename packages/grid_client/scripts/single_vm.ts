@@ -1,4 +1,5 @@
-import { GridClient, MachinesModel } from "../src";
+import { generateString, GridClient, MachinesModel } from "../src";
+import { FLISTS } from "../src/helpers/flists";
 import { type ZmachineData } from "../src/helpers/types";
 import { config, getClient } from "./client_loader";
 import { log } from "./utils";
@@ -26,22 +27,26 @@ async function cancel(client: GridClient, name: string) {
 }
 
 async function main() {
-  const name = "newVMS";
+  const name = "vm" + generateString(6);
+  const networkName = "nw" + generateString(6);
+  const machineName = "machine" + generateString(6);
+  const diskName = "disk" + generateString(6);
+
   const grid3 = await getClient(`vm/${name}`);
 
   const vms: MachinesModel = {
     name,
     network: {
-      name: "wedtest",
+      name: networkName,
       ip_range: "10.249.0.0/16",
     },
     machines: [
       {
-        name: "testvm",
+        name: machineName,
         node_id: 11,
         disks: [
           {
-            name: "wedDisk",
+            name: diskName,
             size: 8,
             mountpoint: "/testdisk",
           },
@@ -53,8 +58,8 @@ async function main() {
         cpu: 1,
         memory: 1024 * 2,
         rootfs_size: 0,
-        flist: "https://hub.grid.tf/tf-official-apps/base:latest.flist",
-        entrypoint: "/sbin/zinit init",
+        flist: FLISTS.MICROVMS_UBUNTU_24.flist,
+        entrypoint: FLISTS.MICROVMS_UBUNTU_24.entryPoint,
         env: {
           SSH_KEY: config.ssh_key,
         },

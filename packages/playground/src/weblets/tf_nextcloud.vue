@@ -91,8 +91,8 @@
 </template>
 
 <script lang="ts" setup>
-import { calculateRootFileSystem, type GridClient } from "@threefold/grid_client";
-import { computed, type Ref, ref, watch } from "vue";
+import { calculateRootFileSystem, FLISTS, type GridClient } from "@threefold/grid_client";
+import { computed, type Ref, ref } from "vue";
 
 import { manual } from "@/utils/manual";
 
@@ -111,10 +111,7 @@ const selectionDetails = ref<SelectionDetails>();
 
 const name = ref(generateName({ prefix: "nc" }));
 const solution = ref() as Ref<SolutionFlavor>;
-const flist: Flist = {
-  value: "https://hub.grid.tf/tf-official-apps/nextcloud.flist",
-  entryPoint: "/sbin/zinit init",
-};
+const flist: Flist = FLISTS.NEXTCLOUD;
 const dedicated = ref(false);
 const rentedByMe = ref(false);
 const rentedBy = computed(() => (rentedByMe.value ? grid.twinId : undefined));

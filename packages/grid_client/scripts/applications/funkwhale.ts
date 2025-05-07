@@ -1,4 +1,5 @@
 import { Features, FilterOptions, GatewayNameModel, MachinesModel } from "../../src";
+import { FLISTS } from "../../src/helpers/flists";
 import { config, getClient } from "../client_loader";
 import { log, pingNodes } from "../utils";
 
@@ -91,8 +92,8 @@ async function main() {
         cpu: instanceCapacity.cru,
         memory: 1024 * instanceCapacity.mru,
         rootfs_size: 0,
-        flist: "https://hub.grid.tf/tf-official-apps/funkwhale-dec21.flist",
-        entrypoint: "/init.sh",
+        flist: FLISTS.FUNKWHALE.value,
+        entrypoint: FLISTS.FUNKWHALE.entryPoint,
         env: {
           SSH_KEY: config.ssh_key,
           FUNKWHALE_HOSTNAME: domain,

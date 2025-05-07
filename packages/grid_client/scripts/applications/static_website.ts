@@ -1,4 +1,5 @@
 import { Features, FilterOptions, GatewayNameModel, GridClient, MachinesModel, NodeInfo } from "../../src";
+import { FLISTS } from "../../src/helpers/flists";
 import { config, getClient } from "../client_loader";
 import { log, pingNodes } from "../utils";
 
@@ -91,8 +92,8 @@ async function main() {
         cpu: instanceCapacity.cru,
         memory: 1024 * instanceCapacity.mru,
         rootfs_size: 0,
-        flist: "https://hub.grid.tf/tf-official-apps/staticwebsite-latest.flist",
-        entrypoint: "/sbin/zinit init",
+        flist: FLISTS.STATICWEBSITE.value,
+        entrypoint: FLISTS.STATICWEBSITE.entryPoint,
         env: {
           SSH_KEY: config.ssh_key,
           STATICWEBSITE_DOMAIN: domain,

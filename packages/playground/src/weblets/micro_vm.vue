@@ -206,49 +206,17 @@ import { generateName } from "../utils/strings";
 
 const layout = useLayout();
 const tabs = ref();
-
-const images = [
-  {
-    name: "Ubuntu-24.04",
-    flist: "https://hub.grid.tf/tf-official-vms/ubuntu-24.04-latest.flist",
-    entryPoint: "/sbin/zinit init",
-  },
-  {
-    name: "Ubuntu-23.04",
-    flist: "https://hub.grid.tf/petep.3bot/threefolddev-ubuntu_23.04-latest.flist",
-    entryPoint: "/sbin/zinit init",
-  },
-  {
-    name: "Ubuntu-22.04",
-    flist: "https://hub.grid.tf/tf-official-apps/threefoldtech-ubuntu-22.04.flist",
-    entryPoint: "/sbin/zinit init",
-  },
-  {
-    name: "Arch",
-    flist: "https://hub.grid.tf/petep.3bot/archlinux_20240101.0.204074.flist",
-    entryPoint: "/sbin/zinit init",
-  },
-  {
-    name: "Debian-12",
-    flist: "https://hub.grid.tf/tf-official-apps/threefoldtech-debian-12.flist",
-    entryPoint: "/sbin/zinit init",
-  },
-  {
-    name: "Alpine-3",
-    flist: "https://hub.grid.tf/tf-official-apps/threefoldtech-alpine-3.flist",
-    entryPoint: "/entrypoint.sh",
-  },
-  {
-    name: "CentOS-8",
-    flist: "https://hub.grid.tf/tf-official-apps/threefoldtech-centos-8.flist",
-    entryPoint: "/entrypoint.sh",
-  },
-  {
-    name: "Nixos",
-    flist: "https://hub.grid.tf/tf-official-vms/nixos-micro-latest.flist",
-    entryPoint: "/entrypoint.sh",
-  },
+const flists = [
+  FLISTS.MICROVMS_UBUNTU_24,
+  FLISTS.MICROVMS_UBUNTU_23,
+  FLISTS.MICROVMS_UBUNTU_22,
+  FLISTS.MICROVMS_NIXOS,
+  FLISTS.MICROVMS_DEBIAN_12,
+  FLISTS.MICROVMS_CENTOS_9,
+  FLISTS.MICROVMS_ARCH,
+  FLISTS.MICROVMS_ALPINE_3,
 ];
+const images: VmImage[] = flists;
 
 const name = ref(generateName({ prefix: "vm" }));
 const flist = ref<Flist>();
@@ -336,9 +304,10 @@ watch(selectedSSHKeys, layoutMount, { deep: true });
 </script>
 
 <script lang="ts">
-import type { GridClient } from "@threefold/grid_client";
+import { FLISTS, type GridClient } from "@threefold/grid_client";
 
 import ExpandableLayout from "../components/expandable_layout.vue";
+import type { VmImage } from "../components/select_vm_image.vue";
 import SelectVmImage from "../components/select_vm_image.vue";
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";

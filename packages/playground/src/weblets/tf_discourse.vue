@@ -121,7 +121,7 @@
 </template>
 
 <script lang="ts" setup>
-import { calculateRootFileSystem, type GridClient } from "@threefold/grid_client";
+import { calculateRootFileSystem, FLISTS, type GridClient } from "@threefold/grid_client";
 import { Buffer } from "buffer";
 import TweetNACL from "tweetnacl";
 import { computed, type Ref, ref, watch } from "vue";
@@ -153,10 +153,7 @@ const certified = ref(false);
 const rootFilesystemSize = computed(() =>
   calculateRootFileSystem({ CPUCores: solution.value?.cpu ?? 0, RAMInMegaBytes: solution.value?.memory ?? 0 }),
 );
-const flist: Flist = {
-  value: "https://hub.grid.tf/tf-official-apps/forum.flist",
-  entryPoint: "/sbin/zinit init",
-};
+const flist: Flist = FLISTS.DISCOURSE;
 const selectedSSHKeys = ref("");
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;

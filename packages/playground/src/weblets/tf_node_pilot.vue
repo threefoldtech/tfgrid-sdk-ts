@@ -106,10 +106,7 @@ const name = ref(generateName({ prefix: "np" }));
 const selectionDetails = ref<SelectionDetails>();
 
 const solution = ref() as Ref<SolutionFlavor>;
-const flist: Flist = {
-  value: "https://hub.grid.tf/tf-official-vms/node-pilot-zdbfs.flist",
-  entryPoint: "/",
-};
+const flist: Flist = FLISTS.NODEPILOT;
 const { ipv4, ipv6, planetary, mycelium, wireguard } = useNetworks({ ipv4: true, ipv6: true });
 const dedicated = ref(false);
 const rentedByMe = ref(false);
@@ -216,6 +213,7 @@ function updateSSHkeyEnv(selectedKeys: string) {
 
 <script lang="ts">
 import type { GridClient, VM } from "@threefold/grid_client";
+import { FLISTS } from "@threefold/grid_client";
 
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";

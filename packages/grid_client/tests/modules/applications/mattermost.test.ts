@@ -20,7 +20,7 @@ let deploymentName: string;
 
 beforeAll(async () => {
   gridClient = await getClient();
-  deploymentName = "mm" + generateString(10);
+  deploymentName = "mm" + gridClient.twinId + generateString(5);
   gridClient.clientOptions.projectName = `mattermost/${deploymentName}`;
   gridClient._connect();
   return gridClient;

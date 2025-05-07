@@ -9,7 +9,7 @@ let deploymentName: string;
 
 beforeAll(async () => {
   gridClient = await getClient();
-  deploymentName = "al" + generateString(10);
+  deploymentName = "al" + gridClient.twinId + generateString(5);
   gridClient.clientOptions.projectName = `algorand/${deploymentName}`;
   gridClient._connect();
   return gridClient;

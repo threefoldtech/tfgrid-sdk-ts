@@ -1,4 +1,5 @@
 import { Features, FilterOptions, MachinesModel } from "../../src";
+import { FLISTS } from "../../src/helpers/flists";
 import { config, getClient } from "../client_loader";
 import { log, pingNodes } from "../utils";
 
@@ -69,8 +70,8 @@ async function main() {
         cpu: instanceCapacity.cru,
         memory: 1024 * instanceCapacity.mru,
         rootfs_size: 2,
-        flist: "https://hub.grid.tf/tf-official-vms/node-pilot-zdbfs.flist",
-        entrypoint: "/",
+        flist: FLISTS.NODEPILOT.value,
+        entrypoint: FLISTS.NODEPILOT.entryPoint,
         env: {
           SSH_KEY: config.ssh_key,
         },

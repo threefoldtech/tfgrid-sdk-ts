@@ -98,7 +98,7 @@
 </template>
 
 <script lang="ts" setup>
-import { calculateRootFileSystem, type GridClient } from "@threefold/grid_client";
+import { calculateRootFileSystem, FLISTS, type GridClient } from "@threefold/grid_client";
 import { computed, onMounted, type Ref, ref } from "vue";
 
 import { manual } from "@/utils/manual";
@@ -110,13 +110,12 @@ import { ProjectName } from "../types";
 import { deployVM, type Disk } from "../utils/deploy_vm";
 import { deployGatewayName, rollbackDeployment } from "../utils/gateway";
 import { normalizeError } from "../utils/helpers";
-
 const layout = useLayout();
 
 const selectionDetails = ref<SelectionDetails>();
 const threebotName = ref<string>("");
 const solution = ref() as Ref<SolutionFlavor>;
-const flist = ref<Flist>();
+const flist: Flist = FLISTS.FREEFLOW;
 const disks = ref<Disk[]>([]);
 const dedicated = ref(false);
 const rentedByMe = ref(false);
@@ -137,11 +136,6 @@ onMounted(() => {
     size: solution?.value?.disk,
     mountPoint: "/disk",
   });
-
-  flist.value = {
-    value: "https://hub.grid.tf/lennertapp2.3bot/threefoldjimber-freeflow-latest.flist",
-    entryPoint: "/sbin/zinit init",
-  };
 });
 
 function finalize(deployment: any) {
@@ -179,8 +173,8 @@ async function deploy() {
           cpu: solution.value.cpu,
           memory: solution.value.memory,
           disks: disks.value,
-          flist: flist?.value!.value,
-          entryPoint: flist.value!.entryPoint,
+          flist: flist.value,
+          entryPoint: flist.entryPoint,
           publicIpv4: ipv4.value,
           publicIpv6: ipv6.value,
           planetary: planetary.value,

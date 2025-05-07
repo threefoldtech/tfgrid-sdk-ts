@@ -213,6 +213,7 @@ const selectionDetails = ref<SelectionDetails>();
 const selectedSSHKeys = ref("");
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
+const flist: Flist = FLISTS.TFROBOT;
 
 function layoutMount() {
   if (envs.value.length > 0) {
@@ -254,8 +255,8 @@ async function deploy() {
           name: name.value,
           cpu: solution.value.cpu,
           memory: solution.value.memory,
-          flist: "https://hub.grid.tf/tf-official-apps/tfrobot.flist",
-          entryPoint: "/sbin/zinit init",
+          flist: flist.value,
+          entryPoint: flist.entryPoint,
           disks: disks.value,
           envs: envs.value,
           planetary: planetary.value,
@@ -286,12 +287,12 @@ watch(selectedSSHKeys, layoutMount, { deep: true });
 </script>
 
 <script lang="ts">
-import type { GridClient } from "@threefold/grid_client";
+import { FLISTS, type GridClient } from "@threefold/grid_client";
 
 import ExpandableLayout from "../components/expandable_layout.vue";
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";
-import type { solutionFlavor as SolutionFlavor } from "../types";
+import type { Flist, solutionFlavor as SolutionFlavor } from "../types";
 import type { SelectionDetails } from "../types/nodeSelector";
 import { updateGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";

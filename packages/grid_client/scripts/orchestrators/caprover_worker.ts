@@ -1,4 +1,5 @@
 import { Features, FilterOptions, MachinesModel } from "../../src";
+import { FLISTS } from "../../src/helpers/flists";
 import { config, getClient } from "../client_loader";
 import { log } from "../utils";
 
@@ -59,8 +60,8 @@ async function main() {
         cpu: 4,
         memory: 1024 * 4,
         rootfs_size: 0,
-        flist: "https://hub.grid.tf/tf-official-apps/tf-caprover-latest.flist",
-        entrypoint: "/sbin/zinit init",
+        flist: FLISTS.CAPROVER.value,
+        entrypoint: FLISTS.CAPROVER.entryPoint,
         env: {
           // These env. vars needed to be changed based on the leader node.
           PUBLIC_KEY: config.ssh_key,

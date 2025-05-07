@@ -6,3 +6,4 @@ export * from "./expose";
 export * from "./migration";
 export * from "./root_fs";
 export * from "./types";
+export * from "./flists";
