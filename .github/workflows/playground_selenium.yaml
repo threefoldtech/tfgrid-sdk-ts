@@ -65,16 +65,20 @@ jobs:
         if: ${{ env.LOCAL_BUILD == 'true' }}
         run: sleep 60
 
-      - name: Set Config.ini values dynamically
+      - name: Set Config.ini values (safe fallback)
         run: |
           echo "[Base]" > Config.ini
           echo "port=5173" >> Config.ini
           echo "net=${{ env.LOCAL_BUILD == 'true' && 'local' || env.NETWORK }}" >> Config.ini
           echo "[Utils]" >> Config.ini
-          echo "seed=${{ secrets.TFCHAIN_MNEMONICS }}" >> Config.ini
-          echo "node_seed=${{ secrets.TFCHAIN_NODE_MNEMONICS }}" >> Config.ini
-          echo "address=${{ secrets.STELLAR_ADDRESS }}" >> Config.ini
-          echo "email=${{ secrets.EMAIL }}" >> Config.ini
+          echo "seed=dummy-seed" >> Config.ini
+          echo "node_seed=dummy-node-seed" >> Config.ini
+          echo "address=dummy-address" >> Config.ini
+          echo "email=dummy@example.com" >> Config.ini
+        working-directory: ./packages/playground/tests/frontend_selenium
+
+      - name: Print Config.ini
+        run: cat Config.ini
         working-directory: ./packages/playground/tests/frontend_selenium
 
       - name: Run Selenium tests
