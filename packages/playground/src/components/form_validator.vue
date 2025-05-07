@@ -45,7 +45,7 @@ export default {
     const form: FormValidatorService = {
       register(uid: string, service) {
         statusMap.value.set(uid, ValidatorStatus.Init);
-        // @ts-expect-error: Service might not fully implement
+        // @ts-expect-error: Service might not fully implement, but it is fully functional
         serviceMap.value.set(uid, service);
       },
       unregister(uid: string) {
