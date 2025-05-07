@@ -52,6 +52,7 @@
             ? `Node ${nodeId} is valid.`
             : undefined
         "
+        @wheel="$event.target.blur()"
         @blur="validationTask.initialized ? undefined : validationTask.run(nodeId)"
       />
     </input-tooltip>
