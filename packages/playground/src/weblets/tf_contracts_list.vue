@@ -421,6 +421,7 @@ async function unlockAllContracts() {
     createCustomToast(loadingTablesMessage.value, ToastType.info);
     setTimeout(() => {
       loadContracts();
+      getTotalCost();
       loadingTablesMessage.value = undefined;
     }, 30000);
     unlockDialog.value = false;
@@ -443,6 +444,7 @@ async function deleteAll() {
     createCustomToast(loadingTablesMessage.value, ToastType.info);
     setTimeout(() => {
       loadContracts();
+      getTotalCost();
       loadingTablesMessage.value = undefined;
     }, 30000);
   } catch (e) {
@@ -499,9 +501,9 @@ async function onDeletedContracts(_contracts: NormalizedContract[]) {
   createCustomToast(loadingTablesMessage.value, ToastType.info);
   setTimeout(() => {
     loadContracts();
+    getTotalCost();
     loadingTablesMessage.value = undefined;
   }, 30000);
-  await getTotalCost();
   contracts.value = [...rentContracts.value, ...nameContracts.value, ...nodeContracts.value];
   totalCost.value = undefined;
 }
