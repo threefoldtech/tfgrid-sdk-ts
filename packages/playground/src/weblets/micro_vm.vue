@@ -203,19 +203,20 @@ import { useGrid } from "../stores";
 import { type Flist, ProjectName } from "../types";
 import { deployVM, type Disk, type Env } from "../utils/deploy_vm";
 import { generateName } from "../utils/strings";
-import { isVMFlist } from "./full_vm.vue";
+
 const layout = useLayout();
 const tabs = ref();
-
-const images: VmImage[] = Object.entries(FLISTS)
-  .filter(([key]) => key.startsWith("MICROVMS"))
-  .map(([key, value]) => value)
-  .filter(isVMFlist)
-  .map(({ name, flist, entryPoint }) => ({
-    name,
-    flist,
-    entryPoint,
-  }));
+const flists = [
+  FLISTS.MICROVMS_UBUNTU_24,
+  FLISTS.MICROVMS_UBUNTU_23,
+  FLISTS.MICROVMS_UBUNTU_22,
+  FLISTS.MICROVMS_NIXOS,
+  FLISTS.MICROVMS_DEBIAN_12,
+  FLISTS.MICROVMS_CENTOS_9,
+  FLISTS.MICROVMS_ARCH,
+  FLISTS.MICROVMS_ALPINE_3,
+];
+const images: VmImage[] = flists;
 
 const name = ref(generateName({ prefix: "vm" }));
 const flist = ref<Flist>();
