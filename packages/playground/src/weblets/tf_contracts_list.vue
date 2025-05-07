@@ -80,7 +80,7 @@
       </v-row>
     </template>
     <template #text>
-      <strong v-if="totalCost" class="text-primary">
+      <strong v-if="totalCost !== undefined" class="text-primary">
         <input-tooltip
           inline
           :alignCenter="true"
