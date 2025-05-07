@@ -237,7 +237,6 @@
 import type { ContractsOverdue, GridClient } from "@threefold/grid_client";
 import { type Contract, ContractState, NodeStatus, SortByContracts, SortOrder } from "@threefold/gridproxy_client";
 import { DeploymentKeyDeletionError } from "@threefold/types";
-import { Decimal } from "decimal.js";
 import { computed, defineComponent, onMounted, type Ref, ref } from "vue";
 
 import ContractsTable from "@/components/contracts_list/contracts_table.vue";
@@ -470,41 +469,10 @@ async function getTotalCost() {
   totalCost.value = 0;
 
   try {
-    const nodeResponse = await gridProxyClient.contracts.list({
-      twinId: profileManager.profile!.twinId,
-      state: [ContractState.Created, ContractState.GracePeriod],
-      type: ContractType.Node,
-      retCount: true,
-    });
-
-    const nameResponse = await gridProxyClient.contracts.list({
-      twinId: profileManager.profile!.twinId,
-      state: [ContractState.Created, ContractState.GracePeriod],
-      type: ContractType.Name,
-      retCount: true,
-    });
-
-    const rentResponse = await gridProxyClient.contracts.list({
-      twinId: profileManager.profile!.twinId,
-      state: [ContractState.Created, ContractState.GracePeriod],
-      type: ContractType.Rent,
-      retCount: true,
-    });
-
-    const allNodeContracts = await _normalizeContracts(nodeResponse.data, ContractType.Node);
-    const allNameContracts = await _normalizeContracts(nameResponse.data, ContractType.Name);
-    const allRentContracts = await _normalizeContracts(rentResponse.data, ContractType.Rent);
-
-    const allContracts = [...allNodeContracts, ...allNameContracts, ...allRentContracts];
-    for (const contract of allContracts) {
-      const consumption =
-        contract.consumption !== undefined && contract.consumption !== null ? contract.consumption.valueOf() : 0;
-      totalCost.value = +new Decimal(totalCost.value).add(consumption);
-    }
-
-    totalCost.value = +totalCost.value.toFixed(3);
-    const TFTInUSD = await queryClient.tftPrice.get();
-    totalCostUSD.value = totalCost.value * (TFTInUSD / 1000);
+    const res = await gridProxyClient.twins.getConsumption(profileManager.profile!.twinId);
+    totalCost.value = +res.last_hour_consumption.toFixed(3);
+    const tftPrice = await queryClient.tftPrice.get();
+    totalCostUSD.value = totalCost.value * (tftPrice / 1000);
   } catch (error: any) {
     loadingErrorMessage.value = `Error calculating total cost: ${error.message}`;
     createCustomToast(loadingErrorMessage.value, ToastType.danger, {});
