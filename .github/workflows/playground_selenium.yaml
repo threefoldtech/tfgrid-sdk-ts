@@ -6,92 +6,78 @@ on:
       network:
         description: "Select the network to run tests on (dev, qa, test, main)"
         required: true
-        default: "dev" # Default to 'dev' if no network is selected
+        default: "dev"
         type: choice
         options:
           - dev
           - qa
           - test
           - main
-      mode:
-        description: "Select the mode to run tests (build locally or use existing URL)"
-        required: true
-        default: "build" # Default to 'build' if no mode is selected
-        type: choice
-        options:
-          - build
-          - remote
 
 jobs:
-  selenium-run:
+  remote-tests:
     runs-on: ubuntu-latest
 
+    env:
+      NETWORK: ${{ github.event.inputs.network }}
+      TFCHAIN_MNEMONICS: ${{ secrets.TFCHAIN_MNEMONICS }}
+      TFCHAIN_NODE_MNEMONICS: ${{ secrets.TFCHAIN_NODE_MNEMONICS }}
+      STELLAR_ADDRESS: ${{ secrets.STELLAR_ADDRESS }}
+      EMAIL: ${{ secrets.EMAIL }}
+
     steps:
-      # Step 1: Checkout the repository
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      # Step 2: Set up Python
-      - name: Setting up Python
+      - name: Set up Python 3.10
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
 
-      # Step 3: Install Python dependencies
-      - name: Install Python Dependencies
-        run: pip install -r packages/playground/tests/frontend_selenium/requirements.txt
+      - name: Install Python deps
+        run: |
+          pip install -r packages/playground/tests/frontend_selenium/requirements.txt
+          pip install pytest-html
 
-      # Step 4: Set up Node.js
-      - name: Node Install
+      - name: Set up Node 18
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: "18"
 
-      # Step 5: Install Node.js dependencies
-      - name: Install Node Dependencies
+      - name: Install Node deps
         run: yarn install
 
-      # Step 6: Build the project
-      - name: Build Project
-        run: yarn lerna run build
-
-      # Step 7: Start the local environment (only for "build" mode)
-      - name: Start Local Environment
-        if: ${{ inputs.mode == 'build' }}
-        run: make run project=playground &
-
-      # Step 8: Wait for the local environment to start
-      - name: Wait for Local Environment
-        if: ${{ inputs.mode == 'build' }}
-        run: sleep 60
-
-      # Step 9: Configure Environment
-      - name: Configure Environment
+      # ─── Patch base.py for DevNet URL ───────────────────────────────────────
+      - name: Patch base.py for DevNet URL
+        if: ${{ inputs.network == 'dev' }}
         run: |
-          echo "[Base]" > packages/playground/tests/frontend_selenium/Config.ini
-          echo "port = 5173" >> packages/playground/tests/frontend_selenium/Config.ini
-          echo "net = ${{ inputs.network }}" >> packages/playground/tests/frontend_selenium/Config.ini
-          if [ "${{ inputs.mode }}" == "build" ]; then
-            echo "base_url = http://localhost:5173" >> packages/playground/tests/frontend_selenium/Config.ini
-          else
-            case ${{ inputs.network }} in
-              dev) echo "base_url = https://staging.dashboard.dev.grid.tf/" >> packages/playground/tests/frontend_selenium/Config.ini ;;
-              qa) echo "base_url = https://dashboard.qa.grid.tf/" >> packages/playground/tests/frontend_selenium/Config.ini ;;
-              test) echo "base_url = https://dashboard.test.grid.tf/" >> packages/playground/tests/frontend_selenium/Config.ini ;;
-              main) echo "base_url = https://dashboard.grid.tf/" >> packages/playground/tests/frontend_selenium/Config.ini ;;
-            esac
-          fi
+          sed -i 's|staging.dashboard.dev.grid.tf|dashboard.dev.grid.tf|g' \
+                packages/playground/tests/frontend_selenium/utils/base.py
 
-      # Step 10: Debug Config File
-      - name: Debug Config File
-        run: cat packages/playground/tests/frontend_selenium/Config.ini
+      # ─── Replace Config.ini ─────────────────────────────────────────────────
+      - name: Replace Config.ini
+        run: |
+          rm -f packages/playground/tests/frontend_selenium/Config.ini
+          cat > packages/playground/tests/frontend_selenium/Config.ini <<EOF
+          [Base]
+          port = 5173
+          net = ${{ inputs.network }}
+          [Utils]
+          seed = ${TFCHAIN_MNEMONICS}
+          node_seed = ${TFCHAIN_NODE_MNEMONICS}
+          address = ${STELLAR_ADDRESS}
+          email = ${EMAIL}
+          EOF
 
-      # Step 11: Run Tests
-      - name: Run Selenium Tests
-        working-directory: ./packages/playground/tests/frontend_selenium
-        env:
-          TFCHAIN_MNEMONICS: ${{ secrets.TFCHAIN_MNEMONICS }}
-          TFCHAIN_NODE_MNEMONICS: ${{ secrets.TFCHAIN_NODE_MNEMONICS }}
-          STELLAR_ADDRESS: ${{ secrets.STELLAR_ADDRESS }}
-          EMAIL: ${{ secrets.EMAIL }}
-        run: python -m pytest -v
+      - name: Debug Config.ini
+        run: nl packages/playground/tests/frontend_selenium/Config.ini
+
+      - name: Run Selenium tests
+        working-directory: packages/playground/tests/frontend_selenium
+        run: python -m pytest -v --html=report.html
+
+      - name: Upload HTML report
+        uses: actions/upload-artifact@v3
+        with:
+          name: selenium-report
+          path: packages/playground/tests/frontend_selenium/report.html
