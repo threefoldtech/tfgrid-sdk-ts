@@ -280,7 +280,6 @@ export default {
         farm => farm.farmId === farmId && farm.stellarAddress === address.value,
       );
       if (farm_with_same_address) {
-        isValidAddress.value = false;
         return {
           message: "Address is already used by this farm.",
         };
