@@ -111,7 +111,7 @@
                 </form-validator>
               </div>
               <v-card-actions class="justify-end px-5 pb-5 pt-0">
-                <v-btn @click="showDialogue = false" color="anchor">Close</v-btn>
+                <v-btn @click="closeDialog" color="anchor">Close</v-btn>
                 <v-btn
                   color="secondary"
                   @click="setStellarAddress(item.farmId, address)"
@@ -341,6 +341,11 @@ export default {
       return data.map(farm => farm.name.toLocaleLowerCase());
     }
 
+    function closeDialog() {
+      showDialogue.value = false;
+      address.value = "";
+    }
+
     context.expose({ getFarmsNames, reloadFarms });
 
     return {
@@ -370,6 +375,7 @@ export default {
       handleIpAdded,
       refreshPublicIPs,
       getFarmsNames,
+      closeDialog,
     };
   },
 };
