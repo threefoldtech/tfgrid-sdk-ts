@@ -248,7 +248,7 @@ export default {
         isAdding.value = true;
         await gridStore.grid.farms.addStellarAddress({ farmId, stellarAddress });
         createCustomToast("Address Added successfully!", ToastType.success);
-        showDialogue.value = false;
+        closeDialog();
         notifyDelaying();
         await reloadFarms();
       } catch (error) {
@@ -256,7 +256,6 @@ export default {
         createCustomToast("Failed to add address!", ToastType.danger);
       } finally {
         isAdding.value = false;
-        address.value = "";
       }
     }
 
