@@ -29,10 +29,6 @@ jobs:
     env:
       NETWORK: ${{ github.event.inputs.network || 'dev' }}
       LOCAL_BUILD: ${{ github.event.inputs.local_build || 'false' }}
-      TFCHAIN_MNEMONICS: ${{ secrets.TFCHAIN_MNEMONICS }}
-      TFCHAIN_NODE_MNEMONICS: ${{ secrets.TFCHAIN_NODE_MNEMONICS }}
-      STELLAR_ADDRESS: ${{ secrets.STELLAR_ADDRESS }}
-      EMAIL: ${{ secrets.EMAIL }}
 
     steps:
       - name: Checkout
