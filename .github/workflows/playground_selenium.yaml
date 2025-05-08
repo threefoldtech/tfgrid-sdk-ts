@@ -97,7 +97,7 @@ jobs:
         run: python -m pytest -v --html=report.html
 
       - name: Upload HTML report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v2.3.1
         with:
           name: selenium-report
           path: packages/playground/tests/frontend_selenium/report.html
