@@ -21,7 +21,7 @@
     "prettier-plugin-svelte": "^3.3.3"
   },
   "scripts": {
-    "prepare": "husky install",
+    "prepare": "husky",
     "lint": "eslint . --fix",
     "check-eslint": "eslint .",
     "check-prettier": "prettier .prettierrc ."
