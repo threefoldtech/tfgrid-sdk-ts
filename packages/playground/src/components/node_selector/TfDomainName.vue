@@ -184,7 +184,7 @@ export default {
     watch(
       [() => props.farm?.farmId, () => gridStore.client?.twinId, () => props.interfaces],
       () => {
-        loadDomains();
+        reloadDomains();
       },
       { deep: true },
     );
