@@ -217,7 +217,6 @@ export default {
     const showDialogue = ref(false);
     const valid = ref(false);
     const address = ref();
-    const isValidAddress = ref(false);
     const isAdding = ref(false);
     const network = process.env.NETWORK || (window as any).env.NETWORK;
     const refreshPublicIPs = ref(false);
@@ -264,8 +263,8 @@ export default {
     }
 
     function customStellarValidation() {
-      isValidAddress.value = StrKey.isValidEd25519PublicKey(address.value);
-      if (!isValidAddress.value) {
+      const isValidAddress = StrKey.isValidEd25519PublicKey(address.value);
+      if (!isValidAddress) {
         return {
           message: "Address is not valid.",
         };
@@ -372,7 +371,6 @@ export default {
       showDialogue,
       address,
       valid,
-      isValidAddress,
       isAdding,
       farmsCount,
       network,
