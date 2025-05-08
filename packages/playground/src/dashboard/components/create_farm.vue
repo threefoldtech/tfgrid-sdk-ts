@@ -1,8 +1,8 @@
 <template>
   <VAlert type="info" v-if="network == 'main'" class="my-2"
     >To create a Farm, use the
-    <a :href="manual.tf_connect_installation" class="app-link" target="_blank">TF Connect App</a>.</VAlert
-  >
+    <a :href="manual.tf_connect_installation" class="app-link" target="_blank">TF Connect App</a>.
+  </VAlert>
   <v-container>
     <v-row class="text-center flex justify-center mt-4">
       <v-btn
@@ -13,24 +13,14 @@
         >Bootstrap Node Image</v-btn
       >
 
-      <v-tooltip
-        text="You must acquire a minimum of 2 TFTs in order to create a farm."
-        location="bottom"
-        :disabled="!notEnoughBalance"
+      <v-btn
+        variant="elevated"
+        class="text-subtitle-1 px-6"
+        v-if="network !== 'main'"
+        @click="showDialogue = true"
+        :disabled="isCreating"
+        >Create Farm</v-btn
       >
-        <template #activator="{ props }">
-          <span v-bind="props">
-            <v-btn
-              variant="elevated"
-              class="text-subtitle-1 px-6"
-              v-if="network !== 'main'"
-              @click="showDialogue = true"
-              :disabled="isCreating || notEnoughBalance"
-              >Create Farm</v-btn
-            >
-          </span>
-        </template>
-      </v-tooltip>
     </v-row>
 
     <v-container v-if="showDialogue">
@@ -42,14 +32,14 @@
               <input-validator
                 :value="farmName"
                 :rules="[
-                  validators.required('Farm name is required.'),
-                  (farmName: string) => validators.isAlpha('Farm name must start with an alphabet char.')(farmName[0]),
-                  validators.minLength('Farm name minimum length is 3 chars.', 3),
-                  validators.maxLength('Farm name maximum length is 40 chars.', 40),
-                  validators.pattern('Farm name should not contain whitespaces.', {
-                    pattern: /^[^\s]+$/,
-                  }),
-                ]"
+                validators.required('Farm name is required.'),
+                (farmName: string) => validators.isAlpha('Farm name must start with an alphabet char.')(farmName[0]),
+                validators.minLength('Farm name minimum length is 3 chars.', 3),
+                validators.maxLength('Farm name maximum length is 40 chars.', 40),
+                validators.pattern('Farm name should not contain whitespaces.', {
+                  pattern: /^[^\s]+$/,
+                }),
+              ]"
                 :async-rules="[validateFarmName]"
                 #="{ props }"
               >
@@ -59,7 +49,19 @@
           </v-card-text>
           <v-card-actions class="justify-end my-1 mr-2">
             <v-btn color="anchor" @click="showDialogue = false">Close</v-btn>
-            <v-btn @click="createFarm" :loading="isCreating" :disabled="!valid || isCreating">Create</v-btn>
+            <v-tooltip
+              text="A minimum of 2 TFTs is required to create a farm."
+              location="top"
+              :disabled="!notEnoughBalance"
+            >
+              <template #activator="{ props }">
+                <span v-bind="props" style="padding: inherit">
+                  <v-btn @click="createFarm" :loading="isCreating" :disabled="!valid || isCreating || notEnoughBalance"
+                    >Create</v-btn
+                  >
+                </span>
+              </template>
+            </v-tooltip>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -68,7 +70,7 @@
 </template>
 
 <script lang="ts">
-import { ref, watchEffect } from "vue";
+import { computed, ref, watch } from "vue";
 
 import { manual } from "@/utils/manual";
 import { notifyDelaying } from "@/utils/notifications";
@@ -87,13 +89,18 @@ export default {
     const farmName = ref("");
     const network = process.env.NETWORK || (window as any).env.NETWORK;
     const profileManagerController = useProfileManagerController();
+    const balance = profileManagerController.balance;
+    const freeBalance = computed(() => balance.value?.free ?? 0);
     const notEnoughBalance = ref(false);
-    watchEffect(async () => {
-      notEnoughBalance.value = await checkBalance();
-    });
+    watch(
+      freeBalance,
+      newBalance => {
+        notEnoughBalance.value = checkBalance(newBalance);
+      },
+      { immediate: true },
+    );
 
     async function createFarm() {
-      ``;
       try {
         isCreating.value = true;
         await gridStore.grid.farms.create({ name: farmName.value });
@@ -122,10 +129,7 @@ export default {
       }
     }
 
-    async function checkBalance() {
-      await profileManagerController.reloadBalance();
-      const freeBalance = profileManagerController.balance.value?.free;
-
+    function checkBalance(freeBalance: number) {
       if (freeBalance && freeBalance < 2) {
         return true;
       }
