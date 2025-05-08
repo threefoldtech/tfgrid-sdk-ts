@@ -61,7 +61,6 @@
         @click="
           contractsTable.forEach(t => t.reset());
           loadContracts();
-          getTotalCost();
         "
         :disabled="totalCost === undefined"
       >
@@ -210,8 +209,6 @@
           @update:unlock-contracts="loadContracts"
           @update:deleted-contracts="onDeletedContracts"
           @update:lock-details="getContractsLockDetails"
-          @update:load-contracts="loadContracts"
-          @update:get-total-cost="getTotalCost"
           @update:page="
             newPage => {
               table.page.value = newPage;
@@ -297,7 +294,6 @@ const nodeIDs = computed(() => {
 const cachedNodeIDs = ref<number[]>([]);
 onMounted(() => {
   loadContracts();
-  getTotalCost();
 });
 
 async function _normalizeContracts(
@@ -390,7 +386,7 @@ async function loadContracts(type?: ContractType, options?: { sort: { key: strin
       }: ${failedContracts.value.join(", ")}.`;
     await getContractsLockDetails();
     contracts.value = [...nodeContracts.value, ...nameContracts.value, ...rentContracts.value];
-
+    if (!type) await getTotalCost();
     // Get the node info e.g. node status.
     nodeInfo.value = await getNodeInfo(nodeIDs.value, cachedNodeIDs.value);
     cachedNodeIDs.value.push(...nodeIDs.value);
@@ -425,7 +421,6 @@ async function unlockAllContracts() {
       loadContracts();
       loadingTablesMessage.value = undefined;
     }, 30000);
-    getTotalCost();
     unlockDialog.value = false;
   } catch (e) {
     loadingErrorMessage.value = `Failed to unlock contract your contracts`;
@@ -444,9 +439,8 @@ async function deleteAll() {
     loadingTablesMessage.value =
       "The contracts have been successfully deleted. Please note that all tables will be reloaded in 30 seconds.";
     createCustomToast(loadingTablesMessage.value, ToastType.info);
-    setTimeout(async () => {
-      await loadContracts();
-      await getTotalCost();
+    setTimeout(() => {
+      loadContracts();
       loadingTablesMessage.value = undefined;
     }, 30000);
   } catch (e) {
@@ -505,7 +499,6 @@ async function onDeletedContracts(_contracts: NormalizedContract[]) {
     loadContracts();
     loadingTablesMessage.value = undefined;
   }, 30000);
-  getTotalCost();
   contracts.value = [...rentContracts.value, ...nameContracts.value, ...nodeContracts.value];
 }
 async function getContractsLockDetails() {
