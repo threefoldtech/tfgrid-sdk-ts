@@ -29,6 +29,10 @@ jobs:
     env:
       NETWORK: ${{ github.event.inputs.network || 'dev' }}
       LOCAL_BUILD: ${{ github.event.inputs.local_build || 'false' }}
+      TFCHAIN_MNEMONICS: ${{ secrets.TFCHAIN_MNEMONICS }}
+      TFCHAIN_NODE_MNEMONICS: ${{ secrets.TFCHAIN_NODE_MNEMONICS }}
+      STELLAR_ADDRESS: ${{ secrets.STELLAR_ADDRESS }}
+      EMAIL: ${{ secrets.EMAIL }}
 
     steps:
       - name: Checkout
@@ -65,16 +69,16 @@ jobs:
         if: ${{ env.LOCAL_BUILD == 'true' }}
         run: sleep 60
 
-      - name: Set Config.ini values (safe fallback)
+      - name: Set Config.ini values from environment
         run: |
           echo "[Base]" > Config.ini
           echo "port=5173" >> Config.ini
           echo "net=${{ env.LOCAL_BUILD == 'true' && 'local' || env.NETWORK }}" >> Config.ini
           echo "[Utils]" >> Config.ini
-          echo "seed=dummy-seed" >> Config.ini
-          echo "node_seed=dummy-node-seed" >> Config.ini
-          echo "address=dummy-address" >> Config.ini
-          echo "email=dummy@example.com" >> Config.ini
+          echo "seed=${TFCHAIN_MNEMONICS}" >> Config.ini
+          echo "node_seed=${TFCHAIN_NODE_MNEMONICS}" >> Config.ini
+          echo "address=${STELLAR_ADDRESS}" >> Config.ini
+          echo "email=${EMAIL}" >> Config.ini
         working-directory: ./packages/playground/tests/frontend_selenium
 
       - name: Print Config.ini
