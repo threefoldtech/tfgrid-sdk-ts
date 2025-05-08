@@ -1,4 +1,4 @@
-name: Playground Selenium Tests
+name: "Playground Selenium Tests (Phase 1: Remote)"
 
 on:
   workflow_dispatch:
@@ -47,14 +47,12 @@ jobs:
       - name: Install Node deps
         run: yarn install
 
-      # ─── Patch base.py for DevNet URL ───────────────────────────────────────
       - name: Patch base.py for DevNet URL
         if: ${{ inputs.network == 'dev' }}
         run: |
           sed -i 's|staging.dashboard.dev.grid.tf|dashboard.dev.grid.tf|g' \
-                packages/playground/tests/frontend_selenium/utils/base.py
+            packages/playground/tests/frontend_selenium/utils/base.py
 
-      # ─── Replace Config.ini ─────────────────────────────────────────────────
       - name: Replace Config.ini
         run: |
           rm -f packages/playground/tests/frontend_selenium/Config.ini
@@ -75,9 +73,3 @@ jobs:
       - name: Run Selenium tests
         working-directory: packages/playground/tests/frontend_selenium
         run: python -m pytest -v --html=report.html
-
-      - name: Upload HTML report
-        uses: actions/upload-artifact@v3
-        with:
-          name: selenium-report
-          path: packages/playground/tests/frontend_selenium/report.html
