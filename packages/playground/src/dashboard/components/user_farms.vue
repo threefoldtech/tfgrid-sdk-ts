@@ -256,6 +256,7 @@ export default {
         createCustomToast("Failed to add address!", ToastType.danger);
       } finally {
         isAdding.value = false;
+        address.value = "";
       }
     }
 
