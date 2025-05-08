@@ -53,19 +53,18 @@ jobs:
           sed -i 's|staging.dashboard.dev.grid.tf|dashboard.dev.grid.tf|g' \
             packages/playground/tests/frontend_selenium/utils/base.py
 
-      - name: Replace Config.ini
+      - name: Replace Config.ini (strip newlines from secrets)
         run: |
-          rm -f packages/playground/tests/frontend_selenium/Config.ini
-          cat > packages/playground/tests/frontend_selenium/Config.ini <<EOF
-          [Base]
-          port = 5173
-          net = ${{ inputs.network }}
-          [Utils]
-          seed = ${TFCHAIN_MNEMONICS}
-          node_seed = ${TFCHAIN_NODE_MNEMONICS}
-          address = ${STELLAR_ADDRESS}
-          email = ${EMAIL}
-          EOF
+          cd packages/playground/tests/frontend_selenium
+          rm -f Config.ini
+          echo "[Base]" > Config.ini
+          echo "port = 5173" >> Config.ini
+          echo "net = ${NETWORK}" >> Config.ini
+          echo "[Utils]" >> Config.ini
+          echo "seed = $(echo "${TFCHAIN_MNEMONICS}" | tr -d '\n')" >> Config.ini
+          echo "node_seed = $(echo "${TFCHAIN_NODE_MNEMONICS}" | tr -d '\n')" >> Config.ini
+          echo "address = $(echo "${STELLAR_ADDRESS}" | tr -d '\n')" >> Config.ini
+          echo "email = $(echo "${EMAIL}" | tr -d '\n')" >> Config.ini
 
       - name: Debug Config.ini
         run: nl packages/playground/tests/frontend_selenium/Config.ini
