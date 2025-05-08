@@ -110,7 +110,7 @@
         </div>
       </v-navigation-drawer>
 
-      <v-main :style="{ paddingTop: navbarConfig ? '140px' : '70px' }">
+      <v-main :style="{ paddingTop: navbarConfig && hasActiveProfile ? '140px' : '70px' }">
         <v-toolbar
           :extended="toolbarExtended"
           extension-height="auto"

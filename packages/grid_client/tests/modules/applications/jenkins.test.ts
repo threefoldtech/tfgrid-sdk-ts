@@ -20,7 +20,7 @@ let deploymentName: string;
 
 beforeAll(async () => {
   gridClient = await getClient();
-  deploymentName = "jk" + generateString(10);
+  deploymentName = "jk" + gridClient.twinId + generateString(5);
   gridClient.clientOptions.projectName = `jenkins/${deploymentName}`;
   gridClient._connect();
   return gridClient;

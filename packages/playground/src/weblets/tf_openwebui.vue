@@ -3,33 +3,27 @@
     ref="layout"
     :cpu="solution?.cpu"
     :memory="solution?.memory"
-    :disk="solution?.disk + rootFilesystemSize"
     :ipv4="ipv4"
+    :disk="disks.reduce((total, disk) => total + disk.size, solution?.disk + 2)"
     :dedicated="dedicated"
     :rentedBy="rentedBy"
     :SelectedNode="selectionDetails?.node"
     :valid-filters="selectionDetails?.validFilters"
-    title-image="images/icons/mattermost.png"
+    title-image="images/icons/openwebui.png"
   >
-    <template #title>Deploy a Mattermost Instance </template>
+    <template #title> Deploy an Open WebUI Instance </template>
 
-    <d-tabs
-      :tabs="[
-        { title: 'Base', value: 'base' },
-        { title: 'SMTP Server', value: 'smtp' },
-      ]"
-      ref="tabs"
-    >
-      <template #base>
+    <d-tabs :tabs="[{ title: 'Config', value: 'config' }]">
+      <template #config>
         <input-validator
           :value="name"
           :rules="[
-            validators.required('Name is required.'),
-            validators.IsAlphanumericExpectUnderscore('Name should consist of letters ,numbers and underscores only.'),
-            (name: string) => validators.isAlpha('Name must start with an alphabetical character.')(name[0]),
-            validators.minLength('Name must be at least 2 characters.', 2),
-            validators.maxLength('Name cannot exceed 15 characters.', 15),
-          ]"
+              validators.required('Name is required.'),
+              validators.IsAlphanumericExpectUnderscore('Name should consist of letters ,numbers and underscores only.'),
+              (name: string) => validators.isAlpha('Name must start with an alphabetical character.')(name[0]),
+              validators.minLength('Name must be at least 2 characters.', 2),
+              validators.maxLength('Name cannot exceed 35 characters.', 35),
+            ]"
           #="{ props }"
         >
           <input-tooltip tooltip="Instance name.">
@@ -38,24 +32,34 @@
         </input-validator>
 
         <SelectSolutionFlavor
+          :small="{ cpu: 2, memory: 8, disk: 25 }"
+          :medium="{ cpu: 4, memory: 16, disk: 50 }"
+          :large="{ cpu: 8, memory: 32, disk: 100 }"
           v-model="solution"
-          :medium="{ cpu: 2, memory: 4, disk: 50 }"
-          :large="{ cpu: 4, memory: 16, disk: 100 }"
         />
+
         <Networks
-          v-model:mycelium="mycelium"
-          v-model:planetary="planetary"
+          required
           v-model:ipv4="ipv4"
           v-model:ipv6="ipv6"
+          v-model:planetary="planetary"
+          v-model:mycelium="mycelium"
           v-model:wireguard="wireguard"
           :has-custom-domain="selectionDetails?.domain?.enabledCustomDomain"
           require-domain
-          :required-ipv4="smtp.enabled"
         />
-
-        <!-- <input-tooltip inline tooltip="" :href="manual"> -->
+        <input-tooltip
+          inline
+          tooltip="
+            Selecting a Node with GPU.
+            When selecting a node with GPU resources, please make sure that you have a rented node. To rent a node and gain access to GPU capabilities, you can use our dashboard.
+            "
+        >
+          <v-switch color="primary" inset label="GPU" v-model="hasGPU" hide-details />
+        </input-tooltip>
+        
         <v-switch color="primary" inset label="Rented By Me" v-model="rentedByMe" hide-details />
-        <!-- </input-tooltip> -->
+        
         <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
           <v-switch color="primary" inset label="Rentable" v-model="dedicated" hide-details />
         </input-tooltip>
@@ -68,10 +72,12 @@
           :filters="{
             ipv4,
             ipv6,
+            hasGPU,
             certified,
             dedicated,
             rentedBy,
             cpu: solution?.cpu,
+            ssdDisks: disks.map(disk => disk.size),
             solutionDisk: solution?.disk,
             memory: solution?.memory,
             rootFilesystemSize,
@@ -83,10 +89,8 @@
           v-model="selectionDetails"
         />
 
+        
         <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
-      </template>
-      <template #smtp>
-        <SmtpServer v-model="smtp" />
       </template>
     </d-tabs>
 
@@ -102,50 +106,76 @@
 </template>
 
 <script lang="ts" setup>
-import { calculateRootFileSystem, FLISTS, type GridClient } from "@threefold/grid_client";
-import { computed, type Ref, ref } from "vue";
+import { computed, type Ref, ref, watch } from "vue";
 
 import { manual } from "@/utils/manual";
 
+import Networks, { useNetworks } from "../components/networks.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useGrid, useProfileManager } from "../stores";
-import type { Flist, solutionFlavor as SolutionFlavor } from "../types";
-import { ProjectName } from "../types";
-import { deployVM } from "../utils/deploy_vm";
+import type { solutionFlavor as SolutionFlavor } from "../types";
+import { type Flist, ProjectName } from "../types";
+import { deployVM, type Disk } from "../utils/deploy_vm";
 import { deployGatewayName, getSubdomain, rollbackDeployment } from "../utils/gateway";
-import { generateName, generatePassword } from "../utils/strings";
+import { normalizeError } from "../utils/helpers";
+import { generateName } from "../utils/strings";
 
-const layout = useLayout();
-const tabs = ref();
-const profileManager = useProfileManager();
 const selectionDetails = ref<SelectionDetails>();
 
-const name = ref(generateName({ prefix: "mm" }));
+const layout = useLayout();
+const profileManager = useProfileManager();
 const solution = ref() as Ref<SolutionFlavor>;
-const flist: Flist = FLISTS.MATTERMOST;
+const selectedSSHKeys = ref("");
+const name = ref(generateName({ prefix: "oi" }));
+const flist = ref<Flist>({
+  name: "Ubuntu-24.04 Open WebUI Instance",
+  value: "https://hub.grid.tf/tf-official-apps/threefoldtech-ubuntu-24.04_fullvm_oi.flist",
+  entryPoint: "",
+});
+const { ipv4, ipv6, mycelium, planetary, wireguard } = useNetworks();
 const dedicated = ref(false);
 const rentedByMe = ref(false);
 const rentedBy = computed(() => (rentedByMe.value ? grid.twinId : undefined));
 const certified = ref(false);
-const { ipv4, ipv6, planetary, mycelium, wireguard } = useNetworks();
-const smtp = ref(createSMTPServer());
-const rootFilesystemSize = computed(() =>
-  calculateRootFileSystem({ CPUCores: solution.value?.cpu ?? 0, RAMInMegaBytes: solution.value?.memory ?? 0 }),
-);
-const selectedSSHKeys = ref("");
+const disks = ref<Disk[]>([]);
+const hasGPU = ref(false);
+const rootFilesystemSize = computed(() => solution.value?.disk);
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
 
+watch(
+  [dedicated, rentedByMe],
+  ([dedicated, rentedByMe]) => {
+    if (dedicated === false && rentedByMe === false) {
+      hasGPU.value = dedicated;
+    }
+  },
+  { immediate: true },
+);
+
+watch(
+  hasGPU,
+  hasGPU => {
+    if (hasGPU) {
+      dedicated.value = true;
+      rentedByMe.value = true;
+    }
+  },
+  { immediate: true },
+);
+
 function finalize(deployment: any) {
   layout.value.reloadDeploymentsList();
-  layout.value.setStatus("success", "Successfully deployed a Mattermost instance.");
-  layout.value.openDialog(deployment, deploymentListEnvironments.mattermost);
+  layout.value.setStatus(
+    "success",
+    `Successfully deployed an Open WebUI instance. Please keep in mind that the installation may take a few minutes to finish. If you encounter a "Bad Gateway" message while accessing the webpage, just wait a moment and refresh the page.`,
+  );
+  layout.value.openDialog(deployment, deploymentListEnvironments.openwebui);
 }
-
 async function deploy() {
   layout.value.setStatus("deploy");
 
-  const projectName = ProjectName.Mattermost.toLowerCase() + "/" + name.value;
+  const projectName = ProjectName.Openwebui.toLowerCase() + "/" + name.value;
 
   const subdomain = getSubdomain({
     deploymentName: name.value,
@@ -153,12 +183,11 @@ async function deploy() {
     twinId: profileManager.profile!.twinId,
   });
 
-  const domain = selectionDetails.value?.domain?.enabledCustomDomain
-    ? selectionDetails.value.domain.customDomain
-    : subdomain + "." + selectionDetails.value?.domain?.selectedDomain?.publicConfig.domain;
+  const domain = selectionDetails.value!.domain!.enabledCustomDomain
+    ? selectionDetails.value!.domain!.customDomain
+    : subdomain + "." + selectionDetails.value!.domain!.selectedDomain?.publicConfig.domain;
 
   let vm: any;
-
   try {
     layout.value?.validateSSH();
     updateGrid(grid, { projectName });
@@ -167,54 +196,41 @@ async function deploy() {
 
     vm = await deployVM(grid!, {
       name: name.value,
-      network: {
-        addAccess: wireguard.value || selectionDetails.value!.domain!.enableSelectedDomain,
-        accessNodeId: selectionDetails.value?.domain?.selectedDomain?.nodeId,
-      },
       machines: [
         {
           name: name.value,
           cpu: solution.value.cpu,
           memory: solution.value.memory,
-          disks: [
-            {
-              size: solution.value.disk,
-              mountPoint: "/var/lib/docker",
-            },
-          ],
-          flist: flist.value,
-          entryPoint: flist.entryPoint,
-          rootFilesystemSize: rootFilesystemSize.value,
+          flist: flist.value!.value,
+          entryPoint: flist.value!.entryPoint,
+          disks: [...disks.value],
           publicIpv4: ipv4.value,
           publicIpv6: ipv6.value,
           planetary: planetary.value,
           mycelium: mycelium.value,
           envs: [
             { key: "SSH_KEY", value: selectedSSHKeys.value },
-            { key: "DB_PASSWORD", value: generatePassword() },
-            { key: "SITE_URL", value: "https://" + domain },
-            { key: "MATTERMOST_DOMAIN", value: domain },
-            ...(smtp.value.enabled
-              ? [
-                  { key: "SMTPUsername", value: smtp.value.username },
-                  { key: "SMTPPassword", value: smtp.value.password },
-                  { key: "SMTPServer", value: smtp.value.hostname },
-                  { key: "SMTPPort", value: smtp.value.port.toString() },
-                ]
-              : []),
+            { key: "OPENWEBUI_DOMAIN", value: domain },
           ],
-          nodeId: selectionDetails.value!.node!.nodeId,
+          rootFilesystemSize: rootFilesystemSize.value,
+          hasGPU: hasGPU.value,
+          nodeId: selectionDetails.value?.node?.nodeId,
+          gpus: hasGPU.value ? selectionDetails.value?.gpuCards.map(card => card.id) : undefined,
           rentedBy: rentedBy.value,
           certified: certified.value,
         },
       ],
+      network: {
+        addAccess: wireguard.value || selectionDetails.value!.domain!.enableSelectedDomain,
+        accessNodeId: selectionDetails.value?.domain?.selectedDomain?.nodeId,
+      },
     });
   } catch (e) {
-    return layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Mattermost instance."));
+    layout.value.setStatus("failed", normalizeError(e, "Failed to deploy an Open WebUI instance."));
   }
 
   if (!selectionDetails.value?.domain?.enableSelectedDomain) {
-    vm[0].customDomain = selectionDetails.value?.domain?.customDomain;
+    vm[0].customDomain = selectionDetails.value!.domain!.customDomain;
     finalize(vm);
     return;
   }
@@ -222,18 +238,19 @@ async function deploy() {
   try {
     layout.value.setStatus("deploy", "Preparing to deploy gateway...");
 
-    await deployGatewayName(grid, selectionDetails.value.domain, {
+    await deployGatewayName(grid, selectionDetails.value?.domain, {
       subdomain,
       ip: vm[0].interfaces[0].ip,
-      port: 8000,
+      port: 8080,
       network: vm[0].interfaces[0].network,
     });
 
     finalize(vm);
   } catch (e) {
     layout.value.setStatus("deploy", "Rollbacking back due to fail to deploy gateway...");
-    await rollbackDeployment(grid!, name.value);
-    layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Mattermost instance."));
+
+    await rollbackDeployment(grid, name.value);
+    layout.value.setStatus("failed", normalizeError(e, "Failed to deploy an Open WebUI instance."));
   }
 }
 
@@ -243,22 +260,18 @@ function updateSSHkeyEnv(selectedKeys: string) {
 </script>
 
 <script lang="ts">
-import { updateGrid } from "@/utils/grid";
+import type { GridClient } from "@threefold/grid_client";
 
-import Networks, { useNetworks } from "../components/networks.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
-import SmtpServer, { createSMTPServer } from "../components/smtp_server.vue";
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";
 import type { SelectionDetails } from "../types/nodeSelector";
-import { normalizeError } from "../utils/helpers";
+import { updateGrid } from "../utils/grid";
 
 export default {
-  name: "TfMattermost",
+  name: "TfOpenwebui",
   components: {
-    SmtpServer,
     SelectSolutionFlavor,
-    Networks,
     ManageSshDeployemnt,
   },
 };

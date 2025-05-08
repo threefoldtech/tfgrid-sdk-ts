@@ -20,7 +20,7 @@ let deploymentName: string;
 
 beforeAll(async () => {
   gridClient = await getClient();
-  deploymentName = "nc" + generateString(10);
+  deploymentName = "nc" + gridClient.twinId + generateString(5);
   gridClient.clientOptions.projectName = `nextcloud/${deploymentName}`;
   gridClient._connect();
   return gridClient;

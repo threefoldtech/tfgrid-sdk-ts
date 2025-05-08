@@ -135,6 +135,7 @@ const workers = ref<CW[]>([]);
 const selectedSSHKeys = ref("");
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
+const flist: Flist = FLISTS.CAPROVER;
 
 async function deploy() {
   layout.value.setStatus("deploy");
@@ -185,8 +186,8 @@ function normalizeCaproverWorker(worker: CW, envs: Env[]): Machine {
     name: worker.name,
     cpu: worker.solution!.cpu,
     memory: worker.solution!.memory,
-    flist: "https://hub.grid.tf/tf-official-apps/tf-caprover-latest.flist",
-    entryPoint: "/sbin/zinit init",
+    flist: flist.value,
+    entryPoint: flist.entryPoint,
     publicIpv4: worker.ipv4,
     planetary: worker.planetary,
     mycelium: worker.mycelium,
@@ -217,7 +218,7 @@ function updateSSHkeyEnv(selectedKeys: string) {
 </script>
 
 <script lang="ts">
-import { calculateRootFileSystem, type GridClient } from "@threefold/grid_client";
+import { calculateRootFileSystem, FLISTS, type GridClient } from "@threefold/grid_client";
 import AwaitLock from "await-lock";
 import { markRaw } from "vue";
 
@@ -227,6 +228,7 @@ import CaproverWorker, { createWorker } from "../components/caprover_worker.vue"
 import ExpandableLayout from "../components/expandable_layout.vue";
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";
+import type { Flist } from "../types";
 import { updateGrid } from "../utils/grid";
 
 export default {

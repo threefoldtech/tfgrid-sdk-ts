@@ -118,6 +118,7 @@ const selectedSSHKeys = ref("");
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
 const profileManager = useProfileManager();
+const flist: Flist = FLISTS.NOSTR;
 
 function finalize(deployment: any) {
   layout.value.reloadDeploymentsList();
@@ -157,8 +158,8 @@ async function deploy() {
           name: name.value,
           cpu: solution.value.cpu,
           memory: solution.value.memory,
-          flist: "https://hub.grid.tf/tf-official-apps/nostr_relay-mycelium.flist",
-          entryPoint: "/sbin/zinit init",
+          flist: flist.value,
+          entryPoint: flist.entryPoint,
           disks: disks.value,
           envs: [
             {
@@ -213,10 +214,11 @@ function updateSSHkeyEnv(selectedKeys: string) {
 
 <script lang="ts">
 import type { GridClient, VM } from "@threefold/grid_client";
+import { FLISTS } from "@threefold/grid_client";
 
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";
-import type { solutionFlavor as SolutionFlavor } from "../types";
+import type { Flist, solutionFlavor as SolutionFlavor } from "../types";
 import type { SelectionDetails } from "../types/nodeSelector";
 import { deployGatewayName, getSubdomain, rollbackDeployment } from "../utils/gateway";
 import { updateGrid } from "../utils/grid";
