@@ -70,7 +70,7 @@
 </template>
 
 <script lang="ts">
-import { computed, ref, watch } from "vue";
+import { computed, ref } from "vue";
 
 import { manual } from "@/utils/manual";
 import { notifyDelaying } from "@/utils/notifications";
@@ -91,14 +91,7 @@ export default {
     const profileManagerController = useProfileManagerController();
     const balance = profileManagerController.balance;
     const freeBalance = computed(() => balance.value?.free ?? 0);
-    const notEnoughBalance = ref(false);
-    watch(
-      freeBalance,
-      newBalance => {
-        notEnoughBalance.value = checkBalance(newBalance);
-      },
-      { immediate: true },
-    );
+    const notEnoughBalance = computed(() => freeBalance.value < 2);
 
     async function createFarm() {
       try {
@@ -129,13 +122,6 @@ export default {
       }
     }
 
-    function checkBalance(freeBalance: number) {
-      if (freeBalance && freeBalance < 2) {
-        return true;
-      }
-      return false;
-    }
-
     return {
       showDialogue,
       isCreating,
@@ -145,7 +131,6 @@ export default {
       validateFarmName,
       network,
       manual,
-      checkBalance,
       notEnoughBalance,
     };
   },
