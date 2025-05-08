@@ -55,7 +55,7 @@
               :disabled="!notEnoughBalance"
             >
               <template #activator="{ props }">
-                <span v-bind="props" style="padding: inherit">
+                <span v-bind="props" style="padding-inline: inherit">
                   <v-btn @click="createFarm" :loading="isCreating" :disabled="!valid || isCreating || notEnoughBalance"
                     >Create</v-btn
                   >
