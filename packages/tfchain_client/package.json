@@ -47,7 +47,7 @@
     "typescript": "^5.0.2"
   },
   "dependencies": {
-    "@polkadot/api": "^8.9.1",
+    "@polkadot/api": "^10.0.1",
     "@threefold/types": "2.8.0-rc2",
     "await-lock": "^2.2.2",
     "bip39": "^3.1.0",
