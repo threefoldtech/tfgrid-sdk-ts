@@ -69,20 +69,27 @@ jobs:
         if: ${{ env.LOCAL_BUILD == 'true' }}
         run: sleep 60
 
+      - name: Validate secrets are set
+        run: |
+          if [ -z "${TFCHAIN_MNEMONICS}" ] || [ -z "${TFCHAIN_NODE_MNEMONICS}" ] || [ -z "${STELLAR_ADDRESS}" ] || [ -z "${EMAIL}" ]; then
+            echo "❌ One or more required secrets are missing or empty!"
+            exit 1
+          fi
+
       - name: Set Config.ini values from environment
         run: |
           echo "[Base]" > Config.ini
           echo "port=5173" >> Config.ini
           echo "net=${{ env.LOCAL_BUILD == 'true' && 'local' || env.NETWORK }}" >> Config.ini
           echo "[Utils]" >> Config.ini
-          echo "seed=${TFCHAIN_MNEMONICS}" >> Config.ini
-          echo "node_seed=${TFCHAIN_NODE_MNEMONICS}" >> Config.ini
-          echo "address=${STELLAR_ADDRESS}" >> Config.ini
-          echo "email=${EMAIL}" >> Config.ini
+          echo "seed=$(echo "$TFCHAIN_MNEMONICS" | tr -d '\n' | sed 's/"/\\"/g')" >> Config.ini
+          echo "node_seed=$(echo "$TFCHAIN_NODE_MNEMONICS" | tr -d '\n' | sed 's/"/\\"/g')" >> Config.ini
+          echo "address=$(echo "$STELLAR_ADDRESS" | tr -d '\n')" >> Config.ini
+          echo "email=$(echo "$EMAIL" | tr -d '\n')" >> Config.ini
         working-directory: ./packages/playground/tests/frontend_selenium
 
-      - name: Print Config.ini
-        run: cat Config.ini
+      - name: Print Config.ini with line numbers
+        run: nl Config.ini
         working-directory: ./packages/playground/tests/frontend_selenium
 
       - name: Run Selenium tests
