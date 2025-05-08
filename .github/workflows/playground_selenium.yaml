@@ -35,7 +35,7 @@ jobs:
       EMAIL: ${{ secrets.EMAIL }}
 
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Set up Python
@@ -53,30 +53,30 @@ jobs:
         with:
           node-version: 18
 
-      - name: Yarn install
+      - name: Yarn install (only for local build)
         if: ${{ env.LOCAL_BUILD == 'true' }}
         run: yarn install
 
-      - name: Lerna Build
+      - name: Lerna build (only for local build)
         if: ${{ env.LOCAL_BUILD == 'true' }}
         run: yarn lerna run build
 
-      - name: Serve Dashboard
+      - name: Serve Dashboard (only for local build)
         if: ${{ env.LOCAL_BUILD == 'true' }}
         run: make run project=playground &
 
-      - name: Wait for local server
+      - name: Wait for local server to boot (only for local build)
         if: ${{ env.LOCAL_BUILD == 'true' }}
         run: sleep 60
 
-      - name: Validate secrets are set
+      - name: Validate secrets are present
         run: |
           if [ -z "${TFCHAIN_MNEMONICS}" ] || [ -z "${TFCHAIN_NODE_MNEMONICS}" ] || [ -z "${STELLAR_ADDRESS}" ] || [ -z "${EMAIL}" ]; then
-            echo "❌ One or more required secrets are missing or empty!"
+            echo "❌ One or more secrets are missing!"
             exit 1
           fi
 
-      - name: Set Config.ini dynamically (for local or remote network)
+      - name: Create Config.ini dynamically
         run: |
           echo "[Base]" > Config.ini
           echo "port=5173" >> Config.ini
@@ -88,16 +88,16 @@ jobs:
           echo "email=$(echo "$EMAIL" | tr -d '\n')" >> Config.ini
         working-directory: ./packages/playground/tests/frontend_selenium
 
-      - name: Print Config.ini with line numbers
+      - name: Print Config.ini (for debugging)
         run: nl Config.ini
         working-directory: ./packages/playground/tests/frontend_selenium
 
-      - name: Run Selenium tests and generate report
+      - name: Run Selenium tests with HTML report
         working-directory: ./packages/playground/tests/frontend_selenium
         run: python -m pytest -v --html=report.html
 
       - name: Upload HTML report
-        uses: actions/upload-artifact@v3.1.3
+        uses: actions/upload-artifact@v3
         with:
           name: selenium-report
           path: packages/playground/tests/frontend_selenium/report.html
