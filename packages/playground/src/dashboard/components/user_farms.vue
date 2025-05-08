@@ -274,19 +274,16 @@ export default {
     }
 
     function isStellarAddressUsed() {
-      if (!expanded.value || expanded.value.length === 0) return undefined;
+      if (!expanded.value || expanded.value.length === 0 || !farms.value) return undefined;
       const farmId = expanded.value[0].farmId;
-      if (!farms.value) return undefined;
-      else {
-        const farm_with_same_address = farms.value.find(
-          farm => farm.farmId === farmId && farm.stellarAddress === address.value,
-        );
-        if (farm_with_same_address) {
-          isValidAddress.value = false;
-          return {
-            message: "Address is already used by this farm.",
-          };
-        }
+      const farm_with_same_address = farms.value.find(
+        farm => farm.farmId === farmId && farm.stellarAddress === address.value,
+      );
+      if (farm_with_same_address) {
+        isValidAddress.value = false;
+        return {
+          message: "Address is already used by this farm.",
+        };
       }
     }
 
