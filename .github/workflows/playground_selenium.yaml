@@ -65,18 +65,18 @@ jobs:
         if: ${{ env.LOCAL_BUILD == 'true' }}
         run: make run project=playground &
 
-      - name: Wait for local server to boot (only for local build)
+      - name: Wait for local server (only for local build)
         if: ${{ env.LOCAL_BUILD == 'true' }}
         run: sleep 60
 
-      - name: Validate secrets are present
+      - name: Validate secrets
         run: |
           if [ -z "${TFCHAIN_MNEMONICS}" ] || [ -z "${TFCHAIN_NODE_MNEMONICS}" ] || [ -z "${STELLAR_ADDRESS}" ] || [ -z "${EMAIL}" ]; then
-            echo "❌ One or more secrets are missing!"
+            echo "❌ Missing secrets!"
             exit 1
           fi
 
-      - name: Create Config.ini dynamically
+      - name: Create Config.ini
         run: |
           echo "[Base]" > Config.ini
           echo "port=5173" >> Config.ini
@@ -88,11 +88,11 @@ jobs:
           echo "email=$(echo "$EMAIL" | tr -d '\n')" >> Config.ini
         working-directory: ./packages/playground/tests/frontend_selenium
 
-      - name: Print Config.ini (for debugging)
+      - name: Print Config.ini (debug)
         run: nl Config.ini
         working-directory: ./packages/playground/tests/frontend_selenium
 
-      - name: Run Selenium tests with HTML report
+      - name: Run Selenium tests
         working-directory: ./packages/playground/tests/frontend_selenium
         run: python -m pytest -v --html=report.html
 
