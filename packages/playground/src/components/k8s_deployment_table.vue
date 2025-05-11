@@ -145,8 +145,8 @@
       </template>
 
       <template #no-data-text>
-        <div v-if="failedDeployments.length > 0" class="text-center">
-          <p v-text="'Couldn\'t load any of your Kubernetes deployments.'" />
+        <div v-if="count! > 0 && items.length === 0 && failedDeployments.length > 0" class="text-center">
+          <p>Couldn't load any of your Kubernetes deployments.</p>
           <VBtn
             class="mt-4"
             variant="outlined"

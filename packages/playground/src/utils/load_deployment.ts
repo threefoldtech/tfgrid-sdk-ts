@@ -199,7 +199,6 @@ export async function loadK8s(grid: GridClient) {
         console.error(`Timeout loading deployment with name ${name}`);
         return null;
       } else if ((result as any).masters.length === 0 && (result as any).workers.length === 0) {
-        console.error(`Failed to load deployment with name ${name}`);
         failedDeployments.push({ name, nodes: nodeIds, contracts: contracts });
       } else {
         return result;
@@ -244,7 +243,7 @@ export async function loadK8s(grid: GridClient) {
   });
 
   return <LoadedDeployments<K8S>>{
-    count: clusters.length,
+    count: data.length,
     items: data,
     failedDeployments,
   };
