@@ -1,32 +1,48 @@
 <template>
-  <VAlert type="info" v-if="network == 'main'" class="my-2"
-    >To create a Farm, use the
-    <a :href="manual.tf_connect_installation" class="app-link" target="_blank">TF Connect App</a>.</VAlert
+  <VAlert
+    v-if="network == 'main'"
+    type="info"
+    class="my-2"
   >
+    To create a Farm, use the
+    <a
+      :href="manual.tf_connect_installation"
+      class="app-link"
+      target="_blank"
+    >TF Connect App</a>.
+  </VAlert>
   <v-container>
     <v-row class="text-center flex justify-center mt-4">
       <v-btn
         color="secondary"
         class="text-subtitle-1 px-6 mr-2"
-        v-bind:href="'https://bootstrap.grid.tf/'"
+        :href="'https://bootstrap.grid.tf/'"
         target="blank"
-        >Bootstrap Node Image</v-btn
       >
+        Bootstrap Node Image
+      </v-btn>
 
       <v-btn
+        v-if="network !== 'main'"
         variant="elevated"
         class="text-subtitle-1 px-6"
-        v-if="network !== 'main'"
-        @click="showDialogue = true"
         :disabled="isCreating"
-        >Create Farm</v-btn
+        @click="showDialogue = true"
       >
+        Create Farm
+      </v-btn>
     </v-row>
 
     <v-container v-if="showDialogue">
-      <v-dialog v-model="showDialogue" max-width="600" attach="#modals">
+      <v-dialog
+        v-model="showDialogue"
+        max-width="600"
+        attach="#modals"
+      >
         <v-card>
-          <v-card-title class="bg-primary"> Create Farm </v-card-title>
+          <v-card-title class="bg-primary">
+            Create Farm
+          </v-card-title>
           <v-card-text>
             <form-validator v-model="valid">
               <input-validator
@@ -43,13 +59,40 @@
                 :async-rules="[validateFarmName]"
                 #="{ props }"
               >
-                <v-text-field v-model="farmName" v-bind:="props" outlined label="Farm name"></v-text-field>
+                <v-text-field
+                  v-model="farmName"
+                  v-bind:="props"
+                  outlined
+                  label="Farm name"
+                />
               </input-validator>
             </form-validator>
           </v-card-text>
           <v-card-actions class="justify-end my-1 mr-2">
-            <v-btn color="anchor" @click="showDialogue = false">Close</v-btn>
-            <v-btn @click="createFarm" :loading="isCreating" :disabled="!valid || isCreating">Create</v-btn>
+            <v-btn
+              color="anchor"
+              @click="showDialogue = false"
+            >
+              Close
+            </v-btn>
+            <v-tooltip
+              text="A minimum of 2 TFTs is required to create a farm."
+              location="top"
+              :disabled="!notEnoughBalance"
+            >
+              <template #activator="{ props }">
+                <span
+                  v-bind="props"
+                  style="padding-left: inherit"
+                >
+                  <v-btn
+                    :loading="isCreating"
+                    :disabled="!valid || isCreating || notEnoughBalance"
+                    @click="createFarm"
+                  >Create</v-btn>
+                </span>
+              </template>
+            </v-tooltip>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -58,12 +101,13 @@
 </template>
 
 <script lang="ts">
-import { ref } from "vue";
+import { computed, ref } from "vue";
 
 import { manual } from "@/utils/manual";
 import { notifyDelaying } from "@/utils/notifications";
 
 import { gridProxyClient } from "../../clients";
+import { useProfileManagerController } from "../../components/profile_manager_controller.vue";
 import { useGrid } from "../../stores";
 import { createCustomToast, ToastType } from "../../utils/custom_toast";
 export default {
@@ -75,6 +119,10 @@ export default {
     const valid = ref(false);
     const farmName = ref("");
     const network = process.env.NETWORK || (window as any).env.NETWORK;
+    const profileManagerController = useProfileManagerController();
+    const balance = profileManagerController.balance;
+    const freeBalance = computed(() => balance.value?.free ?? 0);
+    const notEnoughBalance = computed(() => freeBalance.value < 2);
 
     async function createFarm() {
       try {
@@ -104,6 +152,7 @@ export default {
         return { message: "Farm name already exists!" };
       }
     }
+
     return {
       showDialogue,
       isCreating,
@@ -113,6 +162,7 @@ export default {
       validateFarmName,
       network,
       manual,
+      notEnoughBalance,
     };
   },
 };

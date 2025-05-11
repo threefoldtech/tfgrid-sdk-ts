@@ -1,28 +1,47 @@
 <template v-if="farms">
   <div class="my-6">
-    <v-text-field class="mb-6" v-model="search" label="Search farm by name" single-line hide-details></v-text-field>
-    <v-alert type="warning" variant="tonal" v-if="farmsCount == 0" class="my-8">
+    <v-text-field
+      v-model="search"
+      class="mb-6"
+      label="Search farm by name"
+      single-line
+      hide-details
+    />
+    <v-alert
+      v-if="farmsCount == 0"
+      type="warning"
+      variant="tonal"
+      class="my-8"
+    >
       Can't see any of your farms? Try changing your key type in your TFChain Wallet above.
     </v-alert>
-    <v-alert type="info" variant="tonal" v-if="farmsCount > 0" class="my-8">
+    <v-alert
+      v-if="farmsCount > 0"
+      type="info"
+      variant="tonal"
+      class="my-8"
+    >
       Click on the row to view farm details.
     </v-alert>
     <v-data-table-server
+      v-model:items-per-page="pageSize"
+      v-model:page="page"
       :loading="loading"
       :items-length="farmsCount"
       :search="search"
       :headers="headers"
       :items="farms"
-      v-model:items-per-page="pageSize"
       :items-per-page-options="[
         { value: 5, title: '5' },
         { value: 10, title: '10' },
         { value: 20, title: '20' },
         { value: 50, title: '50' },
       ]"
-      v-model:page="page"
       show-expand
       :expanded="expanded"
+      expand-on-click
+      :hover="true"
+      return-object
       @update:expanded="
         $event => {
           if ($event.length > 0) {
@@ -39,17 +58,19 @@
           getUserFarms();
         }
       "
-      expand-on-click
       @update:options="getUserFarms"
-      :hover="true"
-      return-object
     >
-      <template v-slot:top>
-        <v-toolbar flat color="primary">
-          <v-toolbar-title class="mb-6 text-subtitle-1 text-center">Your Farms</v-toolbar-title>
+      <template #top>
+        <v-toolbar
+          flat
+          color="primary"
+        >
+          <v-toolbar-title class="mb-6 text-subtitle-1 text-center">
+            Your Farms
+          </v-toolbar-title>
         </v-toolbar>
       </template>
-      <template v-slot:expanded-row="{ columns, item }">
+      <template #expanded-row="{ columns, item }">
         <tr>
           <td
             class="border border-anchor px-8 py-4"
@@ -57,28 +78,45 @@
             :colspan="columns.length"
           >
             <v-row>
-              <v-col cols="12" class="mt-4">
-                <card-details :loading="false" title="Farm Details" :items="getFarmDetails(item)"></card-details>
+              <v-col
+                cols="12"
+                class="mt-4"
+              >
+                <card-details
+                  :loading="false"
+                  title="Farm Details"
+                  :items="getFarmDetails(item)"
+                />
               </v-col>
             </v-row>
 
             <v-row>
               <v-col cols="12 my-2">
-                <PublicIPsTable :farmId="item.farmId" :refreshPublicIPs="refreshPublicIPs" />
+                <PublicIPsTable
+                  :farm-id="item.farmId"
+                  :refresh-public-i-ps="refreshPublicIPs"
+                />
                 <v-card-actions>
                   <v-row class="justify-center mt-3">
-                    <v-btn class="text-subtitle-1 px-6" color="secondary" @click="showDialogue = true">
+                    <v-btn
+                      class="text-subtitle-1 px-6"
+                      color="secondary"
+                      @click="showDialogue = true"
+                    >
                       Add/Edit Stellar Payout Address
                     </v-btn>
                     <v-btn
-                      class="text-subtitle-1 px-6"
                       v-if="network == 'main'"
+                      class="text-subtitle-1 px-6"
                       color="secondary"
                       @click="downloadFarmReceipts(item.farmId)"
                     >
                       Download Minting Receipts
                     </v-btn>
-                    <AddIP v-model:farmId="item.farmId" @ip-added-successfully="handleIpAdded" />
+                    <AddIP
+                      v-model:farm-id="item.farmId"
+                      @ip-added-successfully="handleIpAdded"
+                    />
                   </v-row>
                 </v-card-actions>
               </v-col>
@@ -87,16 +125,29 @@
         </tr>
 
         <v-container v-if="showDialogue">
-          <v-dialog v-model="showDialogue" max-width="600" attach="#modals">
+          <v-dialog
+            v-model="showDialogue"
+            max-width="600"
+            attach="#modals"
+          >
             <v-card>
-              <v-toolbar color="primary" dark>
-                <v-toolbar-title class="custom-toolbar_title mb-6"> Add/Edit Stellar V2 Address </v-toolbar-title>
+              <v-toolbar
+                color="primary"
+                dark
+              >
+                <v-toolbar-title class="custom-toolbar_title mb-6">
+                  Add/Edit Stellar V2 Address
+                </v-toolbar-title>
               </v-toolbar>
               <div class="pt-6 px-6">
                 <form-validator v-model="valid">
                   <input-validator
                     :value="address"
-                    :rules="[validators.required('Address is required.'), customStellarValidation]"
+                    :rules="[
+                      validators.required('Address is required.'),
+                      customStellarValidation,
+                      isStellarAddressUsed,
+                    ]"
                     :async-rules="[validators.isValidStellarAddress]"
                     #="{ props }"
                   >
@@ -106,19 +157,25 @@
                       outlined
                       :loading="props.loading"
                       label="Stellar Wallet Address"
-                    ></v-text-field>
+                    />
                   </input-validator>
                 </form-validator>
               </div>
               <v-card-actions class="justify-end px-5 pb-5 pt-0">
-                <v-btn @click="showDialogue = false" color="anchor">Close</v-btn>
+                <v-btn
+                  color="anchor"
+                  @click="showDialogue = false"
+                >
+                  Close
+                </v-btn>
                 <v-btn
                   color="secondary"
-                  @click="setStellarAddress(item.farmId, address)"
                   :loading="isAdding"
                   :disabled="!valid || isAdding"
-                  >Submit</v-btn
+                  @click="setStellarAddress(item.farmId, address)"
                 >
+                  Submit
+                </v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
@@ -213,7 +270,6 @@ export default {
     const showDialogue = ref(false);
     const valid = ref(false);
     const address = ref();
-    const isValidAddress = ref(false);
     const isAdding = ref(false);
     const network = process.env.NETWORK || (window as any).env.NETWORK;
     const refreshPublicIPs = ref(false);
@@ -260,13 +316,26 @@ export default {
     }
 
     function customStellarValidation() {
-      isValidAddress.value = StrKey.isValidEd25519PublicKey(address.value);
-      if (!isValidAddress.value) {
+      const isValidAddress = StrKey.isValidEd25519PublicKey(address.value);
+      if (!isValidAddress) {
         return {
           message: "Address is not valid.",
         };
       }
       return undefined;
+    }
+
+    function isStellarAddressUsed() {
+      if (!expanded.value || expanded.value.length === 0 || !farms.value) return undefined;
+      const farmId = expanded.value[0].farmId;
+      const farm_with_same_address = farms.value.find(
+        farm => farm.farmId === farmId && farm.stellarAddress === address.value,
+      );
+      if (farm_with_same_address) {
+        return {
+          message: "Address is already used by this farm.",
+        };
+      }
     }
 
     const copy = (address: string) => {
@@ -355,7 +424,6 @@ export default {
       showDialogue,
       address,
       valid,
-      isValidAddress,
       isAdding,
       farmsCount,
       network,
@@ -365,6 +433,7 @@ export default {
       getUserFarms,
       setStellarAddress,
       customStellarValidation,
+      isStellarAddressUsed,
       getFarmDetails,
       downloadFarmReceipts,
       handleIpAdded,
