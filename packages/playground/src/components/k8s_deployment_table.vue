@@ -58,16 +58,30 @@
 
     <AccessDeploymentAlert />
 
-    <InputTooltip tooltip="Didn't find your deployments in the list? Enable to show all deployments." inline>
-      <VSwitch
-        inset
-        color="primary"
-        label="Show All Deployments"
-        @update:model-value="loadDeployments"
-        v-model="showAllDeployments"
-      />
-    </InputTooltip>
+    <div
+      class="d-flex flex-column flex-sm-row"
+      :class="[props.projectName.toLowerCase() === 'kubernetes' ? 'justify-sm-space-between' : 'flex-sm-row-reverse']"
+    >
+      <InputTooltip tooltip="Didn't find your deployments in the list? Enable to show all deployments." inline>
+        <VSwitch
+          inset
+          color="primary"
+          label="Show All Deployments"
+          @update:model-value="loadDeployments"
+          v-model="showAllDeployments"
+        />
+      </InputTooltip>
 
+      <VBtn
+        :disabled="loading"
+        variant="outlined"
+        color="secondary"
+        prepend-icon="mdi-reload"
+        text="Reload"
+        @click="loadDeployments"
+        class="my-4"
+      />
+    </div>
     <ListTable
       :headers="[
         { title: 'PLACEHOLDER', key: 'data-table-select' },

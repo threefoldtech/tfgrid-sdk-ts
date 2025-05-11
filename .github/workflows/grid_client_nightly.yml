@@ -62,11 +62,29 @@ jobs:
         run: |
           yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/dynamic_single_vm.ts
 
+      - name: Run test Zos 3 lite gateway
+        id: zos3lite_gateway_domain
+        if: always()
+        run: |
+          yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/zos3lite_gateway_domain.ts
+
+      - name: Run test single ZOS3 lite vm with mycelium
+        id: zos3lite
+        if: always()
+        run: |
+          yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/single_vm_zos3_lite.ts
+
       - name: Run test multiple vms
         id: multiple_vm
         if: always()
         run: |
           yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/multiple_vms.ts
+
+      - name: Run test multiple zos3 lite vms
+        id: multiple_zos3_lite_vm
+        if: always()
+        run: |
+          yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/multiple_vms_zos_3_lite.ts
 
       - name: Run test kubernetes
         id: k8s
@@ -145,7 +163,10 @@ jobs:
             > **Details on failed run**: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
             - **Dynamic Single Vm**: ${{ steps.single_vm.outcome }}
+            - **ZOS3 Lite Mycelium**: ${{ steps.zos3lite.outcome }}
             - **Multiple Vm**: ${{ steps.multiple_vm.outcome }}
+            - **Multiple Vm zos3 lite**: ${{ steps.multiple_zos3_lite_vm.outcome }}
+            - **zos3 lite gateway**: ${{ steps.zos3lite_gateway_domain.outcome }}
             - **Kubernetes**: ${{ steps.k8s.outcome }}
             - **Vmq QSFS**: skipped https://github.com/threefoldtech/tfgrid-sdk-ts/issues/3611
             - **Kubernetes QSFS**: skipped https://github.com/threefoldtech/tfgrid-sdk-ts/issues/3611

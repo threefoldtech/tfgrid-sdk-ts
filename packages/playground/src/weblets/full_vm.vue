@@ -168,33 +168,14 @@ const selectionDetails = ref<SelectionDetails>();
 const layout = useLayout();
 const tabs = ref();
 const solution = ref() as Ref<SolutionFlavor>;
-const images: VmImage[] = [
-  {
-    name: "Ubuntu-24.04",
-    flist: "https://hub.grid.tf/tf-official-vms/ubuntu-24.04-full.flist",
-    entryPoint: "",
-  },
-  {
-    name: "Ubuntu-22.04",
-    flist: "https://hub.grid.tf/tf-official-vms/ubuntu-22.04.flist",
-    entryPoint: "/init.sh",
-  },
-  {
-    name: "Ubuntu-20.04",
-    flist: "https://hub.grid.tf/tf-official-vms/ubuntu-20.04-lts.flist",
-    entryPoint: "/init.sh",
-  },
-  {
-    name: "Ubuntu-18.04",
-    flist: "https://hub.grid.tf/tf-official-vms/ubuntu-18.04-lts.flist",
-    entryPoint: "/init.sh",
-  },
-  {
-    name: "Nixos-22.11",
-    flist: "https://hub.grid.tf/tf-official-vms/nixos-22.11.flist",
-    entryPoint: "/init.sh",
-  },
+const flists = [
+  FLISTS.FULLVMS_UBUNTU_24,
+  FLISTS.FULLVMS_UBUNTU_22,
+  FLISTS.FULLVMS_UBUNTU_20,
+  FLISTS.FULLVMS_UBUNTU_18,
+  FLISTS.FULLVMS_NIXOS_22,
 ];
+const images: VmImage[] = flists;
 
 const selectedSSHKeys = ref("");
 const name = ref(generateName({ prefix: "vm" }));
@@ -296,7 +277,7 @@ function updateSSHkeyEnv(selectedKeys: string) {
 </script>
 
 <script lang="ts">
-import type { GridClient } from "@threefold/grid_client";
+import { FLISTS, type GridClient } from "@threefold/grid_client";
 
 import ExpandableLayout from "../components/expandable_layout.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
