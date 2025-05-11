@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       network:
-        description: "Select the network to run tests on (dev, qa, test, main)"
+        description: "Select network (dev, qa, test, main)"
         required: true
         default: "dev"
         type: choice
@@ -17,54 +17,50 @@ on:
 jobs:
   remote-tests:
     runs-on: ubuntu-latest
-
     env:
-      NETWORK: ${{ github.event.inputs.network }}
       TFCHAIN_MNEMONICS: ${{ secrets.TFCHAIN_MNEMONICS }}
       TFCHAIN_NODE_MNEMONICS: ${{ secrets.TFCHAIN_NODE_MNEMONICS }}
       STELLAR_ADDRESS: ${{ secrets.STELLAR_ADDRESS }}
       EMAIL: ${{ secrets.EMAIL }}
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        name: Checkout
 
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.10"
+      - uses: actions/setup-python@v5
+        name: Set up Python
+        with: { python-version: "3.10" }
 
       - name: Install Python deps
         run: |
           pip install -r packages/playground/tests/frontend_selenium/requirements.txt
           pip install pytest-html
 
-      - name: Set up Node 18
-        uses: actions/setup-node@v4
-        with:
-          node-version: "18"
+      - uses: actions/setup-node@v4
+        name: Set up Node.js
+        with: { node-version: "18" }
 
       - name: Install Node deps
         run: yarn install
 
-      - name: Patch base.py for DevNet URL
+      - name: Patch base.py for DevNet
         if: ${{ inputs.network == 'dev' }}
         run: |
           sed -i 's|staging.dashboard.dev.grid.tf|dashboard.dev.grid.tf|g' \
             packages/playground/tests/frontend_selenium/utils/base.py
 
-      - name: Replace Config.ini (strip newlines from secrets)
+      - name: Write Config.ini
         run: |
-          cd packages/playground/tests/frontend_selenium
-          rm -f Config.ini
-          echo "[Base]" > Config.ini
-          echo "port = 5173" >> Config.ini
-          echo "net = ${NETWORK}" >> Config.ini
-          echo "[Utils]" >> Config.ini
-          echo "seed = $(echo "${TFCHAIN_MNEMONICS}" | tr -d '\n')" >> Config.ini
-          echo "node_seed = $(echo "${TFCHAIN_NODE_MNEMONICS}" | tr -d '\n')" >> Config.ini
-          echo "address = $(echo "${STELLAR_ADDRESS}" | tr -d '\n')" >> Config.ini
-          echo "email = $(echo "${EMAIL}" | tr -d '\n')" >> Config.ini
+          cat > packages/playground/tests/frontend_selenium/Config.ini <<EOF
+          [Base]
+          port = 5173
+          net = ${{ inputs.network }}
+          [Utils]
+          seed = ${TFCHAIN_MNEMONICS}
+          node_seed = ${TFCHAIN_NODE_MNEMONICS}
+          address = ${STELLAR_ADDRESS}
+          email = ${EMAIL}
+          EOF
 
       - name: Debug Config.ini
         run: nl packages/playground/tests/frontend_selenium/Config.ini
