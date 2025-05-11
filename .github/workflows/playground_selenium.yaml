@@ -13,6 +13,8 @@ on:
           - qa
           - test
           - main
+  schedule:
+    - cron: "0 6 * * *"
 
 jobs:
   remote-tests:
@@ -33,7 +35,7 @@ jobs:
         with:
           python-version: "3.10"
 
-      - name: Install Python deps
+      - name: Install Python dependencies
         run: |
           pip install -r packages/playground/tests/frontend_selenium/requirements.txt
           pip install pytest-html
@@ -43,7 +45,7 @@ jobs:
         with:
           node-version: "18"
 
-      - name: Install Node deps
+      - name: Install Node.js dependencies
         run: yarn install
 
       - name: Patch base.py for DevNet URL
@@ -57,17 +59,23 @@ jobs:
           cd packages/playground/tests/frontend_selenium
           rm -f Config.ini
 
-          # Base section
-          echo "[Base]"                                      >  Config.ini
-          echo "port = 5173"                                 >> Config.ini
-          echo "net = ${{ inputs.network }}"                 >> Config.ini
+          # strip newline characters out of secrets
+          CLEAN_SEED=$(printf "%s" "$TFCHAIN_MNEMONICS" | tr -d '\r\n')
+          CLEAN_NODE=$(printf "%s" "$TFCHAIN_NODE_MNEMONICS" | tr -d '\r\n')
+          CLEAN_ADDRESS=$(printf "%s" "$STELLAR_ADDRESS" | tr -d '\r\n')
+          CLEAN_EMAIL=$(printf "%s" "$EMAIL" | tr -d '\r\n')
 
-          # Utils section 
-          echo "[Utils]"                                     >> Config.ini
-          echo "seed = \"$(echo "${TFCHAIN_MNEMONICS}" | tr -d '\n')\""      >> Config.ini
-          echo "node_seed = \"$(echo "${TFCHAIN_NODE_MNEMONICS}" | tr -d '\n')\"" >> Config.ini
-          echo "address = \"$(echo "${STELLAR_ADDRESS}" | tr -d '\n')\""     >> Config.ini
-          echo "email = \"$(echo "${EMAIL}" | tr -d '\n')\""                >> Config.ini
+          # Base section
+          echo "[Base]"               >  Config.ini
+          echo "port = 5173"          >> Config.ini
+          echo "net = ${{ inputs.network }}" >> Config.ini
+
+          # Utils section
+          echo "[Utils]"              >> Config.ini
+          echo "seed = $CLEAN_SEED"   >> Config.ini
+          echo "node_seed = $CLEAN_NODE" >> Config.ini
+          echo "address = $CLEAN_ADDRESS" >> Config.ini
+          echo "email = $CLEAN_EMAIL" >> Config.ini
 
       - name: Debug Config.ini
         run: nl packages/playground/tests/frontend_selenium/Config.ini
