@@ -129,6 +129,7 @@
             v-model="showDialogue"
             max-width="600"
             attach="#modals"
+            @update:model-value="closeDialog"
           >
             <v-card>
               <v-toolbar
@@ -164,7 +165,7 @@
               <v-card-actions class="justify-end px-5 pb-5 pt-0">
                 <v-btn
                   color="anchor"
-                  @click="showDialogue = false"
+                  @click="closeDialog"
                 >
                   Close
                 </v-btn>
@@ -304,7 +305,7 @@ export default {
         isAdding.value = true;
         await gridStore.grid.farms.addStellarAddress({ farmId, stellarAddress });
         createCustomToast("Address Added successfully!", ToastType.success);
-        showDialogue.value = false;
+        closeDialog();
         notifyDelaying();
         await reloadFarms();
       } catch (error) {
@@ -410,6 +411,11 @@ export default {
       return data.map(farm => farm.name.toLocaleLowerCase());
     }
 
+    function closeDialog() {
+      showDialogue.value = false;
+      address.value = "";
+    }
+
     context.expose({ getFarmsNames, reloadFarms });
 
     return {
@@ -439,6 +445,7 @@ export default {
       handleIpAdded,
       refreshPublicIPs,
       getFarmsNames,
+      closeDialog,
     };
   },
 };
