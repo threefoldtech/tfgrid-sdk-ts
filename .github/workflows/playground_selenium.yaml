@@ -20,7 +20,7 @@ jobs:
   selenium-run:
     runs-on: ubuntu-latest
 
-    # expose the chosen network alongside your secrets
+    # expose both the chosen network and your secrets
     env:
       NETWORK: ${{ inputs.network }}
       TFCHAIN_MNEMONICS: ${{ secrets.TFCHAIN_MNEMONICS }}
@@ -32,12 +32,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setting up Python
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
 
-      - name: Installing all necessary Python packages
+      - name: Install Python packages
         run: pip install -r packages/playground/tests/frontend_selenium/requirements.txt
 
       - name: Set up Node.js
@@ -45,7 +45,7 @@ jobs:
         with:
           node-version: 18
 
-      - name: Yarn install
+      - name: Install Node.js dependencies
         run: yarn install
 
       - name: Lerna Build
@@ -54,16 +54,24 @@ jobs:
       - name: Serve Dashboard locally
         run: make run project=playground &
 
-      - name: Wait for local server
+      - name: Wait for localhost
         run: sleep 60
 
-      - name: Debug env
+      - name: Generate Config.ini
         run: |
-          echo "NETWORK=$NETWORK"
-          echo "TFCHAIN_MNEMONICS is set? ${TFCHAIN_MNEMONICS:+yes}"
-          echo "TFCHAIN_NODE_MNEMONICS is set? ${TFCHAIN_NODE_MNEMONICS:+yes}"
-          echo "STELLAR_ADDRESS is set? ${STELLAR_ADDRESS:+yes}"
-          echo "EMAIL is set? ${EMAIL:+yes}"
+          cd packages/playground/tests/frontend_selenium
+          rm -f Config.ini
+          echo "[Base]"                             >  Config.ini
+          echo "port = 5173"                       >> Config.ini
+          echo "net = $NETWORK"                    >> Config.ini
+          echo "[Utils]"                           >> Config.ini
+          echo "seed = $TFCHAIN_MNEMONICS"         >> Config.ini
+          echo "node_seed = $TFCHAIN_NODE_MNEMONICS" >> Config.ini
+          echo "address = $STELLAR_ADDRESS"        >> Config.ini
+          echo "email = $EMAIL"                    >> Config.ini
+
+      - name: Debug Config.ini
+        run: nl packages/playground/tests/frontend_selenium/Config.ini
 
       - name: Run tests
         working-directory: ./packages/playground/tests/frontend_selenium
