@@ -42,7 +42,7 @@ class FarmPage:
     stellar_payout_address = (By.XPATH, '//table/tbody/tr[2]/td/div[1]/div/div/div[3]/div/div/div[1]/div[2]/p')
     dedicated = (By.XPATH, '//table/tbody/tr[2]/td/div[1]/div/div/div[3]/div/div/div[2]/div[2]/p')
     pricing_policy = (By.XPATH, '//table/tbody/tr[2]/td/div[1]/div/div/div[3]/div/div/div[3]/div[2]/p')
-    ip_dropdown = (By.XPATH, "(//i[contains(@class, 'mdi-menu-down')])[3]")
+    ip_dropdown = (By.XPATH, "(//i[contains(@class, 'mdi-menu-down')])[4]")
     range_selection = (By.XPATH, "//div[@class='v-list-item-title'][text()='Range']")
     from_ip_input = (By.XPATH, "//label[text()='From IP']/following-sibling::input") 
     to_ip_input = (By.XPATH, "//label[text()='To IP']/following-sibling::input")
@@ -319,9 +319,10 @@ class FarmPage:
         WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located((By.XPATH, self.farm_public_ips)))
         for i in range(len(self.browser.find_elements(By.XPATH, self.farm_public_ips))):
            if(self.browser.find_element(By.XPATH,  f"{self.farm_public_ips}[{str(i+1)}]/td[2]").text == ip):
-                if(self.browser.find_element(By.XPATH,  f"{self.farm_public_ips}[{str(i+1)}]/td[3]").text == gateway):
+                if(self.browser.find_element(By.XPATH,  f"{self.farm_public_ips}[{str(i+1)}]/td[4]").text == gateway):
                     #WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located((By.XPATH,  f"{self.farm_public_ips}[{str(i+1)}]/td[1]/div/div/div/div/div/input")))
-                    self.browser.find_element(By.XPATH,  f"{self.farm_public_ips}[{str(i+1)}]/td[1]/div/div/div/div/div/input").click()
+                    # self.browser.find_element(By.XPATH,  f"{self.farm_public_ips}[{str(i+1)}]/td[1]/div/div/div/div/div/input").click()
+                    self.browser.find_element(By.XPATH,  f"{self.farm_public_ips}[{str(i+1)}]/td[1]/div/div/div/input").click()
                     WebDriverWait(self.browser, 30).until(EC.element_to_be_clickable(self.delete_button))
                     self.browser.find_element(*self.delete_button).click()
                     WebDriverWait(self.browser, 30).until(EC.element_to_be_clickable(self.confirm_button))

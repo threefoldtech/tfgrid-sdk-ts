@@ -4,7 +4,7 @@ class Base:
     config = configparser.ConfigParser()
     config.read('Config.ini')
     port = config['Base']['port']
-    net = config['Base']['net']
+    net = str(config['Base']['net']).lower()
 
     if str(net).lower() == 'main':
         bridge_address = 'GBNOTAYUMXVO5QDYWYO2SOCOYIJ3XFIP65GKOQN7H65ZZSO6BK4SLWSC'
