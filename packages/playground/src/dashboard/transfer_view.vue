@@ -123,7 +123,7 @@
 import { Keyring } from "@polkadot/keyring";
 import type { Twin } from "@threefold/tfchain_client";
 import { TwinNotExistError } from "@threefold/types";
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 
 import { useProfileManagerController } from "../components/profile_manager_controller.vue";
 import { useGrid, useProfileManager } from "../stores";
@@ -146,12 +146,11 @@ const receptTwinFromTwinID = ref<Twin>();
 const balance = profileManagerController.balance;
 const freeBalance = computed(() => balance.value?.free ?? 0);
 
-const computedValidation = computed(() => {
+watch(freeBalance, async () => {
   if (transferAmount.value) {
-    amountRef.value?.reset();
+    await amountRef.value?.reset();
     amountRef.value?.validate();
   }
-  return null; // or some meaningful return value if needed
 });
 const tick = ref(0);
 function isSameTwinID(value: string) {
