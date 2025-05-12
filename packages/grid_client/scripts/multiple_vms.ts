@@ -1,4 +1,5 @@
-import { FilterOptions, GridClient, MachinesModel } from "../src";
+import { FilterOptions, generateString, GridClient, MachinesModel } from "../src";
+import { FLISTS } from "../src/helpers/flists";
 import { config, getClient } from "./client_loader";
 import { log, pingNodes } from "./utils";
 
@@ -30,7 +31,13 @@ async function getNodeId(client: GridClient, options: FilterOptions) {
 }
 
 async function main() {
-  const name = "monVMS2";
+  const name = "vm" + generateString(6);
+  const networkName = "nw" + generateString(6);
+  const machine1Name = "machine" + generateString(6);
+  const machine2Name = "machine" + generateString(6);
+  const disk1Name = "disk" + generateString(6);
+  const disk2Name = "disk" + generateString(6);
+
   const grid3 = await getClient(`vm/${name}`);
 
   const vmQueryOptions: FilterOptions = {
@@ -46,16 +53,16 @@ async function main() {
   const vms: MachinesModel = {
     name,
     network: {
-      name: "monNetwork",
+      name: networkName,
       ip_range: "10.238.0.0/16",
     },
     machines: [
       {
-        name: "testvm1",
+        name: machine1Name,
         node_id: nodeId!,
         disks: [
           {
-            name: "newDisk1",
+            name: disk1Name,
             size: 5,
             mountpoint: "/newDisk1",
           },
@@ -67,18 +74,18 @@ async function main() {
         cpu: 1,
         memory: 1024,
         rootfs_size: 0,
-        flist: "https://hub.grid.tf/tf-official-apps/base:latest.flist",
-        entrypoint: "/sbin/zinit init",
+        flist: FLISTS.MICROVMS_UBUNTU_24.flist,
+        entrypoint: FLISTS.MICROVMS_UBUNTU_24.entryPoint,
         env: {
           SSH_KEY: config.ssh_key,
         },
       },
       {
-        name: "testvm2",
+        name: machine2Name,
         node_id: nodeId!,
         disks: [
           {
-            name: "newDisk2",
+            name: disk2Name,
             size: 5,
             mountpoint: "/newDisk2",
           },
@@ -90,8 +97,8 @@ async function main() {
         cpu: 1,
         memory: 1024,
         rootfs_size: 0,
-        flist: "https://hub.grid.tf/tf-official-apps/base:latest.flist",
-        entrypoint: "/sbin/zinit init",
+        flist: FLISTS.MICROVMS_UBUNTU_24.flist,
+        entrypoint: FLISTS.MICROVMS_UBUNTU_24.entryPoint,
         env: {
           SSH_KEY: config.ssh_key,
         },
@@ -107,7 +114,7 @@ async function main() {
   //Get the deployment
   await getDeployment(grid3, name);
 
-  // //Uncomment the line below to cancel the deployment
+  // Uncomment the line below to cancel the deployment
   // await cancel(grid3, name);
 
   await grid3.disconnect();

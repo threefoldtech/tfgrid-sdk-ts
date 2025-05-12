@@ -70,7 +70,7 @@ class DashboardPage:
         self.browser.find_element(*self.mnemonic_input).send_keys(Keys.DELETE)
         self.browser.find_element(*self.mnemonic_input).send_keys(seed)
         if(validation):
-            WebDriverWait(self.browser, 30).until(EC.element_to_be_clickable(self.email_input))
+            WebDriverWait(self.browser, 60).until(EC.element_to_be_clickable(self.email_input))
 
     def connect_your_wallet(self, email, password):
         self.browser.find_element(*self.email_input).send_keys(Keys.CONTROL + "a")

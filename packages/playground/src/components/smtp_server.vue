@@ -40,7 +40,6 @@
             placeholder="email@example.com"
             v-model="$props.modelValue.username"
             v-bind="props"
-            autofocus
             class="mt-3"
           />
         </input-tooltip>
@@ -65,7 +64,6 @@
               placeholder="email@example.com"
               v-model="$props.modelValue.password"
               v-bind="{ ...props, ...validatorProps }"
-              autofocus
             />
           </input-tooltip>
         </input-validator>
@@ -101,7 +99,6 @@
             placeholder="email@example.com"
             v-model="$props.modelValue.hostname"
             v-bind="props"
-            autofocus
           />
         </input-tooltip>
       </input-validator>

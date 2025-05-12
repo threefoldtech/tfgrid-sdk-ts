@@ -3,6 +3,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+import time
 
 class NodePage:
 
@@ -17,16 +18,16 @@ class NodePage:
     twin_details_label = (By.XPATH, "//*[contains(text(), 'Twin Details')]")
     farm_section = (By.XPATH, "//span[text()='Farms']")
     farm_page = (By.XPATH, "//span[text()='Your Farms']")
-    node_page = (By.XPATH , "//*[contains(text(), 'Your Nodes')]")
+    node_page = (By.XPATH, "//*[contains(text(), 'Your Nodes')]")
     search_node_input = (By.XPATH, '/html/body/div[1]/div[1]/div[3]/div/div/div[5]/div/div[1]/div/div[1]/div/input')
     node_table = (By.XPATH, "//span[text()='Node ID']/ancestor::table/tbody/tr")
-    node_id = (By.XPATH , "//*[contains(text(), 'Node ID')]")
-    farm_id = (By.XPATH , '//*[@id="app"]/div[1]/div[2]/div/div[1]/div[5]/div[2]/div[1]/div[1]/table/thead/tr/th[3]')
-    country = (By.XPATH , "//*[contains(text(), 'Country')]")
-    serial_number = (By.XPATH , "//*[contains(text(), 'Serial Number')]")
-    status = (By.XPATH , "//*[contains(text(), 'Status')]")
-    id_label = (By.XPATH , "//*[contains(text(), 'Add a public config to your node with ID:')]")
-    update_msg = (By.XPATH , "//*[contains(text(), 'Are you sure you want to remove this node')]")
+    node_id = (By.XPATH, "//*[contains(text(), 'Node ID')]")
+    farm_id = (By.XPATH, '//*[@id="app"]/div[1]/div[2]/div/div[1]/div[5]/div[2]/div[1]/div[1]/table/thead/tr/th[3]')
+    country = (By.XPATH, "//*[contains(text(), 'Country')]")
+    serial_number = (By.XPATH, "//*[contains(text(), 'Serial Number')]")
+    status = (By.XPATH, "//*[contains(text(), 'Status')]")
+    id_label = (By.XPATH, "//*[contains(text(), 'Add a public config to your node with ID:')]")
+    update_msg = (By.XPATH, "//*[contains(text(), 'Are you sure you want to remove this node')]")
     ipv4 = (By.XPATH, "//label[text()='IPv4']/following-sibling::input")
     ipv4_gateway = (By.XPATH, "//label[text()='Gateway IPv4']/following-sibling::input")
     ipv6 = (By.XPATH, "//label[text()='IPv6']/following-sibling::input")
@@ -38,7 +39,7 @@ class NodePage:
     submit = (By.XPATH, "//button[.//span[text()='Remove']]")
     fee_input = (By.XPATH, "//label[text()='Additional Fees']/following-sibling::input")
     set_btn = (By.XPATH, "//button[.//span[text()='Save']]")
-    fee_id = (By.XPATH , "//*[contains(text(), 'Additional fees will be added to your node')]")
+    fee_id = (By.XPATH, "//*[contains(text(), 'Additional fees will be added to your node')]")
     table_xpath = "//span[text()='Node ID']/ancestor::table/tbody/tr"
 
 
@@ -130,7 +131,10 @@ class NodePage:
         return status
     
     def node_details(self):
-        self.browser.find_element(*self.node_id).click()
+        node_element = self.browser.find_element(*self.node_id)
+        WebDriverWait(self.browser, 30).until(EC.element_to_be_clickable(node_element))
+        self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", node_element)
+        node_element.click()
         nodes = []
         for i in range(1, len(self.browser.find_elements(*self.node_table))+1):
             self.browser.execute_script("window.scrollTo(0,document.body.scrollHeight)")
@@ -169,9 +173,16 @@ class NodePage:
     
     def setup_config(self, node_id):
         for i in range(1, len(self.browser.find_elements(*self.node_table))+1):
-            if (self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i)}]/td[1]").text==str(node_id)):
-                self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i)}]/td[6]/span[1]/i").click()
-                WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.id_label))
+            for _ in range (1, 10):
+                table_element = self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i)}]/td[1]")
+                if table_element.text==str(node_id):
+                    config_element = self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i)}]/td[6]/span[1]/i")
+                    WebDriverWait(self.browser, 30).until(EC.element_to_be_clickable(config_element))
+                    self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", config_element)
+                    config_element.click()
+                    WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.id_label))
+                    return
+                time.sleep(2)
 
     def add_config_input(self, ipv4, gw4, ipv6, gw6, domain):
         if(ipv4):
@@ -208,9 +219,16 @@ class NodePage:
     
     def setup_fee(self, node_id):
         for i in range(1, len(self.browser.find_elements(*self.node_table))+1):
-            if (self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i)}]/td[1]").text==str(node_id)):
-                self.browser.find_element(By.XPATH, self.table_xpath+ '['+ str(i) +']/td[6]/span[2]/i').click()
-                WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.fee_id))
+            for _ in range (1, 10):
+                table_element = self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i)}]/td[1]")
+                if table_element.text==str(node_id):
+                    fee_element = self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i)}]/td[6]/span[2]/i")
+                    WebDriverWait(self.browser, 30).until(EC.element_to_be_clickable(fee_element))
+                    self.browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", fee_element)
+                    fee_element.click()
+                    WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.fee_id))
+                    return
+                time.sleep(2)
 
     def set_fee(self, fee):
         self.browser.find_element(*self.fee_input).send_keys(Keys.CONTROL + "a")

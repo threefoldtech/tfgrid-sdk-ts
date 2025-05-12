@@ -139,6 +139,13 @@ export default {
         releaseDate: new Date("2024-11-13"),
       },
       {
+        title: "Open WebUI",
+        excerpt:
+          "Open WebUI is an extensible, feature-rich, and user-friendly self-hosted AI platform designed to operate entirely offline.",
+        icon: "openwebui.png",
+        route: DashboardRoutes.Applications.Openwebui,
+      },
+      {
         title: "Nextcloud",
         excerpt:
           "Nextcloud is a suite of client-server software for creating and using file hosting services. Nextcloud provides functionality similar to Dropbox, Office 365 or Google Drive.",

@@ -110,7 +110,7 @@
         </div>
       </v-navigation-drawer>
 
-      <v-main :style="{ paddingTop: navbarConfig ? '140px' : '70px' }">
+      <v-main :style="{ paddingTop: navbarConfig && hasActiveProfile ? '140px' : '70px' }">
         <v-toolbar
           :extended="toolbarExtended"
           extension-height="auto"
@@ -616,14 +616,6 @@ export default {
 .v-theme--light .v-btn--disabled,
 .v-theme--dark .v-btn--disabled {
   color: #7b7b7b !important;
-}
-body {
-  overflow: auto;
-  height: 100vh;
-}
-
-html {
-  overflow: hidden;
 }
 
 @media only screen and (max-width: 600px) {

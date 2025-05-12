@@ -20,7 +20,7 @@ let deploymentName: string;
 
 beforeAll(async () => {
   gridClient = await getClient();
-  deploymentName = "gt" + generateString(10);
+  deploymentName = "gt" + gridClient.twinId + generateString(5);
   gridClient.clientOptions.projectName = `gitea/${deploymentName}`;
   gridClient._connect();
   return gridClient;

@@ -20,7 +20,7 @@ let deploymentName: string;
 
 beforeAll(async () => {
   gridClient = await getClient();
-  deploymentName = "pt" + generateString(10);
+  deploymentName = "pt" + gridClient.twinId + generateString(5);
   gridClient.clientOptions.projectName = `peertube/${deploymentName}`;
   gridClient._connect();
   return gridClient;

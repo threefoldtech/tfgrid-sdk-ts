@@ -9,6 +9,10 @@ export interface Twin {
   publicKey: string;
 }
 
+export interface Consumption {
+  last_hour_consumption: number;
+  overall_consumption: number;
+}
 export class TwinsClient extends AbstractClient<TwinsBuilder, TwinsQuery> {
   constructor(uri: string) {
     super({
@@ -20,5 +24,10 @@ export class TwinsClient extends AbstractClient<TwinsBuilder, TwinsQuery> {
   public async list(queries: Partial<TwinsQuery> = {}) {
     const res = await this.builder(queries).build("/twins");
     return resolvePaginator<Twin[]>(res);
+  }
+
+  public async getConsumption(twinId: number): Promise<Consumption> {
+    const res = await this.builder().build(`/twins/${twinId}/consumption`);
+    return res.json();
   }
 }

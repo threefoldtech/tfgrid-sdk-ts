@@ -12,7 +12,7 @@ let deploymentName: string;
 
 beforeAll(async () => {
   gridClient = await getClient();
-  deploymentName = "pr" + generateString(10);
+  deploymentName = "pr" + gridClient.twinId + generateString(5);
   gridClient.clientOptions.projectName = `presearch/${deploymentName}`;
   gridClient._connect();
   return gridClient;

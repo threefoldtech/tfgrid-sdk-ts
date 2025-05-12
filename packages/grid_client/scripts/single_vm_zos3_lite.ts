@@ -1,4 +1,5 @@
-import { Features, FilterOptions, generateRandomHexSeed, GridClient, MachinesDeleteModel, MachinesModel } from "../src";
+import { Features, FilterOptions, generateRandomHexSeed, generateString, MachinesModel } from "../src";
+import { FLISTS } from "../src/helpers/flists";
 import { config, getClient } from "./client_loader";
 import { log, pingNodes } from "./utils";
 
@@ -24,7 +25,8 @@ async function cancel(client, vms) {
 }
 
 async function main() {
-  const name = "vm";
+  const name = "vm" + generateString(6);
+  const networkName = "nw" + generateString(6);
   const grid3 = await getClient(`vm/${name}`);
   const instanceCapacity = { cru: 2, mru: 4, sru: 100 }; // Update the instance capacity values according to your requirements.
 
@@ -36,6 +38,7 @@ async function main() {
     availableFor: grid3.twinId,
     features: [Features.zmachinelight, Features.networklight, Features.mycelium],
     nodeExclude: [259],
+    farmName: "LiriaFarm",
   };
   const nodes = await grid3.capacity.filterNodes(vmQueryOptions);
   const vmNode = await pingNodes(grid3, nodes);
@@ -43,7 +46,7 @@ async function main() {
   const vms: MachinesModel = {
     name,
     network: {
-      name: "vmNode",
+      name: networkName,
       ip_range: "10.249.0.0/16",
       myceliumSeeds: [
         {
@@ -89,8 +92,8 @@ async function main() {
         cpu: instanceCapacity.cru,
         memory: 1024 * instanceCapacity.mru,
         rootfs_size: 0,
-        flist: "https://hub.grid.tf/tf-official-apps/base:latest.flist",
-        entrypoint: "/sbin/zinit init",
+        flist: FLISTS.MICROVMS_UBUNTU_24.flist,
+        entrypoint: FLISTS.MICROVMS_UBUNTU_24.entryPoint,
         env: {
           SSH_KEY: config.ssh_key,
         },

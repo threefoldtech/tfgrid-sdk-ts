@@ -20,7 +20,7 @@ let deploymentName: string;
 
 beforeAll(async () => {
   gridClient = await getClient();
-  deploymentName = "ss" + generateString(10);
+  deploymentName = "ss" + gridClient.twinId + generateString(5);
   gridClient.clientOptions.projectName = `subsquid/${deploymentName}`;
   gridClient._connect();
   return gridClient;
