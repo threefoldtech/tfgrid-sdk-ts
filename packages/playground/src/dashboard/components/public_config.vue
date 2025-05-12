@@ -166,7 +166,7 @@ import { ValidationError } from "@threefold/types";
 import { contains } from "cidr-tools";
 import { isEqual } from "lodash";
 import { default as PrivateIp } from "private-ip";
-import { computed, onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 
 import type { RuleReturn } from "@/components/input_validator.vue";
 import { useFormRef } from "@/hooks/form_validator";
@@ -194,14 +194,12 @@ export default {
     const isRemoving = ref(false);
     const isSaving = ref(false);
     const formRef = useFormRef();
+    const isConfigChanged = ref(false);
     const grid = useGrid();
 
     const defualtNodeConfig = ref<PublicConfig>(publicConfigInitializer());
     const config = ref<PublicConfig>(publicConfigInitializer());
-    const isConfigChanged = computed(() => {
-      formRef.value?.validate();
-      return !isEqual(defualtNodeConfig.value, config.value);
-    });
+
     function publicConfigInitializer(): PublicConfig {
       return { ipv4: "", ipv6: "", gw4: "", gw6: "", domain: "" };
     }
@@ -210,6 +208,15 @@ export default {
       await getPublicConfig();
     });
 
+    watch(
+      () => ({ ...config.value }),
+      (old, newValue) => {
+        isConfigChanged.value =
+          !isEqual(defualtNodeConfig.value, config.value) ||
+          (!isEqual(defualtNodeConfig.value, config.value) && !isEqual(old, newValue));
+        formRef.value?.validate();
+      },
+    );
     async function getPublicConfig() {
       try {
         const node = await grid.client.nodes.get({ id: props.nodeId });
