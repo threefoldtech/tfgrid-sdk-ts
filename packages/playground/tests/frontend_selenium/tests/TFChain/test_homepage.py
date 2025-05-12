@@ -194,7 +194,7 @@ def test_login_links(browser):
     if Base.net in ['dev', 'local']:
         wallet_manual_link = 'https://www.manual.grid.tf/documentation/dashboard/wallet_connector.html'
         tf_connect_app_link = 'https://www.manual.grid.tf/documentation/threefold_token/storing_tft/tf_connect_app.html'
-    else:    
+    else:
         wallet_manual_link = 'https://manual.grid.tf/documentation/dashboard/wallet_connector.html'
         tf_connect_app_link = 'https://manual.grid.tf/documentation/threefold_token/storing_tft/tf_connect_app.html'
     assert dashboard_page.manual_link() == wallet_manual_link
