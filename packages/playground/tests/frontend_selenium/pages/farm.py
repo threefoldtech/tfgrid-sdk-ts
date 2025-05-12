@@ -4,6 +4,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+import pyperclip
 
 class FarmPage:
 
@@ -40,6 +41,7 @@ class FarmPage:
     zero = (By.XPATH,'//html/body/main/div[1]/div/h1')
     table_farm_name=(By.XPATH, '//*[@id="app"]/div[1]/div[2]/div/div[1]/div[4]/div[1]/table/tbody/tr[1]/td[3]')
     stellar_payout_address = (By.XPATH, '//table/tbody/tr[2]/td/div[1]/div/div/div[3]/div/div/div[1]/div[2]/p')
+    stellar_payout_address_copy = (By.XPATH, "//i[contains(@class, 'mdi-content-copy') and contains(@class, 'v-icon--clickable')]")
     dedicated = (By.XPATH, '//table/tbody/tr[2]/td/div[1]/div/div/div[3]/div/div/div[2]/div[2]/p')
     pricing_policy = (By.XPATH, '//table/tbody/tr[2]/td/div[1]/div/div/div[3]/div/div/div[3]/div[2]/p')
     ip_dropdown = (By.XPATH, "(//i[contains(@class, 'mdi-menu-down')])[4]")
@@ -337,19 +339,32 @@ class FarmPage:
             gateway_len = len(self.browser.find_elements(By.XPATH, "//td[contains(@class, 'v-data-table__td') and contains(@class, 'v-data-table-column--align-center') and text()='"+ gateway +"']"))
         return ip_len, gateway_len
     
-    def farm_detials(self):
+    def farm_details(self, farm_name):
+        self.search_functionality(farm_name)
+        self.wait_for_farm_name(farm_name)
+        WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.details_arrow))
+        WebDriverWait(self.browser, 30).until(EC.element_to_be_clickable(self.details_arrow))
+        WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located((By.XPATH, "//span[contains(@class, 'v-btn__content')]/i[contains(@class, 'mdi-chevron-down')]")))
+        self.browser.find_element(*self.details_arrow).click()
+        sleep(10)
         details = []
         details.append(self.browser.find_element(By.XPATH,  f"{self.node_expand_details}[1]").text) # Farm ID
         details.append(self.browser.find_element(By.XPATH,  f"{self.node_expand_details}[2]").text) # Farm Name
         details.append(self.browser.find_element(By.XPATH,  f"{self.node_expand_details}[3]").text) # Linked Twin ID
         details.append(self.browser.find_element(By.XPATH,  f"{self.node_expand_details}[4]").text) # Certification Type
-        details.append(self.browser.find_element(*self.stellar_payout_address).text) # Stellar Address
+        # details.append(self.browser.find_element(*self.stellar_payout_address).text) # Stellar Address
+        WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.stellar_payout_address_copy))
+        WebDriverWait(self.browser, 30).until(EC.element_to_be_clickable(self.stellar_payout_address_copy))
+        self.browser.find_element(*self.stellar_payout_address_copy).click()
+        sleep(1)
+        copied_value = pyperclip.paste()
+        details.append(copied_value)
         details.append(True if self.browser.find_element(*self.dedicated).text != "No" else False) # Dedicated
         details.append(self.browser.find_element(*self.pricing_policy).text) # Pricing Policy
         for i in range(len(self.browser.find_elements(By.XPATH, self.farm_public_ips))):
             details.append(self.browser.find_element(By.XPATH,  f"{self.farm_public_ips}[{str(i+1)}]/td[2]").text) # IP
-            details.append(self.browser.find_element(By.XPATH,  f"{self.farm_public_ips}[{str(i+1)}]/td[4]").text) # Deployed Contract ID
-            details.append(self.browser.find_element(By.XPATH,  f"{self.farm_public_ips}[{str(i+1)}]/td[3]").text) # Gateway
+            details.append(self.browser.find_element(By.XPATH,  f"{self.farm_public_ips}[{str(i+1)}]/td[5]").text) # Deployed Contract ID
+            details.append(self.browser.find_element(By.XPATH,  f"{self.farm_public_ips}[{str(i+1)}]/td[4]").text) # Gateway
         return details
 
     def verify_the_availability_of_zero_os_bootstrap(self):
