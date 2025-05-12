@@ -20,16 +20,13 @@ export function ipToLong(ip: string): bigint {
   return long;
 }
 
-export function longToIp(long: bigint): string {
-  const max = BigInt("4294967295");
-  if (long < BigInt(0) || long > max) {
-    throw new Error(`Invalid long number: ${long}`);
-  }
+export function longToIp(long: bigint | number): string {
+  const bigLong = typeof long === "number" ? BigInt(long) : BigInt(long);
 
-  const octet1 = Number((long >> BigInt(24)) & BigInt(255));
-  const octet2 = Number((long >> BigInt(16)) & BigInt(255));
-  const octet3 = Number((long >> BigInt(8)) & BigInt(255));
-  const octet4 = Number(long & BigInt(255));
+  const octet1 = (bigLong >> BigInt(24)) & BigInt(255);
+  const octet2 = (bigLong >> BigInt(16)) & BigInt(255);
+  const octet3 = (bigLong >> BigInt(8)) & BigInt(255);
+  const octet4 = bigLong & BigInt(255);
 
-  return `${octet1}.${octet2}.${octet3}.${octet4}`;
+  return `${Number(octet1)}.${Number(octet2)}.${Number(octet3)}.${Number(octet4)}`;
 }
