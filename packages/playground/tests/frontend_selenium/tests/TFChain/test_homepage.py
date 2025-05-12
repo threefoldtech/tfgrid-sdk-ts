@@ -26,7 +26,7 @@ def test_validate_homepage_links(browser):
     dashboard_page = before_test_setup(browser)
     assert dashboard_page.navigate_to_find_more() == ('https://threefold.io/')
     assert dashboard_page.navigate_to_explore_capacity() == (Base.stats)
-    if Base.net == 'dev':
+    if Base.net in ['dev', 'local']:
         manual_link = 'https://www.manual.grid.tf/'
     else:    
         manual_link = 'https://manual.grid.tf/'
@@ -185,7 +185,7 @@ def test_login_links(browser):
     dashboard_page.import_account(get_seed())
     dashboard_page.click_button(dashboard_page.connect_your_wallet(get_email(), password))
     dashboard_page.open_profile()
-    if Base.net == 'dev':
+    if Base.net in ['dev', 'local']:
         wallet_manual_link = 'https://www.manual.grid.tf/documentation/dashboard/wallet_connector.html'
         tf_connect_app_link = 'https://www.manual.grid.tf/documentation/threefold_token/storing_tft/tf_connect_app.html'
     else:    

@@ -76,7 +76,7 @@ def test_how_it_done(browser):
       Result: it will go to link
     """
     bridge_page = before_test_setup(browser)
-    if Base.net == 'dev':
+    if Base.net in ['dev', 'local']:
         tfchain_stellar_bridge_url = 'https://www.manual.grid.tf/documentation/threefold_token/tft_bridges/tfchain_stellar_bridge.html'
         tft_bridges_url = 'https://www.manual.grid.tf/documentation/threefold_token/tft_bridges/tft_bridges.html'
     else:
