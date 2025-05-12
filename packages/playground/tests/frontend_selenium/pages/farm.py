@@ -320,9 +320,9 @@ class FarmPage:
         self.setup_farmpayout_address(farm_name)
         WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located((By.XPATH, self.farm_public_ips)))
         for i in range(len(self.browser.find_elements(By.XPATH, self.farm_public_ips))):
-           if self.browser.find_element(By.XPATH,  f"{self.farm_public_ips}[{str(i+1)}]/td[2]").text == ip:
-               if self.browser.find_element(By.XPATH, f"{self.farm_public_ips}[{str(i+1)}]/td[4]").text == gateway:
-                    self.browser.find_element(By.XPATH,  f"{self.farm_public_ips}[{str(i+1)}]/td[1]/div/div/div/input").click()
+            if self.browser.find_element(By.XPATH, f"{self.farm_public_ips}[{str(i+1)}]/td[2]").text == ip:
+                if self.browser.find_element(By.XPATH, f"{self.farm_public_ips}[{str(i+1)}]/td[4]").text == gateway:
+                    self.browser.find_element(By.XPATH, f"{self.farm_public_ips}[{str(i+1)}]/td[1]/div/div/div/input").click()
                     WebDriverWait(self.browser, 30).until(EC.element_to_be_clickable(self.delete_button))
                     self.browser.find_element(*self.delete_button).click()
                     WebDriverWait(self.browser, 30).until(EC.element_to_be_clickable(self.confirm_button))
