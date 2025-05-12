@@ -181,7 +181,7 @@ import {
   LocalStorageSettingsKey,
   SessionStorageSettingsKey,
   ThemeSettingsInterface as ThemeInterface,
-  updateLocalStorage,
+  updateThemeInLocalStorage,
 } from "@/utils/settings";
 
 import { useGrid } from "../stores";
@@ -216,7 +216,7 @@ export default {
       theme.global.name,
       theme => {
         selectedTheme.value = currentTheme.value = theme.includes("mode") ? theme : `${theme} mode`;
-        updateLocalStorage(theme);
+        updateThemeInLocalStorage(theme);
       },
       { immediate: true },
     );
@@ -264,7 +264,7 @@ export default {
           theme.global.name.value = AppThemeSelection.light;
           break;
       }
-      updateLocalStorage(currentTheme.value!);
+      updateThemeInLocalStorage(currentTheme.value!);
     }
 
     /** Updates user credentials with the hashes produced by the new password  */

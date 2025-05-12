@@ -15,7 +15,7 @@
 import { computed, onMounted, onUpdated, ref } from "vue";
 import { useTheme } from "vuetify";
 
-import { LocalStorageSettingsKey, updateLocalStorage } from "@/utils/settings";
+import { LocalStorageSettingsKey, updateThemeInLocalStorage } from "@/utils/settings";
 
 const theme = useTheme();
 
@@ -27,7 +27,7 @@ const light = computed(() => {
 
 function setTheme(themeName: string) {
   theme.global.name.value = themeName;
-  updateLocalStorage(themeName);
+  updateThemeInLocalStorage(themeName);
   isLight.value = themeName === "light";
 }
 
