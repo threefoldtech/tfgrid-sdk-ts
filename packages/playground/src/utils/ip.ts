@@ -14,7 +14,7 @@ export function ipToLong(ip: string): bigint {
       throw new Error(`Invalid IP address: ${ip}`);
     }
 
-    long = (long << 8n) + BigInt(num);
+    long = (long << BigInt(8)) + BigInt(num);
   }
 
   return long;
