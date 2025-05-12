@@ -74,7 +74,7 @@ class DashboardPage:
 
     def connect_your_wallet(self, email, password):
         element = WebDriverWait(self.browser, 10).until(EC.presence_of_element_located(self.email_input))
-        for i in range(10):
+        for _ in range(10):
             if element.is_enabled():
                 self.browser.find_element(*self.email_input).send_keys(Keys.CONTROL + "a")
                 self.browser.find_element(*self.email_input).send_keys(Keys.DELETE)
@@ -110,7 +110,7 @@ class DashboardPage:
         self.browser.find_element(*self.login_password_input).send_keys(Keys.DELETE)
         self.browser.find_element(*self.login_password_input).send_keys(password)
         if validation:
-            assert WebDriverWait(self.browser, 30).until(EC.element_to_be_clickable(self.login_button)).is_enabled() == True
+            assert WebDriverWait(self.browser, 30).until(EC.element_to_be_clickable(self.login_button)).is_enabled()
             self.browser.find_element(*self.login_button).click()
             self.open_profile(True)
         else:
