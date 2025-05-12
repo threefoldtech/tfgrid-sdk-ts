@@ -300,16 +300,17 @@ export default {
       showIPs.value = true;
     }
 
-    function generateIpTable(startIp: string, endIp: string, sub: any) {
-      const startLong = ipToLong(startIp);
-      const endLong = ipToLong(endIp);
+    function generateIpTable(startIp: string, endIp: string, sub: number) {
+      const startLong = ipToLong(startIp); // BigInt
+      const endLong = ipToLong(endIp); // BigInt
 
-      // Determine the subnet mask based on the provided CIDR
-      const mask = (0xffffffff << (32 - sub)) >>> 0; // Create subnet mask from CIDR
-      const networkBaseLong = startLong & mask; // Calculate network address using the mask
+      // Create subnet mask from CIDR using BigInt with BigInt()
+      const mask = (BigInt(0xffffffff) << BigInt(32 - sub)) & BigInt(0xffffffff);
+      const networkBaseLong = startLong & mask; // Network address
 
-      const networkBase = longToIp(networkBaseLong); // Convert back to dotted decimal format
+      const networkBase = longToIp(networkBaseLong); // Convert back to dotted decimal
 
+      // Generate IPs in range
       ipsRangeTable.value = [];
       for (let i = startLong; i <= endLong; i++) {
         ipsRangeTable.value.push(longToIp(i));
@@ -317,7 +318,7 @@ export default {
       network.value = `${networkBase}/${sub}`;
     }
     function addIPs() {
-      const sub = publicIP.value.split("/")[1];
+      const sub = Number(publicIP.value.split("/")[1]);
       const start = publicIP.value.split("/")[0];
       let end = toPublicIP.value.split("/")[0];
 
