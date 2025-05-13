@@ -71,11 +71,11 @@ export NODE_OPTIONS="--max-old-space-size=8192"
 - (Not Recommended) Install the recommended version of the pip package listed above for a stable run, or you can just install Python 3 and use the command:
   - `pip install -r requirements.txt --break-system-packages` (Use this if you don't use any of the listed packages).
 - (Recommended) Or use Virtual Environments: 
-    - create an environment using 
+  - create an environment using 
       `python -m venv myenv`
-    -  activate it using
+  - activate it using
       `source myenv/bin/activate`
-    - install packages using
+  - install packages using
       `pip install -r requirements.txt`.
 - You'll also need to install `Xvfb`, Run:
       `sudo apt install xvfb`.
