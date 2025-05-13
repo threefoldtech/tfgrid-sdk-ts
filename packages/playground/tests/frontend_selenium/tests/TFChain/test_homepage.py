@@ -25,7 +25,7 @@ def test_validate_homepage_links(browser):
     """
     dashboard_page = before_test_setup(browser)
     assert dashboard_page.navigate_to_find_more() == ('https://threefold.io/')
-    assert dashboard_page.navigate_to_explore_capacity() == (Base.stats)
+    assert dashboard_page.navigate_to_explore_capacity() == (Base.stats_url)
     if Base.net in ['dev', 'local']:
         manual_link = 'https://www.manual.grid.tf/'
     else:
