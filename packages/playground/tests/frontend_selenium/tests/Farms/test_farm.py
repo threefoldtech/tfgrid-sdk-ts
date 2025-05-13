@@ -353,7 +353,7 @@ def test_range_ips(browser):
     try:
         farm_page.wait_for_button(farm_page.add_range_ips(ip1, ip2, gateway)).click()
         assert farm_page.wait_for('IP is added successfully.')
-    except:
+    except TimeoutException:
         raise AssertionError(
             f"Expected success message was not found after adding IP '{ip1}', '{ip2}' with gateway '{gateway}'."
         )
