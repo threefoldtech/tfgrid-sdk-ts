@@ -76,7 +76,8 @@ def generate_ip():
         if (ip[0] == 10 or
             (ip[0] == 172 and 16 <= ip[1] <= 31) or
             (240 <= ip[0] <= 255) or
-            (ip[0] == 192 and ip[1] == 168)):
+            (ip[0] == 192 and ip[1] == 168) or
+            (224 <= ip[0] <= 239)):
             continue
         port = cryptogen.randrange(33)
         return f"{'.'.join(map(str, ip))}/{port}"
