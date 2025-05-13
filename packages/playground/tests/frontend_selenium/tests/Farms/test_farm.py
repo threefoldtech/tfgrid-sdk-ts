@@ -350,8 +350,13 @@ def test_range_ips(browser):
         ip1 = generate_ip()
         ip2 = increment_ip(ip1)
         gateway, regenerate = generate_gateway_from_ip(ip1)
-    farm_page.wait_for_button(farm_page.add_range_ips(ip1, ip2, gateway)).click()
-    assert farm_page.wait_for('IP is added successfully.')
+    try:
+        farm_page.wait_for_button(farm_page.add_range_ips(ip1, ip2, gateway)).click()
+        assert farm_page.wait_for('IP is added successfully.')
+    except:
+        raise AssertionError(
+            f"Expected success message was not found after adding IP '{ip1}', '{ip2}' with gateway '{gateway}'."
+        )
     assert farm_page.get_ip(ip1, 0) == (1,0)
     assert farm_page.get_ip(ip2, 0) == (1,0)
     assert farm_page.get_ip(gateway, 0) == (2,0)
