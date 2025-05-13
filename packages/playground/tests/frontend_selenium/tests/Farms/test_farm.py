@@ -3,6 +3,7 @@ from pages.farm import FarmPage
 from utils.grid_proxy import GridProxy
 from pages.dashboard import DashboardPage
 from utils.base import Base
+from selenium.common.exceptions import TimeoutException
 
 #  Time required for the run (17 cases) is approximately 13 minutes.
 
