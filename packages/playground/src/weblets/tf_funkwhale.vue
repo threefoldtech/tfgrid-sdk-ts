@@ -222,7 +222,7 @@ async function deploy() {
           disks: [
             {
               size: solution.value.disk,
-              mountPoint: "/data",
+              mountPoint: "/var/lib/docker/",
             },
           ],
           flist: flist.value,
@@ -234,9 +234,9 @@ async function deploy() {
           envs: [
             { key: "SSH_KEY", value: selectedSSHKeys.value },
             { key: "FUNKWHALE_HOSTNAME", value: domain },
-            { key: "DJANGO_SUPERUSER_EMAIL", value: email.value },
-            { key: "DJANGO_SUPERUSER_USERNAME", value: username.value },
-            { key: "DJANGO_SUPERUSER_PASSWORD", value: password.value },
+            { key: "FUNKWHALE_SUPERUSER_EMAIL", value: email.value },
+            { key: "FUNKWHALE_SUPERUSER_NAME", value: username.value },
+            { key: "FUNKWHALE_SUPERUSER_PASSWORD", value: password.value },
           ],
           nodeId: selectionDetails.value!.node!.nodeId,
           rentedBy: rentedBy.value,
@@ -261,7 +261,7 @@ async function deploy() {
     await deployGatewayName(grid, selectionDetails.value.domain, {
       subdomain,
       ip: vm[0].interfaces[0].ip,
-      port: 80,
+      port: 5000,
       network: vm[0].interfaces[0].network,
     });
 
