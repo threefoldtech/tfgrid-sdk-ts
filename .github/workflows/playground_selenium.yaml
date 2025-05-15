@@ -68,26 +68,35 @@ jobs:
 
       - name: Generate Config.ini via Python
         working-directory: packages/playground/tests/frontend_selenium
+        env:
+          NETWORK: ${{ steps.vars.outputs.network }}
+          MODE: ${{ steps.vars.outputs.mode }}
+          TFCHAIN_MNEMONICS: ${{ secrets.TFCHAIN_MNEMONICS }}
+          TFCHAIN_NODE_MNEMONICS: ${{ secrets.TFCHAIN_NODE_MNEMONICS }}
+          STELLAR_ADDRESS: ${{ secrets.STELLAR_ADDRESS }}
+          EMAIL: ${{ secrets.EMAIL }}
         run: |
           python3 - <<'EOF'
           import os, configparser
 
+          net   = os.environ["NETWORK"]
+          mode  = os.environ["MODE"]
+
           cfg = configparser.ConfigParser()
-          # Base section
-          net   = os.environ["network"]
-          mode  = os.environ["mode"]
           base_url = (
               "http://localhost:5173" if mode == "build"
               else f"https://dashboard.{net}.grid.tf/"
           )
-          cfg["Base"] = { "port": "5173", "net": net, "base_url": base_url }
-
-          # Utils section
+          cfg["Base"] = {
+              "port":     "5173",
+              "net":      net,
+              "base_url": base_url
+          }
           cfg["Utils"] = {
-              "seed":      os.getenv("TFCHAIN_MNEMONICS", ""),
-              "node_seed": os.getenv("TFCHAIN_NODE_MNEMONICS", ""),
-              "address":   os.getenv("STELLAR_ADDRESS", ""),
-              "email":     os.getenv("EMAIL", "")
+              "seed":      os.environ["TFCHAIN_MNEMONICS"],
+              "node_seed": os.environ["TFCHAIN_NODE_MNEMONICS"],
+              "address":   os.environ["STELLAR_ADDRESS"],
+              "email":     os.environ["EMAIL"]
           }
 
           with open("Config.ini", "w") as f:
