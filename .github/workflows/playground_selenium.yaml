@@ -66,35 +66,38 @@ jobs:
             sleep 1
           done
 
-      - name: Generate Config.ini
+      - name: Generate Config.ini via Python
         working-directory: packages/playground/tests/frontend_selenium
         run: |
-          cat > Config.ini <<EOF
-          [Base]
-          port = 5173
-          net = ${{ steps.vars.outputs.network }}
-          base_url = $(
-            if [ "${{ steps.vars.outputs.mode }}" = "build" ]; then
-              echo "http://localhost:5173"
-            else
-              echo "https://dashboard.${{ steps.vars.outputs.network }}.grid.tf/"
-            fi
-          )
+          python3 - <<'EOF'
+          import os, configparser
 
-          [Utils]
-          seed = $TFCHAIN_MNEMONICS
-          node_seed = $TFCHAIN_NODE_MNEMONICS
-          address = $STELLAR_ADDRESS
-          email = $EMAIL
+          cfg = configparser.ConfigParser()
+          # Base section
+          net   = os.environ["network"]
+          mode  = os.environ["mode"]
+          base_url = (
+              "http://localhost:5173" if mode == "build"
+              else f"https://dashboard.{net}.grid.tf/"
+          )
+          cfg["Base"] = { "port": "5173", "net": net, "base_url": base_url }
+
+          # Utils section
+          cfg["Utils"] = {
+              "seed":      os.getenv("TFCHAIN_MNEMONICS", ""),
+              "node_seed": os.getenv("TFCHAIN_NODE_MNEMONICS", ""),
+              "address":   os.getenv("STELLAR_ADDRESS", ""),
+              "email":     os.getenv("EMAIL", "")
+          }
+
+          with open("Config.ini", "w") as f:
+              cfg.write(f)
           EOF
 
-      - name: Verify Config.ini location + contents
+      - name: Verify Config.ini
         working-directory: packages/playground/tests/frontend_selenium
         run: |
-          echo "→ Files in $(pwd):"
-          ls -l
-          echo ""
-          echo "→ Config.ini content:"
+          echo "\n→ Config.ini contents:\n"
           nl Config.ini
 
       - name: Run Selenium tests
@@ -102,14 +105,14 @@ jobs:
         run: python -m pytest -v --html=report.html
 
       - name: Upload HTML report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: selenium-report
           path: packages/playground/tests/frontend_selenium/report.html
 
       - name: Upload server logs (if build failed)
         if: ${{ failure() && steps.vars.outputs.mode == 'build' }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: server-logs
           path: server.log
