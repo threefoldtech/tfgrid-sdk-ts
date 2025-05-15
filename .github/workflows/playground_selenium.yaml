@@ -67,32 +67,32 @@ jobs:
         env:
           NETWORK: ${{ steps.vars.outputs.network }}
           MODE: ${{ steps.vars.outputs.mode }}
-          TFCHAIN_MNEMONICS: ${{ secrets.TFCHAIN_MNEMONICS }}
-          TFCHAIN_NODE_MNEMONICS: ${{ secrets.TFCHAIN_NODE_MNEMONICS }}
-          STELLAR_ADDRESS: ${{ secrets.STELLAR_ADDRESS }}
-          EMAIL: ${{ secrets.EMAIL }}
         run: |
           python3 - <<'EOF'
           import os, configparser
 
-          net   = os.environ["NETWORK"]
-          mode  = os.environ["MODE"]
-
           cfg = configparser.ConfigParser()
+          # Prevent line wrapping in config values
+          cfg._interpolation = configparser.ExtendedInterpolation()
+            
           base_url = (
-              "http://localhost:5173" if mode == "build"
-              else f"https://dashboard.{net}.grid.tf/"
+              "http://localhost:5173" 
+              if os.environ["MODE"] == "build" 
+              else f"https://dashboard.{os.environ['NETWORK']}.grid.tf/"
           )
+
           cfg["Base"] = {
-              "port":     "5173",
-              "net":      net,
+              "port": "5173",
+              "net": os.environ["NETWORK"],
               "base_url": base_url
           }
+
+          # Format secrets as single-line values
           cfg["Utils"] = {
-              "seed":      os.environ["TFCHAIN_MNEMONICS"],
-              "node_seed": os.environ["TFCHAIN_NODE_MNEMONICS"],
-              "address":   os.environ["STELLAR_ADDRESS"],
-              "email":     os.environ["EMAIL"]
+              "seed": os.environ["TFCHAIN_MNEMONICS"].replace('\n', ' '),
+              "node_seed": os.environ["TFCHAIN_NODE_MNEMONICS"].replace('\n', ' '),
+              "address": os.environ["STELLAR_ADDRESS"],
+              "email": os.environ["EMAIL"]
           }
 
           with open("Config.ini", "w") as f:
