@@ -4,24 +4,17 @@ on:
   workflow_dispatch:
     inputs:
       network:
-        description: "Select the network to run tests on (dev, qa, test, main)"
+        description: "Select network (dev, qa, test, main)"
         required: true
-        default: "dev"
+        default: dev
         type: choice
-        options:
-          - dev
-          - qa
-          - test
-          - main
+        options: [dev, qa, test, main]
       mode:
-        description: "Select mode: build locally or use existing URL"
+        description: "Select mode (build|remote)"
         required: true
-        default: "remote"
+        default: remote
         type: choice
-        options:
-          - build
-          - remote
-
+        options: [build, remote]
   schedule:
     - cron: "0 6 * * *"
 
@@ -33,19 +26,16 @@ jobs:
       TFCHAIN_NODE_MNEMONICS: ${{ secrets.TFCHAIN_NODE_MNEMONICS }}
       STELLAR_ADDRESS: ${{ secrets.STELLAR_ADDRESS }}
       EMAIL: ${{ secrets.EMAIL }}
-    defaults:
-      run:
-        working-directory: packages/playground/tests/frontend_selenium
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Determine network + mode
         id: vars
         run: |
           echo "network=${{ github.event.inputs.network }}" >> $GITHUB_OUTPUT
           echo "mode=${{ github.event.inputs.mode }}"       >> $GITHUB_OUTPUT
-
-      - name: Checkout repo
-        uses: actions/checkout@v4
 
       - name: Set up Python 3.10
         uses: actions/setup-python@v5
@@ -54,36 +44,8 @@ jobs:
 
       - name: Install Python deps
         run: |
-          pip install -r requirements.txt
+          pip install -r packages/playground/tests/frontend_selenium/requirements.txt
           pip install pytest-html
-
-      - name: Generate Config.ini via Python
-        run: |
-          python3 - <<'EOF'
-          import os, configparser
-
-          cfg = configparser.ConfigParser()
-          base_url = (
-              "http://localhost:5173" if os.environ["mode"] == "build"
-              else f"https://dashboard.{os.environ['network']}.grid.tf/"
-          )
-          cfg["Base"] = {
-              "port":     "5173",
-              "net":      os.environ["network"],
-              "base_url": base_url
-          }
-          cfg["Utils"] = {
-              "seed":      os.environ["TFCHAIN_MNEMONICS"],
-              "node_seed": os.environ["TFCHAIN_NODE_MNEMONICS"],
-              "address":   os.environ["STELLAR_ADDRESS"],
-              "email":     os.environ["EMAIL"]
-          }
-          with open("Config.ini", "w") as f:
-              cfg.write(f)
-          EOF
-
-      - name: Debug Config.ini
-        run: nl Config.ini
 
       - name: Set up Node.js 18
         uses: actions/setup-node@v4
@@ -93,27 +55,59 @@ jobs:
       - name: Install Node deps
         run: yarn install
 
-      - name: Build & serve (only build-mode)
+      - name: Build & serve (local build only)
         if: ${{ steps.vars.outputs.mode == 'build' }}
         run: |
           yarn lerna run build
           nohup make run project=playground > server.log 2>&1 &
+          echo "Waiting for http://localhost:5173…"
           for i in {1..60}; do
-            curl -sf http://localhost:5173 && exit
+            curl -sf http://localhost:5173 && break
             sleep 1
           done
-          echo "Server failed to start" && exit 1
+
+      - name: Generate Config.ini
+        working-directory: packages/playground/tests/frontend_selenium
+        run: |
+          cat > Config.ini <<EOF
+          [Base]
+          port = 5173
+          net = ${{ steps.vars.outputs.network }}
+          base_url = $(
+            if [ "${{ steps.vars.outputs.mode }}" = "build" ]; then
+              echo "http://localhost:5173"
+            else
+              echo "https://dashboard.${{ steps.vars.outputs.network }}.grid.tf/"
+            fi
+          )
+
+          [Utils]
+          seed = $TFCHAIN_MNEMONICS
+          node_seed = $TFCHAIN_NODE_MNEMONICS
+          address = $STELLAR_ADDRESS
+          email = $EMAIL
+          EOF
+
+      - name: Verify Config.ini location + contents
+        working-directory: packages/playground/tests/frontend_selenium
+        run: |
+          echo "→ Files in $(pwd):"
+          ls -l
+          echo ""
+          echo "→ Config.ini content:"
+          nl Config.ini
 
       - name: Run Selenium tests
-        run: pytest -v --html=report.html
+        working-directory: packages/playground/tests/frontend_selenium
+        run: python -m pytest -v --html=report.html
 
       - name: Upload HTML report
         uses: actions/upload-artifact@v4
         with:
           name: selenium-report
-          path: report.html
+          path: packages/playground/tests/frontend_selenium/report.html
 
-      - name: Upload server logs if build failed
+      - name: Upload server logs (if build failed)
         if: ${{ failure() && steps.vars.outputs.mode == 'build' }}
         uses: actions/upload-artifact@v4
         with:
