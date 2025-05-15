@@ -28,103 +28,92 @@ on:
 jobs:
   selenium-run:
     runs-on: ubuntu-latest
+    env:
+      TFCHAIN_MNEMONICS: ${{ secrets.TFCHAIN_MNEMONICS }}
+      TFCHAIN_NODE_MNEMONICS: ${{ secrets.TFCHAIN_NODE_MNEMONICS }}
+      STELLAR_ADDRESS: ${{ secrets.STELLAR_ADDRESS }}
+      EMAIL: ${{ secrets.EMAIL }}
+    defaults:
+      run:
+        working-directory: packages/playground/tests/frontend_selenium
 
     steps:
-      - name: Determine network and mode
+      - name: Determine network + mode
         id: vars
         run: |
-          network="${{ github.event.inputs.network || 'dev' }}"
-          mode="${{ github.event.inputs.mode || 'remote' }}"
-          echo "network=$network" >> $GITHUB_OUTPUT
-          echo "mode=$mode" >> $GITHUB_OUTPUT
+          echo "network=${{ github.event.inputs.network }}" >> $GITHUB_OUTPUT
+          echo "mode=${{ github.event.inputs.mode }}"       >> $GITHUB_OUTPUT
 
-      - name: Checkout code
+      - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Set up Python 3.10
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
 
-      - name: Install Python dependencies
+      - name: Install Python deps
         run: |
-          pip install -r packages/playground/tests/frontend_selenium/requirements.txt
+          pip install -r requirements.txt
           pip install pytest-html
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
-
-      - name: Install Node dependencies
-        run: yarn install
-
-      - name: Build project (only local build)
-        if: ${{ steps.vars.outputs.mode == 'build' }}
-        run: yarn lerna run build
-
-      - name: Serve dashboard locally (only local build)
-        if: ${{ steps.vars.outputs.mode == 'build' }}
+      - name: Generate Config.ini via Python
         run: |
-          nohup make run project=playground > server.log 2>&1 &
-          echo "Waiting for server to start..."
-          for i in {1..60}; do
-            if curl -s http://localhost:5173 >/dev/null; then
-              echo "Server is up!"
-              exit 0
-            fi
-            sleep 1
-          done
-          echo "Server failed to start within 60 seconds."
-          exit 1
+          python3 - <<'EOF'
+          import os, configparser
 
-      - name: Generate Config.ini
-        working-directory: ./packages/playground/tests/frontend_selenium
-        env:
-          TFCHAIN_MNEMONICS: ${{ secrets.TFCHAIN_MNEMONICS }}
-          TFCHAIN_NODE_MNEMONICS: ${{ secrets.TFCHAIN_NODE_MNEMONICS }}
-          STELLAR_ADDRESS: ${{ secrets.STELLAR_ADDRESS }}
-          EMAIL: ${{ secrets.EMAIL }}
-        run: |
-          cat > Config.ini <<EOF
-          [Base]
-          port = 5173
-          net = ${{ steps.vars.outputs.network }}
-          base_url = $(
-            if [ "${{ steps.vars.outputs.mode }}" = "build" ]; then
-              echo "http://localhost:5173"
-            else
-              echo "https://dashboard.${{ steps.vars.outputs.network }}.grid.tf/"
-            fi
+          cfg = configparser.ConfigParser()
+          base_url = (
+              "http://localhost:5173" if os.environ["mode"] == "build"
+              else f"https://dashboard.{os.environ['network']}.grid.tf/"
           )
-
-          [Utils]
-          seed = $TFCHAIN_MNEMONICS
-          node_seed = $TFCHAIN_NODE_MNEMONICS
-          address = $STELLAR_ADDRESS
-          email = $EMAIL
+          cfg["Base"] = {
+              "port":     "5173",
+              "net":      os.environ["network"],
+              "base_url": base_url
+          }
+          cfg["Utils"] = {
+              "seed":      os.environ["TFCHAIN_MNEMONICS"],
+              "node_seed": os.environ["TFCHAIN_NODE_MNEMONICS"],
+              "address":   os.environ["STELLAR_ADDRESS"],
+              "email":     os.environ["EMAIL"]
+          }
+          with open("Config.ini", "w") as f:
+              cfg.write(f)
           EOF
 
       - name: Debug Config.ini
-        working-directory: ./packages/playground/tests/frontend_selenium
         run: nl Config.ini
 
+      - name: Set up Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+
+      - name: Install Node deps
+        run: yarn install
+
+      - name: Build & serve (only build-mode)
+        if: ${{ steps.vars.outputs.mode == 'build' }}
+        run: |
+          yarn lerna run build
+          nohup make run project=playground > server.log 2>&1 &
+          for i in {1..60}; do
+            curl -sf http://localhost:5173 && exit
+            sleep 1
+          done
+          echo "Server failed to start" && exit 1
+
       - name: Run Selenium tests
-        working-directory: ./packages/playground/tests/frontend_selenium
-        env:
-          TFCHAIN_MNEMONICS: ${{ secrets.TFCHAIN_MNEMONICS }}
-          TFCHAIN_NODE_MNEMONICS: ${{ secrets.TFCHAIN_NODE_MNEMONICS }}
-          STELLAR_ADDRESS: ${{ secrets.STELLAR_ADDRESS }}
-          EMAIL: ${{ secrets.EMAIL }}
-        run: python -m pytest -v --html=report.html
+        run: pytest -v --html=report.html
 
       - name: Upload HTML report
         uses: actions/upload-artifact@v4
         with:
           name: selenium-report
-          path: packages/playground/tests/frontend_selenium/report.html
+          path: report.html
 
-      - name: Upload server logs (if build failed)
+      - name: Upload server logs if build failed
         if: ${{ failure() && steps.vars.outputs.mode == 'build' }}
         uses: actions/upload-artifact@v4
         with:
