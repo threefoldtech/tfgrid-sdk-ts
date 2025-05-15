@@ -47,7 +47,9 @@ jobs:
           python-version: "3.10"
 
       - name: Install Python dependencies
-        run: pip install -r packages/playground/tests/frontend_selenium/requirements.txt
+        run: |
+          pip install -r packages/playground/tests/frontend_selenium/requirements.txt
+          pip install pytest-html
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
