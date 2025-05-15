@@ -69,28 +69,28 @@ jobs:
           MODE: ${{ steps.vars.outputs.mode }}
         run: |
           python3 - <<'EOF'
-          import os, configparser
+          import os, configparser, re
+
+          def clean_mnemonic(mnemonic):
+              """Normalize mnemonic to single-space separated format"""
+              return ' '.join(mnemonic.split()).strip()
 
           cfg = configparser.ConfigParser()
-          # Prevent line wrapping in config values
-          cfg._interpolation = configparser.ExtendedInterpolation()
-            
-          base_url = (
-              "http://localhost:5173" 
-              if os.environ["MODE"] == "build" 
-              else f"https://dashboard.{os.environ['NETWORK']}.grid.tf/"
-          )
 
           cfg["Base"] = {
               "port": "5173",
               "net": os.environ["NETWORK"],
-              "base_url": base_url
+              "base_url": (
+                  "http://localhost:5173" 
+                  if os.environ["MODE"] == "build" 
+                  else f"https://dashboard.{os.environ['NETWORK']}.grid.tf/"
+              )
           }
 
-          # Format secrets as single-line values
+          # Process mnemonics with full normalization
           cfg["Utils"] = {
-              "seed": os.environ["TFCHAIN_MNEMONICS"].replace('\n', ' '),
-              "node_seed": os.environ["TFCHAIN_NODE_MNEMONICS"].replace('\n', ' '),
+              "seed": clean_mnemonic(os.environ["TFCHAIN_MNEMONICS"]),
+              "node_seed": clean_mnemonic(os.environ["TFCHAIN_NODE_MNEMONICS"]),
               "address": os.environ["STELLAR_ADDRESS"],
               "email": os.environ["EMAIL"]
           }
