@@ -110,6 +110,7 @@ import { type InputValidatorService, useInputRef } from "@/hooks/input_validator
 
 import { useAsync, usePagination } from "../../hooks";
 import { useForm, useFormRef, ValidatorStatus } from "../../hooks/form_validator";
+import { useWatchDeep } from "../../hooks/useWatchDeep";
 import { useGrid } from "../../stores";
 import type { DomainInfo, NetworkFeatures, SelectionDetailsFilters } from "../../types/nodeSelector";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -181,17 +182,18 @@ export default {
       return loadDomains();
     };
 
-    watch(
-      [() => props.farm?.farmId, () => gridStore.client?.twinId, () => props.interfaces],
-      () => {
-        reloadDomains();
+    useWatchDeep(
+      () => ({
+        farmId: props.farm?.farmId,
+        twinId: gridStore.client?.twinId,
+        interfaces: props.interfaces,
+      }),
+      (newVal, oldVal) => {
+        if (JSON.stringify(oldVal) !== JSON.stringify(newVal)) {
+          reloadDomains();
+        }
       },
-      { deep: true },
     );
-
-    onMounted(() => {
-      loadDomains();
-    });
 
     const customDomain = ref("");
     const domainFormRef = useFormRef();

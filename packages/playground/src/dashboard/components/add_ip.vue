@@ -17,8 +17,12 @@
               ></v-select>
               <input-validator
                 :value="publicIP"
-                :rules="[validators.required('IP is required.'), validators.isIPRange('Not a valid IP')]"
-                :async-rules="[ipcheck]"
+                :rules="[
+                  validators.required('IP is required.'),
+                  validators.isIPRange('Not a valid IP'),
+                  validators.isPublicIP(),
+                ]"
+                :async-rules="[isExistingIp]"
                 #="{ props }"
               >
                 <input-tooltip tooltip="IP address in CIDR format xxx.xxx.xxx.xxx/xx">
@@ -36,8 +40,13 @@
               <input-validator
                 v-if="type === IPType.range"
                 :value="toPublicIP"
-                :rules="[validators.required('IP is required.'), validators.isIPRange('Not a valid IP')]"
-                :async-rules="[toIpCheck]"
+                :rules="[
+                  validators.required('IP is required.'),
+                  validators.isIPRange('Not a valid IP'),
+                  validators.isPublicIP(),
+                  toIpCheck,
+                ]"
+                :async-rules="[isExistingIp]"
                 #="{ props }"
               >
                 <input-tooltip tooltip="IP address in CIDR format xxx.xxx.xxx.xxx/xx">
@@ -134,7 +143,6 @@
 import { TFChainError } from "@threefold/tfchain_client";
 import { contains } from "cidr-tools";
 import { getIPRange } from "get-ip-range";
-import { default as PrivateIp } from "private-ip";
 import { ref, watch } from "vue";
 
 import { gqlClient } from "@/clients";
@@ -181,22 +189,6 @@ export default {
       { deep: true },
     );
 
-    async function ipcheck() {
-      if (PrivateIp(publicIP.value.split("/")[0])) {
-        return {
-          message: "IP is not public",
-        };
-      }
-
-      if (await IpExistsCheck(publicIP.value)) {
-        return {
-          message: "IP exists.",
-        };
-      }
-
-      return undefined;
-    }
-
     watch(
       type,
       () => {
@@ -208,7 +200,15 @@ export default {
       const ips = await gqlClient.publicIps({ ip: true }, { where: { ip_eq: pubIp } });
       return ips.length > 0;
     }
-    async function toIpCheck() {
+    async function isExistingIp(ip: string) {
+      if (await IpExistsCheck(ip)) {
+        return {
+          message: "IP exists.",
+        };
+      }
+      return undefined;
+    }
+    function toIpCheck() {
       if (toPublicIP.value.split("/")[1] !== publicIP.value.split("/")[1]) {
         return {
           message: "Subnet is different.",
@@ -241,17 +241,6 @@ export default {
           message: "Range must not exceed 16.",
         };
       }
-      if (PrivateIp(publicIP.value.split("/")[0])) {
-        return {
-          message: "IP is not public.",
-        };
-      }
-      if (await IpExistsCheck(toPublicIP.value)) {
-        return {
-          message: "IP exists.",
-        };
-      }
-      return undefined;
     }
 
     function gatewayCheck() {
@@ -300,16 +289,17 @@ export default {
       showIPs.value = true;
     }
 
-    function generateIpTable(startIp: string, endIp: string, sub: any) {
-      const startLong = ipToLong(startIp);
-      const endLong = ipToLong(endIp);
+    function generateIpTable(startIp: string, endIp: string, sub: number) {
+      const startLong = ipToLong(startIp); // BigInt
+      const endLong = ipToLong(endIp); // BigInt
 
-      // Determine the subnet mask based on the provided CIDR
-      const mask = (0xffffffff << (32 - sub)) >>> 0; // Create subnet mask from CIDR
-      const networkBaseLong = startLong & mask; // Calculate network address using the mask
+      // Create subnet mask from CIDR using BigInt with BigInt()
+      const mask = (BigInt(0xffffffff) << BigInt(32 - sub)) & BigInt(0xffffffff);
+      const networkBaseLong = startLong & mask; // Network address
 
-      const networkBase = longToIp(networkBaseLong); // Convert back to dotted decimal format
+      const networkBase = longToIp(networkBaseLong); // Convert back to dotted decimal
 
+      // Generate IPs in range
       ipsRangeTable.value = [];
       for (let i = startLong; i <= endLong; i++) {
         ipsRangeTable.value.push(longToIp(i));
@@ -317,7 +307,7 @@ export default {
       network.value = `${networkBase}/${sub}`;
     }
     function addIPs() {
-      const sub = publicIP.value.split("/")[1];
+      const sub = Number(publicIP.value.split("/")[1]);
       const start = publicIP.value.split("/")[0];
       let end = toPublicIP.value.split("/")[0];
 
@@ -398,7 +388,7 @@ export default {
       showRange,
       addIPs,
       addFarmIp,
-      ipcheck,
+      isExistingIp,
       toIpCheck,
       gatewayCheck,
     };

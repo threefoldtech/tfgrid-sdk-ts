@@ -509,15 +509,11 @@ async function getContractsLockDetails() {
 const baseTableHeaders: VDataTableHeader = [
   { title: "PLACEHOLDER", key: "data-table-select" },
   { title: "ID", key: "contract_id", sortable: true },
-  { title: "State", key: "state", sortable: false },
-  { title: "Billing Rate", key: "consumption", sortable: false },
-  { title: "Created At", key: "created_at", sortable: true },
 ];
 
 // Define specific table headers for each contract type
 const nodeTableHeaders: VDataTableHeader = [
-  { title: "PLACEHOLDER", key: "data-table-select" },
-  { title: "ID", key: "contract_id", sortable: true },
+  ...baseTableHeaders,
   { title: "Workload Type", key: "deploymentType", sortable: false },
   {
     title: "Solution",
@@ -548,12 +544,18 @@ const nodeTableHeaders: VDataTableHeader = [
 const nameTableHeaders: VDataTableHeader = [
   ...baseTableHeaders,
   { title: "Solution Name", key: "solutionName", sortable: false },
+  { title: "State", key: "state", sortable: false },
+  { title: "Billing Rate", key: "consumption", sortable: false },
+  { title: "Created At", key: "created_at", sortable: true },
   { title: "Expiration", key: "expiration", sortable: false },
   { title: "Details", key: "actions", sortable: false },
 ];
 
 const RentTableHeaders: VDataTableHeader = [
   ...baseTableHeaders,
+  { title: "State", key: "state", sortable: false },
+  { title: "Billing Rate", key: "consumption", sortable: false },
+  { title: "Created At", key: "created_at", sortable: true },
   { title: "Farm ID", key: "farm_id", sortable: false },
   {
     title: "Node",

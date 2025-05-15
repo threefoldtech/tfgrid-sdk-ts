@@ -512,9 +512,9 @@ class BaseModule {
       message: workload.result.message,
       flist: data.flist,
       publicIP: (await this._getMachinePubIP(deploymentName, deployments, data.network.public_ip)) as PublicIPResult,
-      planetary: data.network.planetary ? resultData.planetary_ip : resultData.ygg_ip,
-      myceliumIP: data.network.mycelium?.hex_seed ? resultData.mycelium_ip : "",
-      interfaces: data.network.interfaces.map(n => ({
+      planetary: data.network?.planetary ? resultData?.planetary_ip : resultData?.ygg_ip,
+      myceliumIP: data.network?.mycelium?.hex_seed ? resultData?.mycelium_ip : "",
+      interfaces: data.network?.interfaces.map(n => ({
         network: n.network,
         ip: n.ip,
       })),
@@ -621,6 +621,8 @@ class BaseModule {
         deployment = await this.rmb.request([node_twin_id], "zos.deployment.get", payload);
       } catch (e) {
         (e as Error).message = formatErrorMessage(`Failed to get deployment`, e);
+        console.error(e);
+        continue;
       }
       let found = false;
       for (const workload of deployment.workloads) {
