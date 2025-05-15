@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { ipToLong, longToIp } from "../../src/utils/ip";
+import { isPublicIP } from "../../src/utils/validators";
 
 describe("ipToLong", () => {
   it('should convert IPv4 "0.0.0.0" to 0', () => {
@@ -55,5 +56,44 @@ describe("longToIp", () => {
     const ip = "192.168.1.1";
     const long = 3232235777;
     expect(longToIp(long)).toBe(ip);
+  });
+});
+
+describe("isPublicIP", () => {
+  const validPublicIPs = ["8.8.8.8", "8.8.8.8/24", "172.32.0.1", "192.169.0.1", "11.12.13.14", "104.25.129.30"];
+
+  const invalidPublicIPs = [
+    // Private IPs
+    "10.0.0.1",
+    "172.16.0.1",
+    "192.168.0.1",
+    // Loopback
+    "127.0.0.1",
+    // Link-local
+    "169.254.0.1",
+    // Multicast
+    "224.0.0.1",
+    "232.229.60.203",
+    "239.255.255.255",
+    // Reserved
+    "240.0.0.1",
+    "255.255.255.255",
+    // Documentation and example ranges
+    "192.0.2.1", // TEST-NET-1
+    "198.51.100.1", // TEST-NET-2
+    "203.0.113.1", // TEST-NET-3
+  ];
+
+  it.each(validPublicIPs)("should return undefined for valid public IP %s", ip => {
+    expect(isPublicIP()(ip)).toBeUndefined();
+  });
+
+  it.each(invalidPublicIPs)("should return an error message for invalid public IP %s", ip => {
+    expect(isPublicIP()(ip)).toEqual({ message: "IP is not public" });
+  });
+
+  it("should return a custom error message when provided", () => {
+    const customMessage = "Custom error message";
+    expect(isPublicIP(customMessage)("10.0.0.1")).toEqual({ message: customMessage });
   });
 });

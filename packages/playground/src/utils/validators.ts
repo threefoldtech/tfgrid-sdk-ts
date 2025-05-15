@@ -1,4 +1,5 @@
 import type { GridClient } from "@threefold/grid_client";
+import { default as PrivateIp } from "private-ip";
 import StellarSdk from "stellar-sdk";
 import validator from "validator";
 import type { Options } from "validator/lib/isBoolean";
@@ -402,6 +403,16 @@ export function isIPRange(msg: string, options?: validator.IPVersion) {
   return (value: string) => {
     if (!validator.isIPRange(value, options)) {
       return { message: msg, isIPRange: options || true };
+    }
+  };
+}
+
+export function isPublicIP(msg = "IP is not public") {
+  return (ip: string) => {
+    const firstOctet = parseInt(ip.split(".")[0], 10);
+    const isMulticast = firstOctet >= 224 && firstOctet <= 239;
+    if (isMulticast || PrivateIp(ip.split("/")[0])) {
+      return { message: msg };
     }
   };
 }
