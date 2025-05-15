@@ -8,13 +8,20 @@ on:
         required: true
         default: "dev"
         type: choice
-        options: [dev, qa, test, main]
+        options:
+          - dev
+          - qa
+          - test
+          - main
       mode:
         description: "Select mode: build locally or use existing URL"
         required: true
         default: "remote"
         type: choice
-        options: [build, remote]
+        options:
+          - build
+          - remote
+
   schedule:
     - cron: "0 6 * * *"
 
@@ -60,10 +67,15 @@ jobs:
         if: ${{ steps.vars.outputs.mode == 'build' }}
         run: |
           nohup make run project=playground > server.log 2>&1 &
+          echo "Waiting for server to start..."
           for i in {1..60}; do
-            if curl -s http://localhost:5173 >/dev/null; then exit 0; fi
+            if curl -s http://localhost:5173 >/dev/null; then
+              echo "Server is up!"
+              exit 0
+            fi
             sleep 1
           done
+          echo "Server failed to start within 60 seconds."
           exit 1
 
       - name: Generate Config.ini
@@ -85,11 +97,12 @@ jobs:
               echo "https://dashboard.${{ steps.vars.outputs.network }}.grid.tf/"
             fi
           )
+
           [Utils]
-          seed = "${TFCHAIN_MNEMONICS}"
-          node_seed = "${TFCHAIN_NODE_MNEMONICS}"
-          address = "${STELLAR_ADDRESS}"
-          email = "${EMAIL}"
+          seed = $TFCHAIN_MNEMONICS
+          node_seed = $TFCHAIN_NODE_MNEMONICS
+          address = $STELLAR_ADDRESS
+          email = $EMAIL
           EOF
 
       - name: Debug Config.ini
