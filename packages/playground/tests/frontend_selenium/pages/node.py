@@ -231,6 +231,8 @@ class NodePage:
                 time.sleep(2)
 
     def set_fee(self, fee):
+        WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.fee_input))
+        WebDriverWait(self.browser, 30).until(EC.element_to_be_clickable(self.fee_input))
         self.browser.find_element(*self.fee_input).send_keys(Keys.CONTROL + "a")
         self.browser.find_element(*self.fee_input).send_keys(Keys.DELETE)
         self.browser.find_element(*self.fee_input).send_keys(fee)
