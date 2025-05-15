@@ -21,6 +21,8 @@ on:
 jobs:
   selenium-run:
     runs-on: ubuntu-latest
+
+    # Pass secrets in for Config.ini
     env:
       TFCHAIN_MNEMONICS: ${{ secrets.TFCHAIN_MNEMONICS }}
       TFCHAIN_NODE_MNEMONICS: ${{ secrets.TFCHAIN_NODE_MNEMONICS }}
@@ -41,9 +43,14 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
-      - name: Installing all necessary packages
-        run: pip install -r  packages/playground/tests/frontend_selenium/requirements.txt
-      - name: Node install
+
+      - name: Install Python deps (including pytest-html)
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install -r packages/playground/tests/frontend_selenium/requirements.txt
+          python3 -m pip install pytest-html
+
+      - name: Set up Node.js 18
         uses: actions/setup-node@v4
         with:
           node-version: "18"
@@ -51,7 +58,7 @@ jobs:
       - name: Install Node deps
         run: yarn install
 
-      - name: Build & serve (local build only)
+      - name: Build & serve (only build mode)
         if: ${{ steps.vars.outputs.mode == 'build' }}
         run: |
           yarn lerna run build
@@ -69,42 +76,41 @@ jobs:
           MODE: ${{ steps.vars.outputs.mode }}
         run: |
           python3 - <<'EOF'
-          import os, configparser, re
+          import os, configparser
 
-          def clean_mnemonic(mnemonic):
-              """Normalize mnemonic to single-space separated format"""
-              return ' '.join(mnemonic.split()).strip()
+          def flatten(var):
+              return os.getenv(var, "").replace("\n", " ").strip()
+
+          net   = os.environ["NETWORK"]
+          mode  = os.environ["MODE"]
+          base_url = ("http://localhost:5173" if mode=="build"
+                      else f"https://dashboard.{net}.grid.tf/")
 
           cfg = configparser.ConfigParser()
-
           cfg["Base"] = {
-              "port": "5173",
-              "net": os.environ["NETWORK"],
-              "base_url": (
-                  "http://localhost:5173" 
-                  if os.environ["MODE"] == "build" 
-                  else f"https://dashboard.{os.environ['NETWORK']}.grid.tf/"
-              )
+              "port":     "5173",
+              "net":      net,
+              "base_url": base_url
           }
-
-          # Process mnemonics with full normalization
           cfg["Utils"] = {
-              "seed": clean_mnemonic(os.environ["TFCHAIN_MNEMONICS"]),
-              "node_seed": clean_mnemonic(os.environ["TFCHAIN_NODE_MNEMONICS"]),
-              "address": os.environ["STELLAR_ADDRESS"],
-              "email": os.environ["EMAIL"]
+              "seed":      flatten("TFCHAIN_MNEMONICS"),
+              "node_seed": flatten("TFCHAIN_NODE_MNEMONICS"),
+              "address":   flatten("STELLAR_ADDRESS"),
+              "email":     flatten("EMAIL")
           }
-
           with open("Config.ini", "w") as f:
               cfg.write(f)
           EOF
 
-      - name: Verify Config.ini
+      - name: Verify Config.ini exists and contents
         working-directory: packages/playground/tests/frontend_selenium
         run: |
-          echo "\n→ Config.ini contents:\n"
+          echo "→ Files in $(pwd):"
+          ls -1
+          echo ""
+          echo "→ Config.ini contents:"
           nl Config.ini
 
       - name: Run Selenium tests
         working-directory: packages/playground/tests/frontend_selenium
-        run: python -m pytest -v --html=report.html
+        run: python3 -m pytest -v --html=report.html
