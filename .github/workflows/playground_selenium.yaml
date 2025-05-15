@@ -8,20 +8,13 @@ on:
         required: true
         default: "dev"
         type: choice
-        options:
-          - dev
-          - qa
-          - test
-          - main
+        options: [dev, qa, test, main]
       mode:
         description: "Select mode: build locally or use existing URL"
         required: true
         default: "remote"
         type: choice
-        options:
-          - build
-          - remote
-
+        options: [build, remote]
   schedule:
     - cron: "0 6 * * *"
 
@@ -67,22 +60,21 @@ jobs:
         if: ${{ steps.vars.outputs.mode == 'build' }}
         run: |
           nohup make run project=playground > server.log 2>&1 &
-          echo "Waiting for server to start..."
           for i in {1..60}; do
-            if curl -s http://localhost:5173 >/dev/null; then
-              echo "Server is up!"
-              exit 0
-            fi
+            if curl -s http://localhost:5173 >/dev/null; then exit 0; fi
             sleep 1
           done
-          echo "Server failed to start within 60 seconds."
           exit 1
 
       - name: Generate Config.ini
         working-directory: ./packages/playground/tests/frontend_selenium
+        env:
+          TFCHAIN_MNEMONICS: ${{ secrets.TFCHAIN_MNEMONICS }}
+          TFCHAIN_NODE_MNEMONICS: ${{ secrets.TFCHAIN_NODE_MNEMONICS }}
+          STELLAR_ADDRESS: ${{ secrets.STELLAR_ADDRESS }}
+          EMAIL: ${{ secrets.EMAIL }}
         run: |
-          rm -f Config.ini
-          cat <<EOF > Config.ini
+          cat > Config.ini <<EOF
           [Base]
           port = 5173
           net = ${{ steps.vars.outputs.network }}
@@ -90,12 +82,7 @@ jobs:
             if [ "${{ steps.vars.outputs.mode }}" = "build" ]; then
               echo "http://localhost:5173"
             else
-              case "${{ steps.vars.outputs.network }}" in
-                dev)  echo "https://staging.dashboard.dev.grid.tf/" ;;
-                qa)   echo "https://dashboard.qa.grid.tf/" ;;
-                test) echo "https://dashboard.test.grid.tf/" ;;
-                main) echo "https://dashboard.grid.tf/" ;;
-              esac
+              echo "https://dashboard.${{ steps.vars.outputs.network }}.grid.tf/"
             fi
           )
           [Utils]
@@ -110,8 +97,8 @@ jobs:
         run: nl Config.ini
 
       - name: Run Selenium tests
+        working-directory: ./packages/playground/tests/frontend_selenium
         env:
-          NETWORK: ${{ steps.vars.outputs.network }}
           TFCHAIN_MNEMONICS: ${{ secrets.TFCHAIN_MNEMONICS }}
           TFCHAIN_NODE_MNEMONICS: ${{ secrets.TFCHAIN_NODE_MNEMONICS }}
           STELLAR_ADDRESS: ${{ secrets.STELLAR_ADDRESS }}
