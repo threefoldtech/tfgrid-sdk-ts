@@ -117,14 +117,14 @@ jobs:
         run: python -m pytest -v --html=report.html
 
       - name: Upload HTML report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v2
         with:
           name: selenium-report
           path: packages/playground/tests/frontend_selenium/report.html
 
       - name: Upload server logs (if build failed)
         if: ${{ failure() && steps.vars.outputs.mode == 'build' }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v2
         with:
           name: server-logs
           path: server.log
