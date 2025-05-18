@@ -6,7 +6,8 @@
   "homepage": "https://github.com/threefoldtech/tfgrid-sdk-ts/blob/development/packages/rmb_peer_client/README.md",
   "repository": {
     "type": "git",
-    "url": "https://github.com/threefoldtech/tfgrid-sdk-ts.git"
+    "url": "https://github.com/threefoldtech/tfgrid-sdk-ts.git",
+    "directory": "packages/rmb_peer_client"
   },
   "publishConfig": {
     "access": "public"

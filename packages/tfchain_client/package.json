@@ -17,7 +17,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/threefoldtech/tfgrid-sdk-ts.git"
+    "url": "https://github.com/threefoldtech/tfgrid-sdk-ts.git",
+    "directory": "packages/tfchain_client"
   },
   "keywords": [
     "tfchain"
