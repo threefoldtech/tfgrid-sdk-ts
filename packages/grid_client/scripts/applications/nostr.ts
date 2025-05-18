@@ -1,4 +1,12 @@
-import { Features, FilterOptions, GatewayNameModel, GridClient, MachinesModel, NodeInfo } from "../../src";
+import {
+  Features,
+  FilterOptions,
+  GatewayNameModel,
+  generateString,
+  GridClient,
+  MachinesModel,
+  NodeInfo,
+} from "../../src";
 import { FLISTS } from "../../src/helpers/flists";
 import { config, getClient } from "../client_loader";
 import { log, pingNodes } from "../utils";
@@ -58,7 +66,7 @@ async function cancel(client: GridClient, name: string, subdomain: string) {
 }
 
 async function main() {
-  const name = "newnostr1";
+  const name = generateString(10);
   const grid3 = await getClient(`nostr/${name}`);
   const subdomain = `ntt${grid3.twinId}${name}`;
   const instanceCapacity = { cru: 2, mru: 4, sru: 50 };
