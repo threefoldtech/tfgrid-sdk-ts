@@ -73,10 +73,13 @@ def generate_ip():
     while True:
         ip = [cryptogen.randrange(256) for _ in range(4)]
         # Check if the generated IP is within private ranges
-        if (ip[0] == 10 or
+        if (
+            ip[0] == 10 or
             (ip[0] == 172 and 16 <= ip[1] <= 31) or
             (240 <= ip[0] <= 255) or
-            (ip[0] == 192 and ip[1] == 168)):
+            (ip[0] == 192 and ip[1] == 168) or
+            (224 <= ip[0] <= 239)
+        ):
             continue
         port = cryptogen.randrange(33)
         return f"{'.'.join(map(str, ip))}/{port}"

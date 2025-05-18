@@ -30,7 +30,8 @@ class BridgePage:
     stellar_address = (By.XPATH, "//label[text()='Stellar Target Wallet Address']/following-sibling::input")
     amount_tft = (By.XPATH, "//input[@class='v-field__input' and @type='number']")
     submit_button = (By.XPATH, "//button[.//span[text()='Send']]")
-    balance_text = (By.XPATH,'/html/body/div[1]/div/div/main/header/div/div[3]/div[2]/p[1]/strong')
+    balance_text = (By.XPATH,"//p[contains(text(), 'Balance:')]")
+    locked_balance_text = (By.XPATH,"//p[contains(text(), 'Locked:')]")
     tft_amount_text = (By.XPATH, "//*[contains(text(), 'Deposit fee is 1 TFT')]")
 
 
@@ -93,7 +94,7 @@ class BridgePage:
         while(balance == 'Loadin'):
             while True:
                 try:
-                    balance = self.browser.find_element(*self.balance_text).text[:-4]
+                    balance = self.browser.find_element(*self.balance_text).text[9:-4]
                     break  # Exit the loop if interaction is successful
                 except StaleElementReferenceException:
                     time.sleep(0.5)
@@ -140,7 +141,7 @@ class BridgePage:
     def get_balance(self):
         while True:
             try:
-                new_balance = self.browser.find_element(*self.balance_text).text[:-4]
+                new_balance = self.browser.find_element(*self.balance_text).text[9:-4]
                 break  # Exit the loop if interaction is successful
             except StaleElementReferenceException:
                 time.sleep(0.5)
@@ -149,7 +150,25 @@ class BridgePage:
             self.wait_for(' Balance: ')
             while True:
                 try:
-                    new_balance = self.browser.find_element(*self.balance_text).text[:-4]
+                    new_balance = self.browser.find_element(*self.balance_text).text[9:-4]
+                    break  # Exit the loop if interaction is successful
+                except StaleElementReferenceException:
+                    time.sleep(0.5)
+        return new_balance
+
+    def get_locked_balance(self):
+        while True:
+            try:
+                new_balance = self.browser.find_element(*self.locked_balance_text).text[8:-4]
+                break  # Exit the loop if interaction is successful
+            except StaleElementReferenceException:
+                time.sleep(0.5)
+        WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.transfer_tft_title))
+        while('Loadin' in new_balance):
+            self.wait_for(' Locked: ')
+            while True:
+                try:
+                    new_balance = self.browser.find_element(*self.locked_balance_text).text[8:-4]
                     break  # Exit the loop if interaction is successful
                 except StaleElementReferenceException:
                     time.sleep(0.5)
@@ -158,7 +177,7 @@ class BridgePage:
     def get_balance_withdraw(self, balance):
         while True:
             try:
-                new_balance = self.browser.find_element(*self.balance_text).text[:-4]
+                new_balance = self.browser.find_element(*self.balance_text).text[9:-4]
                 break  # Exit the loop if interaction is successful
             except StaleElementReferenceException:
                 time.sleep(0.5)
@@ -168,7 +187,7 @@ class BridgePage:
         while(new_balance==balance):
             while True:
                 try:
-                    new_balance = self.browser.find_element(*self.balance_text).text[:-4]
+                    new_balance = self.browser.find_element(*self.balance_text).text[9:-4]
                     break  # Exit the loop if interaction is successful
                 except StaleElementReferenceException:
                     time.sleep(0.5)
