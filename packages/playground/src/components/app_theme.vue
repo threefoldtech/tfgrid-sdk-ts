@@ -19,8 +19,6 @@ import { LocalStorageSettingsKey, updateThemeInLocalStorage } from "@/utils/sett
 
 const theme = useTheme();
 
-const isLight = ref(false);
-
 const light = computed(() => {
   return theme.global.name.value === "light";
 });
@@ -28,11 +26,10 @@ const light = computed(() => {
 function setTheme(themeName: string) {
   theme.global.name.value = themeName;
   updateThemeInLocalStorage(themeName);
-  isLight.value = themeName === "light";
 }
 
 function changeTheme() {
-  const newTheme = isLight.value ? "dark" : "light";
+  const newTheme = light.value ? "dark" : "light";
   setTheme(newTheme);
 }
 
