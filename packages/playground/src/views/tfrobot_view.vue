@@ -11,7 +11,7 @@
 <script lang="ts">
 import { ProjectName } from "../types";
 import TfDeploymentList from "../weblets/tf_deployment_list.vue";
-import TFRobot from "../weblets/tfrobot.vue";
+import TFRobot from "../weblets/tf_tfrobot.vue";
 
 export default {
   name: "TFRobotView",
