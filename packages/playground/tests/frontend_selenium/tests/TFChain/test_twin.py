@@ -3,6 +3,7 @@ from pages.twin import TwinPage
 from utils.grid_proxy import GridProxy
 from pages.dashboard import DashboardPage
 import pytest
+from utils.base import Base
 
 #  Time required for the run (6 cases) is approximately 3 minutes.
 
@@ -74,24 +75,13 @@ def test_get_tft(browser):
       Result: Assert that it should go to the correct link. 
     """
     twin_page = before_test_setup(browser)
-    # twin_page.get_tft() # Get TFT button was removed from dashboard
-    # assert '/html' in browser.page_source
+    if Base.net in ['test', 'main']:
+        get_tft_url = 'https://manual.grid.tf/documentation/threefold_token/buy_sell_tft/tft_lobstr/tft_lobstr_short_guide.html'
+        assert twin_page.get_tft() == get_tft_url # Get TFT button was removed from dashboard for dev and qa networks.
+        assert '/html' in browser.page_source
     # NO checking as devnet don't direct to TF Connect page https://gettft.com/auth/login?next_url=/gettft/shop/#/buy
-    assert twin_page.press_locked_info() == 'https://manual.grid.tf/documentation/developers/tfchain/tfchain.html#contract-locking'
-
-@pytest.mark.skip(reason="https://github.com/threefoldtech/tfgrid-sdk-ts/issues/3751")
-def test_twin_links(browser):
-    """
-      Test Case: TC1801 - Verify your profile links
-      Steps:
-          - Navigate to dashboard.
-          - Enter Mnemonics, Password and Confirmation password.
-          - Click on Connect.
-          - Navigate to Your Profile page.
-          - Verify Manual and Connect links
-      Result: User should be navigated to the Manuak and Connect pages.
-    """
-    twin_page = before_test_setup(browser)
-    assert twin_page.connect_manual_link() == 'https://www.manual.grid.tf/documentation/threefold_token/storing_tft/tf_connect_app.html'
-    assert twin_page.get_connect_google_link() == 'https://play.google.com/store/apps/details?id=org.jimber.threebotlogin&hl=en&gl=US'
-    assert twin_page.get_connect_apple_link() == 'https://apps.apple.com/us/app/threefold-connect/id1459845885'
+    if Base.net in ['dev', 'local']:
+        locked_info = 'https://www.manual.grid.tf/documentation/developers/tfchain/tfchain.html#contract-locking'
+    else:
+        locked_info = 'https://manual.grid.tf/documentation/developers/tfchain/tfchain.html#contract-locking'
+    assert twin_page.press_locked_info() == locked_info

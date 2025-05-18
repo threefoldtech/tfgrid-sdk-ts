@@ -63,10 +63,7 @@ class GridProxy:
         return details
 
     def get_stats_capicity(self):
-        if Base.net == 'main':
-            stats_url = 'https://stats.grid.tf/api/stats-summary'
-        else:
-            stats_url = 'https://stats.' + Base.net + '.grid.tf/api/stats-summary'
+        stats_url = Base.stats_url + 'api/stats-summary'
         r = requests.post(stats_url, timeout=10)
         stats_json = r.json()
         return list(stats_json.values())[1::] #Avoid selecting HDD capacity; as its not shown in the dashboard anymore.

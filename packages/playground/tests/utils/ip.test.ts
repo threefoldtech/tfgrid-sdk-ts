@@ -4,19 +4,19 @@ import { ipToLong, longToIp } from "../../src/utils/ip";
 
 describe("ipToLong", () => {
   it('should convert IPv4 "0.0.0.0" to 0', () => {
-    expect(ipToLong("0.0.0.0")).toBe(0);
+    expect(ipToLong("0.0.0.0")).toBe(0n);
   });
 
   it('should convert IPv4 "255.255.255.255" to 4294967295', () => {
-    expect(ipToLong("255.255.255.255")).toBe(4294967295);
+    expect(ipToLong("255.255.255.255")).toBe(4294967295n);
   });
 
   it('should convert IPv4 "192.168.1.1" to 3232235777', () => {
-    expect(ipToLong("192.168.1.1")).toBe(3232235777);
+    expect(ipToLong("192.168.1.1")).toBe(3232235777n);
   });
 
   it('should convert IPv4 "127.0.0.1" to 2130706433', () => {
-    expect(ipToLong("127.0.0.1")).toBe(2130706433);
+    expect(ipToLong("127.0.0.1")).toBe(2130706433n);
   });
 
   it("should handle invalid input gracefully", () => {

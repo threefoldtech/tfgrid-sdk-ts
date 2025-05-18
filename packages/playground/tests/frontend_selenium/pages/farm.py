@@ -4,6 +4,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+import pyperclip
 
 class FarmPage:
 
@@ -40,9 +41,10 @@ class FarmPage:
     zero = (By.XPATH,'//html/body/main/div[1]/div/h1')
     table_farm_name=(By.XPATH, '//*[@id="app"]/div[1]/div[2]/div/div[1]/div[4]/div[1]/table/tbody/tr[1]/td[3]')
     stellar_payout_address = (By.XPATH, '//table/tbody/tr[2]/td/div[1]/div/div/div[3]/div/div/div[1]/div[2]/p')
+    stellar_payout_address_copy = (By.XPATH, "//i[contains(@class, 'mdi-content-copy') and contains(@class, 'v-icon--clickable')]")
     dedicated = (By.XPATH, '//table/tbody/tr[2]/td/div[1]/div/div/div[3]/div/div/div[2]/div[2]/p')
     pricing_policy = (By.XPATH, '//table/tbody/tr[2]/td/div[1]/div/div/div[3]/div/div/div[3]/div[2]/p')
-    ip_dropdown = (By.XPATH, "(//i[contains(@class, 'mdi-menu-down')])[3]")
+    ip_dropdown = (By.XPATH, "(//i[contains(@class, 'mdi-menu-down')])[4]")
     range_selection = (By.XPATH, "//div[@class='v-list-item-title'][text()='Range']")
     from_ip_input = (By.XPATH, "//label[text()='From IP']/following-sibling::input") 
     to_ip_input = (By.XPATH, "//label[text()='To IP']/following-sibling::input")
@@ -80,7 +82,7 @@ class FarmPage:
             self.browser.find_element(*self.farm_name_text_field).send_keys(char)
 
     def search_functionality(self, farm_name):
-        tries = 3
+        tries = 5
         table = 'No data available'
         while('No data available' in table and tries > 0):
             sleep(5)
@@ -318,10 +320,9 @@ class FarmPage:
         self.setup_farmpayout_address(farm_name)
         WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located((By.XPATH, self.farm_public_ips)))
         for i in range(len(self.browser.find_elements(By.XPATH, self.farm_public_ips))):
-           if(self.browser.find_element(By.XPATH,  f"{self.farm_public_ips}[{str(i+1)}]/td[2]").text == ip):
-                if(self.browser.find_element(By.XPATH,  f"{self.farm_public_ips}[{str(i+1)}]/td[3]").text == gateway):
-                    #WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located((By.XPATH,  f"{self.farm_public_ips}[{str(i+1)}]/td[1]/div/div/div/div/div/input")))
-                    self.browser.find_element(By.XPATH,  f"{self.farm_public_ips}[{str(i+1)}]/td[1]/div/div/div/div/div/input").click()
+            if self.browser.find_element(By.XPATH, f"{self.farm_public_ips}[{str(i+1)}]/td[2]").text == ip:
+                if self.browser.find_element(By.XPATH, f"{self.farm_public_ips}[{str(i+1)}]/td[4]").text == gateway:
+                    self.browser.find_element(By.XPATH, f"{self.farm_public_ips}[{str(i+1)}]/td[1]/div/div/div/input").click()
                     WebDriverWait(self.browser, 30).until(EC.element_to_be_clickable(self.delete_button))
                     self.browser.find_element(*self.delete_button).click()
                     WebDriverWait(self.browser, 30).until(EC.element_to_be_clickable(self.confirm_button))
@@ -336,19 +337,32 @@ class FarmPage:
             gateway_len = len(self.browser.find_elements(By.XPATH, "//td[contains(@class, 'v-data-table__td') and contains(@class, 'v-data-table-column--align-center') and text()='"+ gateway +"']"))
         return ip_len, gateway_len
     
-    def farm_detials(self):
+    def farm_details(self, farm_name):
+        self.search_functionality(farm_name)
+        self.wait_for_farm_name(farm_name)
+        WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.details_arrow))
+        WebDriverWait(self.browser, 30).until(EC.element_to_be_clickable(self.details_arrow))
+        WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located((By.XPATH, "//span[contains(@class, 'v-btn__content')]/i[contains(@class, 'mdi-chevron-down')]")))
+        self.browser.find_element(*self.details_arrow).click()
+        sleep(10)
         details = []
         details.append(self.browser.find_element(By.XPATH,  f"{self.node_expand_details}[1]").text) # Farm ID
         details.append(self.browser.find_element(By.XPATH,  f"{self.node_expand_details}[2]").text) # Farm Name
         details.append(self.browser.find_element(By.XPATH,  f"{self.node_expand_details}[3]").text) # Linked Twin ID
         details.append(self.browser.find_element(By.XPATH,  f"{self.node_expand_details}[4]").text) # Certification Type
-        details.append(self.browser.find_element(*self.stellar_payout_address).text) # Stellar Address
+        # details.append(self.browser.find_element(*self.stellar_payout_address).text) # Stellar Address
+        WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.stellar_payout_address_copy))
+        WebDriverWait(self.browser, 30).until(EC.element_to_be_clickable(self.stellar_payout_address_copy))
+        self.browser.find_element(*self.stellar_payout_address_copy).click()
+        sleep(1)
+        copied_value = pyperclip.paste()
+        details.append(copied_value)
         details.append(True if self.browser.find_element(*self.dedicated).text != "No" else False) # Dedicated
         details.append(self.browser.find_element(*self.pricing_policy).text) # Pricing Policy
         for i in range(len(self.browser.find_elements(By.XPATH, self.farm_public_ips))):
             details.append(self.browser.find_element(By.XPATH,  f"{self.farm_public_ips}[{str(i+1)}]/td[2]").text) # IP
-            details.append(self.browser.find_element(By.XPATH,  f"{self.farm_public_ips}[{str(i+1)}]/td[4]").text) # Deployed Contract ID
-            details.append(self.browser.find_element(By.XPATH,  f"{self.farm_public_ips}[{str(i+1)}]/td[3]").text) # Gateway
+            details.append(self.browser.find_element(By.XPATH,  f"{self.farm_public_ips}[{str(i+1)}]/td[5]").text) # Deployed Contract ID
+            details.append(self.browser.find_element(By.XPATH,  f"{self.farm_public_ips}[{str(i+1)}]/td[4]").text) # Gateway
         return details
 
     def verify_the_availability_of_zero_os_bootstrap(self):
@@ -379,5 +393,5 @@ class FarmPage:
         return button
 
     def wait_for(self, keyword):
-        WebDriverWait(self.browser, 60).until(EC.visibility_of_element_located((By.XPATH, "//*[contains(text(), '"+ keyword +"')]")))
+        WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located((By.XPATH, "//*[contains(text(), '"+ keyword +"')]")))
         return True
