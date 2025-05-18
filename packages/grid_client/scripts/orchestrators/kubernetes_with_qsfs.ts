@@ -143,8 +143,8 @@ async function main() {
   await getDeployment(grid3, name);
 
   // //Uncomment the line below to cancel the deployment
-  // await cancel(grid3, k.name);
-  // await deleteQsfs(grid3, qsfs_name);
+  // await cancel(grid3, { name: `<<Replace with deployment name>>` });
+  // await cancel(grid3, { qsfs_name: `<<Replace with QSFS name>>` });
 
   await grid3.disconnect();
 }

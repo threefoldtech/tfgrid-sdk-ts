@@ -83,7 +83,7 @@ async function main() {
   await getDeployment(grid3, name);
 
   //Uncomment the line below to cancel the deployment
-  // await cancel(grid3, { name });
+  // await cancel(grid3, { name: `<<Replace with deployment name>>` });
 
   await grid3.disconnect();
 }

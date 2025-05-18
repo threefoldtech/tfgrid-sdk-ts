@@ -47,7 +47,7 @@ async function main() {
   await getDeployment(grid3, gw.name);
 
   //Uncomment the line below to cancel the deployment
-  // await cancel(grid3, { name: gw.name });
+  // await cancel(grid3, { name: `<<Replace with gateway name>>` });
 
   grid3.disconnect();
 }

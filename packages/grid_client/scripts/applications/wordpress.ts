@@ -117,7 +117,7 @@ async function main() {
   await getDeployment(grid3, vms, subdomain);
 
   //Uncomment the line below to cancel the deployment
-  // await cancel(grid3, { name }, { name: subdomain });
+  // await cancel(grid3, { name: `<<Replace with deployment name>>` }, { name: `<<Replace with subdomain>>` });
 
   await grid3.disconnect();
 }
