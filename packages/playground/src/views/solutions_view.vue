@@ -101,13 +101,13 @@ export default {
         icon: "peertube.png",
         route: DashboardRoutes.Applications.Peertube,
       },
-      {
-        title: "Funkwhale",
-        excerpt:
-          "Funkwhale is social platform to enjoy and share music. Funkwhale is a community-driven project that lets you listen and share music and audio within a decentralized, open network.",
-        icon: "funkwhale.png",
-        route: DashboardRoutes.Applications.Funkwhale,
-      },
+      // {
+      //   title: "Funkwhale",
+      //   excerpt:
+      //     "Funkwhale is social platform to enjoy and share music. Funkwhale is a community-driven project that lets you listen and share music and audio within a decentralized, open network.",
+      //   icon: "funkwhale.png",
+      //   route: DashboardRoutes.Applications.Funkwhale,
+      // },
       {
         title: "Mattermost",
         excerpt:

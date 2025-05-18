@@ -103,29 +103,29 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
         publicPath: false,
       },
     },
-    {
-      path: DashboardRoutes.Applications.Funkwhale,
-      component: () => import("../views/funkwhale_view.vue"),
-      meta: {
-        title: "Funkwhale",
-        info: { page: "info/funkwhale.md" },
-        navbarConfig: {
-          back: true,
-          path: [
-            { title: "Deploy" },
-            {
-              title: "Labs",
-              disabled: false,
-              to: DashboardRoutes.Deploy.Applications,
-            },
-            {
-              title: "Funkwhale",
-            },
-          ],
-        },
-        publicPath: false,
-      },
-    },
+    // {
+    //   path: DashboardRoutes.Applications.Funkwhale,
+    //   component: () => import("../views/funkwhale_view.vue"),
+    //   meta: {
+    //     title: "Funkwhale",
+    //     info: { page: "info/funkwhale.md" },
+    //     navbarConfig: {
+    //       back: true,
+    //       path: [
+    //         { title: "Deploy" },
+    //         {
+    //           title: "Labs",
+    //           disabled: false,
+    //           to: DashboardRoutes.Deploy.Applications,
+    //         },
+    //         {
+    //           title: "Funkwhale",
+    //         },
+    //       ],
+    //     },
+    //     publicPath: false,
+    //   },
+    // },
     {
       path: DashboardRoutes.Applications.Mattermost,
       component: () => import("../views/mattermost_view.vue"),
