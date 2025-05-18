@@ -10,8 +10,8 @@
 
 <script lang="ts">
 import { ProjectName } from "../types";
-import TfFreeflow from "../weblets/freeflow.vue";
 import TfDeploymentList from "../weblets/tf_deployment_list.vue";
+import TfFreeflow from "../weblets/tf_freeflow.vue";
 
 export default {
   name: "Freeflow",
