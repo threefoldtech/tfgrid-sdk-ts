@@ -455,7 +455,6 @@ class Contracts extends QueryContracts {
     }
     const extrinsic = await this.client.api.tx.smartContractModule.cancelContract(options.id);
     return this.client.patchExtrinsic(extrinsic, {
-      map: () => options.id,
       resultEvents: ["NodeContractCanceled", "NameContractCanceled", "RentContractCanceled", "ContractCanceled"],
     });
   }

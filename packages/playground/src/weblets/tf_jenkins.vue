@@ -4,59 +4,81 @@
     :cpu="solution?.cpu"
     :memory="solution?.memory"
     :disk="solution?.disk"
-    :certified="certified"
+    :ipv4="ipv4"
     :dedicated="dedicated"
     :rentedBy="rentedBy"
-    :ipv4="ipv4"
     :SelectedNode="selectionDetails?.node"
     :valid-filters="selectionDetails?.validFilters"
-    title-image="images/icons/freeflow.png"
+    title-image="images/icons/jenkins.png"
   >
-    <template #title>Deploy a Freeflow Instance </template>
-
+    <template #title>Deploy a Jenkins Instance </template>
     <d-tabs :tabs="[{ title: 'Config', value: 'config' }]">
       <input-validator
-        :value="threebotName"
+        :value="name"
         :rules="[
           validators.required('Name is required.'),
           validators.IsAlphanumericExpectUnderscore('Name should consist of letters ,numbers and underscores only.'),
-          validators.minLength('Name must be at least 4 characters.', 4),
+          (name: string) => validators.isAlpha('Name must start with an alphabetical character.')(name[0]),
+          validators.minLength('Name must be at least 2 characters.', 2),
           validators.maxLength('Name cannot exceed 15 characters.', 15),
         ]"
         #="{ props }"
       >
-        <input-tooltip
-          tooltip="
-          To locate your 3Bot name, please follow these steps:
-          
-          1. Open the ThreeFold Connect app on your device.
-          2. Access the app's settings section.
-          3. Within the settings, you will find your registered 3Bot name.
-
-          Please note that your 3Bot name is the name you provided during the registration process in the ThreeFold Connect app. Should you encounter any difficulties or have further questions, please don't hesitate to reach out for assistance.
-          "
-        >
-          <v-text-field label="3bot name" v-model="threebotName" v-bind="props" />
+        <input-tooltip tooltip="Instance name.">
+          <v-text-field label="Name" v-model="name" v-bind="props" />
         </input-tooltip>
       </input-validator>
+      <input-validator
+        :value="username"
+        :rules="[
+          validators.required('Username is required.'),
+          validators.isLowercase('Username should consist of lowercase letters only.'),
+          validators.isAlphanumeric('Username should consist of letters and numbers only.'),
+          (username: string) => validators.isAlpha('Username must start with an alphabetical character.')(username[0]),
+          validators.minLength('Username must be at least 2 characters.', 2),
+          validators.maxLength('Username cannot exceed 50 characters.', 50),
+        ]"
+        #="{ props }"
+      >
+        <input-tooltip tooltip="Jenkins admin username.">
+          <v-text-field label="Username" v-model="username" v-bind="props" />
+        </input-tooltip>
+      </input-validator>
+      <password-input-wrapper #="{ props }">
+        <input-validator
+          :value="password"
+          :rules="[
+            validators.required('Password is required.'),
+            validators.minLength('Password must be at least 6 characters.', 6),
+            validators.maxLength('Password cannot exceed 15 characters.', 15),
+            validators.pattern('Password should not contain whitespaces.', {
+              pattern: /^[^\s]+$/,
+            }),
+          ]"
+          #="{ props: validatorProps }"
+        >
+          <input-tooltip tooltip="Jenkins admin password.">
+            <v-text-field label="Password" v-model="password" v-bind="{ ...props, ...validatorProps }" />
+          </input-tooltip>
+        </input-validator>
+      </password-input-wrapper>
 
       <SelectSolutionFlavor
+        :small="{ cpu: 2, memory: 4, disk: 50 }"
+        :medium="{ cpu: 4, memory: 8, disk: 500 }"
+        :large="{ cpu: 4, memory: 16, disk: 1000 }"
         v-model="solution"
-        :small="{ cpu: 1, memory: 4, disk: 100 }"
-        :medium="{ cpu: 2, memory: 16, disk: 500 }"
-        :large="{ cpu: 4, memory: 32, disk: 1000 }"
       />
-
       <Networks
-        required
         v-model:ipv4="ipv4"
-        v-model:ipv6="ipv6"
         v-model:planetary="planetary"
         v-model:mycelium="mycelium"
+        v-model:ipv6="ipv6"
         v-model:wireguard="wireguard"
         :has-custom-domain="selectionDetails?.domain?.enabledCustomDomain"
         require-domain
       />
+
       <!-- <input-tooltip inline tooltip="" :href="manual"> -->
       <v-switch color="primary" inset label="Rented By Me" v-model="rentedByMe" hide-details />
       <!-- </input-tooltip> -->
@@ -79,7 +101,6 @@
           solutionDisk: solution?.disk,
           memory: solution?.memory,
           rootFilesystemSize,
-          ssdDisks: disks.map(d => d.size),
           planetary,
           mycelium,
           wireguard,
@@ -92,72 +113,70 @@
     </d-tabs>
 
     <template #footer-actions="{ validateBeforeDeploy }">
-      <v-btn color="secondary" @click="validateBeforeDeploy(deploy)" text="Deploy" />
+      <v-btn
+        variant="elevated"
+        class="text-primery px-10 py-3 h-auto text-subtitle-1"
+        @click="validateBeforeDeploy(deploy)"
+        text="Deploy"
+      />
     </template>
   </weblet-layout>
 </template>
 
 <script lang="ts" setup>
-import { calculateRootFileSystem, type GridClient } from "@threefold/grid_client";
-import { computed, onMounted, type Ref, ref } from "vue";
+import { calculateRootFileSystem, FLISTS, type GridClient } from "@threefold/grid_client";
+import { computed, type Ref, ref } from "vue";
 
 import { manual } from "@/utils/manual";
 
 import { useLayout } from "../components/weblet_layout.vue";
-import { useGrid } from "../stores";
+import { useGrid, useProfileManager } from "../stores";
 import type { Flist, solutionFlavor as SolutionFlavor } from "../types";
 import { ProjectName } from "../types";
-import { deployVM, type Disk } from "../utils/deploy_vm";
-import { deployGatewayName, rollbackDeployment } from "../utils/gateway";
+import { deployVM } from "../utils/deploy_vm";
+import { deployGatewayName, getSubdomain, rollbackDeployment } from "../utils/gateway";
 import { normalizeError } from "../utils/helpers";
-
+import { generateName, generatePassword } from "../utils/strings";
 const layout = useLayout();
+const profileManager = useProfileManager();
 
-const selectionDetails = ref<SelectionDetails>();
-const threebotName = ref<string>("");
+const name = ref(generateName({ prefix: "jk" }));
+const username = ref("admin");
+const password = ref(generatePassword(12));
 const solution = ref() as Ref<SolutionFlavor>;
-const flist = ref<Flist>();
-const disks = ref<Disk[]>([]);
-const dedicated = ref(false);
-const rentedByMe = ref(false);
-const rentedBy = computed(() => (rentedByMe.value ? grid.twinId : undefined));
-
-const certified = ref(false);
-const { ipv4, ipv6, wireguard, planetary, mycelium } = useNetworks();
 const rootFilesystemSize = computed(() =>
   calculateRootFileSystem({ CPUCores: solution.value?.cpu ?? 0, RAMInMegaBytes: solution.value?.memory ?? 0 }),
 );
-const selectedSSHKeys = ref("");
+const flist: Flist = FLISTS.JENKINS;
+const dedicated = ref(false);
+const rentedByMe = ref(false);
+const rentedBy = computed(() => (rentedByMe.value ? grid.twinId : undefined));
+const certified = ref(false);
+const { ipv4, ipv6, mycelium, planetary, wireguard } = useNetworks();
+const selectionDetails = ref<SelectionDetails>();
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
-
-onMounted(() => {
-  disks.value.push({
-    name: "disk",
-    size: solution?.value?.disk,
-    mountPoint: "/disk",
-  });
-
-  flist.value = {
-    value: "https://hub.grid.tf/lennertapp2.3bot/threefoldjimber-freeflow-latest.flist",
-    entryPoint: "/sbin/zinit init",
-  };
-});
+const selectedSSHKeys = ref("");
 
 function finalize(deployment: any) {
   layout.value.reloadDeploymentsList();
-  layout.value.setStatus("success", "Successfully deployed a Freeflow instance.");
-  layout.value.openDialog(deployment, deploymentListEnvironments.freeflow);
+  layout.value.setStatus("success", "Successfully deployed a Jenkins instance.");
+  layout.value.openDialog(deployment, deploymentListEnvironments.jenkins);
 }
-
 async function deploy() {
   layout.value.setStatus("deploy");
 
-  const projectName = ProjectName.FreeFlow.toLowerCase() + "/" + threebotName.value;
+  const projectName = ProjectName.Jenkins.toLowerCase() + "/" + name.value;
 
-  const domain = selectionDetails.value!.domain!.enabledCustomDomain
-    ? selectionDetails.value!.domain!.customDomain
-    : threebotName.value + "." + selectionDetails.value!.domain!.selectedDomain!.publicConfig.domain;
+  const subdomain = getSubdomain({
+    deploymentName: name.value,
+    projectName,
+    twinId: profileManager.profile!.twinId,
+  });
+
+  const domain = selectionDetails.value?.domain?.enabledCustomDomain
+    ? selectionDetails.value.domain.customDomain
+    : subdomain + "." + selectionDetails.value?.domain?.selectedDomain?.publicConfig.domain;
 
   let vm: any;
 
@@ -168,28 +187,33 @@ async function deploy() {
     await layout.value.validateBalance(grid!);
 
     vm = await deployVM(grid!, {
-      name: threebotName.value,
+      name: name.value,
       network: {
         addAccess: wireguard.value || selectionDetails.value!.domain!.enableSelectedDomain,
-        accessNodeId: selectionDetails.value!.domain!.selectedDomain?.nodeId,
+        accessNodeId: selectionDetails.value?.domain?.selectedDomain?.nodeId,
       },
       machines: [
         {
-          name: threebotName.value,
+          name: name.value,
           cpu: solution.value.cpu,
           memory: solution.value.memory,
-          disks: disks.value,
-          flist: flist?.value!.value,
-          entryPoint: flist.value!.entryPoint,
+          disks: [
+            {
+              size: solution.value.disk,
+              mountPoint: "/data",
+            },
+          ],
+          flist: flist.value,
+          entryPoint: flist.entryPoint,
           publicIpv4: ipv4.value,
           publicIpv6: ipv6.value,
-          planetary: planetary.value,
           mycelium: mycelium.value,
+          planetary: planetary.value,
           envs: [
             { key: "SSH_KEY", value: selectedSSHKeys.value },
-            { key: "USER_ID", value: threebotName.value },
-            { key: "DIGITALTWIN_APPID", value: domain },
-            { key: "NODE_ENV", value: "staging" },
+            { key: "JENKINS_HOSTNAME", value: domain },
+            { key: "JENKINS_ADMIN_USERNAME", value: username.value },
+            { key: "JENKINS_ADMIN_PASSWORD", value: password.value },
           ],
           nodeId: selectionDetails.value!.node!.nodeId,
           rentedBy: rentedBy.value,
@@ -199,9 +223,8 @@ async function deploy() {
       ],
     });
   } catch (e) {
-    return layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Freeflow instance."));
+    return layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Jenkins instance."));
   }
-
   if (!selectionDetails.value?.domain?.enableSelectedDomain) {
     vm[0].customDomain = selectionDetails.value?.domain?.customDomain;
     finalize(vm);
@@ -212,7 +235,7 @@ async function deploy() {
     layout.value.setStatus("deploy", "Preparing to deploy gateway...");
 
     await deployGatewayName(grid, selectionDetails.value.domain, {
-      subdomain: threebotName.value,
+      subdomain,
       ip: vm[0].interfaces[0].ip,
       port: 80,
       network: vm[0].interfaces[0].network,
@@ -220,10 +243,10 @@ async function deploy() {
 
     finalize(vm);
   } catch (e) {
-    layout.value.setStatus("deploy", "Rollbacking back due to fail to deploy gateway...");
+    layout.value.setStatus("deploy", "Rolling back due to failure to deploy the gateway...");
 
-    await rollbackDeployment(grid!, threebotName.value);
-    layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Freeflow instance."));
+    await rollbackDeployment(grid!, name.value);
+    layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Jenkins instance."));
   }
 }
 
@@ -241,7 +264,7 @@ import type { SelectionDetails } from "../types/nodeSelector";
 import { updateGrid } from "../utils/grid";
 
 export default {
-  name: "TFFreeflow",
-  components: { SelectSolutionFlavor, Networks, ManageSshDeployemnt },
+  name: "Jenkins",
+  components: { SelectSolutionFlavor, Networks },
 };
 </script>

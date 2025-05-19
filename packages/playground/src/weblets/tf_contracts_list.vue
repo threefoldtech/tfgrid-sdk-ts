@@ -79,7 +79,7 @@
       </v-row>
     </template>
     <template #text>
-      <strong v-if="totalCost != undefined" class="text-primary">
+      <strong v-if="totalCost !== undefined" class="text-primary">
         <input-tooltip
           inline
           :alignCenter="true"
@@ -88,7 +88,7 @@
           {{ totalCost }} TFT/hour ≈ {{ totalCost === 0 ? 0 : (totalCost * 24 * 30).toFixed(3) }} TFT/month
         </input-tooltip>
       </strong>
-      <small v-else> loading total cost... </small>
+      <small v-else> loading total cost...</small>
     </template>
   </v-card>
   <!-- locked amount Dialog -->
@@ -236,7 +236,6 @@
 import type { ContractsOverdue, GridClient } from "@threefold/grid_client";
 import { type Contract, ContractState, NodeStatus, SortByContracts, SortOrder } from "@threefold/gridproxy_client";
 import { DeploymentKeyDeletionError } from "@threefold/types";
-import { Decimal } from "decimal.js";
 import { computed, defineComponent, onMounted, type Ref, ref } from "vue";
 
 import ContractsTable from "@/components/contracts_list/contracts_table.vue";
@@ -293,8 +292,9 @@ const nodeIDs = computed(() => {
 });
 // To avoid multiple requests
 const cachedNodeIDs = ref<number[]>([]);
-
-onMounted(loadContracts);
+onMounted(() => {
+  loadContracts();
+});
 
 async function _normalizeContracts(
   contracts: Contract[],
@@ -348,8 +348,10 @@ async function loadContractsByType(
 }
 
 async function loadContracts(type?: ContractType, options?: { sort: { key: string; order: "asc" | "desc" }[] }) {
-  lockedContracts.value = undefined;
-  totalCost.value = undefined;
+  if (!type) {
+    lockedContracts.value = undefined;
+    totalCost.value = undefined;
+  }
   totalCostUSD.value = undefined;
   loadingErrorMessage.value = undefined;
   loadingTablesMessage.value = undefined;
@@ -384,9 +386,7 @@ async function loadContracts(type?: ContractType, options?: { sort: { key: strin
       }: ${failedContracts.value.join(", ")}.`;
     await getContractsLockDetails();
     contracts.value = [...nodeContracts.value, ...nameContracts.value, ...rentContracts.value];
-
-    // Update the total cost of the contracts.
-    await getTotalCost();
+    if (!type) await getTotalCost();
     // Get the node info e.g. node status.
     nodeInfo.value = await getNodeInfo(nodeIDs.value, cachedNodeIDs.value);
     cachedNodeIDs.value.push(...nodeIDs.value);
@@ -465,12 +465,16 @@ const nodeStatus = computed(() => {
 // Calculate the total cost of contracts
 async function getTotalCost() {
   totalCost.value = 0;
-  for (const contract of contracts.value) {
-    totalCost.value = +new Decimal(totalCost.value).add(contract.consumption?.valueOf() || 0);
+
+  try {
+    const res = await gridProxyClient.twins.getConsumption(profileManager.profile!.twinId);
+    totalCost.value = +res.last_hour_consumption.toFixed(3);
+    const tftPrice = await queryClient.tftPrice.get();
+    totalCostUSD.value = totalCost.value * (tftPrice / 1000);
+  } catch (error: any) {
+    loadingErrorMessage.value = `Error calculating total cost: ${error.message}`;
+    createCustomToast(loadingErrorMessage.value, ToastType.danger, {});
   }
-  totalCost.value = +totalCost.value.toFixed(3);
-  const TFTInUSD = await queryClient.tftPrice.get();
-  totalCostUSD.value = totalCost.value * (TFTInUSD / 1000);
 }
 
 // Handle updates when contracts are deleted
@@ -495,9 +499,7 @@ async function onDeletedContracts(_contracts: NormalizedContract[]) {
     loadContracts();
     loadingTablesMessage.value = undefined;
   }, 30000);
-  await getTotalCost();
   contracts.value = [...rentContracts.value, ...nameContracts.value, ...nodeContracts.value];
-  totalCost.value = undefined;
 }
 async function getContractsLockDetails() {
   lockedContracts.value = await grid.contracts.getTotalOverdue();
@@ -507,14 +509,12 @@ async function getContractsLockDetails() {
 const baseTableHeaders: VDataTableHeader = [
   { title: "PLACEHOLDER", key: "data-table-select" },
   { title: "ID", key: "contract_id", sortable: true },
-  { title: "State", key: "state", sortable: false },
-  { title: "Billing Rate", key: "consumption", sortable: false },
-  { title: "Created At", key: "created_at", sortable: true },
 ];
 
 // Define specific table headers for each contract type
 const nodeTableHeaders: VDataTableHeader = [
   ...baseTableHeaders,
+  { title: "Workload Type", key: "deploymentType", sortable: false },
   {
     title: "Solution",
     key: "solution",
@@ -524,7 +524,9 @@ const nodeTableHeaders: VDataTableHeader = [
       { title: "Name", key: "solutionName", sortable: false },
     ],
   },
-  { title: "Type", key: "deploymentType", sortable: false },
+  { title: "State", key: "state", sortable: false },
+  { title: "Billing Rate", key: "consumption", sortable: false },
+  { title: "Created At", key: "created_at", sortable: true },
   { title: "Expiration", key: "expiration", sortable: false },
   { title: "Farm ID", key: "farm_id", sortable: false },
   {
@@ -542,12 +544,18 @@ const nodeTableHeaders: VDataTableHeader = [
 const nameTableHeaders: VDataTableHeader = [
   ...baseTableHeaders,
   { title: "Solution Name", key: "solutionName", sortable: false },
+  { title: "State", key: "state", sortable: false },
+  { title: "Billing Rate", key: "consumption", sortable: false },
+  { title: "Created At", key: "created_at", sortable: true },
   { title: "Expiration", key: "expiration", sortable: false },
   { title: "Details", key: "actions", sortable: false },
 ];
 
 const RentTableHeaders: VDataTableHeader = [
   ...baseTableHeaders,
+  { title: "State", key: "state", sortable: false },
+  { title: "Billing Rate", key: "consumption", sortable: false },
+  { title: "Created At", key: "created_at", sortable: true },
   { title: "Farm ID", key: "farm_id", sortable: false },
   {
     title: "Node",

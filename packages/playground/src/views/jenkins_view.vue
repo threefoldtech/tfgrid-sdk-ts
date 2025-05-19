@@ -10,8 +10,8 @@
 
 <script lang="ts">
 import { ProjectName } from "../types";
-import Jenkins from "../weblets/jenkins.vue";
 import TfDeploymentList from "../weblets/tf_deployment_list.vue";
+import Jenkins from "../weblets/tf_jenkins.vue";
 
 export default {
   name: "JenkinsView",

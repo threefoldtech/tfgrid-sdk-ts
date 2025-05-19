@@ -28,6 +28,11 @@ There are two ways to run the Automation selenium tests:
   yarn lerna run build
   make run project=playground
   ```
+If the build fails due to a memory issue, please use the following command
+
+```bash
+export NODE_OPTIONS="--max-old-space-size=8192"
+```
 
 - You need to leave the localhost running and open a new terminal.
 
@@ -35,7 +40,7 @@ There are two ways to run the Automation selenium tests:
 
 #### update the config files to point to the target environment
 
-- Update the env url and some other variables directly in these files config.ini and base.py
+- Update the env url and some other variables directly in these files config.ini
 - Ex.: to run against Mainnet
 
   - config.ini
@@ -43,12 +48,6 @@ There are two ways to run the Automation selenium tests:
     ```ini
     [Base]
     net = main
-    ```
-
-  - base.py
-
-    ```python
-    base_url = "https://dashboard.grid.tf/"
     ```
 
 ### Setup environment configurations
@@ -66,17 +65,31 @@ There are two ways to run the Automation selenium tests:
 
 ### Prepare tests requirements
 
-- Change directory to frontend selenium by running `cd packages/playground/tests/frontend_selenium/` in the command line.
-- Install the recommended version of the pip package listed above for a stable run, or you can just install Python 3 and use the command:
+- Change directory to frontend selenium by running
+  `cd packages/playground/tests/frontend_selenium/`
+
+- (Not Recommended) Install the recommended version of the pip package listed above for a stable run, or you can just install Python 3 and use the command:
   - `pip install -r requirements.txt --break-system-packages` (Use this if you don't use any of the listed packages).
-  - Or use Virtual Environments: First, create an environment using `python -m venv myenv`, then activate it using `source myenv/bin/activate`, and finally, install packages using `pip install -r requirements.txt`.
-- You'll also need to install `Xvfb`, Run `sudo apt install xvfb`.
-- You can run selenium tests with pytest through the command line using `python3 -m pytest -v`.
+- (Recommended) Or use Virtual Environments: 
+  - create an environment using 
+      `python -m venv myenv`
+  - activate it using
+      `source myenv/bin/activate`
+  - install packages using
+      `pip install -r requirements.txt`.
+- You'll also need to install `Xvfb`, Run:
+      `sudo apt install xvfb`.
+- You can run selenium tests with pytest through the command line using:
+      `python3 -m pytest -v`.
 
 ### More options to run tests
 
 - If you want to run the tests visually to see how they are running, you need to comment out the lines `16` and `34` in the [conftest.py](../frontend_selenium/tests/conftest.py).
-- You can also run single test file through the command line using `python3 -m pytest -v tests/file/test_file.py`.
-- You can also run specific test cases through the command line using `python3 -m pytest -v tests/file/test_file.py::test_func`.
-- You can also run collection of test cases through the command line using `python3 -m pytest -v -k 'test_func or test_func'`.
-- You can also run all the tests and get an HTML report using [pytest-html](https://pypi.org/project/pytest-html/) package through the command line using `python3 -m pytest -v --html=report.html`.
+- You can also run single test file through the command line using:
+  `python3 -m pytest -v tests/file/test_file.py`.
+- You can also run specific test cases through the command line using:
+  `python3 -m pytest -v tests/file/test_file.py::test_func`.
+- You can also run collection of test cases through the command line using:
+  `python3 -m pytest -v -k 'test_func or test_func'`.
+- You can also run all the tests and get an HTML report using [pytest-html](https://pypi.org/project/pytest-html/) package through the command line using:
+  `python3 -m pytest -v --html=report.html`.

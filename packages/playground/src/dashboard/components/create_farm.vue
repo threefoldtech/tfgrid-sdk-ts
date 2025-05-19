@@ -1,8 +1,8 @@
 <template>
   <VAlert type="info" v-if="network == 'main'" class="my-2"
     >To create a Farm, use the
-    <a :href="manual.tf_connect_installation" class="app-link" target="_blank">TF Connect App</a>.</VAlert
-  >
+    <a :href="manual.tf_connect_installation" class="app-link" target="_blank">TF Connect App</a>.
+  </VAlert>
   <v-container>
     <v-row class="text-center flex justify-center mt-4">
       <v-btn
@@ -32,14 +32,14 @@
               <input-validator
                 :value="farmName"
                 :rules="[
-                  validators.required('Farm name is required.'),
-                  (farmName: string) => validators.isAlpha('Farm name must start with an alphabet char.')(farmName[0]),
-                  validators.minLength('Farm name minimum length is 3 chars.', 3),
-                  validators.maxLength('Farm name maximum length is 40 chars.', 40),
-                  validators.pattern('Farm name should not contain whitespaces.', {
-                    pattern: /^[^\s]+$/,
-                  }),
-                ]"
+                validators.required('Farm name is required.'),
+                (farmName: string) => validators.isAlpha('Farm name must start with an alphabet char.')(farmName[0]),
+                validators.minLength('Farm name minimum length is 3 chars.', 3),
+                validators.maxLength('Farm name maximum length is 40 chars.', 40),
+                validators.pattern('Farm name should not contain whitespaces.', {
+                  pattern: /^[^\s]+$/,
+                }),
+              ]"
                 :async-rules="[validateFarmName]"
                 #="{ props }"
               >
@@ -49,7 +49,19 @@
           </v-card-text>
           <v-card-actions class="justify-end my-1 mr-2">
             <v-btn color="anchor" @click="showDialogue = false">Close</v-btn>
-            <v-btn @click="createFarm" :loading="isCreating" :disabled="!valid || isCreating">Create</v-btn>
+            <v-tooltip
+              text="A minimum of 2 TFTs is required to create a farm."
+              location="top"
+              :disabled="!notEnoughBalance"
+            >
+              <template #activator="{ props }">
+                <span v-bind="props" style="padding-left: inherit">
+                  <v-btn @click="createFarm" :loading="isCreating" :disabled="!valid || isCreating || notEnoughBalance"
+                    >Create</v-btn
+                  >
+                </span>
+              </template>
+            </v-tooltip>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -58,12 +70,13 @@
 </template>
 
 <script lang="ts">
-import { ref } from "vue";
+import { computed, ref } from "vue";
 
 import { manual } from "@/utils/manual";
 import { notifyDelaying } from "@/utils/notifications";
 
 import { gridProxyClient } from "../../clients";
+import { useProfileManagerController } from "../../components/profile_manager_controller.vue";
 import { useGrid } from "../../stores";
 import { createCustomToast, ToastType } from "../../utils/custom_toast";
 export default {
@@ -75,6 +88,10 @@ export default {
     const valid = ref(false);
     const farmName = ref("");
     const network = process.env.NETWORK || (window as any).env.NETWORK;
+    const profileManagerController = useProfileManagerController();
+    const balance = profileManagerController.balance;
+    const freeBalance = computed(() => balance.value?.free ?? 0);
+    const notEnoughBalance = computed(() => freeBalance.value < 2);
 
     async function createFarm() {
       try {
@@ -104,6 +121,7 @@ export default {
         return { message: "Farm name already exists!" };
       }
     }
+
     return {
       showDialogue,
       isCreating,
@@ -113,6 +131,7 @@ export default {
       validateFarmName,
       network,
       manual,
+      notEnoughBalance,
     };
   },
 };

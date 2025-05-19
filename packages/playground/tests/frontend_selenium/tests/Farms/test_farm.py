@@ -2,7 +2,8 @@ from utils.utils import generate_gateway, generate_inavalid_gateway, generate_in
 from pages.farm import FarmPage
 from utils.grid_proxy import GridProxy
 from pages.dashboard import DashboardPage
-import pytest
+from utils.base import Base
+from selenium.common.exceptions import TimeoutException
 
 #  Time required for the run (17 cases) is approximately 13 minutes.
 
@@ -162,12 +163,12 @@ def test_farmpayout_address(browser):
     cases = [' ', 'dgdd', generate_string(), 'gdhjP6TF3UXYXTNEZ2P36J5FH7W4BJJQ4AYYAXC66I2Q2AH5B6O6Bcfg']
     for case in cases:
         assert farm_page.add_farmpayout_address(case).is_enabled()==False
-    case = "GANNTNPQTWLSNYG6BN2DOA2KU7QZUZPRRNCWTDGC3OBKFYO2P7W5MHNT"
+    case = Base.farm_payout_address1
     farm_page.wait_for_button(farm_page.add_farmpayout_address(case)).click()
     assert farm_page.wait_for('This action will be reflected in a bit')
     assert farm_page.wait_for('Address Added successfully!')
     assert farm_page.farmpayout_address_value()[:-3] in case
-    case = "GCTJ3LEETC4Q3ELEEWEMAO3ND34K4HB4WL3ZMB6VJEMIFLP5EWSLEHGQ" ## Update with different address
+    case = Base.farm_payout_address2 ## Update with different address
     farm_page.wait_for_button(browser.find_element(*farm_page.add_v2_button)).click()
     farm_page.wait_for_button(farm_page.add_farmpayout_address(case)).click()
     assert farm_page.wait_for('This action will be reflected in a bit')
@@ -350,8 +351,13 @@ def test_range_ips(browser):
         ip1 = generate_ip()
         ip2 = increment_ip(ip1)
         gateway, regenerate = generate_gateway_from_ip(ip1)
-    farm_page.wait_for_button(farm_page.add_range_ips(ip1, ip2, gateway)).click()
-    assert farm_page.wait_for('IP is added successfully.')
+    try:
+        farm_page.wait_for_button(farm_page.add_range_ips(ip1, ip2, gateway)).click()
+        assert farm_page.wait_for('IP is added successfully.')
+    except TimeoutException:
+        raise AssertionError(
+            f"Expected success message was not found after adding IP '{ip1}', '{ip2}' with gateway '{gateway}'."
+        )
     assert farm_page.get_ip(ip1, 0) == (1,0)
     assert farm_page.get_ip(ip2, 0) == (1,0)
     assert farm_page.get_ip(gateway, 0) == (2,0)
@@ -379,7 +385,7 @@ def test_farm_details(browser):
     farm_page.search_functionality(farm_name)
     assert farm_page.wait_for_farm_name(farm_name)
     farm_page.search_functionality("")
-    case = "GANNTNPQTWLSNYG6BN2DOA2KU7QZUZPRRNCWTDGC3OBKFYO2P7W5MHNT"
+    case = Base.farm_payout_address1
     farm_page.setup_farmpayout_address(farm_name)
     browser.find_element(*farm_page.add_v2_button).click()
     farm_page.wait_for_button(farm_page.add_farmpayout_address(case)).click()
@@ -389,19 +395,20 @@ def test_farm_details(browser):
     while(regenerate):
         ip = generate_ip()
         gateway, regenerate = generate_gateway_from_ip(ip)
-    farm_page.add_ip(ip)
+    farm_page.setup_ip(ip, farm_name)
     farm_page.wait_for_button(farm_page.add_gateway(gateway)).click()
     assert farm_page.wait_for('IP is added successfully.')
-    farm_details = farm_page.farm_detials()
+    assert farm_page.get_ip(ip, gateway) == (1,1)
+    farm_details = farm_page.farm_details(farm_name)
     grid_farm_details = grid_proxy.get_farm_details(farm_details[1])
     assert grid_farm_details[0]['farmId'] == int(farm_details[0])
     assert grid_farm_details[0]['name'] == farm_details[1]
     assert grid_farm_details[0]['twinId'] == int(farm_details[2])
     assert grid_farm_details[0]['certificationType'] == farm_details[3]
-    assert grid_farm_details[0]['stellarAddress'][:30] == farm_details[4][:-3]
+    assert grid_farm_details[0]['stellarAddress'] == farm_details[4]
     assert grid_farm_details[0]['dedicated'] == farm_details[5]
     assert grid_farm_details[0]['pricingPolicyId'] == int(farm_details[6])
     for i in range(len(grid_farm_details[0]['publicIps'])):
         assert grid_farm_details[0]['publicIps'][i]['ip'] == farm_details[7+(i*3)]
-        assert grid_farm_details[0]['publicIps'][i]['contractId'] == int(farm_details[8+(i*3)])
+        assert grid_farm_details[0]['publicIps'][i]['contract_id'] == int(farm_details[8+(i*3)])
         assert grid_farm_details[0]['publicIps'][i]['gateway'] == farm_details[9+(i*3)]

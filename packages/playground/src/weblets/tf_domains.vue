@@ -139,7 +139,6 @@ async function validateSubdomain() {
 </script>
 
 <script lang="ts">
-import { deploymentListEnvironments } from "@/constants";
 import { isAvailableName } from "@/utils/validators";
 
 import type { SelectionDetails } from "../types/nodeSelector";

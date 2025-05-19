@@ -4,15 +4,15 @@
     @mount="layoutMount"
     :cpu="solution?.cpu"
     :memory="solution?.memory"
-    :disk="disks.reduce((total, disk) => total + disk.size, solution?.disk ?? 0)"
+    :disk="disks.reduce((total, disk) => total + disk.size, rootFilesystemSize)"
     :ipv4="ipv4"
     :dedicated="dedicated"
     :rentedBy="rentedBy"
     :SelectedNode="selectionDetails?.node"
     :valid-filters="selectionDetails?.validFilters"
-    title-image="images/icons/vm.png"
+    title-image="images/icons/tfrobot.png"
   >
-    <template #title>Deploy a Micro Virtual Machine </template>
+    <template #title>Deploy a TFRobot Instance </template>
 
     <d-tabs
       :tabs="[
@@ -39,7 +39,6 @@
           </input-tooltip>
         </input-validator>
 
-        <SelectVmImage :images="images" v-model="flist" />
         <SelectSolutionFlavor
           :small="{ cpu: 1, memory: 2, disk: 25 }"
           :medium="{ cpu: 2, memory: 4, disk: 50 }"
@@ -55,11 +54,9 @@
           v-model:mycelium="mycelium"
           v-model:wireguard="wireguard"
         />
-
         <!-- <input-tooltip inline tooltip="" :href="manual"> -->
         <v-switch color="primary" inset label="Rented By Me" v-model="rentedByMe" hide-details />
         <!-- </input-tooltip> -->
-
         <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
           <v-switch color="primary" inset label="Rentable" v-model="dedicated" hide-details />
         </input-tooltip>
@@ -77,8 +74,9 @@
             rentedBy,
             cpu: solution?.cpu,
             ssdDisks: disks.map(disk => disk.size),
+            solutionDisk: solution?.disk,
             memory: solution?.memory,
-            rootFilesystemSize: solution?.disk,
+            rootFilesystemSize,
             planetary,
             mycelium,
             wireguard,
@@ -127,7 +125,7 @@
         <ExpandableLayout
           v-model="disks"
           @add="addDisk"
-          title="Add additional disk space to your micro virtual machine"
+          title="Add additional disk space to your TFRobot machine"
           #="{ index }"
         >
           <p class="text-h6 mb-4">Disk #{{ index + 1 }}</p>
@@ -140,7 +138,7 @@
               }),
               validators.minLength('Disk name minimum length is 2 characters.', 2),
               validators.isAlphanumeric('Disk name only accepts alphanumeric characters.'),
-              validators.maxLength('Disk name maximum length is 35 characters.', 35),
+              validators.maxLength('Disk maxLength is 15 chars.', 15),
             ]"
             #="{ props }"
           >
@@ -181,12 +179,7 @@
     </d-tabs>
 
     <template #footer-actions="{ validateBeforeDeploy }">
-      <v-btn
-        variant="elevated"
-        class="text-primery px-10 py-3 h-auto text-subtitle-1"
-        @click="validateBeforeDeploy(deploy)"
-        text="Deploy"
-      />
+      <v-btn color="secondary" variant="outlined" @click="validateBeforeDeploy(deploy)" text="Deploy" />
     </template>
   </weblet-layout>
 </template>
@@ -200,58 +193,14 @@ import Networks, { useNetworks } from "../components/networks.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useGrid } from "../stores";
-import { type Flist, ProjectName } from "../types";
+import { ProjectName } from "../types";
 import { deployVM, type Disk, type Env } from "../utils/deploy_vm";
 import { generateName } from "../utils/strings";
 
 const layout = useLayout();
 const tabs = ref();
 
-const images = [
-  {
-    name: "Ubuntu-24.04",
-    flist: "https://hub.grid.tf/tf-official-vms/ubuntu-24.04-latest.flist",
-    entryPoint: "/sbin/zinit init",
-  },
-  {
-    name: "Ubuntu-23.10",
-    flist: "https://hub.grid.tf/tf-official-vms/ubuntu-23.10-mycelium.flist",
-    entryPoint: "/sbin/zinit init",
-  },
-  {
-    name: "Ubuntu-22.04",
-    flist: "https://hub.grid.tf/tf-official-apps/threefoldtech-ubuntu-22.04.flist",
-    entryPoint: "/sbin/zinit init",
-  },
-  {
-    name: "Arch",
-    flist: "https://hub.grid.tf/tf-official-vms/arch-mycelium.flist",
-    entryPoint: "/sbin/zinit init",
-  },
-  {
-    name: "Debian-12",
-    flist: "https://hub.grid.tf/tf-official-apps/threefoldtech-debian-12.flist",
-    entryPoint: "/sbin/zinit init",
-  },
-  {
-    name: "Alpine-3",
-    flist: "https://hub.grid.tf/tf-official-apps/threefoldtech-alpine-3.flist",
-    entryPoint: "/entrypoint.sh",
-  },
-  {
-    name: "CentOS-8",
-    flist: "https://hub.grid.tf/tf-official-apps/threefoldtech-centos-8.flist",
-    entryPoint: "/entrypoint.sh",
-  },
-  {
-    name: "Nixos",
-    flist: "https://hub.grid.tf/tf-official-vms/nixos-micro-latest.flist",
-    entryPoint: "/entrypoint.sh",
-  },
-];
-
-const name = ref(generateName({ prefix: "vm" }));
-const flist = ref<Flist>();
+const name = ref(generateName({ prefix: "tfr" }));
 const { ipv4, ipv6, planetary, mycelium, wireguard } = useNetworks();
 const envs = ref<Env[]>([]);
 const disks = ref<Disk[]>([]);
@@ -259,10 +208,12 @@ const dedicated = ref(false);
 const rentedByMe = ref(false);
 const rentedBy = computed(() => (rentedByMe.value ? grid.twinId : undefined));
 const certified = ref(false);
+const rootFilesystemSize = computed(() => solution.value?.disk);
 const selectionDetails = ref<SelectionDetails>();
 const selectedSSHKeys = ref("");
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
+const flist: Flist = FLISTS.TFROBOT;
 
 function layoutMount() {
   if (envs.value.length > 0) {
@@ -287,7 +238,7 @@ function addDisk() {
 async function deploy() {
   layout.value.setStatus("deploy");
 
-  const projectName = ProjectName.VM.toLowerCase() + "/" + name.value;
+  const projectName = ProjectName.TFRobot.toLowerCase() + "/" + name.value;
 
   try {
     updateGrid(grid, { projectName });
@@ -304,15 +255,15 @@ async function deploy() {
           name: name.value,
           cpu: solution.value.cpu,
           memory: solution.value.memory,
-          flist: flist.value!.value,
-          entryPoint: flist.value!.entryPoint,
+          flist: flist.value,
+          entryPoint: flist.entryPoint,
           disks: disks.value,
           envs: envs.value,
           planetary: planetary.value,
           mycelium: mycelium.value,
           publicIpv4: ipv4.value,
           publicIpv6: ipv6.value,
-          rootFilesystemSize: solution.value?.disk,
+          rootFilesystemSize: rootFilesystemSize.value,
           nodeId: selectionDetails.value?.node?.nodeId,
           rentedBy: rentedBy.value,
           certified: certified.value,
@@ -321,10 +272,10 @@ async function deploy() {
     });
 
     layout.value.reloadDeploymentsList();
-    layout.value.setStatus("success", "Successfully deployed a micro virtual machine instance.");
-    layout.value.openDialog(vm, deploymentListEnvironments.vm);
+    layout.value.setStatus("success", "Successfully deployed a TFRobot machine.");
+    layout.value.openDialog(vm, deploymentListEnvironments.tfrobot);
   } catch (e) {
-    layout.value.setStatus("failed", normalizeError(e, "Failed to deploy micro virtual machine instance."));
+    layout.value.setStatus("failed", normalizeError(e, "Failed to deploy TFRobot machine instance."));
   }
 }
 
@@ -336,13 +287,12 @@ watch(selectedSSHKeys, layoutMount, { deep: true });
 </script>
 
 <script lang="ts">
-import type { GridClient } from "@threefold/grid_client";
+import { FLISTS, type GridClient } from "@threefold/grid_client";
 
 import ExpandableLayout from "../components/expandable_layout.vue";
-import SelectVmImage from "../components/select_vm_image.vue";
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";
-import type { solutionFlavor as SolutionFlavor } from "../types";
+import type { Flist, solutionFlavor as SolutionFlavor } from "../types";
 import type { SelectionDetails } from "../types/nodeSelector";
 import { updateGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
@@ -350,9 +300,8 @@ import { normalizeError } from "../utils/helpers";
 const solution = ref() as Ref<SolutionFlavor>;
 
 export default {
-  name: "MicroVm",
+  name: "TFRobot",
   components: {
-    SelectVmImage,
     SelectSolutionFlavor,
     ExpandableLayout,
   },

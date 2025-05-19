@@ -116,7 +116,7 @@
 </template>
 
 <script lang="ts" setup>
-import { calculateRootFileSystem, type GridClient } from "@threefold/grid_client";
+import { calculateRootFileSystem, FLISTS, type GridClient } from "@threefold/grid_client";
 import { computed, type Ref, ref } from "vue";
 
 import { manual } from "@/utils/manual";
@@ -143,11 +143,7 @@ const domain = ref();
 
 const { ipv4, ipv6, planetary, mycelium, wireguard } = useNetworks();
 const solution = ref() as Ref<SolutionFlavor>;
-const flist: Flist = {
-  // Should be upgraded to an oficial Flist
-  value: "https://hub.grid.tf/tf-official-apps/staticwebsite-latest.flist",
-  entryPoint: "/sbin/zinit init",
-};
+const flist: Flist = FLISTS.STATICWEBSITE;
 const dedicated = ref(false);
 const rentedByMe = ref(false);
 const gridStore = useGrid();

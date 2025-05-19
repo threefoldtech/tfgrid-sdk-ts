@@ -53,6 +53,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
           ],
         },
         requireSSH: true,
+        publicPath: false,
       },
     },
     {
@@ -76,6 +77,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
           ],
         },
         requireSSH: true,
+        publicPath: false,
       },
     },
     {
@@ -98,30 +100,32 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
             },
           ],
         },
+        publicPath: false,
       },
     },
-    {
-      path: DashboardRoutes.Applications.Funkwhale,
-      component: () => import("../views/funkwhale_view.vue"),
-      meta: {
-        title: "Funkwhale",
-        info: { page: "info/funkwhale.md" },
-        navbarConfig: {
-          back: true,
-          path: [
-            { title: "Deploy" },
-            {
-              title: "Labs",
-              disabled: false,
-              to: DashboardRoutes.Deploy.Applications,
-            },
-            {
-              title: "Funkwhale",
-            },
-          ],
-        },
-      },
-    },
+    // {
+    //   path: DashboardRoutes.Applications.Funkwhale,
+    //   component: () => import("../views/funkwhale_view.vue"),
+    //   meta: {
+    //     title: "Funkwhale",
+    //     info: { page: "info/funkwhale.md" },
+    //     navbarConfig: {
+    //       back: true,
+    //       path: [
+    //         { title: "Deploy" },
+    //         {
+    //           title: "Labs",
+    //           disabled: false,
+    //           to: DashboardRoutes.Deploy.Applications,
+    //         },
+    //         {
+    //           title: "Funkwhale",
+    //         },
+    //       ],
+    //     },
+    //     publicPath: false,
+    //   },
+    // },
     {
       path: DashboardRoutes.Applications.Mattermost,
       component: () => import("../views/mattermost_view.vue"),
@@ -142,6 +146,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
             },
           ],
         },
+        publicPath: false,
       },
     },
     {
@@ -164,6 +169,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
             },
           ],
         },
+        publicPath: false,
       },
     },
     {
@@ -183,6 +189,29 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
             },
             {
               title: "Taiga",
+            },
+          ],
+        },
+        publicPath: false,
+      },
+    },
+    {
+      path: DashboardRoutes.Applications.Openwebui,
+      component: () => import("../views/openwebui_view.vue"),
+      meta: {
+        title: "Open WebUI",
+        info: { page: "info/openwebui.md" },
+        navbarConfig: {
+          back: true,
+          path: [
+            { title: "Deploy" },
+            {
+              title: "Labs",
+              disabled: false,
+              to: DashboardRoutes.Deploy.Applications,
+            },
+            {
+              title: "Open WebUI",
             },
           ],
         },
@@ -208,6 +237,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
     //         },
     //       ],
     //     },
+    //     publicPath: false,
     //   },
     // },
     {
@@ -230,6 +260,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
             },
           ],
         },
+        publicPath: false,
       },
     },
     {
@@ -252,6 +283,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
             },
           ],
         },
+        publicPath: false,
       },
     },
     {
@@ -274,6 +306,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
             },
           ],
         },
+        publicPath: false,
       },
     },
     {
@@ -296,6 +329,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
             },
           ],
         },
+        publicPath: false,
       },
     },
     {
@@ -318,6 +352,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
             },
           ],
         },
+        publicPath: false,
       },
     },
     {
@@ -340,6 +375,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
             },
           ],
         },
+        publicPath: false,
       },
     },
     {
@@ -362,6 +398,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
             },
           ],
         },
+        publicPath: false,
       },
     },
     {
@@ -384,6 +421,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
             },
           ],
         },
+        publicPath: false,
       },
     },
     {
@@ -406,6 +444,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
             },
           ],
         },
+        publicPath: false,
       },
     },
 
@@ -429,6 +468,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
             },
           ],
         },
+        publicPath: false,
       },
     },
     // Commented for now and will be user later.
@@ -452,6 +492,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
     //         },
     //       ],
     //     },
+    //     publicPath: false,
     //   },
     // },
     {
@@ -474,6 +515,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
             },
           ],
         },
+        publicPath: false,
       },
     },
     {
@@ -496,6 +538,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
             },
           ],
         },
+        publicPath: false,
       },
     },
     {
@@ -518,6 +561,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
             },
           ],
         },
+        publicPath: false,
       },
     },
     {
@@ -540,6 +584,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
             },
           ],
         },
+        publicPath: false,
       },
     },
   ];
@@ -668,7 +713,7 @@ function createDeployRoutes(): RouteRecordRaw[] {
             {
               path: "",
               component: () => import("../views/vms_view.vue"),
-              meta: { title: "Virtual Machines" },
+              meta: { title: "Virtual Machines", publicPath: true },
             },
             {
               path: DashboardRoutes.VirtualMachines.FullVirtualMachine,
@@ -742,7 +787,7 @@ function createDeployRoutes(): RouteRecordRaw[] {
 
         {
           path: DashboardRoutes.Deploy.Applications,
-          meta: { title: "Labs" },
+          meta: { title: "Labs", publicPath: true },
           children: createApplicationsRoutes(),
         },
         {

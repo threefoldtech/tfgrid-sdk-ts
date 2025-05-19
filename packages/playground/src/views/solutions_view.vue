@@ -101,13 +101,13 @@ export default {
         icon: "peertube.png",
         route: DashboardRoutes.Applications.Peertube,
       },
-      {
-        title: "Funkwhale",
-        excerpt:
-          "Funkwhale is social platform to enjoy and share music. Funkwhale is a community-driven project that lets you listen and share music and audio within a decentralized, open network.",
-        icon: "funkwhale.png",
-        route: DashboardRoutes.Applications.Funkwhale,
-      },
+      // {
+      //   title: "Funkwhale",
+      //   excerpt:
+      //     "Funkwhale is social platform to enjoy and share music. Funkwhale is a community-driven project that lets you listen and share music and audio within a decentralized, open network.",
+      //   icon: "funkwhale.png",
+      //   route: DashboardRoutes.Applications.Funkwhale,
+      // },
       {
         title: "Mattermost",
         excerpt:
@@ -137,6 +137,15 @@ export default {
         icon: "static_website.png",
         route: DashboardRoutes.Applications.StaticWebsite,
         releaseDate: new Date("2024-11-13"),
+      },
+      {
+        title: "Open WebUI",
+        excerpt:
+          "Open WebUI is an extensible, feature-rich, and user-friendly self-hosted AI platform designed to operate entirely offline.",
+        icon: "openwebui.png",
+        route: DashboardRoutes.Applications.Openwebui,
+        releaseDate: new Date("2025-5-18"), // TODO: Update release date when OpenWebUI is released On main net
+        tags: ["Community"],
       },
       {
         title: "Nextcloud",

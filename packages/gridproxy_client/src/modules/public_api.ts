@@ -8,3 +8,4 @@ export * from "./gateways";
 export * from "./nodes";
 export * from "./stats";
 export * from "./twins";
+export * from "./public_ips";
