@@ -122,7 +122,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, type Ref, ref } from "vue";
+import { computed, type Ref, ref, watch } from "vue";
 
 import { manual } from "@/utils/manual";
 
@@ -154,12 +154,7 @@ const selectedSSHKeys = ref("");
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
 
-const isValid = computed(() => {
-  if (firstRound.value) {
-    return lastRoundInput.value.validate(lastRound.value.toString());
-  }
-  return false;
-});
+watch(firstRound, () => lastRoundInput.value.validate(lastRound.value.toString()));
 async function deploy() {
   layout.value.setStatus("deploy");
 
