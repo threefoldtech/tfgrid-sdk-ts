@@ -40,12 +40,12 @@ jobs:
         id: massdeployments
         continue-on-error: true
         run: |
-          yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/mass_deployments.ts
+          yarn run ts-node --transpileOnly --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/mass_deployments.ts
 
       - name: Cleanup - Delete all contracts
         id: deleteall
         run: |
-          yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/delete_all_contracts.ts
+          yarn run ts-node --transpileOnly --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/delete_all_contracts.ts
 
       - name: Test Results
         run: |
