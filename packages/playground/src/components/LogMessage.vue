@@ -59,7 +59,7 @@
 
 <script lang="ts">
 import type { PropType } from "vue";
-import { computed, toRef } from "vue";
+import { computed, ref, toRef, watch } from "vue";
 
 import type { Indexed } from "@/clients";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
@@ -80,8 +80,16 @@ export default {
     const props = toRef(_props);
 
     const collapsable = computed(() => props.value.log.data.message?.length > 200);
-    const collapsed = computed(() => !!props.value.log?.id);
+    const collapsed = ref(true);
 
+    watch(
+      () => props.value.log.id,
+      () => {
+        if (!collapsed.value) {
+          collapsed.value = true;
+        }
+      },
+    );
     return { collapsable, collapsed, copyLog };
   },
 };
