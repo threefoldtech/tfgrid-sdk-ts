@@ -40,10 +40,10 @@ jobs:
         with:
           ref: refs/tags/v2.6.3
 
-      - name: Set up node 20
+      - name: Set up node 22 lts
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22.15
           cache: "yarn"
 
       - name: Install deps
