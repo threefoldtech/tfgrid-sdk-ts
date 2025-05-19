@@ -60,7 +60,7 @@
           When selecting a node with GPU resources, please make sure that you have a rented node. To rent a node and gain access to GPU capabilities, you can use our dashboard.
           "
         >
-          <v-switch color="primary" inset label="GPU" v-model="GPUToggled" hide-details />
+          <v-switch color="primary" inset label="GPU" v-model="hasGPU" hide-details />
         </input-tooltip>
         <!-- <input-tooltip inline tooltip="" :href="manual"> -->
         <v-switch color="primary" inset label="Rented By Me" v-model="rentedByMe" hide-details />
@@ -185,10 +185,7 @@ const dedicated = ref(false);
 const rentedByMe = ref(false);
 const certified = ref(false);
 const disks = ref<Disk[]>([]);
-const GPUToggled = ref(false);
-const hasGPU = computed(() => {
-  return (!dedicated.value && !rentedByMe.value) || GPUToggled.value;
-});
+const hasGPU = ref(false);
 
 const rentedBy = computed(() => (rentedByMe.value ? grid.twinId : undefined));
 const rootFilesystemSize = computed(() =>
@@ -205,13 +202,25 @@ function addDisk() {
     mountPoint: "/mnt/" + name,
   });
 }
-
-watch(GPUToggled, GPUToggled => {
-  if (GPUToggled) {
-    dedicated.value = true;
-    rentedByMe.value = true;
-  }
-});
+watch(
+  [dedicated, rentedByMe],
+  ([dedicated, rentedByMe]) => {
+    if (dedicated === false && rentedByMe === false) {
+      hasGPU.value = dedicated;
+    }
+  },
+  { immediate: true },
+);
+watch(
+  hasGPU,
+  hasGPU => {
+    if (hasGPU) {
+      dedicated.value = true;
+      rentedByMe.value = true;
+    }
+  },
+  { immediate: true },
+);
 
 async function deploy() {
   layout.value.setStatus("deploy");
