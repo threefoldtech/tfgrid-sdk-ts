@@ -82,7 +82,9 @@ export default {
     const requireSSH = computed(() => route.meta.requireSSH);
     const requireKYC = computed(() => route.meta.requireKYC || route.path.match(/\/(applications|orchestrators)\/.+$/));
     const showKYCError = computed(() => requireKYC.value && kyc.status !== KycStatus.verified);
-    const showSSHError = computed(() => requireSSH.value && profileManager.profile?.ssh.length == 0);
+    const showSSHError = computed(
+      () => requireSSH.value && (!profileManager.profile?.ssh || profileManager.profile?.ssh?.length == 0),
+    );
     function reRender(e: Event) {
       e.stopPropagation();
       tick.value++;
