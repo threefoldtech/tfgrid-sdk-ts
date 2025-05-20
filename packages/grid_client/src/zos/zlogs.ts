@@ -1,7 +1,6 @@
 import { Expose } from "class-transformer";
 import { ValidateMembers } from "../helpers";
 import { WorkloadData, WorkloadDataResult } from "./workload_base";
-import { WorkloadTypes } from "./workload";
 import { IsString } from "class-validator";
 
 @ValidateMembers()

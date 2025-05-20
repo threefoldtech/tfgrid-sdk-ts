@@ -1,4 +1,3 @@
-import { Mycelium } from "../zos";
 import { ComputeCapacity } from "../zos/computecapacity";
 import { Workload, WorkloadTypes } from "../zos/workload";
 import { Mount, MyceliumIP, Zmachine, ZmachineNetwork, ZNetworkInterface } from "../zos/zmachine";
