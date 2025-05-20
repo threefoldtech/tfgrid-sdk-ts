@@ -1,24 +1,14 @@
 <template>
-  <slot
-    v-if="$slots.unwrap"
-    name="unwrap"
-    :col-props="colProps"
-  />
-  <VCol
-    v-else
-    v-bind="colProps"
-  >
+  <slot name="unwrap" v-if="$slots.unwrap" :colProps="colProps" />
+  <VCol v-else v-bind="colProps">
     <input-validator
-      v-if="$slots.input"
       :rules="$props.rules || []"
       :async-rules="$props.asyncRules"
-      :value="$props.modelValue as string"
+      :value="($props.modelValue as string)"
+      v-if="$slots.input"
       #="{ props }"
     >
-      <slot
-        name="input"
-        :props="props"
-      />
+      <slot name="input" :props="props" />
     </input-validator>
     <slot v-else />
   </VCol>
