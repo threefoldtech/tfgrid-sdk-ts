@@ -6,10 +6,10 @@
       status === 'Valid'
         ? 'rgba(var(--v-theme-primary), 0.1)'
         : status === 'Invalid'
-          ? 'rgba(var(--v-theme-error), 0.1)'
-          : status === 'Pending'
-            ? 'rgba(var(--v-theme-warning), 0.01)'
-            : undefined
+        ? 'rgba(var(--v-theme-error), 0.1)'
+        : status === 'Pending'
+        ? 'rgba(var(--v-theme-warning), 0.01)'
+        : undefined
     "
     :flat="flat"
     v-bind="{
@@ -17,31 +17,20 @@
     }"
   >
     <template #loader>
-      <VProgressLinear
-        v-if="status === 'Pending'"
-        indeterminate
-        color="primary"
-        height="2"
-      />
+      <VProgressLinear indeterminate color="primary" height="2" v-if="status === 'Pending'" />
     </template>
     <template #prepend>
-      <VTooltip
-        :text="node?.location.country"
-        :disabled="!node"
-      >
+      <VTooltip :text="node?.location.country" :disabled="!node">
         <template #activator="{ props }">
           <VAvatar size="40">
-            <span
-              v-if="countryFlagSrc.length === 0"
-              class="flag-avatar"
-            >NA</span>
+            <span v-if="countryFlagSrc.length === 0" class="flag-avatar">NA</span>
             <img
               v-else
               :src="countryFlagSrc"
               class="h-100"
               :alt="(node?.location.country ?? 'node') + '-flag'"
               v-bind="props"
-            >
+            />
           </VAvatar>
         </template>
       </VTooltip>
@@ -49,61 +38,30 @@
 
     <template #title>
       Node ID: {{ node?.nodeId }}
-      <VTooltip
-        v-if="node && serialNumber"
-        text="Node Serial Number"
-      >
+      <VTooltip text="Node Serial Number" v-if="node && serialNumber">
         <template #activator="{ props }">
-          <VChip
-            size="x-small"
-            v-bind="props"
-          >
-            <span
-              class="font-weight-bold"
-              v-text="checkSerialNumber(serialNumber)"
-            />
+          <VChip size="x-small" v-bind="props">
+            <span class="font-weight-bold" v-text="checkSerialNumber(serialNumber)" />
           </VChip>
         </template>
       </VTooltip>
-      <VTooltip
-        v-if="node && node.location.country.trim().length > 0"
-        text="Node Country"
-        location="left"
-      >
+      <VTooltip text="Node Country" v-if="node && node.location.country.trim().length > 0" location="left">
         <template #activator="{ props }">
-          <VChip
-            class="ml-2"
-            size="x-small"
-            v-bind="props"
-          >
-            <span
-              class="font-weight-bold"
-              v-text="node?.location.country"
-            />
+          <VChip class="ml-2" size="x-small" v-bind="props">
+            <span class="font-weight-bold" v-text="node?.location.country" />
           </VChip>
         </template>
       </VTooltip>
     </template>
 
     <template #subtitle>
-      <span v-if="node"> Farm: <span
-        class="font-weight-bold"
-        v-text="node.farmName"
-      /> </span>
-      <span
-        v-if="node"
-        class="ml-2"
-      >
+      <span v-if="node"> Farm: <span class="font-weight-bold" v-text="node.farmName" /> </span>
+      <span class="ml-2" v-if="node">
         Uptime:
-        <span
-          class="font-weight-bold"
-          v-text="toReadableDate(node.uptime)"
-        />
+        <span class="font-weight-bold" v-text="toReadableDate(node.uptime)" />
       </span>
-      <span
-        v-if="node"
-        class="ml-2"
-      >Last Deployment Time:
+      <span class="ml-2" v-if="node"
+        >Last Deployment Time:
         {{ lastDeploymentTime === 0 ? "N/A" : toHumanDate(lastDeploymentTime) }}
       </span>
     </template>
@@ -112,9 +70,9 @@
       <template v-if="node">
         <div class="d-flex align-center">
           <VTooltip
-            v-if="node"
             :text="dedicated ? 'This node is dedicated for one user only' : 'Multiple users can deploy on this node'"
             location="top"
+            v-if="node"
           >
             <template #activator="{ props }">
               <VChip
@@ -126,11 +84,7 @@
             </template>
           </VTooltip>
 
-          <VTooltip
-            v-if="node && node.status"
-            text="Node Status"
-            location="top"
-          >
+          <VTooltip text="Node Status" location="top" v-if="node && node.status">
             <template #activator="{ props }">
               <VChip
                 v-bind="props"
@@ -159,18 +113,9 @@
             </template>
           </VTooltip>
 
-          <VChip
-            v-if="num_gpu"
-            class="mr-2"
-            color="secondary"
-            :text="num_gpu + ' GPU'"
-          />
+          <VChip v-if="num_gpu" class="mr-2" color="secondary" :text="num_gpu + ' GPU'" />
 
-          <VTooltip
-            v-if="node && node.certificationType"
-            location="top"
-            text="Certification type"
-          >
+          <VTooltip v-if="node && node.certificationType" location="top" text="Certification type">
             <template #activator="{ props }">
               <VChip
                 v-bind="props"
@@ -183,23 +128,15 @@
             </template>
           </VTooltip>
 
-          <VTooltip
-            v-if="speed"
-            location="top"
-            text="Network Speed Test"
-          >
+          <VTooltip v-if="speed" location="top" text="Network Speed Test">
             <template #activator="{ props }">
-              <span
-                v-if="speed?.upload && speed?.download"
-                v-bind="props"
-                class="speed-chip mr-2 grey-darken-3"
-              >
+              <span v-bind="props" v-if="speed?.upload && speed?.download" class="speed-chip mr-2 grey-darken-3">
                 <span>
-                  <v-icon icon="mdi-arrow-up" />
+                  <v-icon icon="mdi-arrow-up"></v-icon>
                   <span class="mx-1"> {{ formatSpeed(speed.upload) }}</span>
                 </span>
                 <span>
-                  <v-icon icon="mdi-arrow-down" />
+                  <v-icon icon="mdi-arrow-down"></v-icon>
                   <span class="mx-1">{{ formatSpeed(speed.download) }}</span>
                 </span>
               </span>
@@ -217,7 +154,7 @@
             :used="(node?.used_resources.cru ?? 0) + selectedMachines.reduce((r, m) => r + m.cpu, 0)"
             :total="node?.total_resources.cru ?? 0"
             :text="cruText"
-            :cpu-type="dmi?.processor[0]?.version"
+            :cpuType="dmi?.processor[0]?.version"
           />
         </VCol>
         <VCol class="tf-node-resource">
@@ -226,7 +163,7 @@
             :used="(node?.used_resources.mru ?? 0) + selectedMachines.reduce((r, m) => r + (m.memory / 1024) * 1e9, 0)"
             :total="node?.total_resources.mru ?? 0"
             :text="mruText"
-            :memory-type="dmi?.memory[0]?.type"
+            :memoryType="dmi?.memory[0]?.type"
           />
         </VCol>
       </VRow>
@@ -249,26 +186,14 @@
           />
         </VCol>
       </VRow>
-      <div
-        v-if="node && (rentedByUser || (node.status !== 'down' && node.rentable))"
-        class="ml-auto text-right"
-      >
-        <v-tooltip
-          bottom
-          color="primary"
-          close-delay="100"
-          :disabled="!(node && node.dedicated)"
-        >
-          <template #activator="{ isActive, props }">
-            <span
-              v-bind="props"
-              class="font-weight-bold"
-              v-on="isActive"
-            ><v-icon
-              class="scale_beat mr-2"
-              color="warning"
-              :disabled="!(node && node.dedicated)"
-            >mdi-brightness-percent</v-icon>{{ hourlyPriceAfterDiscount }} USD/Hour</span>
+      <div class="ml-auto text-right" v-if="node && (rentedByUser || (node.status !== 'down' && node.rentable))">
+        <v-tooltip bottom color="primary" close-delay="100" :disabled="!(node && node.dedicated)">
+          <template v-slot:activator="{ isActive, props }">
+            <span v-bind="props" v-on="isActive" class="font-weight-bold"
+              ><v-icon class="scale_beat mr-2" color="warning" :disabled="!(node && node.dedicated)"
+                >mdi-brightness-percent</v-icon
+              >{{ hourlyPriceAfterDiscount }} USD/Hour</span
+            >
           </template>
 
           <span>
@@ -302,43 +227,27 @@
               :disable-sort="true"
               density="compact"
             >
-              <template #bottom />
+              <template #bottom></template>
             </v-data-table>
 
             <ul class="pl-5 py-2">
               <li>
                 {{ rentedByUser ? "You receive " : "You'll receive " }} a
                 <strong class="mr-1">50%</strong>
-                <a
-                  target="_blank"
-                  :href="manual?.billing_pricing"
-                >discount</a>
+                <a target="_blank" :href="manual?.billing_pricing">discount</a>
                 {{ rentedByUser ? " as you reserve the" : " if you reserve the" }}
                 entire node
               </li>
               <li>
                 {{ rentedByUser ? "You receive" : "You'll receive" }} a
-                <VProgressCircular
-                  v-if="loadingStakingDiscount"
-                  indeterminate
-                  size="10"
-                  width="1"
-                  color="info"
-                />
+                <VProgressCircular indeterminate size="10" width="1" color="info" v-if="loadingStakingDiscount" />
                 <strong v-else>{{ stakingDiscount }}%</strong>
                 discount as per the
-                <a
-                  target="_blank"
-                  :href="manual?.discount_levels"
-                > staking discounts </a>
+                <a target="_blank" :href="manual?.discount_levels"> staking discounts </a>
               </li>
             </ul>
             <v-divider />
-            <v-table
-              density="compact"
-              class="mb-2 no-border discount-table"
-              :hide-default="true"
-            >
+            <v-table density="compact" class="mb-2 no-border discount-table" :hide-default="true">
               <tbody>
                 <tr class="no-border">
                   <td class="no-border">Price after discount</td>
@@ -366,7 +275,7 @@
         <reserve-btn
           v-if="node?.dedicated && node?.status !== 'down'"
           class="ml-4"
-          :node="node as GridNode"
+          :node="(node as GridNode)"
           @update:status="$emit('update:status', $event as ValidatorStatus)"
           @update:node="$emit('update:node', $event as NodeInfo)"
         />
