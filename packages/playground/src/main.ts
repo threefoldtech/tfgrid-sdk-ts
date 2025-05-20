@@ -3,7 +3,7 @@ import "./global.scss";
 
 import * as Sentry from "@sentry/vue";
 import { createPinia } from "pinia";
-import { createApp } from "vue";
+import { type ComponentPublicInstance, createApp } from "vue";
 
 import vuetify from "@/plugins/vuetify";
 
@@ -21,6 +21,14 @@ app.config.errorHandler = error => {
       `- Constructor: ${error && typeof error === "object" ? error.constructor.name : null}`,
   );
 };
+
+// In development mode, log warnings to the console not to the logger
+if (import.meta.env.DEV) {
+  app.config.warnHandler = (msg: string, instance: ComponentPublicInstance | null, trace: string) => {
+    const componentName = instance?.$?.type?.name || instance?.$?.type?.__name || "AnonymousComponent";
+    console.warn(`[Vue Warning] ${msg}\n` + `Component: <${componentName}>\n` + (trace ? `Trace:\n${trace}` : ""));
+  };
+}
 
 if (window.env.ENABLE_TELEMETRY) {
   Sentry.init({
