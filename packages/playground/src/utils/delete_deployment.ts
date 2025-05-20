@@ -98,6 +98,9 @@ export function solutionHasGateway(projectName: ProjectName) {
     ProjectName.Gitea,
     ProjectName.Jenkins,
     ProjectName.Jitsi,
+    ProjectName.Nostr,
+    ProjectName.StaticWebsite,
+    ProjectName.NodePilot,
   ];
 
   for (const solution of solutions) {
