@@ -1,34 +1,20 @@
 <template>
-  <v-btn
-    variant="elevated"
-    class="text-subtitle-1 px-6 ml-2 mr-3"
-    :loading="loading"
-    @click="showDialogue = true"
+  <v-btn variant="elevated" class="text-subtitle-1 px-6 ml-2 mr-3" @click="showDialogue = true" :loading="loading"
+    >Add IP</v-btn
   >
-    Add IP
-  </v-btn>
   <v-container>
     <v-container v-if="showDialogue">
-      <v-dialog
-        v-model="showDialogue"
-        max-width="600"
-        attach="#modals"
-      >
+      <v-dialog v-model="showDialogue" max-width="600" attach="#modals">
         <v-card>
-          <v-card-title class="bg-primary">
-            Add Public IP to Farm
-          </v-card-title>
+          <v-card-title class="bg-primary">Add Public IP to Farm</v-card-title>
           <v-card-text>
-            <form-validator
-              ref="formValidator"
-              v-model="valid"
-            >
+            <form-validator ref="formValidator" v-model="valid">
               <v-select
-                v-model="type"
                 :items="items"
                 label="Choose how to enter IP"
+                v-model="type"
                 @update:model-value="$emit('update:type', $event)"
-              />
+              ></v-select>
               <input-validator
                 :value="publicIP"
                 :rules="[
@@ -47,7 +33,7 @@
                     type="text"
                     :label="type === IPType.single ? 'IP' : 'From IP'"
                     @update:model-value="$emit('update:PublicIP', $event)"
-                  />
+                  ></v-text-field>
                 </input-tooltip>
               </input-validator>
 
@@ -68,10 +54,10 @@
                     v-model="toPublicIP"
                     v-bind:="props"
                     type="text"
+                    @update:model-value="$emit('update:toPublicIP', $event)"
                     outlined
                     label="To IP"
-                    @update:model-value="$emit('update:toPublicIP', $event)"
-                  />
+                  ></v-text-field>
                 </input-tooltip>
               </input-validator>
               <input-validator
@@ -88,97 +74,64 @@
                     v-model="gateway"
                     v-bind:="props"
                     type="text"
+                    @update:model-value="$emit('update:gateway', $event)"
                     outlined
                     label="Gateway"
-                    @update:model-value="$emit('update:gateway', $event)"
-                  />
+                  ></v-text-field>
                 </input-tooltip>
               </input-validator>
             </form-validator>
             <v-divider />
           </v-card-text>
-          <v-dialog
-            v-model="showIPs"
-            max-width="600"
-            attach="#modals"
-          >
+          <v-dialog v-model="showIPs" max-width="600" attach="#modals">
             <v-card>
-              <v-card-title class="bg-primary">
-                IPs range
-              </v-card-title>
+              <v-card-title class="bg-primary">IPs range</v-card-title>
               <v-card-text>
                 <v-row>
                   <v-col>
                     <v-list class="my-5">
+                      <v-list-item
+                        ><v-row
+                          ><v-col sm="4"><p>Network:</p></v-col
+                          ><v-col
+                            ><p>{{ network }}</p></v-col
+                          ></v-row
+                        ></v-list-item
+                      >
                       <v-list-item>
                         <v-row>
-                          <v-col sm="4">
-                            <p>Network:</p>
-                          </v-col><v-col>
-                            <p>{{ network }}</p>
-                          </v-col>
-                        </v-row>
-                      </v-list-item>
-                      <v-list-item>
-                        <v-row>
-                          <v-col sm="4">
-                            IP Addresses:
-                          </v-col>
+                          <v-col sm="4">IP Addresses:</v-col>
                           <v-col>
-                            <v-chip
-                              v-for="ip in ipsRangeTable"
-                              :key="ip"
-                              type="warning"
-                              variant="tonal"
-                              class="ma-1"
-                            >
-                              {{
-                                ip
-                              }}
-                            </v-chip>
-                          </v-col>
-                        </v-row>
+                            <v-chip type="warning" variant="tonal" v-for="ip in ipsRangeTable" :key="ip" class="ma-1">{{
+                              ip
+                            }}</v-chip>
+                          </v-col></v-row
+                        >
                       </v-list-item>
                     </v-list>
                   </v-col>
                 </v-row>
-                <v-divider />
+                <v-divider></v-divider>
               </v-card-text>
 
               <v-card-actions class="justify-end mb-1 mr-2">
-                <v-btn
-                  color="anchor"
-                  @click="showIPs = false"
-                >
-                  Close
-                </v-btn>
-              </v-card-actions>
+                <v-btn @click="showIPs = false" color="anchor">Close</v-btn></v-card-actions
+              >
             </v-card>
           </v-dialog>
 
           <v-card-actions class="justify-end mb-1 mr-2">
-            <v-btn
-              color="anchor"
-              @click="showDialogue = false"
-            >
-              Close
-            </v-btn>
+            <v-btn @click="showDialogue = false" color="anchor">Close</v-btn>
 
-            <v-btn
-              :disabled="!valid || type === IPType.single || !toPublicIP"
-              @click="showRange"
-            >
-              Show IPs Range
-            </v-btn>
+            <v-btn @click="showRange" :disabled="!valid || type === IPType.single || !toPublicIP">Show IPs Range</v-btn>
             <v-btn
               color="secondary"
+              @click="addFarmIp($props.farmId, gateway)"
+              @update:modelValue="$emit('update:isAdded', $event)"
               :loading="isAdding"
               :disabled="!valid || isAdding"
-              @click="addFarmIp($props.farmId, gateway)"
-              @update:model-value="$emit('update:isAdded', $event)"
+              >Add</v-btn
             >
-              Add
-            </v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
