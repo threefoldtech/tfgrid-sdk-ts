@@ -4,7 +4,6 @@
       <v-icon size="30" class="pr-3">mdi-key-plus</v-icon>
       <v-card-title class="pa-0">SSH keys</v-card-title>
     </v-card>
-    <v-alert type="info"> Multiple keys support is coming up soon </v-alert>
 
     <v-card class="mt-3 mb-1" color="transparent">
       <v-col class="px-0 d-flex justify-end">

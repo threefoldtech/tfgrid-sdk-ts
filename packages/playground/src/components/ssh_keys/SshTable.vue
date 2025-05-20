@@ -175,10 +175,6 @@ export default defineComponent({
     const itemsPerPage = ref(10);
     const headers: VDataTableHeader = [
       {
-        title: "ID",
-        key: "id",
-      },
-      {
         title: "Name",
         key: "name",
       },

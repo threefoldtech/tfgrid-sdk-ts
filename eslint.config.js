@@ -62,6 +62,7 @@ export default [
     },
     rules: {
       ...tseslint.configs.eslintRecommended.rules,
+      "@typescript-eslint/no-unused-vars": "warn",
 
       "no-console": "off",
       "prettier/prettier": "warn",
