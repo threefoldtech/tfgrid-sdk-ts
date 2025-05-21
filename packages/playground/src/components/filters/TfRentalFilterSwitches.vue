@@ -86,20 +86,20 @@ const hasGPUModel = computed({
   set: val => emit("update:hasGPU", val),
 });
 
-function onUpdateRentedByMe(val: boolean) {
-  rentedByMeModel.value = val;
+function onUpdateRentedByMe(val: boolean | null) {
+  rentedByMeModel.value = !!val;
 }
 
-function onUpdateDedicated(val: boolean) {
-  dedicatedModel.value = val;
+function onUpdateDedicated(val: boolean | null) {
+  dedicatedModel.value = !!val;
 }
 
-function onUpdateCertified(val: boolean) {
-  certifiedModel.value = val;
+function onUpdateCertified(val: boolean | null) {
+  certifiedModel.value = !!val;
 }
 
-function onUpdateHasGPU(val: boolean) {
-  hasGPUModel.value = val;
+function onUpdateHasGPU(val: boolean | null) {
+  hasGPUModel.value = !!val;
 }
 </script>
 
