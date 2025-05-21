@@ -48,25 +48,14 @@
           :has-custom-domain="selectionDetails?.domain?.enabledCustomDomain"
           require-domain
         />
-        <input-tooltip
-          inline
-          tooltip="
-            Selecting a Node with GPU.
-            When selecting a node with GPU resources, please make sure that you have a rented node. To rent a node and gain access to GPU capabilities, you can use our dashboard.
-            "
-        >
-          <v-switch color="primary" inset label="GPU" v-model="hasGPU" hide-details />
-        </input-tooltip>
-        
-        <v-switch color="primary" inset label="Rented By Me" v-model="rentedByMe" hide-details />
-        
-        <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
-          <v-switch color="primary" inset label="Rentable" v-model="dedicated" hide-details />
-        </input-tooltip>
 
-        <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
-          <v-switch color="primary" inset label="Certified" v-model="certified" hide-details />
-        </input-tooltip>
+        <TfRentalFilterSwitches
+          v-model:rentedByMe="rentedByMe"
+          v-model:dedicated="dedicated"
+          v-model:certified="certified"
+          v-model:hasGPU="hasGPU"
+          :show-GPU="true"
+        />
 
         <TfSelectionDetails
           :filters="{
@@ -89,7 +78,6 @@
           v-model="selectionDetails"
         />
 
-        
         <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
       </template>
     </d-tabs>
@@ -107,8 +95,6 @@
 
 <script lang="ts" setup>
 import { computed, type Ref, ref, watch } from "vue";
-
-import { manual } from "@/utils/manual";
 
 import Networks, { useNetworks } from "../components/networks.vue";
 import { useLayout } from "../components/weblet_layout.vue";
@@ -262,6 +248,7 @@ function updateSSHkeyEnv(selectedKeys: string) {
 <script lang="ts">
 import type { GridClient } from "@threefold/grid_client";
 
+import TfRentalFilterSwitches from "../components/filters/TfRentalFilterSwitches.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";
@@ -273,6 +260,7 @@ export default {
   components: {
     SelectSolutionFlavor,
     ManageSshDeployemnt,
+    TfRentalFilterSwitches,
   },
 };
 </script>

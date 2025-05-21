@@ -68,16 +68,11 @@
         </input-tooltip>
       </AlgorandCapacity>
 
-      <!-- <input-tooltip inline tooltip="" :href="manual"> -->
-      <v-switch color="primary" inset label="Rented By Me" v-model="rentedByMe" hide-details />
-      <!-- </input-tooltip> -->
-      <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
-        <v-switch color="primary" inset label="Rentable" v-model="dedicated" hide-details />
-      </input-tooltip>
-
-      <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
-        <v-switch color="primary" inset label="Certified" v-model="certified" hide-details />
-      </input-tooltip>
+      <TfRentalFilterSwitches
+        v-model:rentedByMe="rentedByMe"
+        v-model:dedicated="dedicated"
+        v-model:certified="certified"
+      />
 
       <TfSelectionDetails
         :filters-validators="{
@@ -123,8 +118,6 @@
 
 <script lang="ts" setup>
 import { computed, type Ref, ref, watch } from "vue";
-
-import { manual } from "@/utils/manual";
 
 import { useLayout } from "../components/weblet_layout.vue";
 import { useGrid } from "../stores";
@@ -223,6 +216,7 @@ function updateSSHkeyEnv(selectedKeys: string) {
 import { FLISTS, type GridClient } from "@threefold/grid_client";
 
 import AlgorandCapacity from "../components/algorand_capacity.vue";
+import TfRentalFilterSwitches from "../components/filters/TfRentalFilterSwitches.vue";
 import Networks, { useNetworks } from "../components/networks.vue";
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";
@@ -232,6 +226,6 @@ import { normalizeError } from "../utils/helpers";
 
 export default {
   name: "TfAlgorand",
-  components: { AlgorandCapacity, Networks, ManageSshDeployemnt },
+  components: { AlgorandCapacity, Networks, ManageSshDeployemnt, TfRentalFilterSwitches },
 };
 </script>

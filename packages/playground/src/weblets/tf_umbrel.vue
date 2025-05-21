@@ -83,16 +83,11 @@
         :large="{ cpu: 4, memory: 16, disk: 100 }"
       />
 
-      <!-- <input-tooltip inline tooltip="" :href="manual"> -->
-      <v-switch color="primary" inset label="Rented By Me" v-model="rentedByMe" hide-details />
-      <!-- </input-tooltip> -->
-      <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
-        <v-switch color="primary" inset label="Rentable" v-model="dedicated" hide-details />
-      </input-tooltip>
-
-      <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
-        <v-switch color="primary" inset label="Certified" v-model="certified" hide-details />
-      </input-tooltip>
+      <TfRentalFilterSwitches
+        v-model:rentedByMe="rentedByMe"
+        v-model:dedicated="dedicated"
+        v-model:certified="certified"
+      />
 
       <TfSelectionDetails
         :filters-validators="{
@@ -132,8 +127,6 @@
 
 <script lang="ts" setup>
 import { computed, type Ref, ref } from "vue";
-
-import { manual } from "@/utils/manual";
 
 import Networks, { useNetworks } from "../components/networks.vue";
 import { useLayout } from "../components/weblet_layout.vue";
@@ -233,6 +226,7 @@ import { calculateRootFileSystem, FLISTS, type GridClient } from "@threefold/gri
 
 import { updateGrid } from "@/utils/grid";
 
+import TfRentalFilterSwitches from "../components/filters/TfRentalFilterSwitches.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";
@@ -240,6 +234,6 @@ import type { SelectionDetails } from "../types/nodeSelector";
 
 export default {
   name: "TfUmbrel",
-  components: { SelectSolutionFlavor, ManageSshDeployemnt },
+  components: { SelectSolutionFlavor, ManageSshDeployemnt, TfRentalFilterSwitches },
 };
 </script>

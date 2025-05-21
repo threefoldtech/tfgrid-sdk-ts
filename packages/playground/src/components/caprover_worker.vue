@@ -31,15 +31,12 @@
       v-model:mycelium="$props.modelValue.mycelium"
       v-model:wireguard="$props.modelValue.wireguard"
     />
-    <!-- <input-tooltip inline tooltip="" :href="manual"> -->
-    <v-switch color="primary" inset label="Rented By Me" v-model="$props.modelValue.rentedByMe" hide-details />
-    <!-- </input-tooltip> -->
-    <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
-      <v-switch color="primary" inset label="Rentable" v-model="$props.modelValue.dedicated" hide-details />
-    </input-tooltip>
-    <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
-      <v-switch color="primary" inset label="Certified" v-model="$props.modelValue.certified" hide-details />
-    </input-tooltip>
+
+    <TfRentalFilterSwitches
+      v-model:rentedByMe="$props.modelValue.rentedByMe"
+      v-model:dedicated="$props.modelValue.dedicated"
+      v-model:certified="$props.modelValue.certified"
+    />
 
     <TfSelectionDetails
       :selected-machines="selectedMachines"
@@ -70,8 +67,8 @@ import { computed, type PropType } from "vue";
 
 import { useGrid } from "@/stores";
 import type { SelectedMachine } from "@/types/nodeSelector";
-import { manual } from "@/utils/manual";
 
+import TfRentalFilterSwitches from "../components/filters/TfRentalFilterSwitches.vue";
 import Networks from "../components/networks.vue";
 import type { CaproverWorker } from "../types";
 import { generateName } from "../utils/strings";
@@ -107,7 +104,7 @@ function toMachine(rootFilesystemSize: number, worker?: CaproverWorker): Selecte
 
 export default {
   name: "CaproverWorker",
-  components: { SelectSolutionFlavor, Networks },
+  components: { SelectSolutionFlavor, Networks, TfRentalFilterSwitches },
   props: {
     modelValue: {
       type: Object as PropType<CaproverWorker>,
@@ -142,7 +139,7 @@ export default {
       }, [] as SelectedMachine[]);
     });
 
-    return { rootFilesystemSize, manual, selectedMachines, rentedBy };
+    return { rootFilesystemSize, selectedMachines, rentedBy };
   },
 };
 </script>

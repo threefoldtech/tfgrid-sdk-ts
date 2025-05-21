@@ -66,15 +66,11 @@
           v-model:wireguard="wireguard"
         />
 
-        <!-- <input-tooltip inline tooltip="" :href="manual"> -->
-        <v-switch color="primary" inset label="Rented By Me" v-model="rentedByMe" hide-details />
-        <!-- </input-tooltip> -->
-        <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
-          <v-switch color="primary" inset label="Rentable" v-model="dedicated" hide-details />
-        </input-tooltip>
-        <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
-          <v-switch color="primary" inset label="Certified" v-model="certified" hide-details />
-        </input-tooltip>
+        <TfRentalFilterSwitches
+          v-model:rentedByMe="rentedByMe"
+          v-model:dedicated="dedicated"
+          v-model:certified="certified"
+        />
 
         <TfSelectionDetails
           :filters="{
@@ -126,8 +122,6 @@
 
 <script lang="ts" setup>
 import { computed, ref } from "vue";
-
-import { manual } from "@/utils/manual";
 
 import Networks, { useNetworks } from "../components/networks.vue";
 import { useLayout } from "../components/weblet_layout.vue";
@@ -231,6 +225,7 @@ function updateSSHkeyEnv(selectedKeys: string) {
 <script lang="ts">
 import { calculateRootFileSystem, FLISTS, type GridClient } from "@threefold/grid_client";
 
+import TfRentalFilterSwitches from "../components/filters/TfRentalFilterSwitches.vue";
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";
 import type { SelectionDetails } from "../types/nodeSelector";
@@ -238,6 +233,6 @@ import { updateGrid } from "../utils/grid";
 
 export default {
   name: "TFPresearch",
-  component: { ManageSshDeployemnt },
+  component: { ManageSshDeployemnt, TfRentalFilterSwitches },
 };
 </script>

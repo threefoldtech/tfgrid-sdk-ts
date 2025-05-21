@@ -115,8 +115,6 @@
 <script lang="ts" setup>
 import { ref } from "vue";
 
-import { manual } from "@/utils/manual";
-
 import { useLayout } from "../components/weblet_layout.vue";
 import { useGrid, useProfileManager } from "../stores";
 import { type CaproverWorker as CW, ProjectName } from "../types";

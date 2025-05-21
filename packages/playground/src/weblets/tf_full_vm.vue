@@ -53,25 +53,14 @@
           v-model:mycelium="mycelium"
           v-model:wireguard="wireguard"
         />
-        <input-tooltip
-          inline
-          tooltip="
-          Selecting a Node with GPU.
-          When selecting a node with GPU resources, please make sure that you have a rented node. To rent a node and gain access to GPU capabilities, you can use our dashboard.
-          "
-        >
-          <v-switch color="primary" inset label="GPU" v-model="hasGPU" hide-details />
-        </input-tooltip>
-        <!-- <input-tooltip inline tooltip="" :href="manual"> -->
-        <v-switch color="primary" inset label="Rented By Me" v-model="rentedByMe" hide-details />
-        <!-- </input-tooltip> -->
-        <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
-          <v-switch color="primary" inset label="Rentable" v-model="dedicated" hide-details />
-        </input-tooltip>
 
-        <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
-          <v-switch color="primary" inset label="Certified" v-model="certified" hide-details />
-        </input-tooltip>
+        <TfRentalFilterSwitches
+          v-model:rentedByMe="rentedByMe"
+          v-model:dedicated="dedicated"
+          v-model:certified="certified"
+          v-model:hasGPU="hasGPU"
+          :show-GPU="true"
+        />
 
         <TfSelectionDetails
           :filters="{
@@ -151,8 +140,6 @@
 
 <script lang="ts" setup>
 import { computed, type Ref, ref, watch } from "vue";
-
-import { manual } from "@/utils/manual";
 
 import Networks, { useNetworks } from "../components/networks.vue";
 import { useLayout } from "../components/weblet_layout.vue";
@@ -280,6 +267,7 @@ function updateSSHkeyEnv(selectedKeys: string) {
 import { FLISTS, type GridClient } from "@threefold/grid_client";
 
 import ExpandableLayout from "../components/expandable_layout.vue";
+import TfRentalFilterSwitches from "../components/filters/TfRentalFilterSwitches.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import SelectVmImage, { type VmImage } from "../components/select_vm_image.vue";
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
@@ -294,6 +282,7 @@ export default {
     SelectSolutionFlavor,
     ExpandableLayout,
     ManageSshDeployemnt,
+    TfRentalFilterSwitches,
   },
 };
 </script>

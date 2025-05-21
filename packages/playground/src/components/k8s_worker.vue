@@ -76,16 +76,11 @@
       v-model.number="$props.modelValue.rootFsSize"
     />
 
-    <!-- <input-tooltip inline tooltip="" :href="manual"> -->
-    <v-switch color="primary" inset label="Rented By Me" v-model="$props.modelValue.rentedByMe" hide-details />
-    <!-- </input-tooltip> -->
-    <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
-      <v-switch color="primary" inset label="Rentable" v-model="$props.modelValue.dedicated" hide-details />
-    </input-tooltip>
-
-    <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
-      <v-switch color="primary" inset label="Certified" v-model="$props.modelValue.certified" hide-details />
-    </input-tooltip>
+    <TfRentalFilterSwitches
+      v-model:rentedByMe="$props.modelValue.rentedByMe"
+      v-model:dedicated="$props.modelValue.dedicated"
+      v-model:certified="$props.modelValue.certified"
+    />
 
     <TfSelectionDetails
       :selected-machines="selectedMachines"
@@ -124,8 +119,8 @@ import { computed, type PropType } from "vue";
 
 import { useGrid } from "@/stores";
 import type { SelectedMachine } from "@/types/nodeSelector";
-import { manual } from "@/utils/manual";
 
+import TfRentalFilterSwitches from "../components/filters/TfRentalFilterSwitches.vue";
 import Networks from "../components/networks.vue";
 import type { K8SWorker } from "../types";
 import { generateName } from "../utils/strings";
@@ -167,7 +162,7 @@ function toMachine(worker?: K8SWorker): SelectedMachine | undefined {
 
 export default {
   name: "K8SWorker",
-  components: { RootFsSize, Networks },
+  components: { RootFsSize, Networks, TfRentalFilterSwitches },
   props: {
     modelValue: {
       type: Object as PropType<K8SWorker>,
@@ -193,7 +188,7 @@ export default {
       }, [] as SelectedMachine[]);
     });
 
-    return { calculateRootFileSystem, manual, selectedMachines, rentedBy };
+    return { calculateRootFileSystem, selectedMachines, rentedBy };
   },
 };
 </script>
