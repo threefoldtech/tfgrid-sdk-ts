@@ -1,4 +1,4 @@
-import StellarSdk from "@stellar/stellar-sdk";
+import * as StellarSdk from "@stellar/stellar-sdk";
 import type { GridClient } from "@threefold/grid_client";
 import { default as PrivateIp } from "private-ip";
 import validator from "validator";
