@@ -4,16 +4,16 @@
       v-if="showGPU"
       inline
       tooltip="
-    Selecting a Node with GPU.
-    When selecting a node with GPU resources, please make sure that you have a rented node. To rent a node and gain access to GPU capabilities, you can use our dashboard.
-  "
+        Selecting a Node with GPU.
+        When selecting a node with GPU resources, please make sure that you have a rented node. To rent a node and gain access to GPU capabilities, you can use our dashboard.
+      "
     >
       <v-switch
         color="primary"
         inset
         label="GPU"
         :model-value="hasGPUModel"
-        @update:model-value="hasGPUModel = $event"
+        @update:model-value="onUpdateHasGPU"
         hide-details
       />
     </input-tooltip>
@@ -23,7 +23,7 @@
       inset
       label="Rented By Me"
       :model-value="rentedByMeModel"
-      @update:model-value="rentedByMeModel = $event"
+      @update:model-value="onUpdateRentedByMe"
       hide-details
     />
 
@@ -33,7 +33,7 @@
         inset
         label="Rentable"
         :model-value="dedicatedModel"
-        @update:model-value="dedicatedModel = $event"
+        @update:model-value="onUpdateDedicated"
         hide-details
       />
     </input-tooltip>
@@ -44,7 +44,7 @@
         inset
         label="Certified"
         :model-value="certifiedModel"
-        @update:model-value="certifiedModel = $event"
+        @update:model-value="onUpdateCertified"
         hide-details
       />
     </input-tooltip>
@@ -57,10 +57,10 @@ import { computed } from "vue";
 import { manual } from "@/utils/manual";
 
 const props = defineProps({
-  rentedByMe: { type: Boolean, default: false },
-  dedicated: { type: Boolean, default: false },
-  certified: { type: Boolean, default: false },
-  hasGPU: { type: Boolean, default: false },
+  rentedByMe: Boolean,
+  dedicated: Boolean,
+  certified: Boolean,
+  hasGPU: Boolean,
   showGPU: { type: Boolean, default: false },
 });
 
@@ -68,23 +68,39 @@ const emit = defineEmits(["update:rentedByMe", "update:dedicated", "update:certi
 
 const rentedByMeModel = computed({
   get: () => !!props.rentedByMe,
-  set: (val: boolean) => emit("update:rentedByMe", val),
+  set: val => emit("update:rentedByMe", val),
 });
 
 const dedicatedModel = computed({
   get: () => !!props.dedicated,
-  set: (val: boolean) => emit("update:dedicated", val),
+  set: val => emit("update:dedicated", val),
 });
 
 const certifiedModel = computed({
   get: () => !!props.certified,
-  set: (val: boolean) => emit("update:certified", val),
+  set: val => emit("update:certified", val),
 });
 
 const hasGPUModel = computed({
   get: () => !!props.hasGPU,
-  set: (val: boolean) => emit("update:hasGPU", val),
+  set: val => emit("update:hasGPU", val),
 });
+
+function onUpdateRentedByMe(val: boolean) {
+  rentedByMeModel.value = val;
+}
+
+function onUpdateDedicated(val: boolean) {
+  dedicatedModel.value = val;
+}
+
+function onUpdateCertified(val: boolean) {
+  certifiedModel.value = val;
+}
+
+function onUpdateHasGPU(val: boolean) {
+  hasGPUModel.value = val;
+}
 </script>
 
 <script lang="ts">
