@@ -9,7 +9,7 @@
       <v-card>
         <v-card-title class="bg-primary"> Withdraw TFT </v-card-title>
         <v-card-text>
-          <VAlert type="info" class="mb-5">
+          <VAlert type="info">
             Interact with the bridge in order to withdraw your TFT to
             {{ selectedName?.charAt(0).toUpperCase() + selectedName!.slice(1) }} (withdraw fee is:
             {{ withdrawFee }} TFT)
