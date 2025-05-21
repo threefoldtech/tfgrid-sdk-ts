@@ -57,10 +57,10 @@ import { computed } from "vue";
 import { manual } from "@/utils/manual";
 
 const props = defineProps({
-  rentedByMe: Boolean,
-  dedicated: Boolean,
-  certified: Boolean,
-  hasGPU: Boolean,
+  rentedByMe: { type: Boolean, default: false },
+  dedicated: { type: Boolean, default: false },
+  certified: { type: Boolean, default: false },
+  hasGPU: { type: Boolean, default: false },
   showGPU: { type: Boolean, default: false },
 });
 
