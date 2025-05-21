@@ -67,22 +67,22 @@ const props = defineProps({
 const emit = defineEmits(["update:rentedByMe", "update:dedicated", "update:certified", "update:hasGPU"]);
 
 const rentedByMeModel = computed({
-  get: () => props.rentedByMe,
+  get: () => !!props.rentedByMe,
   set: val => emit("update:rentedByMe", val),
 });
 
 const dedicatedModel = computed({
-  get: () => props.dedicated,
+  get: () => !!props.dedicated,
   set: val => emit("update:dedicated", val),
 });
 
 const certifiedModel = computed({
-  get: () => props.certified,
+  get: () => !!props.certified,
   set: val => emit("update:certified", val),
 });
 
 const hasGPUModel = computed({
-  get: () => props.hasGPU,
+  get: () => !!props.hasGPU,
   set: val => emit("update:hasGPU", val),
 });
 </script>
