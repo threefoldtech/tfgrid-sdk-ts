@@ -28,8 +28,7 @@ There are two ways to run the Automation selenium tests:
   yarn lerna run build
   make run project=playground
   ```
-
-  If the build fails due to a memory issue, please use the following command
+If the build fails due to a memory issue, please use the following command
 
 ```bash
 export NODE_OPTIONS="--max-old-space-size=8192"
@@ -71,17 +70,17 @@ export NODE_OPTIONS="--max-old-space-size=8192"
 
 - (Not Recommended) Install the recommended version of the pip package listed above for a stable run, or you can just install Python 3 and use the command:
   - `pip install -r requirements.txt --break-system-packages` (Use this if you don't use any of the listed packages).
-- (Recommended) Or use Virtual Environments:
-  - create an environment using
-    `python -m venv myenv`
+- (Recommended) Or use Virtual Environments: 
+  - create an environment using 
+      `python -m venv myenv`
   - activate it using
-    `source myenv/bin/activate`
+      `source myenv/bin/activate`
   - install packages using
-    `pip install -r requirements.txt`.
+      `pip install -r requirements.txt`.
 - You'll also need to install `Xvfb`, Run:
-  `sudo apt install xvfb`.
+      `sudo apt install xvfb`.
 - You can run selenium tests with pytest through the command line using:
-  `python3 -m pytest -v`.
+      `python3 -m pytest -v`.
 
 ### More options to run tests
 
