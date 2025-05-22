@@ -12,8 +12,7 @@
         color="primary"
         inset
         label="GPU"
-        :model-value="hasGPUModel"
-        @update:model-value="onUpdateHasGPU"
+        @update:model-value="(val: boolean )=> hasGPUModel = val"
         hide-details
       />
     </input-tooltip>
@@ -22,8 +21,7 @@
       color="primary"
       inset
       label="Rented By Me"
-      :model-value="rentedByMeModel"
-      @update:model-value="onUpdateRentedByMe"
+      @update:model-value="(val: boolean )=> rentedByMeModel = val"
       hide-details
     />
 
@@ -32,8 +30,7 @@
         color="primary"
         inset
         label="Rentable"
-        :model-value="dedicatedModel"
-        @update:model-value="onUpdateDedicated"
+        @update:model-value="(val: boolean )=> dedicatedModel = val"
         hide-details
       />
     </input-tooltip>
@@ -43,8 +40,7 @@
         color="primary"
         inset
         label="Certified"
-        :model-value="certifiedModel"
-        @update:model-value="onUpdateCertified"
+        @update:model-value="(val: boolean )=> certifiedModel = val"
         hide-details
       />
     </input-tooltip>
@@ -85,22 +81,6 @@ const hasGPUModel = computed({
   get: () => !!props.hasGPU,
   set: val => emit("update:hasGPU", val),
 });
-
-function onUpdateRentedByMe(val: boolean | null) {
-  rentedByMeModel.value = !!val;
-}
-
-function onUpdateDedicated(val: boolean | null) {
-  dedicatedModel.value = !!val;
-}
-
-function onUpdateCertified(val: boolean | null) {
-  certifiedModel.value = !!val;
-}
-
-function onUpdateHasGPU(val: boolean | null) {
-  hasGPUModel.value = !!val;
-}
 </script>
 
 <script lang="ts">
