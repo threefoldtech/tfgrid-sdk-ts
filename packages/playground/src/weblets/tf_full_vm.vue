@@ -188,7 +188,7 @@ const disks = ref<Disk[]>([]);
 const hasGPU = ref(false);
 const rentedBy = computed(() => (rentedByMe.value ? grid.twinId : undefined));
 const rootFilesystemSize = computed(() =>
-  flist.value?.name === "Ubuntu-24.04" || flist.value?.name === "Other" ? solution.value?.disk : 2,
+  flist.value?.name === "Ubuntu-24.04" || flist.value?.name === "Other" ? undefined : 2,
 );
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
@@ -252,7 +252,7 @@ async function deploy() {
           planetary: planetary.value,
           mycelium: mycelium.value,
           envs: [{ key: "SSH_KEY", value: selectedSSHKeys.value }],
-          rootFilesystemSize: rootFilesystemSize.value,
+          rootFilesystemSize: rootFilesystemSize.value ?? solution.value.disk,
           hasGPU: hasGPU.value,
           nodeId: selectionDetails.value?.node?.nodeId,
           gpus: hasGPU.value ? selectionDetails.value?.gpuCards.map(card => card.id) : undefined,
