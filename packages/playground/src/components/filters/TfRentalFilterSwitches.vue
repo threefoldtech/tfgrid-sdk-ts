@@ -12,7 +12,7 @@
         color="primary"
         inset
         label="GPU"
-        @update:model-value="(val: boolean )=> hasGPUModel = val"
+        @update:model-value="(val: boolean | null) => { hasGPUModel = !!val }"
         hide-details
       />
     </input-tooltip>
@@ -21,7 +21,7 @@
       color="primary"
       inset
       label="Rented By Me"
-      @update:model-value="(val: boolean )=> rentedByMeModel = val"
+      @update:model-value="(val: boolean | null) => { rentedByMeModel = !!val }"
       hide-details
     />
 
@@ -30,7 +30,7 @@
         color="primary"
         inset
         label="Rentable"
-        @update:model-value="(val: boolean )=> dedicatedModel = val"
+        @update:model-value="(val: boolean | null) => { dedicatedModel = !!val }"
         hide-details
       />
     </input-tooltip>
@@ -40,7 +40,7 @@
         color="primary"
         inset
         label="Certified"
-        @update:model-value="(val: boolean )=> certifiedModel = val"
+        @update:model-value="(val: boolean | null) => { certifiedModel = !!val }"
         hide-details
       />
     </input-tooltip>
