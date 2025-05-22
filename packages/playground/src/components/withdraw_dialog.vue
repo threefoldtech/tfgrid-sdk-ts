@@ -9,8 +9,11 @@
       <v-card>
         <v-card-title class="bg-primary"> Withdraw TFT </v-card-title>
         <v-card-text>
-          Interact with the bridge in order to withdraw your TFT to
-          {{ selectedName?.charAt(0).toUpperCase() + selectedName!.slice(1) }} (withdraw fee is: {{ withdrawFee }} TFT)
+          <VAlert type="info">
+            Interact with the bridge in order to withdraw your TFT to
+            {{ selectedName?.charAt(0).toUpperCase() + selectedName!.slice(1) }} (withdraw fee is:
+            {{ withdrawFee }} TFT)
+          </VAlert>
         </v-card-text>
         <v-card-text>
           <FormValidator v-model="valid">
@@ -35,7 +38,7 @@
               :rules="[
               validators.required('This field is required'),
               validators.min('Amount should be at least 2 TFT', 2),
-              validators.max( 'Amount cannot exceed balance',freeBalance!),
+              validators.max('Amount cannot exceed balance with fees',freeBalance! - withdrawFee!),
               validators.isValidDecimalNumber(3,'Amount must have 3 decimals only')
             ]"
             >
@@ -124,10 +127,11 @@ async function validateAddress() {
 }
 
 async function withdrawTFT(targetAddress: string, withdrawAmount: number) {
+  if (!props.withdrawFee) return;
   loadingWithdraw.value = true;
   try {
     updateGrid(grid, { projectName: "" });
-    await grid?.bridge.swapToStellar({ amount: +withdrawAmount, target: targetAddress });
+    await grid?.bridge.swapToStellar({ amount: +withdrawAmount + props.withdrawFee, target: targetAddress });
 
     await ProfileManagerController.reloadBalance();
     createCustomToast("Transaction Succeeded", ToastType.success);
