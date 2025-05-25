@@ -1,8 +1,13 @@
 <template>
   <v-card>
     <template v-if="loading">
-      <v-skeleton-loader type="heading" class="ma-2" elevation="1" />
-      <v-skeleton-loader type="table-tbody" class="ma-2" elevation="1" />
+     <div class="pa-4">
+        <v-skeleton-loader type="heading" class="mb-4" />
+        <div v-for="n in 3" :key="n" class="d-flex justify-space-between align-center py-2 bb-gray">
+          <v-skeleton-loader type="text" width="40%" />
+          <v-skeleton-loader type="text" width="30%" />
+        </div>
+      </div>
     </template>
     <template v-else>
       <v-alert class="pa-5" style="height: 20px" v-if="title">
