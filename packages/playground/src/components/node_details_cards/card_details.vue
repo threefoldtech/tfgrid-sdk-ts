@@ -1,6 +1,7 @@
 <template>
   <v-card>
     <template v-if="loading">
+      <v-skeleton-loader type="heading" class="ma-2" elevation="1" />
       <v-skeleton-loader type="table-tbody" class="ma-2" elevation="1" />
     </template>
     <template v-else>
