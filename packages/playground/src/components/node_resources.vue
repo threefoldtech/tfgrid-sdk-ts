@@ -4,7 +4,7 @@
       <div class="mb-2">{{ item.name }}</div>
       <div class="text-center">
         <v-progress-circular :model-value="item.value !== 'NaN' ? item.value : 0" :size="150" :width="15" color="info">
-          {{ item.value !== "NaN" ? item.value + "%" : "N/A" }}
+          {{ item.value !== "NaN" ? (+item.value > 100 ? "100+ %" : item.value + "%") : "N/A" }}
         </v-progress-circular>
       </div>
     </div>

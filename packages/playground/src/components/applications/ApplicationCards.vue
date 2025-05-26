@@ -20,7 +20,7 @@
                 :src="baseURL + 'images/icons/' + card.icon"
                 :alt="card.title"
                 :style="{
-                  filter: `brightness(${$vuetify.theme.global.name === 'light' ? 0.2 : 1})`,
+                  filter: `brightness(${!theme.global.current.value.dark ? 0.2 : 1})`,
                   lineHeight: 1,
                 }"
               />
@@ -48,6 +48,7 @@
 
 <script lang="ts">
 import { defineComponent, type PropType } from "vue";
+import { useTheme } from "vuetify";
 
 import { isReleasedOverMon } from "@/utils/date";
 import type { ApplicationCard } from "@/utils/types";
@@ -61,10 +62,12 @@ export default defineComponent({
   },
   setup() {
     const baseURL = import.meta.env.BASE_URL;
+    const theme = useTheme();
 
     return {
       baseURL,
       isReleasedOverMon,
+      theme,
     };
   },
 });

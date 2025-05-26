@@ -3,6 +3,7 @@ from pages.dashboard import DashboardPage
 from utils.grid_proxy import GridProxy
 from pages.bridge import BridgePage
 import pytest
+from utils.base import Base
 
 #  Time required for the run (11 cases) is approximately 3 minutes.
 
@@ -28,21 +29,6 @@ def test_navigate_bridge(browser):
     """
     before_test_setup(browser)
     assert 'Transfer TFT Across Chains' in browser.page_source
-
-
-# def test_transfer_chain(browser):
-#     """
-#       Test Case: TC1113 transfer chain
-#       Steps:
-#           - Navigate to the dashboard.
-#           - Login.
-#           - Click on bridge from side menu.
-#           - Click on chain list.
-#       Result: Steller should be selected.
-#     """
-#     bridge_page = before_test_setup(browser)
-#     bridge_page.transfer_chain()
-#     assert 'stellar' in browser.page_source
 
 
 def test_choose_deposit(browser):
@@ -90,8 +76,14 @@ def test_how_it_done(browser):
       Result: it will go to link
     """
     bridge_page = before_test_setup(browser)
-    assert bridge_page.how_it_done() in 'https://www.manual.grid.tf/documentation/threefold_token/tft_bridges/tfchain_stellar_bridge.html'
-    assert bridge_page.deposite_learn_more() in 'https://www.manual.grid.tf/documentation/threefold_token/tft_bridges/tft_bridges.html'
+    if Base.net in ['dev', 'local']:
+        tfchain_stellar_bridge_url = 'https://www.manual.grid.tf/documentation/threefold_token/tft_bridges/tfchain_stellar_bridge.html'
+        tft_bridges_url = 'https://www.manual.grid.tf/documentation/threefold_token/tft_bridges/tft_bridges.html'
+    else:
+        tfchain_stellar_bridge_url = 'https://manual.grid.tf/documentation/threefold_token/tft_bridges/tfchain_stellar_bridge.html'
+        tft_bridges_url = 'https://manual.grid.tf/documentation/threefold_token/tft_bridges/tft_bridges.html'
+    assert bridge_page.how_it_done() == tfchain_stellar_bridge_url
+    assert bridge_page.deposite_learn_more() == tft_bridges_url
 
 
 def test_check_deposit(browser):
@@ -110,13 +102,12 @@ def test_check_deposit(browser):
     grid_proxy = GridProxy(browser)
     twin_id, amount_text, bridge_address = bridge_page.check_deposit()
     assert bridge_page.wait_for(amount_text)
-    assert bridge_address == 'GDHJP6TF3UXYXTNEZ2P36J5FH7W4BJJQ4AYYAXC66I2Q2AH5B6O6BCFG'
+    assert bridge_address == Base.bridge_address
     assert bridge_page.wait_for('Add twin ID as memo text or you will lose your tokens')
     user_address = bridge_page.twin_address()
     assert grid_proxy.get_twin_address(twin_id[twin_id.find('_')+1:]) == user_address
 
 
-@pytest.mark.skip(reason="https://github.com/threefoldtech/tfgrid-sdk-ts/issues/3752")
 def test_check_withdraw_stellar(browser):
     """
       Test Case: TC1118 check withdraw stellar
@@ -158,7 +149,7 @@ def test_check_withdraw_invalid_stellar(browser):
     assert bridge_page.check_withdraw_invalid_stellar('') == False
     assert bridge_page.wait_for('This field is required')
 
-@pytest.mark.skip(reason="https://github.com/threefoldtech/tfgrid-sdk-ts/issues/3752")
+
 def test_check_withdraw_tft_amount(browser):
     """
       Test Case: TC1131 check withdraw tft amount
@@ -174,8 +165,10 @@ def test_check_withdraw_tft_amount(browser):
     """
     bridge_page = before_test_setup(browser)
     balance = bridge_page.setup_widthdraw_address(get_stellar_address())
+    locked_balance = bridge_page.get_locked_balance()
+    #decrease the locked TFT before transfer
     cases = [2, 8.001, 10.111]
-    cases.append(format(float(balance)-1, '.3f'))
+    cases.append(format(float(balance)-float(locked_balance), '.3f'))
     for case in cases:
         assert bridge_page.check_withdraw_tft_amount(case) == True
 
@@ -206,7 +199,7 @@ def test_check_withdraw_invalid_tft_amount(browser):
     assert bridge_page.check_withdraw_invalid_tft_amount('') == False
     assert bridge_page.wait_for('This field is required')
 
-@pytest.mark.skip(reason="https://github.com/threefoldtech/tfgrid-sdk-ts/issues/3752")
+
 def test_check_withdraw(browser):
     """
       Test Case: TC1132 check withdraw 

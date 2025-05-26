@@ -1,80 +1,97 @@
 <template>
-  <v-card :loading="loading">
-    <v-alert class="pa-5" style="height: 20px" v-if="title">
-      <h4 class="text-center font-weight-medium">
-        <v-icon :icon="icon" size="large" />
-        {{ title }}
-      </h4>
-    </v-alert>
-    <v-card-item :class="`mt-2 mb-2 ${$props.isMap ? 'map' : ''}`">
-      <v-alert type="error" variant="tonal" class="mt-2 mb-4" v-if="$props.error">
-        {{ $props.error }}
+  <v-card>
+    <template v-if="loading">
+     <div class="pa-4">
+        <v-skeleton-loader type="heading" class="mb-4" />
+        <div v-for="n in 3" :key="n" class="d-flex justify-space-between align-center py-2 bb-gray">
+          <v-skeleton-loader type="text" width="40%" />
+          <v-skeleton-loader type="text" width="30%" />
+        </div>
+      </div>
+    </template>
+    <template v-else>
+      <v-alert class="pa-5" style="height: 20px" v-if="title">
+        <h4 class="text-center font-weight-medium">
+          <v-icon :icon="icon" size="large" />
+          {{ title }}
+        </h4>
       </v-alert>
-      <div v-else-if="$props.isMap">
-        <tf-map :nodes="transformedObject" r="76" g="187" b="217"></tf-map>
-      </div>
+      <v-card-item :class="`mt-2 mb-2 ${$props.isMap ? 'map' : ''}`">
+        <v-alert type="error" variant="tonal" class="mt-2 mb-4" v-if="$props.error">
+          {{ $props.error }}
+        </v-alert>
+        <div v-else-if="$props.isMap">
+          <tf-map :nodes="transformedObject" r="76" g="187" b="217"></tf-map>
+        </div>
 
-      <div :class="`items`" v-else>
-        <slot name="gpu-hint-message" />
+        <div :class="`items`" v-else>
+          <slot name="gpu-hint-message" />
 
-        <v-row class="bb-gray" v-for="item in items" :key="item.name">
-          <v-col v-if="$props.iperf" class="font-14 d-flex justify-space-between">
-            <p class="ml-20 font-14">{{ item.name }}/{{ item.type }}</p>
-            <div>
-              <v-icon icon="mdi-arrow-up"></v-icon>
-              <span class="mx-3">{{ item.uploadSpeed }}</span>
-            </div>
-            <div>
-              <v-icon icon="mdi-arrow-down"></v-icon>
-              <span class="mx-3">{{ item.downloadSpeed }}</span>
-            </div>
-          </v-col>
-          <v-col v-if="!$props.iperf" class="d-flex justify-start align-center ml-3">
-            <p class="font-14">{{ item.name }}</p>
-            <v-chip class="ml-4" v-if="item.nameHint" :color="item.nameHintColor">{{ item.nameHint }}</v-chip>
-          </v-col>
-          <v-col v-if="!$props.iperf" class="d-flex overflowText justify-end align-center mr-3">
-            <p class="font-14" v-if="!item.icon && !item.hint && !item.imgSrc">
-              {{ item.value && item.value.length > maxLenChar ? item.value.slice(0, maxLenChar) + "..." : item.value }}
-            </p>
+          <v-row class="bb-gray" v-for="item in items" :key="item.name">
+            <v-col v-if="$props.iperf" class="font-14 d-flex justify-space-between">
+              <p class="ml-20 font-14">{{ item.name }}/{{ item.type }}</p>
+              <div>
+                <v-icon icon="mdi-arrow-up"></v-icon>
+                <span class="mx-3">{{ item.uploadSpeed }}</span>
+              </div>
+              <div>
+                <v-icon icon="mdi-arrow-down"></v-icon>
+                <span class="mx-3">{{ item.downloadSpeed }}</span>
+              </div>
+            </v-col>
+            <v-col v-if="!$props.iperf" class="d-flex justify-start align-center ml-3">
+              <p class="font-14">{{ item.name }}</p>
+              <v-chip class="ml-4" v-if="item.nameHint" :color="item.nameHintColor">{{ item.nameHint }}</v-chip>
+            </v-col>
+            <v-col v-if="!$props.iperf" class="d-flex overflowText justify-end align-center mr-3">
+              <p class="font-14" v-if="!item.icon && !item.hint && !item.imgSrc">
+                {{
+                  item.value && item.value.length > maxLenChar ? item.value.slice(0, maxLenChar) + "..." : item.value
+                }}
+              </p>
 
-            <v-tooltip class="overflowText" v-if="item.hint && !item.icon" location="top" :text="item.hint">
-              <template #activator="{ props }">
-                <span class="flag-avatar" v-if="item.name === 'Flag' && !item.imgSrc">NA</span>
-                <p class="font-14" v-bind="props">
-                  {{
-                    item.value && item.value.length > maxLenChar ? item.value.slice(0, maxLenChar) + "..." : item.value
-                  }}
-                </p>
-              </template>
-            </v-tooltip>
+              <v-tooltip class="overflowText" v-if="item.hint && !item.icon" location="top" :text="item.hint">
+                <template #activator="{ props }">
+                  <span class="flag-avatar" v-if="item.name === 'Flag' && !item.imgSrc">NA</span>
+                  <p class="font-14" v-bind="props">
+                    {{
+                      item.value && item.value.length > maxLenChar
+                        ? item.value.slice(0, maxLenChar) + "..."
+                        : item.value
+                    }}
+                  </p>
+                </template>
+              </v-tooltip>
 
-            <v-tooltip class="overflowText" v-if="item.hint && item.icon" location="top" :text="item.hint">
-              <template #activator="{ props }">
-                <p class="font-14" v-bind="props">
-                  {{
-                    item.value && item.value.length > maxLenChar ? item.value.slice(0, maxLenChar) + "..." : item.value
-                  }}
-                </p>
-                <v-icon
-                  v-if="item.value && item.value.length && item.value != '-'"
-                  class="ml-1"
-                  v-bind="props"
-                  :icon="item.icon"
-                  @click="item.callback!(item.value!)"
-                />
-              </template>
-            </v-tooltip>
+              <v-tooltip class="overflowText" v-if="item.hint && item.icon" location="top" :text="item.hint">
+                <template #activator="{ props }">
+                  <p class="font-14" v-bind="props">
+                    {{
+                      item.value && item.value.length > maxLenChar
+                        ? item.value.slice(0, maxLenChar) + "..."
+                        : item.value
+                    }}
+                  </p>
+                  <v-icon
+                    v-if="item.value && item.value.length && item.value != '-'"
+                    class="ml-1"
+                    v-bind="props"
+                    :icon="item.icon"
+                    @click="item.callback!(item.value!)"
+                  />
+                </template>
+              </v-tooltip>
 
-            <v-tooltip location="top" v-else-if="item.imgSrc" :text="item.hint">
-              <template #activator="{ props }">
-                <img alt="flag" width="40" v-bind="props" :src="item.imgSrc" />
-              </template>
-            </v-tooltip>
-          </v-col>
-        </v-row>
-      </div>
-    </v-card-item>
+              <v-tooltip location="top" v-else-if="item.imgSrc" :text="item.hint">
+                <template #activator="{ props }">
+                  <img alt="flag" width="40" v-bind="props" :src="item.imgSrc" />
+                </template>
+              </v-tooltip>
+            </v-col>
+          </v-row>
+        </div>
+      </v-card-item>
+    </template>
   </v-card>
 </template>
 

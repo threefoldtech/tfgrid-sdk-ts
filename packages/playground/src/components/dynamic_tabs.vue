@@ -9,7 +9,7 @@
         :alt="tab.title"
         v-else-if="tab.imgPath"
         :style="{
-          filter: `brightness(${$vuetify.theme.global.name === 'light' ? 0.2 : 1})`,
+          filter: `brightness(${!theme.global.current.value.dark ? 0.2 : 1})`,
         }"
       />
       {{ tab.title }}
@@ -42,6 +42,7 @@
 
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue";
+import { useTheme } from "vuetify";
 
 import { useFormRef } from "@/hooks/form_validator";
 
@@ -69,6 +70,7 @@ const emits = defineEmits<{
 
 const webletLayoutServie = useWebletLayoutServie();
 const forms = useFormRef(true);
+const theme = useTheme();
 
 const activeTab = ref<number>(props.modelValue ?? 0);
 watch(activeTab, t => {

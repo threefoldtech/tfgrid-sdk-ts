@@ -3,6 +3,7 @@ import { IsInt, IsNotEmpty, IsString, Min, ValidateNested } from "class-validato
 
 import { ValidateMembers } from "../helpers";
 import { WorkloadData, WorkloadDataResult } from "./workload_base";
+import { WorkloadTypes } from "./workload";
 
 class Encryption {
   @Expose() @IsNotEmpty() @IsString() algorithm: string;
@@ -108,6 +109,7 @@ class QuantumSafeFSConfig {
 
 @ValidateMembers()
 class QuantumSafeFS extends WorkloadData {
+  @Expose() __type: WorkloadTypes = WorkloadTypes.qsfs;
   @Expose() @IsInt() @Min(250 * 1024 ** 2) cache: number;
   @Expose() @Type(() => QuantumSafeFSConfig) @ValidateNested() config: QuantumSafeFSConfig;
 

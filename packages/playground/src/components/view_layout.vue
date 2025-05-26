@@ -5,7 +5,7 @@
     ref="viewLayoutContainer"
   >
     <div
-      :style="{ opacity: $vuetify.theme.name === 'dark' ? 'var(--v-medium-emphasis-opacity)' : '' }"
+      :style="{ opacity: theme.global.current.value.dark ? 'var(--v-medium-emphasis-opacity)' : '' }"
       v-if="$slots.description"
     />
 
@@ -60,6 +60,7 @@
 import { KycStatus } from "@threefold/grid_client";
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import { useRoute } from "vue-router";
+import { useTheme } from "vuetify";
 
 import { DashboardRoutes } from "@/router/routes";
 import { useProfileManager } from "@/stores";
@@ -75,6 +76,7 @@ export default {
     const route = useRoute();
     const profileManager = useProfileManager();
     const kyc = useKYC();
+    const theme = useTheme();
     const viewLayoutContainer = ref<HTMLElement>();
     const tick = ref(0);
     const kycDialog = ref(false);
@@ -82,7 +84,9 @@ export default {
     const requireSSH = computed(() => route.meta.requireSSH);
     const requireKYC = computed(() => route.meta.requireKYC || route.path.match(/\/(applications|orchestrators)\/.+$/));
     const showKYCError = computed(() => requireKYC.value && kyc.status !== KycStatus.verified);
-    const showSSHError = computed(() => requireSSH.value && !profileManager.profile?.ssh);
+    const showSSHError = computed(
+      () => requireSSH.value && (!profileManager.profile?.ssh || profileManager.profile?.ssh?.length == 0),
+    );
     function reRender(e: Event) {
       e.stopPropagation();
       tick.value++;
@@ -109,6 +113,7 @@ export default {
       KycStatus,
       kycDialog,
       kycDialogLoading,
+      theme,
     };
   },
 };

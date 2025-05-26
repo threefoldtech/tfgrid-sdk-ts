@@ -48,7 +48,6 @@ export default {
     const query = router.currentRoute.value.query[props.value.queryRoute];
     query && typeof query === "string" && ctx.emit("update:model-value", normalizeValue(query));
 
-    // eslint-disable-next-line vue/no-setup-props-destructure
     const initialValue = props.value.modelValue;
 
     const filtersContainerService = useFiltersContainerService();

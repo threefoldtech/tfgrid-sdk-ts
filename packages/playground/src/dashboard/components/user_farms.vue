@@ -87,7 +87,7 @@
         </tr>
 
         <v-container v-if="showDialogue">
-          <v-dialog v-model="showDialogue" max-width="600" attach="#modals">
+          <v-dialog v-model="showDialogue" max-width="600" attach="#modals" @update:model-value="closeDialog">
             <v-card>
               <v-toolbar color="primary" dark>
                 <v-toolbar-title class="custom-toolbar_title mb-6"> Add/Edit Stellar V2 Address </v-toolbar-title>
@@ -96,7 +96,11 @@
                 <form-validator v-model="valid">
                   <input-validator
                     :value="address"
-                    :rules="[validators.required('Address is required.'), customStellarValidation]"
+                    :rules="[
+                      validators.required('Address is required.'),
+                      customStellarValidation,
+                      isStellarAddressUsed,
+                    ]"
                     :async-rules="[validators.isValidStellarAddress]"
                     #="{ props }"
                   >
@@ -111,7 +115,7 @@
                 </form-validator>
               </div>
               <v-card-actions class="justify-end px-5 pb-5 pt-0">
-                <v-btn @click="showDialogue = false" color="anchor">Close</v-btn>
+                <v-btn @click="closeDialog" color="anchor">Close</v-btn>
                 <v-btn
                   color="secondary"
                   @click="setStellarAddress(item.farmId, address)"
@@ -129,10 +133,10 @@
 </template>
 
 <script lang="ts">
+import { StrKey } from "@stellar/stellar-sdk";
 import { type Farm, SortBy, SortOrder } from "@threefold/gridproxy_client";
 import { jsPDF } from "jspdf";
 import { debounce } from "lodash";
-import { StrKey } from "stellar-sdk";
 import { ref, watch } from "vue";
 
 import { gridProxyClient } from "@/clients";
@@ -213,7 +217,6 @@ export default {
     const showDialogue = ref(false);
     const valid = ref(false);
     const address = ref();
-    const isValidAddress = ref(false);
     const isAdding = ref(false);
     const network = process.env.NETWORK || (window as any).env.NETWORK;
     const refreshPublicIPs = ref(false);
@@ -248,7 +251,7 @@ export default {
         isAdding.value = true;
         await gridStore.grid.farms.addStellarAddress({ farmId, stellarAddress });
         createCustomToast("Address Added successfully!", ToastType.success);
-        showDialogue.value = false;
+        closeDialog();
         notifyDelaying();
         await reloadFarms();
       } catch (error) {
@@ -260,13 +263,26 @@ export default {
     }
 
     function customStellarValidation() {
-      isValidAddress.value = StrKey.isValidEd25519PublicKey(address.value);
-      if (!isValidAddress.value) {
+      const isValidAddress = StrKey.isValidEd25519PublicKey(address.value);
+      if (!isValidAddress) {
         return {
           message: "Address is not valid.",
         };
       }
       return undefined;
+    }
+
+    function isStellarAddressUsed() {
+      if (!expanded.value || expanded.value.length === 0 || !farms.value) return undefined;
+      const farmId = expanded.value[0].farmId;
+      const farm_with_same_address = farms.value.find(
+        farm => farm.farmId === farmId && farm.stellarAddress === address.value,
+      );
+      if (farm_with_same_address) {
+        return {
+          message: "Address is already used by this farm.",
+        };
+      }
     }
 
     const copy = (address: string) => {
@@ -341,6 +357,11 @@ export default {
       return data.map(farm => farm.name.toLocaleLowerCase());
     }
 
+    function closeDialog() {
+      showDialogue.value = false;
+      address.value = "";
+    }
+
     context.expose({ getFarmsNames, reloadFarms });
 
     return {
@@ -355,7 +376,6 @@ export default {
       showDialogue,
       address,
       valid,
-      isValidAddress,
       isAdding,
       farmsCount,
       network,
@@ -365,11 +385,13 @@ export default {
       getUserFarms,
       setStellarAddress,
       customStellarValidation,
+      isStellarAddressUsed,
       getFarmDetails,
       downloadFarmReceipts,
       handleIpAdded,
       refreshPublicIPs,
       getFarmsNames,
+      closeDialog,
     };
   },
 };

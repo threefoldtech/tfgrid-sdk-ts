@@ -3,9 +3,11 @@ import { IsBoolean } from "class-validator";
 
 import { ValidateMembers } from "../helpers";
 import { WorkloadData, WorkloadDataResult } from "./workload_base";
+import { WorkloadTypes } from ".";
 
 @ValidateMembers()
 class PublicIP extends WorkloadData {
+  @Expose() __type: WorkloadTypes = WorkloadTypes.ip;
   @Expose() @IsBoolean() v4: boolean;
   @Expose() @IsBoolean() v6: boolean;
   challenge(): string {

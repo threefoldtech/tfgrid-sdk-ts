@@ -224,7 +224,7 @@
                 },
               ]"
               :items="discountTableItems"
-              disable-sort="true"
+              :disable-sort="true"
               density="compact"
             >
               <template #bottom></template>
@@ -476,9 +476,17 @@ export default {
       }
     }
 
-    const cruText = computed(() =>
-      props.node ? `${props.node.used_resources.cru} / ${props.node.total_resources.cru} (Cores)` : "",
-    );
+    const cruText = computed(() => {
+      if (!props.node) return;
+
+      const displayUsedCores =
+        props.node.used_resources.cru > props.node.total_resources.cru
+          ? `${props.node.total_resources.cru}+`
+          : props.node.used_resources.cru;
+
+      return `${displayUsedCores} / ${props.node.total_resources.cru} (Cores)`;
+    });
+
     const mruText = computed(normalizeBytesResource("mru"));
     const sruText = computed(normalizeBytesResource("sru"));
     const hruText = computed(normalizeBytesResource("hru"));

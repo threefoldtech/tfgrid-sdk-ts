@@ -19,6 +19,7 @@ export const manual = {
   dao: urlJoin(BASE, "/documentation/dashboard/tfchain/tf_dao.html"),
   caprover: urlJoin(BASE, "/documentation/dashboard/solutions/caprover.html"),
   tf_connect_app: urlJoin(BASE, "/documentation/threefold_token/storing_tft/tf_connect_app.html"),
+  tf_connect_installation: urlJoin(BASE, "/documentation/tfconnect/tfconnect_installation.html#download-links"),
   tf_connect_wallet: urlJoin(BASE, "/documentation/dashboard/wallet_connector.html"),
   contract_locking: urlJoin(BASE, "/documentation/developers/tfchain/tfchain.html#contract-locking"),
   billing_pricing: urlJoin(BASE, "/documentation/dashboard/deploy/node_finder.html#billing--pricing"),

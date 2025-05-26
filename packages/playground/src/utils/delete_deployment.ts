@@ -94,9 +94,13 @@ export function solutionHasGateway(projectName: ProjectName) {
     ProjectName.Taiga,
     ProjectName.Wordpress,
     ProjectName.Nextcloud,
+    ProjectName.Openwebui,
     ProjectName.Gitea,
     ProjectName.Jenkins,
     ProjectName.Jitsi,
+    ProjectName.Nostr,
+    ProjectName.StaticWebsite,
+    ProjectName.NodePilot,
   ];
 
   for (const solution of solutions) {

@@ -346,7 +346,8 @@ async function storeAndLogin() {
     if (e instanceof TwinNotExistError) {
       isNonActiveMnemonic.value = true;
       if (keypairType.value === KeypairType.ed25519) {
-        createOrActivateError.value = "Generating new ed25519 keys is not supported. You can only import existing keys.";
+        createOrActivateError.value =
+          "Generating new ed25519 keys is not supported. You can only import existing keys.";
         return;
       }
 

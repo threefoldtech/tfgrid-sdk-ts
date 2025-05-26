@@ -14,7 +14,7 @@ const network_temp = config.network;
 beforeAll(async () => {
   config.network = "main"; //Change network to mainnet, the only network with enough resources
   gridClient = await getClient();
-  deploymentName = "np" + generateString(10);
+  deploymentName = "np" + gridClient.twinId + generateString(5);
   gridClient.clientOptions.projectName = `nodepilot/${deploymentName}`;
   gridClient._connect();
   return gridClient;

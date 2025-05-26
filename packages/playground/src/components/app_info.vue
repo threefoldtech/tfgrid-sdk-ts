@@ -68,7 +68,7 @@ export default {
 
         title.value = attributes.title || "";
         subtitle.value = attributes.subtitle || "";
-        html.value = marked.parse(body);
+        html.value = await marked.parse(body);
 
         loading.value = false;
       }

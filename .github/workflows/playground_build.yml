@@ -6,13 +6,11 @@ on:
   push:
     branches: 
       - development
-      - development_2.7
     paths:
       - "packages/playground/**"
   pull_request:
     branches: 
       - development
-      - development_2.7
     paths:
       - "packages/playground/**"
 
@@ -24,14 +22,14 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [18.x]
+        node-version: [22.15]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Setup Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
           cache: "yarn"

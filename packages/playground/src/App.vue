@@ -110,7 +110,7 @@
         </div>
       </v-navigation-drawer>
 
-      <v-main :style="{ paddingTop: navbarConfig ? '140px' : '70px' }">
+      <v-main :style="{ paddingTop: navbarConfig && hasActiveProfile ? '140px' : '70px' }">
         <v-toolbar
           :extended="toolbarExtended"
           extension-height="auto"
@@ -264,7 +264,6 @@ const $router = useRouter();
 const profileManager = useProfileManager();
 const gridStore = useGrid();
 const network = process.env.NETWORK || (window as any).env.NETWORK;
-const toolbarExtended = ref(false);
 const openProfile = ref(false);
 const hasActiveProfile = computed(() => !!profileManager.profile);
 const theme = useTheme();
@@ -276,13 +275,12 @@ const hasClient = computed(() => !!gridStore.client);
 // eslint-disable-next-line no-undef
 const permanent = ref(window.innerWidth > 980);
 const openSidebar = ref(permanent.value);
-
+const toolbarExtended = ref(false);
 watch(permanent, value => {
   if (value) {
     toolbarExtended.value = false;
   }
 });
-
 function setSidebarOnResize() {
   permanent.value =
     window.innerWidth >
@@ -618,14 +616,6 @@ export default {
 .v-theme--light .v-btn--disabled,
 .v-theme--dark .v-btn--disabled {
   color: #7b7b7b !important;
-}
-body {
-  overflow: auto;
-  height: 100vh;
-}
-
-html {
-  overflow: hidden;
 }
 
 @media only screen and (max-width: 600px) {

@@ -58,8 +58,8 @@
 </template>
 
 <script lang="ts">
-import { type PropType, ref } from "vue";
-import { computed, toRef, watch } from "vue";
+import type { PropType } from "vue";
+import { computed, ref, toRef, watch } from "vue";
 
 import type { Indexed } from "@/clients";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
@@ -90,7 +90,6 @@ export default {
         }
       },
     );
-
     return { collapsable, collapsed, copyLog };
   },
 };

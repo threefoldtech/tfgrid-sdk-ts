@@ -6,17 +6,15 @@ on:
   push:
     branches: 
       - development
-      - development_2.7
   pull_request:
     branches: 
       - development
-      - development_2.7
 
 jobs:
   audit-and-open-issue:
     runs-on: ubuntu-latest
     steps:
-          - uses: actions/checkout@v2
+          - uses: actions/checkout@v4
           - name: Yarn Audit
             uses: pragatheeswarans/yarn-audit-action@v1.0.0
             with:

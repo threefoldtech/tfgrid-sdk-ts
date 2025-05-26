@@ -62,6 +62,12 @@
               <CopyReadonlyInput label="Network Name" :data="contract.interfaces[0].network" />
               <CopyReadonlyInput label="CPU (vCores)" :data="contract.capacity.cpu" />
               <CopyReadonlyInput label="Memory (MB)" :data="contract.capacity.memory" />
+              <CopyReadonlyInput label="Total Storage (GB)" :data="getTotalStorage(contract)" />
+              <CopyReadonlyInput
+                v-if="contract.mounts.length > 0"
+                label="Root Filesystem (GB)"
+                :data="getStorage(contract.rootfs_size)"
+              />
               <CopyReadonlyInput
                 v-for="disk of contract.mounts"
                 :key="disk.name"
@@ -126,10 +132,10 @@
             </v-form>
           </template>
           <template v-else>
-            <HighlightDark v-if="$vuetify.theme.name === 'dark'" />
+            <HighlightDark v-if="theme.global.current.value.dark" />
             <HighlightLight v-else />
             <pre>
-            <code class="hljs json" :class="[$vuetify.theme.name ==='dark' ? 'dark-bg' : 'light-bg']" v-html="html"></code>
+            <code class="hljs json" :class="[theme.global.current.value.dark ? 'dark-bg' : 'light-bg']" v-html="html"></code>
           </pre>
           </template>
         </v-card-text>
@@ -145,6 +151,7 @@
 <script lang="ts" setup>
 import hljs from "highlight.js";
 import { computed, type PropType, ref } from "vue";
+import { useTheme } from "vuetify";
 
 import { gridProxyClient } from "@/clients";
 import { getCardName } from "@/utils/helpers";
@@ -177,6 +184,7 @@ const showGpuCard = ref(false);
 const activeTab = ref(0);
 const grafanaURL = ref("");
 const gpuInfo = ref("");
+const theme = useTheme();
 const contracts = computed(() => {
   if (!props.data) return [];
   if ("masters" in props.data) return [...props.data.masters, ...props.data.workers];
@@ -216,6 +224,22 @@ function getValue(key: string) {
   const transform = (props.environments || ({} as any))[key]?.transform || _transform;
   return transform(value);
 }
+
+const getStorage = (disk: number) => {
+  return Math.ceil(disk / (1024 * 1024 * 1024));
+};
+
+const getTotalStorage = (contract: any) => {
+  let total = getStorage(contract.rootfs_size);
+
+  if (contract.mounts) {
+    total += contract.mounts.reduce((acc: number, disk: any) => {
+      return acc + Math.ceil(disk.size / (1024 * 1024 * 1024));
+    }, 0);
+  }
+
+  return total;
+};
 
 async function getGrafanaUrl() {
   isLoading.value = true;

@@ -3,6 +3,7 @@ import { ArrayNotEmpty, IsDefined, IsInt, IsNotEmpty, IsOptional, IsString, Vali
 
 import { ValidateMembers } from "../helpers";
 import { WorkloadData } from "./workload_base";
+import { WorkloadTypes } from "./workload";
 
 class Peer {
   @Expose() @IsString() @IsNotEmpty() subnet: string;
@@ -30,6 +31,7 @@ class Mycelium {
 
 @ValidateMembers()
 class Znet extends WorkloadData {
+  @Expose() __type: WorkloadTypes = WorkloadTypes.network;
   @Expose() @IsString() @IsNotEmpty() subnet: string;
   @Expose() @IsString() @IsNotEmpty() ip_range: string;
   @Expose() @IsString() @IsNotEmpty() wireguard_private_key: string;

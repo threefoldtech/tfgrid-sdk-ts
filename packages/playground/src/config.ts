@@ -8,7 +8,7 @@ import {
   StatsMonitor,
   TFChainMonitor,
 } from "@threefold/monitoring";
-import { marked } from "marked";
+import { marked, type Token, type Tokens } from "marked";
 import { type App, type Component, defineAsyncComponent } from "vue";
 
 import * as validators from "./utils/validators";
@@ -34,21 +34,23 @@ export function defineGlobals(app: App<Element>): void {
 
   marked.use({
     renderer: {
-      heading(text, level) {
+      heading({ text, depth }: Tokens.Heading) {
+        const level = depth;
         const margin = Math.max(7 - level, 3);
         return `<h${level} class="text-h${level} mb-${margin}">${text}</h${level}>`;
       },
-      list(body) {
+      list({ items }: Tokens.List) {
+        const body = items.map((item: Tokens.ListItem) => item.text).join("");
         return `<ul style="list-style: none;padding: 10px;">${body}</ul>`;
       },
-      blockquote(quote) {
+      blockquote({ text }: Tokens.Blockquote) {
         return `
           <blockquote class="md-blockquote">
-            <p>${quote}</p>
+            <p>${text}</p>
           </blockquote>
         `;
       },
-      link(href, title, text) {
+      link({ href, title, text }: Tokens.Link) {
         const t = title ? `title="${title}"` : "";
         const h = `href="${href}"`;
         return `<a class="app-link" target="_blank" ${t} ${h}>${text}</a>`;

@@ -173,7 +173,7 @@ export default {
         const fn = attrs["onUpdate:ipv4"];
         if (required && typeof fn === "function") {
           fn(true);
-        } else if (typeof fn === "function") fn(false);
+        }
       },
       { immediate: true },
     );

@@ -160,7 +160,13 @@
           ></v-text-field>
         </input-validator>
         <v-card-actions class="justify-end mb-3 mx-3">
-          <v-btn :disabled="!isValidTimeout || isCurrentTimeout()" @click="UpdateTimeout" class="justify-end ml-auto"
+          <v-tooltip location="top">
+            <template #activator="{ props: tooltipProps }">
+              <v-btn @click="ResetTimeoutToDefault" class="mr-2" v-bind="tooltipProps">Set Default Values</v-btn>
+            </template>
+            <span>Sets query timeout to 30s and deployment timeout to 300s. Click Update to apply.</span>
+          </v-tooltip>
+          <v-btn :disabled="!isValidTimeout || isCurrentTimeout()" @click="UpdateTimeout" class="justify-end"
             >Update</v-btn
           ></v-card-actions
         >
@@ -181,6 +187,7 @@ import {
   LocalStorageSettingsKey,
   SessionStorageSettingsKey,
   ThemeSettingsInterface as ThemeInterface,
+  updateThemeInLocalStorage,
 } from "@/utils/settings";
 
 import { useGrid } from "../stores";
@@ -215,7 +222,7 @@ export default {
       theme.global.name,
       theme => {
         selectedTheme.value = currentTheme.value = theme.includes("mode") ? theme : `${theme} mode`;
-        localStorage.setItem(LocalStorageSettingsKey.THEME_KEY, theme);
+        updateThemeInLocalStorage(theme);
       },
       { immediate: true },
     );
@@ -263,8 +270,7 @@ export default {
           theme.global.name.value = AppThemeSelection.light;
           break;
       }
-
-      localStorage.setItem(LocalStorageSettingsKey.THEME_KEY, currentTheme.value!);
+      updateThemeInLocalStorage(currentTheme.value!);
     }
 
     /** Updates user credentials with the hashes produced by the new password  */
@@ -287,6 +293,13 @@ export default {
         currentDeploymentTimeout.value == selectedDeploymentTimeout.value
       );
     }
+    // This function only resets the input field values to defaults.
+    // User still needs to click Update button to apply these changes.
+    function ResetTimeoutToDefault() {
+      selectedQueryTimeout.value = 120;
+      selectedDeploymentTimeout.value = 600;
+    }
+
     async function UpdateTimeout() {
       try {
         const client = gridStore.client as GridClient;
@@ -334,6 +347,7 @@ export default {
       passFormRef,
       UpdatePassword,
       UpdateTimeout,
+      ResetTimeoutToDefault,
       isCurrentTheme,
       isCurrentTimeout,
       confirmPasswordInput,

@@ -3,9 +3,11 @@ import { ArrayNotEmpty, IsBoolean, IsFQDN, IsNotEmpty, IsOptional, IsString, IsU
 
 import { ValidateMembers } from "../helpers";
 import { WorkloadData, WorkloadDataResult } from "./workload_base";
+import { WorkloadTypes } from ".";
 
 @ValidateMembers()
 class GatewayFQDNProxy extends WorkloadData {
+  @Expose() __type: WorkloadTypes = WorkloadTypes.gatewayfqdnproxy;
   @Expose() @IsFQDN() fqdn: string;
   @Expose() @IsBoolean() tls_passthrough: boolean;
   @Expose() @ArrayNotEmpty() @IsUrl({ protocols: ["http", "https"] }, { each: true }) backends: string[];
@@ -24,6 +26,7 @@ class GatewayFQDNProxy extends WorkloadData {
 }
 @ValidateMembers()
 class GatewayNameProxy extends WorkloadData {
+  @Expose() __type: WorkloadTypes = WorkloadTypes.gatewaynameproxy;
   @Expose() @IsString() @IsNotEmpty() name: string;
   @Expose() @IsBoolean() tls_passthrough: boolean;
   @Expose() @ArrayNotEmpty() @IsUrl({ protocols: ["http", "https"] }, { each: true }) backends: string[];

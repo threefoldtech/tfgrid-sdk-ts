@@ -17,8 +17,12 @@
               ></v-select>
               <input-validator
                 :value="publicIP"
-                :rules="[validators.required('IP is required.'), validators.isIPRange('Not a valid IP')]"
-                :async-rules="[ipcheck]"
+                :rules="[
+                  validators.required('IP is required.'),
+                  validators.isIPRange('Not a valid IP'),
+                  validators.isPublicIP(),
+                ]"
+                :async-rules="[isExistingIp]"
                 #="{ props }"
               >
                 <input-tooltip tooltip="IP address in CIDR format xxx.xxx.xxx.xxx/xx">
@@ -36,8 +40,13 @@
               <input-validator
                 v-if="type === IPType.range"
                 :value="toPublicIP"
-                :rules="[validators.required('IP is required.'), validators.isIPRange('Not a valid IP')]"
-                :async-rules="[toIpCheck]"
+                :rules="[
+                  validators.required('IP is required.'),
+                  validators.isIPRange('Not a valid IP'),
+                  validators.isPublicIP(),
+                  toIpCheck,
+                ]"
+                :async-rules="[isExistingIp]"
                 #="{ props }"
               >
                 <input-tooltip tooltip="IP address in CIDR format xxx.xxx.xxx.xxx/xx">
@@ -74,11 +83,40 @@
             </form-validator>
             <v-divider />
           </v-card-text>
-          <v-dialog v-model="showIPs" max-width="500" attach="#modals">
+          <v-dialog v-model="showIPs" max-width="600" attach="#modals">
             <v-card>
-              <v-card-title class="text-h5">IPs range</v-card-title>
-              <v-card-text v-for="(IP, i) in IPs" :key="IP">{{ i + 1 }}- {{ IP }}</v-card-text>
-              <v-card-actions> </v-card-actions>
+              <v-card-title class="bg-primary">IPs range</v-card-title>
+              <v-card-text>
+                <v-row>
+                  <v-col>
+                    <v-list class="my-5">
+                      <v-list-item
+                        ><v-row
+                          ><v-col sm="4"><p>Network:</p></v-col
+                          ><v-col
+                            ><p>{{ network }}</p></v-col
+                          ></v-row
+                        ></v-list-item
+                      >
+                      <v-list-item>
+                        <v-row>
+                          <v-col sm="4">IP Addresses:</v-col>
+                          <v-col>
+                            <v-chip type="warning" variant="tonal" v-for="ip in ipsRangeTable" :key="ip" class="ma-1">{{
+                              ip
+                            }}</v-chip>
+                          </v-col></v-row
+                        >
+                      </v-list-item>
+                    </v-list>
+                  </v-col>
+                </v-row>
+                <v-divider></v-divider>
+              </v-card-text>
+
+              <v-card-actions class="justify-end mb-1 mr-2">
+                <v-btn @click="showIPs = false" color="anchor">Close</v-btn></v-card-actions
+              >
             </v-card>
           </v-dialog>
 
@@ -103,12 +141,12 @@
 
 <script lang="ts">
 import { TFChainError } from "@threefold/tfchain_client";
-import { contains } from "cidr-tools";
+import CidrTools from "cidr-tools";
 import { getIPRange } from "get-ip-range";
-import { default as PrivateIp } from "private-ip";
 import { ref, watch } from "vue";
 
 import { gqlClient } from "@/clients";
+import { ipToLong, longToIp } from "@/utils/ip";
 import { IPType } from "@/utils/types";
 
 import { useGrid } from "../../stores";
@@ -121,6 +159,7 @@ export default {
       required: true,
     },
   },
+
   setup(_, context) {
     const gridStore = useGrid();
     const IPs = ref<string[]>();
@@ -137,7 +176,8 @@ export default {
     const publicIP = ref("");
     const toPublicIP = ref("");
     const gateway = ref("");
-
+    const network = ref("");
+    const ipsRangeTable = ref<string[]>([]);
     const formValidator = ref();
 
     watch(
@@ -148,22 +188,6 @@ export default {
       },
       { deep: true },
     );
-
-    async function ipcheck() {
-      if (PrivateIp(publicIP.value.split("/")[0])) {
-        return {
-          message: "IP is not public",
-        };
-      }
-
-      if (await IpExistsCheck(publicIP.value)) {
-        return {
-          message: "IP exists.",
-        };
-      }
-
-      return undefined;
-    }
 
     watch(
       type,
@@ -176,7 +200,15 @@ export default {
       const ips = await gqlClient.publicIps({ ip: true }, { where: { ip_eq: pubIp } });
       return ips.length > 0;
     }
-    async function toIpCheck() {
+    async function isExistingIp(ip: string) {
+      if (await IpExistsCheck(ip)) {
+        return {
+          message: "IP exists.",
+        };
+      }
+      return undefined;
+    }
+    function toIpCheck() {
       if (toPublicIP.value.split("/")[1] !== publicIP.value.split("/")[1]) {
         return {
           message: "Subnet is different.",
@@ -209,17 +241,6 @@ export default {
           message: "Range must not exceed 16.",
         };
       }
-      if (PrivateIp(publicIP.value.split("/")[0])) {
-        return {
-          message: "IP is not public.",
-        };
-      }
-      if (await IpExistsCheck(toPublicIP.value)) {
-        return {
-          message: "IP exists.",
-        };
-      }
-      return undefined;
     }
 
     function gatewayCheck() {
@@ -228,7 +249,7 @@ export default {
       let isRange = false;
 
       try {
-        isRange = contains(publicIP.value, gateway.value);
+        isRange = CidrTools.containsCidr(publicIP.value, gateway.value);
       } catch {
         isRange = false;
       }
@@ -268,13 +289,30 @@ export default {
       showIPs.value = true;
     }
 
+    function generateIpTable(startIp: string, endIp: string, sub: number) {
+      const startLong = ipToLong(startIp); // BigInt
+      const endLong = ipToLong(endIp); // BigInt
+
+      // Create subnet mask from CIDR using BigInt with BigInt()
+      const mask = (BigInt(0xffffffff) << BigInt(32 - sub)) & BigInt(0xffffffff);
+      const networkBaseLong = startLong & mask; // Network address
+
+      const networkBase = longToIp(networkBaseLong); // Convert back to dotted decimal
+
+      // Generate IPs in range
+      ipsRangeTable.value = [];
+      for (let i = startLong; i <= endLong; i++) {
+        ipsRangeTable.value.push(longToIp(i));
+      }
+      network.value = `${networkBase}/${sub}`;
+    }
     function addIPs() {
-      const sub = publicIP.value.split("/")[1];
+      const sub = Number(publicIP.value.split("/")[1]);
       const start = publicIP.value.split("/")[0];
       let end = toPublicIP.value.split("/")[0];
 
       if (type.value === IPType.single) end = start;
-
+      generateIpTable(start, end, sub);
       IPs.value = getIPRange(start, end);
       IPs.value.forEach((ip, i) => {
         IPs.value![i] = ip + "/" + sub;
@@ -307,7 +345,7 @@ export default {
           });
         }
         context.emit("ip-added-successfully");
-        createCustomToast("IP is added successfully.", ToastType.success);
+        createCustomToast("IP is added successfully. It may takes a few seconds to reflect", ToastType.success);
         showDialogue.value = false;
       } catch (error) {
         if (error instanceof TFChainError && error.keyError === "IpExists") {
@@ -330,7 +368,9 @@ export default {
     }
 
     return {
+      ipsRangeTable,
       showDialogue,
+      network,
       valid,
       IPs,
       items,
@@ -348,7 +388,7 @@ export default {
       showRange,
       addIPs,
       addFarmIp,
-      ipcheck,
+      isExistingIp,
       toIpCheck,
       gatewayCheck,
     };

@@ -8,7 +8,7 @@
             alt="title image"
             v-if="titleImage"
             :style="{
-              filter: `brightness(${$vuetify.theme.global.name === 'light' ? 0.2 : 1})`,
+              filter: `brightness(${!theme.global.current.value.dark ? 0.2 : 1})`,
             }"
           />
           <slot name="title" />
@@ -110,6 +110,7 @@
 import { events, type GridClient, type NodeInfo } from "@threefold/grid_client";
 import debounce from "lodash/debounce.js";
 import { computed, ref, watch } from "vue";
+import { useTheme } from "vuetify";
 
 import { manual } from "@/utils/manual";
 
@@ -155,6 +156,7 @@ const props = defineProps({
 const emits = defineEmits<{ (event: "mount"): void; (event: "back"): void }>();
 const baseUrl = import.meta.env.BASE_URL;
 const profileManager = useProfileManager();
+const theme = useTheme();
 const webletLayoutContainer = ref<VCard>();
 const status = ref<WebletStatus>();
 const message = ref<string>();
@@ -402,7 +404,7 @@ async function loadCost(profile: { mnemonic: string }) {
     mru: typeof props.memory === "number" ? (props.memory ?? 0) / 1024 : 0,
     hru: 0,
     ipv4u: props.ipv4,
-    certified: props.SelectedNode?.certificationType === "Certified" ?? false,
+    certified: props.SelectedNode?.certificationType === "Certified",
   });
   await getIPv1Price(grid!);
   usd.value = props.dedicated ? dedicatedPrice : sharedPrice;

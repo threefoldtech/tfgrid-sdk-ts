@@ -1,9 +1,9 @@
+import * as StellarSdk from "@stellar/stellar-sdk";
 import { ExtrinsicResult } from "@threefold/tfchain_client";
 import { GridClientError, RequestError, ValidationError } from "@threefold/types";
 import axios, { AxiosError } from "axios";
 import { Buffer } from "buffer";
 import * as PATH from "path";
-import { default as StellarSdk } from "stellar-sdk";
 
 import { TFClient } from "../clients/tf-grid/client";
 import { GridClientConfig } from "../config";
@@ -27,7 +27,7 @@ import {
 } from ".";
 import blockchainInterface, { blockchainType } from "./blockchainInterface";
 
-const server = new StellarSdk.Server("https://horizon-testnet.stellar.org");
+const server = new StellarSdk.Horizon.Server("https://horizon-testnet.stellar.org");
 
 class Stellar implements blockchainInterface {
   fileName = "stellar.json";
@@ -169,8 +169,9 @@ class Stellar implements blockchainInterface {
   async sign(options: BlockchainSignModel): Promise<string> {
     const secret = await this.getWalletSecret(options.name);
     const walletKeypair = StellarSdk.Keypair.fromSecret(secret);
-    const signed_content = walletKeypair.sign(options.content);
-    return Buffer.from(signed_content).toString("hex");
+    const contentBuffer = Buffer.from(options.content);
+    const signed_content = walletKeypair.sign(contentBuffer);
+    return signed_content.toString("hex");
   }
 
   /**
@@ -187,7 +188,9 @@ class Stellar implements blockchainInterface {
   @validateInput
   verify(options: StellarWalletVerifyModel): boolean {
     const walletKeypair = StellarSdk.Keypair.fromPublicKey(options.public_key);
-    return walletKeypair.verify(options.content, Buffer.from(options.signedContent, "hex"));
+    const contentBuffer = Buffer.from(options.content);
+    const signatureBuffer = Buffer.from(options.signedContent, "hex");
+    return walletKeypair.verify(contentBuffer, signatureBuffer);
   }
 
   /**
@@ -305,7 +308,7 @@ class Stellar implements blockchainInterface {
     for (const [name, secret] of Object.entries(data)) {
       accounts.push({
         name: name,
-        public_key: StellarSdk.Keypair.fromSecret(secret).publicKey(),
+        public_key: StellarSdk.Keypair.fromSecret(secret as string).publicKey(),
         blockchain_type: blockchainType.stellar,
       });
     }
@@ -364,12 +367,23 @@ class Stellar implements blockchainInterface {
   async balance_by_address(options: StellarWalletBalanceByAddressModel): Promise<BlockchainAssetModel[]> {
     const account = await server.loadAccount(options.address);
     const balances: BlockchainAssetModel[] = [];
+
     for (const balance of account.balances) {
-      if (!balance.asset_code) {
-        balance.asset_code = "XLM";
+      let assetCode = "XLM";
+
+      // Check if it's a non-native asset (has asset_code)
+      if ("asset_type" in balance && balance.asset_type !== "native") {
+        if ("asset_code" in balance) {
+          assetCode = balance.asset_code;
+        }
       }
-      balances.push({ asset: balance.asset_code, amount: balance.balance });
+
+      balances.push({
+        asset: assetCode,
+        amount: +balance.balance,
+      });
     }
+
     return balances;
   }
 
@@ -402,7 +416,13 @@ class Stellar implements blockchainInterface {
     if (options.asset != "XLM") {
       let issuer;
       for (const balance of sourceAccount.balances) {
-        if (balance.asset_code === options.asset) {
+        if (
+          "asset_type" in balance &&
+          balance.asset_type !== "native" &&
+          "asset_code" in balance &&
+          balance.asset_code === options.asset &&
+          "asset_issuer" in balance
+        ) {
           issuer = balance.asset_issuer;
         }
       }
@@ -414,9 +434,9 @@ class Stellar implements blockchainInterface {
       asset = StellarSdk.Asset.native();
     }
     const fee = await server.fetchBaseFee();
-    const memo = StellarSdk.Memo.text(options.description);
+    const memo = options.description ? StellarSdk.Memo.text(options.description) : undefined;
     const transaction = new StellarSdk.TransactionBuilder(sourceAccount, {
-      fee: fee,
+      fee: fee.toString(),
       networkPassphrase: StellarSdk.Networks.TESTNET,
       memo: memo,
     })
@@ -435,8 +455,29 @@ class Stellar implements blockchainInterface {
     try {
       const transactionResult = await server.submitTransaction(transaction);
       console.log(JSON.stringify(transactionResult, null, 2));
-      console.log("Success! View the transaction at: ", transactionResult._links.transaction.href);
-      return transactionResult._links.transaction.href;
+
+      let transactionUrl = "";
+
+      const result = transactionResult as Record<string, any>;
+
+      if (
+        result &&
+        result._links &&
+        typeof result._links === "object" &&
+        result._links.transaction &&
+        typeof result._links.transaction === "object" &&
+        result._links.transaction.href &&
+        typeof result._links.transaction.href === "string"
+      ) {
+        transactionUrl = result._links.transaction.href;
+        console.log("Success! View the transaction at: ", transactionUrl);
+      } else {
+        console.log("Transaction successful, but URL not available in response");
+        const txHash = result && typeof result.hash === "string" ? result.hash : "";
+        transactionUrl = `https://horizon-testnet.stellar.org/transactions/${txHash}`;
+      }
+
+      return transactionUrl;
     } catch (e) {
       throw new GridClientError(`An error has occurred: ${e}`);
     }
