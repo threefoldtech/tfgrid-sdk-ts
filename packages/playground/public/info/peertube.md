@@ -2,4 +2,4 @@
 title: Peertube
 ---
 
-Peertube aspires to be a decentralized and free/libre alternative to video broadcasting services. For more details, check [Peertube documentation](https://manual.dev.grid.tf/labs/documentation/dashboard/deploy/applications/peertube).
+Peertube aspires to be a decentralized and free/libre alternative to video broadcasting services. For more details, check [Peertube documentation](https://manual.grid.tf/labs/documentation/dashboard/deploy/applications/peertube).

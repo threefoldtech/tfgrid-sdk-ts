@@ -8,7 +8,7 @@ By connecting a 3Node to the Grid, you get Farming Rewards. If you set a public 
 
 <br />
 
-A user can verify the 3Nodes' payments on Stellar Blockchain through the Threefold's [minting tool](https://manual.dev.grid.tf/labs/documentation/dashboard/tfchain/tf_minting_reports) by using the hash receipt from the payment.
+A user can verify the 3Nodes' payments on Stellar Blockchain through the Threefold's [minting tool](https://manual.grid.tf/labs/documentation/dashboard/tfchain/tf_minting_reports) by using the hash receipt from the payment.
 
 <br />
 

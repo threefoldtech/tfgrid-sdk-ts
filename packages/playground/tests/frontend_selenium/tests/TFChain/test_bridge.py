@@ -80,8 +80,8 @@ def test_how_it_done(browser):
         tfchain_stellar_bridge_url = 'https://manual.dev.grid.tf/labs/documentation/threefold_token/tft_bridges/tfchain_stellar_bridge/'
         tft_bridges_url = 'https://manual.dev.grid.tf/labs/documentation/threefold_token/tft_bridges/'
     else:
-        tfchain_stellar_bridge_url = 'https://manual.grid.tf/documentation/threefold_token/tft_bridges/tfchain_stellar_bridge.html'
-        tft_bridges_url = 'https://manual.grid.tf/documentation/threefold_token/tft_bridges/tft_bridges.html'
+        tfchain_stellar_bridge_url = 'https://manual.grid.tf/labs/documentation/threefold_token/tft_bridges/tfchain_stellar_bridge/'
+        tft_bridges_url = 'https://manual.grid.tf/labs/documentation/threefold_token/tft_bridges/'
     assert bridge_page.how_it_done() == tfchain_stellar_bridge_url
     assert bridge_page.deposite_learn_more() == tft_bridges_url
 

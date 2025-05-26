@@ -2,4 +2,4 @@
 title: Umbrel
 ---
 
-Umbrel is an OS for running a personal server in your home. Self-host open source apps like Nextcloud, Bitcoin node, and more. For more details, check [Umbrel documentation](https://manual.dev.grid.tf/labs/documentation/dashboard/deploy/applications/umbrel).
+Umbrel is an OS for running a personal server in your home. Self-host open source apps like Nextcloud, Bitcoin node, and more. For more details, check [Umbrel documentation](https://manual.grid.tf/labs/documentation/dashboard/deploy/applications/umbrel).
