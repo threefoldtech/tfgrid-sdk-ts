@@ -272,9 +272,11 @@ export default {
         (!priceTask.value.loading && priceTask.value.data?.dedicatedPackage.package === "gold")
       )
         return 0;
+      const appliedDiscount = priceTask.value.data?.dedicatedPackage.discount;
+      const originalPrice = (dedicatedPriceTFT.value * 100) / (100 - appliedDiscount);
       const balanceToUse =
         userBalance.value && resources.value.useCurrentBalance ? userBalance.value.free : +resources.value.balance;
-      const balanceNeeded = Math.ceil(dedicatedPriceTFT.value * 18 - balanceToUse);
+      const balanceNeeded = Math.ceil(originalPrice * 18 - balanceToUse);
       return balanceNeeded > 0 ? balanceNeeded : 0;
     });
 
@@ -285,13 +287,11 @@ export default {
         (!priceTask.value.loading && priceTask.value.data?.sharedPackage.package === "gold")
       )
         return 0;
-
       const balanceToUse =
         userBalance.value && resources.value.useCurrentBalance ? userBalance.value.free : +resources.value.balance;
-      console.log("balanceToUse", balanceToUse);
-      console.log("threshhold", sharedPriceTFT.value * 18);
-      const balanceNeeded = Math.ceil(sharedPriceTFT.value * 18 - balanceToUse);
-      console.log(balanceNeeded, sharedPriceTFT.value * 18, balanceToUse);
+      const appliedDiscount = priceTask.value.data?.sharedPackage.discount;
+      const originalPrice = (sharedPriceTFT.value * 100) / (100 - appliedDiscount);
+      const balanceNeeded = Math.ceil(originalPrice * 18 - balanceToUse);
       return balanceNeeded > 0 ? balanceNeeded : 0;
     });
     const tftPriceTask = useAsync(() => calculator.tftPrice(), {
