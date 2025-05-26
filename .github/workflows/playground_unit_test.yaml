@@ -1,6 +1,8 @@
 # This workflow will do a clean install of node dependencies, cache/restore them, build the source code using yarn build:app run unit tests using yarn test:unit.
 
 name: Playground Unit tests
+permissions:
+  contents: read
 
 on:
   pull_request:
