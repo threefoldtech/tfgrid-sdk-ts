@@ -155,7 +155,6 @@
               <VAlert type="error" :text="normalizeError(priceTask.error, 'Failed to calculate price.')" />
             </VCol>
           </VRow>
-
           <VRow class="text-center text-body-1 text-black" v-else-if="valid">
             <VCol lg="6" md="6" sm="12">
               <div
@@ -266,8 +265,35 @@ export default {
       ipv4: false,
       useCurrentBalance: true,
     });
-    const dedicatedUpgradePrice = Math.ceil(114.473 * 18);
-    const sharedUpgradePrice = Math.ceil(228.947 * 18);
+    const dedicatedUpgradePrice = computed(() => {
+      if (
+        !valid.value ||
+        dedicatedPriceTFT.value === 0 ||
+        (!priceTask.value.loading && priceTask.value.data?.dedicatedPackage.package === "gold")
+      )
+        return 0;
+      const balanceToUse =
+        userBalance.value && resources.value.useCurrentBalance ? userBalance.value.free : +resources.value.balance;
+      const balanceNeeded = Math.ceil(dedicatedPriceTFT.value * 18 - balanceToUse);
+      return balanceNeeded > 0 ? balanceNeeded : 0;
+    });
+
+    const sharedUpgradePrice = computed(() => {
+      if (
+        !valid.value ||
+        sharedPriceTFT.value === 0 ||
+        (!priceTask.value.loading && priceTask.value.data?.sharedPackage.package === "gold")
+      )
+        return 0;
+
+      const balanceToUse =
+        userBalance.value && resources.value.useCurrentBalance ? userBalance.value.free : +resources.value.balance;
+      console.log("balanceToUse", balanceToUse);
+      console.log("threshhold", sharedPriceTFT.value * 18);
+      const balanceNeeded = Math.ceil(sharedPriceTFT.value * 18 - balanceToUse);
+      console.log(balanceNeeded, sharedPriceTFT.value * 18, balanceToUse);
+      return balanceNeeded > 0 ? balanceNeeded : 0;
+    });
     const tftPriceTask = useAsync(() => calculator.tftPrice(), {
       init: true,
       default: 0,
