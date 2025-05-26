@@ -8,6 +8,12 @@ on:
   pull_request:
     branches:
       - development
+    paths:
+      - "packages/playground/**"
+
+  push:
+    branches:
+      - development
       - development_vitest
     paths:
       - "packages/playground/**"
