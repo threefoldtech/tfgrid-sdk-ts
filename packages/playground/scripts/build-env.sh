@@ -25,7 +25,7 @@ case $MODE in
         STELLAR_NETWORK="${STELLAR_NETWORK:-test}"
         KYC_URL="${KYC_URL:-https://kyc.dev.grid.tf}"
         SENTRY_DSN="https://b9af6796f176d1f02837a06f0da3caee@dev.sentry.grid.tf/2"
-        MANUAL_URL="${MANUAL_URL:-https://manual.grid.tf}"
+        MANUAL_URL="${MANUAL_URL:-https://manual.dev.grid.tf}"
     ;;
     "qa")
         GRAPHQL_URL="${GRAPHQL_URL:-"https://graphql.qa.grid.tf/graphql,https://graphql.02.qa.grid.tf/graphql"}"
