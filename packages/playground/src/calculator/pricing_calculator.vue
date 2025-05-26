@@ -272,7 +272,7 @@ export default {
         (!priceTask.value.loading && priceTask.value.data?.dedicatedPackage.package === "gold")
       )
         return 0;
-      const appliedDiscount = priceTask.value.data?.dedicatedPackage.discount;
+      const appliedDiscount = priceTask.value.data?.dedicatedPackage.discount ?? 0;
       const originalPrice = (dedicatedPriceTFT.value * 100) / (100 - appliedDiscount);
       const balanceToUse =
         userBalance.value && resources.value.useCurrentBalance ? userBalance.value.free : +resources.value.balance;
@@ -289,7 +289,7 @@ export default {
         return 0;
       const balanceToUse =
         userBalance.value && resources.value.useCurrentBalance ? userBalance.value.free : +resources.value.balance;
-      const appliedDiscount = priceTask.value.data?.sharedPackage.discount;
+      const appliedDiscount = priceTask.value.data?.sharedPackage.discount ?? 0;
       const originalPrice = (sharedPriceTFT.value * 100) / (100 - appliedDiscount);
       const balanceNeeded = Math.ceil(originalPrice * 18 - balanceToUse);
       return balanceNeeded > 0 ? balanceNeeded : 0;
