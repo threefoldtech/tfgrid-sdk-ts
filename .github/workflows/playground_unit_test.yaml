@@ -11,13 +11,6 @@ on:
     paths:
       - "packages/playground/**"
 
-  push:
-    branches:
-      - development
-      - development_vitest
-    paths:
-      - "packages/playground/**"
-
 jobs:
   unit-tests:
     runs-on: ubuntu-latest
