@@ -6,6 +6,16 @@ import { expose } from "../helpers/expose";
 import { validateInput } from "../helpers/validator";
 import { CalculatorModel, CUModel, NUModel, SUModel } from "./models";
 
+/**
+ * Conversion factor for ThreeFold Grid pricing units.
+ *
+ * On the ThreeFold Grid blockchain, pricing values are stored as "units USD per hour"
+ * where 1 USD = 10,000,000 (1e7) blockchain units.
+ *
+ * This constant is used for converting between USD values and blockchain internal units
+ * when calculating prices, discounts, and TFT token conversions.
+ */
+const UNIT_USD_FACTOR = 1e7;
 export interface PricingInfo {
   dedicatedPrice: number;
   dedicatedPackage: {
@@ -109,7 +119,7 @@ class Calculator {
   @expose
   @validateInput
   calNU(options: NUModel): number {
-    return (options.nu * 1000) / 1e7;
+    return (options.nu * 1000) / UNIT_USD_FACTOR;
   }
 
   /**
@@ -192,30 +202,40 @@ class Calculator {
   @expose
   @validateInput
   async calculate(options: CalculatorModel): Promise<PricingInfo> {
+    /**
+     * Balance in Unit_TFT
+     */
     let balance = 0;
     const pricing = await this.pricing(options);
 
+    let sharedPrice = pricing.musd_month;
     // discount for Dedicated Nodes
     const discount = pricing.dedicatedDiscount;
     let dedicatedPrice = pricing.musd_month - pricing.musd_month * (+discount / 100);
-    let sharedPrice = pricing.musd_month;
+
     const TFTPrice = await this.tftPrice();
     if (options.balance) {
-      balance = TFTPrice * options.balance * 10000000;
+      balance = TFTPrice * options.balance * UNIT_USD_FACTOR;
     }
 
     let dedicatedPackage = "none";
     let sharedPackage = "none";
-    for (const pkg in discountPackages) {
-      if (balance > dedicatedPrice * discountPackages[pkg].duration) {
+
+    for (const pkg of Object.keys(discountPackages)) {
+      const threshold = dedicatedPrice * discountPackages[pkg].duration;
+      if (balance > threshold) {
         dedicatedPackage = pkg;
       }
-      if (balance > sharedPrice * discountPackages[pkg].duration) {
+      const sharedThreshold = sharedPrice * discountPackages[pkg].duration;
+      if (balance > sharedThreshold) {
         sharedPackage = pkg;
       }
     }
-    dedicatedPrice = (dedicatedPrice - dedicatedPrice * (discountPackages[dedicatedPackage].discount / 100)) / 10000000;
-    sharedPrice = (sharedPrice - sharedPrice * (discountPackages[sharedPackage].discount / 100)) / 10000000;
+
+    // Update the prices with the discount
+    dedicatedPrice =
+      (dedicatedPrice - dedicatedPrice * (discountPackages[dedicatedPackage].discount / 100)) / UNIT_USD_FACTOR;
+    sharedPrice = (sharedPrice - sharedPrice * (discountPackages[sharedPackage].discount / 100)) / UNIT_USD_FACTOR;
     return {
       dedicatedPrice: dedicatedPrice,
       dedicatedPackage: {
