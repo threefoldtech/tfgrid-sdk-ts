@@ -8,13 +8,11 @@
     :certified="certified"
     :dedicated="dedicated"
     :rented-by="rentedBy"
-    :SelectedNode="selectionDetails?.node"
+    :selected-node="selectionDetails?.node"
     :valid-filters="selectionDetails?.validFilters"
     title-image="images/icons/owncloud.png"
   >
-    <template #title>
-      Deploy an OwnCloud Instance
-    </template>
+    <template #title> Deploy an OwnCloud Instance </template>
 
     <d-tabs
       ref="tabs"

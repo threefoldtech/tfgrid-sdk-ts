@@ -8,13 +8,11 @@
     :certified="certified"
     :dedicated="dedicated"
     :rented-by="rentedBy"
-    :SelectedNode="selectionDetails?.node"
+    :selected-node="selectionDetails?.node"
     :valid-filters="selectionDetails?.validFilters"
     title-image="images/icons/peertube.png"
   >
-    <template #title>
-      Deploy a Peertube Instance
-    </template>
+    <template #title> Deploy a Peertube Instance </template>
     <d-tabs :tabs="[{ title: 'Config', value: 'config' }]">
       <input-validator
         :value="name"

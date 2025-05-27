@@ -7,13 +7,11 @@
     :ipv4="ipv4"
     :dedicated="dedicated"
     :rented-by="rentedBy"
-    :SelectedNode="selectionDetails?.node"
+    :selected-node="selectionDetails?.node"
     :valid-filters="selectionDetails?.validFilters"
     title-image="images/icons/casperlabs.png"
   >
-    <template #title>
-      Deploy a Casperlabs Instance
-    </template>
+    <template #title> Deploy a Casperlabs Instance </template>
 
     <d-tabs :tabs="[{ title: 'Config', value: 'config' }]">
       <input-validator

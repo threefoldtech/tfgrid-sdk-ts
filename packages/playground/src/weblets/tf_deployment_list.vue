@@ -3,9 +3,7 @@
     <template #title>
       {{ title || "Deployment List" }}
     </template>
-    <template v-if="!$props.projectName" #subtitle>
-      List your own deployments for different solutions
-    </template>
+    <template v-if="!$props.projectName" #subtitle> List your own deployments for different solutions </template>
     <d-tabs
       :tabs="tabs"
       :model-value="activeTab"
@@ -20,7 +18,7 @@
         :project-name="tabs[activeTab].value"
         :project-title="tabs[activeTab].title"
         :deleting="deleting"
-        :hide-s-s-h="hideSSH"
+        :hide-ssh="hideSsh"
         @click:row="clickOpenDialog"
       >
         <template #Fullvm-actions="{ item }">
@@ -314,11 +312,11 @@
             icon="mdi-view-dashboard"
             :href="
               'http://' +
-                (item.publicIP?.ip
-                  ? item.publicIP.ip.slice(0, -3)
-                  : item.planetary
-                    ? '[' + item.planetary + ']'
-                    : item.interfaces[0].ip)
+              (item.publicIP?.ip
+                ? item.publicIP.ip.slice(0, -3)
+                : item.planetary
+                  ? '[' + item.planetary + ']'
+                  : item.interfaces[0].ip)
             "
           />
         </template>
@@ -439,9 +437,7 @@
       </v-card-title>
       <v-card-text>
         <template v-if="hasWorkers">
-          <v-alert type="warning">
-            Please note that: This deployment contains workers workloads.
-          </v-alert>
+          <v-alert type="warning"> Please note that: This deployment contains workers workloads. </v-alert>
         </template>
         <template v-for="item in selectedItems" :key="item.name">
           <template v-if="item.workers">
@@ -456,12 +452,8 @@
         <v-divider />
       </v-card-text>
       <v-card-actions class="justify-end my-1 mr-2">
-        <v-btn color="anchar" @click="deletingDialog = false">
-          Cancel
-        </v-btn>
-        <v-btn color="error" @click="onDelete(tabs[activeTab].value.toLowerCase() === 'kubernetes')">
-          Delete
-        </v-btn>
+        <v-btn color="anchar" @click="deletingDialog = false"> Cancel </v-btn>
+        <v-btn color="error" @click="onDelete(tabs[activeTab].value.toLowerCase() === 'kubernetes')"> Delete </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -480,7 +472,7 @@ import { updateGrid } from "../utils/grid";
 const props = defineProps<{
   projectName?: ProjectName;
   title?: string;
-  hideSSH?: boolean;
+  hideSsh?: boolean;
 }>();
 
 const tabs: Tab[] = [
@@ -575,8 +567,8 @@ function openDialog(project: string, item?: any): void {
   const key: keyof typeof deploymentListEnvironments = VMS.includes(project)
     ? "vm"
     : project === ProjectName.Kubernetes
-    ? "k8s"
-    : (project.toLowerCase() as any);
+      ? "k8s"
+      : (project.toLowerCase() as any);
 
   if (item && item.projectName && item.projectName.includes(ProjectName.Caprover.toLocaleLowerCase())) {
     if (!item.workers) {

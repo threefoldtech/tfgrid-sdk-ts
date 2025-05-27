@@ -7,13 +7,11 @@
     :dedicated="dedicated"
     :rented-by="rentedBy"
     :ipv4="ipv4"
-    :SelectedNode="selectionDetails?.node"
+    :selected-node="selectionDetails?.node"
     :valid-filters="selectionDetails?.validFilters"
     title-image="images/icons/discourse.png"
   >
-    <template #title>
-      Deploy a Discourse Instance
-    </template>
+    <template #title> Deploy a Discourse Instance </template>
     <d-tabs
       ref="tabs"
       :tabs="[

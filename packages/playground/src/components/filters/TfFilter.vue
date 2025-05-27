@@ -1,5 +1,5 @@
 <template>
-  <slot v-if="$slots.unwrap" name="unwrap" :colProps="colProps" />
+  <slot v-if="$slots.unwrap" name="unwrap" :col-props="colProps" />
   <VCol v-else v-bind="colProps">
     <input-validator
       v-if="$slots.input"

@@ -146,7 +146,7 @@
           </v-row>
           <v-row v-show="!isAdvanced">
             <v-col>
-              <LineChart :xs="xs" :isProfit="isProfit" :getTotalReward="getTotalReward" :getRoi="getRoi" />
+              <LineChart :xs="xs" :is-profit="isProfit" :get-total-reward="getTotalReward" :get-roi="getRoi" />
             </v-col>
           </v-row>
           <v-row v-show="isAdvanced">

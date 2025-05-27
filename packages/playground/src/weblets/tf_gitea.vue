@@ -7,13 +7,11 @@
     :ipv4="ipv4"
     :rented-by="rentedBy"
     :dedicated="dedicated"
-    :SelectedNode="selectionDetails?.node"
+    :selected-node="selectionDetails?.node"
     :valid-filters="selectionDetails?.validFilters"
     title-image="images/icons/gitea.png"
   >
-    <template #title>
-      Deploy a Gitea Instance
-    </template>
+    <template #title> Deploy a Gitea Instance </template>
 
     <d-tabs
       ref="tabs"

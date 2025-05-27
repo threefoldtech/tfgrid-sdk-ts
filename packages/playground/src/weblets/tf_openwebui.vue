@@ -7,13 +7,11 @@
     :disk="disks.reduce((total, disk) => total + disk.size, solution?.disk + 2)"
     :dedicated="dedicated"
     :rented-by="rentedBy"
-    :SelectedNode="selectionDetails?.node"
+    :selected-node="selectionDetails?.node"
     :valid-filters="selectionDetails?.validFilters"
     title-image="images/icons/openwebui.png"
   >
-    <template #title>
-      Deploy an Open WebUI Instance
-    </template>
+    <template #title> Deploy an Open WebUI Instance </template>
 
     <d-tabs :tabs="[{ title: 'Config', value: 'config' }]">
       <template #config>

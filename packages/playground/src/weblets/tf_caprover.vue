@@ -14,22 +14,20 @@
           }),
         leader.solution?.disk ??
           0 +
-          calculateRootFileSystem({
-            CPUCores: leader.solution?.cpu ?? 0,
-            RAMInMegaBytes: leader.solution?.memory ?? 0,
-          }),
+            calculateRootFileSystem({
+              CPUCores: leader.solution?.cpu ?? 0,
+              RAMInMegaBytes: leader.solution?.memory ?? 0,
+            }),
       )
     "
     :ipv4="true"
     :rented-by="leader.rentedBy"
     :dedicated="leader.dedicated"
-    :SelectedNode="leader.selectionDetails?.node"
+    :selected-node="leader.selectionDetails?.node"
     :valid-filters="leader.selectionDetails?.validFilters"
     title-image="images/icons/caprover.png"
   >
-    <template #title>
-      Deploy a Caprover Instance
-    </template>
+    <template #title> Deploy a Caprover Instance </template>
     <d-tabs
       ref="tabs"
       :tabs="[

@@ -7,14 +7,12 @@
     :ipv4="ipv4"
     :dedicated="dedicated"
     :rented-by="rentedBy"
-    :SelectedNode="selectionDetails?.node"
+    :selected-node="selectionDetails?.node"
     :valid-filters="selectionDetails?.validFilters"
     title-image="images/icons/vm.png"
     @mount="layoutMount"
   >
-    <template #title>
-      Deploy a Micro Virtual Machine
-    </template>
+    <template #title> Deploy a Micro Virtual Machine </template>
 
     <d-tabs
       ref="tabs"
@@ -132,9 +130,7 @@
           #="{ index }"
           @add="addDisk"
         >
-          <p class="text-h6 mb-4">
-            Disk #{{ index + 1 }}
-          </p>
+          <p class="text-h6 mb-4">Disk #{{ index + 1 }}</p>
           <input-validator
             :value="disks[index].name"
             :rules="[

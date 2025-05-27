@@ -7,7 +7,7 @@
       :loading="$props.loading.value || deleting"
       loading-text="Loading contracts..."
       :deleting="deleting"
-      :onClick:row="loading || deleting ? undefined : onClickRow"
+      :on-click:row="loading || deleting ? undefined : onClickRow"
       :no-data-text="capitalize(`No ${props.contractsType} contracts found on your account.`)"
       class="elevation-1 v-data-table-header"
       density="compact"
@@ -40,15 +40,11 @@
           v-if="item?.consumption !== 0 && item?.consumption !== undefined"
           class="d-flex justify-center align-center"
         >
-          <p class="mr-2 text-no-wrap" cols="8">
-            {{ item.consumption.toFixed(3) }} TFT/hour
-          </p>
+          <p class="mr-2 text-no-wrap" cols="8">{{ item.consumption.toFixed(3) }} TFT/hour</p>
 
           <v-tooltip v-if="item.discountPackage" bottom color="primary" close-delay="100" cols="2">
             <template #activator="{ props }">
-              <v-icon class="scale_beat" color="warning" v-bind="props">
-                mdi-brightness-percent
-              </v-icon>
+              <v-icon class="scale_beat" color="warning" v-bind="props"> mdi-brightness-percent </v-icon>
             </template>
 
             <a
@@ -64,9 +60,7 @@
           </v-tooltip>
         </div>
 
-        <p v-else>
-          No Data Available
-        </p>
+        <p v-else>No Data Available</p>
       </template>
 
       <template #[`item.farm_id`]="{ item }">
@@ -89,9 +83,7 @@
         >
           {{ $props.nodeStatus[item.details.nodeId] }}
         </v-chip>
-        <p v-else>
-          -
-        </p>
+        <p v-else>-</p>
       </template>
 
       <template #[`item.state`]="{ item }">
@@ -135,12 +127,8 @@
               v-bind="props"
               @click="showDetails(item)"
             >
-              <v-icon v-if="failedContractId == item.contract_id" class="pt-1">
-                mdi-refresh
-              </v-icon>
-              <v-icon v-else>
-                mdi-eye-outline
-              </v-icon>
+              <v-icon v-if="failedContractId == item.contract_id" class="pt-1"> mdi-refresh </v-icon>
+              <v-icon v-else> mdi-eye-outline </v-icon>
             </v-btn>
           </template>
         </v-tooltip>
@@ -180,9 +168,7 @@
 
   <v-dialog v-model="contractStateDialog" width="800" attach="#modals">
     <v-card>
-      <v-card-title class="bg-primary">
-        Contract lock Details
-      </v-card-title>
+      <v-card-title class="bg-primary"> Contract lock Details </v-card-title>
       <v-card-text class="mt-5">
         <p v-if="!isNodeInRentContracts" class="d-flex justify-center">
           Amount Locked:
@@ -202,9 +188,7 @@
         <v-divider class="mt-3" />
       </v-card-text>
       <v-card-actions class="justify-end mb-1 mr-2">
-        <v-btn color="anchor" class="mr-2 px-3" @click="contractStateDialog = false">
-          Close
-        </v-btn>
+        <v-btn color="anchor" class="mr-2 px-3" @click="contractStateDialog = false"> Close </v-btn>
         <v-tooltip
           :text="
             freeBalance < getAmountLocked
@@ -234,17 +218,13 @@
 
   <v-dialog v-model="deletingDialog" width="800" attach="#modals">
     <v-card>
-      <v-card-title class="bg-primary">
-        Delete the following contracts?
-      </v-card-title>
+      <v-card-title class="bg-primary"> Delete the following contracts? </v-card-title>
       <v-alert class="ma-4" type="warning" variant="tonal">
         It is advisable to remove the contract from its solution page, especially when multiple contracts may be linked
         to the same instance.
       </v-alert>
 
-      <v-alert class="mx-4" type="warning" variant="tonal">
-        Deleting contracts may take a while to complete.
-      </v-alert>
+      <v-alert class="mx-4" type="warning" variant="tonal"> Deleting contracts may take a while to complete. </v-alert>
       <v-card-text>
         <v-chip v-for="c in selectedContracts" :key="c.contract_id" class="ma-1" label>
           {{ c.contract_id }}
@@ -252,12 +232,8 @@
         <v-divider class="mt-3" />
       </v-card-text>
       <v-card-actions class="justify-end mb-1 mr-2">
-        <v-btn color="anchor" @click="deletingDialog = false">
-          Cancel
-        </v-btn>
-        <v-btn color="error" @click="onDelete">
-          Delete
-        </v-btn>
+        <v-btn color="anchor" @click="deletingDialog = false"> Cancel </v-btn>
+        <v-btn color="error" @click="onDelete"> Delete </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -270,9 +246,7 @@
       <v-card-text v-if="loadingShowDetails" class="d-flex flex-column justify-center align-center pb-0 pt-6">
         <v-progress-circular indeterminate />
 
-        <div class="text-subtitle-2 pt-2">
-          Loading contracts lock details
-        </div>
+        <div class="text-subtitle-2 pt-2">Loading contracts lock details</div>
         <v-divider class="mt-3" />
       </v-card-text>
       <v-card-text v-else>
@@ -307,9 +281,7 @@
         <v-divider class="mt-3" />
       </v-card-text>
       <v-card-actions class="justify-end mb-1 mr-2">
-        <v-btn color="anchor" @click="unlockDialog = false">
-          Cancel
-        </v-btn>
+        <v-btn color="anchor" @click="unlockDialog = false"> Cancel </v-btn>
         <v-tooltip
           :text="
             freeBalance < selectedLockedAmount

@@ -7,13 +7,11 @@
     :ipv4="ipv4"
     :rented-by="rentedBy"
     :dedicated="dedicated"
-    :SelectedNode="selectionDetails?.node"
+    :selected-node="selectionDetails?.node"
     :valid-filters="selectionDetails?.validFilters"
     title-image="images/icons/vm.png"
   >
-    <template #title>
-      Deploy a Full Virtual Machine
-    </template>
+    <template #title> Deploy a Full Virtual Machine </template>
 
     <d-tabs
       ref="tabs"
@@ -106,15 +104,13 @@
           #="{ index }"
           @add="addDisk"
         >
-          <p class="text-h6 mb-4">
-            Disk #{{ index + 1 }}
-          </p>
+          <p class="text-h6 mb-4">Disk #{{ index + 1 }}</p>
           <input-validator
             :value="disks[index].name"
             :rules="[
               validators.required('Disk name is required.'),
-              (name: string) => validators.isAlpha('Name must start with an alphabetical character.')(name[0]), 
-              validators.minLength('Disk name minimum length is 2 characters.', 2), 
+              (name: string) => validators.isAlpha('Name must start with an alphabetical character.')(name[0]),
+              validators.minLength('Disk name minimum length is 2 characters.', 2),
               validators.isAlphanumeric('Disk name only accepts alphanumeric characters.'),
               validators.maxLength('Disk name maximum length is 35 characters.', 35),
             ]"

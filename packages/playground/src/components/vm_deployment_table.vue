@@ -8,7 +8,9 @@
 
       <span>
         This might happen because the node is down or it's not reachable
-        <span v-if="showEncryption">or the deployment{{ count - items.length > 1 ? "s are" : " is" }} encrypted by another key</span>.
+        <span v-if="showEncryption"
+          >or the deployment{{ count - items.length > 1 ? "s are" : " is" }} encrypted by another key</span
+        >.
       </span>
       <v-tooltip location="top" text="Show failed deployments">
         <template #activator="{ props }">
@@ -26,9 +28,7 @@
         attach="#modals"
       >
         <v-card>
-          <v-card-title style="font-weight: bold">
-            Failed Deployments
-          </v-card-title>
+          <v-card-title style="font-weight: bold"> Failed Deployments </v-card-title>
           <v-divider color="#FFCC00" />
           <v-card-text>
             <v-alert type="error" variant="tonal">
@@ -37,7 +37,9 @@
 
               <span>
                 This might happen because the node is down or it's not reachable
-                <span v-if="showEncryption">or the deployment{{ count - items.length > 1 ? "s are" : " is" }} encrypted by another key</span>.
+                <span v-if="showEncryption"
+                  >or the deployment{{ count - items.length > 1 ? "s are" : " is" }} encrypted by another key</span
+                >.
               </span>
             </v-alert>
             <v-list :items="failedDeploymentList" item-props lines="three">
@@ -47,15 +49,13 @@
             </v-list>
           </v-card-text>
           <v-card-actions class="justify-end my-1 mr-2">
-            <v-btn color="anchor" @click="showDialog = false">
-              Close
-            </v-btn>
+            <v-btn color="anchor" @click="showDialog = false"> Close </v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
     </v-alert>
 
-    <AccessDeploymentAlert v-if="!hideSSH" />
+    <AccessDeploymentAlert v-if="!hideSsh" />
 
     <div
       class="d-flex flex-column flex-sm-row"
@@ -130,9 +130,7 @@
         {{ toHumanDate(item.created) }}
       </template>
       <template #[`item.actions`]="{ item }">
-        <v-chip v-if="deleting && ($props.modelValue || []).includes(item)" color="error">
-          Deleting...
-        </v-chip>
+        <v-chip v-if="deleting && ($props.modelValue || []).includes(item)" color="error"> Deleting... </v-chip>
         <v-btn-group v-else variant="tonal">
           <slot :name="projectName + '-actions'" :item="item" :update="updateItem" />
         </v-btn-group>
@@ -141,9 +139,7 @@
       <template #[`item.status`]="{ item }">
         <v-chip :color="getNodeHealthColor(item.status as string).color">
           <v-tooltip v-if="item.status == NodeHealth.Error" activator="parent" location="top">
-            {{
-              item.message
-            }}
+            {{ item.message }}
           </v-tooltip>
           <v-tooltip v-if="item.status == NodeHealth.Paused" activator="parent" location="top">
             The deployment contract is in grace period
@@ -156,9 +152,7 @@
       <template #[`item.health`]="{ item }">
         <v-chip :color="getNodeHealthColor(item[0].workloads[0].result.state as string).color">
           <v-tooltip v-if="item[0].workloads[0].result.state == NodeHealth.Error" activator="parent" location="top">
-            {{
-              item.message
-            }}
+            {{ item.message }}
           </v-tooltip>
           <v-tooltip v-if="item[0].workloads[0].result.state == NodeHealth.Paused" activator="parent" location="top">
             The deployment contract is in grace period
@@ -204,7 +198,7 @@ const props = defineProps<{
   projectTitle: string;
   modelValue: any[];
   deleting: boolean;
-  hideSSH?: boolean;
+  hideSsh?: boolean;
 }>();
 defineEmits<{ (event: "update:model-value", value: any[]): void }>();
 

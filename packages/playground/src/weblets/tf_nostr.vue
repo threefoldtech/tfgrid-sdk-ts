@@ -7,13 +7,11 @@
     :ipv4="ipv4"
     :dedicated="dedicated"
     :rented-by="rentedBy"
-    :SelectedNode="selectionDetails?.node"
+    :selected-node="selectionDetails?.node"
     :valid-filters="selectionDetails?.validFilters"
     title-image="images/icons/nostr.png"
   >
-    <template #title>
-      Deploy a Nostr Instance
-    </template>
+    <template #title> Deploy a Nostr Instance </template>
 
     <d-tabs ref="tabs" :tabs="[{ title: 'Config', value: 'config' }]">
       <template #config>

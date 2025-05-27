@@ -154,7 +154,7 @@
             :used="(node?.used_resources.cru ?? 0) + selectedMachines.reduce((r, m) => r + m.cpu, 0)"
             :total="node?.total_resources.cru ?? 0"
             :text="cruText"
-            :cpuType="dmi?.processor[0]?.version"
+            :cpu-type="dmi?.processor[0]?.version"
           />
         </VCol>
         <VCol class="tf-node-resource">
@@ -163,7 +163,7 @@
             :used="(node?.used_resources.mru ?? 0) + selectedMachines.reduce((r, m) => r + (m.memory / 1024) * 1e9, 0)"
             :total="node?.total_resources.mru ?? 0"
             :text="mruText"
-            :memoryType="dmi?.memory[0]?.type"
+            :memory-type="dmi?.memory[0]?.type"
           />
         </VCol>
       </VRow>

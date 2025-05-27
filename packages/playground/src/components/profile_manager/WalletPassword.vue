@@ -21,7 +21,7 @@
             <VTextField
               id="wallet-password__text-field"
               label="Password"
-              :modelValue="modelValue"
+              :model-value="modelValue"
               v-bind="{ ...passwordInputProps, ...validationProps }"
               autocomplete="off"
               :disabled="props.disabled"

@@ -10,13 +10,11 @@
     :certified="master.certified"
     :dedicated="master.dedicated"
     :rented-by="master.rentedBy"
-    :SelectedNode="master.selectionDetails?.node"
+    :selected-node="master.selectionDetails?.node"
     :valid-filters="master.selectionDetails?.validFilters"
     title-image="images/icons/kubernetes.png"
   >
-    <template #title>
-      Deploy a Kubernetes cluster
-    </template>
+    <template #title> Deploy a Kubernetes cluster </template>
     <d-tabs
       ref="tabs"
       :tabs="[
