@@ -5,20 +5,22 @@
     :memory="solution?.memory"
     :disk="disks.reduce((total, disk) => total + disk.size, solution?.disk + 2)"
     :ipv4="ipv4"
-    :rentedBy="rentedBy"
+    :rented-by="rentedBy"
     :dedicated="dedicated"
     :SelectedNode="selectionDetails?.node"
     :valid-filters="selectionDetails?.validFilters"
     title-image="images/icons/vm.png"
   >
-    <template #title> Deploy a Full Virtual Machine </template>
+    <template #title>
+      Deploy a Full Virtual Machine
+    </template>
 
     <d-tabs
+      ref="tabs"
       :tabs="[
         { title: 'Config', value: 'config' },
         { title: 'Disks', value: 'disks' },
       ]"
-      ref="tabs"
     >
       <template #config>
         <input-validator
@@ -33,25 +35,25 @@
           #="{ props }"
         >
           <input-tooltip tooltip="Instance name.">
-            <v-text-field label="Name" v-model="name" v-bind="props" />
+            <v-text-field v-model="name" label="Name" v-bind="props" />
           </input-tooltip>
         </input-validator>
 
-        <SelectVmImage :images="images" v-model="flist" />
+        <SelectVmImage v-model="flist" :images="images" />
         <SelectSolutionFlavor
+          v-model="solution"
           :small="{ cpu: 1, memory: 2, disk: 25 }"
           :medium="{ cpu: 2, memory: 4, disk: 50 }"
           :large="{ cpu: 4, memory: 16, disk: 100 }"
-          v-model="solution"
         />
 
         <Networks
-          required
           v-model:ipv4="ipv4"
           v-model:ipv6="ipv6"
           v-model:planetary="planetary"
           v-model:mycelium="mycelium"
           v-model:wireguard="wireguard"
+          required
         />
         <input-tooltip
           inline
@@ -60,20 +62,21 @@
           When selecting a node with GPU resources, please make sure that you have a rented node. To rent a node and gain access to GPU capabilities, you can use our dashboard.
           "
         >
-          <v-switch color="primary" inset label="GPU" v-model="hasGPU" hide-details />
+          <v-switch v-model="hasGPU" color="primary" inset label="GPU" hide-details />
         </input-tooltip>
         <!-- <input-tooltip inline tooltip="" :href="manual"> -->
-        <v-switch color="primary" inset label="Rented By Me" v-model="rentedByMe" hide-details />
+        <v-switch v-model="rentedByMe" color="primary" inset label="Rented By Me" hide-details />
         <!-- </input-tooltip> -->
         <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
-          <v-switch color="primary" inset label="Rentable" v-model="dedicated" hide-details />
+          <v-switch v-model="dedicated" color="primary" inset label="Rentable" hide-details />
         </input-tooltip>
 
         <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
-          <v-switch color="primary" inset label="Certified" v-model="certified" hide-details />
+          <v-switch v-model="certified" color="primary" inset label="Certified" hide-details />
         </input-tooltip>
 
         <TfSelectionDetails
+          v-model="selectionDetails"
           :filters="{
             ipv4,
             ipv6,
@@ -90,7 +93,6 @@
             mycelium,
             wireguard,
           }"
-          v-model="selectionDetails"
         />
 
         <!-- Manage the selected keys and send them to the deployment as env var -->
@@ -100,11 +102,13 @@
       <template #disks>
         <ExpandableLayout
           v-model="disks"
-          @add="addDisk"
           title="Add additional disk space to your full virtual machine"
           #="{ index }"
+          @add="addDisk"
         >
-          <p class="text-h6 mb-4">Disk #{{ index + 1 }}</p>
+          <p class="text-h6 mb-4">
+            Disk #{{ index + 1 }}
+          </p>
           <input-validator
             :value="disks[index].name"
             :rules="[
@@ -117,7 +121,7 @@
             #="{ props }"
           >
             <input-tooltip tooltip="Disk name.">
-              <v-text-field label="Name" v-model="disks[index].name" v-bind="props" />
+              <v-text-field v-model="disks[index].name" label="Name" v-bind="props" />
             </input-tooltip>
           </input-validator>
           <input-validator
@@ -131,7 +135,7 @@
             #="{ props }"
           >
             <input-tooltip tooltip="Disk Size.">
-              <v-text-field label="Size (GB)" type="number" v-model.number="disks[index].size" v-bind="props" />
+              <v-text-field v-model.number="disks[index].size" label="Size (GB)" type="number" v-bind="props" />
             </input-tooltip>
           </input-validator>
         </ExpandableLayout>
@@ -142,8 +146,8 @@
       <v-btn
         variant="elevated"
         class="text-primery px-10 py-3 h-auto text-subtitle-1"
-        @click="validateBeforeDeploy(deploy)"
         text="Deploy"
+        @click="validateBeforeDeploy(deploy)"
       />
     </template>
   </weblet-layout>

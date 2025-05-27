@@ -1,17 +1,21 @@
 <template>
   <!-- Error Alert -->
-  <v-alert type="error" variant="tonal" class="mt-2 mb-4" v-if="loadingErrorMessage">
+  <v-alert v-if="loadingErrorMessage" type="error" variant="tonal" class="mt-2 mb-4">
     Error while listing contracts due: {{ loadingErrorMessage }}
   </v-alert>
 
-  <v-alert type="success" variant="tonal" class="mt-2 mb-4" v-if="loadingTablesMessage">
+  <v-alert v-if="loadingTablesMessage" type="success" variant="tonal" class="mt-2 mb-4">
     {{ loadingTablesMessage }}
   </v-alert>
 
   <!-- Contracts List Card -->
   <v-card color="primary" class="d-flex justify-center items-center mb-4 pa-3 text-center">
-    <v-icon size="30" class="pr-3">mdi-file-document-edit</v-icon>
-    <v-card-title class="pa-0">Contracts List</v-card-title>
+    <v-icon size="30" class="pr-3">
+      mdi-file-document-edit
+    </v-icon>
+    <v-card-title class="pa-0">
+      Contracts List
+    </v-card-title>
   </v-card>
 
   <v-alert class="mb-4 text-subtitle-2 font-weight-regular" type="info" variant="tonal">
@@ -20,16 +24,15 @@
       class="app-link font-weight-medium"
       target="_blank"
       href="https://www.manual.grid.tf/documentation/developers/tfchain/tfchain.html"
-      >Contract Documentation,
+    >Contract Documentation,
     </a>
     and to explore further contract details, check
     <a
       class="app-link font-weight-medium"
       target="_blank"
       href="https://www.manual.grid.tf/documentation/dashboard/deploy/your_contracts.html"
-      >Node Contract Documentation.</a
-    >
-    <br />
+    >Node Contract Documentation.</a>
+    <br>
   </v-alert>
 
   <v-card variant="text" class="my-3">
@@ -40,14 +43,14 @@
         class="mr-2"
         color="warning"
         prepend-icon="mdi-lock-open"
-        @click="openUnlockDialog"
         :loading="unlockContractLoading"
+        @click="openUnlockDialog"
       >
         Unlock All
       </v-btn>
       <v-btn
-        class="mr-2"
         v-if="contracts.length > 0"
+        class="mr-2"
         :loading="deleting"
         prepend-icon="mdi-delete"
         color="error"
@@ -58,11 +61,11 @@
       <v-btn
         prepend-icon="mdi-refresh"
         color="info"
+        :disabled="totalCost === undefined"
         @click="
           contractsTable.forEach(t => t.reset());
           loadContracts();
         "
-        :disabled="totalCost === undefined"
       >
         refresh
       </v-btn>
@@ -74,7 +77,9 @@
     <template #title>
       <v-row>
         <v-col class="d-flex justify-start">
-          <p class="text-subtitle-1">Total cost of contracts</p>
+          <p class="text-subtitle-1">
+            Total cost of contracts
+          </p>
         </v-col>
       </v-row>
     </template>
@@ -82,7 +87,7 @@
       <strong v-if="totalCost !== undefined" class="text-primary">
         <input-tooltip
           inline
-          :alignCenter="true"
+          :align-center="true"
           :tooltip="`${totalCostUSD?.toFixed(3)} USD/hour ≈ ${totalCostUSD === 0 ? 0 : (totalCostUSD! * 24 * 30).toFixed(3)} USD/month`"
         >
           {{ totalCost }} TFT/hour ≈ {{ totalCost === 0 ? 0 : (totalCost * 24 * 30).toFixed(3) }} TFT/month
@@ -92,14 +97,13 @@
     </template>
   </v-card>
   <!-- locked amount Dialog -->
-  <v-dialog width="800" v-model="unlockDialog" v-if="lockedContracts?.totalOverdueAmount" attach="#modals">
+  <v-dialog v-if="lockedContracts?.totalOverdueAmount" v-model="unlockDialog" width="800" attach="#modals">
     <v-card>
       <v-card-title class="bg-primary">
         Unlock All Contracts
         <v-tooltip text="Grace period contracts documentation" location="bottom right">
           <template #activator="{ props }">
             <v-btn
-              @click.stop
               v-bind="props"
               color="white"
               variant="text"
@@ -108,6 +112,7 @@
               width="24px"
               target="_blank"
               :href="manual.contract_locking"
+              @click.stop
             />
           </template>
         </v-tooltip>
@@ -115,7 +120,9 @@
       <v-card-text v-if="loadingLockDetails" class="d-flex flex-column justify-center align-center pb-0 pt-6">
         <v-progress-circular indeterminate />
 
-        <div class="text-subtitle-2 pt">Loading contracts lock details</div>
+        <div class="text-subtitle-2 pt">
+          Loading contracts lock details
+        </div>
         <v-divider class="mt-3" />
       </v-card-text>
       <v-card-text v-else>
@@ -139,7 +146,9 @@
         <v-divider class="mt-3" />
       </v-card-text>
       <v-card-actions class="justify-end mb-1 mr-2">
-        <v-btn color="anchor" @click="unlockDialog = false"> Close </v-btn>
+        <v-btn color="anchor" @click="unlockDialog = false">
+          Close
+        </v-btn>
         <v-tooltip
           :text="
             freeBalance < lockedContracts?.totalOverdueAmount
@@ -153,9 +162,9 @@
               <v-btn
                 :disabled="freeBalance < lockedContracts.totalOverdueAmount || loadingLockDetails"
                 color="warning"
-                @click="unlockAllContracts"
                 :loading="unlockContractLoading"
                 class="ml-2"
+                @click="unlockAllContracts"
               >
                 Unlock contracts
               </v-btn>
@@ -167,27 +176,35 @@
   </v-dialog>
 
   <!-- delete all dialog-->
-  <v-dialog width="800" v-model="deleteDialog" attach="#modals">
+  <v-dialog v-model="deleteDialog" width="800" attach="#modals">
     <v-card>
-      <v-card-title class="bg-primary"> Delete all your contracts </v-card-title>
+      <v-card-title class="bg-primary">
+        Delete all your contracts
+      </v-card-title>
       <v-alert class="mx-4 mt-4" type="warning" variant="tonal">
-        <template v-slot:prepend>
-          <v-icon class="pt-4" icon="$warning"></v-icon>
+        <template #prepend>
+          <v-icon class="pt-4" icon="$warning" />
         </template>
         <div>You are about to permanently delete all contracts. This action cannot be reversed!</div>
         <div>Deleting contracts may take a while to complete.</div>
       </v-alert>
       <v-card-actions class="justify-end my-1 mr-2">
-        <v-btn color="anchor" @click="deleteDialog = false"> Cancel </v-btn>
-        <v-btn color="error" @click="deleteAll"> Delete </v-btn>
+        <v-btn color="anchor" @click="deleteDialog = false">
+          Cancel
+        </v-btn>
+        <v-btn color="error" @click="deleteAll">
+          Delete
+        </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
   <!-- Contracts Tables -->
   <v-expansion-panels v-model="panel" multiple>
-    <v-expansion-panel class="mb-4" :elevation="3" v-for="(table, idx) of contractsTables" :key="idx">
+    <v-expansion-panel v-for="(table, idx) of contractsTables" :key="idx" class="mb-4" :elevation="3">
       <v-expansion-panel-title color="primary" style="height: 40px !important; min-height: 15px !important">
-        <v-icon size="24" class="pr-3">{{ table.icon }}</v-icon>
+        <v-icon size="24" class="pr-3">
+          {{ table.icon }}
+        </v-icon>
         <v-card-title class="pa-0 text-subtitle-1">
           <strong>{{ table.title }}</strong>
         </v-card-title>

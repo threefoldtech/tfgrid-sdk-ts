@@ -11,17 +11,21 @@
         <v-divider />
         <v-card-text>This will free up the node for others on the chain</v-card-text>
         <v-card-actions class="justify-end mb-1 mr-2">
-          <v-btn color="anchor" @click="openUnreserveDialog = false">Close</v-btn>
-          <v-btn color="error" @click="unReserveNode" :loading="loadingUnreserveNode">Confirm</v-btn>
+          <v-btn color="anchor" @click="openUnreserveDialog = false">
+            Close
+          </v-btn>
+          <v-btn color="error" :loading="loadingUnreserveNode" @click="unReserveNode">
+            Confirm
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
     <v-btn
-      :loading="loadingReserveNode"
       v-if="node.rentedByTwinId === 0"
+      :loading="loadingReserveNode"
       :disabled="disableButton || hasInsufficientBalance"
-      @click.stop="reserveNode"
       color="primary"
+      @click.stop="reserveNode"
     >
       Reserve
     </v-btn>
@@ -33,11 +37,11 @@
       </v-tooltip>
     </span>
     <v-btn
+      v-if="node.rentedByTwinId === profile?.twinId"
       size="small"
       color="error"
       :loading="loadingUnreserveBtn"
       :disabled="disableButton"
-      v-if="node.rentedByTwinId === profile?.twinId"
       @click.stop="removeReserve"
     >
       Unreserve

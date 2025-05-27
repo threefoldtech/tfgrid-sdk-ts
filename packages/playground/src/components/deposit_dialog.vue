@@ -1,13 +1,15 @@
 <template>
   <v-container>
     <v-dialog
-      transition="dialog-bottom-transition"
       v-model="depositDialog"
-      @update:model-value="closeDialog"
+      transition="dialog-bottom-transition"
       attach="#modals"
+      @update:model-value="closeDialog"
     >
       <v-card>
-        <VCardTitle class="bg-primary">Deposit TFT</VCardTitle>
+        <VCardTitle class="bg-primary">
+          Deposit TFT
+        </VCardTitle>
         <v-card-text>
           <v-container>
             <v-row class="py-2">
@@ -18,7 +20,9 @@
                     {{ selectedName ? selectedName.charAt(0).toUpperCase() + selectedName.slice(1) : "" }}
                     transaction.
                   </p>
-                  <p class="mt-1 mb-8 text-secondary text-sm-subtitle-2 font-weight-bold">Deposit fee is 1 TFT</p>
+                  <p class="mt-1 mb-8 text-secondary text-sm-subtitle-2 font-weight-bold">
+                    Deposit fee is 1 TFT
+                  </p>
                 </div>
                 <input-tooltip
                   v-if="selectedName == 'stellar'"
@@ -26,9 +30,9 @@
                   :href="stellarLink"
                   target="_blank"
                 >
-                  <CopyReadonlyInput label="Destination" :data="depositWallet"></CopyReadonlyInput>
+                  <CopyReadonlyInput label="Destination" :data="depositWallet" />
                 </input-tooltip>
-                <CopyReadonlyInput v-else label="Destination" :data="depositWallet"></CopyReadonlyInput>
+                <CopyReadonlyInput v-else label="Destination" :data="depositWallet" />
                 <div class="memo-text-warn">
                   <CopyReadonlyInput
                     label="Memo Text"
@@ -45,19 +49,23 @@
                   </p>
                 </div>
               </v-col>
-              <v-divider class="mx-4" vertical></v-divider>
+              <v-divider class="mx-4" vertical />
               <v-col>
-                <QRPlayStore :qr="qrCodeText"
-                  ><b> OR </b>
-                  <p class="mb-3">Use ThreeFold Connect to scan this QRcode:</p></QRPlayStore
-                >
+                <QRPlayStore :qr="qrCodeText">
+                  <b> OR </b>
+                  <p class="mb-3">
+                    Use ThreeFold Connect to scan this QRcode:
+                  </p>
+                </QRPlayStore>
               </v-col>
             </v-row>
           </v-container>
           <v-divider />
         </v-card-text>
         <v-card-actions class="justify-end my-1 mr-2">
-          <v-btn color="anchor" @click="closeDialog"> Close </v-btn>
+          <v-btn color="anchor" @click="closeDialog">
+            Close
+          </v-btn>
           <v-btn color="secondary" :href="manual.tft_bridges" target="_blank" text="Learn more?" />
         </v-card-actions>
       </v-card>

@@ -3,14 +3,16 @@
     <VCard>
       <VCardTitle class="v-card-title font-weight-black text-center text-h5 bg-primary py-3" v-text="title" />
       <VCardText class="text-center">
-        <VIcon icon="mdi-close-circle-outline" class="text-h3" color="error" v-if="failed" />
-        <VProgressCircular indeterminate size="40" width="5" color="info" v-else />
+        <VIcon v-if="failed" icon="mdi-close-circle-outline" class="text-h3" color="error" />
+        <VProgressCircular v-else indeterminate size="40" width="5" color="info" />
 
         <p class="my-4" v-text="description" />
       </VCardText>
 
-      <VCardActions class="d-flex justify-center mb-4" v-if="failed">
-        <VBtn prepend-icon="mdi-reload" variant="outlined" color="secondary" @click="reload">Reload Now</VBtn>
+      <VCardActions v-if="failed" class="d-flex justify-center mb-4">
+        <VBtn prepend-icon="mdi-reload" variant="outlined" color="secondary" @click="reload">
+          Reload Now
+        </VBtn>
       </VCardActions>
     </VCard>
   </VDialog>

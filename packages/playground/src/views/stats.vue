@@ -2,24 +2,28 @@
   <div>
     <div class="border px-4 pb-4 rounded position-relative mt-2">
       <v-card color="primary" class="d-flex justify-center items-center mt-3 pa-3 text-center">
-        <v-icon size="30" class="pr-3" color="white">mdi-chart-scatter-plot</v-icon>
-        <v-card-title class="pa-0">Statistics</v-card-title>
+        <v-icon size="30" class="pr-3" color="white">
+          mdi-chart-scatter-plot
+        </v-icon>
+        <v-card-title class="pa-0">
+          Statistics
+        </v-card-title>
       </v-card>
       <div class="text-center">
         <v-row align="center" justify="center">
           <v-col cols="12" sm="6" md="4">
             <div class="d-flex my-6 align-center justify-center">
-              <v-progress-circular indeterminate v-if="loading" />
+              <v-progress-circular v-if="loading" indeterminate />
             </div>
           </v-col>
         </v-row>
       </div>
       <v-card class="d-flex">
         <v-row align="center" class="pa-5">
-          <v-col color="red" v-if="failed">
+          <v-col v-if="failed" color="red">
             <v-alert type="error" variant="tonal">
               Failed to get stats data after 3 attempts, Feel free to contact the support team or try again later.
-              <v-btn @click="fetchData" color="transparent">
+              <v-btn color="transparent" @click="fetchData">
                 <v-icon> mdi-refresh</v-icon>
               </v-btn>
             </v-alert>

@@ -1,30 +1,33 @@
 <template>
   <section>
-    <h6 class="text-h5 mb-4 mt-2" v-if="!hideTitle">Domain Name</h6>
+    <h6 v-if="!hideTitle" class="text-h5 mb-4 mt-2">
+      Domain Name
+    </h6>
 
     <input-tooltip tooltip="Use a custom domain" align-center>
       <div>
-        <VSwitch color="primary" inset label="Custom Domain" v-model="enableCustomDomain" hide-details />
+        <VSwitch v-model="enableCustomDomain" color="primary" inset label="Custom Domain" hide-details />
       </div>
     </input-tooltip>
 
     <div ref="input">
       <form-validator ref="domainFormRef">
         <VExpandTransition>
-          <input-tooltip tooltip="Domain Name that will point to this instance" v-if="enableCustomDomain">
+          <input-tooltip v-if="enableCustomDomain" tooltip="Domain Name that will point to this instance">
             <InputValidator
+              ref="customInputRef"
+              v-model:value="customDomain"
               :rules="[
                 validators.required('Domain name is required.'),
                 validators.isFQDN('Please provide a valid domain name.'),
               ]"
-              v-model:value="customDomain"
-              ref="customInputRef"
               #="{ props }"
-              ><VTextField
+            >
+              <VTextField
                 v-bind="props"
+                v-model="customDomain"
                 label="Custom Domain"
                 placeholder="Your custom domain"
-                v-model="customDomain"
               />
             </InputValidator>
           </input-tooltip>
@@ -32,47 +35,47 @@
 
         <VExpandTransition>
           <input-tooltip
-            tooltip="Creates a subdomain for your instance on the selected domain to be able to access your instance from the browser."
             v-if="!disableSelectedDomain"
+            tooltip="Creates a subdomain for your instance on the selected domain to be able to access your instance from the browser."
           >
             <InputValidator
-              #="{ props }"
               ref="domainInput"
+              #="{ props }"
               :rules="[validators.required('Domain is required.')]"
               :value="(selectedDomain as INode)"
             >
               <VAutocomplete
                 v-bind="props"
+                v-model="selectedDomain"
                 validate-on="input"
                 label="Select domain"
                 placeholder="Select a domain"
                 :items="loadedDomains"
                 :loading="domainsTask.loading"
                 item-title="publicConfig.domain"
-                v-model="selectedDomain"
                 :error-messages="[
                   ...props?.errorMessages,
                   ...(domainsTask.error?.message ? [domainsTask.error.message] : []),
                 ]"
                 return-object
               >
-                <template #append-item v-if="pagination.page !== -1">
+                <template v-if="pagination.page !== -1" #append-item>
                   <VContainer>
                     <VBtn
-                      @click="loadDomains"
                       block
                       color="secondary"
                       variant="tonal"
                       :loading="domainsTask.loading"
                       prepend-icon="mdi-reload"
+                      @click="loadDomains"
                     >
                       Load More Domains
                     </VBtn>
                   </VContainer>
                 </template>
-                <template v-slot:append>
+                <template #append>
                   <v-slide-x-reverse-transition mode="out-in">
-                    <v-icon icon="mdi-reload" @click="reloadDomains"></v-icon>
+                    <v-icon icon="mdi-reload" @click="reloadDomains" />
                   </v-slide-x-reverse-transition>
                 </template>
               </VAutocomplete>
@@ -83,10 +86,10 @@
         <v-alert
           v-if="
             !disableSelectedDomain &&
-            useFQDN &&
-            modelValue &&
-            modelValue.customDomain &&
-            selectedDomain?.publicConfig?.ipv4
+              useFQDN &&
+              modelValue &&
+              modelValue.customDomain &&
+              selectedDomain?.publicConfig?.ipv4
           "
           class="mb-4"
           type="warning"

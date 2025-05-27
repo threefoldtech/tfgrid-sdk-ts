@@ -2,16 +2,9 @@
   <div>
     <v-data-table-server
       v-model="selectedItems"
+      v-model:items-per-page="pageSize"
       :headers="headers"
       :items-length="publicIpsCount"
-      v-model:items-per-page="pageSize"
-      @update:options="
-        (options: any ) => {
-          page = options.page;
-          pageSize = options.itemsPerPage;
-          getFarmPublicIp(true, { page, size: pageSize });
-        }
-      "
       :items="ips"
       :loading="loading"
       :items-per-page-options="[
@@ -24,10 +17,19 @@
       :deleting="isRemoving"
       show-select
       return-object
+      @update:options="
+        (options: any ) => {
+          page = options.page;
+          pageSize = options.itemsPerPage;
+          getFarmPublicIp(true, { page, size: pageSize });
+        }
+      "
     >
-      <template v-slot:top>
+      <template #top>
         <v-alert>
-          <h4 class="text-center font-weight-medium">Public IPs</h4>
+          <h4 class="text-center font-weight-medium">
+            Public IPs
+          </h4>
         </v-alert>
       </template>
       <template #[`item.ip`]="{ item }">
@@ -62,20 +64,22 @@
           <strong>Delete the following IPs?</strong>
         </v-card-title>
         <v-card-text>
-          <v-chip class="mb-5 mr-2" v-for="item in selectedItems" :key="item">
+          <v-chip v-for="item in selectedItems" :key="item" class="mb-5 mr-2">
             {{ item.ip }}
           </v-chip>
           <v-divider />
         </v-card-text>
         <v-card-actions class="justify-end mb-1 mr-2">
-          <v-btn @click="showDialogue = false" color="anchor">Close</v-btn>
+          <v-btn color="anchor" @click="showDialogue = false">
+            Close
+          </v-btn>
           <v-btn
             text="Delete"
             :loading="isRemoving"
             color="error"
             :disabled="selectedItems.length == 0 || isRemoving"
             @click="removeFarmIps"
-          ></v-btn>
+          />
         </v-card-actions>
       </v-card>
     </v-dialog>

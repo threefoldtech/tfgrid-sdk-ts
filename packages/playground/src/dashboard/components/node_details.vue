@@ -1,23 +1,27 @@
 <template>
-  <td :colspan="columnsLen" v-if="dNodeLoading" style="text-align: center">
+  <td v-if="dNodeLoading" :colspan="columnsLen" style="text-align: center">
     <div class="pa-1">
       <div class="d-flex my-6 align-center justify-center">
         <v-progress-circular :size="20" />
       </div>
     </div>
   </td>
-  <td :colspan="columnsLen" v-else-if="dNodeError" style="text-align: center">
+  <td v-else-if="dNodeError" :colspan="columnsLen" style="text-align: center">
     <div class="pt-4">
       <v-alert variant="tonal" class="d-flex justify-between" dense outlined type="error" style="text-align: center">
-        <div style="display: flex; align-items: center">Failed to retrieve Node details.</div>
-        <template v-slot:append>
-          <v-icon @click="reloadNodeDetails" style="cursor: pointer">mdi-reload</v-icon>
+        <div style="display: flex; align-items: center">
+          Failed to retrieve Node details.
+        </div>
+        <template #append>
+          <v-icon style="cursor: pointer" @click="reloadNodeDetails">
+            mdi-reload
+          </v-icon>
         </template>
       </v-alert>
     </div>
   </td>
 
-  <td :style="{ backgroundColor: 'rgb(var(--v-theme-background))' }" :colspan="columnsLen" v-else>
+  <td v-else :style="{ backgroundColor: 'rgb(var(--v-theme-background))' }" :colspan="columnsLen">
     <v-row class="ma-2">
       <v-col :cols="getColSize">
         <div class="mt-3">
@@ -26,7 +30,7 @@
             title="Node Resources"
             icon="mdi-harddisk"
             :items="getNodeResourceCard()"
-          ></card-details>
+          />
         </div>
       </v-col>
 
@@ -37,7 +41,7 @@
             title="Location"
             icon="mdi-map-marker"
             :items="getCountryResourceCard()"
-          ></card-details>
+          />
         </div>
       </v-col>
 
@@ -48,12 +52,12 @@
             title="Farm details"
             icon="mdi-silo"
             :items="getFarmResourceCard()"
-          ></card-details>
+          />
         </div>
       </v-col>
     </v-row>
     <v-row class="d-flex" style="justify-content: center">
-      <div class="pa-1 pb-4" v-if="gpuLoading">
+      <div v-if="gpuLoading" class="pa-1 pb-4">
         <div style="bottom: 10rem; top: 10rem">
           <p
             :style="{
@@ -77,9 +81,13 @@
             type="error"
             style="text-align: center"
           >
-            <div style="display: flex; align-items: center">Failed to receive node GPUs information</div>
-            <template v-slot:append>
-              <v-icon @click="getGpuDetails" style="cursor: pointer">mdi-reload</v-icon>
+            <div style="display: flex; align-items: center">
+              Failed to receive node GPUs information
+            </div>
+            <template #append>
+              <v-icon style="cursor: pointer" @click="getGpuDetails">
+                mdi-reload
+              </v-icon>
             </template>
           </v-alert>
         </div>
@@ -91,8 +99,9 @@
       >
         <div class="mt-3">
           <GPUDetailsCard :node="node" />
-        </div> </v-col
-    ></v-row>
+        </div>
+      </v-col>
+    </v-row>
   </td>
 </template>
 
