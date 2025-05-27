@@ -34,7 +34,7 @@
                 #="{ props }"
               >
                 <input-tooltip tooltip="IPv4 address in CIDR format xx.xx.xx.xx/xx">
-                  <v-text-field v-model="config.ipv4" v-bind="props" outlined label="IPv4"></v-text-field>
+                  <v-text-field v-model="config.ipv4" v-bind="props" outlined label="IPv4" />
                 </input-tooltip>
               </input-validator>
 
@@ -55,7 +55,7 @@
                 #="{ props }"
               >
                 <input-tooltip tooltip="Gateway for the IP in IPv4 format">
-                  <v-text-field v-model="config.gw4" v-bind="props" outlined label="Gateway IPv4"></v-text-field>
+                  <v-text-field v-model="config.gw4" v-bind="props" outlined label="Gateway IPv4" />
                 </input-tooltip>
               </input-validator>
 
@@ -70,7 +70,7 @@
                 #="{ props }"
               >
                 <input-tooltip tooltip="IPv6 address in format x:x:x:x:x:x:x:x">
-                  <v-text-field v-model="config.ipv6" v-bind="props" outlined label="IPv6"></v-text-field>
+                  <v-text-field v-model="config.ipv6" v-bind="props" outlined label="IPv6" />
                 </input-tooltip>
               </input-validator>
 
@@ -91,7 +91,7 @@
                 #="{ props }"
               >
                 <input-tooltip tooltip="Gateway for the IP in IPv6 format">
-                  <v-text-field v-model="config.gw6" v-bind="props" outlined label="Gateway IPv6"></v-text-field>
+                  <v-text-field v-model="config.gw6" v-bind="props" outlined label="Gateway IPv6" />
                 </input-tooltip>
               </input-validator>
 
@@ -102,7 +102,7 @@
                 #="{ props }"
               >
                 <input-tooltip tooltip="Domain for web gateway">
-                  <v-text-field v-model="config.domain" v-bind="props" outlined label="Domain"></v-text-field>
+                  <v-text-field v-model="config.domain" v-bind="props" outlined label="Domain" />
                 </input-tooltip>
               </input-validator>
             </form-validator>
@@ -146,14 +146,8 @@
 
           <v-card-actions class="justify-end my-1 mr-2">
             <!-- Cancel and Remove Buttons -->
-            <v-btn text="Cancel" color="anchor" @click="showClearDialogue = false"></v-btn>
-            <v-btn
-              text="Remove"
-              color="error"
-              :loading="isRemoving"
-              :disabled="isRemoving"
-              @click="removeConfig()"
-            ></v-btn>
+            <v-btn text="Cancel" color="anchor" @click="showClearDialogue = false" />
+            <v-btn text="Remove" color="error" :loading="isRemoving" :disabled="isRemoving" @click="removeConfig()" />
           </v-card-actions>
         </v-card>
       </v-dialog>

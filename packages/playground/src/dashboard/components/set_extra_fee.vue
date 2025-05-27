@@ -44,12 +44,12 @@
                     label="Additional Fees"
                     :disabled="isSetting || loading"
                     :loading="loading"
-                  ></v-text-field>
+                  />
                 </input-tooltip>
               </input-validator>
             </form-validator>
 
-            <v-divider></v-divider>
+            <v-divider />
           </v-card-text>
           <v-card-actions class="justify-end my-1 mr-2">
             <v-btn color="anchor" @click="showDialogue = false">Close</v-btn>

@@ -4,7 +4,7 @@
       <template #activator="{ props }">
         {{ getPropsRef(props) }}
         <div class="d-flex" :class="{ 'w-100': !inline, 'align-center': alignCenter, 'justify-center': justifyCenter }">
-          <slot></slot>
+          <slot />
           <span
             :style="{
               cursor: 'help',

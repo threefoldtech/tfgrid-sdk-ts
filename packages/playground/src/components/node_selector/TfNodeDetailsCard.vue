@@ -132,11 +132,11 @@
             <template #activator="{ props }">
               <span v-if="speed?.upload && speed?.download" v-bind="props" class="speed-chip mr-2 grey-darken-3">
                 <span>
-                  <v-icon icon="mdi-arrow-up"></v-icon>
+                  <v-icon icon="mdi-arrow-up" />
                   <span class="mx-1"> {{ formatSpeed(speed.upload) }}</span>
                 </span>
                 <span>
-                  <v-icon icon="mdi-arrow-down"></v-icon>
+                  <v-icon icon="mdi-arrow-down" />
                   <span class="mx-1">{{ formatSpeed(speed.download) }}</span>
                 </span>
               </span>
@@ -227,7 +227,7 @@
               :disable-sort="true"
               density="compact"
             >
-              <template #bottom></template>
+              <template #bottom />
             </v-data-table>
 
             <ul class="pl-5 py-2">

@@ -60,8 +60,7 @@
                     label="Public SSH Key"
                     v-bind="{ ...props, ...copyInputProps }"
                     :rules="sshRules(sshKey)"
-                  >
-                  </v-textarea>
+                  />
                 </CopyInputWrapper>
               </input-tooltip>
             </div>
@@ -69,7 +68,7 @@
           </v-card-text>
 
           <v-card-actions class="justify-end mb-1 mr-2">
-            <v-btn color="anchor" text="Close" @click="$emit('close')"></v-btn>
+            <v-btn color="anchor" text="Close" @click="$emit('close')" />
 
             <v-btn
               v-if="$props.dialogType === SSHCreationMethod.Generate"
@@ -87,7 +86,7 @@
               color="secondary"
               text="Save"
               @click="createNewSSHKey"
-            ></v-btn>
+            />
           </v-card-actions>
         </v-card>
       </v-form>

@@ -77,13 +77,7 @@
             "
           >
             <template #activator="{ props }">
-              <v-progress-circular
-                v-if="item.activating"
-                :size="20"
-                :width="2"
-                color="info"
-                indeterminate
-              ></v-progress-circular>
+              <v-progress-circular v-if="item.activating" :size="20" :width="2" color="info" indeterminate />
               <VCheckboxBtn
                 v-else
                 class="d-inline"

@@ -11,7 +11,7 @@
       />
     </input-tooltip>
 
-    <slot></slot>
+    <slot />
 
     <template v-if="custom">
       <input-validator

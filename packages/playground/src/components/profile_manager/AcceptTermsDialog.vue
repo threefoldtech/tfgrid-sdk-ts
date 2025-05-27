@@ -2,7 +2,7 @@
   <v-dialog id="terms-dialog" :model-value="props.modelValue" persistent fullscreen width="100%" attach="#modals">
     <!-- Content card -->
     <v-card v-if="!loading" id="terms-dialog__card-content">
-      <v-card-text id="terms-dialog__text-content" class="pa-15" v-html="acceptTermsContent"></v-card-text>
+      <v-card-text id="terms-dialog__text-content" class="pa-15" v-html="acceptTermsContent" />
       <div id="terms-dialog__footer" class="terms-footer">
         <v-btn
           v-show="!loading"
