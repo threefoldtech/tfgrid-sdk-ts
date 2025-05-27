@@ -13,8 +13,8 @@
         >.
       </span>
       <v-tooltip location="top" text="Show failed deployments">
-        <template #activator="{ props }">
-          <v-icon v-bind="props" class="custom-icon" @click="showDialog = true">
+        <template #activator="{ props: tooltipProps }">
+          <v-icon v-bind="tooltipProps" class="custom-icon" @click="showDialog = true">
             mdi-file-document-refresh-outline
           </v-icon>
         </template>
@@ -115,8 +115,8 @@
 
       <template #[`item.flist`]="{ item }">
         <v-tooltip :text="item.flist" location="bottom right">
-          <template #activator="{ props }">
-            <p v-bind="props">
+          <template #activator="{ props: flistProps }">
+            <p v-bind="flistProps">
               {{ renameFlist(item.flist) }}
             </p>
           </template>

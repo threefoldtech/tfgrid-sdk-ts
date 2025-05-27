@@ -23,8 +23,8 @@
                     <v-list-item style="font-weight: 500" v-bind="props" :prepend-icon="route.icon">
                       <v-list-item-title class="font-weight-bold">
                         <v-tooltip :text="route.tooltip" :disabled="!route.tooltip">
-                          <template #activator="{ props }">
-                            <span v-bind="props">
+                          <template #activator="{ props: tooltipProps }">
+                            <span v-bind="tooltipProps">
                               {{ route.title }}
                             </span>
                           </template>
@@ -278,7 +278,6 @@ const navbarConfig = ref();
 const hasGrid = computed(() => !!gridStore.grid);
 const hasClient = computed(() => !!gridStore.client);
 
- 
 const permanent = ref(window.innerWidth > 980);
 const openSidebar = ref(permanent.value);
 const toolbarExtended = ref(false);
@@ -365,7 +364,6 @@ async function setTimeouts() {
     }
   }
 }
- 
 
 const routes: AppRoute[] = [
   {

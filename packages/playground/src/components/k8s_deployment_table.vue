@@ -5,11 +5,13 @@
 
       <span>
         This might happen because the node is down or it's not reachable
-        <span v-if="showEncryption">or the deployment{{ count - items.length > 1 ? "s are" : " is" }} encrypted by another key</span>.
+        <span v-if="showEncryption"
+          >or the deployment{{ count - items.length > 1 ? "s are" : " is" }} encrypted by another key</span
+        >.
       </span>
       <v-tooltip location="top" text="Show failed deployments">
-        <template #activator="{ props }">
-          <v-icon v-bind="props" class="custom-icon" @click="showDialog = true">
+        <template #activator="{ props: tooltipProps }">
+          <v-icon v-bind="tooltipProps" class="custom-icon" @click="showDialog = true">
             mdi-file-document-refresh-outline
           </v-icon>
         </template>
@@ -17,9 +19,7 @@
 
       <v-dialog v-model="showDialog" transition="dialog-bottom-transition" attach="#modals">
         <v-card>
-          <v-card-title style="color: #ffcc00; font-weight: bold">
-            Failed Deployments
-          </v-card-title>
+          <v-card-title style="color: #ffcc00; font-weight: bold"> Failed Deployments </v-card-title>
           <v-divider color="#FFCC00" />
           <v-card-text>
             <v-alert type="error" variant="tonal">
@@ -28,15 +28,17 @@
 
               <span>
                 This might happen because the node is down or it's not reachable
-                <span v-if="showEncryption">or the deployment{{ count - items.length > 1 ? "s are" : " is" }} encrypted by another key</span>.
+                <span v-if="showEncryption"
+                  >or the deployment{{ count - items.length > 1 ? "s are" : " is" }} encrypted by another key</span
+                >.
               </span>
             </v-alert>
             <li v-for="deployment in failedDeployments" :key="deployment.name">
               {{
                 deployment.nodes.length > 0
                   ? `${deployment.name} on node${deployment.nodes.length > 1 ? "s" : ""}: ${deployment.nodes.join(
-                    ", ",
-                  )}`
+                      ", ",
+                    )}`
                   : deployment.name
               }}
               <template v-if="deployment.contracts && deployment.contracts.length > 0">
@@ -48,9 +50,7 @@
             </li>
           </v-card-text>
           <v-card-actions class="justify-end my-1 mr-2">
-            <v-btn color="anchor" @click="showDialog = false">
-              Close
-            </v-btn>
+            <v-btn color="anchor" @click="showDialog = false"> Close </v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -126,9 +126,7 @@
       <template #[`item.status`]="{ item }">
         <v-chip :color="getNodeHealthColor(item.masters[0].status as string).color">
           <v-tooltip v-if="item.masters[0].status == NodeHealth.Error" activator="parent" location="top">
-            {{
-              item.masters[0].message
-            }}
+            {{ item.masters[0].message }}
           </v-tooltip>
           <v-tooltip v-if="item.masters[0].status == NodeHealth.Paused" activator="parent" location="top">
             The deployment contract is in grace period
@@ -140,9 +138,7 @@
       </template>
 
       <template #[`item.actions`]="{ item }">
-        <v-chip v-if="deleting && ($props.modelValue || []).includes(item.value)" color="error">
-          Deleting...
-        </v-chip>
+        <v-chip v-if="deleting && ($props.modelValue || []).includes(item.value)" color="error"> Deleting... </v-chip>
         <v-btn-group v-else variant="tonal">
           <slot name="actions" :item="item" />
         </v-btn-group>

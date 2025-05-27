@@ -33,8 +33,8 @@
                   >
                     <template #append-inner>
                       <v-tooltip :text="$props.modelValue[key].tooltip">
-                        <template #activator="{ props }">
-                          <VIcon icon="mdi-information-outline" v-bind="props" />
+                        <template #activator="{ props: tooltipProps }">
+                          <VIcon icon="mdi-information-outline" v-bind="tooltipProps" />
                         </template>
                       </v-tooltip>
                     </template>

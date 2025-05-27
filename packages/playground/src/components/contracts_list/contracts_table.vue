@@ -43,8 +43,8 @@
           <p class="mr-2 text-no-wrap" cols="8">{{ item.consumption.toFixed(3) }} TFT/hour</p>
 
           <v-tooltip v-if="item.discountPackage" bottom color="primary" close-delay="100" cols="2">
-            <template #activator="{ props }">
-              <v-icon class="scale_beat" color="warning" v-bind="props"> mdi-brightness-percent </v-icon>
+            <template #activator="{ props: discountProps }">
+              <v-icon class="scale_beat" color="warning" v-bind="discountProps"> mdi-brightness-percent </v-icon>
             </template>
 
             <a
@@ -92,8 +92,14 @@
           :text="'Click here to check the amount of tokens needed to unlock your contract and resume your workload.'"
           location="top center"
         >
-          <template #activator="{ props }">
-            <VProgressCircular v-bind="props" :color="getStateColor(item.state)" indeterminate size="20" width="3" />
+          <template #activator="{ props: progressProps }">
+            <VProgressCircular
+              v-bind="progressProps"
+              :color="getStateColor(item.state)"
+              indeterminate
+              size="20"
+              width="3"
+            />
           </template>
         </v-tooltip>
         <v-tooltip
@@ -101,9 +107,9 @@
           :text="'Click here to check the amount of tokens needed to unlock your contract and resume your workload.'"
           location="top center"
         >
-          <template #activator="{ props }">
+          <template #activator="{ props: chipProps }">
             <v-chip
-              v-bind="props"
+              v-bind="chipProps"
               :color="getStateColor(item.state)"
               @click.stop="contractLockDetails(item as unknown as Contract)"
             >
@@ -118,13 +124,13 @@
 
       <template #[`item.actions`]="{ item }">
         <v-tooltip :text="failedContractId == item.contract_id ? 'Retry' : 'Show Details'">
-          <template #activator="{ props }">
+          <template #activator="{ props: actionProps }">
             <v-btn
               :color="failedContractId == item.contract_id ? 'error' : ''"
               variant="tonal"
               :disabled="(loadingShowDetails && loadingContractId !== item.contract_id) || deleting"
               :loading="loadingContractId == item.contract_id"
-              v-bind="props"
+              v-bind="actionProps"
               @click="showDetails(item)"
             >
               <v-icon v-if="failedContractId == item.contract_id" class="pt-1"> mdi-refresh </v-icon>
@@ -197,8 +203,8 @@
           "
           location="top center"
         >
-          <template #activator="{ props }">
-            <div v-bind="props">
+          <template #activator="{ props: unlockProps }">
+            <div v-bind="unlockProps">
               <v-btn
                 v-if="!isNodeInRentContracts"
                 :disabled="freeBalance < getAmountLocked || loadingShowDetails"
@@ -271,8 +277,8 @@
           {{ c.contract_id }}
         </v-chip>
         <v-tooltip text="Rent contract associated with some of the selected contracts" location="top center">
-          <template #activator="{ props }">
-            <v-chip v-for="id in selectedRentContracts" v-bind="props" :key="id" class="ma-1" color="default" label>
+          <template #activator="{ props: rentProps }">
+            <v-chip v-for="id in selectedRentContracts" v-bind="rentProps" :key="id" class="ma-1" color="default" label>
               {{ id }}
             </v-chip>
           </template>
@@ -290,8 +296,8 @@
           "
           location="top center"
         >
-          <template #activator="{ props }">
-            <div v-bind="props">
+          <template #activator="{ props: batchUnlockProps }">
+            <div v-bind="batchUnlockProps">
               <v-btn
                 :disabled="selectedLockedAmount > freeBalance || loadingShowDetails"
                 color="warning"

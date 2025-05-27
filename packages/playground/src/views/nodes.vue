@@ -100,8 +100,8 @@
               <VTextField v-model="filters.nodeId" label="Node ID" variant="outlined" density="compact" v-bind="props">
                 <template #append-inner>
                   <VTooltip text="Filter by node id">
-                    <template #activator="{ props }">
-                      <VIcon icon="mdi-information-outline" v-bind="props" />
+                    <template #activator="{ props: tooltipProps }">
+                      <VIcon icon="mdi-information-outline" v-bind="tooltipProps" />
                     </template>
                   </VTooltip>
                 </template>
@@ -125,8 +125,8 @@
               <VTextField v-model="filters.farmId" label="Farm ID" variant="outlined" density="compact" v-bind="props">
                 <template #append-inner>
                   <VTooltip text="Filter by farm id">
-                    <template #activator="{ props }">
-                      <VIcon icon="mdi-information-outline" v-bind="props" />
+                    <template #activator="{ props: tooltipProps }">
+                      <VIcon icon="mdi-information-outline" v-bind="tooltipProps" />
                     </template>
                   </VTooltip>
                 </template>
@@ -192,8 +192,8 @@
               >
                 <template #append-inner>
                   <VTooltip text="Filter by free Public IPs">
-                    <template #activator="{ props }">
-                      <VIcon icon="mdi-information-outline" v-bind="props" />
+                    <template #activator="{ props: tooltipProps }">
+                      <VIcon icon="mdi-information-outline" v-bind="tooltipProps" />
                     </template>
                   </VTooltip>
                 </template>
@@ -220,8 +220,8 @@
               >
                 <template #append-inner>
                   <VTooltip text="Filter by the minimum available amount of SSD in the node.">
-                    <template #activator="{ props }">
-                      <VIcon icon="mdi-information-outline" v-bind="props" />
+                    <template #activator="{ props: tooltipProps }">
+                      <VIcon icon="mdi-information-outline" v-bind="tooltipProps" />
                     </template>
                   </VTooltip>
                 </template>
@@ -248,8 +248,8 @@
               >
                 <template #append-inner>
                   <VTooltip text="Filter by the minimum available amount of HDD in the node.">
-                    <template #activator="{ props }">
-                      <VIcon icon="mdi-information-outline" v-bind="props" />
+                    <template #activator="{ props: tooltipProps }">
+                      <VIcon icon="mdi-information-outline" v-bind="tooltipProps" />
                     </template>
                   </VTooltip>
                 </template>
@@ -276,8 +276,8 @@
               >
                 <template #append-inner>
                   <VTooltip text="Filter by the minimum available amount of RAM in the node.">
-                    <template #activator="{ props }">
-                      <VIcon icon="mdi-information-outline" v-bind="props" />
+                    <template #activator="{ props: tooltipProps }">
+                      <VIcon icon="mdi-information-outline" v-bind="tooltipProps" />
                     </template>
                   </VTooltip>
                 </template>
@@ -298,8 +298,8 @@
               <VTextField v-model="filters.numGpu" density="compact" label="Num GPU" variant="outlined" v-bind="props">
                 <template #append-inner>
                   <VTooltip text="Filter by the number of gpus in the node.">
-                    <template #activator="{ props }">
-                      <VIcon icon="mdi-information-outline" v-bind="props" />
+                    <template #activator="{ props: tooltipProps }">
+                      <VIcon icon="mdi-information-outline" v-bind="tooltipProps" />
                     </template>
                   </VTooltip>
                 </template>
@@ -326,8 +326,8 @@
               >
                 <template #append-inner>
                   <VTooltip text="Filter by the minimum total amount of SSD in the node.">
-                    <template #activator="{ props }">
-                      <VIcon icon="mdi-information-outline" v-bind="props" />
+                    <template #activator="{ props: tooltipProps }">
+                      <VIcon icon="mdi-information-outline" v-bind="tooltipProps" />
                     </template>
                   </VTooltip>
                 </template>
@@ -354,8 +354,8 @@
               >
                 <template #append-inner>
                   <VTooltip text="Filter by the minimum total amount of HDD in the node.">
-                    <template #activator="{ props }">
-                      <VIcon icon="mdi-information-outline" v-bind="props" />
+                    <template #activator="{ props: tooltipProps }">
+                      <VIcon icon="mdi-information-outline" v-bind="tooltipProps" />
                     </template>
                   </VTooltip>
                 </template>
@@ -382,8 +382,8 @@
               >
                 <template #append-inner>
                   <VTooltip text="Filter by the minimum total amount of RAM in the node.">
-                    <template #activator="{ props }">
-                      <VIcon icon="mdi-information-outline" v-bind="props" />
+                    <template #activator="{ props: tooltipProps }">
+                      <VIcon icon="mdi-information-outline" v-bind="tooltipProps" />
                     </template>
                   </VTooltip>
                 </template>
@@ -410,8 +410,8 @@
               >
                 <template #append-inner>
                   <VTooltip text="Filter by the minimum total number of CPUs in the node.">
-                    <template #activator="{ props }">
-                      <VIcon icon="mdi-information-outline" v-bind="props" />
+                    <template #activator="{ props: tooltipProps }">
+                      <VIcon icon="mdi-information-outline" v-bind="tooltipProps" />
                     </template>
                   </VTooltip>
                 </template>

@@ -20,12 +20,18 @@
               validators.validateResourceMaxNumber('This is not a valid ID.'),
             ]"
           >
-            <template #input="{ props }">
-              <VTextField v-model="filters.farmId" label="Farm ID" variant="outlined" density="compact" v-bind="props">
+            <template #input="{ props: inputProps }">
+              <VTextField
+                v-model="filters.farmId"
+                label="Farm ID"
+                variant="outlined"
+                density="compact"
+                v-bind="inputProps"
+              >
                 <template #append-inner>
                   <VTooltip text="Filter by farm id">
-                    <template #activator="{ props }">
-                      <VIcon icon="mdi-information-outline" v-bind="props" />
+                    <template #activator="{ props: tooltipProps }">
+                      <VIcon icon="mdi-information-outline" v-bind="tooltipProps" />
                     </template>
                   </VTooltip>
                 </template>
@@ -70,8 +76,8 @@
               >
                 <template #append-inner>
                   <VTooltip text="Filter by free public IPs">
-                    <template #activator="{ props }">
-                      <VIcon icon="mdi-information-outline" v-bind="props" />
+                    <template #activator="{ props: ipsTooltipProps }">
+                      <VIcon icon="mdi-information-outline" v-bind="ipsTooltipProps" />
                     </template>
                   </VTooltip>
                 </template>

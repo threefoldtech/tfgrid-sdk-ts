@@ -1,8 +1,8 @@
 <template>
   <div :style="{ position: 'relative' }">
-    <router-view v-slot="{ Component, route }">
-      <div :key="route.path">
-        <component :is="Component" v-if="isAuth || route.meta.publicPath" />
+    <router-view v-slot="{ Component, route: currentRoute }">
+      <div :key="currentRoute.path">
+        <component :is="Component" v-if="isAuth || currentRoute.meta.publicPath" />
         <ConnectWalletLanding v-else @openProfile="$emit('openProfile')" />
       </div>
     </router-view>

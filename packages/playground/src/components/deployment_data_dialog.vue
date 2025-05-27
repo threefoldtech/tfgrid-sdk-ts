@@ -18,8 +18,8 @@
               class="mx-2"
             >
               <v-tooltip location="bottom" :text="getTooltipText(item, index)" :disabled="!hasMaster(item)">
-                <template #activator="{ props }">
-                  <span v-bind="props" class="text-lowercase">{{
+                <template #activator="{ props: tooltipProps }">
+                  <span v-bind="tooltipProps" class="text-lowercase">{{
                     contracts && contracts.length === 1 && "name" in contracts ? (contracts as any).name : item.name
                   }}</span>
                 </template>
@@ -140,12 +140,8 @@
           </template>
         </v-card-text>
         <v-card-actions class="justify-end my-1 mr-2">
-          <v-btn color="anchor" @click="$emit('close')">
-            Close
-          </v-btn>
-          <v-btn v-if="showType == 1" color="secondary" @click="copy">
-            Copy
-          </v-btn>
+          <v-btn color="anchor" @click="$emit('close')"> Close </v-btn>
+          <v-btn v-if="showType == 1" color="secondary" @click="copy"> Copy </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>

@@ -7,8 +7,8 @@
     eager
     @update:model-value="handleProfileDialog($event)"
   >
-    <template #activator="{ props }">
-      <VCard v-bind="props" class="pa-3 d-inline-flex align-center bg-transparent elevation-0">
+    <template #activator="{ props: cardSlotProps }">
+      <VCard v-bind="cardSlotProps" class="pa-3 d-inline-flex align-center bg-transparent elevation-0">
         <div>
           <v-btn v-if="!profileManager.profile" variant="elevated">
             <VProgressCircular v-if="loading" class="mr-2" indeterminate color="white" size="20" width="2" /><v-icon
@@ -36,9 +36,9 @@
                 {{ normalizeBalance(balance.reserved, true) || 0 }} TFT
               </strong>
               <v-tooltip text="Locked balance documentation" location="bottom right">
-                <template #activator="{ props }">
+                <template #activator="{ props: tooltipBtnProps }">
                   <v-btn
-                    v-bind="props"
+                    v-bind="tooltipBtnProps"
                     :color="theme.name.value === AppThemeSelection.light ? 'black' : 'white'"
                     icon="mdi-information-outline"
                     height="24px"
@@ -54,14 +54,14 @@
           </template>
         </div>
         <v-tooltip text="Logout" location="bottom" :disabled="!profileManager.profile">
-          <template #activator="{ props }">
+          <template #activator="{ props: logoutBtnProps }">
             <VBtn
               v-if="profileManager.profile"
               color="error"
               variant="tonal"
               :disabled="loadingBalance"
               class="ml-2"
-              v-bind="props"
+              v-bind="logoutBtnProps"
               icon="mdi-logout"
               @click.stop="logout"
             />
@@ -70,9 +70,7 @@
       </VCard>
     </template>
     <v-card color="primary" class="d-flex justify-center items-center mt-3 pa-3 text-center">
-      <v-card-title class="pa-0">
-        TFChain Wallet
-      </v-card-title>
+      <v-card-title class="pa-0"> TFChain Wallet </v-card-title>
     </v-card>
     <WebletLayout disable-alerts>
       <v-alert variant="tonal" class="mb-6">
@@ -147,9 +145,7 @@
       </template>
       <!-- <v-divider horizontal></v-divider> -->
       <div class="d-flex justify-end mt-4 mb-2">
-        <VBtn v-if="profileManager.profile" color="anchor" @click="$emit('update:modelValue', false)">
-          Close
-        </VBtn>
+        <VBtn v-if="profileManager.profile" color="anchor" @click="$emit('update:modelValue', false)"> Close </VBtn>
         <VBtn
           v-if="profileManager.profile"
           class="ml-2"

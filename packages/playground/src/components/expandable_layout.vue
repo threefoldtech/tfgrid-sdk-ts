@@ -6,8 +6,8 @@
       </v-card-subtitle>
       <v-spacer />
       <v-tooltip text="Add">
-        <template #activator="{ props }">
-          <v-btn icon="mdi-plus" color="secondary" v-bind="props" :disabled="disabled" @click="$emit('add')" />
+        <template #activator="{ props: addBtnProps }">
+          <v-btn icon="mdi-plus" color="secondary" v-bind="addBtnProps" :disabled="disabled" @click="$emit('add')" />
         </template>
       </v-tooltip>
     </div>
@@ -20,12 +20,12 @@
         <div class="d-flex">
           <v-spacer />
           <v-tooltip text="Remove">
-            <template #activator="{ props }">
+            <template #activator="{ props: removeBtnProps }">
               <v-btn
                 v-if="!required.includes(index)"
                 color="error"
                 icon="mdi-delete-outline"
-                v-bind="props"
+                v-bind="removeBtnProps"
                 @click="remove(index)"
               />
             </template>
