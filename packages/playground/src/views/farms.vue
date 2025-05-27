@@ -1,16 +1,10 @@
 <template>
   <view-layout>
     <v-card color="primary" class="d-flex justify-center items-center pa-3 mb-3 text-center">
-      <v-icon size="30" class="pr-3">
-        mdi-lan-connect
-      </v-icon>
-      <v-card-title class="pa-0">
-        Farm Finder
-      </v-card-title>
+      <v-icon size="30" class="pr-3"> mdi-lan-connect </v-icon>
+      <v-card-title class="pa-0"> Farm Finder </v-card-title>
     </v-card>
-    <v-alert type="info" variant="tonal" class="mb-6">
-      Click on the row to view farm details.
-    </v-alert>
+    <v-alert type="info" variant="tonal" class="mb-6"> Click on the row to view farm details. </v-alert>
     <TfFiltersLayout>
       <template #filters>
         <TfFiltersContainer class="mb-4" :loading="loading" @apply="loadFarms(true)">
@@ -135,9 +129,7 @@
         <v-toolbar :height="35">
           <div class="ml-auto">
             <v-btn icon @click="() => (dialog = false)">
-              <v-icon color="anchor">
-                mdi-close
-              </v-icon>
+              <v-icon color="anchor"> mdi-close </v-icon>
             </v-btn>
           </div>
         </v-toolbar>
@@ -274,6 +266,7 @@ import TfFiltersLayout from "../components/filters/TfFiltersLayout.vue";
 import TfSelectFarm from "../components/node_selector/TfSelectFarm.vue";
 
 export default {
+  // eslint-disable-next-line vue/multi-word-component-names
   name: "Farms",
   components: {
     FarmDetailsCard,

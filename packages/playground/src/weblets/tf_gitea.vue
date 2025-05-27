@@ -253,6 +253,7 @@ import { normalizeError } from "../utils/helpers";
 const solution = ref() as Ref<SolutionFlavor>;
 
 export default {
+  // eslint-disable-next-line vue/multi-word-component-names
   name: "Gitea",
   components: {
     ManageSshDeployemnt,

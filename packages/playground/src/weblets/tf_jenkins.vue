@@ -264,6 +264,7 @@ import type { SelectionDetails } from "../types/nodeSelector";
 import { updateGrid } from "../utils/grid";
 
 export default {
+  // eslint-disable-next-line vue/multi-word-component-names
   name: "Jenkins",
   components: { SelectSolutionFlavor, Networks },
 };

@@ -223,6 +223,7 @@ const fitlerColProps = { class: "py-2 px-4", cols: 12, md: 6, lg: 3 };
 
 <script lang="ts">
 export default defineComponent({
+  // eslint-disable-next-line vue/multi-word-component-names
   name: "Filters",
 });
 </script>

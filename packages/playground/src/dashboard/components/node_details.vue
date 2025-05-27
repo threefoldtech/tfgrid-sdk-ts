@@ -9,13 +9,9 @@
   <td v-else-if="dNodeError" :colspan="columnsLen" style="text-align: center">
     <div class="pt-4">
       <v-alert variant="tonal" class="d-flex justify-between" dense outlined type="error" style="text-align: center">
-        <div style="display: flex; align-items: center">
-          Failed to retrieve Node details.
-        </div>
+        <div style="display: flex; align-items: center">Failed to retrieve Node details.</div>
         <template #append>
-          <v-icon style="cursor: pointer" @click="reloadNodeDetails">
-            mdi-reload
-          </v-icon>
+          <v-icon style="cursor: pointer" @click="reloadNodeDetails"> mdi-reload </v-icon>
         </template>
       </v-alert>
     </div>
@@ -25,34 +21,19 @@
     <v-row class="ma-2">
       <v-col :cols="getColSize">
         <div class="mt-3">
-          <card-details
-            :loading="false"
-            title="Node Resources"
-            icon="mdi-harddisk"
-            :items="getNodeResourceCard()"
-          />
+          <card-details :loading="false" title="Node Resources" icon="mdi-harddisk" :items="getNodeResourceCard()" />
         </div>
       </v-col>
 
       <v-col :cols="getColSize">
         <div class="mt-3">
-          <card-details
-            :loading="false"
-            title="Location"
-            icon="mdi-map-marker"
-            :items="getCountryResourceCard()"
-          />
+          <card-details :loading="false" title="Location" icon="mdi-map-marker" :items="getCountryResourceCard()" />
         </div>
       </v-col>
 
       <v-col :cols="getColSize" class="{ 'mt-n8': getColSize() === 6 }">
         <div class="mt-3">
-          <card-details
-            :loading="false"
-            title="Farm details"
-            icon="mdi-silo"
-            :items="getFarmResourceCard()"
-          />
+          <card-details :loading="false" title="Farm details" icon="mdi-silo" :items="getFarmResourceCard()" />
         </div>
       </v-col>
     </v-row>
@@ -81,13 +62,9 @@
             type="error"
             style="text-align: center"
           >
-            <div style="display: flex; align-items: center">
-              Failed to receive node GPUs information
-            </div>
+            <div style="display: flex; align-items: center">Failed to receive node GPUs information</div>
             <template #append>
-              <v-icon style="cursor: pointer" @click="getGpuDetails">
-                mdi-reload
-              </v-icon>
+              <v-icon style="cursor: pointer" @click="getGpuDetails"> mdi-reload </v-icon>
             </template>
           </v-alert>
         </div>
@@ -232,6 +209,7 @@ import CardDetails from "@/components/node_details_cards/card_details.vue";
 import GPUDetailsCard from "@/components/node_details_cards/gpu_details_card.vue";
 
 export default {
+  // eslint-disable-next-line vue/multi-word-component-names
   name: "Node Details",
   components: {
     CardDetails,

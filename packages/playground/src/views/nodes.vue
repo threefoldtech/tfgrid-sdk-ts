@@ -1,12 +1,8 @@
 <template>
   <view-layout>
     <v-card color="primary" class="d-flex justify-center items-center pa-3 text-center">
-      <v-icon size="30" class="pr-3">
-        mdi-access-point
-      </v-icon>
-      <v-card-title class="pa-0">
-        Node Finder
-      </v-card-title>
+      <v-icon size="30" class="pr-3"> mdi-access-point </v-icon>
+      <v-card-title class="pa-0"> Node Finder </v-card-title>
     </v-card>
     <div class="hint mt-3">
       <v-alert class="mb-4" type="info" variant="tonal">
@@ -514,6 +510,8 @@ const sortItems = [
 ];
 
 export default {
+  // eslint-disable-next-line vue/multi-word-component-names
+  name: "Nodes",
   components: {
     NodesTable,
     NodeDetails,

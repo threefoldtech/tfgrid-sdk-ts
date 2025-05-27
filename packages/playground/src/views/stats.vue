@@ -2,12 +2,8 @@
   <div>
     <div class="border px-4 pb-4 rounded position-relative mt-2">
       <v-card color="primary" class="d-flex justify-center items-center mt-3 pa-3 text-center">
-        <v-icon size="30" class="pr-3" color="white">
-          mdi-chart-scatter-plot
-        </v-icon>
-        <v-card-title class="pa-0">
-          Statistics
-        </v-card-title>
+        <v-icon size="30" class="pr-3" color="white"> mdi-chart-scatter-plot </v-icon>
+        <v-card-title class="pa-0"> Statistics </v-card-title>
       </v-card>
       <div class="text-center">
         <v-row align="center" justify="center">
@@ -67,19 +63,22 @@ let stats: Stats | null | undefined = null;
 function mergeNodeDistribution(stats: Stats["nodesDistribution"][]) {
   const keys = new Set(stats.map(obj => Object.keys(obj)).flat());
 
-  return Array.from(keys).reduce((res, key) => {
-    res[key] = 0;
-    stats.forEach(country => {
-      res[key] += country[key] ?? 0;
-    });
+  return Array.from(keys).reduce(
+    (res, key) => {
+      res[key] = 0;
+      stats.forEach(country => {
+        res[key] += country[key] ?? 0;
+      });
 
-    if (key === "The Netherlands" && res["The Netherlands"]) {
-      res["Netherlands"] = res["The Netherlands"];
-      delete res["The Netherlands"];
-    }
+      if (key === "The Netherlands" && res["The Netherlands"]) {
+        res["Netherlands"] = res["The Netherlands"];
+        delete res["The Netherlands"];
+      }
 
-    return res;
-  }, {} as { [key: string]: number });
+      return res;
+    },
+    {} as { [key: string]: number },
+  );
 }
 
 function mergeStatsData(stats: Stats[]): Stats {
@@ -157,6 +156,13 @@ const fetchData = async () => {
 };
 
 onMounted(fetchData);
+</script>
+
+<script lang="ts">
+export default {
+  // eslint-disable-next-line vue/multi-word-component-names
+  name: "stats",
+};
 </script>
 
 <style scoped>
