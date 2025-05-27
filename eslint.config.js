@@ -9,13 +9,20 @@ import { defineConfigWithVueTs, vueTsConfigs } from "@vue/eslint-config-typescri
 // This returns an ARRAY of config objects optimized for Vue+TS
 const vueTsGeneratedConfigs = defineConfigWithVueTs(pluginVue.configs["flat/recommended"], vueTsConfigs.recommended, {
   rules: {
-    "@typescript-eslint/no-explicit-any": "warn",
-    "vue/multi-word-component-names": "warn",
+    // TODO: enable this rule after https://github.com/threefoldtech/tfgrid-sdk-ts/issues/4075
+    "@typescript-eslint/no-explicit-any": "off",
+    "vue/multi-word-component-names": "error",
     "vue/no-v-text-v-html-on-component": "off",
     "@typescript-eslint/no-unused-expressions": "warn",
-    "@typescript-eslint/no-unused-vars": `warn`,
+    "@typescript-eslint/no-unused-vars": "warn",
     "@typescript-eslint/no-duplicate-enum-values": "warn",
     "vue/no-dupe-keys": "warn",
+    "vue/max-attributes-per-line": "off",
+    "vue/no-v-html": "off",
+    "vue/singleline-html-element-content-newline": "off",
+    "vue/html-self-closing": "off",
+    "vue/html-indent": "off",
+    "vue/no-template-shadow": "error",
   },
 });
 
@@ -79,11 +86,11 @@ export default [
         {
           types: {
             "{}": "Use `unknown` instead.",
-            "Function": "Use specific function types instead.",
-            "Object": "Use `Record<string, unknown>` or specific object types instead.",
-            "String": "Use `string` instead.",
-            "Number": "Use `number` instead.",
-            "Boolean": "Use `boolean` instead.",
+            Function: "Use specific function types instead.",
+            Object: "Use `Record<string, unknown>` or specific object types instead.",
+            String: "Use `string` instead.",
+            Number: "Use `number` instead.",
+            Boolean: "Use `boolean` instead.",
           },
         },
       ],
