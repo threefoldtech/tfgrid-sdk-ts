@@ -3,7 +3,7 @@
     <VContainer>
       <VRow>
         <div>
-          <span v-text="name" class="text-caption font-weight-bold" />
+          <span class="text-caption font-weight-bold" v-text="name" />
           <template v-if="cpuType">
             <VTooltip text="Processor Version">
               <template #activator="{ props }">
@@ -27,7 +27,7 @@
 
         <VSpacer />
         <template v-if="text">
-          <span v-text="text" class="text-caption font-weight-bold text-info" />
+          <span class="text-caption font-weight-bold text-info" v-text="text" />
           <VSpacer />
         </template>
         <p class="font-weight-bold text-primary" v-text="usageText" />

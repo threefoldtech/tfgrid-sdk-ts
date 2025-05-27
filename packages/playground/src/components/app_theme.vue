@@ -4,8 +4,8 @@
       <v-btn
         v-bind="props"
         color="anchor"
-        @click="changeTheme()"
         :icon="light ? 'mdi-moon-waning-crescent' : 'mdi-brightness-4'"
+        @click="changeTheme()"
       />
     </template>
   </v-tooltip>

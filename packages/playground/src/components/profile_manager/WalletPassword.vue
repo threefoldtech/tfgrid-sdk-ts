@@ -2,6 +2,7 @@
   <PasswordInputWrapper id="wallet-password__input-wrapper" #="{ props: passwordInputProps }">
     <InputValidator
       id="wallet-password__input-validator"
+      ref="passwordInput"
       :value="modelValue"
       :rules="[
         validators.required('Password is required.'),
@@ -9,7 +10,6 @@
         validatePassword,
       ]"
       #="{ props: validationProps }"
-      ref="passwordInput"
     >
       <v-tooltip
         id="wallet-password__tooltip"
@@ -22,10 +22,10 @@
               id="wallet-password__text-field"
               label="Password"
               :modelValue="modelValue"
-              @update:modelValue="$emit('update:modelValue', $event)"
               v-bind="{ ...passwordInputProps, ...validationProps }"
               autocomplete="off"
               :disabled="props.disabled"
+              @update:modelValue="$emit('update:modelValue', $event)"
             />
           </div>
         </template>

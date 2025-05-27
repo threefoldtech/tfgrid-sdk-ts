@@ -23,7 +23,7 @@
       <span v-text="log.data.timestamp" />
       <VSpacer />
       <div v-show="collapsable">
-        <VBtn @click="collapsed = !collapsed" size="xs" class="pa-1 text-body-1 text-info">
+        <VBtn size="xs" class="pa-1 text-body-1 text-info" @click="collapsed = !collapsed">
           <div class="d-flex align-center">
             <VIcon :icon="collapsed ? 'mdi-chevron-down' : 'mdi-chevron-up'" class="mr-1 text-body-1" />
             <span v-text="collapsed ? 'show more' : 'show less'" />
@@ -31,7 +31,7 @@
         </VBtn>
         &nbsp;|&nbsp;
       </div>
-      <VBtn @click="copyLog(log.data.message)" size="xs" class="pa-1 text-link text-body-1">
+      <VBtn size="xs" class="pa-1 text-link text-body-1" @click="copyLog(log.data.message)">
         <div class="d-flex align-center">
           <VIcon icon="mdi-content-copy" size="xs" class="mr-1 text-caption" />
           <span v-text="'Copy'" />
@@ -49,8 +49,8 @@
       &nbsp;
       <a
         v-if="collapsable"
-        @click="collapsed = !collapsed"
         class="show-more-btn"
+        @click="collapsed = !collapsed"
         v-text="collapsed ? 'show more' : 'show less'"
       />
     </VListItemTitle>

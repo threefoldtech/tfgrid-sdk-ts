@@ -2,16 +2,16 @@
   <div class="d-flex">
     <div :style="{ width: '100%' }" class="mr-4">
       <input-validator
+        ref="input"
         :value="value"
         :rules="[
           validators.required('SSD Storage is required.'),
           dynamicValidateRootFs(validators),
           validators.max('Maximum allowed SSD Storage is 10000 GB.', 10000),
         ]"
-        ref="input"
         #="{ props }"
       >
-        <v-text-field label="SSD Storage (GB)" type="number" :disabled="!edit" v-model.number="value" v-bind="props" />
+        <v-text-field v-model.number="value" label="SSD Storage (GB)" type="number" :disabled="!edit" v-bind="props" />
       </input-validator>
     </div>
 
@@ -19,7 +19,7 @@
       text="Allows adjusting the size of the root filesystem. The root filesystem is the primary storage location for the operating system and its associated files."
     >
       <template v-slot:activator="{ props }">
-        <v-switch inset color="primary" v-model="edit" v-bind="props" />
+        <v-switch v-model="edit" inset color="primary" v-bind="props" />
       </template>
     </v-tooltip>
   </div>

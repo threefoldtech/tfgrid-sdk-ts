@@ -11,9 +11,9 @@
         :style="{ cursor: 'pointer', width: '9rem' }"
         class="mx-2"
         :title="app.alt"
-        v-html="app.src"
         :href="app.url"
         target="_blank"
+        v-html="app.src"
       />
     </div>
   </div>

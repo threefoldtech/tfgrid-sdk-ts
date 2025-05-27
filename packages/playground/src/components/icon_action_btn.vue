@@ -2,7 +2,6 @@
   <v-tooltip :text="tooltip" location="bottom">
     <template #activator="{ props }">
       <v-btn
-        @click.stop="$emit('click', $event)"
         :color="color"
         v-bind="props"
         :href="href"
@@ -11,6 +10,7 @@
         :height="height"
         class="my-1 mr-1"
         :disabled="disabled"
+        @click.stop="$emit('click', $event)"
       >
         <v-icon> {{ icon }}</v-icon>
       </v-btn>

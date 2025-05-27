@@ -37,17 +37,17 @@
                   <div v-bind="tooltipProps">
                     <VTextField
                       id="mnemonic-text-field"
+                      v-bind="{
+                        ...passwordInputProps,
+                        ...validationProps,
+                      }"
+                      ref="mnemonicRef"
                       v-model="mnemonic"
                       readonly
                       :append-icon="enableReload && mnemonic !== '' ? 'mdi-reload' : ''"
                       label="Mnemonic or Hex Seed"
                       placeholder="Please insert your Mnemonic or Hex Seed"
-                      v-bind="{
-                        ...passwordInputProps,
-                        ...validationProps,
-                      }"
                       autocomplete="off"
-                      ref="mnemonicRef"
                       :disabled="creatingAccount || connecting"
                       @focus="(event: Event) => (event.target as HTMLInputElement)?.removeAttribute('readonly')"
                       @blur="(event: Event) => (event.target as HTMLInputElement)?.setAttribute('readonly', 'readonly')"
@@ -163,9 +163,7 @@
       </v-alert>
       <!-- Action Buttons -->
       <div id="action-buttons-container" class="d-flex justify-center mt-2">
-        <VBtn id="close-btn" color="anchor" variant="outlined" @click="emit('closeDialog')">
-          Close
-        </VBtn>
+        <VBtn id="close-btn" color="anchor" variant="outlined" @click="emit('closeDialog')"> Close </VBtn>
         <VBtn
           id="connect-btn"
           class="ml-2"
@@ -316,8 +314,8 @@ async function activateAccount() {
     const mnemonicOrSeedValue = validateMnemonic(mnemonic.value)
       ? mnemonic.value
       : mnemonic.value.length === 66
-      ? mnemonic.value
-      : `0x${mnemonic.value}`;
+        ? mnemonic.value
+        : `0x${mnemonic.value}`;
     await activateAccountAndCreateTwin(mnemonicOrSeedValue);
     await storeAndLogin();
   } catch (e) {

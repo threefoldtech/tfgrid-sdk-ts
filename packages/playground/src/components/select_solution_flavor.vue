@@ -4,10 +4,10 @@
       tooltip="Choosing the appropriate computing resources and performance capabilities for a virtual instance or server. When provisioning a virtual machine or cloud instance, the 'Select instance capacity' step allows users to specify the desired CPU, memory, storage, and network resources for their virtual environment."
     >
       <v-select
-        label="Select instance capacity"
         v-bind="props"
-        :items="packages"
         v-model="solution"
+        label="Select instance capacity"
+        :items="packages"
         :disabled="props.disabled"
       />
     </input-tooltip>
@@ -24,7 +24,7 @@
         #="{ props }"
       >
         <input-tooltip tooltip="The number of virtual cores allocated to your instance.">
-          <v-text-field label="CPU (vCores)" type="number" v-model.number="cpu" v-bind="props" />
+          <v-text-field v-model.number="cpu" label="CPU (vCores)" type="number" v-bind="props" />
         </input-tooltip>
       </input-validator>
 
@@ -39,7 +39,7 @@
         #="{ props }"
       >
         <input-tooltip tooltip="The amount of RAM (Random Access Memory) allocated to your instance.">
-          <v-text-field label="Memory (MB)" type="number" v-model.number="memory" v-bind="props" />
+          <v-text-field v-model.number="memory" label="Memory (MB)" type="number" v-bind="props" />
         </input-tooltip>
       </input-validator>
 
@@ -56,7 +56,7 @@
         <input-tooltip
           tooltip="The storage capacity allocated to your instance, indicating the amount of space available to store files, data, and applications."
         >
-          <v-text-field label="SSD Storage (GB)" type="number" v-model.number="disk" v-bind="props" />
+          <v-text-field v-model.number="disk" label="SSD Storage (GB)" type="number" v-bind="props" />
         </input-tooltip>
       </input-validator>
     </div>

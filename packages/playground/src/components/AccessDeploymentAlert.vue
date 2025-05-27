@@ -13,7 +13,7 @@
           'text-grey-darken-3': !theme.global.current.value.dark,
         }"
       >
-        &blacksquare; ssh root@&lt;<span v-text="method" class="text-grey-darken-1" />&gt;
+        &blacksquare; ssh root@&lt;<span class="text-grey-darken-1" v-text="method" />&gt;
       </li>
     </ul>
   </VAlert>

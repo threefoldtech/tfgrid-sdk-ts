@@ -1,5 +1,6 @@
 <template>
   <v-data-table
+    v-model="selectedItems"
     :headers="headers"
     :items="items"
     item-title="title"
@@ -7,11 +8,10 @@
     hover
     hide-default-footer
     show-select
-    v-model="selectedItems"
     hide-no-data
     :return-object="returnObject"
-    @update:options="selectedItems = []"
     v-bind="$attrs"
+    @update:options="selectedItems = []"
   >
     <template #[`header.data-table-select`]>
       <div class="d-flex align-center justify-space-between">
@@ -51,19 +51,19 @@
     </template>
 
     <!-- Forward slots to the host component -->
-    <template v-for="slot in (Object.keys($slots) as any[])" v-slot:[slot]="scope">
+    <template v-for="slot in Object.keys($slots) as any[]" v-slot:[slot]="scope">
       <slot :name="slot" v-bind="scope" />
     </template>
 
     <template
-      #bottom
       v-if="
         deleting ||
         (loading && items.length === 0) ||
         (!loading && items.length === 0 && (noDataText || $slots['no-data-text']))
       "
+      #bottom
     >
-      <v-row class="my-5" v-if="loading && items.length === 0">
+      <v-row v-if="loading && items.length === 0" class="my-5">
         <v-spacer />
         <div class="d-flex my-6 align-center justify-center">
           <v-progress-circular indeterminate :width="3" :size="30" />
@@ -73,7 +73,7 @@
       <template v-else-if="!loading && items.length === 0 && (noDataText || $slots['no-data-text'])">
         <VContainer>
           <VRow justify="center" align="center" class="my-5">
-            <slot name="no-data-text" v-if="$slots['no-data-text']" />
+            <slot v-if="$slots['no-data-text']" name="no-data-text" />
             <p v-else v-text="noDataText" />
           </VRow>
         </VContainer>

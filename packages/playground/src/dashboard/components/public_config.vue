@@ -16,13 +16,13 @@
     </v-tooltip>
 
     <template v-if="showDialogue">
-      <v-dialog v-model="showDialogue" max-width="600" @click:outside="reset" attach="#modals">
+      <v-dialog v-model="showDialogue" max-width="600" attach="#modals" @click:outside="reset">
         <v-card>
           <v-card-title class="bg-primary">
             Add a public config to your node with ID: {{ $props.nodeId }}
           </v-card-title>
           <v-card-text>
-            <form-validator v-model="valid" ref="formRef">
+            <form-validator ref="formRef" v-model="valid">
               <!-- IPv4 -->
               <input-validator
                 :value="config.ipv4"
@@ -81,11 +81,12 @@
                   value => (config.ipv6 !== '' ? validators.required('Gateway is required.')(value) : '') as RuleReturn,
                   value => validators.isIP('Gateway is not valid.', 6)(value),
                   () => IPGatewayCheck('ipv6'),
-                  value => validators.ipNotEqualGateway(
-                    config.ipv6!,
-                    config.gw6!,
-                    'Gateway IPv6 should not be equal to IPv6.',
-                  )(value),
+                  value =>
+                    validators.ipNotEqualGateway(
+                      config.ipv6!,
+                      config.gw6!,
+                      'Gateway IPv6 should not be equal to IPv6.',
+                    )(value),
                 ]"
                 #="{ props }"
               >
@@ -109,25 +110,25 @@
           <v-card-actions class="justify-end my-1 mr-2">
             <!-- Remove and Generate Config Buttons -->
             <v-btn
+              color="anchor"
               @click="
                 showDialogue = false;
                 reset();
               "
-              color="anchor"
               >Close</v-btn
             >
             <v-btn
-              @click="isNodeHasConfig"
               color="error"
               :disabled="isRemoving || Object.values(config).every(value => value == '')"
+              @click="isNodeHasConfig"
             >
               Remove Config
             </v-btn>
             <v-btn
               color="secondary"
-              @click="AddConfig"
               :loading="isSaving"
               :disabled="isSaving || !valid || (valid && !isConfigChanged)"
+              @click="AddConfig"
             >
               Save
             </v-btn>
