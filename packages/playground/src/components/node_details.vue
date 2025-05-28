@@ -1,16 +1,23 @@
 <template>
   <v-dialog
     v-model="$props.openDialog"
-    @update:modelValue="(val:boolean) => closeDialog(val)"
-    @click:outside="() => $emit('close-dialog', false)"
     transition="dialog-bottom-transition"
     hide-overlay
     attach="#modals"
+    min-height="95%"
+    @update:model-value="(val: boolean) => closeDialog(val)"
+    @click:outside="() => $emit('close-dialog', false)"
   >
     <v-toolbar color="primary">
       <div class="d-flex justify-center">
-        <v-btn icon dark @click="() => $emit('close-dialog', false)">
-          <v-icon color="anchor">mdi-close</v-icon>
+        <v-btn
+          icon
+          dark
+          @click="() => $emit('close-dialog', false)"
+        >
+          <v-icon color="anchor">
+            mdi-close
+          </v-icon>
         </v-btn>
       </div>
     </v-toolbar>
@@ -25,37 +32,87 @@
     <template v-else-if="isError">
       <v-card class="d-flex justify-center align-center h-screen">
         <div class="text-center w-100 pa-3">
-          <v-icon variant="tonal" color="error" style="font-size: 50px" icon="mdi-close-circle-outline" />
+          <v-icon
+            variant="tonal"
+            color="error"
+            style="font-size: 50px"
+            icon="mdi-close-circle-outline"
+          />
           <p class="mt-4 mb-4 font-weight-bold text-error">
             {{ errorMessage }}
           </p>
-          <v-btn class="mr-4" @click="requestNode" text="Try Again" />
-          <v-btn @click="(val:boolean) => closeDialog(val)" color="error" text="Cancel" />
+          <v-btn
+            class="mr-4"
+            text="Try Again"
+            @click="requestNode"
+          />
+          <v-btn
+            color="error"
+            text="Cancel"
+            @click="(val: boolean) => closeDialog(val)"
+          />
         </div>
       </v-card>
     </template>
 
     <template v-else>
       <v-card>
-        <node-resources-charts :node="node" :is-live-stats="isLiveStats" :hint-message="errorLoadingStatsMessage" />
-        <v-row class="pa-8 mt-5" justify-md="start" justify-sm="center">
-          <v-col cols="12" md="6" sm="12">
+        <node-resources-charts
+          :node="node"
+          :is-live-stats="isLiveStats"
+          :hint-message="errorLoadingStatsMessage"
+        />
+        <v-row
+          class="pa-8 mt-5"
+          justify-md="start"
+          justify-sm="center"
+        >
+          <v-col
+            cols="12"
+            md="6"
+            sm="12"
+          >
             <node-details-card :node="node" />
-            <farm-details-card class="mt-5" :node="node" />
-            <interfaces-details-card class="mt-5" :node="node" />
+            <farm-details-card
+              class="mt-5"
+              :node="node"
+            />
+            <interfaces-details-card
+              class="mt-5"
+              :node="node"
+            />
             <public-config-details-card
               v-if="node.publicConfig && node.publicConfig.domain"
               class="mt-5"
               :node="node"
             />
 
-            <cpu-benchmark-card v-if="hasActiveProfile && node.healthy" class="mt-5" :node="node" />
+            <cpu-benchmark-card
+              v-if="hasActiveProfile && node.healthy"
+              class="mt-5"
+              :node="node"
+            />
           </v-col>
-          <v-col cols="12" md="6" sm="12">
+          <v-col
+            cols="12"
+            md="6"
+            sm="12"
+          >
             <country-details-card :node="node" />
-            <twin-details-card class="mt-3" :node="node" />
-            <gpu-details-card class="mt-3" v-if="node.gpus?.length" :node="node" />
-            <i-perf-card class="mt-3" v-if="hasActiveProfile && node.healthy" :node="node" />
+            <twin-details-card
+              class="mt-3"
+              :node="node"
+            />
+            <gpu-details-card
+              v-if="node.gpus?.length"
+              class="mt-3"
+              :node="node"
+            />
+            <i-perf-card
+              v-if="hasActiveProfile && node.healthy"
+              class="mt-3"
+              :node="node"
+            />
           </v-col>
         </v-row>
       </v-card>
@@ -85,6 +142,19 @@ import { getNode, getNodeStatusColor } from "@/utils/get_nodes";
 import IPerfCard from "./node_details_cards/iperf_details_card.vue";
 import NodeResourcesCharts from "./node_resources_charts.vue";
 export default {
+
+  components: {
+    NodeResourcesCharts,
+    NodeDetailsCard,
+    FarmDetailsCard,
+    CountryDetailsCard,
+    InterfacesDetailsCard,
+    TwinDetailsCard,
+    GpuDetailsCard,
+    PublicConfigDetailsCard,
+    IPerfCard,
+    cpuBenchmarkCard,
+  },
   props: {
     openDialog: {
       type: Boolean,
@@ -98,19 +168,6 @@ export default {
       type: Object as PropType<FilterOptions>,
       required: true,
     },
-  },
-
-  components: {
-    NodeResourcesCharts,
-    NodeDetailsCard,
-    FarmDetailsCard,
-    CountryDetailsCard,
-    InterfacesDetailsCard,
-    TwinDetailsCard,
-    GpuDetailsCard,
-    PublicConfigDetailsCard,
-    IPerfCard,
-    cpuBenchmarkCard,
   },
 
   setup(props, { emit }) {
