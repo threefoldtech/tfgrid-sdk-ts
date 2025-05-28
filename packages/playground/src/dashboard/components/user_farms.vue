@@ -73,7 +73,7 @@
                       Add/Edit Stellar Payout Address
                     </v-btn>
                     <v-btn
-                      v-if="network == 'main'"
+                      v-if="network != 'main'"
                       class="text-subtitle-1 px-6"
                       color="secondary"
                       @click="downloadFarmReceipts(item.farmId)"

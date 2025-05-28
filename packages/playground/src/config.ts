@@ -8,7 +8,7 @@ import {
   StatsMonitor,
   TFChainMonitor,
 } from "@threefold/monitoring";
-import { marked, type Token, type Tokens } from "marked";
+import { marked, type Tokens } from "marked";
 import { type App, type Component, defineAsyncComponent } from "vue";
 
 import * as validators from "./utils/validators";

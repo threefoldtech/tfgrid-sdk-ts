@@ -1,6 +1,5 @@
 import { CertificationType, type GridNode, type NodeStats, NodeStatus } from "@threefold/gridproxy_client";
 import { capitalize } from "vue";
-import type { VDataTable } from "vuetify/components";
 
 import type { AsyncRule, SyncRule } from "@/components/input_validator.vue";
 

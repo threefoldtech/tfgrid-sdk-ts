@@ -772,7 +772,7 @@ export function isString(msg: string) {
 }
 
 export function ipNotEqualGateway(ip: string, gw: string, msg: string) {
-  return (value: string) => {
+  return () => {
     const address = ip.split("/")[0];
     if (gw === address) {
       return { message: msg, isNotEqualStrings: true };

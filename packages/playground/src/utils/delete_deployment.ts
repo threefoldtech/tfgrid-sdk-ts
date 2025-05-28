@@ -40,7 +40,7 @@ export async function deleteDeployment(grid: GridClient, options: DeleteDeployme
 
   /* Delete deployment */
   if (options.k8s) {
-    const { gateways } = await loadDeploymentGateways(grid, { filter: gw => true });
+    const { gateways } = await loadDeploymentGateways(grid, { filter: () => true });
     for (const gateway of gateways) {
       try {
         await grid.gateway.delete_name({ name: gateway.name });
