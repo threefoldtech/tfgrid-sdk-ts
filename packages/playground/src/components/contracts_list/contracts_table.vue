@@ -317,7 +317,7 @@
 
 <script lang="ts" setup>
 // Import necessary types and libraries
-import { ContractStates, discountPackages, type GridClient, type OverdueDetails } from "@threefold/grid_client";
+import { ContractStates, type GridClient, type OverdueDetails } from "@threefold/grid_client";
 import { type Contract, ContractState, type NodeStatus } from "@threefold/gridproxy_client";
 import { TFChainError } from "@threefold/tfchain_client";
 import { DeploymentKeyDeletionError } from "@threefold/types";

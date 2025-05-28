@@ -32,7 +32,7 @@
                   label="Public SSH Key"
                   no-resize
                   :spellcheck="false"
-                  :rules="sshRules(currentKey[_key])"
+                  :rules="sshRules()"
                   v-bind="{ ...copyInputProps }"
                 />
               </CopyInputWrapper>
@@ -113,7 +113,7 @@ export default defineComponent({
       ctx.emit("update", currentKey.value);
     };
 
-    function sshRules(value: any) {
+    function sshRules() {
       return [
         (v: string) => !!v || " The SSH key is required.",
         (v: string) =>

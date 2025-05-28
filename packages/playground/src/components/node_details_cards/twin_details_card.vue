@@ -37,7 +37,7 @@ export default {
       if (props.farm) {
         try {
           twin.value = await getFarmTwinByTwinId({ twinId: props.farm.twinId });
-        } catch (err) {
+        } catch {
           createCustomToast(
             "Failed to load Twin details due to Slow Network. Please try again later.",
             ToastType.danger,

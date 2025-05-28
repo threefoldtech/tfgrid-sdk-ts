@@ -64,7 +64,7 @@
 
 <script lang="ts">
 import type { Features, FilterOptions, NodeInfo } from "@threefold/grid_client";
-import { type Farm, type NodeStats, NodeStatus } from "@threefold/gridproxy_client";
+import { type Farm, NodeStatus } from "@threefold/gridproxy_client";
 import type AwaitLock from "await-lock";
 import isInt from "validator/lib/isInt";
 import { computed, onUnmounted, type PropType, ref, watch } from "vue";

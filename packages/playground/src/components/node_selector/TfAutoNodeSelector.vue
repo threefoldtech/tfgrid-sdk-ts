@@ -152,8 +152,6 @@ import type AwaitLock from "await-lock";
 import equals from "lodash/fp/equals.js";
 import { computed, nextTick, onMounted, onUnmounted, onUpdated, type PropType, ref } from "vue";
 
-import { normalizeError } from "@/utils/helpers";
-
 import { useAsync, usePagination, useWatchDeep } from "../../hooks";
 import { ValidatorStatus } from "../../hooks/form_validator";
 import { useGrid } from "../../stores";

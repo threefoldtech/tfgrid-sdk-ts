@@ -364,7 +364,7 @@ export default {
         updateGrid(grid, { projectName: props.vm ? props.vm.projectName : props.k8s!.projectName });
 
         const { gateways: gws, failedToList } = await loadDeploymentGateways(grid, {
-          filter: gw => true,
+          filter: () => true,
         });
         gateways.value = gws;
 
@@ -414,6 +414,7 @@ export default {
         layout.value.setStatus("success", "Successfully deployed gateway.");
       } catch (error) {
         errorMessage.value = "Failed to add domain";
+        console.error(errorMessage.value, error);
         layout.value.setStatus("failed", normalizeError(errorMessage.value, "Something went wrong."));
       }
     }

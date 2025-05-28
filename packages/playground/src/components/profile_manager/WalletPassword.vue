@@ -38,7 +38,6 @@
 import md5 from "md5";
 import { ref } from "vue";
 
-import { ValidatorStatus } from "@/hooks/form_validator";
 import { getCredentials } from "@/utils/credentials";
 
 const props = defineProps({

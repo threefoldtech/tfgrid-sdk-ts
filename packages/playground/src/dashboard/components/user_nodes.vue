@@ -202,12 +202,12 @@ export default {
             node.receipts = [];
             try {
               if (network == "main") node.receipts = await getNodeMintingFixupReceipts(node.nodeId);
-            } catch (e) {
+            } catch {
               createCustomToast(`Failed to get node ${node.nodeId} minting receipts!`, ToastType.danger);
             }
             node.availability = await getNodeAvailability(node.nodeId);
             node.uptime = +calculateUptime(node.availability.currentPeriod, node.availability.downtime);
-          } catch (error) {
+          } catch {
             node.receipts = [];
             node.used_resources = {
               sru: 0,

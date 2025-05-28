@@ -12,7 +12,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, onUpdated, ref } from "vue";
+import { computed, onMounted } from "vue";
 import { useTheme } from "vuetify";
 
 import { LocalStorageSettingsKey, updateThemeInLocalStorage } from "@/utils/settings";

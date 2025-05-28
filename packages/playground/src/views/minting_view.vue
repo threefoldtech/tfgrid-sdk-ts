@@ -245,7 +245,7 @@ function mintingHash(): AsyncRule {
     try {
       item.value = await getMintingData(receiptHash.value);
       return { message: "" };
-    } catch (e) {
+    } catch {
       return { message: "Receipt not found." };
     } finally {
       loading.value = false;

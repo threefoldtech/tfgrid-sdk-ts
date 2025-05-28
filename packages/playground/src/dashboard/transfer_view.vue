@@ -196,7 +196,7 @@ async function isValidAddress() {
   const keyring = new Keyring({ type: "sr25519" });
   try {
     keyring.addFromAddress(recipientAddress.value.trim());
-  } catch (error) {
+  } catch {
     return { message: "Invalid address." };
   }
   try {
@@ -211,7 +211,7 @@ async function isValidAddress() {
         return { message: "Twin ID doesn't exist" };
       }
     }
-  } catch (err) {
+  } catch {
     return { message: "Invalid address. Twin ID doesn't exist" };
   }
 }
@@ -233,7 +233,7 @@ async function transfer(recipientTwin: Twin) {
       createCustomToast("Transaction Complete!", ToastType.success);
       profileManagerController.reloadBalance();
     }
-  } catch (err) {
+  } catch {
     createInvalidTransferToast("transfer failed!");
   }
 }
