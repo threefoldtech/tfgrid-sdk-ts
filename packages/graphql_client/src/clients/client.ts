@@ -40,7 +40,8 @@ export class TFGridGqlClient extends AbstractClient {
   public merge<T extends MergableQuery>(queries: T) {
     const options: RequestOptions[] = [];
     for (const query in queries) {
-      options.push(this[`__${query}` as any](...queries[query]));
+      // eslint-disable-next-line prefer-spread
+      options.push(this[`__${query}` as any].apply(this, queries[query]));
     }
 
     const mergedOptions = options.reduce(
