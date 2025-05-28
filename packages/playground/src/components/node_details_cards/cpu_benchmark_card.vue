@@ -18,7 +18,7 @@ import { useGrid } from "../../stores";
 import CardDetails from "./card_details.vue";
 
 export default {
-  name: "cpuBenchmarkCard",
+  name: "CpuBenchmarkCard",
   components: { CardDetails },
   props: {
     node: {

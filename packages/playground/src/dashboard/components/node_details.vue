@@ -210,7 +210,7 @@ import GPUDetailsCard from "@/components/node_details_cards/gpu_details_card.vue
 
 export default {
   // eslint-disable-next-line vue/multi-word-component-names
-  name: "Node Details",
+  name: "NodeDetails",
   components: {
     CardDetails,
     GPUDetailsCard,

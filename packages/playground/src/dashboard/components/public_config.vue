@@ -50,7 +50,7 @@
                       config.ipv4,
                       config.gw4,
                       'Gateway IPv4 should not be equal to IPv4.',
-                    )(value),
+                    )(),
                 ]"
                 #="{ props }"
               >
@@ -86,7 +86,7 @@
                       config.ipv6!,
                       config.gw6!,
                       'Gateway IPv6 should not be equal to IPv6.',
-                    )(value),
+                    )(),
                 ]"
                 #="{ props }"
               >
