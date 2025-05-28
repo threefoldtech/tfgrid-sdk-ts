@@ -11,5 +11,5 @@ npx ts-node --project tsconfig-node.json scripts/zdb.ts
 or
 
 ```bash
-yarn run ts-node --project tsconfig-node.json scripts/zdb.ts
+yarn run ts-node --transpileOnly --project tsconfig-node.json scripts/zdb.ts
 ```

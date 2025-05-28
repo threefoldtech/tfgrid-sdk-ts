@@ -38,6 +38,7 @@
               v-model="filters.rentable"
               density="compact"
               hide-details
+              @change="handleRentableChange()"
             />
           </TfFilter>
 
@@ -558,6 +559,18 @@ export default {
         }
       },
     );
+
+    const nodeStatus = computed(() => {
+      if (filters.value.rentable) {
+        return UnifiedNodeStatus.UpStandby;
+      } else {
+        return oldNodeStatus.value;
+      }
+    });
+
+    const handleRentableChange = () => {
+      filters.value.status = nodeStatus.value;
+    };
     const loading = ref<boolean>(true);
     const _nodes = ref<GridNode[]>([]);
 
@@ -666,6 +679,7 @@ export default {
       page,
       error,
       loadNodes,
+      handleRentableChange,
     };
   },
 };

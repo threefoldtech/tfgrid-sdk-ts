@@ -20,7 +20,7 @@ import { BackendStorage, BackendStorageType } from "../storage/backend";
 import { Zmachine } from "../zos";
 import { Deployment } from "../zos/deployment";
 import { Workload, WorkloadTypes } from "../zos/workload";
-import { Peer, Znet } from "../zos/znet";
+import { Mycelium, Peer, Znet } from "../zos/znet";
 import { Nodes } from "./nodes";
 
 class WireGuardKeys {
@@ -69,7 +69,11 @@ class Network {
   wireguardConfig: string;
   tfClient: TFClient;
 
-  constructor(public name: string, public ipRange: string, public config: GridClientConfig) {
+  constructor(
+    public name: string,
+    public ipRange: string,
+    public config: GridClientConfig,
+  ) {
     if (Addr(ipRange).prefix !== 16) {
       throw new ValidationError("Network ip_range should have a prefix 16.");
     }
@@ -188,11 +192,10 @@ class Network {
           validateHexSeed(myceliumNetworkSeed.seed, 32);
           seed = myceliumNetworkSeed.seed;
         }
-
-        network.mycelium = {
-          hex_key: seed,
-          peers: [],
-        };
+        const myceliumInstance = new Mycelium();
+        myceliumInstance.hex_key = seed;
+        myceliumInstance.peers;
+        network.mycelium = myceliumInstance;
         this.getUpdatedNetwork(network);
         this.updateNetworkDeployments();
 
@@ -243,13 +246,12 @@ class Network {
         seed = myceliumNetworkSeed.seed;
         validateHexSeed(seed, 32);
       }
+      const myceliumInstance = new Mycelium();
+      myceliumInstance.hex_key = seed;
+      myceliumInstance.peers = [];
 
-      znet.mycelium = {
-        hex_key: seed,
-        peers: [],
-      };
+      znet.mycelium = myceliumInstance;
     }
-
     this.networks.push(znet);
     await this.generatePeers();
     this.updateNetworkDeployments();
@@ -467,7 +469,9 @@ class Network {
 
   getPublicKey(privateKey: string): string {
     const privKey = Buffer.from(privateKey, "base64");
-    const keypair = TweetNACL.box.keyPair.fromSecretKey(privKey);
+    // Convert Buffer to Uint8Array to satisfy the type requirements
+    const uint8Array = new Uint8Array(privKey);
+    const keypair = TweetNACL.box.keyPair.fromSecretKey(uint8Array);
     return Buffer.from(keypair.publicKey).toString("base64");
   }
 

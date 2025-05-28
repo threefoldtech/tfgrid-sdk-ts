@@ -145,7 +145,6 @@ const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
 
 watch(firstRound, () => lastRoundInput.value.validate(lastRound.value.toString()));
-
 async function deploy() {
   layout.value.setStatus("deploy");
 

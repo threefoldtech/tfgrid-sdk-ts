@@ -5,10 +5,12 @@
 // this is required to allow for ambient/previous definitions
 import "@polkadot/api-base/types/consts";
 
+import "@polkadot/types/lookup";
+
 import type { ApiTypes, AugmentedConst } from "@polkadot/api-base/types";
 import type { u128, u16, u32, u64, u8 } from "@polkadot/types-codec";
 import type { Codec } from "@polkadot/types-codec/types";
-import type {
+import {
   FrameSystemLimitsBlockLength,
   FrameSystemLimitsBlockWeights,
   SpVersionRuntimeVersion,

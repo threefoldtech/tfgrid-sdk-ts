@@ -12,7 +12,7 @@
 </template>
 
 <script lang="ts">
-import { ref, watch } from "vue";
+import { ref } from "vue";
 
 import CreateFarm from "./components/create_farm.vue";
 import UserFarms from "./components/user_farms.vue";
@@ -29,13 +29,11 @@ export default {
     const userFarms = ref();
     function handleFarmCreated() {
       farmsReload.value = !farmsReload.value;
-    }
-    watch(
-      () => farmsReload.value,
-      () => {
+      if (userFarms.value) {
         userFarms.value.reloadFarms = farmsReload.value;
-      },
-    );
+      }
+    }
+
     return {
       farmsReload,
       handleFarmCreated,

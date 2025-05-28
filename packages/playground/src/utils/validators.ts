@@ -1,6 +1,6 @@
+import * as StellarSdk from "@stellar/stellar-sdk";
 import type { GridClient } from "@threefold/grid_client";
 import { default as PrivateIp } from "private-ip";
-import StellarSdk from "stellar-sdk";
 import validator from "validator";
 import type { Options } from "validator/lib/isBoolean";
 import type { IsEmailOptions } from "validator/lib/isEmail";
@@ -642,7 +642,7 @@ export function isRFC3339(msg: string) {
 
 export function isRgbColor(msg: string, includePercentValues?: boolean) {
   return (value: string) => {
-    if (!validator.isRgbColor(value, includePercentValues)) {
+    if (!validator.isRgbColor(value, includePercentValues ? { includePercentValues } : undefined)) {
       return { message: msg, isRgbColor: includePercentValues || true };
     }
   };
@@ -805,14 +805,15 @@ export function isValidDecimalNumber(length: number, msg: string) {
 export async function isValidStellarAddress(
   target: string,
 ): Promise<import("@/components/input_validator.vue").RuleReturn> {
-  const server = new StellarSdk.Server(window.env.STELLAR_HORIZON_URL);
+  const server = new StellarSdk.Horizon.Server(window.env.STELLAR_HORIZON_URL);
   try {
     // check if the account provided exists on stellar
     const account = await server.loadAccount(target);
     // check if the account provided has the appropriate trustlines
-    const includes = account.balances.find(
-      (b: { asset_code: string; asset_issuer: string }) =>
-        b.asset_code === "TFT" && b.asset_issuer === window.env.TFT_ASSET_ISSUER,
+    const includes = (account.balances as { asset_code: string; asset_issuer: string }[]).find(
+      (balance: { asset_code: string; asset_issuer: string }) => {
+        return balance?.asset_code === "TFT" && balance?.asset_issuer === window.env.TFT_ASSET_ISSUER;
+      },
     );
     if (!includes) throw new Error("Invalid trustline");
   } catch (e) {

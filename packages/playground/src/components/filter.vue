@@ -80,8 +80,7 @@
 import type { NodeStatus } from "@threefold/gridproxy_client";
 import { cloneDeep, isEmpty } from "lodash";
 import equals from "lodash/fp/equals.js";
-import { nextTick } from "process";
-import { computed, defineComponent, onMounted, type PropType, ref, watch } from "vue";
+import { computed, defineComponent, nextTick, onMounted, type PropType, ref, watch } from "vue";
 import { type LocationQueryRaw, useRoute } from "vue-router";
 
 import { useFormRef } from "@/hooks/form_validator";

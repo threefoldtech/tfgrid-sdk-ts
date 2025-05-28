@@ -1,10 +1,11 @@
 import { plainToClass } from "class-transformer";
 
-import { ComputeCapacity, Mount, Zmachine, ZmachineNetwork, ZNetworkInterface } from "../../src";
+import { ComputeCapacity, Mount, MyceliumIP, Zmachine, ZmachineNetwork, ZNetworkInterface } from "../../src";
 
 let zmachine = new Zmachine();
 const computeCapacity = new ComputeCapacity();
 const network = new ZmachineNetwork();
+const networkInterface = new ZNetworkInterface()
 const disks = new Mount();
 
 beforeEach(() => {
@@ -13,16 +14,16 @@ beforeEach(() => {
 
   network.planetary = true;
   network.public_ip = "10.249.0.0/16";
+  networkInterface.ip = "10.20.2.2"
+  networkInterface.network= "znetwork"
   network.interfaces = [
-    {
-      network: "znetwork",
-      ip: "10.20.2.2",
-    },
+    networkInterface
   ];
-  network.mycelium = {
-    network: "mycelium_net",
-    hex_seed: "abc123",
-  };
+  const myceliumInstance = new MyceliumIP();
+  myceliumInstance.hex_seed = "abc123";
+  myceliumInstance.network = "mycelium_net";
+
+  network.mycelium = myceliumInstance;
 
   const rootfs_size = 2;
 

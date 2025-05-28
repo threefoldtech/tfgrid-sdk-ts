@@ -264,7 +264,6 @@ const $router = useRouter();
 const profileManager = useProfileManager();
 const gridStore = useGrid();
 const network = process.env.NETWORK || (window as any).env.NETWORK;
-const toolbarExtended = ref(false);
 const openProfile = ref(false);
 const hasActiveProfile = computed(() => !!profileManager.profile);
 const theme = useTheme();
@@ -276,13 +275,12 @@ const hasClient = computed(() => !!gridStore.client);
 // eslint-disable-next-line no-undef
 const permanent = ref(window.innerWidth > 980);
 const openSidebar = ref(permanent.value);
-
+const toolbarExtended = ref(false);
 watch(permanent, value => {
   if (value) {
     toolbarExtended.value = false;
   }
 });
-
 function setSidebarOnResize() {
   permanent.value =
     window.innerWidth >

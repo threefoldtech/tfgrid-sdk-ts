@@ -224,7 +224,7 @@
                 },
               ]"
               :items="discountTableItems"
-              disable-sort="true"
+              :disable-sort="true"
               density="compact"
             >
               <template #bottom></template>

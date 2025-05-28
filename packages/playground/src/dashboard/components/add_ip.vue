@@ -141,7 +141,7 @@
 
 <script lang="ts">
 import { TFChainError } from "@threefold/tfchain_client";
-import { contains } from "cidr-tools";
+import CidrTools from "cidr-tools";
 import { getIPRange } from "get-ip-range";
 import { ref, watch } from "vue";
 
@@ -249,7 +249,7 @@ export default {
       let isRange = false;
 
       try {
-        isRange = contains(publicIP.value, gateway.value);
+        isRange = CidrTools.containsCidr(publicIP.value, gateway.value);
       } catch {
         isRange = false;
       }

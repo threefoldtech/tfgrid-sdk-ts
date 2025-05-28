@@ -463,7 +463,7 @@ function normalizeFiltersValidators(
     }),
     rootFilesystemSize: normalizeNumericValidator(validators.rootFilesystemSize, {
       type: "number",
-      min: 500 / 1024,
+      min: 0,
       max: 10000,
     }),
     solutionDisk: normalizeNumericValidator(validators.solutionDisk, {

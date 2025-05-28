@@ -1,11 +1,20 @@
 <template>
   <div>
     <TfNodeDetailsCard
-      :selected-machines="selectedMachines.filter(m => m.nodeId === nodeId)"
       v-show="modelValue || placeholderNode"
       :key="modelValue?.rentedByTwinId"
+      :selected-machines="selectedMachines.filter(m => m.nodeId === nodeId)"
       flat
       :node="modelValue || placeholderNode"
+      :status="
+        validationTask.loading
+          ? 'Pending'
+          : validationTask.initialized
+            ? validationTask.error
+              ? 'Invalid'
+              : 'Valid'
+            : 'Init'
+      "
       @update:node="
         $emit('update:model-value', $event as any);
         validationTask.run(nodeId);
@@ -14,43 +23,37 @@
         $emit('update:status', $event as ValidatorStatus);
         validationTask.reset();
       "
-      :status="
-        validationTask.loading
-          ? 'Pending'
-          : validationTask.initialized
-          ? validationTask.error
-            ? 'Invalid'
-            : 'Valid'
-          : 'Init'
-      "
     />
 
-    <input-tooltip tooltip="Node ID to deploy on." align-center>
+    <input-tooltip
+      tooltip="Node ID to deploy on."
+      align-center
+    >
       <VTextField
+        v-model.number="nodeId"
         label="Node ID"
         placeholder="Add your desired node id to validate"
         class="w-100 mt-4"
         type="number"
-        v-model.number="nodeId"
         :error="!!validationTask.error"
         :error-messages="validationTask.error || undefined"
         :disabled="!validFilters"
         :persistent-hint="
           (nodeId && !validationTask.initialized) ||
-          !validFilters ||
-          validationTask.loading ||
-          (validationTask.initialized && validationTask.data === true)
+            !validFilters ||
+            validationTask.loading ||
+            (validationTask.initialized && validationTask.data === true)
         "
         :hint="
           !validFilters
             ? 'Please provide valid data.'
             : nodeId && !validationTask.initialized
-            ? 'Preparing to validate node.'
-            : validationTask.loading
-            ? 'Validating node...'
-            : validationTask.data
-            ? `Node ${nodeId} is valid.`
-            : undefined
+              ? 'Preparing to validate node.'
+              : validationTask.loading
+                ? 'Validating node...'
+                : validationTask.data
+                  ? `Node ${nodeId} is valid.`
+                  : undefined
         "
         @wheel="$event.target.blur()"
         @blur="validationTask.initialized ? undefined : validationTask.run(nodeId)"

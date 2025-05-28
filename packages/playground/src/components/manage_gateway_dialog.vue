@@ -242,7 +242,6 @@ export default {
     const layout = useLayout();
     const gatewayTab = ref(0);
     const dialogVisible = ref(true);
-    const isWireGuard = ref(false);
 
     const oldPrefix = ref("");
     const prefix = ref("");
@@ -270,6 +269,7 @@ export default {
     const availableK8SNodesNames = availableK8SNodes.map(node => node.name);
     const selectedK8SNodeName = ref(availableK8SNodesNames[0]);
     const selectedNode = ref();
+
     const interfaceFeature = computed<NetworkFeatures[]>(() => {
       const net = networks.value.find(net => net.value == selectedIPAddress.value);
       switch (net?.title) {
@@ -286,7 +286,9 @@ export default {
       }
     });
     const errorMessage = ref("");
-
+    const isWireGuard = computed(() => {
+      return networks.value.find(net => net.value === selectedIPAddress.value)?.title === NetworkInterfaces.WireGuard;
+    });
     watch(selectedK8SNodeName, getSupportedNetworks, { deep: true });
     const tableHeaders = ref([
       { title: "Name", key: "name" },
@@ -456,15 +458,6 @@ export default {
       }
       selectedIPAddress.value = networks.value[0].value;
     }
-
-    watch(
-      selectedIPAddress,
-      () => {
-        isWireGuard.value =
-          networks.value.find(net => net.value === selectedIPAddress.value)?.title === NetworkInterfaces.WireGuard;
-      },
-      { deep: true },
-    );
 
     function formatDomainName(gw: string) {
       if (gw.startsWith(prefix.value)) {

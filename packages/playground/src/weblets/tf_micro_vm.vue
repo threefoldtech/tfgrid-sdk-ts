@@ -183,7 +183,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, type Ref, ref, watch } from "vue";
+import { computed, type Ref, ref } from "vue";
 
 import Networks, { useNetworks } from "../components/networks.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
@@ -287,9 +287,8 @@ async function deploy() {
 
 function updateSSHkeyEnv(selectedKeys: string) {
   selectedSSHKeys.value = selectedKeys;
+  layoutMount();
 }
-
-watch(selectedSSHKeys, layoutMount, { deep: true });
 </script>
 
 <script lang="ts">

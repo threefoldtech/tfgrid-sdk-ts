@@ -163,7 +163,7 @@
 <script lang="ts">
 import type { PublicConfig } from "@threefold/grid_client";
 import { ValidationError } from "@threefold/types";
-import { contains } from "cidr-tools";
+import CidrTools from "cidr-tools";
 import { isEqual } from "lodash";
 import { default as PrivateIp } from "private-ip";
 import { onMounted, ref, watch } from "vue";
@@ -193,8 +193,8 @@ export default {
     const showClearDialogue = ref(false);
     const isRemoving = ref(false);
     const isSaving = ref(false);
-    const isConfigChanged = ref(false);
     const formRef = useFormRef();
+    const isConfigChanged = ref(false);
     const grid = useGrid();
 
     const defualtNodeConfig = ref<PublicConfig>(publicConfigInitializer());
@@ -217,7 +217,6 @@ export default {
         formRef.value?.validate();
       },
     );
-
     async function getPublicConfig() {
       try {
         const node = await grid.client.nodes.get({ id: props.nodeId });
@@ -332,9 +331,9 @@ export default {
 
       try {
         if (type === "ipv4") {
-          isRange = contains(config.value.ipv4, config.value.gw4);
+          isRange = CidrTools.containsCidr(config.value.ipv4, config.value.gw4);
         } else {
-          isRange = contains(config.value.ipv6, config.value.gw6);
+          isRange = CidrTools.containsCidr(config.value.ipv6, config.value.gw6);
         }
       } catch {
         isRange = false;

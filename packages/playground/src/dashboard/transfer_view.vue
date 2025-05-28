@@ -152,7 +152,6 @@ watch(freeBalance, async () => {
     amountRef.value?.validate();
   }
 });
-
 const tick = ref(0);
 function isSameTwinID(value: string) {
   if (parseInt(value.trim()) == profile.value?.twinId) {

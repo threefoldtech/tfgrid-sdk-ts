@@ -3,6 +3,7 @@ import { IsBoolean, IsEnum, IsInt, IsNotEmpty, IsString, Min } from "class-valid
 
 import { ValidateMembers } from "../helpers";
 import { WorkloadData, WorkloadDataResult } from "./workload_base";
+import { WorkloadTypes } from "./workload";
 
 enum ZdbModes {
   seq = "seq",
@@ -11,6 +12,7 @@ enum ZdbModes {
 
 @ValidateMembers()
 class Zdb extends WorkloadData {
+  @Expose() __type: WorkloadTypes = WorkloadTypes.zdb;
   @Expose() @IsInt() @Min(1) size: number; // in bytes
   @Expose() @Transform(({ value }) => ZdbModes[value]) @IsEnum(ZdbModes) mode: ZdbModes = ZdbModes.seq;
   @Expose() @IsString() @IsNotEmpty() password: string;

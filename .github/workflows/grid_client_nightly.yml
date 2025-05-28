@@ -40,10 +40,10 @@ jobs:
         with:
           ref: refs/tags/v2.6.3
 
-      - name: Set up node 18
+      - name: Set up node 22 lts
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 22.15
           cache: "yarn"
 
       - name: Install deps
@@ -60,74 +60,74 @@ jobs:
         id: single_vm
         if: always()
         run: |
-          yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/dynamic_single_vm.ts
+          yarn run ts-node --transpileOnly --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/dynamic_single_vm.ts
 
       - name: Run test Zos 3 lite gateway
         id: zos3lite_gateway_domain
         if: always()
         run: |
-          yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/zos3lite_gateway_domain.ts
+          yarn run ts-node --transpileOnly --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/zos3lite_gateway_domain.ts
 
       - name: Run test single ZOS3 lite vm with mycelium
         id: zos3lite
         if: always()
         run: |
-          yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/single_vm_zos3_lite.ts
+          yarn run ts-node --transpileOnly --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/single_vm_zos3_lite.ts
 
       - name: Run test multiple vms
         id: multiple_vm
         if: always()
         run: |
-          yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/multiple_vms.ts
+          yarn run ts-node --transpileOnly --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/multiple_vms.ts
 
       - name: Run test multiple zos3 lite vms
         id: multiple_zos3_lite_vm
         if: always()
         run: |
-          yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/multiple_vms_zos_3_lite.ts
+          yarn run ts-node --transpileOnly --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/multiple_vms_zos_3_lite.ts
 
       - name: Run test kubernetes
         id: k8s
         if: always()
         run: |
-          yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/orchestrators/kubernetes_leader.ts
+          yarn run ts-node --transpileOnly --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/orchestrators/kubernetes_leader.ts
 
       - name: Run test vm with qsfs
         id: vmqsfs
         if: always()
         continue-on-error: true
         run: |
-          yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/vm_with_qsfs.ts
+          yarn run ts-node --transpileOnly --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/vm_with_qsfs.ts
 
       - name: Run test kubernetes with qsfs
         id: k8sqsfs
         if: always()
         continue-on-error: true
         run: |
-          yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/orchestrators/kubernetes_with_qsfs.ts
+          yarn run ts-node --transpileOnly --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/orchestrators/kubernetes_with_qsfs.ts
 
       - name: Run test kvstore
         id: kvstore
         if: always()
         run: |
-          yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/kvstore_example.ts
+          yarn run ts-node --transpileOnly --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/kvstore_example.ts
 
       - name: Run test zdb
         id: zdb
         if: always()
         run: |
-          yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/zdb.ts
+          yarn run ts-node --transpileOnly --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/zdb.ts
 
       - name: Cleanup - Delete all contracts
         if: always()
         id: delete_all
         run: |
-          yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/delete_all_contracts.ts
+          yarn run ts-node --transpileOnly --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/delete_all_contracts.ts
 
       - name: Run check up - List all contracts
         run: |
           sleep 15
-          yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/list_all_contracts.ts > output.txt
+          yarn run ts-node --transpileOnly --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/list_all_contracts.ts > output.txt
 
       - name: Check if contracts are Empty
         run: |

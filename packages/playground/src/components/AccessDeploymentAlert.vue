@@ -9,8 +9,8 @@
         :key="method"
         class="my-1"
         :class="{
-          'text-white': $vuetify.theme.global.name === 'dark',
-          'text-grey-darken-3': $vuetify.theme.global.name === 'light',
+          'text-white': theme.global.current.value.dark,
+          'text-grey-darken-3': !theme.global.current.value.dark,
         }"
       >
         &blacksquare; ssh root@&lt;<span v-text="method" class="text-grey-darken-1" />&gt;
@@ -20,12 +20,15 @@
 </template>
 
 <script lang="ts">
+import { useTheme } from "vuetify";
+
 const methods = ["public-ipv4", "planetary-network-ip", "public-ipv6", "wireguard-ip", "mycelium-network-ip"];
 
 export default {
   name: "AccessDeploymentAlert",
   setup() {
-    return { methods };
+    const theme = useTheme();
+    return { methods, theme };
   },
 };
 </script>

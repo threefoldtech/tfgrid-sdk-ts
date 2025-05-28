@@ -14,11 +14,11 @@
   "dependencies": {
     "@threefold/grid_client": "2.8.0-rc4",
     "@threefold/rmb_peer_server": "2.8.0-rc4",
-    "typescript": "^4.7.4"
+    "typescript": "^5.8.3"
   },
   "devDependencies": {
     "@threefold/rmb_peer_client": "2.8.0-rc4",
-    "ts-node": "^10.9.1"
+    "ts-node": "^10.9.2"
   },
   "main": "./dist/index.js",
   "types": "dist/index.d.ts",

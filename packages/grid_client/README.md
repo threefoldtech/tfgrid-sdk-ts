@@ -155,7 +155,7 @@ gridClient.disconnect();
 - After following the previous examples to create a client instance and using it in a script, you can then execute this script using [ts-node](https://www.npmjs.com/ts-node).
 
   ```bash
-  yarn run ts-node --project tsconfig-node.json filename.ts
+  yarn run ts-node --transpileOnly --project tsconfig-node.json filename.ts
   ```
 
 ## Usage examples

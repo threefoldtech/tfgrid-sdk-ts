@@ -11,3 +11,6 @@ export enum LocalStorageSettingsKey {
 export enum SessionStorageSettingsKey {
   PASSWORD_KEY = "password",
 }
+export const updateThemeInLocalStorage = (newTheme: string) => {
+  localStorage.setItem(LocalStorageSettingsKey.THEME_KEY, newTheme);
+};

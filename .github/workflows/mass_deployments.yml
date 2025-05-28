@@ -21,10 +21,10 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: refs/tags/v2.7.0-rc1
-      - name: Set up node 18
+      - name: Set up node 22
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 22.15
           cache: "yarn"
 
       - name: Install deps
@@ -40,12 +40,12 @@ jobs:
         id: massdeployments
         continue-on-error: true
         run: |
-          yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/mass_deployments.ts
+          yarn run ts-node --transpileOnly --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/mass_deployments.ts
 
       - name: Cleanup - Delete all contracts
         id: deleteall
         run: |
-          yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/delete_all_contracts.ts
+          yarn run ts-node --transpileOnly --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/delete_all_contracts.ts
 
       - name: Test Results
         run: |

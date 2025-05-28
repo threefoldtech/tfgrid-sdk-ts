@@ -48,7 +48,7 @@
           :has-custom-domain="selectionDetails?.domain?.enabledCustomDomain"
           require-domain
         />
-
+        
         <TfSelectionDetails
           :filters="{
             ipv4,

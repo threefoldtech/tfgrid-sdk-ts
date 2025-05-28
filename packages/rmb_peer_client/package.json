@@ -12,13 +12,13 @@
     "access": "public"
   },
   "dependencies": {
-    "redis": "^4.3.1",
-    "typescript": "^4.7.4",
-    "uuid4": "^2.0.2"
+    "redis": "^4.7.0",
+    "typescript": "^5.8.3",
+    "uuid4": "^2.0.3"
   },
   "devDependencies": {
-    "@types/uuid4": "^2.0.0",
-    "ts-node": "^10.9.1"
+    "@types/uuid4": "^2.0.3",
+    "ts-node": "^10.9.2"
   },
   "main": "./dist/index.js",
   "types": "dist/index.d.ts",
