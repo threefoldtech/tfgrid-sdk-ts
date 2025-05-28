@@ -3,12 +3,12 @@
     tooltip="A virtual machine (VM) image is a snapshot or template of a virtual machine that contains the necessary components to create and run a virtual instance of an operating system. It includes the operating system, installed applications, configurations, and any additional files or data required for the virtual machine, also you can put your own image/flist by choosing the other option."
   >
     <v-select
-      label="VM Image"
+      v-bind="props"
+      v-model="image"
+      label="Image"
       :items="[...$props.images, { name: 'Other' }]"
       return-object
       item-title="name"
-      v-bind="props"
-      v-model="image"
     />
   </input-tooltip>
 
@@ -25,14 +25,21 @@
       #="{ props }"
     >
       <input-tooltip tooltip="Add a custom flist link, you can visit our 0-hub for more information.">
-        <v-text-field label="Flist" v-model="flist" v-bind="props" />
+        <v-text-field
+          v-model="flist"
+          label="Flist"
+          v-bind="props"
+        />
       </input-tooltip>
     </input-validator>
 
     <input-tooltip
       tooltip="The entry point of the selected flist. It's the first process that runs on the machine once it's deployed."
     >
-      <v-text-field label="Entry Point" v-model="entryPoint" />
+      <v-text-field
+        v-model="entryPoint"
+        label="Entry Point"
+      />
     </input-tooltip>
   </template>
 </template>
