@@ -70,12 +70,12 @@
         </div>
       </v-row>
       <v-col
-        v-if="node.num_gpu > 0"
+        v-if="nodeData.num_gpu > 0"
         cols="getColSize"
         style="max-width: 93rem; min-height: 400px; justify-content: center"
       >
         <div class="mt-3">
-          <GPUDetailsCard :node="node" />
+          <GPUDetailsCard :node="nodeData" />
         </div>
       </v-col>
     </v-row>
@@ -98,7 +98,7 @@ const gpuLoading = ref(false);
 const gpuError = ref(false);
 const farmName = ref("");
 const publicIps = ref(0);
-const node = ref<GridNode>(nodeInitializer);
+const nodeData = ref<GridNode>(nodeInitializer);
 const dots = ref(".");
 const interval = ref<number | null>(null);
 
@@ -150,7 +150,7 @@ async function getGpuDetails() {
 
       gpuError.value = false;
       const _node: GridNode = await getNode(props.node.nodeId);
-      node.value = _node;
+      nodeData.value = _node;
     }
     gpuLoading.value = false;
   } catch (e) {

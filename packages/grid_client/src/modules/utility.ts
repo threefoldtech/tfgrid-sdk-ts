@@ -4,7 +4,6 @@ import { expose } from "../helpers/expose";
 import { BatchModel } from "./models";
 import { checkBalance } from "./utils";
 
-
 class Utility {
   client: TFClient;
 

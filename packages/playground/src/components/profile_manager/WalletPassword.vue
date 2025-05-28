@@ -48,7 +48,6 @@ const props = defineProps({
   mode: {
     required: true,
     type: String as () => "Login" | "Create",
-    default: "Create",
   },
   disabled: {
     required: false,

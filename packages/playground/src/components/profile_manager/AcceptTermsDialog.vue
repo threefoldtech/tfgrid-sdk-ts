@@ -48,7 +48,6 @@ const theme = useTheme();
 const props = defineProps({
   modelValue: {
     required: true,
-    default: false,
     type: Boolean,
   },
 });

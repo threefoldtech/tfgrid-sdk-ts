@@ -353,7 +353,6 @@ class Client extends QueryClient {
             console.log(`phase: ${phase}, section: ${section}, method: ${method}, data: ${data}`);
             if (section === SYSTEM && method === ExtrinsicState.ExtrinsicFailed) {
               try {
-
                 const [dispatchError, _] = data; // eslint-disable-line @typescript-eslint/no-unused-vars
                 reject(dispatchError);
               } catch (e) {

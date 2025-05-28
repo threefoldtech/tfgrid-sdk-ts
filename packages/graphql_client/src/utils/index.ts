@@ -1,7 +1,6 @@
 import { ValidationError } from "@threefold/types";
 type AssertReturn = void | never;
 
-
 /**
  * @description
  * Assertion

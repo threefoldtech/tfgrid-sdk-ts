@@ -158,7 +158,7 @@ const props = defineProps({
     required: false,
     default: () => false,
   },
-  SelectedNode: Object as PropType<NodeInfo>,
+  selectedNode: Object as PropType<NodeInfo>,
   validFilters: Boolean,
 });
 const emits = defineEmits<{ (event: "mount"): void; (event: "back"): void }>();
