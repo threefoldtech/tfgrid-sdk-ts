@@ -58,8 +58,9 @@
               :loading="isSetting"
               :disabled="!valid || isSetting || isDisabled"
               @click="setExtraFee()"
-              >Save</v-btn
             >
+              Save
+            </v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>

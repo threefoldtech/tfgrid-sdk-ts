@@ -115,8 +115,9 @@
                 showDialogue = false;
                 reset();
               "
-              >Close</v-btn
             >
+              Close
+            </v-btn>
             <v-btn
               color="error"
               :disabled="isRemoving || Object.values(config).every(value => value == '')"

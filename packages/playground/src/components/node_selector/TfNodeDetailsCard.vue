@@ -60,8 +60,8 @@
         Uptime:
         <span class="font-weight-bold" v-text="toReadableDate(node.uptime)" />
       </span>
-      <span v-if="node" class="ml-2"
-        >Last Deployment Time:
+      <span v-if="node" class="ml-2">
+        Last Deployment Time:
         {{ lastDeploymentTime === 0 ? "N/A" : toHumanDate(lastDeploymentTime) }}
       </span>
     </template>
@@ -189,11 +189,7 @@
       <div v-if="node && (rentedByUser || (node.status !== 'down' && node.rentable))" class="ml-auto text-right">
         <v-tooltip bottom color="primary" close-delay="100" :disabled="!(node && node.dedicated)">
           <template v-slot:activator="{ isActive, props }">
-            <span v-bind="props" class="font-weight-bold" v-on="isActive"
-              ><v-icon class="scale_beat mr-2" color="warning" :disabled="!(node && node.dedicated)"
-                >mdi-brightness-percent</v-icon
-              >{{ hourlyPriceAfterDiscount }} USD/Hour</span
-            >
+            <span v-bind="props" class="font-weight-bold" v-on="isActive"><v-icon class="scale_beat mr-2" color="warning" :disabled="!(node && node.dedicated)">mdi-brightness-percent</v-icon>{{ hourlyPriceAfterDiscount }} USD/Hour</span>
           </template>
 
           <span>
