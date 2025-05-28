@@ -8,9 +8,9 @@
     <div>
       Get TFT on Stellar using BTC or Credit card, then you can bridge it to your tfchain account using the Bridge in
       the dashboard section.
-      <v-btn icon small :href="manual.buy_sell_tft" target="_blank" @click.stop
-        ><v-icon>mdi-information-outline</v-icon></v-btn
-      >
+      <v-btn icon small :href="manual.buy_sell_tft" target="_blank" @click.stop>
+        <v-icon>mdi-information-outline</v-icon>
+      </v-btn>
     </div>
   </v-tooltip>
 </template>

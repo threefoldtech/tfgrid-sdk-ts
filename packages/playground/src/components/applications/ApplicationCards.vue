@@ -39,8 +39,8 @@
                 {{ card.excerpt }}
               </v-card-text>
             </v-card>
-          </template></v-hover
-        >
+          </template>
+        </v-hover>
       </router-link>
     </v-col>
   </v-row>
