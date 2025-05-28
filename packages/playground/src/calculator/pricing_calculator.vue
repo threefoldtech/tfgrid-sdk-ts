@@ -234,7 +234,7 @@
 
 <script lang="ts">
 import { QueryClient } from "@threefold/tfchain_client";
-import { computed, ref, watch } from "vue";
+import { computed, type ComputedRef, ref, watch } from "vue";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { VForm } from "vuetify/components/VForm";
 
@@ -265,35 +265,27 @@ export default {
       ipv4: false,
       useCurrentBalance: true,
     });
-    const dedicatedUpgradePrice = computed(() => {
+    const calculatePrice = (priceTFT: ComputedRef<number>, packageType: "dedicatedPackage" | "sharedPackage") => {
       if (
         !valid.value ||
-        dedicatedPriceTFT.value === 0 ||
-        (!priceTask.value.loading && priceTask.value.data?.dedicatedPackage.package === "gold")
+        priceTFT.value === 0 ||
+        (!priceTask.value.loading && priceTask.value.data?.[packageType]?.package === "gold")
       )
         return 0;
-      const appliedDiscount = priceTask.value.data?.dedicatedPackage.discount ?? 0;
-      const originalPrice = (dedicatedPriceTFT.value * 100) / (100 - appliedDiscount);
-      const balanceToUse =
-        userBalance.value && resources.value.useCurrentBalance ? userBalance.value.free : +resources.value.balance;
-      const balanceNeeded = Math.ceil(originalPrice * 18 - balanceToUse);
-      return balanceNeeded > 0 ? balanceNeeded : 0;
-    });
 
-    const sharedUpgradePrice = computed(() => {
-      if (
-        !valid.value ||
-        sharedPriceTFT.value === 0 ||
-        (!priceTask.value.loading && priceTask.value.data?.sharedPackage.package === "gold")
-      )
-        return 0;
+      const discount = priceTask.value.data?.[packageType]?.discount ?? 0;
+      const originalPrice = (priceTFT.value * 100) / (100 - discount);
       const balanceToUse =
         userBalance.value && resources.value.useCurrentBalance ? userBalance.value.free : +resources.value.balance;
-      const appliedDiscount = priceTask.value.data?.sharedPackage.discount ?? 0;
-      const originalPrice = (sharedPriceTFT.value * 100) / (100 - appliedDiscount);
-      const balanceNeeded = Math.ceil(originalPrice * 18 - balanceToUse);
+      const balanceNeeded = Math.ceil(originalPrice * 18 - balanceToUse) + 1;
+      console.log(originalPrice * 18 - balanceToUse, balanceNeeded);
       return balanceNeeded > 0 ? balanceNeeded : 0;
-    });
+    };
+
+    const dedicatedUpgradePrice = computed(() => calculatePrice(dedicatedPriceTFT, "dedicatedPackage"));
+
+    const sharedUpgradePrice = computed(() => calculatePrice(sharedPriceTFT, "sharedPackage"));
+
     const tftPriceTask = useAsync(() => calculator.tftPrice(), {
       init: true,
       default: 0,
