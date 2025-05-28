@@ -1,8 +1,6 @@
 import { ValidationError } from "@threefold/types";
 type AssertReturn = void | never;
-function panic(message: string): never {
-  throw new Error(message);
-}
+
 
 /**
  * @description

@@ -3,7 +3,6 @@ import { plainToClass } from "class-transformer";
 import {
   DeploymentResult,
   Encryption,
-  MachineInterface,
   Mycelium,
   MyceliumIP,
   NetworkLight,
@@ -45,7 +44,6 @@ const createDataInstance = (type: WorkloadTypes) => {
   let instance;
   const network = new ZmachineNetwork();
   const networklight = new ZmachineLightNetwork();
-  const interfaces = new MachineInterface();
   const myceliumip = new MyceliumIP();
 
   const computeCapacity = new ComputeCapacity();

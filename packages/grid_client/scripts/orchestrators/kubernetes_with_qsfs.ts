@@ -23,6 +23,7 @@ async function getDeployment(client: GridClient, k8s: string) {
   log("================= Getting deployment information =================");
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function cancel(client: GridClient, k8s: string) {
   const res = await client.k8s.delete({ name: k8s });
   log("================= Canceling the deployment =================");
@@ -30,6 +31,7 @@ async function cancel(client: GridClient, k8s: string) {
   log("================= Canceling the deployment =================");
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function deleteQsfs(client: GridClient, qsfs: string) {
   const res = await client.qsfs_zdbs.delete({ name: qsfs });
   log("================= Deleting QSFS =================");

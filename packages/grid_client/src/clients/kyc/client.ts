@@ -191,7 +191,7 @@ export class KYC {
       const { status } = res.data.result;
       if (status !== `Healthy`) return false;
       return true;
-    } catch (error) {
+    } catch {
       return false;
     }
   }

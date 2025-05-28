@@ -1,5 +1,5 @@
 import { assertBoolean, assertId, assertNatural, assertString } from "../utils";
-import { AbstractBuilder, BuilderMapper, BuilderMethods, BuilderValidator } from "./abstract_builder";
+import { AbstractBuilder, BuilderMapper, BuilderValidator } from "./abstract_builder";
 import { SortBy, SortOrder } from "./nodes";
 
 export interface PublicIpQuery {

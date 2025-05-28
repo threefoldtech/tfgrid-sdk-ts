@@ -17,7 +17,6 @@ import { validateHexSeed } from "../helpers/validator";
 import { ContractStates, MyceliumNetworkModel } from "../modules";
 import { DeploymentFactory } from "../primitives/deployment";
 import { BackendStorage, BackendStorageType } from "../storage/backend";
-import { Zmachine } from "../zos";
 import { Deployment } from "../zos/deployment";
 import { Workload, WorkloadTypes } from "../zos/workload";
 import { Mycelium, Peer, Znet } from "../zos/znet";

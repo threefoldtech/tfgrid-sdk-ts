@@ -45,7 +45,6 @@ test("TC2954 - Applications: Deploy Nostr", async () => {
   **********************************************/
   const name = "gw" + generateString(10).toLowerCase();
   const subdomain = name; // Using the same variable for gateway subdomain
-  const tlsPassthrough = false;
   const cpu = 1;
   const memory = 2;
   const rootfsSize = 2;

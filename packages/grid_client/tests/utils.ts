@@ -93,7 +93,7 @@ async function getOnlineNode(Nodes) {
     try {
       log(await gridClient.zos.pingNode({ nodeId: node.nodeId }));
       break;
-    } catch (error) {
+    } catch {
       log("node " + node.nodeId + " is not responding, trying different node.");
       Nodes.splice(+[Nodes.indexOf(node)], 1);
     }

@@ -1,6 +1,4 @@
-import { Contract } from "@threefold/tfchain_client";
 import { ValidationError } from "@threefold/types";
-import { Buffer } from "buffer";
 import { plainToInstance } from "class-transformer";
 import { Addr } from "netaddr";
 import { default as PrivateIp } from "private-ip";

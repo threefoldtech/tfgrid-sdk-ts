@@ -24,6 +24,7 @@ async function getDeployment(client, vms) {
   log("================= Getting deployment information =================");
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function cancel(client, vms) {
   const res = await client.machines.delete(vms);
   log("================= Canceling the deployment =================");
@@ -31,6 +32,7 @@ async function cancel(client, vms) {
   log("================= Canceling the deployment =================");
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function deleteQsfs(client, qsfs) {
   const res = await client.qsfs_zdbs.delete(qsfs);
   log("================= Deleting QSFS =================");

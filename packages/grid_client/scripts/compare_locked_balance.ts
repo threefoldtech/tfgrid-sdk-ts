@@ -1,7 +1,7 @@
 import TFGridGqlClient from "@threefold/graphql_client";
 import { ContractState } from "@threefold/gridproxy_client";
 
-import { BalanceGetModel, GridClient } from "../src";
+import { GridClient } from "../src";
 import { getClient } from "./client_loader";
 
 interface Contract {

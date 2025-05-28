@@ -42,6 +42,7 @@ class HttpServer {
   }
 
   handle(gridClient, module, method) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     this.router.post(`/${module}/${method}`, async (req, res, next) => {
       const payload = req.body;
 
@@ -83,9 +84,11 @@ class HttpServer {
 
   run() {
     // ping-pong the server
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     this.server.use("/ping", (req, res, next) => res.status(200).json("pong"));
 
     /** Error handling */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     this.server.use((req, res, next) => {
       const error = new Error("not found");
       return res.status(404).json({

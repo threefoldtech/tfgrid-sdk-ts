@@ -150,6 +150,7 @@ async function main() {
 
     const deploymentPromises = batchVMs.map(async (vms, index) => {
       try {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const [twinDeployments, _, __] = await grid3.machines._createDeployment(vms);
         return { twinDeployments, batchIndex: index };
       } catch (error) {

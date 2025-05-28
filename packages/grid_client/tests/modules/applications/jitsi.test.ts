@@ -8,7 +8,6 @@ import {
   generateString,
   GridClient,
   MachinesModel,
-  randomChoice,
 } from "../../../src";
 import { config, getClient } from "../../client_loader";
 import { generateInt, getOnlineNode, log } from "../../utils";

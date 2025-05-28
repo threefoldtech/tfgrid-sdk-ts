@@ -11,8 +11,7 @@ import { Graphql } from "../clients/graphql/client";
 import { Features, formatErrorMessage } from "../helpers";
 import { send, sendWithFullResponse } from "../helpers/requests";
 import { convertObjectToQueryString } from "../helpers/utils";
-import { FarmFilterOptions, FilterOptions, MachineModel, NodeStatus } from "../modules/models";
-import { WorkloadTypes } from "../zos";
+import { FarmFilterOptions, FilterOptions, NodeStatus } from "../modules/models";
 
 interface FarmInfo {
   name: string;
