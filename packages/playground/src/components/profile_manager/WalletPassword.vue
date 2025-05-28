@@ -25,7 +25,7 @@
               v-bind="{ ...passwordInputProps, ...validationProps }"
               autocomplete="off"
               :disabled="props.disabled"
-              @update:modelValue="$emit('update:modelValue', $event)"
+              @update:model-value="$emit('update:modelValue', $event)"
             />
           </div>
         </template>

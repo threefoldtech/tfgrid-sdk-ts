@@ -1,8 +1,8 @@
 <template>
   <div class="d-flex flex-column" style="min-height: 100vh">
     <v-alert
-      transition="fade-transition"
       v-model="alert"
+      transition="fade-transition"
       border="start"
       type="info"
       close-label="Close Alert"
@@ -16,7 +16,7 @@
     </v-alert>
 
     <v-container class="d-flex flex-grow-1 align-center justify-center">
-      <v-form class="my-2" v-model="valid" @submit.prevent="submitForm">
+      <v-form v-model="valid" class="my-2" @submit.prevent="submitForm">
         <v-img :src="Logo" width="200" max-height="100" class="mx-auto mb-5" />
         <v-card class="mx-auto bg-transparent" width="400" flat>
           <!-- Solana Address -->
@@ -35,7 +35,7 @@
           </p>
         </v-card>
         <v-expand-transition>
-          <v-card class="bg-transparent" v-if="isValidTransaction" flat>
+          <v-card v-if="isValidTransaction" class="bg-transparent" flat>
             <v-card-subtitle class="text-center my-5">
               Enter the following information manually <strong>OR</strong> scan the QR code with Threefold Connect app
             </v-card-subtitle>
@@ -90,9 +90,9 @@
                     :style="{ cursor: 'pointer', width: '9rem' }"
                     class="mx-2"
                     :title="app.alt"
-                    v-html="app.src"
                     :href="app.url"
                     target="_blank"
+                    v-html="app.src"
                   />
                 </div>
               </v-col>
@@ -100,7 +100,7 @@
           </v-card>
         </v-expand-transition>
       </v-form>
-      <v-dialog max-width="500" v-model="isActive">
+      <v-dialog v-model="isActive" max-width="500">
         <v-card>
           <v-card-text> {{ confirmMessage }} </v-card-text>
 

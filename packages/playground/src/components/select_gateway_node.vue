@@ -24,7 +24,7 @@
         :model-value="$props.modelValue"
         @update:model-value="$emit('update:model-value', $event)"
       >
-        <template v-if="page !== -1" v-slot:append-item>
+        <template v-if="page !== -1" #append-item>
           <div class="px-4 mt-4">
             <v-btn
               block

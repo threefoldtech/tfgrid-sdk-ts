@@ -51,7 +51,7 @@
     </template>
 
     <!-- Forward slots to the host component -->
-    <template v-for="slot in Object.keys($slots) as any[]" v-slot:[slot]="scope">
+    <template v-for="slot in Object.keys($slots) as any[]" #[slot]="scope">
       <slot :name="slot" v-bind="scope" />
     </template>
 
@@ -89,6 +89,9 @@ import type { VDataTableHeader } from "../types";
 
 export default {
   name: "ListTable",
+  // inheritAttrs: true will allow to use @click:row from <ListTable @click:row="listener" />
+  // by default it's true but added he to make it clear
+  inheritAttrs: true,
   props: {
     headers: { type: Object as PropType<VDataTableHeader>, required: true },
     items: { type: Array as PropType<any[]>, required: true },
@@ -98,9 +101,6 @@ export default {
     noDataText: String,
     returnObject: Boolean,
   },
-  // inheritAttrs: true will allow to use @click:row from <ListTable @click:row="listener" />
-  // by default it's true but added he to make it clear
-  inheritAttrs: true,
   emit: { "update:model-value": (value: any[]) => value },
   setup(props, { emit }) {
     const selectedItems = ref<any[]>([]);

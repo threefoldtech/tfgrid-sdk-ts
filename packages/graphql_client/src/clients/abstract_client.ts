@@ -102,10 +102,13 @@ export abstract class AbstractClient {
 
   private static normalizeFields<T>(fields: PartialBoolean<T>): string {
     return Object.entries(fields)
-      .reduce((out, [key, value]: any) => {
-        out.push(value === true ? key : `${key}{${AbstractClient.normalizeFields(value)}}`);
-        return out;
-      }, <string[]>[])
+      .reduce(
+        (out, [key, value]: any) => {
+          out.push(value === true ? key : `${key}{${AbstractClient.normalizeFields(value)}}`);
+          return out;
+        },
+        <string[]>[],
+      )
       .join(",");
   }
 }

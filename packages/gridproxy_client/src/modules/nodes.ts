@@ -15,7 +15,11 @@ export class NodesClient extends AbstractClient<NodesBuilder, NodesQuery> {
   public farms: Map<number, Farm>;
   public twins: Map<number, Twin>;
 
-  constructor(uri: string, private readonly __farmsClient: FarmsClient, private readonly __twinsClient: TwinsClient) {
+  constructor(
+    uri: string,
+    private readonly __farmsClient: FarmsClient,
+    private readonly __twinsClient: TwinsClient,
+  ) {
     super({
       uri,
       Builder: NodesBuilder,

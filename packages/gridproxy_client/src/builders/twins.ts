@@ -26,7 +26,10 @@ const TWINS_VALIDATOR: BuilderValidator<TwinsQuery> = {
 };
 
 export class TwinsBuilder extends AbstractBuilder<TwinsQuery> {
-  constructor(public uri: string, queries: Partial<TwinsQuery> = {}) {
+  constructor(
+    public uri: string,
+    queries: Partial<TwinsQuery> = {},
+  ) {
     super({
       mapper: TWINS_MAPPER,
       validator: TWINS_VALIDATOR,
@@ -35,5 +38,4 @@ export class TwinsBuilder extends AbstractBuilder<TwinsQuery> {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface TwinsBuilder extends BuilderMethods<TwinsQuery, TwinsBuilder> {}

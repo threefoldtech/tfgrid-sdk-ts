@@ -27,7 +27,7 @@
               :items="cardsIds"
               variant="outlined"
             >
-              <template v-slot:selection="{ item }">
+              <template #selection="{ item }">
                 <v-chip>
                   {{ item.title }}
                 </v-chip>

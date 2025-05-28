@@ -35,10 +35,7 @@ async function updateStats(r) {
   }
 }
 function initTargeRequests(urls) {
-  return urls.map(url =>
-    //   eslint-disable-next-line no-undef
-    ngx.fetch(url, { verify: false }).then(res => res.json()),
-  );
+  return urls.map(url => ngx.fetch(url, { verify: false }).then(res => res.json()));
 }
 async function fetchStats(r) {
   let retries = 0;

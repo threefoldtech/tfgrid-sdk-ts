@@ -102,7 +102,11 @@ export interface StoragePool {
 class Nodes {
   gqlClient: Graphql;
   rmb: RMB;
-  constructor(public graphqlURL: string, public proxyURL: string, rmbClient: RMBClient) {
+  constructor(
+    public graphqlURL: string,
+    public proxyURL: string,
+    rmbClient: RMBClient,
+  ) {
     this.gqlClient = new Graphql(graphqlURL);
     this.rmb = new RMB(rmbClient);
   }

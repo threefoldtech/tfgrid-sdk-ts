@@ -114,7 +114,7 @@ class DeploymentFactory {
   async fromObj(deployment): Promise<Deployment> {
     // Deep copy to create plain objects with deletable properties (needed for class-transformer's discriminator)
     const deploymentCopy = JSON.parse(JSON.stringify(deployment));
-    
+
     for (const workload of deploymentCopy.workloads) {
       workload.data["__type"] = workload.type;
       if (workload.result && workload.result.data) {

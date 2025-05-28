@@ -18,7 +18,7 @@
     <v-tooltip
       text="Allows adjusting the size of the root filesystem. The root filesystem is the primary storage location for the operating system and its associated files."
     >
-      <template v-slot:activator="{ props: switchProps }">
+      <template #activator="{ props: switchProps }">
         <v-switch v-model="edit" inset color="primary" v-bind="switchProps" />
       </template>
     </v-tooltip>

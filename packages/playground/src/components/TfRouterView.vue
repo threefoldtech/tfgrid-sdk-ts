@@ -3,7 +3,7 @@
     <router-view v-slot="{ Component, route: currentRoute }">
       <div :key="currentRoute.path">
         <component :is="Component" v-if="isAuth || currentRoute.meta.publicPath" />
-        <ConnectWalletLanding v-else @openProfile="$emit('openProfile')" />
+        <ConnectWalletLanding v-else @open-profile="$emit('openProfile')" />
       </div>
     </router-view>
   </div>

@@ -3,7 +3,7 @@
     <v-col v-for="card in cards" :key="card.title" cols="12" sm="12" lg="6" :xl="cards.length > 3 ? 4 : 6">
       <router-link :to="card.route">
         <v-hover>
-          <template v-slot:default="{ isHovering, props }">
+          <template #default="{ isHovering, props }">
             <v-card
               :height="200"
               class="pa-3 pt-6"

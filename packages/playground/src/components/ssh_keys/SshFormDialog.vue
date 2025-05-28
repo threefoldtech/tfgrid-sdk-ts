@@ -6,7 +6,7 @@
     @click:outside="() => $emit('close')"
     @keydown.esc="() => $emit('close')"
   >
-    <template v-slot:default>
+    <template #default>
       <v-form v-model="isValidForm">
         <v-card>
           <v-toolbar color="primary" class="custom-toolbar">

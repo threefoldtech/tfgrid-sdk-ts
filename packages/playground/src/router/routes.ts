@@ -16,7 +16,6 @@ enum VirtualMachinesRoutes {
   MicroVirtualMachine = "/deploy/virtual-machines/micro-virtual-machine/",
 }
 
-
 enum FarmRoutes {
   BaseRoute = "/farms/",
   YourFarms = "/farms/your-farms/",

@@ -229,12 +229,10 @@ class TFContracts extends Contracts {
       filterQuery += " , AND: [";
 
       if (options.type) {
-        // eslint-disable-next-line no-useless-escape
         filterQuery += `{ deploymentData_contains: \"\\\"type\\\":\\\"${options.type}\\\"\" },`;
       }
 
       if (options.projectName) {
-        // eslint-disable-next-line no-useless-escape
         filterQuery += `{ deploymentData_contains: \"\\\"projectName\\\":\\\"${options.projectName}\" }`;
       }
 

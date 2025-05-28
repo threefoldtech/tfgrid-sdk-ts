@@ -62,7 +62,10 @@ class QueryClient {
   council: QueryCouncil = new QueryCouncil(this);
   __disconnectHandler = this.newProvider.bind(this);
 
-  constructor(public url: string, public keepReconnecting: boolean = false) {}
+  constructor(
+    public url: string,
+    public keepReconnecting: boolean = false,
+  ) {}
 
   async loadKeyPairOrSigner(): Promise<void> {} // to be overridden in the full client
   checkInputs(): void {
@@ -409,7 +412,6 @@ class Client extends QueryClient {
   }
 
   patchExtrinsic<R>(extrinsic: Extrinsic, options: PatchExtrinsicOptions<R> = {}): ExtrinsicResult<R> {
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this;
     (<any>extrinsic).apply = async () => {
       const res = await self.applyExtrinsic(extrinsic, options.resultSections, options.resultEvents, options.map);

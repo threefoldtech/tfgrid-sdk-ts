@@ -2,8 +2,8 @@ import { Expose, Transform } from "class-transformer";
 import { IsBoolean, IsEnum, IsInt, IsNotEmpty, IsString, Min } from "class-validator";
 
 import { ValidateMembers } from "../helpers";
-import { WorkloadData, WorkloadDataResult } from "./workload_base";
 import { WorkloadTypes } from "./workload";
+import { WorkloadData, WorkloadDataResult } from "./workload_base";
 
 enum ZdbModes {
   seq = "seq",

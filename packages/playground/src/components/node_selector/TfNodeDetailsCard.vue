@@ -188,7 +188,7 @@
       </VRow>
       <div v-if="node && (rentedByUser || (node.status !== 'down' && node.rentable))" class="ml-auto text-right">
         <v-tooltip bottom color="primary" close-delay="100" :disabled="!(node && node.dedicated)">
-          <template v-slot:activator="{ isActive, props }">
+          <template #activator="{ isActive, props }">
             <span v-bind="props" class="font-weight-bold" v-on="isActive"><v-icon class="scale_beat mr-2" color="warning" :disabled="!(node && node.dedicated)">mdi-brightness-percent</v-icon>{{ hourlyPriceAfterDiscount }} USD/Hour</span>
           </template>
 

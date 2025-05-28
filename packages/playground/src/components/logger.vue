@@ -4,7 +4,7 @@
       <v-expansion-panel eager>
         <v-expansion-panel-title :class="{ 'text-error': !!connectDB.error }">
           <span class="text-subtitle-1"> <VIcon icon="mdi-cog" /> Dashboard Logs ({{ logs.length }}) </span>
-          <template v-slot:actions>
+          <template #actions>
             <div>
               <VTooltip text="Download Logs">
                 <template #activator="{ props }">
@@ -54,7 +54,7 @@
               <v-divider />
             </template>
 
-            <template v-slot="{ item, index, active }">
+            <template #default="{ item, index, active }">
               <DynamicScrollerItem :item="item" :active="active" :data-index="index" tag="v-list-item">
                 <LogMessage :log="item" />
                 <v-divider />

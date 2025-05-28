@@ -68,14 +68,14 @@ type NormalizeMerge<T> = {
       ? Q[]
       : unknown
     : K extends keyof ByIdQueries
-    ? ReturnType<ByIdQueries[K]> extends Promise<infer Q>
-      ? Q
-      : unknown
-    : K extends keyof ConnectionQueries
-    ? ReturnType<ConnectionQueries[K]> extends Promise<infer Q>
-      ? Q
-      : unknown
-    : unknown;
+      ? ReturnType<ByIdQueries[K]> extends Promise<infer Q>
+        ? Q
+        : unknown
+      : K extends keyof ConnectionQueries
+        ? ReturnType<ConnectionQueries[K]> extends Promise<infer Q>
+          ? Q
+          : unknown
+        : unknown;
 };
 
 export interface TFGridGqlClient extends ListQueries, ByIdQueries, ConnectionQueries {}

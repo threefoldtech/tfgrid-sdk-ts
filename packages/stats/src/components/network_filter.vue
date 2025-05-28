@@ -26,12 +26,12 @@
       class="d-flex justify-end justify-lg-start justify-xl-start flex-wrap py-0 align-center"
     >
       <v-col
+        v-for="(network, index) in networks"
+        :key="index"
         cla
         cols="12"
         lg="3"
         xl="3"
-        v-for="(network, index) in networks"
-        :key="index"
         class="py-0 px-1 d-flex text-center justify-center"
         :style="{ order: network.label === 'Main' ? 1 : 0 }"
       >
@@ -42,9 +42,9 @@
             color="primary"
             :disabled="loading"
             :model-value="network.value"
-            @update:model-value="updateNetworks($event, index)"
             inset
             :label="network.label + ' Nodes'"
+            @update:model-value="updateNetworks($event, index)"
           />
         </div>
       </v-col>
@@ -112,7 +112,7 @@ function updateNetworks(event: boolean | null, index: number) {
 </script>
 <script lang="ts">
 export default {
-  name: "networkFilter",
+  name: "NetworkFilter",
 };
 </script>
 
