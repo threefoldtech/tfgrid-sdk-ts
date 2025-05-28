@@ -68,12 +68,6 @@
         </input-tooltip>
       </AlgorandCapacity>
 
-      <TfRentalFilterSwitches
-        v-model:rentedByMe="rentedByMe"
-        v-model:dedicated="dedicated"
-        v-model:certified="certified"
-      />
-
       <TfSelectionDetails
         :filters-validators="{
           cpu: { min: type === 'relay' || type === 'indexer' ? 4 : 2 },
@@ -101,6 +95,9 @@
           wireguard,
         }"
         v-model="selectionDetails"
+        v-model:rentedByMe="rentedByMe"
+        v-model:dedicated="dedicated"
+        v-model:certified="certified"
       />
 
       <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
@@ -216,7 +213,6 @@ function updateSSHkeyEnv(selectedKeys: string) {
 import { FLISTS, type GridClient } from "@threefold/grid_client";
 
 import AlgorandCapacity from "../components/algorand_capacity.vue";
-import TfRentalFilterSwitches from "../components/filters/TfRentalFilterSwitches.vue";
 import Networks, { useNetworks } from "../components/networks.vue";
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";
@@ -226,6 +222,6 @@ import { normalizeError } from "../utils/helpers";
 
 export default {
   name: "TfAlgorand",
-  components: { AlgorandCapacity, Networks, ManageSshDeployemnt, TfRentalFilterSwitches },
+  components: { AlgorandCapacity, Networks, ManageSshDeployemnt },
 };
 </script>

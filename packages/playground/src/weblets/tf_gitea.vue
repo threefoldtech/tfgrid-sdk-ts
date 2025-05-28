@@ -57,12 +57,6 @@
           :has-smtp="smtp.enabled"
         />
 
-        <TfRentalFilterSwitches
-          v-model:rentedByMe="rentedByMe"
-          v-model:dedicated="dedicated"
-          v-model:certified="certified"
-        />
-
         <TfSelectionDetails
           :filters="{
             ipv4,
@@ -80,6 +74,9 @@
             wireguard,
           }"
           v-model="selectionDetails"
+          v-model:rentedByMe="rentedByMe"
+          v-model:dedicated="dedicated"
+          v-model:certified="certified"
           require-domain
         />
 
@@ -234,7 +231,6 @@ function updateSSHkeyEnv(selectedKeys: string) {
 import type { GridClient, VM } from "@threefold/grid_client";
 import { FLISTS } from "@threefold/grid_client";
 
-import TfRentalFilterSwitches from "../components/filters/TfRentalFilterSwitches.vue";
 import SmtpServer, { createSMTPServer } from "../components/smtp_server.vue";
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";
@@ -252,7 +248,6 @@ export default {
     ManageSshDeployemnt,
     SelectSolutionFlavor,
     SmtpServer,
-    TfRentalFilterSwitches,
   },
 };
 </script>

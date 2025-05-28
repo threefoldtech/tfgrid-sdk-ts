@@ -32,12 +32,6 @@
       v-model:wireguard="$props.modelValue.wireguard"
     />
 
-    <TfRentalFilterSwitches
-      v-model:rentedByMe="$props.modelValue.rentedByMe"
-      v-model:dedicated="$props.modelValue.dedicated"
-      v-model:certified="$props.modelValue.certified"
-    />
-
     <TfSelectionDetails
       :selected-machines="selectedMachines"
       :nodes-lock="nodesLock"
@@ -56,6 +50,9 @@
         wireguard: $props.modelValue.wireguard,
       }"
       v-model="$props.modelValue.selectionDetails"
+      v-model:rentedByMe="$props.modelValue.rentedByMe"
+      v-model:dedicated="$props.modelValue.dedicated"
+      v-model:certified="$props.modelValue.certified"
     />
   </div>
 </template>
@@ -68,7 +65,6 @@ import { computed, type PropType } from "vue";
 import { useGrid } from "@/stores";
 import type { SelectedMachine } from "@/types/nodeSelector";
 
-import TfRentalFilterSwitches from "../components/filters/TfRentalFilterSwitches.vue";
 import Networks from "../components/networks.vue";
 import type { CaproverWorker } from "../types";
 import { generateName } from "../utils/strings";
@@ -104,7 +100,7 @@ function toMachine(rootFilesystemSize: number, worker?: CaproverWorker): Selecte
 
 export default {
   name: "CaproverWorker",
-  components: { SelectSolutionFlavor, Networks, TfRentalFilterSwitches },
+  components: { SelectSolutionFlavor, Networks },
   props: {
     modelValue: {
       type: Object as PropType<CaproverWorker>,

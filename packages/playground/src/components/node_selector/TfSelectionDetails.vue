@@ -2,7 +2,21 @@
   <section class="mt-4">
     <template v-if="!disableNodeSelection">
       <h3 class="bg-primary pa-2 text-h6 rounded">Node Selection</h3>
-      <p class="text-h6 mb-4 mt-2 ml-2">Choose a way to select Node</p>
+
+      <TfRentalFilterSwitches
+        :rentedByMe="rentedByMe"
+        :dedicated="dedicated"
+        :certified="certified"
+        :hasGPU="hasGPU"
+        :showGPU="showGPU"
+        @update:rentedByMe="$emit('update:rentedByMe', $event)"
+        @update:dedicated="$emit('update:dedicated', $event)"
+        @update:certified="$emit('update:certified', $event)"
+        @update:hasGPU="$emit('update:hasGPU', $event)"
+        class="my-2"
+      />
+
+      <p class="text-h6 mb-4 ml-2">Choose a way to select Node</p>
 
       <v-radio-group v-model="wayToSelect" color="primary" inline>
         <InputTooltip
@@ -95,6 +109,7 @@ import type {
   SelectionDetailsFiltersValidators,
 } from "../../types/nodeSelector";
 import { createSelectionDetailsFiltersValidator } from "../../utils/nodeSelector";
+import TfRentalFilterSwitches from "../filters/TfRentalFilterSwitches.vue";
 import TfAutoNodeSelector from "./TfAutoNodeSelector.vue";
 import TfDomainName from "./TfDomainName.vue";
 import TfManualNodeSelector from "./TfManualNodeSelector.vue";
@@ -104,7 +119,15 @@ import TfSelectLocation from "./TfSelectLocation.vue";
 
 export default {
   name: "TfSelectionDetails",
-  components: { TfSelectLocation, TfSelectFarm, TfAutoNodeSelector, TfManualNodeSelector, TfSelectGpu, TfDomainName },
+  components: {
+    TfRentalFilterSwitches,
+    TfSelectLocation,
+    TfSelectFarm,
+    TfAutoNodeSelector,
+    TfManualNodeSelector,
+    TfSelectGpu,
+    TfDomainName,
+  },
   props: {
     modelValue: Object as PropType<SelectionDetails>,
     filters: {
@@ -128,10 +151,19 @@ export default {
       default: () => [],
     },
     nodesLock: Object as PropType<AwaitLock>,
+    rentedByMe: Boolean,
+    dedicated: Boolean,
+    certified: Boolean,
+    hasGPU: Boolean,
+    showGPU: Boolean,
   },
   emits: {
     "update:model-value": (value: SelectionDetails) => true || value,
     "update:status": (value: ValidatorStatus) => true || value,
+    "update:rentedByMe": (value: boolean) => true || value,
+    "update:dedicated": (value: boolean) => true || value,
+    "update:certified": (value: boolean) => true || value,
+    "update:hasGPU": (value: boolean) => true || value,
   },
   setup(props, ctx) {
     const input = ref<HTMLElement>();

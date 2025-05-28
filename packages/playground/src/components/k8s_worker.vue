@@ -76,12 +76,6 @@
       v-model.number="$props.modelValue.rootFsSize"
     />
 
-    <TfRentalFilterSwitches
-      v-model:rentedByMe="$props.modelValue.rentedByMe"
-      v-model:dedicated="$props.modelValue.dedicated"
-      v-model:certified="$props.modelValue.certified"
-    />
-
     <TfSelectionDetails
       :selected-machines="selectedMachines"
       :nodes-lock="nodesLock"
@@ -108,6 +102,9 @@
         wireguard: $props.modelValue.wireguard,
       }"
       v-model="$props.modelValue.selectionDetails"
+      v-model:rentedByMe="$props.modelValue.rentedByMe"
+      v-model:dedicated="$props.modelValue.dedicated"
+      v-model:certified="$props.modelValue.certified"
     />
   </div>
 </template>
@@ -120,7 +117,6 @@ import { computed, type PropType } from "vue";
 import { useGrid } from "@/stores";
 import type { SelectedMachine } from "@/types/nodeSelector";
 
-import TfRentalFilterSwitches from "../components/filters/TfRentalFilterSwitches.vue";
 import Networks from "../components/networks.vue";
 import type { K8SWorker } from "../types";
 import { generateName } from "../utils/strings";
@@ -162,7 +158,7 @@ function toMachine(worker?: K8SWorker): SelectedMachine | undefined {
 
 export default {
   name: "K8SWorker",
-  components: { RootFsSize, Networks, TfRentalFilterSwitches },
+  components: { RootFsSize, Networks },
   props: {
     modelValue: {
       type: Object as PropType<K8SWorker>,

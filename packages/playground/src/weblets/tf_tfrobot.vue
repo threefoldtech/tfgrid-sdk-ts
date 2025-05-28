@@ -55,12 +55,6 @@
           v-model:wireguard="wireguard"
         />
 
-        <TfRentalFilterSwitches
-          v-model:rentedByMe="rentedByMe"
-          v-model:dedicated="dedicated"
-          v-model:certified="certified"
-        />
-
         <TfSelectionDetails
           :filters="{
             ipv4,
@@ -78,6 +72,9 @@
             wireguard,
           }"
           v-model="selectionDetails"
+          v-model:rentedByMe="rentedByMe"
+          v-model:dedicated="dedicated"
+          v-model:certified="certified"
         />
 
         <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
@@ -284,7 +281,6 @@ watch(selectedSSHKeys, layoutMount, { deep: true });
 import { FLISTS, type GridClient } from "@threefold/grid_client";
 
 import ExpandableLayout from "../components/expandable_layout.vue";
-import TfRentalFilterSwitches from "../components/filters/TfRentalFilterSwitches.vue";
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";
 import type { Flist, solutionFlavor as SolutionFlavor } from "../types";
@@ -299,7 +295,6 @@ export default {
   components: {
     SelectSolutionFlavor,
     ExpandableLayout,
-    TfRentalFilterSwitches,
   },
 };
 </script>

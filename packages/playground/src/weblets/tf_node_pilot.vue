@@ -47,12 +47,6 @@
         require-domain
       />
 
-      <TfRentalFilterSwitches
-        v-model:rentedByMe="rentedByMe"
-        v-model:dedicated="dedicated"
-        v-model:certified="certified"
-      />
-
       <TfSelectionDetails
         :filters="{
           ipv4: ipv4,
@@ -68,6 +62,9 @@
           wireguard,
         }"
         v-model="selectionDetails"
+        v-model:rentedByMe="rentedByMe"
+        v-model:dedicated="dedicated"
+        v-model:certified="certified"
         require-domain
       />
 
@@ -208,7 +205,6 @@ function updateSSHkeyEnv(selectedKeys: string) {
 import type { GridClient, VM } from "@threefold/grid_client";
 import { FLISTS } from "@threefold/grid_client";
 
-import TfRentalFilterSwitches from "../components/filters/TfRentalFilterSwitches.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";
@@ -220,6 +216,6 @@ import { normalizeError } from "../utils/helpers";
 
 export default {
   name: "NodePilot",
-  components: { ManageSshDeployemnt, SelectSolutionFlavor, TfRentalFilterSwitches },
+  components: { ManageSshDeployemnt, SelectSolutionFlavor },
 };
 </script>

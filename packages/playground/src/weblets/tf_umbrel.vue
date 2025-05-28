@@ -83,12 +83,6 @@
         :large="{ cpu: 4, memory: 16, disk: 100 }"
       />
 
-      <TfRentalFilterSwitches
-        v-model:rentedByMe="rentedByMe"
-        v-model:dedicated="dedicated"
-        v-model:certified="certified"
-      />
-
       <TfSelectionDetails
         :filters-validators="{
           solutionDisk: { min: 10 },
@@ -109,6 +103,9 @@
           wireguard,
         }"
         v-model="selectionDetails"
+        v-model:rentedByMe="rentedByMe"
+        v-model:dedicated="dedicated"
+        v-model:certified="certified"
       />
 
       <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
@@ -226,7 +223,6 @@ import { calculateRootFileSystem, FLISTS, type GridClient } from "@threefold/gri
 
 import { updateGrid } from "@/utils/grid";
 
-import TfRentalFilterSwitches from "../components/filters/TfRentalFilterSwitches.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";
@@ -234,6 +230,6 @@ import type { SelectionDetails } from "../types/nodeSelector";
 
 export default {
   name: "TfUmbrel",
-  components: { SelectSolutionFlavor, ManageSshDeployemnt, TfRentalFilterSwitches },
+  components: { SelectSolutionFlavor, ManageSshDeployemnt },
 };
 </script>

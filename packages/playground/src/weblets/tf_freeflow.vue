@@ -58,12 +58,6 @@
         require-domain
       />
 
-      <TfRentalFilterSwitches
-        v-model:rentedByMe="rentedByMe"
-        v-model:dedicated="dedicated"
-        v-model:certified="certified"
-      />
-
       <TfSelectionDetails
         :filters="{
           ipv4,
@@ -82,6 +76,9 @@
         }"
         require-domain
         v-model="selectionDetails"
+        v-model:rentedByMe="rentedByMe"
+        v-model:dedicated="dedicated"
+        v-model:certified="certified"
       />
 
       <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
@@ -221,7 +218,6 @@ function updateSSHkeyEnv(selectedKeys: string) {
 </script>
 
 <script lang="ts">
-import TfRentalFilterSwitches from "../components/filters/TfRentalFilterSwitches.vue";
 import Networks, { useNetworks } from "../components/networks.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
@@ -231,6 +227,6 @@ import { updateGrid } from "../utils/grid";
 
 export default {
   name: "TFFreeflow",
-  components: { SelectSolutionFlavor, Networks, ManageSshDeployemnt, TfRentalFilterSwitches },
+  components: { SelectSolutionFlavor, Networks, ManageSshDeployemnt },
 };
 </script>

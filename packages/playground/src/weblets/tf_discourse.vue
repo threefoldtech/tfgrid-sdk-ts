@@ -69,12 +69,6 @@
           :has-smtp="true"
         />
 
-        <TfRentalFilterSwitches
-          v-model:rentedByMe="rentedByMe"
-          v-model:dedicated="dedicated"
-          v-model:certified="certified"
-        />
-
         <TfSelectionDetails
           :filters="{
             ipv4,
@@ -92,6 +86,9 @@
           }"
           require-domain
           v-model="selectionDetails"
+          v-model:rentedByMe="rentedByMe"
+          v-model:dedicated="dedicated"
+          v-model:certified="certified"
         />
 
         <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
@@ -272,7 +269,6 @@ watch(
 </script>
 
 <script lang="ts">
-import TfRentalFilterSwitches from "../components/filters/TfRentalFilterSwitches.vue";
 import Networks, { useNetworks } from "../components/networks.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import SmtpServer, { createSMTPServer } from "../components/smtp_server.vue";
@@ -288,7 +284,6 @@ export default {
     SelectSolutionFlavor,
     Networks,
     ManageSshDeployemnt,
-    TfRentalFilterSwitches,
   },
 };
 </script>

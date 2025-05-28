@@ -49,14 +49,6 @@
           require-domain
         />
 
-        <TfRentalFilterSwitches
-          v-model:rentedByMe="rentedByMe"
-          v-model:dedicated="dedicated"
-          v-model:certified="certified"
-          v-model:hasGPU="hasGPU"
-          :show-GPU="true"
-        />
-
         <TfSelectionDetails
           :filters="{
             ipv4,
@@ -76,6 +68,11 @@
           }"
           require-domain
           v-model="selectionDetails"
+          v-model:rentedByMe="rentedByMe"
+          v-model:dedicated="dedicated"
+          v-model:certified="certified"
+          v-model:hasGPU="hasGPU"
+          :showGPU="true"
         />
 
         <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
@@ -248,7 +245,6 @@ function updateSSHkeyEnv(selectedKeys: string) {
 <script lang="ts">
 import type { GridClient } from "@threefold/grid_client";
 
-import TfRentalFilterSwitches from "../components/filters/TfRentalFilterSwitches.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";
@@ -260,7 +256,6 @@ export default {
   components: {
     SelectSolutionFlavor,
     ManageSshDeployemnt,
-    TfRentalFilterSwitches,
   },
 };
 </script>

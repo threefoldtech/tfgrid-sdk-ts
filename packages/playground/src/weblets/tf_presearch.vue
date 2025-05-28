@@ -66,12 +66,6 @@
           v-model:wireguard="wireguard"
         />
 
-        <TfRentalFilterSwitches
-          v-model:rentedByMe="rentedByMe"
-          v-model:dedicated="dedicated"
-          v-model:certified="certified"
-        />
-
         <TfSelectionDetails
           :filters="{
             ipv4,
@@ -89,6 +83,9 @@
             wireguard,
           }"
           v-model="selectionDetails"
+          v-model:rentedByMe="rentedByMe"
+          v-model:dedicated="dedicated"
+          v-model:certified="certified"
         />
 
         <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
@@ -225,7 +222,6 @@ function updateSSHkeyEnv(selectedKeys: string) {
 <script lang="ts">
 import { calculateRootFileSystem, FLISTS, type GridClient } from "@threefold/grid_client";
 
-import TfRentalFilterSwitches from "../components/filters/TfRentalFilterSwitches.vue";
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";
 import type { SelectionDetails } from "../types/nodeSelector";
@@ -233,6 +229,6 @@ import { updateGrid } from "../utils/grid";
 
 export default {
   name: "TFPresearch",
-  component: { ManageSshDeployemnt, TfRentalFilterSwitches },
+  component: { ManageSshDeployemnt },
 };
 </script>
