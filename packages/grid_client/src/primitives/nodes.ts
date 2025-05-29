@@ -1,7 +1,6 @@
 import { SortBy, SortOrder } from "@threefold/gridproxy_client";
 import { Client as RMBClient } from "@threefold/rmb_direct_client";
-import { QueryClient } from "@threefold/tfchain_client";
-import { TFChainError } from "@threefold/tfchain_client";
+import { QueryClient, TFChainError } from "@threefold/tfchain_client";
 import { BaseError, GridClientError, GridClientErrors, RequestError, ValidationError } from "@threefold/types";
 import { default as PrivateIp } from "private-ip";
 import urlJoin from "url-join";
@@ -11,8 +10,7 @@ import { Graphql } from "../clients/graphql/client";
 import { Features, formatErrorMessage } from "../helpers";
 import { send, sendWithFullResponse } from "../helpers/requests";
 import { convertObjectToQueryString } from "../helpers/utils";
-import { FarmFilterOptions, FilterOptions, MachineModel, NodeStatus } from "../modules/models";
-import { WorkloadTypes } from "../zos";
+import { FarmFilterOptions, FilterOptions, NodeStatus } from "../modules/models";
 
 interface FarmInfo {
   name: string;
@@ -102,7 +100,11 @@ export interface StoragePool {
 class Nodes {
   gqlClient: Graphql;
   rmb: RMB;
-  constructor(public graphqlURL: string, public proxyURL: string, rmbClient: RMBClient) {
+  constructor(
+    public graphqlURL: string,
+    public proxyURL: string,
+    rmbClient: RMBClient,
+  ) {
     this.gqlClient = new Graphql(graphqlURL);
     this.rmb = new RMB(rmbClient);
   }
@@ -134,7 +136,6 @@ class Nodes {
     do {
       nodes = await this.filterNodes({
         accessNodeV4: true,
-        accessNodeV6: true,
         availableFor,
         page,
       });
