@@ -71,3 +71,33 @@ export function computePackageColor(packageName?: string): string {
       return "#f3f3f3";
   }
 }
+
+/**
+ * Calculates the additional TFT balance needed for a package upgrade
+ * 
+ * This function determines how many additional TFT tokens are needed for a
+ * package upgrade, considering the current price, any applied discount,
+ * and the user's existing balance.
+ * 
+ * @param priceTFT - The current price in TFT tokens
+ * @param appliedDiscount - The discount percentage (0-100) applied to the package
+ * @param needUpgrade - Flag indicating if an upgrade is required
+ * @param currentBalance - The user's current TFT balance
+ * @returns The additional TFT balance needed to perform the upgrade, or 0 if no upgrade is needed or balance is sufficient
+ */
+export function calculateUpgradeBalanceNeeded(
+  priceTFT: number,
+  appliedDiscount: number,
+  needUpgrade = false,
+  currentBalance = 0,
+) {
+  // If no upgrade is needed, return 0
+  if (!needUpgrade) return 0;
+
+  // Calculate original price before the applied discount
+  const originalPrice = (priceTFT * 100) / (100 - appliedDiscount);
+  
+  // Calculate balance needed; +1 to pass upgrade threshold
+  const balanceNeeded = Math.ceil(originalPrice * 18 - currentBalance) + 1;
+  return balanceNeeded > 0 ? balanceNeeded : 0;
+};
