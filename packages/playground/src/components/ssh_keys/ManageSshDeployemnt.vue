@@ -89,13 +89,12 @@ export default defineComponent({
     };
 
     function chipClass(key: SSHKeyData) {
-      if (isKeySelected(key)) {
-        return ["bg-primary", "v-chip--selected"];
-      } else  {
-        const keys = document.querySelectorAll(".keys .v-chip");
-        keys.forEach(key => key.classList.remove("v-chip--selected"));
-        return "anchor";
-      }
+      if (isKeySelected(key)) return ["bg-primary", "v-chip--selected"];
+      
+      const keys = document.querySelectorAll(".keys .v-chip");
+      keys.forEach(key => key.classList.remove("v-chip--selected"));
+      return "anchor";
+      
     }
 
     function selectKey(key: SSHKeyData) {
