@@ -1,5 +1,5 @@
 import cache from "./cache.js";
-
+/* global ngx */
 const RETRIES = 3;
 const cache_path = "/tmp/statsSummary.json";
 let URLS = [

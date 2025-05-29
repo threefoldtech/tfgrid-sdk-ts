@@ -24,7 +24,6 @@ const vueTsGeneratedConfigs = defineConfigWithVueTs(pluginVue.configs["flat/reco
     
     // --- WARN rules ---
     "@typescript-eslint/no-duplicate-enum-values": "warn",
-    "vue/no-dupe-keys": "warn",
     
     // --- ERROR rules ---
     "vue/multi-word-component-names": "error",
@@ -92,17 +91,16 @@ export default [
 
       // --- WARN rules ---
       "prettier/prettier": "warn",
-      "simple-import-sort/imports": "warn",
       "prefer-spread": "warn",
       "@typescript-eslint/no-restricted-types": [
         "warn",
         {
           types: {
-            Function: "Use specific function types instead.",
-            Object: "Use `Record<string, unknown>` or specific object types instead.",
-            String: "Use `string` instead.",
-            Number: "Use `number` instead.",
-            Boolean: "Use `boolean` instead.",
+            "Function": "Use specific function types instead.",
+            "Object": "Use `Record<string, unknown>` or specific object types instead.",
+            "String": "Use `string` instead.",
+            "Number": "Use `number` instead.",
+            "Boolean": "Use `boolean` instead.",
           },
         },
       ],
