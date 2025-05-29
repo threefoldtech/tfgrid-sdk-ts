@@ -84,7 +84,7 @@
           <span class="font-weight-black">{{ costLoading ? "Calculating..." : normalizeBalance(usd) }}</span>
           USD per month.
 
-          <div v-if="SelectedNode?.certificationType === 'Certified'">
+          <div v-if="selectedNode?.certificationType === 'Certified'">
             You selected a certified node. Please note that this deployment costs more TFT.
           </div>
         </div>
@@ -360,7 +360,7 @@ const onlyIPV4TftPrice = ref<number>();
 const onlyIPV4UsdPrice = ref<number>();
 
 watch(
-  () => [props.cpu, props.memory, props.disk, props.ipv4, props.dedicated, props.SelectedNode],
+  () => [props.cpu, props.memory, props.disk, props.ipv4, props.dedicated, props.selectedNode],
   debounce((value, oldValue) => {
     if (
       oldValue &&
@@ -412,7 +412,7 @@ async function loadCost(profile: { mnemonic: string }) {
     mru: typeof props.memory === "number" ? (props.memory ?? 0) / 1024 : 0,
     hru: 0,
     ipv4u: props.ipv4,
-    certified: props.SelectedNode?.certificationType === "Certified",
+    certified: props.selectedNode?.certificationType === "Certified",
   });
   await getIPv1Price(grid!);
   usd.value = props.dedicated ? dedicatedPrice : sharedPrice;
