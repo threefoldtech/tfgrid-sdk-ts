@@ -95,7 +95,7 @@ export default defineComponent({
         const keys = document.querySelectorAll(".keys .v-chip");
         keys.forEach(key => key.classList.remove("v-chip--selected"));
         return "anchor";
-     
+      }
     }
 
     function selectKey(key: SSHKeyData) {
