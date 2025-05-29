@@ -101,6 +101,7 @@ export function solutionHasGateway(projectName: ProjectName) {
     ProjectName.Nostr,
     ProjectName.StaticWebsite,
     ProjectName.NodePilot,
+    ProjectName.Openwebui,
   ];
 
   for (const solution of solutions) {
