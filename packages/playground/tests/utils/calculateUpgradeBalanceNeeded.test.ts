@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { calculateUpgradeBalanceNeeded } from "../../src/utils/pricing_calculator";
 
 describe("calculateUpgradeBalanceNeeded", () => {
@@ -35,10 +36,37 @@ describe("calculateUpgradeBalanceNeeded", () => {
     expect(calculateUpgradeBalanceNeeded(40, 60, true, 2000)).toBe(0);
   });
 
+  // Test when user balance is exactly at the threshold
+  it("should return 1 when current balance is exactly at threshold", () => {
+    // Price after 60% discount = 40, original price = 100
+    // 100 * 18 = 1800, balance = 1800
+    // Need 1 more to pass threshold
+    expect(calculateUpgradeBalanceNeeded(40, 60, true, 1800)).toBe(1);
+  });
+
   // Edge case test with small values
   it("should handle edge cases with very small TFT values", () => {
     // Price is 0.5, no discount
     // 0.5 * 18 = 9 + 1 = 10
     expect(calculateUpgradeBalanceNeeded(0.5, 0, true, 0)).toBe(10);
+  });
+
+  // Test error cases
+  it("should throw error when discount is 100%", () => {
+    expect(() => calculateUpgradeBalanceNeeded(100, 100, true, 0)).toThrow(
+      "Discount cannot be 100% (would result in division by zero)",
+    );
+  });
+
+  it("should throw error when discount is greater than 100%", () => {
+    expect(() => calculateUpgradeBalanceNeeded(100, 110, true, 0)).toThrow("Discount must be between 0 and 100");
+  });
+
+  it("should throw error when discount is negative", () => {
+    expect(() => calculateUpgradeBalanceNeeded(100, -10, true, 0)).toThrow("Discount must be between 0 and 100");
+  });
+
+  it("should throw error when price is negative", () => {
+    expect(() => calculateUpgradeBalanceNeeded(-100, 20, true, 0)).toThrow("Price cannot be negative");
   });
 });

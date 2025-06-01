@@ -246,7 +246,7 @@ import { useAsync } from "../hooks";
 import { useProfileManager } from "../stores";
 import { normalizeError } from "../utils/helpers";
 import { balanceRules, cruRules, hruRules, mruRules, nuRules, sruRules } from "../utils/pricing_calculator";
-import { computePackageColor, normalizePrice, calculateUpgradeBalanceNeeded } from "../utils/pricing_calculator";
+import { calculateUpgradeBalanceNeeded, computePackageColor, normalizePrice } from "../utils/pricing_calculator";
 export default {
   name: "PricingCalculator",
   setup() {
@@ -277,37 +277,44 @@ export default {
       return (
         valid.value &&
         !priceTask.value.loading &&
-        ( priceTask.value.data?.["sharedPackage"]?.package !== "gold" ||
-          priceTask.value.data?.["dedicatedPackage"]?.package !== "gold"
-        )
+        (priceTask.value.data?.["sharedPackage"]?.package !== "gold" ||
+          priceTask.value.data?.["dedicatedPackage"]?.package !== "gold")
       );
     });
 
     /**
      * Computes the balance to use for calculations based on user selection
      */
-    const balanceToUse = computed(() => 
-      userBalance.value && resources.value.useCurrentBalance 
-        ? userBalance.value.free 
-        : +resources.value.balance
+    const balanceToUse = computed(() =>
+      userBalance.value && resources.value.useCurrentBalance ? userBalance.value.free : +resources.value.balance,
     );
 
     const dedicatedUpgradePrice = computed(() => {
-      return calculateUpgradeBalanceNeeded(
-        dedicatedPriceTFT.value, 
-        priceTask.value.data?.dedicatedPackage?.discount ?? 0, 
-        needUpgrade.value,
-        balanceToUse.value,
-      );
+      try {
+        return calculateUpgradeBalanceNeeded(
+          dedicatedPriceTFT.value,
+          priceTask.value.data?.dedicatedPackage?.discount ?? 0,
+          needUpgrade.value,
+          balanceToUse.value,
+        );
+      } catch (error) {
+        console.error("Error calculating dedicated upgrade price:", error);
+        return 0;
+      }
     });
 
     const sharedUpgradePrice = computed(() => {
-      return calculateUpgradeBalanceNeeded(
-        sharedPriceTFT.value, 
-        priceTask.value.data?.sharedPackage?.discount ?? 0, 
-        needUpgrade.value,
-        balanceToUse.value,
-      );
+      try {
+        return calculateUpgradeBalanceNeeded(
+          sharedPriceTFT.value,
+          priceTask.value.data?.sharedPackage?.discount ?? 0,
+          needUpgrade.value,
+          balanceToUse.value,
+        );
+      } catch (error) {
+        console.error("Error calculating shared upgrade price:", error);
+        return 0;
+      }
     });
 
     const tftPriceTask = useAsync(() => calculator.tftPrice(), {
