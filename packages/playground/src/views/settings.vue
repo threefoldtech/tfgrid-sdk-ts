@@ -1,27 +1,48 @@
 <template>
   <view-layout>
-    <v-card color="primary" class="d-flex justify-center items-center mt-3 pa-3 text-center">
-      <v-icon size="30" class="pr-3">mdi-cog</v-icon>
-      <v-card-title class="pa-0">Settings</v-card-title>
+    <v-card
+      color="primary"
+      class="d-flex justify-center items-center mt-3 pa-3 text-center"
+    >
+      <v-icon
+        size="30"
+        class="pr-3"
+      >
+        mdi-cog
+      </v-icon>
+      <v-card-title class="pa-0">
+        Settings
+      </v-card-title>
     </v-card>
-    <v-card class="my-5"
-      ><v-card-title>Theme</v-card-title> <v-card-text>Pick an application theme!</v-card-text>
+    <v-card class="my-5">
+      <v-card-title>Theme</v-card-title> <v-card-text>Pick an application theme!</v-card-text>
 
-      <v-select class="pa-3 capitalize" :items="themes" v-model="selectedTheme" />
+      <v-select
+        v-model="selectedTheme"
+        class="pa-3 capitalize"
+        :items="themes"
+      />
 
       <v-card-actions class="justify-end mb-3 mx-3">
-        <v-btn :disabled="isCurrentTheme()" @click="UpdateTheme" class="justify-end ml-auto"
-          >Update</v-btn
-        ></v-card-actions
-      >
+        <v-btn
+          :disabled="isCurrentTheme()"
+          class="justify-end ml-auto"
+          @click="UpdateTheme"
+        >
+          Update
+        </v-btn>
+      </v-card-actions>
     </v-card>
-    <v-card class="my-5"
-      ><v-card-title>Password</v-card-title> <v-card-text>Change your password</v-card-text>
-      <form-validator ref="passFormRef" v-model="isValidPassword">
+    <v-card class="my-5">
+      <v-card-title>Password</v-card-title> <v-card-text>Change your password</v-card-text>
+      <form-validator
+        ref="passFormRef"
+        v-model="isValidPassword"
+      >
         <PasswordInputWrapper #="{ props: passwordInputProps }">
           <InputValidator
-            default-value=""
             v-model:value="currentPassword"
+            default-value=""
             :rules="[
               validators.required('Password is required.'),
               validators.minLength('Password must be at least 6 characters.', 6),
@@ -30,8 +51,8 @@
             #="{ props: validationProps }"
           >
             <VTextField
-              label="Current Password"
               v-model="currentPassword"
+              label="Current Password"
               v-bind="{ ...passwordInputProps, ...validationProps }"
               autocomplete="off"
               class="pa-3"
@@ -42,8 +63,8 @@
 
         <PasswordInputWrapper #="{ props: passwordInputProps }">
           <InputValidator
-            default-value=""
             v-model:value="newPassword"
+            default-value=""
             :rules="[
               validators.required('Password is required.'),
               validators.minLength('Password must be at least 6 characters.', 6),
@@ -55,8 +76,8 @@
             #="{ props: validationProps }"
           >
             <VTextField
-              label="New Password"
               v-model="newPassword"
+              label="New Password"
               v-bind="{ ...passwordInputProps, ...validationProps }"
               autocomplete="off"
               class="pa-3"
@@ -66,18 +87,18 @@
         </PasswordInputWrapper>
         <PasswordInputWrapper #="{ props: confirmPasswordInputProps }">
           <InputValidator
-            default-value=""
+            ref="confirmPasswordInput"
             v-model:value="confirmPassword"
+            default-value=""
             :rules="[
               validators.required('A confirmation password is required.'),
               validators.validateConfirmPassword('Passwords should match.', newPassword),
             ]"
             #="{ props: validationProps }"
-            ref="confirmPasswordInput"
           >
             <VTextField
-              label="Confirm Password"
               v-model="confirmPassword"
+              label="Confirm Password"
               v-bind="{
                 ...confirmPasswordInputProps,
                 ...validationProps,
@@ -90,26 +111,33 @@
         </PasswordInputWrapper>
       </form-validator>
       <v-card-actions class="justify-end mb-3 mx-3">
-        <v-btn :disabled="!isValidPassword" @click="UpdatePassword" class="justify-end ml-auto"
-          >Update</v-btn
-        ></v-card-actions
-      >
+        <v-btn
+          :disabled="!isValidPassword"
+          class="justify-end ml-auto"
+          @click="UpdatePassword"
+        >
+          Update
+        </v-btn>
+      </v-card-actions>
     </v-card>
-    <v-card class="my-5"
-      ><v-card-title>Timeout</v-card-title>
+    <v-card class="my-5">
+      <v-card-title>Timeout</v-card-title>
 
       <form-validator v-model="isValidTimeout">
         <v-card-text>
           Adjust Query Timeout
           <v-tooltip location="end">
             <template #activator="{ props: tooltipProps }">
-              <v-icon v-bind="tooltipProps"> mdi-information-outline </v-icon>
+              <v-icon v-bind="tooltipProps">
+                mdi-information-outline
+              </v-icon>
             </template>
             <span>Set desired queries timeout in seconds</span>
           </v-tooltip>
         </v-card-text>
 
         <input-validator
+          ref="timeoutQueryInput"
           :value="selectedQueryTimeout"
           :rules="[
             validators.required('Query timeout is required.'),
@@ -118,28 +146,30 @@
             validators.max('Query timeout maximum limit is 180 seconds', 3 * 60),
           ]"
           #="{ props }"
-          ref="timeoutQueryInput"
         >
           <v-text-field
+            v-bind="props"
+            v-model="selectedQueryTimeout"
             label="Enter Query timeout (sec)"
             class="pa-3"
-            v-bind="props"
             type="number"
-            v-model="selectedQueryTimeout"
             hide-details="auto"
-          ></v-text-field>
+          />
         </input-validator>
 
         <v-card-text>
           Adjust Deployment Timeout
           <v-tooltip location="end">
             <template #activator="{ props: tooltipProps }">
-              <v-icon v-bind="tooltipProps"> mdi-information-outline </v-icon>
+              <v-icon v-bind="tooltipProps">
+                mdi-information-outline
+              </v-icon>
             </template>
             <span>Set desired deployment timeout in seconds</span>
           </v-tooltip>
         </v-card-text>
         <input-validator
+          ref="timeoutDeploymentInput"
           :value="selectedDeploymentTimeout"
           :rules="[
             validators.required('Deployment timeout is required.'),
@@ -148,35 +178,47 @@
             validators.max('Deployment timeout maximum limit is 1800 seconds', 30 * 60),
           ]"
           #="{ props }"
-          ref="timeoutDeploymentInput"
         >
           <v-text-field
+            v-bind="props"
+            v-model="selectedDeploymentTimeout"
             label="Enter Deployment timeout (sec)"
             class="pa-3"
-            v-bind="props"
             type="number"
-            v-model="selectedDeploymentTimeout"
             hide-details="auto"
-          ></v-text-field>
+          />
         </input-validator>
         <v-card-actions class="justify-end mb-3 mx-3">
-          <v-tooltip location="top">
-            <template #activator="{ props: tooltipProps }">
-              <v-btn @click="ResetTimeoutToDefault" class="mr-2" v-bind="tooltipProps">Set Default Values</v-btn>
-            </template>
-            <span>Sets query timeout to 30s and deployment timeout to 300s. Click Update to apply.</span>
-          </v-tooltip>
-          <v-btn :disabled="!isValidTimeout || isCurrentTimeout()" @click="UpdateTimeout" class="justify-end"
-            >Update</v-btn
-          ></v-card-actions
-        >
+          <div class="d-inline-block">
+            <v-tooltip location="top">
+              <template #activator="{ props: tooltipProps }">
+                <span v-bind="tooltipProps">
+                  <v-btn
+                    :disabled="isOnDefaultTimeout"
+                    class="mr-2"
+                    @click="ResetTimeoutToDefault"
+                  >Set Default Values</v-btn>
+                </span>
+              </template>
+              <span v-if="isOnDefaultTimeout">Values are already set to defaults (query: 120s, deployment: 600s)</span>
+              <span v-else>Sets query timeout to 120s and deployment timeout to 600s. Click Update to apply.</span>
+            </v-tooltip>
+          </div>
+          <v-btn
+            :disabled="!isValidTimeout || isCurrentTimeout()"
+            class="justify-end"
+            @click="UpdateTimeout"
+          >
+            Update
+          </v-btn>
+        </v-card-actions>
       </form-validator>
     </v-card>
   </view-layout>
 </template>
 <script lang="ts">
 import type { GridClient } from "@threefold/grid_client";
-import { nextTick, onMounted, ref, watch } from "vue";
+import { nextTick, onMounted, ref, watch, computed } from "vue";
 import { useTheme } from "vuetify";
 
 import { useFormRef } from "@/hooks/form_validator";
@@ -196,6 +238,8 @@ import { updateCredentials } from "../utils/credentials";
 export default {
   name: "Settings",
   setup() {
+    const DEFAULT_QUERY_TIMEOUT = 120;
+    const DEFAULT_DEPLOYMENT_TIMEOUT = 600;
     const theme = useTheme();
 
     const themes: string[] = [ThemeInterface.Dark, ThemeInterface.Light, ThemeInterface.System];
@@ -296,10 +340,15 @@ export default {
     // This function only resets the input field values to defaults.
     // User still needs to click Update button to apply these changes.
     function ResetTimeoutToDefault() {
-      selectedQueryTimeout.value = 120;
-      selectedDeploymentTimeout.value = 600;
+      selectedQueryTimeout.value = DEFAULT_QUERY_TIMEOUT;
+      selectedDeploymentTimeout.value = DEFAULT_DEPLOYMENT_TIMEOUT;
     }
-
+    const isOnDefaultTimeout = computed(() => {
+      return (
+        selectedQueryTimeout.value == DEFAULT_QUERY_TIMEOUT &&
+        selectedDeploymentTimeout.value == DEFAULT_DEPLOYMENT_TIMEOUT
+      );
+    });
     async function UpdateTimeout() {
       try {
         const client = gridStore.client as GridClient;
@@ -348,6 +397,7 @@ export default {
       UpdatePassword,
       UpdateTimeout,
       ResetTimeoutToDefault,
+      isOnDefaultTimeout,
       isCurrentTheme,
       isCurrentTimeout,
       confirmPasswordInput,
