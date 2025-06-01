@@ -272,10 +272,20 @@ export async function loadValidNodes(
   pagination: ReturnType<typeof usePagination>,
   nodesLock?: AwaitLock,
 ): Promise<NodeInfo[]> {
-  if (nodesLock) {
-    await nodesLock.acquireAsync();
+  let lockAcquired = false;
+  try {
+    if (nodesLock) {
+      await nodesLock.acquireAsync();
+      lockAcquired = true;
+    }
+    return await _loadValidNodes(gridStore, selectionFitlers, filters, pagination);
+  } catch (error) {
+    throw error;
+  } finally {
+    if (lockAcquired && nodesLock) {
+      release(nodesLock);
+    }
   }
-  return _loadValidNodes(gridStore, selectionFitlers, filters, pagination);
 }
 
 async function _loadValidNodes(
