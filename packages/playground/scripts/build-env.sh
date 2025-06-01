@@ -3,7 +3,7 @@
 # Env vars with default values
 MODE="${MODE:=dev}"
 STELLAR_NETWORK="${STELLAR_NETWORK:=test}"
-TIMEOUT="${TIMEOUT:=10000}"
+TIMEOUT="${TIMEOUT:=120000}"
 PAGE_SIZE="${PAGE_SIZE:=20}"
 MINTING_URL="https://alpha.minting.tfchain.grid.tf"
 MANUAL_URL="${MANUAL_URL:-https://www.manual.grid.tf}"
