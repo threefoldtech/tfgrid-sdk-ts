@@ -11,7 +11,7 @@
       color="primary"
       variant="tonal"
       class="mb-0"
-      :max-height="$vuetify.display.xs ? 80 : 64"
+      :max-height="xs ? 80 : 64"
       closable
       @click:close="!alert"
     >
@@ -27,13 +27,13 @@
       >
         <v-img
           :src="Logo"
-          :width="$vuetify.display.xs ? 150 : 200"
+          :width="xs ? 150 : 200"
           max-height="100"
           class="mx-auto mb-5"
         />
         <v-card
           class="mx-auto bg-transparent"
-          :width="$vuetify.display.xs ? '100%' : 400"
+          :width="xs ? '100%' : 400"
           flat
         >
           <!-- Solana Address -->
@@ -67,20 +67,20 @@
           >
             <v-card-subtitle
               class="text-center my-5"
-              :class="$vuetify.display.xs ? 'text-body-2' : ''"
+              :class="xs ? 'text-body-2' : ''"
             >
               Enter the following information manually <strong>OR</strong> scan the QR code with Threefold Connect app
             </v-card-subtitle>
             <div
               class="border mt-5 mb-2"
-              :class="$vuetify.display.xs ? 'pa-2' : 'pa-5'"
+              :class="xs ? 'pa-2' : 'pa-5'"
             >
               <v-row>
-                <v-col :cols="$vuetify.display.smAndDown ? 12 : 'auto'">
+                <v-col :cols="smAndDown ? 12 : 'auto'">
                   <v-card
-                    :width="$vuetify.display.xs ? '100%' : 400"
+                    :width="xs ? '100%' : 400"
                     class="mx-auto bg-transparent"
-                    :class="$vuetify.display.xs ? 'pa-2' : 'pa-5'"
+                    :class="xs ? 'pa-2' : 'pa-5'"
                     flat
                   >
                     <div class="text-subtitle-1 text-medium-emphasis mb-3">
@@ -108,7 +108,7 @@
                   </v-card>
                 </v-col>
                 <v-col
-                  v-if="!$vuetify.display.smAndDown"
+                  v-if="!smAndDown"
                   class="divider-container"
                   cols="auto"
                 >
@@ -116,23 +116,23 @@
                   <span class="divider-text text-grey-darken-1 mainBG">OR</span>
                 </v-col>
                 <v-col
-                  v-if="$vuetify.display.smAndDown"
+                  v-if="smAndDown"
                   cols="12"
                   class="text-center my-3"
                 >
                   <v-divider />
                   <span class="divider-text-horizontal text-grey-darken-1 mainBG">OR</span>
                 </v-col>
-                <v-col :cols="$vuetify.display.smAndDown ? 12 : 'auto'">
+                <v-col :cols="smAndDown ? 12 : 'auto'">
                   <v-card
-                    :width="$vuetify.display.xs ? '100%' : 400"
+                    :width="xs ? '100%' : 400"
                     class="bg-transparent"
                     flat
                   >
                     <v-img
                       :src="QRSrc"
                       alt="qrcode"
-                      :width="$vuetify.display.xs ? 150 : 200"
+                      :width="xs ? 150 : 200"
                       class="mx-auto"
                     />
                     <v-card-text class="mt-4">
@@ -147,14 +147,12 @@
               <v-col>
                 <div
                   class="mt-4"
-                  :class="
-                    $vuetify.display.xs ? 'd-flex flex-column align-center' : 'd-flex justify-center align-center'
-                  "
+                  :class="xs ? 'd-flex flex-column align-center' : 'd-flex justify-center align-center'"
                 >
-                  <p :class="$vuetify.display.xs ? 'mb-3 text-center' : 'mr-3'">
+                  <p :class="xs ? 'mb-3 text-center' : 'mr-3'">
                     Don't have the app? Download it now
                   </p>
-                  <div :class="$vuetify.display.xs ? 'd-flex align-center' : 'd-flex'">
+                  <div :class="xs ? 'd-flex align-center' : 'd-flex'">
                     <a
                       v-for="app in apps"
                       :key="app.alt"
@@ -162,7 +160,7 @@
                       target="_blank"
                       :title="app.alt"
                       style="cursor: pointer"
-                      :class="$vuetify.display.xs ? 'my-1 mr-2' : 'mx-2'"
+                      :class="xs ? 'my-1 mr-2' : 'mx-2'"
                       v-html="app.src"
                     />
                   </div>
@@ -174,7 +172,7 @@
       </v-form>
       <v-dialog
         v-model="isActive"
-        :max-width="$vuetify.display.xs ? '90%' : 500"
+        :max-width="xs ? '90%' : 500"
       >
         <v-card>
           <v-card-text> {{ confirmMessage }} </v-card-text>
@@ -203,6 +201,7 @@ import { computed, ref, watch } from "vue";
 
 import Logo from "../assets/logo_tft.png";
 import { BRIDGE_ADDRESS, transferTFT } from "../services/stellar";
+import { useDisplay } from "vuetify";
 
 const fromAddress = ref("");
 const toAddress = ref();
@@ -227,6 +226,7 @@ const apps = [
     url: "https://apps.apple.com/us/app/threefold-connect/id1459845885",
   },
 ];
+const { xs, smAndDown } = useDisplay();
 const stellarSeedRules = computed(() => [
   (v: string) => !!v || "Stellar seed is required",
   (v: string) => validateStellarSeed(v) || "Invalid Stellar secret seed",
