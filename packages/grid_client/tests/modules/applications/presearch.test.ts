@@ -4,6 +4,7 @@ import { setTimeout } from "timers/promises";
 import { FilterOptions, generateString, GridClient, MachinesModel, randomChoice } from "../../../src";
 import { config, getClient } from "../../client_loader";
 import { GBToBytes, generateInt, getOnlineNode, log, RemoteRun, splitIP } from "../../utils";
+import { FLISTS } from "../../../src/helpers/flists";
 
 jest.setTimeout(900000);
 
@@ -86,8 +87,8 @@ test("TC2728 - Applications: Deploy Presearch", async () => {
             mountpoint: mountPoint,
           },
         ],
-        flist: "https://hub.grid.tf/tf-official-apps/presearch-v2.3.flist",
-        entrypoint: "/sbin/zinit init",
+        flist: FLISTS.PRESEARCH.value,
+        entrypoint: FLISTS.PRESEARCH.entryPoint,
         public_ip: publicIp,
         planetary: true,
         mycelium: true,

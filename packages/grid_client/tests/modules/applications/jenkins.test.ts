@@ -12,6 +12,7 @@ import {
 } from "../../../src";
 import { config, getClient } from "../../client_loader";
 import { generateInt, getOnlineNode, log } from "../../utils";
+import { FLISTS } from "../../../src/helpers/flists";
 
 jest.setTimeout(1250000);
 
@@ -110,8 +111,8 @@ test("TC2953 - Applications: Deploy Jenkins", async () => {
             mountpoint: mountPoint,
           },
         ],
-        flist: "https://hub.grid.tf/tf-official-apps/jenkins-latest.flist",
-        entrypoint: "/sbin/zinit init",
+        flist: FLISTS.JENKINS.value,
+        entrypoint: FLISTS.JENKINS.entryPoint,
         public_ip: publicIp,
         planetary: true,
         mycelium: true,

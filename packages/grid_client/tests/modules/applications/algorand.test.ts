@@ -1,7 +1,7 @@
 import { FilterOptions, generateString, GridClient, MachinesModel, randomChoice } from "../../../src";
 import { config, getClient } from "../../client_loader";
 import { GBToBytes, generateInt, getOnlineNode, log, RemoteRun, splitIP } from "../../utils";
-
+import { FLISTS } from "../../../src/helpers/flists";
 jest.setTimeout(900000);
 
 let gridClient: GridClient;
@@ -84,8 +84,8 @@ test("TC2727 - Applications: Deploy Algorand", async () => {
             mountpoint: mountPoint,
           },
         ],
-        flist: "https://hub.grid.tf/tf-official-apps/algorand-latest.flist",
-        entrypoint: "/sbin/zinit init",
+        flist: FLISTS.ALGORAND.value,
+        entrypoint: FLISTS.ALGORAND.entryPoint,
         public_ip: publicIp,
         planetary: true,
         mycelium: true,

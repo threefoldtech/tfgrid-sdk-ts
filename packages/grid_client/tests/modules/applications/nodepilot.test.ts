@@ -4,6 +4,7 @@ import { setTimeout } from "timers/promises";
 import { Features, FilterOptions, generateString, GridClient, MachinesModel, randomChoice } from "../../../src";
 import { config, getClient } from "../../client_loader";
 import { GBToBytes, generateInt, getOnlineNode, log, splitIP } from "../../utils";
+import { FLISTS } from "../../../src/helpers/flists";
 
 jest.setTimeout(1250000);
 
@@ -99,8 +100,8 @@ test.skip("TC2701 - Applications: Deploy Nodepilot", async () => {
             mountpoint: mountPoint2,
           },
         ],
-        flist: "https://hub.grid.tf/tf-official-vms/node-pilot-zdbfs.flist",
-        entrypoint: "/",
+        flist: FLISTS.NODEPILOT.value,
+        entrypoint: FLISTS.NODEPILOT.entryPoint,
         public_ip: publicIp,
         planetary: true,
         mycelium: true,

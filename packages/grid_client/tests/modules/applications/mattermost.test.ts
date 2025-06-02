@@ -12,6 +12,7 @@ import {
 } from "../../../src";
 import { config, getClient } from "../../client_loader";
 import { GBToBytes, generateInt, getOnlineNode, log, splitIP } from "../../utils";
+import { FLISTS } from "../../../src/helpers/flists";
 
 jest.setTimeout(1250000);
 
@@ -113,8 +114,8 @@ test("TC2689 - Applications: Deploy Mattermost", async () => {
             mountpoint: mountPoint,
           },
         ],
-        flist: "https://hub.grid.tf/tf-official-apps/mattermost-latest.flist",
-        entrypoint: "/sbin/zinit init",
+        flist: FLISTS.MATTERMOST.value,
+        entrypoint: FLISTS.MATTERMOST.entryPoint,
         public_ip: publicIp,
         planetary: true,
         mycelium: true,

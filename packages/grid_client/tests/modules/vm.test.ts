@@ -9,6 +9,7 @@ import {
 } from "../../src";
 import { config, getClient } from "../client_loader";
 import { GBToBytes, generateInt, getOnlineNode, log, RemoteRun, splitIP } from "../utils";
+import { FLISTS } from "../../src/helpers/flists";
 
 jest.setTimeout(300000);
 
@@ -110,8 +111,8 @@ test("TC1228 - VM: Deploy a VM", async () => {
         memory: memory,
         rootfs_size: rootfsSize,
         disks: disks,
-        flist: "https://hub.grid.tf/tf-official-apps/threefoldtech-ubuntu-22.04.flist",
-        entrypoint: "/sbin/zinit init",
+        flist: FLISTS.MICROVMS_UBUNTU_24.flist,
+        entrypoint: FLISTS.MICROVMS_UBUNTU_24.entryPoint,
         public_ip: publicIP,
         planetary: true,
         mycelium: true,
@@ -281,8 +282,8 @@ test("TC2847 - VM: Deploy a VM With Mycelium", async () => {
         memory: memory,
         rootfs_size: rootfsSize,
         disks: disks,
-        flist: "https://hub.grid.tf/tf-official-apps/base:latest.flist",
-        entrypoint: "/sbin/zinit init",
+        flist: FLISTS.MICROVMS_UBUNTU_24.flist,
+        entrypoint: FLISTS.MICROVMS_UBUNTU_24.entryPoint,
         public_ip: publicIP,
         planetary: true,
         mycelium: true,
@@ -485,8 +486,8 @@ test("TC1229 - VM: Deploy a VM With a Disk", async () => {
             mountpoint: mountPoint,
           },
         ],
-        flist: "https://hub.grid.tf/tf-official-apps/base:latest.flist",
-        entrypoint: "/sbin/zinit init",
+        flist: FLISTS.MICROVMS_UBUNTU_24.flist,
+        entrypoint: FLISTS.MICROVMS_UBUNTU_24.entryPoint,
         public_ip: publicIP,
         planetary: true,
         mycelium: true,
@@ -662,8 +663,8 @@ test("TC1230 - VM: Deploy Multiple VMs on Different Nodes", async () => {
     memory: vmMemory[0],
     rootfs_size: vmRootfs[0],
     disks: vmDisks,
-    flist: "https://hub.grid.tf/tf-official-apps/base:latest.flist",
-    entrypoint: "/sbin/zinit init",
+    flist: FLISTS.MICROVMS_UBUNTU_24.flist,
+    entrypoint: FLISTS.MICROVMS_UBUNTU_24.entryPoint,
     public_ip: vmPublicIP,
     planetary: true,
     mycelium: true,
@@ -680,8 +681,8 @@ test("TC1230 - VM: Deploy Multiple VMs on Different Nodes", async () => {
     memory: vmMemory[1],
     rootfs_size: vmRootfs[1],
     disks: vmDisks,
-    flist: "https://hub.grid.tf/tf-official-apps/base:latest.flist",
-    entrypoint: "/sbin/zinit init",
+    flist: FLISTS.MICROVMS_UBUNTU_24.flist,
+    entrypoint: FLISTS.MICROVMS_UBUNTU_24.entryPoint,
     public_ip: vmPublicIP,
     planetary: true,
     mycelium: true,
@@ -850,8 +851,8 @@ test("TC3850 - VM: Deploy a ZOS3 Lite VM with Mycelium", async () => {
         memory,
         rootfs_size: rootfsSize,
         disks: [],
-        flist: "https://hub.grid.tf/tf-official-apps/base:latest.flist",
-        entrypoint: "/sbin/zinit init",
+        flist: FLISTS.MICROVMS_UBUNTU_24.flist,
+        entrypoint: FLISTS.MICROVMS_UBUNTU_24.entryPoint,
         public_ip: false,
         planetary: true,
         mycelium: true,

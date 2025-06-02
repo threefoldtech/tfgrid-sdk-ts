@@ -12,6 +12,7 @@ import {
 } from "../../../src";
 import { config, getClient } from "../../client_loader";
 import { GBToBytes, generateInt, getOnlineNode, log, splitIP } from "../../utils";
+import { FLISTS } from "../../../src/helpers/flists";
 
 jest.setTimeout(1250000);
 
@@ -113,8 +114,8 @@ test("TC2684 - Applications: Deploy Peertube", async () => {
             mountpoint: mountPoint,
           },
         ],
-        flist: "https://hub.grid.tf/tf-official-apps/peertube-v3.1.1.flist",
-        entrypoint: "/sbin/zinit init",
+        flist: FLISTS.PEERTUBE.value,
+        entrypoint: FLISTS.PEERTUBE.entryPoint,
         public_ip: publicIp,
         planetary: true,
         mycelium: true,

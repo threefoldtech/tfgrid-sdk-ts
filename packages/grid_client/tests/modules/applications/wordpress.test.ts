@@ -12,6 +12,7 @@ import {
 } from "../../../src";
 import { config, getClient } from "../../client_loader";
 import { GBToBytes, generateInt, getOnlineNode, log, splitIP } from "../../utils";
+import { FLISTS } from "../../../src/helpers/flists";
 
 jest.setTimeout(1250000);
 
@@ -113,8 +114,8 @@ test("TC2700 - Applications: Deploy Wordpress", async () => {
             mountpoint: mountPoint,
           },
         ],
-        flist: "https://hub.grid.tf/tf-official-apps/tf-wordpress-latest.flist",
-        entrypoint: "/sbin/zinit init",
+        flist: FLISTS.WORDPRESS.value,
+        entrypoint: FLISTS.WORDPRESS.entryPoint,
         public_ip: publicIp,
         planetary: true,
         mycelium: true,
