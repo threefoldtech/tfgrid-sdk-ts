@@ -238,7 +238,7 @@ import { updateCredentials } from "../utils/credentials";
 export default {
   name: "Settings",
   setup() {
-    const DEFAULT_QUERY_TIMEOUT = 120;
+    const DEFAULT_QUERY_TIMEOUT = 10;
     const DEFAULT_DEPLOYMENT_TIMEOUT = 600;
     const theme = useTheme();
 
