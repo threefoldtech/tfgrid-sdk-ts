@@ -22,9 +22,9 @@
         location="top"
         text="Show failed deployments"
       >
-        <template #activator="{ props }">
+        <template #activator="{ props: slotProps }">
           <v-icon
-            v-bind="props"
+            v-bind="slotProps"
             class="custom-icon"
             @click="showDialog = true"
           >
@@ -143,8 +143,8 @@
           :text="item.flist"
           location="bottom right"
         >
-          <template #activator="{ props }">
-            <p v-bind="props">
+          <template #activator="{ props: slotProps }">
+            <p v-bind="slotProps">
               {{ renameFlist(item.flist) }}
             </p>
           </template>

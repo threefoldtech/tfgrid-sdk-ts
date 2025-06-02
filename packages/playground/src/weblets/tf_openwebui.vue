@@ -32,10 +32,10 @@
         </input-validator>
 
         <SelectSolutionFlavor
+          v-model="solution"
           :small="{ cpu: 4, memory: 16, disk: 125 }"
           :medium="{ cpu: 8, memory: 32, disk: 250 }"
           :large="{ cpu: 16, memory: 64, disk: 500 }"
-          v-model="solution"
         />
 
         <Networks
