@@ -347,6 +347,7 @@ export default {
     }
 
     onUnmounted(() => {
+      release(props.nodesLock);
       bindModelValue();
       bindStatus();
     });
