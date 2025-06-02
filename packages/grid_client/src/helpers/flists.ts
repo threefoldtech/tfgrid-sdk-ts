@@ -20,11 +20,6 @@ export const FLISTS = {
     flist: "https://hub.grid.tf/tf-official-vms/ubuntu-18.04-lts.flist",
     entryPoint: "",
   },
-  FULLVMS_NIXOS_22: {
-    name: "Nixos-22.11",
-    flist: "https://hub.grid.tf/tf-official-vms/nixos-22.11.flist",
-    entryPoint: "",
-  },
 
   // MicroVMs
   MICROVMS_UBUNTU_24: {
@@ -60,11 +55,6 @@ export const FLISTS = {
   MICROVMS_CENTOS_9: {
     name: "CentOS-9",
     flist: "https://hub.grid.tf/tf-official-apps/centos-stream9.flist",
-    entryPoint: "/entrypoint.sh",
-  },
-  MICROVMS_NIXOS: {
-    name: "Nixos",
-    flist: "https://hub.grid.tf/tf-official-vms/nixos-22.11.flist",
     entryPoint: "/entrypoint.sh",
   },
 
