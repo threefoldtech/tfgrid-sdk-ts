@@ -13,8 +13,8 @@
         inset
         label="GPU"
         :model-value="hasGPUModel"
-        @update:model-value="onUpdateHasGPU"
         hide-details
+        @update:model-value="onUpdateHasGPU"
       />
     </input-tooltip>
 
@@ -23,29 +23,36 @@
       inset
       label="Rented By Me"
       :model-value="rentedByMeModel"
-      @update:model-value="onUpdateRentedByMe"
       hide-details
+      @update:model-value="onUpdateRentedByMe"
     />
 
-    <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual?.dedicated_machines">
+    <input-tooltip
+      inline
+      tooltip="Click to know more about dedicated machines."
+      :href="manual?.dedicated_machines"
+    >
       <v-switch
         color="primary"
         inset
         label="Rentable"
         :model-value="dedicatedModel"
-        @update:model-value="onUpdateDedicated"
         hide-details
+        @update:model-value="onUpdateDedicated"
       />
     </input-tooltip>
 
-    <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
+    <input-tooltip
+      inline
+      tooltip="Renting capacity on certified nodes is charged 25% extra."
+    >
       <v-switch
         color="primary"
         inset
         label="Certified"
         :model-value="certifiedModel"
-        @update:model-value="onUpdateCertified"
         hide-details
+        @update:model-value="onUpdateCertified"
       />
     </input-tooltip>
   </div>
@@ -55,16 +62,19 @@
 import { computed } from "vue";
 
 import { manual } from "@/utils/manual";
+import { solutionType } from "@/types";
+
+import { useRoute } from "vue-router";
 
 const props = defineProps({
   rentedByMe: Boolean,
   dedicated: Boolean,
   certified: Boolean,
   hasGPU: Boolean,
-  showGPU: { type: Boolean, default: false },
 });
-
 const emit = defineEmits(["update:rentedByMe", "update:dedicated", "update:certified", "update:hasGPU"]);
+
+const route = useRoute();
 
 const rentedByMeModel = computed({
   get: () => !!props.rentedByMe,
@@ -85,6 +95,8 @@ const hasGPUModel = computed({
   get: () => !!props.hasGPU,
   set: val => emit("update:hasGPU", val),
 });
+
+const showGPU = computed(() => route.meta.title == solutionType.fullvm || route.meta.title == solutionType.openwebui);
 
 function onUpdateRentedByMe(val: boolean | null) {
   rentedByMeModel.value = !!val;

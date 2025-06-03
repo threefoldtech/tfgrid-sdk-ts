@@ -10,7 +10,6 @@
         :dedicated="dedicated"
         :certified="certified"
         :has-g-p-u="hasGPU"
-        :show-g-p-u="showGPU"
         class="my-2"
         @update:rented-by-me="$emit('update:rentedByMe', $event)"
         @update:dedicated="$emit('update:dedicated', $event)"
@@ -182,7 +181,6 @@ export default {
     dedicated: Boolean,
     certified: Boolean,
     hasGPU: Boolean,
-    showGPU: Boolean,
   },
   emits: {
     "update:model-value": (value: SelectionDetails) => true || value,

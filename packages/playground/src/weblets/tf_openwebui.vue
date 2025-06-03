@@ -6,50 +6,61 @@
     :ipv4="ipv4"
     :disk="disks.reduce((total, disk) => total + disk.size, solution?.disk + 2)"
     :dedicated="dedicated"
-    :rentedBy="rentedBy"
+    :rented-by="rentedBy"
     :SelectedNode="selectionDetails?.node"
     :valid-filters="selectionDetails?.validFilters"
     title-image="images/icons/openwebui.png"
   >
-    <template #title> Deploy an Open WebUI Instance </template>
+    <template #title>
+      Deploy an Open WebUI Instance
+    </template>
 
     <d-tabs :tabs="[{ title: 'Config', value: 'config' }]">
       <template #config>
         <input-validator
           :value="name"
           :rules="[
-              validators.required('Name is required.'),
-              validators.IsAlphanumericExpectUnderscore('Name should consist of letters ,numbers and underscores only.'),
-              (name: string) => validators.isAlpha('Name must start with an alphabetical character.')(name[0]),
-              validators.minLength('Name must be at least 2 characters.', 2),
-              validators.maxLength('Name cannot exceed 35 characters.', 35),
-            ]"
+            validators.required('Name is required.'),
+            validators.IsAlphanumericExpectUnderscore('Name should consist of letters ,numbers and underscores only.'),
+            (name: string) => validators.isAlpha('Name must start with an alphabetical character.')(name[0]),
+            validators.minLength('Name must be at least 2 characters.', 2),
+            validators.maxLength('Name cannot exceed 35 characters.', 35),
+          ]"
           #="{ props }"
         >
           <input-tooltip tooltip="Instance name.">
-            <v-text-field label="Name" v-model="name" v-bind="props" />
+            <v-text-field
+              v-model="name"
+              label="Name"
+              v-bind="props"
+            />
           </input-tooltip>
         </input-validator>
 
         <SelectSolutionFlavor
+          v-model="solution"
           :small="{ cpu: 4, memory: 16, disk: 125 }"
           :medium="{ cpu: 8, memory: 32, disk: 250 }"
           :large="{ cpu: 16, memory: 64, disk: 500 }"
-          v-model="solution"
         />
 
         <Networks
-          required
           v-model:ipv4="ipv4"
           v-model:ipv6="ipv6"
           v-model:planetary="planetary"
           v-model:mycelium="mycelium"
           v-model:wireguard="wireguard"
+          required
           :has-custom-domain="selectionDetails?.domain?.enabledCustomDomain"
           require-domain
         />
-        
+
         <TfSelectionDetails
+          v-model="selectionDetails"
+          v-model:rented-by-me="rentedByMe"
+          v-model:dedicated="dedicated"
+          v-model:certified="certified"
+          v-model:has-g-p-u="hasGPU"
           :filters="{
             ipv4,
             ipv6,
@@ -67,12 +78,6 @@
             wireguard,
           }"
           require-domain
-          v-model="selectionDetails"
-          v-model:rentedByMe="rentedByMe"
-          v-model:dedicated="dedicated"
-          v-model:certified="certified"
-          v-model:hasGPU="hasGPU"
-          :showGPU="true"
         />
 
         <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
@@ -83,8 +88,8 @@
       <v-btn
         variant="elevated"
         class="text-primery px-10 py-3 h-auto text-subtitle-1"
-        @click="validateBeforeDeploy(deploy)"
         text="Deploy"
+        @click="validateBeforeDeploy(deploy)"
       />
     </template>
   </weblet-layout>
