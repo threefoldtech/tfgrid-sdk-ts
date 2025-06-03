@@ -354,11 +354,11 @@ const filteredHeaders = computed(() => {
   if (props.projectName.toLowerCase() === ProjectName.Domains.toLowerCase()) {
     return [
       {
-        title: "Name",
-        key: "domain-name",
+        title: "Domain",
+        key: "fqdn",
         value(item: any) {
           const [workload] = item[0].workloads;
-          return workload.data.name || workload.name;
+          return workload.result.data.fqdn || workload.data.fqdn;
         },
       },
       {
@@ -368,14 +368,6 @@ const filteredHeaders = computed(() => {
           return item[0].workloads[0].data.backends.join(", ");
         },
         sortable: false,
-      },
-      {
-        title: "Domain",
-        key: "fqdn",
-        value(item: any) {
-          const [workload] = item[0].workloads;
-          return workload.result.data.fqdn || workload.data.fqdn;
-        },
       },
       {
         title: "Health",

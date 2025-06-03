@@ -13,10 +13,17 @@
             :rules="[
               validators.required('Subdomain is required.'),
               validators.isLowercase('Subdomain should consist of lowercase letters only.'),
-              validators.isAlphanumeric('Subdomain should consist of letters and numbers only.'),
-              subdomain => validators.isAlpha('Subdomain must start with alphabet char.')(subdomain[0]),
+              validators.IsAlphanumericExpectDashAndUnderscore(
+                'Subdomain should consist only letters, numbers, dashes, and underscores',
+              ),
+              (subdomain: string) =>
+                validators.isAlphanumeric('Subdomain should start of letters and numbers only.')(subdomain[0]),
+              (subdomain: string) =>
+                validators.isAlphanumeric('Subdomain should end with letters and numbers only.')(
+                  subdomain[subdomain.length - 1],
+                ),
               validators.minLength('Subdomain must be at least 4 characters.', 4),
-              subdomain => validators.maxLength('Subdomain cannot exceed 35 characters.', 35)(subdomain),
+              (subdomain: string) => validators.maxLength('Subdomain cannot exceed 35 characters.', 35)(subdomain),
             ]"
             :async-rules="[validateSubdomain]"
             #="{ props }"
@@ -118,7 +125,9 @@ async function deploy() {
     layout.value.setStatus("deploy", "Preparing to deploy gateway...");
 
     const gateway: any = await deployGatewayName(grid, selectionDetails.value?.domain, {
-      subdomain: subdomain.value,
+      subdomain: selectionDetails.value?.domain?.enabledCustomDomain
+        ? subdomain.value.replace(/-/g, "")
+        : subdomain.value,
       ip: ip.value,
       port: port.value,
       tlsPassthrough: passThrough.value,

@@ -64,10 +64,6 @@
             :deleting="deleting"
             no-data-text="No domains attached to this virtual machine."
           >
-            <template #[`item.name`]="{ item }">
-              {{ item.name }}
-            </template>
-
             <template #[`item.tls_passthrough`]="{ item }"> {{ item.tls_passthrough ? "Yes" : "No" }} </template>
 
             <template #[`item.backends`]="{ item }">
@@ -167,7 +163,7 @@
         <v-card-title> Are you sure you want to delete the following gateways? </v-card-title>
         <v-card-text class="d-flex flex-wrap">
           <v-chip label class="mr-1 mb-5" v-for="gw in gatewaysToDelete" :key="gw.name">
-            {{ gw.name }}
+            {{ gw.domain }}
           </v-chip>
           <v-divider />
         </v-card-text>
@@ -291,7 +287,6 @@ export default {
     });
     watch(selectedK8SNodeName, getSupportedNetworks, { deep: true });
     const tableHeaders = ref([
-      { title: "Name", key: "name" },
       { title: "Contract ID", key: "contractId" },
       { title: "Domain", key: "domain" },
       { title: "TLS Passthrough", key: "tls_passthrough" },
@@ -408,6 +403,7 @@ export default {
       deleting.value = true;
       const deletedGateways = new Set<GridGateway>();
       for (const gw of gatewaysToDelete.value) {
+        gw.name = gw.domain.split(".")[0];
         await grid.gateway
           .delete_name(gw)
           .then(() => deletedGateways.add(gw))
@@ -492,8 +488,15 @@ export default {
     const subdomainRules = [
       validators.required("Subdomain is required."),
       validators.isLowercase("Subdomain should consist of lowercase letters only."),
-      validators.isAlphanumeric("Subdomain should consist of letters and numbers only."),
-      (subdomain: string) => validators.isAlpha("Subdomain must start with an alphabet char.")(subdomain[0]),
+      validators.IsAlphanumericExpectDashAndUnderscore(
+        "Subdomain should consist only letters, numbers, dashes, and underscores",
+      ),
+      (subdomain: string) =>
+        validators.isAlphanumeric("Subdomain should start of letters and numbers only.")(subdomain[0]),
+      (subdomain: string) =>
+        validators.isAlphanumeric("Subdomain should end with letters and numbers only.")(
+          subdomain[subdomain.length - 1],
+        ),
       validators.minLength("Subdomain must be at least 4 characters.", 4),
       (subdomain: string) => validators.maxLength("Subdomain cannot exceed 35 characters.", 35)(subdomain),
     ];

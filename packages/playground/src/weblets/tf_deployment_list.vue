@@ -445,7 +445,12 @@
               {{ worker.name }}
             </v-chip>
           </template>
-          <v-chip class="ma-3">
+          <template v-if="item.length > 0">
+            <template v-for="props in item" :key="props.name">
+              <v-chip class="ma-3"> {{ props.workloads[0].result.data.fqdn || props.workloads[0].data.fqdn }} </v-chip>
+            </template>
+          </template>
+          <v-chip class="ma-3" v-else>
             {{ item.name }}
           </v-chip>
         </template>
@@ -534,7 +539,7 @@ async function onDelete(k8s = false) {
         if (projectNameLower === ProjectName.Domains.toLowerCase()) {
           await deleteGatewayDeployment(
             updateGrid(grid, { projectName: projectNameLower }),
-            item[0].workloads[0].name as string,
+            item[0].workloads[0].data.name ? (item[0].workloads[0].data.name as string) : item[0].workloads[0].name,
           );
         } else {
           await deleteDeployment(updateGrid(grid!, { projectName: item.projectName }), {
