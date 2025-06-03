@@ -57,7 +57,7 @@ python3 -m pip install setuptools
 
 - Network environment: should select dev environment, qa, test or main.
 
-- Wallet connector: mnemonics (12 random words in a unique order) for your account to interact with the chain. [Create one](https://www.manual.grid.tf/documentation/dashboard/wallet_connector.html)
+- Wallet connector: mnemonics (12 random words in a unique order) for your account to interact with the chain. [Create one](https://manual.grid.tf/labs/documentation/dashboard/wallet_connector)
 
 - Store secret: it's any word that will be used for encrypting/decrypting the keys on threefold key-value store.
 
@@ -173,4 +173,4 @@ gridClient.disconnect();
 ## Related Documentations
 
 - [Contribution Guide](./docs/contribution.md)
-- [Grid Client documentation](https://manual.grid.tf/documentation/developers/javascript/grid3_javascript_readme.html)
+- [Grid Client documentation](https://manual.grid.tf/labs/documentation/developers/grid3_javascript/)
