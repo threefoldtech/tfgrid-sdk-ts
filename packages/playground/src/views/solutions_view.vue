@@ -1,12 +1,8 @@
 <template>
   <view-layout>
     <v-card color="primary" class="d-flex justify-center items-center mb-4 pa-3 text-center">
-      <v-icon size="30" class="pr-3">
-        mdi-lightbulb-on-outline
-      </v-icon>
-      <v-card-title class="pa-0">
-        Labs
-      </v-card-title>
+      <v-icon size="30" class="pr-3"> mdi-lightbulb-on-outline </v-icon>
+      <v-card-title class="pa-0"> Labs </v-card-title>
     </v-card>
     <v-text-field v-model="searchItem" label="Search for a lab" class="mb-5" clearable />
     <p v-if="filteredAppCards.length === 0 && filteredOrchCards.length === 0" class="mx-3 mb-3">
@@ -150,7 +146,7 @@ export default {
           "Open WebUI is an extensible, feature-rich, and user-friendly self-hosted AI platform designed to operate entirely offline.",
         icon: "openwebui.png",
         route: DashboardRoutes.Applications.Openwebui,
-        releaseDate: new Date("2025-5-18"), // TODO: Update release date when OpenWebUI is released On main net
+        releaseDate: new Date("2025-6-02"),
         tags: ["Community"],
       },
       {

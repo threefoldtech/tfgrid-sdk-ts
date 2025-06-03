@@ -27,7 +27,7 @@ def test_validate_homepage_links(browser):
     assert dashboard_page.navigate_to_find_more() == ('https://threefold.io/')
     assert dashboard_page.navigate_to_explore_capacity() == (Base.stats_url)
     if Base.net in ['dev', 'local']:
-        manual_link = 'https://www.manual.grid.tf/'
+        manual_link = 'https://manual.dev.grid.tf/'
     else:
         manual_link = 'https://manual.grid.tf/'
     assert dashboard_page.navigate_to_learn_about_grid() == (manual_link)
@@ -192,11 +192,11 @@ def test_login_links(browser):
     dashboard_page.click_button(dashboard_page.connect_your_wallet(get_email(), password))
     dashboard_page.open_profile()
     if Base.net in ['dev', 'local']:
-        wallet_manual_link = 'https://www.manual.grid.tf/documentation/dashboard/wallet_connector.html'
-        tf_connect_app_link = 'https://www.manual.grid.tf/documentation/threefold_token/storing_tft/tf_connect_app.html'
+        wallet_manual_link = 'https://manual.dev.grid.tf/labs/documentation/dashboard/wallet_connector/'
+        tf_connect_app_link = 'https://manual.dev.grid.tf/labs/documentation/threefold_token/storing_tft/tf_connect_app/'
     else:
-        wallet_manual_link = 'https://manual.grid.tf/documentation/dashboard/wallet_connector.html'
-        tf_connect_app_link = 'https://manual.grid.tf/documentation/threefold_token/storing_tft/tf_connect_app.html'
+        wallet_manual_link = 'https://manual.grid.tf/labs/documentation/dashboard/wallet_connector/'
+        tf_connect_app_link = 'https://manual.grid.tf/labs/documentation/threefold_token/storing_tft/tf_connect_app/'
     assert dashboard_page.manual_link() == wallet_manual_link
     assert dashboard_page.connect_manual_link() == tf_connect_app_link
     assert dashboard_page.get_connect_google_link() == 'https://play.google.com/store/apps/details?id=org.jimber.threebotlogin&hl=en&gl=US'

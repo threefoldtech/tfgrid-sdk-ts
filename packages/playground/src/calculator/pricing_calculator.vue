@@ -2,12 +2,8 @@
   <ViewLayout>
     <VCard>
       <v-card color="primary" class="d-flex justify-center items-center pa-3 text-center">
-        <v-icon size="30" class="pr-3">
-          mdi-currency-usd
-        </v-icon>
-        <v-card-title class="pa-0">
-          Pricing Calculator
-        </v-card-title>
+        <v-icon size="30" class="pr-3"> mdi-currency-usd </v-icon>
+        <v-card-title class="pa-0"> Pricing Calculator </v-card-title>
       </v-card>
       <VCardText>
         <VContainer fluid>
@@ -159,7 +155,6 @@
               <VAlert type="error" :text="normalizeError(priceTask.error, 'Failed to calculate price.')" />
             </VCol>
           </VRow>
-
           <VRow v-else-if="valid" class="text-center text-body-1 text-black">
             <VCol lg="6" md="6" sm="12">
               <div
@@ -251,7 +246,7 @@ import { useAsync } from "../hooks";
 import { useProfileManager } from "../stores";
 import { normalizeError } from "../utils/helpers";
 import { balanceRules, cruRules, hruRules, mruRules, nuRules, sruRules } from "../utils/pricing_calculator";
-import { computePackageColor, normalizePrice } from "../utils/pricing_calculator";
+import { calculateUpgradeBalanceNeeded, computePackageColor, normalizePrice } from "../utils/pricing_calculator";
 export default {
   name: "PricingCalculator",
   setup() {
@@ -270,8 +265,58 @@ export default {
       ipv4: false,
       useCurrentBalance: true,
     });
-    const dedicatedUpgradePrice = Math.ceil(114.473 * 18);
-    const sharedUpgradePrice = Math.ceil(228.947 * 18);
+
+    /**
+     * Determines if the user needs to upgrade their package.
+     * @returns {boolean} True when all conditions are met:
+     * - The form input is valid
+     * - Price data has finished loading
+     * - One of the packages is not already at "gold" tier
+     */
+    const needUpgrade = computed(() => {
+      return (
+        valid.value &&
+        !priceTask.value.loading &&
+        (priceTask.value.data?.["sharedPackage"]?.package !== "gold" ||
+          priceTask.value.data?.["dedicatedPackage"]?.package !== "gold")
+      );
+    });
+
+    /**
+     * Computes the balance to use for calculations based on user selection
+     */
+    const balanceToUse = computed(() =>
+      userBalance.value && resources.value.useCurrentBalance ? userBalance.value.free : +resources.value.balance,
+    );
+
+    const dedicatedUpgradePrice = computed(() => {
+      try {
+        return calculateUpgradeBalanceNeeded(
+          dedicatedPriceTFT.value,
+          priceTask.value.data?.dedicatedPackage?.discount ?? 0,
+          needUpgrade.value,
+          balanceToUse.value,
+        );
+      } catch (error) {
+        console.error("Error calculating dedicated upgrade price:", error);
+        return 0;
+      }
+    });
+
+    const sharedUpgradePrice = computed(() => {
+      try {
+        return calculateUpgradeBalanceNeeded(
+          sharedPriceTFT.value,
+          priceTask.value.data?.sharedPackage?.discount ?? 0,
+          needUpgrade.value,
+          balanceToUse.value,
+        );
+      } catch (error) {
+        console.error("Error calculating shared upgrade price:", error);
+        return 0;
+      }
+    });
+
     const tftPriceTask = useAsync(() => calculator.tftPrice(), {
       init: true,
       default: 0,
@@ -285,8 +330,7 @@ export default {
           sru: +resources.value.sru,
           ipv4u: resources.value.ipv4,
           certified: resources.value.certified,
-          balance:
-            userBalance.value && resources.value.useCurrentBalance ? userBalance.value.free : +resources.value.balance,
+          balance: balanceToUse.value,
           nu: +resources.value.nu,
         });
       },

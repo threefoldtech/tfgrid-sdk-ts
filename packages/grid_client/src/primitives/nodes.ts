@@ -416,6 +416,7 @@ class Nodes {
 
   async getNodesCount(options: FilterOptions = {}, url = ""): Promise<number> {
     const _options = { ...options };
+    _options.features = this.getFeaturesFromFilters(options);
     url = url || this.proxyURL;
     _options.ret_count = true;
     _options.page = 1;
