@@ -27,7 +27,7 @@
         <VExpandTransition>
           <input-tooltip
             v-if="enableCustomDomain"
-            tooltip="Domain Name that will point to this instance"
+            tooltip="Domain name that will point to this instance"
           >
             <InputValidator
               ref="customInputRef"
