@@ -7,6 +7,7 @@ on:
   push:
     branches: 
       - development
+      - development_update_workflow
   pull_request:
     branches: 
       - development
