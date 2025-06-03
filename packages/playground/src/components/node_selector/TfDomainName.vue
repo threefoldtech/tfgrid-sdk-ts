@@ -1,8 +1,6 @@
 <template>
   <section>
-    <h6 v-if="!hideTitle" class="text-h5 mb-4 mt-2">
-      Domain Name
-    </h6>
+    <h6 v-if="!hideTitle" class="text-h5 mb-4 mt-2">Domain Name</h6>
 
     <input-tooltip tooltip="Use a custom domain" align-center>
       <div>
@@ -13,7 +11,7 @@
     <div ref="input">
       <form-validator ref="domainFormRef">
         <VExpandTransition>
-          <input-tooltip v-if="enableCustomDomain" tooltip="Domain Name that will point to this instance">
+          <input-tooltip v-if="enableCustomDomain" tooltip="Domain name that will point to this instance">
             <InputValidator
               ref="customInputRef"
               v-model:value="customDomain"
@@ -42,7 +40,7 @@
               ref="domainInput"
               #="{ props }"
               :rules="[validators.required('Domain is required.')]"
-              :value="(selectedDomain as INode)"
+              :value="selectedDomain as INode"
             >
               <VAutocomplete
                 v-bind="props"
@@ -86,10 +84,10 @@
         <v-alert
           v-if="
             !disableSelectedDomain &&
-              useFQDN &&
-              modelValue &&
-              modelValue.customDomain &&
-              selectedDomain?.publicConfig?.ipv4
+            useFQDN &&
+            modelValue &&
+            modelValue.customDomain &&
+            selectedDomain?.publicConfig?.ipv4
           "
           class="mb-4"
           type="warning"
@@ -147,14 +145,25 @@ export default {
     const input = ref<HTMLElement>();
 
     const loadedDomains = ref<NodeInfo[]>([]);
+    const loadedPages = ref<Set<number>>(new Set());
     const domainsTask = useAsync(loadNodes, {
       onAfterTask({ data }) {
-        loadedDomains.value = loadedDomains.value.concat(data as NodeInfo[]);
+        const currentPage = pagination.value.page;
+        if (!loadedPages.value.has(currentPage)) {
+          loadedDomains.value = loadedDomains.value.concat(data as NodeInfo[]);
+          loadedPages.value.add(currentPage);
+        }
         pagination.value.next();
       },
       default: [],
     });
-    const pageCountTask = useAsync(getNodePageCount, { default: 1 });
+    const pageCountTask = useAsync(getNodePageCount, {
+      default: 1,
+      onAfterTask({ data }) {
+        pagination.value.reset(data as number);
+        loadedPages.value.clear();
+      },
+    });
     const pagination = usePagination();
 
     const enableCustomDomain = ref(false);
@@ -169,7 +178,12 @@ export default {
       hasIPv6: props.interfaces.some(i => i === Features.ip) || undefined,
     }));
     const selectedDomain = ref<NodeInfo | null>(null);
-    const loadDomains = () => domainsTask.value.run(gridStore, filters.value);
+    const loadDomains = () => {
+      const currentPage = pagination.value.page;
+      if (!loadedPages.value.has(currentPage)) {
+        return domainsTask.value.run(gridStore, filters.value);
+      }
+    };
 
     const domainInput = useInputRef();
     const reloadDomains = async () => {
@@ -178,9 +192,9 @@ export default {
         selectedDomain.value = null;
         bindModelValue();
       }
-      await pageCountTask.value.run(gridStore, filters.value);
-      pagination.value.reset(pageCountTask.value.data as number);
+      loadedPages.value.clear();
       loadedDomains.value = [];
+      await pageCountTask.value.run(gridStore, filters.value);
       await nextTick();
       return loadDomains();
     };
@@ -244,7 +258,9 @@ export default {
 
     onMounted(() => {
       bindStatus();
-      loadDomains();
+      pageCountTask.value.run(gridStore, filters.value).then(() => {
+        loadDomains();
+      });
       form?.register(uid.toString(), fakeService);
     });
     onUnmounted(() => form?.unregister(uid.toString()));
