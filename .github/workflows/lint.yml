@@ -14,7 +14,7 @@ on:
 
 jobs:
   lint:
-    runs-on: self-hosted
+    runs-on: threefoldtech-self-hosted
     strategy:
       matrix:
         node-version: [22.15]
