@@ -18,7 +18,7 @@
         :rules="[
           validators.required('CPU is required.'),
           validators.isInt('CPU must be a valid integer.'),
-          validators.min('CPU min is 1 cores.', 1),
+          validators.min(`CPU min is ${minCpuSize} cores.`, minCpuSize),
           validators.max('CPU max is 32 cores.', 32),
         ]"
         #="{ props }"
@@ -33,7 +33,7 @@
         :rules="[
           validators.required('Memory is required.'),
           validators.isInt('Memory must be a valid integer.'),
-          validators.min('Minimum allowed memory is 256 MB.', 256),
+          validators.min(`Minimum allowed memory is ${minMemorySize} MB.`, minMemorySize * 1024),
           validators.max('Maximum allowed memory is 256 GB.', 256 * 1024),
         ]"
         #="{ props }"
@@ -82,7 +82,9 @@ const props = defineProps({
 });
 const emits = defineEmits<{ (event: "update:model-value", value?: solutionFlavor): void }>();
 
-const minDiskSize = computed(() => Math.min(15, props.small.disk, props.medium.disk, props.large.disk));
+const minDiskSize = computed(() => props.small.disk);
+const minMemorySize = computed(() => props.small.memory);
+const minCpuSize = computed(() => props.small.cpu);
 
 const packages = computed(() => {
   const { small, medium, large } = props;

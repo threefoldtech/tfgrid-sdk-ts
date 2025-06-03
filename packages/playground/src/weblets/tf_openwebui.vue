@@ -32,9 +32,9 @@
         </input-validator>
 
         <SelectSolutionFlavor
-          :small="{ cpu: 2, memory: 8, disk: 25 }"
-          :medium="{ cpu: 4, memory: 16, disk: 50 }"
-          :large="{ cpu: 8, memory: 32, disk: 100 }"
+          :small="{ cpu: 4, memory: 16, disk: 125 }"
+          :medium="{ cpu: 8, memory: 32, disk: 250 }"
+          :large="{ cpu: 16, memory: 64, disk: 500 }"
           v-model="solution"
         />
 

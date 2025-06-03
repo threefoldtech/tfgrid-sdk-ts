@@ -144,7 +144,7 @@ export default {
           "Open WebUI is an extensible, feature-rich, and user-friendly self-hosted AI platform designed to operate entirely offline.",
         icon: "openwebui.png",
         route: DashboardRoutes.Applications.Openwebui,
-        releaseDate: new Date("2025-5-18"), // TODO: Update release date when OpenWebUI is released On main net
+        releaseDate: new Date("2025-6-02"),
         tags: ["Community"],
       },
       {

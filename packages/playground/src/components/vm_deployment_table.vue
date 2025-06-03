@@ -1,55 +1,80 @@
 <template>
   <div>
-    <v-alert v-if="errorMessage" type="error" variant="tonal">
+    <v-alert
+      v-if="errorMessage"
+      type="error"
+      variant="tonal"
+    >
       {{ errorMessage }}
     </v-alert>
-    <v-alert v-if="!loading && count && items.length < count" type="warning" variant="tonal">
+    <v-alert
+      v-if="!loading && count && items.length < count"
+      type="warning"
+      variant="tonal"
+    >
       Failed to load <strong>{{ count - items.length }}</strong> deployment{{ count - items.length > 1 ? "s" : "" }}.
 
       <span>
         This might happen because the node is down or it's not reachable
-        <span v-if="showEncryption"
-          >or the deployment{{ count - items.length > 1 ? "s are" : " is" }} encrypted by another key</span
-        >.
+        <span v-if="showEncryption">or the deployment{{ count - items.length > 1 ? "s are" : " is" }} encrypted by another key</span>.
       </span>
-      <v-tooltip location="top" text="Show failed deployments">
+      <v-tooltip
+        location="top"
+        text="Show failed deployments"
+      >
         <template #activator="{ props }">
-          <v-icon v-bind="props" class="custom-icon" @click="showDialog = true"
-            >mdi-file-document-refresh-outline
+          <v-icon
+            v-bind="props"
+            class="custom-icon"
+            @click="showDialog = true"
+          >
+            mdi-file-document-refresh-outline
           </v-icon>
         </template>
       </v-tooltip>
 
       <v-dialog
-        transition="dialog-bottom-transition"
         v-model="showDialog"
+        transition="dialog-bottom-transition"
         max-width="500px"
         scrollable
         attach="#modals"
       >
         <v-card>
-          <v-card-title style="font-weight: bold">Failed Deployments</v-card-title>
+          <v-card-title style="font-weight: bold">
+            Failed Deployments
+          </v-card-title>
           <v-divider color="#FFCC00" />
           <v-card-text>
-            <v-alert type="error" variant="tonal">
+            <v-alert
+              type="error"
+              variant="tonal"
+            >
               Failed to load
               <strong>{{ count - items.length }}</strong> deployment{{ count - items.length > 1 ? "s" : "" }}.
 
               <span>
                 This might happen because the node is down or it's not reachable
-                <span v-if="showEncryption"
-                  >or the deployment{{ count - items.length > 1 ? "s are" : " is" }} encrypted by another key</span
-                >.
+                <span v-if="showEncryption">or the deployment{{ count - items.length > 1 ? "s are" : " is" }} encrypted by another key</span>.
               </span>
             </v-alert>
-            <v-list :items="failedDeploymentList" item-props lines="three">
-              <template v-slot:subtitle="{ subtitle }">
-                <div v-html="subtitle"></div>
+            <v-list
+              :items="failedDeploymentList"
+              item-props
+              lines="three"
+            >
+              <template #subtitle="{ subtitle }">
+                <div v-html="subtitle" />
               </template>
             </v-list>
           </v-card-text>
           <v-card-actions class="justify-end my-1 mr-2">
-            <v-btn @click="showDialog = false" color="anchor">Close</v-btn>
+            <v-btn
+              color="anchor"
+              @click="showDialog = false"
+            >
+              Close
+            </v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -67,10 +92,10 @@
         inline
       >
         <VSwitch
+          v-model="showAllDeployments"
           inset
           color="primary"
           label="Show All Deployments"
-          v-model="showAllDeployments"
           @update:model-value="loadDeployments"
         />
       </InputTooltip>
@@ -81,8 +106,8 @@
         color="secondary"
         prepend-icon="mdi-reload"
         text="Reload"
-        @click="loadDeployments"
         class="my-4"
+        @click="loadDeployments"
       />
     </div>
     <ListTable
@@ -97,9 +122,9 @@
         { value: 20, title: '20' },
         { value: 50, title: '50' },
       ]"
+      :sort-by="sortBy"
       @update:model-value="$emit('update:model-value', $event)"
       @click:row="$attrs['onClick:row']"
-      :sort-by="sortBy"
     >
       <template #[`item.name`]="{ item }">
         {{ item.name }}
@@ -114,7 +139,10 @@
       </template>
 
       <template #[`item.flist`]="{ item }">
-        <v-tooltip :text="item.flist" location="bottom right">
+        <v-tooltip
+          :text="item.flist"
+          location="bottom right"
+        >
           <template #activator="{ props }">
             <p v-bind="props">
               {{ renameFlist(item.flist) }}
@@ -130,20 +158,42 @@
         {{ toHumanDate(item.created) }}
       </template>
       <template #[`item.actions`]="{ item }">
-        <v-chip color="error" v-if="deleting && ($props.modelValue || []).includes(item)"> Deleting... </v-chip>
-        <v-btn-group variant="tonal" v-else>
-          <slot :name="projectName + '-actions'" :item="item" :update="updateItem"></slot>
+        <v-chip
+          v-if="deleting && ($props.modelValue || []).includes(item)"
+          color="error"
+        >
+          Deleting...
+        </v-chip>
+        <v-btn-group
+          v-else
+          variant="tonal"
+        >
+          <slot
+            :name="projectName + '-actions'"
+            :item="item"
+            :update="updateItem"
+          />
         </v-btn-group>
       </template>
 
       <template #[`item.status`]="{ item }">
         <v-chip :color="getNodeHealthColor(item.status as string).color">
-          <v-tooltip v-if="item.status == NodeHealth.Error" activator="parent" location="top">{{
-            item.message
-          }}</v-tooltip>
-          <v-tooltip v-if="item.status == NodeHealth.Paused" activator="parent" location="top"
-            >The deployment contract is in grace period</v-tooltip
+          <v-tooltip
+            v-if="item.status == NodeHealth.Error"
+            activator="parent"
+            location="top"
           >
+            {{
+              item.message
+            }}
+          </v-tooltip>
+          <v-tooltip
+            v-if="item.status == NodeHealth.Paused"
+            activator="parent"
+            location="top"
+          >
+            The deployment contract is in grace period
+          </v-tooltip>
           <span class="text-uppercase">
             {{ getNodeHealthColor(item.status as string).type }}
           </span>
@@ -151,12 +201,22 @@
       </template>
       <template #[`item.health`]="{ item }">
         <v-chip :color="getNodeHealthColor(item[0].workloads[0].result.state as string).color">
-          <v-tooltip v-if="item[0].workloads[0].result.state == NodeHealth.Error" activator="parent" location="top">{{
-            item.message
-          }}</v-tooltip>
-          <v-tooltip v-if="item[0].workloads[0].result.state == NodeHealth.Paused" activator="parent" location="top"
-            >The deployment contract is in grace period</v-tooltip
+          <v-tooltip
+            v-if="item[0].workloads[0].result.state == NodeHealth.Error"
+            activator="parent"
+            location="top"
           >
+            {{
+              item.message
+            }}
+          </v-tooltip>
+          <v-tooltip
+            v-if="item[0].workloads[0].result.state == NodeHealth.Paused"
+            activator="parent"
+            location="top"
+          >
+            The deployment contract is in grace period
+          </v-tooltip>
           <span class="text-uppercase">
             {{ getNodeHealthColor(item[0].workloads[0].result.state as string).type }}
           </span>
@@ -164,7 +224,10 @@
       </template>
 
       <template #no-data-text>
-        <div v-if="failedDeploymentList.length > 0" class="text-center">
+        <div
+          v-if="failedDeploymentList.length > 0"
+          class="text-center"
+        >
           <p v-text="'Couldn\'t load any of your ' + projectTitle + ' deployments.'" />
           <VBtn
             class="mt-4"
@@ -175,7 +238,10 @@
             @click="loadDeployments"
           />
         </div>
-        <p v-else v-text="'No ' + projectTitle + ' deployments found on this account.'" />
+        <p
+          v-else
+          v-text="'No ' + projectTitle + ' deployments found on this account.'"
+        />
       </template>
     </ListTable>
   </div>
@@ -335,7 +401,7 @@ const filteredHeaders = computed(() => {
         { title: "Mycelium IP", key: "mycelium", sortable: false },
       ],
     },
-    { title: "Flist", key: "flist" },
+    { title: "Image", key: "flist" },
     { title: "Cost", key: "billing" },
     { title: "Created At", key: "created" },
     { title: "Health", key: "status", sortable: false },
