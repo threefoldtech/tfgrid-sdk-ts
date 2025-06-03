@@ -26,24 +26,7 @@
         #="{ props }"
       >
         <input-tooltip tooltip="Instance name.">
-          <v-text-field label="Name" v-model="name" v-bind="props" />
-        </input-tooltip>
-      </input-validator>
-
-      <input-validator
-        :value="username"
-        :rules="[
-          validators.required('Username is required.'),
-          validators.isLowercase('Username should consist of lowercase letters only.'),
-          validators.isAlphanumeric('Username should consist of letters and numbers only.'),
-          (username: string) => validators.isAlpha('Username must start with alphabet char.')(username[0]),
-          validators.minLength('Username must be at least 2 characters.', 2),
-          validators.maxLength('Username cannot exceed 50 characters.', 50),
-        ]"
-        #="{ props }"
-      >
-        <input-tooltip tooltip="Funkwhale admin username.">
-          <v-text-field label="Username" v-model="username" v-bind="props" />
+          <v-text-field label="Name/Username" v-model="name" v-bind="props" />
         </input-tooltip>
       </input-validator>
 
@@ -163,7 +146,6 @@ const profileManager = useProfileManager();
 const selectionDetails = ref<SelectionDetails>();
 
 const name = ref(generateName({ prefix: "fw" }));
-const username = ref("admin");
 const email = ref(profileManager.profile?.email || "");
 const password = ref(generatePassword(12));
 const solution = ref() as Ref<SolutionFlavor>;
@@ -222,7 +204,7 @@ async function deploy() {
           disks: [
             {
               size: solution.value.disk,
-              mountPoint: "/data",
+              mountPoint: "/var/lib/docker/",
             },
           ],
           flist: flist.value,
@@ -234,9 +216,9 @@ async function deploy() {
           envs: [
             { key: "SSH_KEY", value: selectedSSHKeys.value },
             { key: "FUNKWHALE_HOSTNAME", value: domain },
-            { key: "DJANGO_SUPERUSER_EMAIL", value: email.value },
-            { key: "DJANGO_SUPERUSER_USERNAME", value: username.value },
-            { key: "DJANGO_SUPERUSER_PASSWORD", value: password.value },
+            { key: "FUNKWHALE_SUPERUSER_EMAIL", value: email.value },
+            { key: "FUNKWHALE_SUPERUSER_NAME", value: name.value },
+            { key: "FUNKWHALE_SUPERUSER_PASSWORD", value: password.value },
           ],
           nodeId: selectionDetails.value!.node!.nodeId,
           rentedBy: rentedBy.value,
@@ -261,7 +243,7 @@ async function deploy() {
     await deployGatewayName(grid, selectionDetails.value.domain, {
       subdomain,
       ip: vm[0].interfaces[0].ip,
-      port: 80,
+      port: 5000,
       network: vm[0].interfaces[0].network,
     });
 
