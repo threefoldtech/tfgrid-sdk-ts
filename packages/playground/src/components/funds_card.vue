@@ -25,7 +25,7 @@ export default {
   setup() {
     const loadingAddTFT = ref(false);
     const hideGetTFT = window.env.NETWORK == "dev" || window.env.NETWORK == "qa";
-    const addTFT = async () => window.open("https://gettft.com/gettft/", "_blank");
+    const addTFT = async () => window.open(`${manual.tft_lobstr}`, "_blank");
     return {
       loadingAddTFT,
       manual,

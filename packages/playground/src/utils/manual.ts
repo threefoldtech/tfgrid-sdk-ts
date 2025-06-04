@@ -13,6 +13,7 @@ export const manual = {
   dedicated_machines: urlJoin(BASE, "/labs/documentation/dashboard/deploy/node_finder#dedicated-nodes"),
   tft_bridges: urlJoin(BASE, "/labs/documentation/threefold_token/tft_bridges"),
   buy_sell_tft: urlJoin(BASE, "/labs/documentation/threefold_token/buy_sell_tft"),
+  tft_lobstr: urlJoin(BASE, "/labs/documentation/threefold_token/buy_sell_tft/tft_lobstr_complete_guide/"),
   farmers: urlJoin(BASE, "/labs/documentation/farmers"),
   governance: urlJoin(BASE, "/labs/documentation/dashboard/tfchain/tf_dao"),
   pricing: urlJoin(BASE, "/labs/knowledge_base/cloud_toc/pricing_toc"),
