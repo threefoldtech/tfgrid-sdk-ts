@@ -1,5 +1,5 @@
 import { assertBoolean, assertId, assertNatural, assertString } from "../utils";
-import { AbstractBuilder, BuilderMapper, BuilderMethods, BuilderValidator } from "./abstract_builder";
+import { AbstractBuilder, BuilderMapper, BuilderValidator } from "./abstract_builder";
 import { SortBy, SortOrder } from "./nodes";
 
 export interface PublicIpQuery {
@@ -42,7 +42,10 @@ const PUBLICIPS_VALIDATOR: BuilderValidator<PublicIpQuery> = {
 };
 
 export class PublicIpBuilder extends AbstractBuilder<PublicIpQuery> {
-  constructor(public uri: string, queries: Partial<PublicIpQuery> = {}) {
+  constructor(
+    public uri: string,
+    queries: Partial<PublicIpQuery> = {},
+  ) {
     super({
       mapper: PUBLICIPS_MAPPER,
       validator: PUBLICIPS_VALIDATOR,

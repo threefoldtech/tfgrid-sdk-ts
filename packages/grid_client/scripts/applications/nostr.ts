@@ -43,6 +43,7 @@ async function getDeployment(client: GridClient, name: string, subdomain: string
   log("================= Getting Gateway Deployment =================");
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function cancel(client: GridClient, name: string, subdomain: string) {
   // Cancel VM deployment
   const resultVM = await client.machines.delete({ name });

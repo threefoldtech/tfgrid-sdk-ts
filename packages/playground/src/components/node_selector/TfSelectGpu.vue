@@ -11,11 +11,7 @@
         multiple
         :model-value="$props.modelValue"
         item-value="id"
-        @update:model-value="
-          bindModelValue($event);
-          bindStatus($event.length === 0 ? ValidatorStatus.Invalid : ValidatorStatus.Valid);
-        "
-        :items="(cardsTask.data as GPUCardInfo[])"
+        :items="cardsTask.data as GPUCardInfo[]"
         item-title="device"
         :loading="cardsTask.loading"
         :error="!!cardsTask.error"
@@ -27,6 +23,10 @@
         :disabled="!$props.validNode"
         :hint="$props.validNode ? undefined : 'Please select a valid node to load its GPU cards.'"
         :persistent-hint="!$props.validNode"
+        @update:model-value="
+          bindModelValue($event);
+          bindStatus($event.length === 0 ? ValidatorStatus.Invalid : ValidatorStatus.Valid);
+        "
         @update:menu="opened => !opened && $props.modelValue.length === 0 && bindStatus(ValidatorStatus.Invalid)"
       />
     </input-tooltip>

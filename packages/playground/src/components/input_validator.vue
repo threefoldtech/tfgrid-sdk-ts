@@ -10,7 +10,7 @@
         'persistent-hint': hintPersistent,
         class: extraClass,
       }"
-    ></slot>
+    />
   </div>
 </template>
 

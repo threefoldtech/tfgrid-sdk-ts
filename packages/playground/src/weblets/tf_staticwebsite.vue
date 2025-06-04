@@ -6,12 +6,12 @@
     :disk="solution?.disk"
     :ipv4="ipv4"
     :dedicated="dedicated"
-    :rentedBy="rentedBy"
-    :SelectedNode="selectionDetails?.node"
+    :rented-by="rentedBy"
+    :selected-node="selectionDetails?.node"
     :valid-filters="selectionDetails?.validFilters"
     title-image="images/icons/static_website.png"
   >
-    <template #title>Deploy a Static Website Instance </template>
+    <template #title> Deploy a Static Website Instance </template>
 
     <d-tabs :tabs="[{ title: 'Config', value: 'config' }]">
       <input-validator
@@ -26,7 +26,7 @@
         #="{ props }"
       >
         <input-tooltip tooltip="Instance name.">
-          <v-text-field label="Name" v-model="name" v-bind="props" />
+          <v-text-field v-model="name" label="Name" v-bind="props" />
         </input-tooltip>
       </input-validator>
 
@@ -43,17 +43,17 @@
         #="{ props }"
       >
         <input-tooltip tooltip="Git https url to serve.">
-          <v-text-field label="Git URL" v-model="gitUrl" v-bind="props" />
+          <v-text-field v-model="gitUrl" label="Git URL" v-bind="props" />
         </input-tooltip>
       </input-validator>
 
       <input-tooltip tooltip="Git Branch name to serve (optional).">
-        <v-text-field label="Git Branch" v-model="gitBranch" />
+        <v-text-field v-model="gitBranch" label="Git Branch" />
       </input-tooltip>
       <input-tooltip
         tooltip="HTML directory to be served. Please ensure correct casing, as this field is case-sensitive. If the directory is the root of the repository, it should not be added."
       >
-        <v-text-field label="HTML Directory" v-model="root" />
+        <v-text-field v-model="root" label="HTML Directory" />
       </input-tooltip>
 
       <SelectSolutionFlavor
@@ -73,6 +73,10 @@
       />
 
       <TfSelectionDetails
+        v-model="selectionDetails"
+        v-model:rented-by-me="rentedByMe"
+        v-model:dedicated="dedicated"
+        v-model:certified="certified"
         :filters="{
           ipv4,
           ipv6,
@@ -88,10 +92,6 @@
           wireguard,
         }"
         require-domain
-        v-model="selectionDetails"
-        v-model:rentedByMe="rentedByMe"
-        v-model:dedicated="dedicated"
-        v-model:certified="certified"
       />
       <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
     </d-tabs>
@@ -100,8 +100,8 @@
       <v-btn
         variant="elevated"
         class="text-primery px-10 py-3 h-auto text-subtitle-1"
-        @click="validateBeforeDeploy(deploy)"
         text="Deploy"
+        @click="validateBeforeDeploy(deploy)"
       />
     </template>
   </weblet-layout>

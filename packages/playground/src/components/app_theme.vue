@@ -4,15 +4,15 @@
       <v-btn
         v-bind="props"
         color="anchor"
-        @click="changeTheme()"
         :icon="light ? 'mdi-moon-waning-crescent' : 'mdi-brightness-4'"
+        @click="changeTheme()"
       />
     </template>
   </v-tooltip>
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, onUpdated, ref } from "vue";
+import { computed, onMounted } from "vue";
 import { useTheme } from "vuetify";
 
 import { LocalStorageSettingsKey, updateThemeInLocalStorage } from "@/utils/settings";

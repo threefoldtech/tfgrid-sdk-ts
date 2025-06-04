@@ -1,13 +1,13 @@
 <template>
   <v-container>
     <v-dialog
-      transition="dialog-bottom-transition"
       v-model="depositDialog"
-      @update:model-value="closeDialog"
+      transition="dialog-bottom-transition"
       attach="#modals"
+      @update:model-value="closeDialog"
     >
       <v-card>
-        <VCardTitle class="bg-primary">Deposit TFT</VCardTitle>
+        <VCardTitle class="bg-primary"> Deposit TFT </VCardTitle>
         <v-card-text>
           <v-container>
             <v-row class="py-2">
@@ -26,9 +26,9 @@
                   :href="stellarLink"
                   target="_blank"
                 >
-                  <CopyReadonlyInput label="Destination" :data="depositWallet"></CopyReadonlyInput>
+                  <CopyReadonlyInput label="Destination" :data="depositWallet" />
                 </input-tooltip>
-                <CopyReadonlyInput v-else label="Destination" :data="depositWallet"></CopyReadonlyInput>
+                <CopyReadonlyInput v-else label="Destination" :data="depositWallet" />
                 <div class="memo-text-warn">
                   <CopyReadonlyInput
                     label="Memo Text"
@@ -45,12 +45,12 @@
                   </p>
                 </div>
               </v-col>
-              <v-divider class="mx-4" vertical></v-divider>
+              <v-divider class="mx-4" vertical />
               <v-col>
-                <QRPlayStore :qr="qrCodeText"
-                  ><b> OR </b>
-                  <p class="mb-3">Use ThreeFold Connect to scan this QRcode:</p></QRPlayStore
-                >
+                <QRPlayStore :qr="qrCodeText">
+                  <b> OR </b>
+                  <p class="mb-3">Use ThreeFold Connect to scan this QRcode:</p>
+                </QRPlayStore>
               </v-col>
             </v-row>
           </v-container>

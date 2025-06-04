@@ -6,9 +6,9 @@
       inset
       :label="label"
       :model-value="value"
-      @update:model-value="callEmitFunction($event ?? false)"
       :readonly="readonly"
       :style="{ opacity: readonly ? 0.5 : 1 }"
+      @update:model-value="callEmitFunction($event ?? false)"
     />
   </input-tooltip>
 </template>

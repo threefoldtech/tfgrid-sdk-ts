@@ -15,7 +15,12 @@ export enum Generic {
   KycError,
 }
 export abstract class BaseError extends Error {
-  constructor(name: string, public code: number, message: string, public module: ErrorModules) {
+  constructor(
+    name: string,
+    public code: number,
+    message: string,
+    public module: ErrorModules,
+  ) {
     super(message);
   }
 }
@@ -50,7 +55,10 @@ export class InvalidResponse extends BaseError {
 }
 
 export class RequestError extends BaseError {
-  constructor(message: string, public statusCode = -1) {
+  constructor(
+    message: string,
+    public statusCode = -1,
+  ) {
     super("RequestError", Generic.RequestError, message, ErrorModules.Generic);
   }
 }
@@ -74,7 +82,10 @@ export class DeploymentKeyDeletionError extends BaseError {
 }
 
 export class KycBaseError extends BaseError {
-  constructor(message: string, public statusCode = -1) {
+  constructor(
+    message: string,
+    public statusCode = -1,
+  ) {
     super("TFGridKYC", Generic.KycError, message, ErrorModules.Generic);
   }
 }

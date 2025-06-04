@@ -1,7 +1,9 @@
 <template>
   <v-card color="primary" class="py-2 text-center flex-grow-1">
     <div class="font-weight-medium">
-      <v-icon class="mr-2" size="small">{{ item.icon }} </v-icon>
+      <v-icon class="mr-2" size="small">
+        {{ item.icon }}
+      </v-icon>
       <span>
         {{ item.title }}
       </span>
@@ -9,7 +11,9 @@
 
     <v-divider class="mt-1" />
 
-    <v-card-text class="card-body"> {{ item.data }} </v-card-text>
+    <v-card-text class="card-body">
+      {{ item.data }}
+    </v-card-text>
   </v-card>
 </template>
 

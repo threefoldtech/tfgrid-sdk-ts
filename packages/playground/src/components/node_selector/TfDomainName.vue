@@ -1,34 +1,17 @@
 <template>
   <section>
-    <h6
-      v-if="!hideTitle"
-      class="text-h5 mb-4 mt-2"
-    >
-      Domain Name
-    </h6>
+    <h6 v-if="!hideTitle" class="text-h5 mb-4 mt-2">Domain Name</h6>
 
-    <input-tooltip
-      tooltip="Use a custom domain"
-      align-center
-    >
+    <input-tooltip tooltip="Use a custom domain" align-center>
       <div>
-        <VSwitch
-          v-model="enableCustomDomain"
-          color="primary"
-          inset
-          label="Custom Domain"
-          hide-details
-        />
+        <VSwitch v-model="enableCustomDomain" color="primary" inset label="Custom Domain" hide-details />
       </div>
     </input-tooltip>
 
     <div ref="input">
       <form-validator ref="domainFormRef">
         <VExpandTransition>
-          <input-tooltip
-            v-if="enableCustomDomain"
-            tooltip="Domain name that will point to this instance"
-          >
+          <input-tooltip v-if="enableCustomDomain" tooltip="Domain name that will point to this instance">
             <InputValidator
               ref="customInputRef"
               v-model:value="customDomain"
@@ -74,10 +57,7 @@
                 ]"
                 return-object
               >
-                <template
-                  v-if="pagination.page !== -1"
-                  #append-item
-                >
+                <template v-if="pagination.page !== -1" #append-item>
                   <VContainer>
                     <VBtn
                       block
@@ -93,10 +73,7 @@
                 </template>
                 <template #append>
                   <v-slide-x-reverse-transition mode="out-in">
-                    <v-icon
-                      icon="mdi-reload"
-                      @click="reloadDomains"
-                    />
+                    <v-icon icon="mdi-reload" @click="reloadDomains" />
                   </v-slide-x-reverse-transition>
                 </template>
               </VAutocomplete>
@@ -107,10 +84,10 @@
         <v-alert
           v-if="
             !disableSelectedDomain &&
-              useFQDN &&
-              modelValue &&
-              modelValue.customDomain &&
-              selectedDomain?.publicConfig?.ipv4
+            useFQDN &&
+            modelValue &&
+            modelValue.customDomain &&
+            selectedDomain?.publicConfig?.ipv4
           "
           class="mb-4"
           type="warning"

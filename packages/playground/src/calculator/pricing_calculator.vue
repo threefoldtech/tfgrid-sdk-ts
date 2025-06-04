@@ -2,8 +2,8 @@
   <ViewLayout>
     <VCard>
       <v-card color="primary" class="d-flex justify-center items-center pa-3 text-center">
-        <v-icon size="30" class="pr-3">mdi-currency-usd</v-icon>
-        <v-card-title class="pa-0">Pricing Calculator</v-card-title>
+        <v-icon size="30" class="pr-3"> mdi-currency-usd </v-icon>
+        <v-card-title class="pa-0"> Pricing Calculator </v-card-title>
       </v-card>
       <VCardText>
         <VContainer fluid>
@@ -14,8 +14,8 @@
 
           <VForm
             ref="form"
-            @vue:mounted="($refs.form as VForm).validate()"
             :model-value="valid"
+            @vue:mounted="($refs.form as VForm).validate()"
             @update:model-value="
               valid = $event as boolean;
               if ($event) {
@@ -28,12 +28,12 @@
               <v-col md="6" sm="12" xs="12">
                 <InputTooltip tooltip="The number of virtual cores.">
                   <VTextField
+                    v-model="resources.cru"
                     label="CPU (vCores)"
                     suffix="vCores"
                     min="1"
                     max="256"
                     :rules="[cruRules]"
-                    v-model="resources.cru"
                   />
                 </InputTooltip>
               </v-col>
@@ -41,12 +41,12 @@
               <v-col md="6" sm="12" xs="12">
                 <InputTooltip tooltip="The amount of RAM (Random Access Memory) in GB.">
                   <VTextField
+                    v-model="resources.mru"
                     label="Memory (GB)"
                     suffix="GB"
                     min="1"
                     max="1024"
                     :rules="[mruRules]"
-                    v-model="resources.mru"
                   />
                 </InputTooltip>
               </v-col>
@@ -54,12 +54,12 @@
               <VCol lg="6" md="6" sm="12">
                 <InputTooltip tooltip="The SSD capacity storage.">
                   <VTextField
+                    v-model="resources.sru"
                     label="Disk SSD"
                     suffix="GB"
                     min="1"
                     max="1000000"
                     :rules="[sruRules]"
-                    v-model="resources.sru"
                   />
                 </InputTooltip>
               </VCol>
@@ -67,12 +67,12 @@
               <VCol lg="6" md="6" sm="12">
                 <InputTooltip tooltip="The HDD capacity storage.">
                   <VTextField
+                    v-model="resources.hru"
                     label="Disk HDD"
                     suffix="GB"
                     min="0"
                     max="1000000"
                     :rules="[hruRules]"
-                    v-model="resources.hru"
                   />
                 </InputTooltip>
               </VCol>
@@ -80,13 +80,13 @@
               <VCol lg="6" md="6" sm="12">
                 <InputTooltip tooltip="To input network bandwidth, The public IPv4 should be enabled.">
                   <VTextField
+                    v-model="resources.nu"
                     label="Bandwidth"
                     suffix="GB"
                     min="0"
                     max="1000000"
                     :disabled="!resources.ipv4"
                     :rules="[nuRules]"
-                    v-model="resources.nu"
                   />
                 </InputTooltip>
               </VCol>
@@ -112,7 +112,7 @@
                   inline
                   tooltip=" A certified node will receive 25% more reward compared to a non-certified node."
                 >
-                  <VSwitch color="primary" inset label="Certified Node" hide-details v-model="resources.certified" />
+                  <VSwitch v-model="resources.certified" color="primary" inset label="Certified Node" hide-details />
                 </InputTooltip>
               </VCol>
 
@@ -121,16 +121,16 @@
                   inline
                   tooltip="An Internet Protocol version 4 address that is globally unique and accessible over the internet"
                 >
-                  <VSwitch color="primary" inset label="With a Public IPv4" hide-details v-model="resources.ipv4" />
+                  <VSwitch v-model="resources.ipv4" color="primary" inset label="With a Public IPv4" hide-details />
                 </InputTooltip>
               </VCol>
 
               <VCol
+                v-if="userBalance"
                 lg="4"
                 md="6"
                 sm="12"
                 xs="12"
-                v-if="userBalance"
                 @vue:unmounted="
                   resources.useCurrentBalance = true;
                   priceTask.run();
@@ -138,11 +138,11 @@
               >
                 <input-tooltip inline tooltip="Use current balance to calculate the discount.">
                   <VSwitch
+                    v-model="resources.useCurrentBalance"
                     color="primary"
                     inset
                     label="Use current balance"
                     hide-details
-                    v-model="resources.useCurrentBalance"
                   />
                 </input-tooltip>
               </VCol>
@@ -155,7 +155,7 @@
               <VAlert type="error" :text="normalizeError(priceTask.error, 'Failed to calculate price.')" />
             </VCol>
           </VRow>
-          <VRow class="text-center text-body-1 text-black" v-else-if="valid">
+          <VRow v-else-if="valid" class="text-center text-body-1 text-black">
             <VCol lg="6" md="6" sm="12">
               <div
                 class="rounded pa-4 discount border"
@@ -164,22 +164,22 @@
                 }"
               >
                 <input-tooltip
-                  justifyCenter
-                  alignCenter
+                  justify-center
+                  align-center
                   tooltip="Dedicated Node allow user to reserve an entire node then use it exclusively to deploy solutions."
                 >
                   <p>
                     Cost of reserving a
                     <strong class="mr-1" v-text="'Dedicated Node'" />
-                    <strong v-text="'Loading...'" v-if="priceTask.loading" />
+                    <strong v-if="priceTask.loading" v-text="'Loading...'" />
                     <strong v-else v-text="dedicatedPriceUSD + ' USD/month, ' + dedicatedPriceTFT + ' TFT/month'" />
                   </p>
                 </input-tooltip>
               </div>
 
               <section
-                class="card mt-5"
                 v-if="!priceTask.loading && priceTask.data?.dedicatedPackage.package !== 'gold'"
+                class="card mt-5"
               >
                 <p class="card-info pa-2">
                   <b>Too expensive?</b> can upgrade to <b>Gold package</b> to get discount up to 60% when you fund your
@@ -195,21 +195,21 @@
                 }"
               >
                 <input-tooltip
-                  justifyCenter
-                  alignCenter
+                  justify-center
+                  align-center
                   tooltip="Shared Nodes allow several users to host various workloads on a single node."
                 >
                   <p>
                     Cost of reservation on a
                     <strong class="mr-1" v-text="'Shared Node'" />
-                    <strong v-text="'Loading...'" v-if="priceTask.loading" />
+                    <strong v-if="priceTask.loading" v-text="'Loading...'" />
                     <strong v-else v-text="sharedPriceUSD + ' USD/month, ' + sharedPriceTFT + ' TFT/month'" />
                   </p>
                 </input-tooltip>
               </div>
               <section
-                class="card mt-5 pa-2"
                 v-if="!priceTask.loading && priceTask.data?.sharedPackage.package !== 'gold'"
+                class="card mt-5 pa-2"
               >
                 <p class="card-info">
                   <b>Too expensive?</b> can upgrade to <b>Gold package</b> to get discount up to 60% when you fund your
@@ -234,7 +234,7 @@
 
 <script lang="ts">
 import { QueryClient } from "@threefold/tfchain_client";
-import { computed, type ComputedRef, ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { VForm } from "vuetify/components/VForm";
 

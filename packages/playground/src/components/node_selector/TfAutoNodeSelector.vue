@@ -6,9 +6,9 @@
       class="mb-4"
       size="x-large"
       block
-      @click="resetPageAndReloadNodes()"
       :loading="pageCountTask.loading || nodesTask.loading"
       :disabled="nodeInputValidateTask.loading || !validFilters"
+      @click="resetPageAndReloadNodes()"
     >
       Load Nodes
     </VBtn>
@@ -17,8 +17,8 @@
       <div class="w-100" :style="{ position: 'relative' }">
         <div class="d-flex my-6 align-center justify-center">
           <v-progress-circular
-            indeterminate
             v-if="loadedNodes.length > 0 && (pageCountTask.loading || nodesTask.loading)"
+            indeterminate
           />
         </div>
         <VCard
@@ -44,6 +44,7 @@
             <VAlert v-else type="error" text="No Nodes were found!" />
           </VContainer>
           <div
+            v-if="loadedNodes.length"
             ref="nodesContainer"
             :style="{
               maxHeight: '450px',
@@ -51,7 +52,6 @@
               backgroundColor: 'rgb(var(--v-theme-background))',
             }"
             class="overflow-auto px-4"
-            v-if="loadedNodes.length"
           >
             <template v-for="(node, index) in loadedNodes" :key="node.id">
               <div class="my-4">
@@ -60,25 +60,24 @@
                   v-model:node="loadedNodes[index]"
                   :selected="!validFilters || filtersUpdated ? false : $props.modelValue === node"
                   selectable
-                  @update:node="updateNode($event as NodeInfo)"
-                  @node:select="bindModelValueAndValidate"
-                  @update:status="bindStatus($event as ValidatorStatus)"
                   :status="
                     $props.modelValue === node
                       ? nodeInputValidateTask.loading
                         ? 'Pending'
                         : nodeInputValidateTask.data
-                        ? 'Valid'
-                        : 'Invalid'
+                          ? 'Valid'
+                          : 'Invalid'
                       : 'Init'
                   "
+                  @update:node="updateNode($event as NodeInfo)"
+                  @node:select="bindModelValueAndValidate"
+                  @update:status="bindStatus($event as ValidatorStatus)"
                 />
               </div>
             </template>
 
             <VContainer v-if="loadedNodes.length > 0 && pagination.page !== -1">
               <VBtn
-                @click="reloadNodes()"
                 block
                 color="secondary"
                 variant="tonal"
@@ -86,6 +85,7 @@
                 :loading="nodesTask.loading"
                 prepend-icon="mdi-reload"
                 :disabled="nodeInputValidateTask.loading"
+                @click="reloadNodes()"
               >
                 Load More Nodes
               </VBtn>
@@ -94,6 +94,7 @@
         </VCard>
 
         <VAlert
+          v-if="!validFilters || (filtersUpdated && validFilters)"
           :type="!validFilters ? 'error' : 'warning'"
           variant="elevated"
           :style="{
@@ -103,7 +104,6 @@
             transform: 'translate(-50%, -50%)',
             zIndex: 9,
           }"
-          v-if="!validFilters || (filtersUpdated && validFilters)"
         >
           <span v-if="!validFilters" v-text="'Please provide valid data.'" />
           <template v-else>
@@ -112,6 +112,7 @@
         </VAlert>
 
         <VAlert
+          v-else-if="nodeInputValidateTask.loading"
           type="info"
           variant="elevated"
           :style="{
@@ -120,15 +121,13 @@
             right: '31px',
             zIndex: 9,
           }"
-          v-else-if="nodeInputValidateTask.loading"
           text="Checking if the deployment will fit in the node's disks..."
         />
 
         <VAlert
+          v-if="visibleAlert && !filtersUpdated && nodeInputValidateTask.error"
           type="error"
           variant="elevated"
-          v-if="visibleAlert && !filtersUpdated && nodeInputValidateTask.error"
-          @click="visibleAlert = !visibleAlert"
           :style="{
             position: 'absolute',
             bottom: '31px',
@@ -138,6 +137,7 @@
           }"
           :text="nodeInputValidateTask.error"
           dismissable
+          @click="visibleAlert = !visibleAlert"
         />
       </div>
     </input-tooltip>
@@ -151,8 +151,6 @@ import { RequestError } from "@threefold/types";
 import type AwaitLock from "await-lock";
 import equals from "lodash/fp/equals.js";
 import { computed, nextTick, onMounted, onUnmounted, onUpdated, type PropType, ref } from "vue";
-
-import { normalizeError } from "@/utils/helpers";
 
 import { useAsync, usePagination, useWatchDeep } from "../../hooks";
 import { ValidatorStatus } from "../../hooks/form_validator";

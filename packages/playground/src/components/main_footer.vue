@@ -10,8 +10,8 @@
                 : baseUrl + 'images/logoTF_light.png'
             }`"
             width="140px"
-            @click="navigateToHome"
             class="clickable-logo"
+            @click="navigateToHome"
           />
           <p class="mt-3 text-subtitle-2">
             A peer-to-peer open-source Internet platform that connects users directly with local Internet capacity.
@@ -21,22 +21,18 @@
               href="https://github.com/threefoldtech/tfgrid-sdk-ts"
               target="_blank"
               :style="{ color: 'rgb(var(--v-footer-color-link)) !important' }"
-              ><v-btn color="anchor" icon="mdi-github" variant="text"></v-btn
-            ></a>
+              ><v-btn color="anchor" icon="mdi-github" variant="text" /></a>
             <a
               href="mailto:info@threefold.io"
               target="_blank"
               :style="{ color: 'rgb(var(--v-footer-color)) !important' }"
-              ><v-btn color="anchor" icon="mdi-email-outline" variant="text"></v-btn
-            ></a>
+              ><v-btn color="anchor" icon="mdi-email-outline" variant="text" /></a>
           </div>
         </v-col>
         <v-col class="mb-2" cols="12" sm="3" md="2">
           <p class="text-subtitle-1 footer_header" color="secondary">Take Action</p>
           <div>
-            <a color="error" :href="manual.buy_sell_tft" class="app-link text-subtitle-2" target="_blank"
-              >Buy the Token</a
-            >
+            <a color="error" :href="manual.buy_sell_tft" class="app-link text-subtitle-2" target="_blank">Buy the Token</a>
           </div>
           <div>
             <a :href="manual.farmers" class="app-link text-subtitle-2" target="_blank">Start Farming</a>
@@ -54,8 +50,7 @@
               variant="text"
               class="app-link text-subtitle-2"
               target="_blank"
-              >ThreeFold</a
-            >
+              >ThreeFold</a>
           </div>
           <div>
             <a href="https://www.threefold.io/blog/" class="app-link text-subtitle-2" target="_blank">Blog</a>
@@ -90,8 +85,7 @@
             <span class="mx-2">|</span>Version
             <span class="footer_header">
               {{ version }}
-            </span></span
-          >
+            </span></span>
         </p>
       </div>
     </v-container>
@@ -118,7 +112,7 @@ function navigateToHome() {
 </script>
 <script lang="ts">
 export default {
-  name: "mainFooter",
+  name: "MainFooter",
   data: () => ({
     icons: ["mdi-github", "mdi-email-outline"],
   }),

@@ -6,10 +6,10 @@
       status === 'Valid'
         ? 'rgba(var(--v-theme-primary), 0.1)'
         : status === 'Invalid'
-        ? 'rgba(var(--v-theme-error), 0.1)'
-        : status === 'Pending'
-        ? 'rgba(var(--v-theme-warning), 0.01)'
-        : undefined
+          ? 'rgba(var(--v-theme-error), 0.1)'
+          : status === 'Pending'
+            ? 'rgba(var(--v-theme-warning), 0.01)'
+            : undefined
     "
     :flat="flat"
     v-bind="{
@@ -17,7 +17,7 @@
     }"
   >
     <template #loader>
-      <VProgressLinear indeterminate color="primary" height="2" v-if="status === 'Pending'" />
+      <VProgressLinear v-if="status === 'Pending'" indeterminate color="primary" height="2" />
     </template>
     <template #prepend>
       <VTooltip :text="node?.location.country" :disabled="!node">
@@ -38,14 +38,14 @@
 
     <template #title>
       Node ID: {{ node?.nodeId }}
-      <VTooltip text="Node Serial Number" v-if="node && serialNumber">
+      <VTooltip v-if="node && serialNumber" text="Node Serial Number">
         <template #activator="{ props }">
           <VChip size="x-small" v-bind="props">
             <span class="font-weight-bold" v-text="checkSerialNumber(serialNumber)" />
           </VChip>
         </template>
       </VTooltip>
-      <VTooltip text="Node Country" v-if="node && node.location.country.trim().length > 0" location="left">
+      <VTooltip v-if="node && node.location.country.trim().length > 0" text="Node Country" location="left">
         <template #activator="{ props }">
           <VChip class="ml-2" size="x-small" v-bind="props">
             <span class="font-weight-bold" v-text="node?.location.country" />
@@ -56,12 +56,12 @@
 
     <template #subtitle>
       <span v-if="node"> Farm: <span class="font-weight-bold" v-text="node.farmName" /> </span>
-      <span class="ml-2" v-if="node">
+      <span v-if="node" class="ml-2">
         Uptime:
         <span class="font-weight-bold" v-text="toReadableDate(node.uptime)" />
       </span>
-      <span class="ml-2" v-if="node"
-        >Last Deployment Time:
+      <span v-if="node" class="ml-2">
+        Last Deployment Time:
         {{ lastDeploymentTime === 0 ? "N/A" : toHumanDate(lastDeploymentTime) }}
       </span>
     </template>
@@ -70,9 +70,9 @@
       <template v-if="node">
         <div class="d-flex align-center">
           <VTooltip
+            v-if="node"
             :text="dedicated ? 'This node is dedicated for one user only' : 'Multiple users can deploy on this node'"
             location="top"
-            v-if="node"
           >
             <template #activator="{ props }">
               <VChip
@@ -84,7 +84,7 @@
             </template>
           </VTooltip>
 
-          <VTooltip text="Node Status" location="top" v-if="node && node.status">
+          <VTooltip v-if="node && node.status" text="Node Status" location="top">
             <template #activator="{ props }">
               <VChip
                 v-bind="props"
@@ -130,13 +130,13 @@
 
           <VTooltip v-if="speed" location="top" text="Network Speed Test">
             <template #activator="{ props }">
-              <span v-bind="props" v-if="speed?.upload && speed?.download" class="speed-chip mr-2 grey-darken-3">
+              <span v-if="speed?.upload && speed?.download" v-bind="props" class="speed-chip mr-2 grey-darken-3">
                 <span>
-                  <v-icon icon="mdi-arrow-up"></v-icon>
+                  <v-icon icon="mdi-arrow-up" />
                   <span class="mx-1"> {{ formatSpeed(speed.upload) }}</span>
                 </span>
                 <span>
-                  <v-icon icon="mdi-arrow-down"></v-icon>
+                  <v-icon icon="mdi-arrow-down" />
                   <span class="mx-1">{{ formatSpeed(speed.download) }}</span>
                 </span>
               </span>
@@ -154,7 +154,7 @@
             :used="(node?.used_resources.cru ?? 0) + selectedMachines.reduce((r, m) => r + m.cpu, 0)"
             :total="node?.total_resources.cru ?? 0"
             :text="cruText"
-            :cpuType="dmi?.processor[0]?.version"
+            :cpu-type="dmi?.processor[0]?.version"
           />
         </VCol>
         <VCol class="tf-node-resource">
@@ -163,7 +163,7 @@
             :used="(node?.used_resources.mru ?? 0) + selectedMachines.reduce((r, m) => r + (m.memory / 1024) * 1e9, 0)"
             :total="node?.total_resources.mru ?? 0"
             :text="mruText"
-            :memoryType="dmi?.memory[0]?.type"
+            :memory-type="dmi?.memory[0]?.type"
           />
         </VCol>
       </VRow>
@@ -186,14 +186,10 @@
           />
         </VCol>
       </VRow>
-      <div class="ml-auto text-right" v-if="node && (rentedByUser || (node.status !== 'down' && node.rentable))">
+      <div v-if="node && (rentedByUser || (node.status !== 'down' && node.rentable))" class="ml-auto text-right">
         <v-tooltip bottom color="primary" close-delay="100" :disabled="!(node && node.dedicated)">
-          <template v-slot:activator="{ isActive, props }">
-            <span v-bind="props" v-on="isActive" class="font-weight-bold"
-              ><v-icon class="scale_beat mr-2" color="warning" :disabled="!(node && node.dedicated)"
-                >mdi-brightness-percent</v-icon
-              >{{ hourlyPriceAfterDiscount }} USD/Hour</span
-            >
+          <template #activator="{ isActive, props }">
+            <span v-bind="props" class="font-weight-bold" v-on="isActive"><v-icon class="scale_beat mr-2" color="warning" :disabled="!(node && node.dedicated)">mdi-brightness-percent</v-icon>{{ hourlyPriceAfterDiscount }} USD/Hour</span>
           </template>
 
           <span>
@@ -227,7 +223,7 @@
               :disable-sort="true"
               density="compact"
             >
-              <template #bottom></template>
+              <template #bottom />
             </v-data-table>
 
             <ul class="pl-5 py-2">
@@ -240,7 +236,7 @@
               </li>
               <li>
                 {{ rentedByUser ? "You receive" : "You'll receive" }} a
-                <VProgressCircular indeterminate size="10" width="1" color="info" v-if="loadingStakingDiscount" />
+                <VProgressCircular v-if="loadingStakingDiscount" indeterminate size="10" width="1" color="info" />
                 <strong v-else>{{ stakingDiscount }}%</strong>
                 discount as per the
                 <a target="_blank" :href="manual?.discount_levels"> staking discounts </a>
@@ -275,7 +271,7 @@
         <reserve-btn
           v-if="node?.dedicated && node?.status !== 'down'"
           class="ml-4"
-          :node="(node as GridNode)"
+          :node="node as GridNode"
           @update:status="$emit('update:status', $event as ValidatorStatus)"
           @update:node="$emit('update:node', $event as NodeInfo)"
         />

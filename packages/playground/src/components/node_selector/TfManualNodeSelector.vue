@@ -25,10 +25,7 @@
       "
     />
 
-    <input-tooltip
-      tooltip="Node ID to deploy on."
-      align-center
-    >
+    <input-tooltip tooltip="Node ID to deploy on." align-center>
       <VTextField
         v-model.number="nodeId"
         label="Node ID"
@@ -40,9 +37,9 @@
         :disabled="!validFilters"
         :persistent-hint="
           (nodeId && !validationTask.initialized) ||
-            !validFilters ||
-            validationTask.loading ||
-            (validationTask.initialized && validationTask.data === true)
+          !validFilters ||
+          validationTask.loading ||
+          (validationTask.initialized && validationTask.data === true)
         "
         :hint="
           !validFilters
@@ -64,7 +61,7 @@
 
 <script lang="ts">
 import type { Features, FilterOptions, NodeInfo } from "@threefold/grid_client";
-import { type Farm, type NodeStats, NodeStatus } from "@threefold/gridproxy_client";
+import { type Farm, NodeStatus } from "@threefold/gridproxy_client";
 import type AwaitLock from "await-lock";
 import isInt from "validator/lib/isInt";
 import { computed, onUnmounted, type PropType, ref, watch } from "vue";

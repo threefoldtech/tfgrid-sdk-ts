@@ -1,33 +1,35 @@
 <template>
   <view-layout>
     <v-card color="primary" class="d-flex justify-center items-center mb-4 pa-3 text-center">
-      <v-icon size="30" class="pr-3">mdi-lightbulb-on-outline</v-icon>
-      <v-card-title class="pa-0">Labs</v-card-title>
+      <v-icon size="30" class="pr-3"> mdi-lightbulb-on-outline </v-icon>
+      <v-card-title class="pa-0"> Labs </v-card-title>
     </v-card>
-    <v-text-field label="Search for a lab" v-model="searchItem" class="mb-5" clearable></v-text-field>
+    <v-text-field v-model="searchItem" label="Search for a lab" class="mb-5" clearable />
     <p v-if="filteredAppCards.length === 0 && filteredOrchCards.length === 0" class="mx-3 mb-3">
       No solution was found with the provided search query.
     </p>
 
-    <v-card class="my-5" variant="text" v-if="filteredOrchCards.length > 0"
-      ><v-card-title
+    <v-card v-if="filteredOrchCards.length > 0" class="my-5" variant="text">
+      <v-card-title
         class="mb-2"
         :style="{
           fontSize: '1.25rem',
         }"
-        >Orchestrators</v-card-title
       >
+        Orchestrators
+      </v-card-title>
       <ApplicationCards :cards="filteredOrchCards" />
     </v-card>
-    <v-divider class="my-4" v-if="filteredAppCards.length && filteredOrchCards.length"></v-divider>
-    <v-card class="my-5" variant="text" v-if="filteredAppCards.length > 0"
-      ><v-card-title
+    <v-divider v-if="filteredAppCards.length && filteredOrchCards.length" class="my-4" />
+    <v-card v-if="filteredAppCards.length > 0" class="my-5" variant="text">
+      <v-card-title
         class="mb-2"
         :style="{
           fontSize: '1.25rem',
         }"
-        >Applications</v-card-title
       >
+        Applications
+      </v-card-title>
       <ApplicationCards :cards="filteredAppCards" />
     </v-card>
   </view-layout>

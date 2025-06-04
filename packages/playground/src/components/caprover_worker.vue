@@ -13,7 +13,7 @@
       #="{ props }"
     >
       <input-tooltip tooltip="Node name.">
-        <v-text-field label="Name" v-model="$props.modelValue.name" v-bind="props" />
+        <v-text-field v-model="$props.modelValue.name" label="Name" v-bind="props" />
       </input-tooltip>
     </input-validator>
 
@@ -24,15 +24,19 @@
     />
 
     <Networks
-      required
-      :ipv4="$props.modelValue.ipv4"
       v-model:ipv6="$props.modelValue.ipv6"
       v-model:planetary="$props.modelValue.planetary"
       v-model:mycelium="$props.modelValue.mycelium"
       v-model:wireguard="$props.modelValue.wireguard"
+      required
+      :ipv4="$props.modelValue.ipv4"
     />
 
     <TfSelectionDetails
+      v-model="$props.modelValue.selectionDetails"
+      v-model:rented-by-me="$props.modelValue.rentedByMe"
+      v-model:dedicated="$props.modelValue.dedicated"
+      v-model:certified="$props.modelValue.certified"
       :selected-machines="selectedMachines"
       :nodes-lock="nodesLock"
       :filters="{
@@ -49,10 +53,6 @@
         mycelium: $props.modelValue.mycelium,
         wireguard: $props.modelValue.wireguard,
       }"
-      v-model="$props.modelValue.selectionDetails"
-      v-model:rentedByMe="$props.modelValue.rentedByMe"
-      v-model:dedicated="$props.modelValue.dedicated"
-      v-model:certified="$props.modelValue.certified"
     />
   </div>
 </template>

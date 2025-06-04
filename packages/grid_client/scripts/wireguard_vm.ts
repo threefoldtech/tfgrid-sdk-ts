@@ -86,6 +86,7 @@ async function deleteVM(client, vms) {
   log("================= Canceling the VM deployment =================");
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function deleteGw(client, gw) {
   const res = await client.gateway.delete_name(gw);
   log("================= Canceling the GW deployment =================");

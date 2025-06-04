@@ -3,19 +3,20 @@
     width="1024"
     class="mx-auto"
     :model-value="$props.modelValue"
-    @update:model-value="handleProfileDialog($event)"
     attach="#modals"
     eager
+    @update:model-value="handleProfileDialog($event)"
   >
-    <template #activator="{ props }">
-      <VCard v-bind="props" class="pa-3 d-inline-flex align-center bg-transparent elevation-0">
+    <template #activator="{ props: cardSlotProps }">
+      <VCard v-bind="cardSlotProps" class="pa-3 d-inline-flex align-center bg-transparent elevation-0">
         <div>
-          <v-btn v-if="!profileManager.profile" variant="elevated"
-            ><VProgressCircular v-if="loading" class="mr-2" indeterminate color="white" size="20" width="2" /><v-icon
+          <v-btn v-if="!profileManager.profile" variant="elevated">
+            <VProgressCircular v-if="loading" class="mr-2" indeterminate color="white" size="20" width="2" /><v-icon
               size="20"
               class="pr-2"
-              >mdi-wallet-outline</v-icon
             >
+              mdi-wallet-outline
+            </v-icon>
             Connect your TFChain Wallet
           </v-btn>
           <p v-else-if="loadingBalance">
@@ -35,10 +36,9 @@
                 {{ normalizeBalance(balance.reserved, true) || 0 }} TFT
               </strong>
               <v-tooltip text="Locked balance documentation" location="bottom right">
-                <template #activator="{ props }">
+                <template #activator="{ props: tooltipBtnProps }">
                   <v-btn
-                    @click.stop
-                    v-bind="props"
+                    v-bind="tooltipBtnProps"
                     :color="theme.name.value === AppThemeSelection.light ? 'black' : 'white'"
                     icon="mdi-information-outline"
                     height="24px"
@@ -46,6 +46,7 @@
                     class="ml-2"
                     :href="manual.contract_locking"
                     target="_blank"
+                    @click.stop
                   />
                 </template>
               </v-tooltip>
@@ -53,23 +54,23 @@
           </template>
         </div>
         <v-tooltip text="Logout" location="bottom" :disabled="!profileManager.profile">
-          <template #activator="{ props }">
+          <template #activator="{ props: logoutBtnProps }">
             <VBtn
+              v-if="profileManager.profile"
               color="error"
               variant="tonal"
-              @click.stop="logout"
-              v-if="profileManager.profile"
               :disabled="loadingBalance"
               class="ml-2"
-              v-bind="props"
+              v-bind="logoutBtnProps"
               icon="mdi-logout"
+              @click.stop="logout"
             />
           </template>
         </v-tooltip>
       </VCard>
     </template>
     <v-card color="primary" class="d-flex justify-center items-center mt-3 pa-3 text-center">
-      <v-card-title class="pa-0">TFChain Wallet</v-card-title>
+      <v-card-title class="pa-0"> TFChain Wallet </v-card-title>
     </v-card>
     <WebletLayout disable-alerts>
       <v-alert variant="tonal" class="mb-6">
@@ -82,13 +83,15 @@
 
       <DTabs
         v-if="!profileManager.profile"
-        :tabs="getTabs()"
-        v-model="activeTab"
-        :disabled="loading"
         ref="tabsRef"
+        v-model="activeTab"
+        :tabs="getTabs()"
+        :disabled="loading"
         destroy
       >
-        <template #login> <Wallet_login @close-dialog="emit(`update:modelValue`, false)" /> </template>
+        <template #login>
+          <Wallet_login @close-dialog="emit(`update:modelValue`, false)" />
+        </template>
         <template #register>
           <ConnectWallet @close-dialog="emit(`update:modelValue`, false)" @update:loading="loading = $event" />
         </template>
@@ -98,30 +101,30 @@
         <v-row>
           <v-col cols="12" md="6" lg="6" xl="6">
             <PasswordInputWrapper
-              #="{ props }"
               v-if="profileManager.profile.mnemonic !== profileManager.profile.hexSeed"
+              #="{ props }"
             >
-              <VTextField :label="'Your Mnemonic'" readonly v-model="profileManager.profile.mnemonic" v-bind="props" />
+              <VTextField v-model="profileManager.profile.mnemonic" :label="'Your Mnemonic'" readonly v-bind="props" />
             </PasswordInputWrapper>
             <PasswordInputWrapper #="{ props }">
               <input-tooltip tooltip=" Please use this hex seed to import your wallet in Threefold Connect">
-                <VTextField label="Your Hex Seed" readonly v-model="profileManager.profile.hexSeed" v-bind="props" />
+                <VTextField v-model="profileManager.profile.hexSeed" label="Your Hex Seed" readonly v-bind="props" />
               </input-tooltip>
             </PasswordInputWrapper>
 
             <CopyInputWrapper :data="profileManager.profile.twinId.toString()" #="{ props }">
-              <VTextField label="Twin ID" readonly v-model="profileManager.profile.twinId" v-bind="props" />
+              <VTextField v-model="profileManager.profile.twinId" label="Twin ID" readonly v-bind="props" />
             </CopyInputWrapper>
 
             <CopyInputWrapper v-if="profileManager.profile.email" :data="profileManager.profile.email" #="{ props }">
-              <VTextField label="Email" readonly v-model="profileManager.profile.email" v-bind="props" />
+              <VTextField v-model="profileManager.profile.email" label="Email" readonly v-bind="props" />
             </CopyInputWrapper>
             <CopyInputWrapper :data="profileManager.profile.address" #="{ props }">
-              <VTextField label="Address" readonly v-model="profileManager.profile.address" v-bind="props" />
+              <VTextField v-model="profileManager.profile.address" label="Address" readonly v-bind="props" />
             </CopyInputWrapper>
 
             <CopyInputWrapper :data="freeBalance.toString()" #="{ props }">
-              <VTextField label="Balance" readonly v-model="freeBalance" v-bind="props" />
+              <VTextField v-model="freeBalance" label="Balance" readonly v-bind="props" />
             </CopyInputWrapper>
           </v-col>
 
@@ -144,12 +147,12 @@
       <div class="d-flex justify-end mt-4 mb-2">
         <VBtn v-if="profileManager.profile" color="anchor" @click="$emit('update:modelValue', false)"> Close </VBtn>
         <VBtn
+          v-if="profileManager.profile"
           class="ml-2"
           color="error"
-          @click="logout"
           variant="outlined"
-          v-if="profileManager.profile"
           :disabled="loadingBalance"
+          @click="logout"
         >
           Logout
         </VBtn>

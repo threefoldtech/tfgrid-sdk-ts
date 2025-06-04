@@ -1,6 +1,6 @@
 import { SubmittableExtrinsic } from "@polkadot/api-base/types";
 import { ISubmittableResult } from "@polkadot/types/types";
-import { ExtrinsicResult, KVStoreSetOptions } from "@threefold/tfchain_client";
+import { ExtrinsicResult } from "@threefold/tfchain_client";
 
 import { TFClient } from "../clients/tf-grid/client";
 import { KeypairType } from "../zos/deployment";

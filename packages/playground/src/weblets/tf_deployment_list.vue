@@ -3,22 +3,22 @@
     <template #title>
       {{ title || "Deployment List" }}
     </template>
-    <template #subtitle v-if="!$props.projectName"> List your own deployments for different solutions </template>
+    <template v-if="!$props.projectName" #subtitle> List your own deployments for different solutions </template>
     <d-tabs
       :tabs="tabs"
       :model-value="activeTab"
-      @update:model-value="activeTab = $event"
       :disabled="deleting"
       destroy
       :hide-tabs="!!$props.projectName"
+      @update:model-value="activeTab = $event"
     >
       <VmDeploymentTable
-        :projectName="tabs[activeTab].value"
-        :projectTitle="tabs[activeTab].title"
-        v-model="selectedItems"
-        :deleting="deleting"
-        :hideSSH="hideSSH"
         ref="table"
+        v-model="selectedItems"
+        :project-name="tabs[activeTab].value"
+        :project-title="tabs[activeTab].title"
+        :deleting="deleting"
+        :hide-ssh="hideSsh"
         @click:row="clickOpenDialog"
       >
         <template #Fullvm-actions="{ item }">
@@ -315,8 +315,8 @@
               (item.publicIP?.ip
                 ? item.publicIP.ip.slice(0, -3)
                 : item.planetary
-                ? '[' + item.planetary + ']'
-                : item.interfaces[0].ip)
+                  ? '[' + item.planetary + ']'
+                  : item.interfaces[0].ip)
             "
           />
         </template>
@@ -374,10 +374,10 @@
 
       <template #Kubernetes>
         <K8sDeploymentTable
-          :projectName="tabs[activeTab].value"
-          v-model="selectedItems"
-          :deleting="deleting"
           ref="table"
+          v-model="selectedItems"
+          :project-name="tabs[activeTab].value"
+          :deleting="deleting"
           @click:row="clickOpenDialog"
         >
           <template #actions="{ item }">
@@ -437,11 +437,11 @@
       </v-card-title>
       <v-card-text>
         <template v-if="hasWorkers">
-          <v-alert type="warning">Please note that: This deployment contains workers workloads.</v-alert>
+          <v-alert type="warning"> Please note that: This deployment contains workers workloads. </v-alert>
         </template>
         <template v-for="item in selectedItems" :key="item.name">
           <template v-if="item.workers">
-            <v-chip class="ma-3" v-for="worker in item.workers" :key="worker.name">
+            <v-chip v-for="worker in item.workers" :key="worker.name" class="ma-3">
               {{ worker.name }}
             </v-chip>
           </template>
@@ -452,7 +452,7 @@
         <v-divider />
       </v-card-text>
       <v-card-actions class="justify-end my-1 mr-2">
-        <v-btn color="anchar" @click="deletingDialog = false">Cancel</v-btn>
+        <v-btn color="anchar" @click="deletingDialog = false"> Cancel </v-btn>
         <v-btn color="error" @click="onDelete(tabs[activeTab].value.toLowerCase() === 'kubernetes')"> Delete </v-btn>
       </v-card-actions>
     </v-card>
@@ -472,7 +472,7 @@ import { updateGrid } from "../utils/grid";
 const props = defineProps<{
   projectName?: ProjectName;
   title?: string;
-  hideSSH?: boolean;
+  hideSsh?: boolean;
 }>();
 
 const tabs: Tab[] = [
@@ -567,8 +567,8 @@ function openDialog(project: string, item?: any): void {
   const key: keyof typeof deploymentListEnvironments = VMS.includes(project)
     ? "vm"
     : project === ProjectName.Kubernetes
-    ? "k8s"
-    : (project.toLowerCase() as any);
+      ? "k8s"
+      : (project.toLowerCase() as any);
 
   if (item && item.projectName && item.projectName.includes(ProjectName.Caprover.toLocaleLowerCase())) {
     if (!item.workers) {

@@ -1,9 +1,7 @@
 <template>
-  <div
-    class="d-flex flex-column"
-    style="min-height: 100vh"
-  >
+  <div class="d-flex flex-column" style="min-height: 100vh">
     <v-alert
+      v-model="alert"
       transition="fade-transition"
       border="start"
       type="info"
@@ -19,23 +17,9 @@
     </v-alert>
 
     <v-container class="d-flex flex-grow-1 align-center justify-center pa-4">
-      <v-form
-        v-model="valid"
-        class="my-2 w-100"
-        style="max-width: 900px"
-        @submit.prevent="submitForm"
-      >
-        <v-img
-          :src="Logo"
-          :width="xs ? 150 : 200"
-          max-height="100"
-          class="mx-auto mb-5"
-        />
-        <v-card
-          class="mx-auto bg-transparent"
-          :width="xs ? '100%' : 400"
-          flat
-        >
+      <v-form v-model="valid" class="my-2 w-100" style="max-width: 900px" @submit.prevent="submitForm">
+        <v-img :src="Logo" :width="xs ? 150 : 200" max-height="100" class="mx-auto mb-5" />
+        <v-card class="mx-auto bg-transparent" :width="xs ? '100%' : 400" flat>
           <!-- Solana Address -->
           <v-text-field
             v-model="toAddress"
@@ -46,46 +30,21 @@
           />
 
           <!-- Amount Input -->
-          <v-text-field
-            v-model="amount"
-            label="Amount"
-            variant="outlined"
-            type="number"
-            :rules="amountRules"
-          />
+          <v-text-field v-model="amount" label="Amount" variant="outlined" type="number" :rules="amountRules" />
           <p class="d-flex align-center text-caption text-grey-darken-1">
-            <v-icon class="mr-1">
-              mdi-information-outline
-            </v-icon> Transfer Fee: {{ transferFee }} TFT
+            <v-icon class="mr-1"> mdi-information-outline </v-icon> Transfer Fee: {{ transferFee }} TFT
           </p>
         </v-card>
         <v-expand-transition>
-          <v-card
-            v-if="isValidTransaction"
-            class="bg-transparent"
-            flat
-          >
-            <v-card-subtitle
-              class="text-center my-5"
-              :class="xs ? 'text-body-2' : ''"
-            >
+          <v-card v-if="isValidTransaction" class="bg-transparent" flat>
+            <v-card-subtitle class="text-center my-5" :class="xs ? 'text-body-2' : ''">
               Enter the following information manually <strong>OR</strong> scan the QR code with Threefold Connect app
             </v-card-subtitle>
-            <div
-              class="border mt-5 mb-2"
-              :class="xs ? 'pa-2' : 'pa-5'"
-            >
+            <div class="border mt-5 mb-2" :class="xs ? 'pa-2' : 'pa-5'">
               <v-row>
                 <v-col :cols="smAndDown ? 12 : 'auto'">
-                  <v-card
-                    :width="xs ? '100%' : 400"
-                    class="mx-auto bg-transparent"
-                    :class="xs ? 'pa-2' : 'pa-5'"
-                    flat
-                  >
-                    <div class="text-subtitle-1 text-medium-emphasis mb-3">
-                      Enter your Stellar Account Seed:
-                    </div>
+                  <v-card :width="xs ? '100%' : 400" class="mx-auto bg-transparent" :class="xs ? 'pa-2' : 'pa-5'" flat>
+                    <div class="text-subtitle-1 text-medium-emphasis mb-3">Enter your Stellar Account Seed:</div>
                     <!-- Stellar Address -->
                     <v-text-field
                       v-model="fromAddress"
@@ -107,34 +66,17 @@
                     </v-btn>
                   </v-card>
                 </v-col>
-                <v-col
-                  v-if="!smAndDown"
-                  class="divider-container"
-                  cols="auto"
-                >
+                <v-col v-if="!smAndDown" class="divider-container" cols="auto">
                   <v-divider vertical />
                   <span class="divider-text text-grey-darken-1 mainBG">OR</span>
                 </v-col>
-                <v-col
-                  v-if="smAndDown"
-                  cols="12"
-                  class="text-center my-3"
-                >
+                <v-col v-if="smAndDown" cols="12" class="text-center my-3">
                   <v-divider />
                   <span class="divider-text-horizontal text-grey-darken-1 mainBG">OR</span>
                 </v-col>
                 <v-col :cols="smAndDown ? 12 : 'auto'">
-                  <v-card
-                    :width="xs ? '100%' : 400"
-                    class="bg-transparent"
-                    flat
-                  >
-                    <v-img
-                      :src="QRSrc"
-                      alt="qrcode"
-                      :width="xs ? 150 : 200"
-                      class="mx-auto"
-                    />
+                  <v-card :width="xs ? '100%' : 400" class="bg-transparent" flat>
+                    <v-img :src="QRSrc" alt="qrcode" :width="xs ? 150 : 200" class="mx-auto" />
                     <v-card-text class="mt-4">
                       <p><strong>Destination:</strong> {{ BRIDGE_ADDRESS }}</p>
                       <p><strong>Memo Hash:</strong> {{ memoHash }}</p>
@@ -149,9 +91,7 @@
                   class="mt-4"
                   :class="xs ? 'd-flex flex-column align-center' : 'd-flex justify-center align-center'"
                 >
-                  <p :class="xs ? 'mb-3 text-center' : 'mr-3'">
-                    Don't have the app? Download it now
-                  </p>
+                  <p :class="xs ? 'mb-3 text-center' : 'mr-3'">Don't have the app? Download it now</p>
                   <div :class="xs ? 'd-flex align-center' : 'd-flex'">
                     <a
                       v-for="app in apps"
@@ -170,20 +110,14 @@
           </v-card>
         </v-expand-transition>
       </v-form>
-      <v-dialog
-        v-model="isActive"
-        :max-width="xs ? '90%' : 500"
-      >
+      <v-dialog v-model="isActive" :max-width="xs ? '90%' : 500">
         <v-card>
           <v-card-text> {{ confirmMessage }} </v-card-text>
 
           <v-card-actions>
             <v-spacer />
 
-            <v-btn
-              text="Close"
-              @click="isActive = false"
-            />
+            <v-btn text="Close" @click="isActive = false" />
           </v-card-actions>
         </v-card>
       </v-dialog>

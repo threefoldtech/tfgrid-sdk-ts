@@ -17,6 +17,7 @@ async function getDeployment(client: GridClient, name: string) {
   log("================= Getting deployment information =================");
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function cancel(client: GridClient, options: MachinesDeleteModel) {
   const res = await client.machines.delete(options);
   log("================= Canceling the deployment =================");

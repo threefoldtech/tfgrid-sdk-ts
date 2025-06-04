@@ -264,7 +264,7 @@ class Client {
       while (this.con.readyState != this.con.OPEN && retries >= retriesCount++) {
         try {
           await this.waitForOpenConnection();
-        } catch (er) {
+        } catch {
           if (retries === retriesCount) {
             throw new ConnectionError(`Failed to open connection after try for ${retriesCount} times.`);
           }
@@ -328,7 +328,7 @@ class Client {
       while (this.con.readyState != this.con.OPEN && retries >= retriesCount++) {
         try {
           await this.waitForOpenConnection();
-        } catch (er) {
+        } catch {
           if (retries === retriesCount) {
             throw new ConnectionError(`Failed to open connection after try for ${retriesCount} times.`);
           }

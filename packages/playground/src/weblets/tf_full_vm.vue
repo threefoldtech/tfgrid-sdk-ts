@@ -7,13 +7,11 @@
     :ipv4="ipv4"
     :rented-by="rentedBy"
     :dedicated="dedicated"
-    :SelectedNode="selectionDetails?.node"
+    :selected-node="selectionDetails?.node"
     :valid-filters="selectionDetails?.validFilters"
     title-image="images/icons/vm.png"
   >
-    <template #title>
-      Deploy a Full Virtual Machine
-    </template>
+    <template #title> Deploy a Full Virtual Machine </template>
 
     <d-tabs
       ref="tabs"
@@ -35,18 +33,11 @@
           #="{ props }"
         >
           <input-tooltip tooltip="Instance name.">
-            <v-text-field
-              v-model="name"
-              label="Name"
-              v-bind="props"
-            />
+            <v-text-field v-model="name" label="Name" v-bind="props" />
           </input-tooltip>
         </input-validator>
 
-        <SelectVmImage
-          v-model="flist"
-          :images="images"
-        />
+        <SelectVmImage v-model="flist" :images="images" />
         <SelectSolutionFlavor
           v-model="solution"
           :small="{ cpu: 1, memory: 2, disk: 25 }"
@@ -98,9 +89,7 @@
           #="{ index }"
           @add="addDisk"
         >
-          <p class="text-h6 mb-4">
-            Disk #{{ index + 1 }}
-          </p>
+          <p class="text-h6 mb-4">Disk #{{ index + 1 }}</p>
           <input-validator
             :value="disks[index].name"
             :rules="[
@@ -113,11 +102,7 @@
             #="{ props }"
           >
             <input-tooltip tooltip="Disk name.">
-              <v-text-field
-                v-model="disks[index].name"
-                label="Name"
-                v-bind="props"
-              />
+              <v-text-field v-model="disks[index].name" label="Name" v-bind="props" />
             </input-tooltip>
           </input-validator>
           <input-validator
@@ -131,12 +116,7 @@
             #="{ props }"
           >
             <input-tooltip tooltip="Disk Size.">
-              <v-text-field
-                v-model.number="disks[index].size"
-                label="Size (GB)"
-                type="number"
-                v-bind="props"
-              />
+              <v-text-field v-model.number="disks[index].size" label="Size (GB)" type="number" v-bind="props" />
             </input-tooltip>
           </input-validator>
         </ExpandableLayout>

@@ -1,11 +1,11 @@
 <template>
   <v-col cols="11" class="mx-auto pt-0">
     <networkFilter
-      @refresh="statsTableRef.getStatsData(true)"
-      :loading="statsTableRef?.loading"
       v-model="networks"
+      :loading="statsTableRef?.loading"
+      @refresh="statsTableRef.getStatsData(true)"
     ></networkFilter>
-    <statsTable :networks="networks" ref="statsTableRef"></statsTable>
+    <statsTable ref="statsTableRef" :networks="networks"></statsTable>
   </v-col>
 </template>
 
@@ -20,7 +20,7 @@ const networks = ref() as Ref<string[]>;
 </script>
 <script lang="ts">
 export default {
-  components: { networkFilter, statsTable },
   name: "StatisticsView",
+  components: { networkFilter, statsTable },
 };
 </script>

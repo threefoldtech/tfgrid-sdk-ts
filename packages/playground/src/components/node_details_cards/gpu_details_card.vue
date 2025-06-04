@@ -20,14 +20,14 @@
           </v-col>
           <v-col class="mr-3 d-flex justify-end align-center">
             <v-select
+              v-model="cardId"
+              v-model:menu="menu"
               density="compact"
               hide-details="auto"
-              v-model="cardId"
               :items="cardsIds"
               variant="outlined"
-              v-model:menu="menu"
             >
-              <template v-slot:selection="{ item }">
+              <template #selection="{ item }">
                 <v-chip>
                   {{ item.title }}
                 </v-chip>

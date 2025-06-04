@@ -1,26 +1,23 @@
 <template>
-  <VAlert type="info" v-if="network == 'main'" class="my-2"
-    >To create a Farm, use the
+  <VAlert v-if="network == 'main'" type="info" class="my-2">
+    To create a Farm, use the
     <a :href="manual.tf_connect_installation" class="app-link" target="_blank">TF Connect App</a>.
   </VAlert>
   <v-container>
     <v-row class="text-center flex justify-center mt-4">
-      <v-btn
-        color="secondary"
-        class="text-subtitle-1 px-6 mr-2"
-        v-bind:href="'https://bootstrap.grid.tf/'"
-        target="blank"
-        >Bootstrap Node Image</v-btn
-      >
+      <v-btn color="secondary" class="text-subtitle-1 px-6 mr-2" :href="'https://bootstrap.grid.tf/'" target="blank">
+        Bootstrap Node Image
+      </v-btn>
 
       <v-btn
+        v-if="network !== 'main'"
         variant="elevated"
         class="text-subtitle-1 px-6"
-        v-if="network !== 'main'"
-        @click="showDialogue = true"
         :disabled="isCreating"
-        >Create Farm</v-btn
+        @click="showDialogue = true"
       >
+        Create Farm
+      </v-btn>
     </v-row>
 
     <v-container v-if="showDialogue">
@@ -32,23 +29,23 @@
               <input-validator
                 :value="farmName"
                 :rules="[
-                validators.required('Farm name is required.'),
-                (farmName: string) => validators.isAlpha('Farm name must start with an alphabet char.')(farmName[0]),
-                validators.minLength('Farm name minimum length is 3 chars.', 3),
-                validators.maxLength('Farm name maximum length is 40 chars.', 40),
-                validators.pattern('Farm name should not contain whitespaces.', {
-                  pattern: /^[^\s]+$/,
-                }),
-              ]"
+                  validators.required('Farm name is required.'),
+                  (farmName: string) => validators.isAlpha('Farm name must start with an alphabet char.')(farmName[0]),
+                  validators.minLength('Farm name minimum length is 3 chars.', 3),
+                  validators.maxLength('Farm name maximum length is 40 chars.', 40),
+                  validators.pattern('Farm name should not contain whitespaces.', {
+                    pattern: /^[^\s]+$/,
+                  }),
+                ]"
                 :async-rules="[validateFarmName]"
                 #="{ props }"
               >
-                <v-text-field v-model="farmName" v-bind:="props" outlined label="Farm name"></v-text-field>
+                <v-text-field v-model="farmName" v-bind:="props" outlined label="Farm name" />
               </input-validator>
             </form-validator>
           </v-card-text>
           <v-card-actions class="justify-end my-1 mr-2">
-            <v-btn color="anchor" @click="showDialogue = false">Close</v-btn>
+            <v-btn color="anchor" @click="showDialogue = false"> Close </v-btn>
             <v-tooltip
               text="A minimum of 2 TFTs is required to create a farm."
               location="top"
@@ -56,9 +53,7 @@
             >
               <template #activator="{ props }">
                 <span v-bind="props" style="padding-left: inherit">
-                  <v-btn @click="createFarm" :loading="isCreating" :disabled="!valid || isCreating || notEnoughBalance"
-                    >Create</v-btn
-                  >
+                  <v-btn :loading="isCreating" :disabled="!valid || isCreating || notEnoughBalance" @click="createFarm">Create</v-btn>
                 </span>
               </template>
             </v-tooltip>

@@ -1,33 +1,33 @@
 <template>
-  <v-dialog :model-value="props.modelValue" persistent fullscreen width="100%" attach="#modals" id="terms-dialog">
+  <v-dialog id="terms-dialog" :model-value="props.modelValue" persistent fullscreen width="100%" attach="#modals">
     <!-- Content card -->
-    <v-card id="terms-dialog__card-content" v-if="!loading">
-      <v-card-text class="pa-15" v-html="acceptTermsContent" id="terms-dialog__text-content"></v-card-text>
-      <div class="terms-footer" id="terms-dialog__footer">
+    <v-card v-if="!loading" id="terms-dialog__card-content">
+      <v-card-text id="terms-dialog__text-content" class="pa-15" v-html="acceptTermsContent" />
+      <div id="terms-dialog__footer" class="terms-footer">
         <v-btn
-          class="mr-2"
-          id="terms-dialog__go-back-button"
-          @click="emit('update:modelValue', false)"
           v-show="!loading"
+          id="terms-dialog__go-back-button"
+          class="mr-2"
           :color="theme.name.value === AppThemeSelection.light ? 'black' : 'white'"
           :text="capitalize('go back')"
+          @click="emit('update:modelValue', false)"
         />
         <v-btn
-          id="terms-dialog__accept-button"
-          @click="emit('onAccept')"
           v-show="!loading"
+          id="terms-dialog__accept-button"
           :text="capitalize('accept terms and conditions')"
+          @click="emit('onAccept')"
         />
       </div>
     </v-card>
     <!-- Loading card -->
-    <v-card id="terms-dialog__card-loading" v-else :style="{ height: '100%' }">
+    <v-card v-else id="terms-dialog__card-loading" :style="{ height: '100%' }">
       <v-card-text
+        id="terms-dialog__loading-content"
         class="d-flex justify-center align-center"
         :style="{ height: '100%' }"
-        id="terms-dialog__loading-content"
       >
-        <v-progress-circular indeterminate id="terms-dialog__progress-indicator" />
+        <v-progress-circular id="terms-dialog__progress-indicator" indeterminate />
       </v-card-text>
     </v-card>
   </v-dialog>
@@ -48,7 +48,6 @@ const theme = useTheme();
 const props = defineProps({
   modelValue: {
     required: true,
-    default: false,
     type: Boolean,
   },
 });

@@ -1,15 +1,15 @@
 <template>
   <v-row justify="center">
-    <v-dialog model-value @update:model-value="$emit('close')" scrollable attach="#modals">
+    <v-dialog model-value scrollable attach="#modals" @update:model-value="$emit('close')">
       <v-card>
-        <v-card-title class="d-flex flex-column" v-if="!onlyJson">
+        <v-card-title v-if="!onlyJson" class="d-flex flex-column">
           <div class="d-flex justify-center">
-            <v-btn-toggle divided v-model="showType" mandatory>
+            <v-btn-toggle v-model="showType" divided mandatory>
               <v-btn> details </v-btn>
               <v-btn> JSON</v-btn>
             </v-btn-toggle>
           </div>
-          <v-tabs v-model="activeTab" align-tabs="center" class="my-4 mx-auto" v-if="showType === 0">
+          <v-tabs v-if="showType === 0" v-model="activeTab" align-tabs="center" class="my-4 mx-auto">
             <v-tab
               v-for="(item, index) in contracts"
               :key="item.contractId"
@@ -18,8 +18,8 @@
               class="mx-2"
             >
               <v-tooltip location="bottom" :text="getTooltipText(item, index)" :disabled="!hasMaster(item)">
-                <template #activator="{ props }">
-                  <span v-bind="props" class="text-lowercase">{{
+                <template #activator="{ props: tooltipProps }">
+                  <span v-bind="tooltipProps" class="text-lowercase">{{
                     contracts && contracts.length === 1 && "name" in contracts ? (contracts as any).name : item.name
                   }}</span>
                 </template>
@@ -30,10 +30,10 @@
         <v-card-text>
           <template v-if="showType === 0">
             <v-form
-              readonly
               v-if="contract && !['gateway-name-proxy', 'gateway-fqdn-proxy'].includes(data?.[0]?.workloads?.[0]?.type)"
+              readonly
             >
-              <v-alert class="my-4" variant="tonal" v-if="contract.customDomain" type="info">
+              <v-alert v-if="contract.customDomain" class="my-4" variant="tonal" type="info">
                 Make sure to create an A record on your name provider with
                 <span class="font-weight-bold">{{ contract.customDomain }}</span>
                 pointing to
@@ -45,19 +45,19 @@
 
               <template v-if="contract.publicIP">
                 <CopyReadonlyInput
+                  v-if="contract.publicIP.ip"
                   label="Public IPv4"
                   :data="contract.publicIP.ip.split('/')[0] || contract.publicIP.ip"
-                  v-if="contract.publicIP.ip"
                 />
                 <CopyReadonlyInput
+                  v-if="contract.publicIP.ip6"
                   label="Public IPv6"
                   :data="contract.publicIP.ip6 ? contract.publicIP.ip6.replace(/\/64$/, '') : '-'"
-                  v-if="contract.publicIP.ip6"
                 />
               </template>
 
-              <CopyReadonlyInput label="Planetary Network IP" :data="contract.planetary" v-if="contract.planetary" />
-              <CopyReadonlyInput label="Mycelium Network IP" :data="contract.myceliumIP" v-if="contract.myceliumIP" />
+              <CopyReadonlyInput v-if="contract.planetary" label="Planetary Network IP" :data="contract.planetary" />
+              <CopyReadonlyInput v-if="contract.myceliumIP" label="Mycelium Network IP" :data="contract.myceliumIP" />
 
               <CopyReadonlyInput label="Network Name" :data="contract.interfaces[0].network" />
               <CopyReadonlyInput label="CPU (vCores)" :data="contract.capacity.cpu" />
@@ -80,12 +80,12 @@
                 :data="contract.interfaces[0].ip"
               />
               <CopyReadonlyInput
+                v-if="data.wireguard || contract.wireguard"
                 label="WireGuard Config"
                 textarea
                 :data="data.wireguard || contract.wireguard"
-                v-if="data.wireguard || contract.wireguard"
               />
-              <CopyReadonlyInput label="Flist" :data="contract.flist" v-if="contract.flist" />
+              <CopyReadonlyInput v-if="contract.flist" label="Flist" :data="contract.flist" />
               <template v-if="environments !== false">
                 <template v-for="key of Object.keys(contract.env)" :key="key">
                   <template v-if="(environments[key] || !(key in environments)) && contract.env[key]">
@@ -113,10 +113,10 @@
                   </template>
                 </template>
               </template>
-              <CopyReadonlyInput label="GPU Cards" :data="gpuInfo" :loading="loadingCard" v-if="showGpuCard" />
+              <CopyReadonlyInput v-if="showGpuCard" label="GPU Cards" :data="gpuInfo" :loading="loadingCard" />
               <CopyReadonlyInput label="Monitoring URL" :data="grafanaURL" :loading="isLoading" />
             </v-form>
-            <v-form readonly v-else>
+            <v-form v-else readonly>
               <CopyReadonlyInput label="Name" :data="data.name" />
               <CopyReadonlyInput label="IP" :data="data[0].workloads[0].data.backends.join(', ')" />
               <CopyReadonlyInput
@@ -135,13 +135,13 @@
             <HighlightDark v-if="theme.global.current.value.dark" />
             <HighlightLight v-else />
             <pre>
-            <code class="hljs json" :class="[theme.global.current.value.dark ? 'dark-bg' : 'light-bg']" v-html="html"></code>
+            <code class="hljs json" :class="[theme.global.current.value.dark ? 'dark-bg' : 'light-bg']" v-html="html" />
           </pre>
           </template>
         </v-card-text>
         <v-card-actions class="justify-end my-1 mr-2">
-          <v-btn color="anchor" @click="$emit('close')">Close</v-btn>
-          <v-btn color="secondary" v-if="showType == 1" @click="copy">Copy</v-btn>
+          <v-btn color="anchor" @click="$emit('close')"> Close </v-btn>
+          <v-btn v-if="showType == 1" color="secondary" @click="copy"> Copy </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>

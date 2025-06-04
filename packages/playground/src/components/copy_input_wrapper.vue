@@ -8,7 +8,7 @@
           }
         : {}
     "
-  ></slot>
+  />
 </template>
 
 <script lang="ts" setup>

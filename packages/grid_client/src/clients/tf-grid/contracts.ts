@@ -6,10 +6,8 @@ import GridProxyClient, {
   ContractType,
 } from "@threefold/gridproxy_client";
 import {
-  BillingInformation,
   ContractLock,
   ContractLockOptions,
-  ContractPaymentState,
   Contracts,
   ExtrinsicResult,
   GetDedicatedNodePriceOptions,
@@ -144,21 +142,6 @@ export interface CalculateOverdueOptions {
   gridProxyClient: GridProxyClient;
 }
 
-/**
- * Represents the total cost associated with the provided contracts.
- *
- * @interface TotalContractsCost
- *
- * @property {number} ipsCost - Total cost for the provided amount for ips per mount in USD.
- * @property {Decimal} nuCost - The total unbilled amount of network usage (NU), represented as a Decimal Unit USD.
- * @property {Decimal} overdraft - The overdraft amount, the sum of `additionalOverdraft` and `standardOverdraft` represented as a Decimal as Unit TFT.
- */
-interface TotalContractsCost {
-  ipsCost: number;
-  nuCost: number;
-  overdraft: Decimal;
-}
-
 const SECONDS_ONE_HOUR = 60 * 60;
 
 const HOURS_ONE_MONTH = 24 * 30;
@@ -229,12 +212,10 @@ class TFContracts extends Contracts {
       filterQuery += " , AND: [";
 
       if (options.type) {
-        // eslint-disable-next-line no-useless-escape
         filterQuery += `{ deploymentData_contains: \"\\\"type\\\":\\\"${options.type}\\\"\" },`;
       }
 
       if (options.projectName) {
-        // eslint-disable-next-line no-useless-escape
         filterQuery += `{ deploymentData_contains: \"\\\"projectName\\\":\\\"${options.projectName}\" }`;
       }
 

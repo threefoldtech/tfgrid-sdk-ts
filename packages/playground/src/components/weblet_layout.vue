@@ -4,9 +4,9 @@
       <div>
         <v-card-title v-if="$slots.title" class="font-weight-bold d-flex align-center title">
           <img
+            v-if="titleImage"
             :src="baseUrl + titleImage"
             alt="title image"
-            v-if="titleImage"
             :style="{
               filter: `brightness(${!theme.global.current.value.dark ? 0.2 : 1})`,
             }"
@@ -18,17 +18,17 @@
         </v-card-subtitle>
       </div>
       <v-spacer />
-      <div class="mr-4" v-if="$slots['header-actions']">
-        <slot name="header-actions" :hasProfile="!!profileManager.profile" />
+      <div v-if="$slots['header-actions']" class="mr-4">
+        <slot name="header-actions" :has-profile="!!profileManager.profile" />
       </div>
     </section>
     <v-card-text>
       <slot v-if="disableAlerts" />
       <template v-else>
-        <v-alert variant="tonal" type="info" v-show="!profileManager.profile"> Please connect your wallet </v-alert>
+        <v-alert v-show="!profileManager.profile" variant="tonal" type="info"> Please connect your wallet </v-alert>
 
         <div ref="msgAlert">
-          <v-alert variant="tonal" v-show="profileManager.profile && status" :type="alertType">
+          <v-alert v-show="profileManager.profile && status" variant="tonal" :type="alertType">
             {{ message }}
           </v-alert>
         </div>
@@ -46,11 +46,11 @@
     <template v-if="$slots['footer-actions'] && (profileManager.profile || disableAlerts)">
       <v-alert
         v-show="!status"
+        v-if="showPrice"
         class="mx-4"
         :style="{ fontSize: '1.2rem' }"
         type="info"
         variant="tonal"
-        v-if="showPrice"
       >
         <div v-if="ipv4 && dedicated">
           <span>
@@ -80,7 +80,7 @@
           <span class="font-weight-black">{{ costLoading ? "Calculating..." : normalizeBalance(usd) }}</span>
           USD per month.
 
-          <div v-if="SelectedNode?.certificationType === 'Certified'">
+          <div v-if="selectedNode?.certificationType === 'Certified'">
             You selected a certified node. Please note that this deployment costs more TFT.
           </div>
         </div>
@@ -91,17 +91,17 @@
       </v-alert>
       <v-divider class="mt-3" />
       <v-card-actions class="justify-end my-1 mr-2 py-4">
-        <slot name="footer-actions" :validateBeforeDeploy="validateBeforeDeploy" v-if="!status" />
+        <slot v-if="!status" name="footer-actions" :validate-before-deploy="validateBeforeDeploy" />
         <v-btn v-else color="secondary" :loading="status === 'deploy'" @click="reset"> Back </v-btn>
       </v-card-actions>
     </template>
   </v-card>
 
   <DeploymentDataDialog
+    v-if="dialogData"
     :data="dialogData"
     :environments="environments"
-    :onlyJson="onlyJson"
-    v-if="dialogData"
+    :only-json="onlyJson"
     @close="dialogData = environments = undefined"
   />
 </template>
@@ -150,7 +150,7 @@ const props = defineProps({
     required: false,
     default: () => false,
   },
-  SelectedNode: Object as PropType<NodeInfo>,
+  selectedNode: Object as PropType<NodeInfo>,
   validFilters: Boolean,
 });
 const emits = defineEmits<{ (event: "mount"): void; (event: "back"): void }>();
@@ -229,8 +229,8 @@ function validateBeforeDeploy(fn: () => void, documentScrollend = false) {
       __input && typeof __input === "object" && "value" in __input && __input.value instanceof HTMLElement
         ? __input.value
         : __input instanceof HTMLElement
-        ? __input
-        : null;
+          ? __input
+          : null;
 
     if (!input || !__setTab) {
       return;
@@ -352,7 +352,7 @@ const onlyIPV4TftPrice = ref<number>();
 const onlyIPV4UsdPrice = ref<number>();
 
 watch(
-  () => [props.cpu, props.memory, props.disk, props.ipv4, props.dedicated, props.SelectedNode],
+  () => [props.cpu, props.memory, props.disk, props.ipv4, props.dedicated, props.selectedNode],
   debounce((value, oldValue) => {
     if (
       oldValue &&
@@ -404,7 +404,7 @@ async function loadCost(profile: { mnemonic: string }) {
     mru: typeof props.memory === "number" ? (props.memory ?? 0) / 1024 : 0,
     hru: 0,
     ipv4u: props.ipv4,
-    certified: props.SelectedNode?.certificationType === "Certified",
+    certified: props.selectedNode?.certificationType === "Certified",
   });
   await getIPv1Price(grid!);
   usd.value = props.dedicated ? dedicatedPrice : sharedPrice;

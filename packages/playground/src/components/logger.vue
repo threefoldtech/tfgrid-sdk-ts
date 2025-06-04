@@ -1,10 +1,10 @@
 <template>
   <VBottomNavigation class="border" :height="debugOpened === 0 ? openHeight : undefined">
-    <v-expansion-panels :model-value="debugOpened" ref="panel" @update:model-value="bindDebugOpened" :multiple="false">
+    <v-expansion-panels ref="panel" :model-value="debugOpened" :multiple="false" @update:model-value="bindDebugOpened">
       <v-expansion-panel eager>
         <v-expansion-panel-title :class="{ 'text-error': !!connectDB.error }">
           <span class="text-subtitle-1"> <VIcon icon="mdi-cog" /> Dashboard Logs ({{ logs.length }}) </span>
-          <template v-slot:actions>
+          <template #actions>
             <div>
               <VTooltip text="Download Logs">
                 <template #activator="{ props }">
@@ -36,7 +36,7 @@
           </template>
         </v-expansion-panel-title>
 
-        <v-expansion-panel-text eager class="debug-container" v-if="!connectDB.error">
+        <v-expansion-panel-text v-if="!connectDB.error" eager class="debug-container">
           <DynamicScroller
             ref="scroller"
             :items="logs"
@@ -45,7 +45,7 @@
             @resize="scrollToBottom()"
           >
             <template #before>
-              <div class="pa-2" v-if="page !== -1">
+              <div v-if="page !== -1" class="pa-2">
                 <VBtn class="w-100 text-secondary" :loading="loadLogs.loading" variant="tonal" @click="loadLogs.run()">
                   Load More Logs
                 </VBtn>
@@ -54,7 +54,7 @@
               <v-divider />
             </template>
 
-            <template v-slot="{ item, index, active }">
+            <template #default="{ item, index, active }">
               <DynamicScrollerItem :item="item" :active="active" :data-index="index" tag="v-list-item">
                 <LogMessage :log="item" />
                 <v-divider />
@@ -68,20 +68,20 @@
             <span class="text-body-2">Failed to connect to logs database.</span>
 
             <template #append>
-              <VBtn size="xs" variant="plain" @click="connectDB.run()" text="Reconnect" />
+              <VBtn size="xs" variant="plain" text="Reconnect" @click="connectDB.run()" />
             </template>
           </VAlert>
         </v-expansion-panel-text>
       </v-expansion-panel>
     </v-expansion-panels>
   </VBottomNavigation>
-  <v-dialog max-width="400px" v-model="clearDialog" attach="#modals">
+  <v-dialog v-model="clearDialog" max-width="400px" attach="#modals">
     <v-card>
       <VCardTitle v-text="'Clear Logs'" />
       <VCardText v-text="'This will delete all of your logs. Be careful this operation is irreversible!'" />
       <v-card-actions class="justify-end mb-1 mr-2">
-        <v-btn color="anchor" @click="clearDialog = false" text="Cancel" />
-        <v-btn color="error" @click="clearLogs.run()" text="clear" />
+        <v-btn color="anchor" text="Cancel" @click="clearDialog = false" />
+        <v-btn color="error" text="clear" @click="clearLogs.run()" />
       </v-card-actions>
     </v-card>
   </v-dialog>

@@ -1,7 +1,7 @@
 <template>
   <div>
-    <v-alert color="warning" variant="tonal"
-      ><v-icon size="24" class="pb-1">mdi-alert-circle</v-icon>
+    <v-alert color="warning" variant="tonal">
+      <v-icon size="24" class="pb-1"> mdi-alert-circle </v-icon>
       Connect your TFChain
       <a class="app-link" @click="$emit('openProfile')">Wallet</a>
       to view {{ pageTitle }}
@@ -11,10 +11,8 @@
       <v-container class="d-flex justify-center">
         <p class="home_text text-center text-subtitle w-75 sm-w-auto">
           ThreeFold is
-          <strong
-            >a peer-to-peer open-source Internet platform that connects users directly with local Internet
-            capacity</strong
-          >
+          <strong>a peer-to-peer open-source Internet platform that connects users directly with local Internet
+            capacity</strong>
           (storage, compute, and network) provided by farmers. A decentralized sovereign alternative to today’s
           centralized Internet model.
           <a href="https://threefold.io/" target="_blank" class="app-link">Find More!</a>
@@ -36,7 +34,7 @@
         <v-container fluid>
           <div class="d-flex flex-column">
             <v-row class="justify-center items-center mx-sm-2 mx-lg-10">
-              <v-col lg="3" md="6" sm="12" v-for="s in stats" :key="s.value" class="stats px-8">
+              <v-col v-for="s in stats" :key="s.value" lg="3" md="6" sm="12" class="stats px-8">
                 <v-card class="mt-2">
                   <v-img
                     cover

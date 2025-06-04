@@ -4,10 +4,6 @@ import { expose } from "../helpers/expose";
 import { BatchModel } from "./models";
 import { checkBalance } from "./utils";
 
-interface Extrinsic {
-  extrinsic: [];
-}
-
 class Utility {
   client: TFClient;
 

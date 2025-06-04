@@ -6,12 +6,12 @@
     :disk="solution?.disk"
     :ipv4="ipv4"
     :dedicated="dedicated"
-    :rentedBy="rentedBy"
-    :SelectedNode="selectionDetails?.node"
+    :rented-by="rentedBy"
+    :selected-node="selectionDetails?.node"
     :valid-filters="selectionDetails?.validFilters"
     title-image="images/icons/casperlabs.png"
   >
-    <template #title>Deploy a Casperlabs Instance </template>
+    <template #title> Deploy a Casperlabs Instance </template>
 
     <d-tabs :tabs="[{ title: 'Config', value: 'config' }]">
       <input-validator
@@ -26,7 +26,7 @@
         #="{ props }"
       >
         <input-tooltip tooltip="Instance name.">
-          <v-text-field label="Name" v-model="name" v-bind="props" />
+          <v-text-field v-model="name" label="Name" v-bind="props" />
         </input-tooltip>
       </input-validator>
 
@@ -48,6 +48,10 @@
       />
 
       <TfSelectionDetails
+        v-model="selectionDetails"
+        v-model:rented-by-me="rentedByMe"
+        v-model:dedicated="dedicated"
+        v-model:certified="certified"
         :filters="{
           ipv4,
           ipv6,
@@ -63,10 +67,6 @@
           wireguard,
         }"
         require-domain
-        v-model="selectionDetails"
-        v-model:rentedByMe="rentedByMe"
-        v-model:dedicated="dedicated"
-        v-model:certified="certified"
       />
 
       <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
@@ -76,8 +76,8 @@
       <v-btn
         variant="elevated"
         class="text-primery px-10 py-3 h-auto text-subtitle-1"
-        @click="validateBeforeDeploy(deploy)"
         text="Deploy"
+        @click="validateBeforeDeploy(deploy)"
       />
     </template>
   </weblet-layout>

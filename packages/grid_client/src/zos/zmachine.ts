@@ -14,9 +14,9 @@ import {
 } from "class-validator";
 
 import { ValidateMembers } from "../helpers";
+import { WorkloadTypes } from ".";
 import { ComputeCapacity } from "./computecapacity";
 import { WorkloadData, WorkloadDataResult } from "./workload_base";
-import { WorkloadTypes } from ".";
 
 class ZNetworkInterface {
   @Expose() @IsString() @IsNotEmpty() network: string;

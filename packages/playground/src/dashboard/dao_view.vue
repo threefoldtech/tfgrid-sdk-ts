@@ -1,11 +1,11 @@
 <template>
   <div class="border px-4 pb-4 rounded position-relative">
     <v-card color="primary" class="d-flex justify-center items-center mt-3 pa-3 text-center">
-      <v-icon size="30" class="pr-3">mdi-note-check-outline</v-icon>
-      <v-card-title class="pa-0">DAO</v-card-title>
+      <v-icon size="30" class="pr-3"> mdi-note-check-outline </v-icon>
+      <v-card-title class="pa-0"> DAO </v-card-title>
     </v-card>
 
-    <div class="d-flex my-6 align-center justify-center" v-if="loadingProposals">
+    <div v-if="loadingProposals" class="d-flex my-6 align-center justify-center">
       <v-progress-circular indeterminate />
     </div>
 
@@ -18,10 +18,12 @@
       <v-card>
         <h4 class="d-flex justify-center pa-4">
           You can now vote on proposals!
-          <v-icon @click="openInfoModal = true" class="mx-3"> mdi-information-outline </v-icon>
+          <v-icon class="mx-3" @click="openInfoModal = true"> mdi-information-outline </v-icon>
         </h4>
         <v-tabs v-model="activeTab" align-tabs="center">
-          <v-tab color="secondary" v-for="(tab, index) in tabs" :key="index" :value="`${index}`">{{ tab.title }}</v-tab>
+          <v-tab v-for="(tab, index) in tabs" :key="index" color="secondary" :value="`${index}`">
+            {{ tab.title }}
+          </v-tab>
         </v-tabs>
       </v-card>
       <v-window v-model="activeTab">
@@ -33,17 +35,17 @@
               variant="underlined"
               label="Search by proposal description"
               class="pa-5"
-            ></v-text-field>
+            />
           </v-card>
 
           <v-card
+            v-for="(proposal, i) in filteredProposals(tab.content.value)"
+            :key="i"
             class="my-3 pa-5"
             :class="{
               'dark-bg': route.query.hash == proposal.hash && theme.name.value == 'dark',
               'light-bg': route.query.hash == proposal.hash && theme.name.value == 'light',
             }"
-            v-for="(proposal, i) in filteredProposals(tab.content.value)"
-            :key="i"
           >
             <div
               class="d-flex align-center"
@@ -51,14 +53,12 @@
                 justifyContent: proposal.action ? 'space-between' : 'flex-end',
               }"
             >
-              <v-card-title class="pa-0 mb-5 font-weight-bold" v-if="proposal.action">
+              <v-card-title v-if="proposal.action" class="pa-0 mb-5 font-weight-bold">
                 {{ proposal.action }}
               </v-card-title>
               <div class="d-flex justify-between">
-                <v-btn color="secondary" v-bind:href="proposal.link" v-bind:target="'blank'" class="mx-3">
-                  Go to Proposal
-                </v-btn>
-                <v-btn @click="shareProposal(proposal.hash, proposal.end)">Share</v-btn>
+                <v-btn color="secondary" :href="proposal.link" :target="'blank'" class="mx-3"> Go to Proposal </v-btn>
+                <v-btn @click="shareProposal(proposal.hash, proposal.end)"> Share </v-btn>
               </div>
             </div>
             <v-divider class="mt-1 mb-5 text-red-700" />
@@ -82,26 +82,26 @@
               <v-col class="votes">
                 <v-container class="" :style="{}">
                   <v-row v-if="expired(proposal.end)" class="d-flex justify-space-between">
-                    <v-btn @click="openVoteDialog(proposal.hash, true)" :disabled="loadingVote" variant="flat"
-                      >Yes <v-divider class="mx-3" vertical />{{ proposal.ayes.length }}
+                    <v-btn :disabled="loadingVote" variant="flat" @click="openVoteDialog(proposal.hash, true)">
+                      Yes <v-divider class="mx-3" vertical />{{ proposal.ayes.length }}
                     </v-btn>
                     <div class="d-flex align-center text-center pr-2">
                       <span class="px-1"
                         >Threshold: {{ proposal.nayes.length + proposal.ayes.length }}/{{ proposal.threshold }}
                       </span>
                     </div>
-                    <v-btn color="anchor" @click="openVoteDialog(proposal.hash, false)" :disabled="loadingVote"
-                      >No <v-divider class="mx-3" vertical />{{ proposal.nayes.length }}
+                    <v-btn color="anchor" :disabled="loadingVote" @click="openVoteDialog(proposal.hash, false)">
+                      No <v-divider class="mx-3" vertical />{{ proposal.nayes.length }}
                     </v-btn>
                   </v-row>
                 </v-container>
-                <v-container :style="{ width: '100%' }" v-if="proposal.ayesProgress > 0 || proposal.nayesProgress > 0">
+                <v-container v-if="proposal.ayesProgress > 0 || proposal.nayesProgress > 0" :style="{ width: '100%' }">
                   <v-row v-if="expired(proposal.end)" class="">
                     <div :style="{ width: `${proposal.ayesProgress}%` }">
                       <v-progress-linear
+                        v-model="proposal.ayesProgress"
                         :height="24"
                         color="primary"
-                        v-model="proposal.ayesProgress"
                         :style="{
                           backgroundColor: '#1AA18F',
                           marginRight: 'auto',
@@ -116,9 +116,9 @@
                     </div>
                     <div :style="{ width: `${proposal.nayesProgress}%` }">
                       <v-progress-linear
+                        v-model="proposal.nayesProgress"
                         :height="24"
                         color="#9e9e9e"
-                        v-model="proposal.nayesProgress"
                         :style="{
                           backgroundColor: '#9e9e9e',
                           marginRight: 'auto',
@@ -185,8 +185,8 @@
                         <v-progress-linear
                           v-if="proposal.ayesProgress > proposal.nayesProgress"
                           v-bind="props"
-                          rounded
                           v-model="proposal.ayesProgress"
+                          rounded
                           color="primary"
                           height="24"
                           :style="{
@@ -194,7 +194,7 @@
                             color: '#fff',
                           }"
                         >
-                          <template v-slot:default="{ value }">
+                          <template #default="{ value }">
                             <strong class="mx-3">Accepted </strong>
                             <span>{{ !!(value % 1) ? value.toFixed(2) : value }}%</span>
                           </template>
@@ -203,8 +203,8 @@
                         <v-progress-linear
                           v-else
                           v-bind="props"
-                          rounded
                           v-model="proposal.nayesProgress"
+                          rounded
                           color="disable"
                           height="24"
                           :style="{
@@ -212,7 +212,7 @@
                             color: '#333',
                           }"
                         >
-                          <template v-slot:default="{ value }">
+                          <template #default="{ value }">
                             <strong class="mx-3">Rejected </strong>
                             <span>{{ !!(value % 1) ? value.toFixed(2) : value }}%</span>
                           </template>
@@ -234,28 +234,27 @@
               <input-validator :value="selectedFarm" :rules="[validators.required('Required field')]" #="{ props }">
                 <input-tooltip tooltip="Select farm you wish to vote with">
                   <v-select
+                    v-model="selectedFarm"
                     :items="userFarms"
                     :item-title="(item: any) => `${item.name}`"
                     :item-value="(item: any) => item.farmID"
                     label="Select a farm"
-                    v-model="selectedFarm"
                     v-bind="props"
-                  >
-                  </v-select>
+                  />
                 </input-tooltip>
               </input-validator>
             </form-validator>
           </v-card-text>
           <v-card-actions class="justify-end mb-1 mr-2">
-            <v-btn @click="openVDialog = false" color="anchor">Close</v-btn>
-            <v-btn @click="castVote" :loading="loadingVote" color="secondary" :disabled="!isValidFarm">Vote</v-btn>
+            <v-btn color="anchor" @click="openVDialog = false"> Close </v-btn>
+            <v-btn :loading="loadingVote" color="secondary" :disabled="!isValidFarm" @click="castVote"> Vote </v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
       <v-dialog v-model="openInfoModal" width="50vw" attach="#modals">
         <v-card>
           <v-card-title class="text-h5 my-2"> Proposals Information </v-card-title>
-          <v-divider></v-divider>
+          <v-divider />
           <v-card-text>
             <div class="textContainer">
               <h2>General</h2>
@@ -292,11 +291,11 @@
             </div>
           </v-card-text>
 
-          <v-divider></v-divider>
+          <v-divider />
 
           <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn @click="openInfoModal = false" color="anchor"> Close </v-btn>
+            <v-spacer />
+            <v-btn color="anchor" @click="openInfoModal = false"> Close </v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>

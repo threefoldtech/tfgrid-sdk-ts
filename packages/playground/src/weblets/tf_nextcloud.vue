@@ -6,12 +6,12 @@
     :disk="(solution?.disk ?? 0) + rootFilesystemSize"
     :ipv4="ipv4"
     :dedicated="dedicated"
-    :rentedBy="rentedBy"
-    :SelectedNode="selectionDetails?.node"
+    :rented-by="rentedBy"
+    :selected-node="selectionDetails?.node"
     :valid-filters="selectionDetails?.validFilters"
     title-image="images/icons/nextcloud.png"
   >
-    <template #title>Deploy a Nextcloud All-in-One Instance </template>
+    <template #title> Deploy a Nextcloud All-in-One Instance </template>
 
     <d-tabs :tabs="[{ title: 'Config', value: 'config' }]">
       <input-validator
@@ -26,15 +26,15 @@
         #="{ props }"
       >
         <input-tooltip tooltip="Instance name.">
-          <v-text-field label="Name" v-model="name" v-bind="props" />
+          <v-text-field v-model="name" label="Name" v-bind="props" />
         </input-tooltip>
       </input-validator>
 
       <SelectSolutionFlavor
+        v-model="solution"
         :small="{ cpu: 2, memory: 4, disk: 50 }"
         :medium="{ cpu: 4, memory: 8, disk: 500 }"
         :large="{ cpu: 4, memory: 16, disk: 1000 }"
-        v-model="solution"
       />
       <Networks
         v-model:ipv4="ipv4"
@@ -47,6 +47,10 @@
       />
 
       <TfSelectionDetails
+        v-model="selectionDetails"
+        v-model:rented-by-me="rentedByMe"
+        v-model:dedicated="dedicated"
+        v-model:certified="certified"
         :filters="{
           ipv4,
           ipv6,
@@ -62,10 +66,6 @@
           wireguard,
         }"
         require-domain
-        v-model="selectionDetails"
-        v-model:rentedByMe="rentedByMe"
-        v-model:dedicated="dedicated"
-        v-model:certified="certified"
       />
 
       <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
@@ -75,8 +75,8 @@
       <v-btn
         variant="elevated"
         class="text-primery px-10 py-3 h-auto text-subtitle-1"
-        @click="validateBeforeDeploy(deploy)"
         text="Deploy"
+        @click="validateBeforeDeploy(deploy)"
       />
     </template>
   </weblet-layout>

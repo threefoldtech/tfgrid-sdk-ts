@@ -9,7 +9,10 @@ class TFTUSDConversionService {
    * Class representing a service for converting between TFT (ThreeFold Token) and USD (United States Dollar).
    * The service provides methods for normalizing currency amounts, converting between TFT and USD, and calculating daily, monthly, and yearly amounts in both currencies.
    */
-  constructor(private _rate: number, private decimals = 2) {}
+  constructor(
+    private _rate: number,
+    private decimals = 2,
+  ) {}
 
   get rate() {
     return this._rate;

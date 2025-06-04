@@ -5,19 +5,19 @@
     :memory="solution?.memory"
     :disk="(solution?.disk ?? 0) + rootFilesystemSize"
     :dedicated="dedicated"
-    :rentedBy="rentedBy"
+    :rented-by="rentedBy"
     :ipv4="ipv4"
-    :SelectedNode="selectionDetails?.node"
+    :selected-node="selectionDetails?.node"
     :valid-filters="selectionDetails?.validFilters"
     title-image="images/icons/discourse.png"
   >
     <template #title> Deploy a Discourse Instance </template>
     <d-tabs
+      ref="tabs"
       :tabs="[
         { title: 'Config', value: 'config' },
         { title: 'Mail Server', value: 'mail' },
       ]"
-      ref="tabs"
     >
       <template #config>
         <input-validator
@@ -32,7 +32,7 @@
           #="{ props }"
         >
           <input-tooltip tooltip="Instance name.">
-            <v-text-field label="Name" v-model="name" v-bind="props" />
+            <v-text-field v-model="name" label="Name" v-bind="props" />
           </input-tooltip>
         </input-validator>
         <input-validator
@@ -45,9 +45,9 @@
         >
           <input-tooltip tooltip="This email will be used to login to your instance.">
             <v-text-field
+              v-model="email"
               label="Email"
               placeholder="This email will be used to login to your instance."
-              v-model="email"
               v-bind="props"
             />
           </input-tooltip>
@@ -70,6 +70,10 @@
         />
 
         <TfSelectionDetails
+          v-model="selectionDetails"
+          v-model:rented-by-me="rentedByMe"
+          v-model:dedicated="dedicated"
+          v-model:certified="certified"
           :filters="{
             ipv4,
             ipv6,
@@ -85,10 +89,6 @@
             wireguard,
           }"
           require-domain
-          v-model="selectionDetails"
-          v-model:rentedByMe="rentedByMe"
-          v-model:dedicated="dedicated"
-          v-model:certified="certified"
         />
 
         <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
@@ -105,8 +105,8 @@
       <v-btn
         variant="elevated"
         class="text-primery px-10 py-3 h-auto text-subtitle-1"
-        @click="validateBeforeDeploy(deploy)"
         text="Deploy"
+        @click="validateBeforeDeploy(deploy)"
       />
     </template>
   </weblet-layout>

@@ -1,6 +1,8 @@
 <template>
-  <input-tooltip :tooltip="($props.tooltip as string)" :disabled="insetTooltip">
+  <input-tooltip :tooltip="$props.tooltip as string" :disabled="insetTooltip">
     <VAutocomplete
+      v-model:menu="menuOpened"
+      v-model:search.trim="searchQuery"
       label="Farm Name"
       placeholder="Select a farm"
       class="w-100 mb-1"
@@ -8,25 +10,19 @@
       :loading="farmsTask.loading"
       item-title="name"
       :model-value="modelValue || farms[0]"
-      @update:model-value="bindModelValue"
       clearable
-      @click:clear="onClear()"
       return-object
       prepend-inner-icon="mdi-magnify"
-      v-model:menu="menuOpened"
       :focused="focused"
-      @update:focused="updateFocused($event)"
-      v-model:search.trim="searchQuery"
-      @keyup="searchForFarms"
       spellcheck="false"
       :hint="
         !validFilters
           ? 'Please provide valid data.'
           : pageCountTask.loading || !farmsTask.initialized
-          ? 'Preparing to load farms'
-          : searchQuery === '' && !menuOpened && focused
-          ? 'Type any desired farm name to search for...'
-          : undefined
+            ? 'Preparing to load farms'
+            : searchQuery === '' && !menuOpened && focused
+              ? 'Type any desired farm name to search for...'
+              : undefined
       "
       :persistent-hint="
         !validFilters ||
@@ -36,8 +32,12 @@
       "
       :disabled="!validFilters"
       v-bind="$attrs"
+      @update:model-value="bindModelValue"
+      @click:clear="onClear()"
+      @update:focused="updateFocused($event)"
+      @keyup="searchForFarms"
     >
-      <template #no-data v-if="searchTask.loading">
+      <template v-if="searchTask.loading" #no-data>
         <div class="d-flex pa-2">
           <VProgressCircular indeterminate color="primary" size="20" width="3" />
           <p class="ml-2">
@@ -46,26 +46,26 @@
         </div>
       </template>
 
-      <template #prepend-item v-if="searchQuery === '' && menuOpened">
+      <template v-if="searchQuery === '' && menuOpened" #prepend-item>
         <span class="px-4 text-caption text-medium-emphasis">Type any desired farm name to search for...</span>
       </template>
 
-      <template #append-item v-if="!searchTask.initialized && pagination.page !== -1">
+      <template v-if="!searchTask.initialized && pagination.page !== -1" #append-item>
         <VContainer>
           <VBtn
-            @click="reloadFarms()"
             block
             color="secondary"
             variant="tonal"
             :loading="farmsTask.loading"
             prepend-icon="mdi-reload"
+            @click="reloadFarms()"
           >
             Load More Farms
           </VBtn>
         </VContainer>
       </template>
 
-      <template #append-inner v-if="insetTooltip">
+      <template v-if="insetTooltip" #append-inner>
         <VTooltip :text="$props.tooltip">
           <template #activator="{ props }">
             <VIcon icon="mdi-information-outline" v-bind="props" />

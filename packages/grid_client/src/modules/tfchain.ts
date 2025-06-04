@@ -478,7 +478,8 @@ class TFChain implements blockchainInterface {
     }
     await (
       await client.termsAndConditions.accept({
-        documentLink: "https://raw.githubusercontent.com/threefoldtech/info_grid/development/labs/docs/knowledge_base/terms_conditions_all3/terms_conditions_all3.md",
+        documentLink:
+          "https://raw.githubusercontent.com/threefoldtech/info_grid/development/labs/docs/knowledge_base/terms_conditions_all3/terms_conditions_all3.md",
       })
     ).apply();
     const ret = await (await client.twins.create({ relay })).apply();

@@ -6,19 +6,19 @@
     :disk="solution?.disk + rootFilesystemSize"
     :ipv4="ipv4"
     :dedicated="dedicated"
-    :rentedBy="rentedBy"
-    :SelectedNode="selectionDetails?.node"
+    :rented-by="rentedBy"
+    :selected-node="selectionDetails?.node"
     :valid-filters="selectionDetails?.validFilters"
     title-image="images/icons/mattermost.png"
   >
-    <template #title>Deploy a Mattermost Instance </template>
+    <template #title> Deploy a Mattermost Instance </template>
 
     <d-tabs
+      ref="tabs"
       :tabs="[
         { title: 'Base', value: 'base' },
         { title: 'SMTP Server', value: 'smtp' },
       ]"
-      ref="tabs"
     >
       <template #base>
         <input-validator
@@ -33,7 +33,7 @@
           #="{ props }"
         >
           <input-tooltip tooltip="Instance name.">
-            <v-text-field label="Name" v-model="name" v-bind="props" />
+            <v-text-field v-model="name" label="Name" v-bind="props" />
           </input-tooltip>
         </input-validator>
 
@@ -54,6 +54,10 @@
         />
 
         <TfSelectionDetails
+          v-model="selectionDetails"
+          v-model:rented-by-me="rentedByMe"
+          v-model:dedicated="dedicated"
+          v-model:certified="certified"
           :filters="{
             ipv4,
             ipv6,
@@ -69,10 +73,6 @@
             wireguard,
           }"
           require-domain
-          v-model="selectionDetails"
-          v-model:rentedByMe="rentedByMe"
-          v-model:dedicated="dedicated"
-          v-model:certified="certified"
         />
 
         <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
@@ -86,8 +86,8 @@
       <v-btn
         variant="elevated"
         class="text-primery px-10 py-3 h-auto text-subtitle-1"
-        @click="validateBeforeDeploy(deploy)"
         text="Deploy"
+        @click="validateBeforeDeploy(deploy)"
       />
     </template>
   </weblet-layout>
