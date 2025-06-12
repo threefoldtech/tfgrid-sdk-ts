@@ -1,10 +1,10 @@
-import type { GridClient } from "@threefold/grid_client";
+import { type ClientOptions, type GridClient } from "@threefold/grid_client";
 
+import { batchProcess } from "./batch_process";
 import { formatConsumption } from "./contracts";
 import { getGrid, updateGrid } from "./grid";
 import { normalizeError } from "./helpers";
 import { migrateModule } from "./migration";
-
 export interface LoadedDeployments<T> {
   count: number;
   items: T[];
@@ -21,6 +21,22 @@ export interface LoadVMsOptions {
   filter?(vm: any): boolean;
 }
 
+const gridClientCache = new Map<string, GridClient>();
+
+export async function getGridClient(config: ClientOptions, projectName: string): Promise<GridClient> {
+  const cacheKey = `${config.mnemonic}-${projectName}`;
+  if (gridClientCache.has(cacheKey)) {
+    return gridClientCache.get(cacheKey)!;
+  }
+
+  const grid = await getGrid(config, projectName);
+  if (!grid) {
+    throw new Error("Failed to create grid client");
+  }
+  gridClientCache.set(cacheKey, grid);
+  return grid;
+}
+
 async function getDeploymentContracts(grid: GridClient, name: string, projectName: string) {
   const contracts1 = await grid.machines.getDeploymentContracts(name);
   if (contracts1.length) {
@@ -35,60 +51,62 @@ async function getDeploymentContracts(grid: GridClient, name: string, projectNam
 export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
   await migrateModule(grid.machines);
 
+  let count = 0;
   const machines = await grid.machines.list();
-
-  let count = machines.length;
+  count = machines.length;
   const failedDeployments: FailedDeployment[] = [];
 
   const projectName = grid.clientOptions.projectName || "";
-  const grids = (await Promise.all(
-    machines.map(n => getGrid(grid.clientOptions, projectName ? `${projectName}/${n}` : n)),
-  )) as GridClient[];
 
-  const promises = machines.map(async (name, index) => {
-    let contracts: any[] = [];
-    let nodeIds: number[] = [];
+  const grids = await Promise.all(
+    machines.map(n => getGridClient(grid.clientOptions, projectName ? `${projectName}/${n}` : n)),
+  );
 
+  const machinePromises = machines.map(async (name, index) => {
     try {
-      contracts = await getDeploymentContracts(grids[index], name, projectName);
-      nodeIds = await grids[index].machines._getDeploymentNodeIds(name);
+      const [contracts, nodeIds] = await Promise.all([
+        getDeploymentContracts(grids[index], name, projectName),
+        grids[index].machines._getDeploymentNodeIds(name),
+      ]);
+
+      if (contracts.length === 0) {
+        count--;
+        return null;
+      }
+
+      const machinePromise = grids[index].machines.getObj(name).then(res => {
+        if (!projectName && (!Array.isArray(res) || res.length === 0)) {
+          grids[index] = updateGrid(grids[index], { projectName: "" });
+          return grids[index].machines.getObj(name);
+        }
+        return res;
+      });
+
+      const timeoutPromise = new Promise((resolve, reject) => {
+        setTimeout(() => {
+          reject(new Error("Timeout"));
+        }, window.env.TIMEOUT);
+      });
+
+      try {
+        const result = await Promise.race([machinePromise, timeoutPromise]);
+        if (result instanceof Error && result.message === "Timeout") {
+          console.error(`Timeout loading deployment with name ${name}`);
+          return null;
+        }
+        return result;
+      } catch (e) {
+        console.error(`Failed to load deployment with name ${name}:\n${normalizeError(e, "No errors were provided.")}`);
+        failedDeployments.push({ name, nodes: nodeIds, contracts });
+        return null;
+      }
     } catch {
       failedDeployments.push({ name, contracts: [], nodes: [] });
-      return;
-    }
-
-    if (contracts.length === 0) {
-      count--;
-      return;
-    }
-
-    const machinePromise = grids[index].machines.getObj(name).then(res => {
-      if (!projectName && (!Array.isArray(res) || res.length === 0)) {
-        grids[index] = updateGrid(grids[index], { projectName: "" });
-        return grids[index].machines.getObj(name);
-      }
-      return res;
-    });
-    const timeoutPromise = new Promise((resolve, reject) => {
-      setTimeout(() => {
-        reject(new Error("Timeout"));
-      }, window.env.TIMEOUT);
-    });
-
-    try {
-      const result = await Promise.race([machinePromise, timeoutPromise]);
-      if (result instanceof Error && result.message === "Timeout") {
-        console.error(`Timeout loading deployment with name ${name}`);
-        return null;
-      } else {
-        return result;
-      }
-    } catch (e) {
-      console.error(`Failed to load deployment with name ${name}:\n${normalizeError(e, "No errors were provided.")}`);
-      failedDeployments.push({ name, nodes: nodeIds, contracts: contracts });
+      return null;
     }
   });
-  const items = await Promise.all(promises);
+
+  const items = await Promise.all(machinePromises);
   const vms = items
     .map((item: any, index) => {
       if (item) {
@@ -115,16 +133,27 @@ export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
       }
       return true;
     }) as any[][];
-  const consumptions = await Promise.all(
-    vms.map((vm, index) => {
-      return grids[index].contracts.getConsumption({ id: vm[0].contractId }).catch(() => undefined);
-    }),
-  );
-  const wireguards = await Promise.all(
-    vms.map((vm, index) =>
-      getWireguardConfig(grids[index], vm[0].interfaces[0].network, vm[0].interfaces[0].ip).catch(() => []),
-    ),
-  );
+
+  const BATCH_SIZE = 10;
+  const consumptions = await batchProcess(vms, BATCH_SIZE, async batch => {
+    return Promise.all(
+      batch.map(vm => {
+        const gridIndex = vms.indexOf(vm);
+        return grids[gridIndex].contracts.getConsumption({ id: vm[0].contractId }).catch(() => undefined);
+      }),
+    );
+  });
+
+  const wireguards = await batchProcess(vms, BATCH_SIZE, async batch => {
+    return Promise.all(
+      batch.map(vm => {
+        const gridIndex = vms.indexOf(vm);
+        return getWireguardConfig(grids[gridIndex], vm[0].interfaces[0].network, vm[0].interfaces[0].ip).catch(
+          () => [],
+        );
+      }),
+    );
+  });
 
   const data = vms.map((vm, index) => {
     for (let i = 0; i < vm.length; i++) {
