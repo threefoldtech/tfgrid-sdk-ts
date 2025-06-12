@@ -86,8 +86,7 @@
                       Yes <v-divider class="mx-3" vertical />{{ proposal.ayes.length }}
                     </v-btn>
                     <div class="d-flex align-center text-center pr-2">
-                      <span class="px-1"
-                        >Threshold: {{ proposal.nayes.length + proposal.ayes.length }}/{{ proposal.threshold }}
+                      <span class="px-1">Threshold: {{ proposal.nayes.length + proposal.ayes.length }}/{{ proposal.threshold }}
                       </span>
                     </div>
                     <v-btn color="anchor" :disabled="loadingVote" @click="openVoteDialog(proposal.hash, false)">
@@ -107,11 +106,9 @@
                           marginRight: 'auto',
                         }"
                       >
-                        <span class=""
-                          >{{
+                        <span class="">{{
                             !!(proposal.ayesProgress % 1) ? proposal.ayesProgress.toFixed(2) : proposal.ayesProgress
-                          }}%</span
-                        >
+                          }}%</span>
                       </v-progress-linear>
                     </div>
                     <div :style="{ width: `${proposal.nayesProgress}%` }">
@@ -125,13 +122,11 @@
                         }"
                       >
                         <v-row class="d-flex justify-center">
-                          <span class="text-black"
-                            >{{
+                          <span class="text-black">{{
                               !!(proposal.nayesProgress % 1)
                                 ? proposal.nayesProgress.toFixed(2)
                                 : proposal.nayesProgress
-                            }}%</span
-                          >
+                            }}%</span>
                         </v-row>
                       </v-progress-linear>
                     </div>
@@ -258,15 +253,12 @@
           <v-card-text>
             <div class="textContainer">
               <h2>General</h2>
-              <span
-                >TFChain council members have exclusive authority to generate proposals, while owners of farms
-                containing one or more up nodes can cast votes.</span
-              >
+              <span>TFChain council members have exclusive authority to generate proposals, while owners of farms
+                containing one or more up nodes can cast votes.</span>
               <span> The voting process concludes at the designated maturity date and time of the proposal.</span>
               <span>
                 Decisions regarding the proposal's acceptance or rejection are determined by the majority of weighted
-                votes.</span
-              >
+                votes.</span>
               <span>
                 However, a minimum participation threshold must be attained in order for the voting process to be
                 considered valid.
@@ -278,16 +270,11 @@
               <br />
               <br />
               <h3>How do we count weight:</h3>
-              <span
-                >Votes are weighted based on the farmers stake in the network. One vote by default is 1 weight.</span
-              >
+              <span>Votes are weighted based on the farmers stake in the network. One vote by default is 1 weight.</span>
               <span> If the farmers has nodes, the weight of the vote is calulcated as following:</span>
-              <span
-                ><b>
+              <span><b>
                   The farmer's vote weight is the sum of all the farmer's nodes weight. A node's weight is calculated
-                  as: node CU * 2 + node SU.</b
-                ></span
-              >
+                  as: node CU * 2 + node SU.</b></span>
             </div>
           </v-card-text>
 
