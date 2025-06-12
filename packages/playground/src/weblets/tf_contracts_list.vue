@@ -19,17 +19,16 @@
     <a
       class="app-link font-weight-medium"
       target="_blank"
-      href="https://www.manual.grid.tf/documentation/developers/tfchain/tfchain.html"
-      >Contract Documentation,
+      href="https://manual.grid.tf/labs/documentation/developers/tfchain/"
+    >Contract Documentation,
     </a>
     and to explore further contract details, check
     <a
       class="app-link font-weight-medium"
       target="_blank"
-      href="https://www.manual.grid.tf/documentation/dashboard/deploy/your_contracts.html"
-      >Node Contract Documentation.</a
-    >
-    <br />
+      href="https://manual.grid.tf/labs/documentation/dashboard/deploy/your_contracts"
+    >Node Contract Documentation.</a>
+    <br>
   </v-alert>
 
   <v-card variant="text" class="my-3">
