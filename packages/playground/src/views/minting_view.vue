@@ -16,7 +16,8 @@
         class="app-link font-weight-medium"
         target="_blank"
         href="https://stellar.expert/explorer/public/account/GBOVQKJYHXRR3DX6NOX2RRYFRCUMSADGDESTDNBDS6CDVLGVESRTAC47"
-        >GBOVQKJYHXRR3DX6NOX2RRYFRCUMSADGDESTDNBDS6CDVLGVESRTAC47.</a>
+        >GBOVQKJYHXRR3DX6NOX2RRYFRCUMSADGDESTDNBDS6CDVLGVESRTAC47.</a
+      >
       <br />
     </v-alert>
     <v-form class="d-inline-flex w-100">

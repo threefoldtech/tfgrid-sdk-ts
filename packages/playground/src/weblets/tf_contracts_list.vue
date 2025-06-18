@@ -20,15 +20,15 @@
       class="app-link font-weight-medium"
       target="_blank"
       href="https://manual.grid.tf/labs/documentation/developers/tfchain/"
-    >Contract Documentation,
+      >Contract Documentation,
     </a>
     and to explore further contract details, check
     <a
       class="app-link font-weight-medium"
       target="_blank"
       href="https://manual.grid.tf/labs/documentation/dashboard/deploy/your_contracts"
-    >Node Contract Documentation.</a>
-    <br>
+      >Node Contract Documentation.</a>
+    <br />
   </v-alert>
 
   <v-card variant="text" class="my-3">

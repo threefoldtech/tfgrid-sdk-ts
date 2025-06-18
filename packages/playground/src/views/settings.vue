@@ -160,7 +160,9 @@
             <v-tooltip location="top">
               <template #activator="{ props: tooltipProps }">
                 <span v-bind="tooltipProps">
-                  <v-btn :disabled="isOnDefaultTimeout" class="mr-2" @click="ResetTimeoutToDefault">Set Default Values</v-btn>
+                  <v-btn :disabled="isOnDefaultTimeout" class="mr-2" @click="ResetTimeoutToDefault"
+                    >Set Default Values</v-btn
+                  >
                 </span>
               </template>
               <span v-if="isOnDefaultTimeout">Values are already set to defaults (query: 120s, deployment: 600s)</span>
