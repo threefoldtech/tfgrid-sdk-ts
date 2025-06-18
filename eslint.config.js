@@ -96,11 +96,11 @@ export default [
         "warn",
         {
           types: {
-            Function: "Use specific function types instead.",
-            Object: "Use `Record<string, unknown>` or specific object types instead.",
-            String: "Use `string` instead.",
-            Number: "Use `number` instead.",
-            Boolean: "Use `boolean` instead.",
+            "Function": "Use specific function types instead.",
+            "Object": "Use `Record<string, unknown>` or specific object types instead.",
+            "String": "Use `string` instead.",
+            "Number": "Use `number` instead.",
+            "Boolean": "Use `boolean` instead.",
           },
         },
       ],
