@@ -189,6 +189,13 @@ export async function loadK8s(grid: GridClient) {
   await migrateModule(grid.k8s);
 
   const clusters = await grid.k8s.list();
+  if (clusters.length === 0) {
+    return <LoadedDeployments<K8S>>{
+      count: 0,
+      items: [],
+      failedDeployments: [],
+    };
+  }
 
   const projectName = grid.clientOptions.projectName;
   const grids = (await Promise.all(
@@ -196,73 +203,105 @@ export async function loadK8s(grid: GridClient) {
   )) as GridClient[];
   const failedDeployments: FailedDeployment[] = [];
 
-  const promises = clusters.map(async (name, index) => {
-    let contracts: any[] = [];
-    let nodeIds: number[] = [];
+  const BATCH_SIZE = 5;
+  const contractsAndNodeIds: { contracts: any[]; nodeIds: number[]; success: boolean }[] = await batchProcess(
+    clusters,
+    BATCH_SIZE,
+    async batch => {
+      return await Promise.all(
+        batch.map(async name => {
+          const globalIndex = clusters.indexOf(name);
+          try {
+            const [contracts, nodeIds] = await Promise.all([
+              grids[globalIndex].k8s.getDeploymentContracts(name),
+              grids[globalIndex].k8s._getDeploymentNodeIds(name),
+            ]);
+            return { contracts, nodeIds, success: true };
+          } catch {
+            failedDeployments.push({ name, contracts: [], nodes: [] });
+            return { contracts: [], nodeIds: [], success: false };
+          }
+        }),
+      );
+    },
+  );
 
-    try {
-      contracts = await grids[index].k8s.getDeploymentContracts(name);
-      nodeIds = await grids[index].k8s._getDeploymentNodeIds(name);
-    } catch {
-      failedDeployments.push({ name, contracts: [], nodes: [] });
-      return;
-    }
+  const clusterObjs: any[] = await batchProcess(clusters, BATCH_SIZE, async batch => {
+    return await Promise.all(
+      batch.map(async name => {
+        const index = clusters.indexOf(name);
+        const { contracts, nodeIds, success } = contractsAndNodeIds[index];
+        if (!success) return null;
 
-    try {
-      const clusterPromise = grids[index].k8s.getObj(name).then(res => {
-        if (!projectName && res && res.masters && res.masters.length === 0) {
-          grids[index] = updateGrid(grids[index], { projectName: "" });
-          return grids[index].k8s.getObj(name);
+        try {
+          const clusterPromise = grids[index].k8s.getObj(name).then(res => {
+            if (!projectName && res && res.masters && res.masters.length === 0) {
+              grids[index] = updateGrid(grids[index], { projectName: "" });
+              return grids[index].k8s.getObj(name);
+            }
+            return res;
+          });
+          const timeoutPromise = new Promise((resolve, reject) => {
+            setTimeout(() => {
+              reject(new Error("Timeout"));
+            }, window.env.TIMEOUT);
+          });
+
+          const result = await Promise.race([clusterPromise, timeoutPromise]);
+          if (result instanceof Error && result.message === "Timeout") {
+            console.error(`Timeout loading deployment with name ${name}`);
+            return null;
+          } else if ((result as any).masters.length === 0 && (result as any).workers.length === 0) {
+            console.error(`Failed to load deployment with name ${name}`);
+            failedDeployments.push({ name, nodes: nodeIds, contracts: contracts });
+            return null;
+          } else {
+            return result;
+          }
+        } catch (e) {
+          console.error(
+            `Failed to load deployment with name ${name}:\n${normalizeError(e, "No errors were provided.")}`,
+          );
+          failedDeployments.push({ name, nodes: nodeIds, contracts: contracts });
+          return null;
         }
-
-        return res;
-      });
-      const timeoutPromise = new Promise((resolve, reject) => {
-        setTimeout(() => {
-          reject(new Error("Timeout"));
-        }, window.env.TIMEOUT);
-      });
-
-      const result = await Promise.race([clusterPromise, timeoutPromise]);
-      if (result instanceof Error && result.message === "Timeout") {
-        console.error(`Timeout loading deployment with name ${name}`);
-        return null;
-      } else if ((result as any).masters.length === 0 && (result as any).workers.length === 0) {
-        console.error(`Failed to load deployment with name ${name}`);
-        failedDeployments.push({ name, nodes: nodeIds, contracts: contracts });
-      } else {
-        return result;
-      }
-    } catch (e) {
-      console.error(`Failed to load deployment with name ${name}:\n${normalizeError(e, "No errors were provided.")}`);
-      failedDeployments.push({ name, nodes: nodeIds, contracts: contracts });
-    }
+      }),
+    );
   });
-  const items = (await Promise.all(promises)) as any[];
+
+  const items = clusterObjs.filter(Boolean) as any[];
   const k8s = items
-    .map((item, index) => {
+    .map(item => {
       if (item) {
-        item.deploymentName = clusters[index];
-        item.projectName = grids[index].clientOptions!.projectName;
+        item.deploymentName = clusters[clusterObjs.indexOf(item)];
+        item.projectName = grids[clusterObjs.indexOf(item)].clientOptions!.projectName;
       }
       return item;
     })
     .filter(item => item && item.masters.length > 0) as K8S[];
-  const consumptions = await Promise.all(
-    k8s.map((cluster, index) => {
-      return grids[index].contracts.getConsumption({ id: cluster.masters[0].contractId }).catch(() => undefined);
-    }),
-  );
 
-  const wireguards = await Promise.all(
-    k8s.map((cluster, index) =>
-      getWireguardConfig(
-        grids[index],
-        cluster.masters[0].interfaces[0].network,
-        cluster.masters[0].interfaces[0].ip,
-      ).catch(() => []),
-    ),
-  );
+  const consumptions = await batchProcess(k8s, BATCH_SIZE, async batch => {
+    return Promise.all(
+      batch.map(cluster => {
+        const gridIndex = clusters.findIndex(name => name === cluster.deploymentName);
+        return grids[gridIndex].contracts.getConsumption({ id: cluster.masters[0].contractId }).catch(() => undefined);
+      }),
+    );
+  });
+
+  const wireguards = await batchProcess(k8s, BATCH_SIZE, async batch => {
+    return Promise.all(
+      batch.map(cluster => {
+        const gridIndex = clusters.findIndex(name => name === cluster.deploymentName);
+        return getWireguardConfig(
+          grids[gridIndex],
+          cluster.masters[0].interfaces[0].network,
+          cluster.masters[0].interfaces[0].ip,
+        ).catch(() => []);
+      }),
+    );
+  });
+
   const data = k8s.map((cluster, index) => {
     cluster.masters[0].billing = formatConsumption(consumptions[index]?.amountBilled as number);
 

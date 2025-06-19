@@ -6,8 +6,7 @@
       <span>
         This might happen because the node is down or it's not reachable
         <span v-if="showEncryption">
-          or the deployment{{ count - items.length > 1 ? "s are" : " is" }} encrypted by another key
-        </span>.
+          or the deployment{{ count - items.length > 1 ? "s are" : " is" }} encrypted by another key </span>.
       </span>
       <v-tooltip location="top" text="Show failed deployments">
         <template #activator="{ props: tooltipProps }">
@@ -168,7 +167,7 @@ import { getNodeHealthColor, NodeHealth } from "@/utils/get_nodes";
 import { useProfileManager } from "../stores";
 import { getGrid, updateGrid } from "../utils/grid";
 import { markAsFromAnotherClient } from "../utils/helpers";
-import { type K8S, type LoadedDeployments, loadK8s, mergeLoadedDeployments } from "../utils/load_deployment";
+import { loadK8s, mergeLoadedDeployments } from "../utils/load_deployment";
 const profileManager = useProfileManager();
 const showDialog = ref(false);
 const showEncryption = ref(false);
@@ -188,35 +187,82 @@ const loading = ref(false);
 
 onMounted(loadDeployments);
 async function loadDeployments() {
+  const start = performance.now();
   items.value = [];
   loading.value = true;
-  const grid = await getGrid(profileManager.profile!, props.projectName);
-  const chunk1 = await loadK8s(grid!);
-  const chunk2 = await loadK8s(updateGrid(grid!, { projectName: props.projectName.toLowerCase() }));
-  let chunk3: LoadedDeployments<K8S> = { count: 0, items: [], failedDeployments: [] };
-
-  if (showAllDeployments.value) {
-    chunk3 = await loadK8s(updateGrid(grid!, { projectName: "" }));
-    chunk3.items = chunk3.items.map(i => {
-      return !i.projectName || i.projectName === "Kubernetes" ? markAsFromAnotherClient(i) : i;
+  try {
+    const grid = await getGrid(profileManager.profile!, props.projectName);
+    if (!grid) {
+      loading.value = false;
+      return;
+    }
+    const [chunk1, chunk2, chunk3] = await Promise.all([
+      loadK8s(grid),
+      loadK8s(updateGrid(grid, { projectName: props.projectName.toLowerCase() })),
+      showAllDeployments.value
+        ? loadK8s(updateGrid(grid, { projectName: "" }))
+        : Promise.resolve({ count: 0, items: [], failedDeployments: [] }),
+    ]);
+    if (chunk3.items) {
+      chunk3.items = chunk3.items.map(i => {
+        return !i.projectName || i.projectName === "Kubernetes" ? markAsFromAnotherClient(i) : i;
+      });
+    }
+    const clusters = mergeLoadedDeployments(chunk1, chunk2, chunk3);
+    failedDeployments.value = clusters.failedDeployments;
+    count.value = clusters.count;
+    items.value = clusters.items.map(item => {
+      const master = item.masters[0];
+      const publicIP = master.publicIP?.ip;
+      return {
+        ...item,
+        name: item.deploymentName,
+        ipv4: publicIP ? publicIP.split("/")?.[0] || publicIP : "-",
+        ipv6: master.publicIP?.ip6?.replace(/\/64$/, "") || "-",
+        planetary: master.planetary || "-",
+        workersLength: item.workers.length,
+        billing: undefined,
+        wireguard: undefined,
+        detailsLoading: false,
+      };
     });
+
+    setTimeout(() => {
+      items.value.forEach(item => fetchClusterDetails(item));
+    }, 0);
+  } catch (error) {
+    console.error("Error loading deployments:", error);
+    items.value = [];
+    count.value = 0;
+    failedDeployments.value = [];
+  } finally {
+    loading.value = false;
+    const end = performance.now();
+    console.log(`Time taken: ${(end - start) / 1000} seconds`);
   }
+}
 
-  const clusters = mergeLoadedDeployments(chunk1, chunk2, chunk3);
-  failedDeployments.value = clusters.failedDeployments;
-
-  count.value = clusters.count;
-  items.value = clusters.items.map((item: any) => {
-    item.name = item.deploymentName;
-    item.ipv4 = item.masters[0].publicIP?.ip?.split("/")?.[0] || item.masters[0].publicIP?.ip || "-";
-    item.ipv6 = item.masters[0].publicIP?.ip6.replace(/\/64$/, "") || "-";
-    item.planetary = item.masters[0].planetary || "-";
-    item.workersLength = item.workers.length;
-    item.billing = item.masters[0].billing;
-    item.created = item.masters[0].created;
-    return item;
-  });
-  loading.value = false;
+async function fetchClusterDetails(item: any) {
+  if (item.detailsLoading || (item.billing !== undefined && item.wireguard !== undefined)) return;
+  item.detailsLoading = true;
+  try {
+    const grid = await getGrid(profileManager.profile!, item.projectName || props.projectName);
+    if (!grid) {
+      item.detailsLoading = false;
+      return;
+    }
+    const consumption = await grid.contracts.getConsumption({ id: item.masters[0].contractId }).catch(() => undefined);
+    item.billing = consumption ? consumption.amountBilled : "No Data Available";
+    item.wireguard = await grid.networks
+      .getWireGuardConfigs({
+        name: item.masters[0].interfaces[0].network,
+        ipRange: item.masters[0].interfaces[0].ip,
+      })
+      .then(res => res[0])
+      .catch(() => undefined);
+  } finally {
+    item.detailsLoading = false;
+  }
 }
 
 defineExpose({ loadDeployments });
