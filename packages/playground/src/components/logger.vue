@@ -1,6 +1,12 @@
 <template>
   <VBottomNavigation class="border" :height="debugOpened === 0 ? openHeight : undefined">
-    <v-expansion-panels ref="panel" :model-value="debugOpened" :multiple="false" @update:model-value="bindDebugOpened">
+    <v-expansion-panels
+      ref="panel"
+      v-click-outside="bindDebugOpened"
+      :model-value="debugOpened"
+      :multiple="false"
+      @update:model-value="bindDebugOpened"
+    >
       <v-expansion-panel eager>
         <v-expansion-panel-title :class="{ 'text-error': !!connectDB.error }">
           <span class="text-subtitle-1"> <VIcon icon="mdi-cog" /> Dashboard Logs ({{ logs.length }}) </span>
@@ -117,7 +123,8 @@ export default {
     const panel = ref();
 
     function bindDebugOpened(value?: any): void {
-      debugOpened.value = value;
+      // Check if value is not a number (handles click outside events)
+      debugOpened.value = typeof value === "number" ? value : undefined;
 
       scroller.value?.scrollToBottom();
 
