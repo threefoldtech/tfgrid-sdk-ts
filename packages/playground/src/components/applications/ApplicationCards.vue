@@ -3,7 +3,7 @@
     <v-col v-for="card in cards" :key="card.title" cols="12" sm="12" lg="6" :xl="cards.length > 3 ? 4 : 6">
       <router-link :to="card.route">
         <v-hover>
-          <template v-slot:default="{ isHovering, props }">
+          <template #default="{ isHovering, props }">
             <v-card
               :height="200"
               class="pa-3 pt-6"
@@ -20,7 +20,7 @@
                 :src="baseURL + 'images/icons/' + card.icon"
                 :alt="card.title"
                 :style="{
-                  filter: `brightness(${$vuetify.theme.global.name === 'light' ? 0.2 : 1})`,
+                  filter: `brightness(${!theme.global.current.value.dark ? 0.2 : 1})`,
                   lineHeight: 1,
                 }"
               />
@@ -39,8 +39,8 @@
                 {{ card.excerpt }}
               </v-card-text>
             </v-card>
-          </template></v-hover
-        >
+          </template>
+        </v-hover>
       </router-link>
     </v-col>
   </v-row>
@@ -48,6 +48,7 @@
 
 <script lang="ts">
 import { defineComponent, type PropType } from "vue";
+import { useTheme } from "vuetify";
 
 import { isReleasedOverMon } from "@/utils/date";
 import type { ApplicationCard } from "@/utils/types";
@@ -61,10 +62,12 @@ export default defineComponent({
   },
   setup() {
     const baseURL = import.meta.env.BASE_URL;
+    const theme = useTheme();
 
     return {
       baseURL,
       isReleasedOverMon,
+      theme,
     };
   },
 });

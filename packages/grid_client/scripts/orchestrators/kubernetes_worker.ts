@@ -17,7 +17,7 @@ async function getWorker(client, worker) {
   log(res);
   log("================= Getting worker information =================");
 }
-
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function deleteWorker(client, worker) {
   const res = await client.k8s.delete_worker(worker);
   log("================= Deleting the worker =================");

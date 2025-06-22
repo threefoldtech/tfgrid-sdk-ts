@@ -1,5 +1,5 @@
 <template>
-  <form id="wallet-form" @submit.prevent="storeAndLogin()" class="pa-4">
+  <form id="wallet-form" class="pa-4" @submit.prevent="storeAndLogin()">
     <FormValidator id="form-validator" v-model="isValidForm">
       <v-alert id="mnemonic-warning" type="warning" variant="tonal" class="mb-6">
         <p :style="{ maxWidth: '880px' }">
@@ -7,7 +7,7 @@
           password. Mnemonic or Hex Seed will never be shared outside of this device.
         </p>
       </v-alert>
-      <v-alert id="ed25519-warning" variant="tonal" type="info" class="mb-6" v-if="keypairType === KeypairType.ed25519">
+      <v-alert v-if="keypairType === KeypairType.ed25519" id="ed25519-warning" variant="tonal" type="info" class="mb-6">
         <p>
           Please note that generating or activating of ed25519 Keys isn't supported, you can only import pre-existing
           ones.
@@ -27,34 +27,34 @@
               <PasswordInputWrapper id="password-input-wrapper" #="{ props: passwordInputProps }">
                 <InputValidator
                   id="mnemonic-input-validator"
+                  ref="mnemonicInput"
                   :value="mnemonic"
                   :rules="[validators.required('Mnemonic or Hex Seed is required.')]"
-                  :asyncRules="[validateMnemonicInput]"
+                  :async-rules="[validateMnemonicInput]"
                   valid-message="Mnemonic or Hex Seed is valid."
                   #="{ props: validationProps }"
-                  ref="mnemonicInput"
                 >
                   <div v-bind="tooltipProps">
                     <VTextField
-                      readonly
-                      @focus="(event: Event) => (event.target as HTMLInputElement)?.removeAttribute('readonly')"
-                      @blur="(event: Event) => (event.target as HTMLInputElement)?.setAttribute('readonly', 'readonly')"
                       id="mnemonic-text-field"
-                      :append-icon="enableReload && mnemonic !== '' ? 'mdi-reload' : ''"
-                      label="Mnemonic or Hex Seed"
-                      placeholder="Please insert your Mnemonic or Hex Seed"
-                      v-model="mnemonic"
                       v-bind="{
                         ...passwordInputProps,
                         ...validationProps,
                       }"
+                      ref="mnemonicRef"
+                      v-model="mnemonic"
+                      readonly
+                      :append-icon="enableReload && mnemonic !== '' ? 'mdi-reload' : ''"
+                      label="Mnemonic or Hex Seed"
+                      placeholder="Please insert your Mnemonic or Hex Seed"
                       autocomplete="off"
                       :disabled="creatingAccount || connecting"
+                      @focus="(event: Event) => (event.target as HTMLInputElement)?.removeAttribute('readonly')"
+                      @blur="(event: Event) => (event.target as HTMLInputElement)?.setAttribute('readonly', 'readonly')"
                       @update:model-value="isNonActiveMnemonic = false && clearErrors"
                       @click:append="reloadValidation"
-                      ref="mnemonicRef"
                     >
-                      <template v-slot:prepend-inner v-if="validationProps.hint || validationProps.error">
+                      <template v-if="validationProps.hint || validationProps.error" #prepend-inner>
                         <v-icon id="mnemonic-validation-icon" :color="validationProps.error ? 'red' : 'green'">
                           {{ validationProps.error ? "mdi-close" : "mdi-check" }}
                         </v-icon>
@@ -75,12 +75,12 @@
             <template #activator="{ props }">
               <v-select
                 id="keypair-select"
-                label="Keypair Type"
                 v-bind="props"
+                v-model="keypairType"
+                label="Keypair Type"
                 :items="[...keyType]"
                 item-title="name"
-                v-model="keypairType"
-                @update:modelValue="mnemonic !== '' ? reloadValidation() : null"
+                @update:model-value="mnemonic !== '' ? reloadValidation() : null"
               />
             </template>
           </v-tooltip>
@@ -102,7 +102,7 @@
         </VBtn>
       </div>
 
-      <v-alert id="activation-error" type="error" variant="tonal" class="mb-4" v-if="createOrActivateError">
+      <v-alert v-if="createOrActivateError" id="activation-error" type="error" variant="tonal" class="mb-4">
         {{ createOrActivateError }}
       </v-alert>
 
@@ -118,13 +118,13 @@
       >
         <v-text-field
           id="email-text-field"
+          v-bind="props"
+          ref="emailRef"
+          v-model="email"
           label="Email"
           placeholder="email@example.com"
-          v-model="email"
-          v-bind="props"
           :loading="loadEmail"
           :disabled="creatingAccount || connecting || loadEmail || mnemonicInput?.status !== ValidatorStatus.Valid"
-          ref="emailRef"
           autocomplete="off"
         />
       </input-validator>
@@ -132,22 +132,22 @@
       <WalletPassword
         id="password-input"
         v-model="password"
-        @update:modelValue="confirmPassword ? confirmPasswordInput?.validate() : null"
         mode="Create"
         :disabled="creatingAccount || connecting"
+        @update:model-value="confirmPassword ? confirmPasswordInput?.validate() : null"
       />
       <PasswordInputWrapper id="confirm-password-wrapper" #="{ props: confirmPasswordInputProps }">
         <InputValidator
           id="confirm-password-validator"
+          ref="confirmPasswordInput"
           :value="confirmPassword"
           :rules="[validators.required('A confirmation password is required.'), validateConfirmPassword]"
           #="{ props: validationProps }"
-          ref="confirmPasswordInput"
         >
           <VTextField
             id="confirm-password-text-field"
-            label="Confirm Password"
             v-model="confirmPassword"
+            label="Confirm Password"
             v-bind="{
               ...confirmPasswordInputProps,
               ...validationProps,
@@ -158,7 +158,7 @@
         </InputValidator>
       </PasswordInputWrapper>
 
-      <v-alert id="login-error" type="error" variant="tonal" class="mb-4" v-if="storeAndLoginError">
+      <v-alert v-if="storeAndLoginError" id="login-error" type="error" variant="tonal" class="mb-4">
         {{ storeAndLoginError }}
       </v-alert>
       <!-- Action Buttons -->
@@ -180,8 +180,8 @@
   <AcceptTermsDialog
     id="terms-dialog"
     v-model="openAcceptTerms"
-    @onError="handleTCErrors"
-    @onAccept="handleAcceptTerms"
+    @on-error="handleTCErrors"
+    @on-accept="handleAcceptTerms"
   />
 </template>
 <script lang="ts" setup>
@@ -314,8 +314,8 @@ async function activateAccount() {
     const mnemonicOrSeedValue = validateMnemonic(mnemonic.value)
       ? mnemonic.value
       : mnemonic.value.length === 66
-      ? mnemonic.value
-      : `0x${mnemonic.value}`;
+        ? mnemonic.value
+        : `0x${mnemonic.value}`;
     await activateAccountAndCreateTwin(mnemonicOrSeedValue);
     await storeAndLogin();
   } catch (e) {

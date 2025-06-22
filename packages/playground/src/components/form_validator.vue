@@ -1,5 +1,5 @@
 <template>
-  <slot></slot>
+  <slot />
 </template>
 
 <script lang="ts">
@@ -43,11 +43,12 @@ export default {
         [...statusMap.value.values()].some(status => status === ValidatorStatus.Init),
     );
     const form: FormValidatorService = {
-      register(uid, service) {
+      register(uid: string, service) {
         statusMap.value.set(uid, ValidatorStatus.Init);
+        // @ts-expect-error: Service might not fully implement, but it is fully functional
         serviceMap.value.set(uid, service);
       },
-      unregister(uid) {
+      unregister(uid: string) {
         statusMap.value.delete(uid);
         serviceMap.value.delete(uid);
       },
@@ -57,7 +58,7 @@ export default {
         return valids.every(valid => valid);
       },
 
-      updateStatus(uid, status) {
+      updateStatus(uid: string, status: ValidatorStatus) {
         if (statusMap.value.get(uid) !== status) {
           statusMap.value.set(uid, status);
         }
@@ -67,9 +68,12 @@ export default {
           const input =
             el instanceof HTMLElement
               ? el
-              : el && typeof el === "object" && "value" in el && el.value instanceof HTMLElement
-              ? el.value
-              : null;
+              : el &&
+                  typeof el === "object" &&
+                  "value" in el &&
+                  (el as { value: HTMLElement }).value instanceof HTMLElement
+                ? (el as { value: HTMLElement }).value
+                : null;
 
           if (input) {
             input.classList.remove("weblet-layout-error");
@@ -82,7 +86,7 @@ export default {
         [...serviceMap.value.values()].map(({ reset }) => reset());
       },
 
-      get: uid => serviceMap.value.get(uid),
+      get: (uid: string) => serviceMap.value.get(uid) as InputValidatorService | undefined,
 
       valid,
       invalid,

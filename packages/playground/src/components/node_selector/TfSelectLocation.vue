@@ -1,7 +1,7 @@
 <template>
-  <h6 class="text-h5 mb-4 mt-2" v-if="title" v-text="title" />
+  <h6 v-if="title" class="text-h5 mb-4 mt-2" v-text="title" />
 
-  <VAlert type="error" class="text-body-1 mb-4" v-if="locationsTask.error">
+  <VAlert v-if="locationsTask.error" type="error" class="text-body-1 mb-4">
     Failed to load locations. Please try again!
     <template #append>
       <VBtn icon="mdi-reload" color="error" variant="plain" density="compact" @click="locationsTask.run()" />

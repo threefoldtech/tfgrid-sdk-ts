@@ -70,7 +70,10 @@ const FARMS_VALIDATOR: BuilderValidator<FarmsQuery> = {
 };
 
 export class FarmsBuilder extends AbstractBuilder<FarmsQuery> {
-  constructor(public uri: string, queries: Partial<FarmsQuery> = {}) {
+  constructor(
+    public uri: string,
+    queries: Partial<FarmsQuery> = {},
+  ) {
     super({
       mapper: FARMS_MAPPER,
       validator: FARMS_VALIDATOR,
@@ -78,5 +81,5 @@ export class FarmsBuilder extends AbstractBuilder<FarmsQuery> {
     });
   }
 }
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
+
 export interface FarmsBuilder extends BuilderMethods<FarmsQuery, FarmsBuilder> {}

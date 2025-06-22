@@ -5,7 +5,7 @@
         <v-row class="mt-1 px-4">
           <div class="d-flex align-center">
             <label class="label mr-2 mb-0">Basic</label>
-            <v-switch hide-details color="primary" v-model="isAdvanced" inset />
+            <v-switch v-model="isAdvanced" hide-details color="primary" inset />
             <span class="slider" />
             <label class="label ml-2">Advanced</label>
           </div>
@@ -22,7 +22,7 @@
             :rules="[validators.min('Value must be positive.', 0)]"
             #="{ props }"
           >
-            <v-text-field label="Memory (GB)" type="number" v-model.number="activeProfile.memory" v-bind="props" />
+            <v-text-field v-model.number="activeProfile.memory" label="Memory (GB)" type="number" v-bind="props" />
           </input-validator>
 
           <input-validator
@@ -30,7 +30,7 @@
             :rules="[validators.min('Value must be positive.', 0)]"
             #="{ props }"
           >
-            <v-text-field label="vCPU (Threads)" type="number" v-model.number="activeProfile.cpu" v-bind="props" />
+            <v-text-field v-model.number="activeProfile.cpu" label="vCPU (Threads)" type="number" v-bind="props" />
           </input-validator>
           <input-validator
             v-if="props.chosenConfig == 'DIY'"
@@ -38,14 +38,14 @@
             :rules="[validators.min('Value must be positive.', 0)]"
             #="{ props }"
           >
-            <v-text-field label="HDD (GB)" type="number" v-model.number="activeProfile.hdd" v-bind="props" />
+            <v-text-field v-model.number="activeProfile.hdd" label="HDD (GB)" type="number" v-bind="props" />
           </input-validator>
           <input-validator
             :value="activeProfile.ssd"
             :rules="[validators.min('Value must be positive.', 0)]"
             #="{ props }"
           >
-            <v-text-field label="SSD (GB)" type="number" v-model.number="activeProfile.ssd" v-bind="props" />
+            <v-text-field v-model.number="activeProfile.ssd" label="SSD (GB)" type="number" v-bind="props" />
           </input-validator>
           <input-validator
             :value="activeProfile.nuRequiredPerCu"
@@ -53,9 +53,9 @@
             #="{ props }"
           >
             <v-text-field
+              v-model.number="activeProfile.nuRequiredPerCu"
               label="NU Required Per CU"
               type="number"
-              v-model.number="activeProfile.nuRequiredPerCu"
               v-bind="props"
             />
           </input-validator>
@@ -65,9 +65,9 @@
             #="{ props }"
           >
             <v-text-field
+              v-model.number="activeProfile.investmentCostHW"
               label="Hardware Cost (USD)"
               type="number"
-              v-model.number="activeProfile.investmentCostHW"
               v-bind="props"
             />
           </input-validator>
@@ -77,9 +77,9 @@
             #="{ props }"
           >
             <v-text-field
+              v-model.number="activeProfile.price"
               label="Price of TFT at point of registration on blockchain (USD)"
               type="number"
-              v-model.number="activeProfile.price"
               v-bind="props"
             />
           </input-validator>
@@ -90,9 +90,9 @@
             #="{ props }"
           >
             <v-text-field
+              v-model.number="activeProfile.maximumTokenPrice"
               label="Maximum Token Price"
               type="number"
-              v-model.number="activeProfile.maximumTokenPrice"
               v-bind="props"
             />
           </input-validator>
@@ -102,9 +102,9 @@
             #="{ props }"
           >
             <v-text-field
+              v-model.number="activeProfile.powerUtilization"
               label="Power Utilization (Watt)"
               type="number"
-              v-model.number="activeProfile.powerUtilization"
               v-bind="props"
             />
           </input-validator>
@@ -114,21 +114,21 @@
             #="{ props }"
           >
             <v-text-field
+              v-model.number="activeProfile.powerCost"
               label="Power Cost (USD)"
               type="number"
-              v-model.number="activeProfile.powerCost"
               v-bind="props"
             />
           </input-validator>
-          <v-checkbox color="title" v-model="activeProfile.publicIp" label="Public IP" />
+          <v-checkbox v-model="activeProfile.publicIp" color="title" label="Public IP" />
 
           <v-autocomplete
             v-if="props.chosenConfig == 'Titan v2.1'"
+            v-model="certified"
             label="Certified"
             :items="[...certifications]"
             return-object
             item-title="name"
-            v-model="certified"
           />
         </div>
       </v-card>
@@ -136,7 +136,7 @@
     <v-col sm="12" md="12" lg="7">
       <v-card class="my-3 pa-3">
         <v-card-text>
-          <v-row class="mt-1 px-4" v-if="!isAdvanced">
+          <v-row v-if="!isAdvanced" class="mt-1 px-4">
             <div class="d-flex align-center">
               <label class="label mr-2 mb-0">Net Profit</label>
               <!-- <v-switch hide-details color="primary" v-model="isProfit" inset disabled /> -->
@@ -146,100 +146,100 @@
           </v-row>
           <v-row v-show="!isAdvanced">
             <v-col>
-              <LineChart :xs="xs" :isProfit="isProfit" :getTotalReward="getTotalReward" :getRoi="getRoi" />
+              <LineChart :xs="xs" :is-profit="isProfit" :get-total-reward="getTotalReward" :get-roi="getRoi" />
             </v-col>
           </v-row>
           <v-row v-show="isAdvanced">
             <v-col sm="12" md="6">
               <PieChart :chartdata="chartdata" />
             </v-col>
-            <v-col sm="12" md="6" v-if="isAdvanced">
+            <v-col v-if="isAdvanced" sm="12" md="6">
               <input-validator
                 :value="activeProfile.powerCost"
                 :rules="[validators.min('Value must be positive.', 0)]"
                 #="{ props }"
               >
                 <v-text-field
+                  v-model.number="activeProfile.priceAfter5Years"
                   label="Token price after 5 years (USD)"
                   type="number"
-                  v-model.number="activeProfile.priceAfter5Years"
                   v-bind="props"
                 />
               </input-validator>
 
               <!-- <v-text-field disabled label="Return On Investment" v-model.number="ROI" /> -->
-              <v-text-field disabled label="Net Profit" type="number" v-model.number="netProfit" />
-              <v-text-field disabled label="Gross Profit" type="number" v-model.number="grossProfit" />
-              <v-text-field disabled label="Total Costs" type="number" v-model.number="totalCosts" />
+              <v-text-field v-model.number="netProfit" disabled label="Net Profit" type="number" />
+              <v-text-field v-model.number="grossProfit" disabled label="Gross Profit" type="number" />
+              <v-text-field v-model.number="totalCosts" disabled label="Total Costs" type="number" />
             </v-col>
           </v-row>
-          <v-row class="mt-3 px-3" v-if="isAdvanced">
+          <v-row v-if="isAdvanced" class="mt-3 px-3">
             <v-text-field
+              v-model.number="totalFarmingRewardInTft"
               disabled
               label="Total Monthly Farming Reward In TFT"
               type="number"
-              v-model.number="totalFarmingRewardInTft"
             />
           </v-row>
           <v-row class="mt-3 px-0">
             <v-col sm="12" lg="4">
-              <v-text-field disabled label="CU" type="number" v-model.number="cu" />
+              <v-text-field v-model.number="cu" disabled label="CU" type="number" />
             </v-col>
             <v-col sm="12" lg="4">
-              <v-text-field disabled label="SU" type="number" v-model.number="su" />
+              <v-text-field v-model.number="su" disabled label="SU" type="number" />
             </v-col>
             <v-col sm="12" lg="4">
-              <v-text-field disabled label="NU" type="number" v-model.number="nu" />
+              <v-text-field v-model.number="nu" disabled label="NU" type="number" />
             </v-col>
           </v-row>
 
           <v-row class="mt-3 px-0">
             <v-col sm="12" lg="4">
-              <v-text-field disabled label="USD reward per CU" type="number" v-model.number="rewardPerCu" />
+              <v-text-field v-model.number="rewardPerCu" disabled label="USD reward per CU" type="number" />
             </v-col>
             <v-col sm="12" lg="4">
-              <v-text-field disabled label="USD reward per SU" type="number" v-model.number="rewardPerSu" />
+              <v-text-field v-model.number="rewardPerSu" disabled label="USD reward per SU" type="number" />
             </v-col>
             <v-col sm="12" lg="4">
-              <v-text-field disabled label="USD reward per NU" type="number" v-model.number="rewardPerNu" />
+              <v-text-field v-model.number="rewardPerNu" disabled label="USD reward per NU" type="number" />
             </v-col>
           </v-row>
 
-          <v-row class="mt-3 px-0" v-if="isAdvanced">
+          <v-row v-if="isAdvanced" class="mt-3 px-0">
             <v-col sm="12" lg="4">
-              <v-text-field disabled label="TFT Reward Per CU" type="number" v-model.number="tftRewardPerCu" />
+              <v-text-field v-model.number="tftRewardPerCu" disabled label="TFT Reward Per CU" type="number" />
             </v-col>
             <v-col sm="12" lg="4">
-              <v-text-field disabled label="TFT Reward Per SU" type="number" v-model.number="tftRewardPerSu" />
+              <v-text-field v-model.number="tftRewardPerSu" disabled label="TFT Reward Per SU" type="number" />
             </v-col>
             <v-col sm="12" lg="4">
-              <v-text-field disabled label="TFT Reward Per NU" type="number" v-model.number="tftRewardPerNu" />
+              <v-text-field v-model.number="tftRewardPerNu" disabled label="TFT Reward Per NU" type="number" />
             </v-col>
           </v-row>
 
-          <v-row class="mt-3 px-0" v-if="isAdvanced">
+          <v-row v-if="isAdvanced" class="mt-3 px-0">
             <v-col sm="12" lg="4">
               <v-text-field
+                v-model.number="cuFarmingRewardInTft"
                 disabled
                 label="CU Farming Reward In TFT"
                 type="number"
-                v-model.number="cuFarmingRewardInTft"
               />
             </v-col>
             <v-col sm="12" lg="4">
               <v-text-field
+                v-model.number="suFarmingRewardInTft"
                 disabled
                 label="SU Farming Reward In TFT"
                 type="number"
-                v-model.number="suFarmingRewardInTft"
               />
             </v-col>
             <v-col sm="12" lg="4">
               <v-text-field
+                v-model.number="nuFarmingRewardInTft"
                 disabled
                 label="NU Farming Reward In TFT"
                 type="number"
-                v-model.number="nuFarmingRewardInTft"
               />
             </v-col>
           </v-row>

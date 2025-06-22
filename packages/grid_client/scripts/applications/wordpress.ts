@@ -35,6 +35,7 @@ async function getDeployment(client, vms, gw) {
   log("================= Getting deployment information =================");
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function cancel(client, vms, gw) {
   const resultVM = await client.machines.delete(vms);
   const resultGateway = await client.gateway.delete_name(gw);

@@ -80,6 +80,7 @@ export class Response extends pb_1.Message {
     if (!Array.isArray(data) && typeof data == "object") {
     }
   }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   static fromObject(data: {}): Response {
     const message = new Response({});
     return message;
@@ -312,6 +313,7 @@ export class Ping extends pb_1.Message {
     if (!Array.isArray(data) && typeof data == "object") {
     }
   }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   static fromObject(data: {}): Ping {
     const message = new Ping({});
     return message;
@@ -353,6 +355,7 @@ export class Pong extends pb_1.Message {
     if (!Array.isArray(data) && typeof data == "object") {
     }
   }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   static fromObject(data: {}): Pong {
     const message = new Pong({});
     return message;

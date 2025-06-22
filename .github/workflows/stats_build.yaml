@@ -4,11 +4,11 @@ name: Stats Build
 
 on:
   push:
-    branches: [development, development_2.7]
+    branches: [development]
     paths:
       - "packages/stats/**"
   pull_request:
-    branches: [development, development_2.7]
+    branches: [development]
     paths:
       - "packages/stats/**"
 
@@ -20,7 +20,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [18.x]
+        node-version: [22.15]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:

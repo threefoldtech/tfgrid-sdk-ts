@@ -1,11 +1,11 @@
 <template>
-  <slot name="unwrap" v-if="$slots.unwrap" :colProps="colProps" />
+  <slot v-if="$slots.unwrap" name="unwrap" :col-props="colProps" />
   <VCol v-else v-bind="colProps">
     <input-validator
+      v-if="$slots.input"
       :rules="$props.rules || []"
       :async-rules="$props.asyncRules"
-      :value="($props.modelValue as string)"
-      v-if="$slots.input"
+      :value="$props.modelValue as string"
       #="{ props }"
     >
       <slot name="input" :props="props" />
@@ -48,7 +48,6 @@ export default {
     const query = router.currentRoute.value.query[props.value.queryRoute];
     query && typeof query === "string" && ctx.emit("update:model-value", normalizeValue(query));
 
-    // eslint-disable-next-line vue/no-setup-props-destructure
     const initialValue = props.value.modelValue;
 
     const filtersContainerService = useFiltersContainerService();

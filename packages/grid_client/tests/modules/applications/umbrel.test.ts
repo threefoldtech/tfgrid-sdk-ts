@@ -88,7 +88,6 @@ test("TC2694 - Applications: Deploy Umbrel", async () => {
   } as FilterOptions);
   const nodeId = await getOnlineNode(nodes);
   if (nodeId === -1) throw new Error("No nodes available to complete this test");
-  const domain = subdomain + "." + GatewayNode.publicConfig.domain;
 
   const vms: MachinesModel = {
     name: deploymentName,

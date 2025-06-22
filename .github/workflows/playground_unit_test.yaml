@@ -1,0 +1,42 @@
+# This workflow will do a clean install of node dependencies, cache/restore them, build the source code using yarn build:app run unit tests using yarn test:unit.
+
+name: Playground Unit tests
+permissions:
+  contents: read
+
+on:
+  pull_request:
+    branches:
+      - development
+    paths:
+      - "packages/playground/**"
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    env:
+      NODE_OPTIONS: "--max-old-space-size=8192"
+
+    strategy:
+      matrix:
+        node-version: [22.16]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "yarn"
+          cache-dependency-path: "**/yarn.lock"
+
+      - name: Install dependencies
+        run: |
+          yarn install
+      - name: Build
+        run: |
+          lerna run build --no-private
+      - name: Run unit tests
+        run: yarn workspace @threefold/playground test:unit

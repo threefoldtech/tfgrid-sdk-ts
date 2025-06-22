@@ -11,7 +11,12 @@ export enum Errors {
 }
 
 export class TFGridKycError extends BaseError {
-  constructor(name = "TFGridKycError", code: number, message: string, public statusCode = -1) {
+  constructor(
+    name = "TFGridKycError",
+    code: number,
+    message: string,
+    public statusCode = -1,
+  ) {
     super(name, code, message, ErrorModules.KYC);
   }
 }

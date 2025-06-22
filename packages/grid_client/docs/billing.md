@@ -82,7 +82,7 @@ Contract cost/hour = CU cost/hour + SU cost/hour
 
 ### Applying the discounts
 
-Before assuming that the price listed is the final price, please verify if you qualify for any of the available staking discount levels for additional savings. For more details on these discount levels, refer to the [manual](https://manual.grid.tf/cloud/cloudunits_pricing.html#staking-discount).
+Before assuming that the price listed is the final price, please verify if you qualify for any of the available staking discount levels for additional savings. For more details on these discount levels, refer to the [manual](https://manual.grid.tf/labs/knowledge_base/cloud_toc/pricing_toc/staking_discount_levels).
 
 For this example lets assume that this twin has 18 months worth of TFTs staked, so the user will be applicable for a Gold discount level (60% discount).
 
@@ -182,7 +182,7 @@ Contract cost/hour = CU cost/hour + SU cost/hour
 
 ### Applying the Dedicated Node Discount
 
-There's a default `50%` discount for renting a node, this discount is not related to the staking discount. for more info please check the [manual](https://manual.grid.tf/cloud/cloudunits_pricing.html#dedicated-nodes).
+There's a default `50%` discount for renting a node, this discount is not related to the staking discount. for more info please check the [manual](https://manual.grid.tf/labs/knowledge_base/cloud_toc/pricing_toc/pricing#dedicated-nodes).
 
 ```sh
 Cost with 50% discount = 35.725 * 0.5
@@ -191,7 +191,7 @@ Cost with 50% discount = 35.725 * 0.5
 
 ### Applying the Staking discount
 
-Before assuming that the price listed is the final price, please verify if you qualify for any of the available staking discount levels for additional savings. For more details on these discount levels, refer to the [manual](https://manual.grid.tf/cloud/cloudunits_pricing.html#staking-discount).
+Before assuming that the price listed is the final price, please verify if you qualify for any of the available staking discount levels for additional savings. For more details on these discount levels, refer to the [manual](https://manual.grid.tf/labs/knowledge_base/cloud_toc/pricing_toc/staking_discount_levels).
 
 For this example lets assume that this twin has 18 months worth of TFTs staked, so the user will be applicable for a Gold discount level (60% discount).
 
@@ -223,7 +223,7 @@ uniqueName in TFT = 0.00025 * 100
 
 ### Applying Staking discount
 
-Before assuming that the price listed is the final price, please verify if you qualify for any of the available staking discount levels for additional savings. For more details on these discount levels, refer to the [manual](https://manual.grid.tf/cloud/cloudunits_pricing.html#staking-discount).
+Before assuming that the price listed is the final price, please verify if you qualify for any of the available staking discount levels for additional savings. For more details on these discount levels, refer to the [manual](https://manual.grid.tf/labs/knowledge_base/cloud_toc/pricing_toc/staking_discount_levels).
 
 For this example lets assume that this twin has 18 months worth of TFTs staked, so the user will be applicable for a Gold discount level (60% discount).
 
@@ -256,7 +256,7 @@ Public IP in TFT = 0.004 * 100
 
 ### Applying Staking discount with public IP
 
-Before assuming that the price listed is the final price, please verify if you qualify for any of the available staking discount levels for additional savings. For more details on these discount levels, refer to the [manual](https://manual.grid.tf/cloud/cloudunits_pricing.html#staking-discount).
+Before assuming that the price listed is the final price, please verify if you qualify for any of the available staking discount levels for additional savings. For more details on these discount levels, refer to the [manual](https://manual.grid.tf/labs/knowledge_base/cloud_toc/pricing_toc/staking_discount_levels).
 
 For this example lets assume that this twin has 18 months worth of TFTs staked, so the user will be applicable for a Gold discount level (60% discount).
 
@@ -297,7 +297,7 @@ NU price in TFT = 0.0015 * 100
 
 ### Applying Staking discount with NU
 
-Before assuming that the price listed is the final price, please verify if you qualify for any of the available staking discount levels for additional savings. For more details on these discount levels, refer to the [manual](https://manual.grid.tf/cloud/cloudunits_pricing.html#staking-discount).
+Before assuming that the price listed is the final price, please verify if you qualify for any of the available staking discount levels for additional savings. For more details on these discount levels, refer to the [manual](https://manual.grid.tf/labs/knowledge_base/cloud_toc/pricing_toc/staking_discount_levels).
 
 For this example lets assume that this twin has 18 months worth of TFTs staked, so the user will be applicable for a Gold discount level (60% discount).
 

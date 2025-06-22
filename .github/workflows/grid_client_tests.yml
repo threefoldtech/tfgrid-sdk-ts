@@ -31,7 +31,7 @@ jobs:
       - name: Set up node version
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 22.15
           cache: "yarn"
       - name: Install Yggdrasil and Add Peers
         run: |
@@ -72,7 +72,7 @@ jobs:
           NODE_TLS_REJECT_UNAUTHORIZED: '0'  # Disable TLS/SSL certificate validation
       - name: Cleanup
         continue-on-error: true
-        run: yarn run ts-node --project tsconfig-node.json packages/grid_client/tests/global_teardown.ts
+        run: yarn run ts-node --transpileOnly --project tsconfig-node.json packages/grid_client/tests/global_teardown.ts
       - name: Upload coverage to Codecov
         if: success()
         uses: codecov/codecov-action@v1

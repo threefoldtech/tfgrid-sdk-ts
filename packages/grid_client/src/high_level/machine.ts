@@ -12,7 +12,6 @@ import {
   DeploymentFactory,
   DiskPrimitive,
   Network,
-  Nodes,
   PublicIPPrimitive,
   VMLightPrimitive,
   VMPrimitive,

@@ -9,19 +9,19 @@
     :ipv4="master.ipv4"
     :certified="master.certified"
     :dedicated="master.dedicated"
-    :rentedBy="master.rentedBy"
-    :SelectedNode="master.selectionDetails?.node"
+    :rented-by="master.rentedBy"
+    :selected-node="master.selectionDetails?.node"
     :valid-filters="master.selectionDetails?.validFilters"
     title-image="images/icons/kubernetes.png"
   >
-    <template #title>Deploy a Kubernetes cluster</template>
+    <template #title> Deploy a Kubernetes cluster </template>
     <d-tabs
+      ref="tabs"
       :tabs="[
         { title: 'Config', value: 'config' },
         { title: 'Master', value: 'master' },
         { title: 'Workers', value: 'workers', workers: workers.length },
       ]"
-      ref="tabs"
     >
       <template #config>
         <input-validator
@@ -36,7 +36,7 @@
           #="{ props }"
         >
           <input-tooltip tooltip="Instance name.">
-            <v-text-field label="Name" v-model="name" v-bind="{ ...props }" />
+            <v-text-field v-model="name" label="Name" v-bind="{ ...props }" />
           </input-tooltip>
         </input-validator>
 
@@ -56,7 +56,7 @@
             <input-tooltip
               tooltip="The Kubernetes Cluster Token is a specially generated authentication token used for accessing and managing a Kubernetes cluster."
             >
-              <v-text-field label="Cluster Token" v-bind="{ ...props, ...validationProps }" v-model="clusterToken" />
+              <v-text-field v-bind="{ ...props, ...validationProps }" v-model="clusterToken" label="Cluster Token" />
             </input-tooltip>
           </password-input-wrapper>
         </input-validator>
@@ -69,7 +69,7 @@
       </template>
 
       <template #workers>
-        <ExpandableLayout v-model="workers" @add="addWorker" #="{ index }">
+        <ExpandableLayout v-model="workers" #="{ index }" @add="addWorker">
           <K8SWorker
             v-model="workers[index]"
             :other-workers="[workers, master].flat(1).filter((_, i) => i !== index)"
@@ -83,8 +83,8 @@
       <v-btn
         variant="elevated"
         class="text-primery px-10 py-3 h-auto text-subtitle-1"
-        @click="validateBeforeDeploy(deploy)"
         text="Deploy"
+        @click="validateBeforeDeploy(deploy)"
       />
     </template>
   </weblet-layout>

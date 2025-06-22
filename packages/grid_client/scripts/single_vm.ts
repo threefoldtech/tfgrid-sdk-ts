@@ -19,6 +19,7 @@ async function getDeployment(client: GridClient, name: string): Promise<Zmachine
   return res;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function cancel(client: GridClient, name: string) {
   const res = await client.machines.delete({ name: name });
   log("================= Canceling the deployment =================");

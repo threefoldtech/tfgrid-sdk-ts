@@ -64,13 +64,16 @@ export async function getStats(network: string, url: string): Promise<{ network:
 function mergeNodeDistribution(stats: Stats["nodesDistribution"][]) {
   const keys = new Set(stats.map(obj => Object.keys(obj)).flat());
 
-  return Array.from(keys).reduce((res, key) => {
-    res[key] = 0;
-    stats.forEach(country => {
-      res[key] += country[key] ?? 0;
-    });
-    return res;
-  }, {} as { [key: string]: number });
+  return Array.from(keys).reduce(
+    (res, key) => {
+      res[key] = 0;
+      stats.forEach(country => {
+        res[key] += country[key] ?? 0;
+      });
+      return res;
+    },
+    {} as { [key: string]: number },
+  );
 }
 
 export function formatData(network: string[] = ["main"], totalStat: NetworkStats) {

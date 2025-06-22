@@ -1,35 +1,35 @@
 <template>
   <v-container>
     <v-menu ref="menu" v-model="showMenu" :close-on-content-click="false" transition="scale-transition">
-      <template v-slot:activator="{ props }">
+      <template #activator="{ props }">
         <v-text-field v-bind="props" label="Select Month and Year" readonly :model-value="selectedData" />
       </template>
 
       <v-card>
         <v-card-text class="d-flex">
-          <v-select v-model="selectedMonth" :items="months" label="Month"></v-select>
-          <v-select v-model="selectedYear" :items="years" label="Year"></v-select>
+          <v-select v-model="selectedMonth" :items="months" label="Month" />
+          <v-select v-model="selectedYear" :items="years" label="Year" />
         </v-card-text>
       </v-card>
     </v-menu>
     <v-card outlined class="pa-2 border">
-      <div class="receipt-body" v-if="receipts?.length">
+      <div v-if="receipts?.length" class="receipt-body">
         <v-row>
           <v-col
+            v-for="receipt in receipts"
+            :key="receipt.hash"
             class="text-start"
             cols="12"
             md="12"
             :lg="receipts.length > 1 ? '6' : '12'"
-            v-for="receipt in receipts"
-            :key="receipt.hash"
           >
             <v-card style="box-shadow: none" outlined>
               <v-container>
                 <v-row>
                   <v-list class="custom-list" density="compact">
                     <h3 class="mb-1 font-weight-medium">
-                      Minting Details<v-chip class="ma-2 me-auto" :color="getChipColor(receipt.type)"
-                        >{{ receipt.type }}
+                      Minting Details<v-chip class="ma-2 me-auto" :color="getChipColor(receipt.type)">
+                        {{ receipt.type }}
                       </v-chip>
                     </h3>
                     <div class="border">
@@ -52,16 +52,16 @@
                         <v-col class="py-1">
                           <v-list-item>
                             <div style="display: flex; justify-content: end">
-                              {{ receipt.tft || 0 }} TFT<span v-if="receipt.fixupReward"
-                                >+ {{ receipt.fixupReward || 0 }} TFT FixedUp</span
-                              >
+                              {{ receipt.tft || 0 }} TFT<span v-if="receipt.fixupReward">+ {{ receipt.fixupReward || 0 }} TFT FixedUp</span>
                             </div>
                           </v-list-item>
                         </v-col>
                       </v-row>
                       <v-row class="row-style">
                         <v-col class="py-1" cols="1" sm="2" style="min-width: fit-content">
-                          <v-list-item style="text-transform: uppercase"> CU :</v-list-item>
+                          <v-list-item style="text-transform: uppercase">
+                            CU :
+                          </v-list-item>
                         </v-col>
                         <v-col class="py-1">
                           <v-list-item>
@@ -79,7 +79,9 @@
                       </v-row>
                       <v-row class="row-style">
                         <v-col class="py-1" cols="1" sm="2" style="min-width: fit-content">
-                          <v-list-item style="text-transform: uppercase"> SU :</v-list-item>
+                          <v-list-item style="text-transform: uppercase">
+                            SU :
+                          </v-list-item>
                         </v-col>
                         <v-col class="py-1">
                           <v-list-item>
@@ -97,7 +99,9 @@
                       </v-row>
                       <v-row class="row-style">
                         <v-col class="py-1" cols="1" sm="2" style="min-width: fit-content">
-                          <v-list-item style="text-transform: uppercase"> NU :</v-list-item>
+                          <v-list-item style="text-transform: uppercase">
+                            NU :
+                          </v-list-item>
                         </v-col>
                         <v-col class="py-1">
                           <v-list-item>
@@ -122,11 +126,15 @@
         </v-row>
       </div>
       <div v-else>
-        <v-card-text class="font-weight-bold">No receipts found for this month</v-card-text>
+        <v-card-text class="font-weight-bold">
+          No receipts found for this month
+        </v-card-text>
       </div>
       <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn color="secondary" @click="downloadNodeReceipt" :disabled="!node.receipts">Download Node Receipt</v-btn>
+        <v-spacer />
+        <v-btn color="secondary" :disabled="!node.receipts" @click="downloadNodeReceipt">
+          Download Node Receipt
+        </v-btn>
       </v-card-actions>
     </v-card>
   </v-container>

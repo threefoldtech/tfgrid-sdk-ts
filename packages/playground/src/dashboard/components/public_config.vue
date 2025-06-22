@@ -16,13 +16,13 @@
     </v-tooltip>
 
     <template v-if="showDialogue">
-      <v-dialog v-model="showDialogue" max-width="600" @click:outside="reset" attach="#modals">
+      <v-dialog v-model="showDialogue" max-width="600" attach="#modals" @click:outside="reset">
         <v-card>
           <v-card-title class="bg-primary">
             Add a public config to your node with ID: {{ $props.nodeId }}
           </v-card-title>
           <v-card-text>
-            <form-validator v-model="valid" ref="formRef">
+            <form-validator ref="formRef" v-model="valid">
               <!-- IPv4 -->
               <input-validator
                 :value="config.ipv4"
@@ -34,7 +34,7 @@
                 #="{ props }"
               >
                 <input-tooltip tooltip="IPv4 address in CIDR format xx.xx.xx.xx/xx">
-                  <v-text-field v-model="config.ipv4" v-bind="props" outlined label="IPv4"></v-text-field>
+                  <v-text-field v-model="config.ipv4" v-bind="props" outlined label="IPv4" />
                 </input-tooltip>
               </input-validator>
 
@@ -50,12 +50,12 @@
                       config.ipv4,
                       config.gw4,
                       'Gateway IPv4 should not be equal to IPv4.',
-                    )(value),
+                    )(),
                 ]"
                 #="{ props }"
               >
                 <input-tooltip tooltip="Gateway for the IP in IPv4 format">
-                  <v-text-field v-model="config.gw4" v-bind="props" outlined label="Gateway IPv4"></v-text-field>
+                  <v-text-field v-model="config.gw4" v-bind="props" outlined label="Gateway IPv4" />
                 </input-tooltip>
               </input-validator>
 
@@ -70,7 +70,7 @@
                 #="{ props }"
               >
                 <input-tooltip tooltip="IPv6 address in format x:x:x:x:x:x:x:x">
-                  <v-text-field v-model="config.ipv6" v-bind="props" outlined label="IPv6"></v-text-field>
+                  <v-text-field v-model="config.ipv6" v-bind="props" outlined label="IPv6" />
                 </input-tooltip>
               </input-validator>
 
@@ -81,16 +81,17 @@
                   value => (config.ipv6 !== '' ? validators.required('Gateway is required.')(value) : '') as RuleReturn,
                   value => validators.isIP('Gateway is not valid.', 6)(value),
                   () => IPGatewayCheck('ipv6'),
-                  value => validators.ipNotEqualGateway(
-                    config.ipv6!,
-                    config.gw6!,
-                    'Gateway IPv6 should not be equal to IPv6.',
-                  )(value),
+                  value =>
+                    validators.ipNotEqualGateway(
+                      config.ipv6!,
+                      config.gw6!,
+                      'Gateway IPv6 should not be equal to IPv6.',
+                    )(),
                 ]"
                 #="{ props }"
               >
                 <input-tooltip tooltip="Gateway for the IP in IPv6 format">
-                  <v-text-field v-model="config.gw6" v-bind="props" outlined label="Gateway IPv6"></v-text-field>
+                  <v-text-field v-model="config.gw6" v-bind="props" outlined label="Gateway IPv6" />
                 </input-tooltip>
               </input-validator>
 
@@ -101,7 +102,7 @@
                 #="{ props }"
               >
                 <input-tooltip tooltip="Domain for web gateway">
-                  <v-text-field v-model="config.domain" v-bind="props" outlined label="Domain"></v-text-field>
+                  <v-text-field v-model="config.domain" v-bind="props" outlined label="Domain" />
                 </input-tooltip>
               </input-validator>
             </form-validator>
@@ -109,25 +110,26 @@
           <v-card-actions class="justify-end my-1 mr-2">
             <!-- Remove and Generate Config Buttons -->
             <v-btn
+              color="anchor"
               @click="
                 showDialogue = false;
                 reset();
               "
-              color="anchor"
-              >Close</v-btn
             >
+              Close
+            </v-btn>
             <v-btn
-              @click="isNodeHasConfig"
               color="error"
               :disabled="isRemoving || Object.values(config).every(value => value == '')"
+              @click="isNodeHasConfig"
             >
               Remove Config
             </v-btn>
             <v-btn
               color="secondary"
-              @click="AddConfig"
               :loading="isSaving"
               :disabled="isSaving || !valid || (valid && !isConfigChanged)"
+              @click="AddConfig"
             >
               Save
             </v-btn>
@@ -145,14 +147,8 @@
 
           <v-card-actions class="justify-end my-1 mr-2">
             <!-- Cancel and Remove Buttons -->
-            <v-btn text="Cancel" color="anchor" @click="showClearDialogue = false"></v-btn>
-            <v-btn
-              text="Remove"
-              color="error"
-              :loading="isRemoving"
-              :disabled="isRemoving"
-              @click="removeConfig()"
-            ></v-btn>
+            <v-btn text="Cancel" color="anchor" @click="showClearDialogue = false" />
+            <v-btn text="Remove" color="error" :loading="isRemoving" :disabled="isRemoving" @click="removeConfig()" />
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -163,11 +159,12 @@
 <script lang="ts">
 import type { PublicConfig } from "@threefold/grid_client";
 import { ValidationError } from "@threefold/types";
-import { contains } from "cidr-tools";
+import CidrTools from "cidr-tools";
 import { isEqual } from "lodash";
 import { default as PrivateIp } from "private-ip";
 import { onMounted, ref, watch } from "vue";
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { RuleReturn } from "@/components/input_validator.vue";
 import { useFormRef } from "@/hooks/form_validator";
 import { useGrid } from "@/stores";
@@ -193,8 +190,8 @@ export default {
     const showClearDialogue = ref(false);
     const isRemoving = ref(false);
     const isSaving = ref(false);
-    const isConfigChanged = ref(false);
     const formRef = useFormRef();
+    const isConfigChanged = ref(false);
     const grid = useGrid();
 
     const defualtNodeConfig = ref<PublicConfig>(publicConfigInitializer());
@@ -217,7 +214,6 @@ export default {
         formRef.value?.validate();
       },
     );
-
     async function getPublicConfig() {
       try {
         const node = await grid.client.nodes.get({ id: props.nodeId });
@@ -332,9 +328,9 @@ export default {
 
       try {
         if (type === "ipv4") {
-          isRange = contains(config.value.ipv4, config.value.gw4);
+          isRange = CidrTools.containsCidr(config.value.ipv4, config.value.gw4);
         } else {
-          isRange = contains(config.value.ipv6, config.value.gw6);
+          isRange = CidrTools.containsCidr(config.value.ipv6, config.value.gw6);
         }
       } catch {
         isRange = false;

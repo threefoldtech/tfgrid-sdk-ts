@@ -14,26 +14,26 @@ import type {
 import type { Bytes, Compact, Option, U8aFixed, Vec, bool, u128, u16, u32, u64, u8 } from "@polkadot/types-codec";
 import type { AnyNumber, IMethod, ITuple } from "@polkadot/types-codec/types";
 import type { AccountId32, Call, H256, MultiAddress } from "@polkadot/types/interfaces/runtime";
-import type {
-  PalletSmartContractContractResources,
-  PalletSmartContractNruConsumption,
-  PalletSmartContractProvider,
-  PalletTfgridLocationInput,
-  PalletTfgridPolicy,
-  PalletTfgridStorageVersion,
+import {
+  SpWeightsWeightV2Weight,
   SpConsensusGrandpaEquivocationProof,
   SpCoreVoid,
-  SpWeightsWeightV2Weight,
   TfchainRuntimeOpaqueSessionKeys,
-  TfchainRuntimeOriginCaller,
-  TfchainSupportFarmCertification,
+  PalletSmartContractNruConsumption,
+  PalletSmartContractProvider,
+  PalletSmartContractContractResources,
+  TfchainSupportPublicConfig,
   TfchainSupportFarmingPolicyLimit,
-  TfchainSupportInterfaceBoundedVec,
+  TfchainSupportPower,
   TfchainSupportIp4,
   TfchainSupportNodeCertification,
-  TfchainSupportPower,
-  TfchainSupportPublicConfig,
+  TfchainSupportFarmCertification,
   TfchainSupportResources,
+  PalletTfgridLocationInput,
+  TfchainSupportInterfaceBoundedVec,
+  PalletTfgridPolicy,
+  PalletTfgridStorageVersion,
+  TfchainRuntimeOriginCaller,
 } from "@polkadot/types/lookup";
 
 export type __AugmentedSubmittable = AugmentedSubmittable<() => unknown>;
@@ -1002,7 +1002,7 @@ declare module "@polkadot/api-base/types/submittable" {
           minimalUptime: u16 | AnyNumber | Uint8Array,
           policyEnd: u32 | AnyNumber | Uint8Array,
           immutable: bool | boolean | Uint8Array,
-          _default: bool | boolean | Uint8Array,
+          ___default: bool | boolean | Uint8Array,
           nodeCertification: TfchainSupportNodeCertification | "Diy" | "Certified" | number | Uint8Array,
           farmCertification: TfchainSupportFarmCertification | "NotCertified" | "Gold" | number | Uint8Array,
         ) => SubmittableExtrinsic<ApiType>,
@@ -1249,7 +1249,7 @@ declare module "@polkadot/api-base/types/submittable" {
           ipv4: u32 | AnyNumber | Uint8Array,
           minimalUptime: u16 | AnyNumber | Uint8Array,
           policyEnd: u32 | AnyNumber | Uint8Array,
-          _default: bool | boolean | Uint8Array,
+          ___default: bool | boolean | Uint8Array,
           nodeCertification: TfchainSupportNodeCertification | "Diy" | "Certified" | number | Uint8Array,
           farmCertification: TfchainSupportFarmCertification | "NotCertified" | "Gold" | number | Uint8Array,
         ) => SubmittableExtrinsic<ApiType>,

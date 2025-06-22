@@ -14,6 +14,7 @@ import TfDeploymentList from "../weblets/tf_deployment_list.vue";
 import TfFreeflow from "../weblets/tf_freeflow.vue";
 
 export default {
+  // eslint-disable-next-line vue/multi-word-component-names
   name: "Freeflow",
   components: {
     TfDeploymentList,

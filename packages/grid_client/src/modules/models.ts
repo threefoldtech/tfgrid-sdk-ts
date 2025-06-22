@@ -602,7 +602,7 @@ class NodeIdFromContractIdModel {
 }
 class CapacityPoolCheckModel {
   @Expose() @IsInt() @Min(1) nodeId: number;
-  @Expose() @IsInt({ each: true }) @Min(250 * 1024 ** 2, { each: true }) rootfsDisks: number[]; //Byte
+  @Expose() @IsInt({ each: true }) @Min(0, { each: true }) rootfsDisks: number[]; //Byte
   @Expose() @IsInt({ each: true }) @Min(250 * 1024 ** 2, { each: true }) ssdDisks: number[]; //Byte
   @Expose() @IsInt({ each: true }) @Min(250 * 1024 ** 2, { each: true }) hddDisks: number[]; //Byte
 }

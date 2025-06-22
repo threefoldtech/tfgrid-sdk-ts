@@ -62,7 +62,6 @@ test("TC1255 - Stellar: Import Account", async () => {
   //Test Data
   const accountName = "Test" + generateString(5);
   const newAccountName = "Test" + generateString(5);
-  const blockchainType = "stellar";
 
   //Create Account
   const account: StellarWalletCreateModel = {
@@ -134,7 +133,6 @@ test("TC1257 - Stellar: Check if Account exists", async () => {
 
   //Test Data
   const accountName = "Test" + generateString(5);
-  const blockchainType = "stellar";
 
   //Create Account
   const account: StellarWalletCreateModel = {
@@ -235,7 +233,6 @@ test("TC1260 - Stellar: Get Account assets by address", async () => {
 
   //Test Data
   const accountName = "Test" + generateString(5);
-  const blockchainType = "stellar";
 
   //Create Account
   const account: StellarWalletCreateModel = {

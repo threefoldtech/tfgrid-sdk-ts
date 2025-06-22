@@ -43,8 +43,8 @@ export function normalizeError(error: any, fallbackError: string): string {
   return typeof error === "string"
     ? error
     : error && typeof error === "object" && "message" in error && typeof error.message === "string"
-    ? error.message
-    : fallbackError;
+      ? error.message
+      : fallbackError;
 }
 
 export function normalizeBalance(num: number | string | undefined, floor = false): string {

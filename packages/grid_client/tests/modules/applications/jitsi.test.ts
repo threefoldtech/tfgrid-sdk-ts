@@ -1,15 +1,7 @@
 import axios from "axios";
 import { setTimeout } from "timers/promises";
 
-import {
-  Features,
-  FilterOptions,
-  GatewayNameModel,
-  generateString,
-  GridClient,
-  MachinesModel,
-  randomChoice,
-} from "../../../src";
+import { Features, FilterOptions, GatewayNameModel, generateString, GridClient, MachinesModel } from "../../../src";
 import { config, getClient } from "../../client_loader";
 import { generateInt, getOnlineNode, log } from "../../utils";
 

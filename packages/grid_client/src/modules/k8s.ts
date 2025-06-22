@@ -1,4 +1,3 @@
-import { Contract } from "@threefold/tfchain_client";
 import { GridClientErrors, ValidationError } from "@threefold/types";
 import { Addr } from "netaddr";
 

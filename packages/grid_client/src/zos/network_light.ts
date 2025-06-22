@@ -2,6 +2,7 @@ import { Expose, Type } from "class-transformer";
 import { IsNotEmpty, IsOptional, IsString, ValidateNested } from "class-validator";
 
 import { ValidateMembers } from "../helpers";
+import { WorkloadTypes } from "./workload";
 import { WorkloadData } from "./workload_base";
 
 class Mycelium {
@@ -11,6 +12,7 @@ class Mycelium {
 
 @ValidateMembers()
 class NetworkLight extends WorkloadData {
+  @Expose() __type: WorkloadTypes = WorkloadTypes.networklight;
   @Expose() @IsString() @IsNotEmpty() subnet: string;
   @Expose() @IsOptional() @Type(() => Mycelium) @ValidateNested() mycelium?: Mycelium;
 

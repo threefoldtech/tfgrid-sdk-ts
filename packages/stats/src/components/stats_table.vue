@@ -1,7 +1,7 @@
 <template>
   <div>
     <!--loading-->
-    <v-sheet color="transparent" height="82vh" v-if="loading" class="d-flex align-center justify-center">
+    <v-sheet v-if="loading" color="transparent" height="82vh" class="d-flex align-center justify-center">
       <v-container class="text-center d-block">
         <v-progress-circular size="40" indeterminate />
         <p class="pt-4 font-weight-bold">Loading Statistics</p>
@@ -9,17 +9,17 @@
     </v-sheet>
 
     <!--error-->
-    <v-sheet color="transparent" height="82vh" v-else-if="failed" class="d-flex align-center w-100 justify-center">
+    <v-sheet v-else-if="failed" color="transparent" height="82vh" class="d-flex align-center w-100 justify-center">
       <v-container class="text-center">
         <v-icon color="error" size="x-large">mdi-close-circle-outline</v-icon>
         <v-container class="text-error">
-          Failed to get stats data, Please check you internet connection or try again later</v-container
-        >
-        <v-btn class="text-capitalize" @click="getStatsData(true)" color="secondary">Try again </v-btn>
+          Failed to get stats data, Please check you internet connection or try again later
+</v-container>
+        <v-btn class="text-capitalize" color="secondary" @click="getStatsData(true)">Try again </v-btn>
       </v-container>
     </v-sheet>
 
-    <v-container fluid class="py-0 pt-4 ml-2 d-flex justify-center" v-else>
+    <v-container v-else fluid class="py-0 pt-4 ml-2 d-flex justify-center">
       <v-row class="w-100 py-0">
         <v-col xl="8" lg="8" md="12" cols="12" class="mt-2 pb-0 px-0">
           <v-col xl="12" lg="12" cols="12" class="mx-auto pb-0">

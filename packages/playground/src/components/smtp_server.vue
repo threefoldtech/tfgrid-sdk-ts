@@ -1,8 +1,10 @@
 <template>
   <div>
     <v-alert variant="tonal" type="warning" :class="{ 'mb-4': persistent }">
-      <slot v-if="$slots.default"></slot>
-      <p v-else>Configure your SMTP Server.</p>
+      <slot v-if="$slots.default" />
+      <p v-else>
+        Configure your SMTP Server.
+      </p>
     </v-alert>
 
     <v-alert variant="tonal" type="warning" class="mt-3">
@@ -13,7 +15,7 @@
       inline
       tooltip="When the SMTP server is enabled, the system is capable of sending outgoing emails through the SMTP server."
     >
-      <v-switch color="primary" inset label="Toggle SMTP Server Enable" v-model="$props.modelValue.enabled" />
+      <v-switch v-model="$props.modelValue.enabled" color="primary" inset label="Toggle SMTP Server Enable" />
     </input-tooltip>
 
     <template v-if="$props.modelValue.enabled || persistent">
@@ -36,9 +38,9 @@
       >
         <input-tooltip tooltip="SMTP admin email, Username or API key.">
           <v-text-field
+            v-model="$props.modelValue.username"
             label="Admin Email or Username"
             placeholder="email@example.com"
-            v-model="$props.modelValue.username"
             v-bind="props"
             class="mt-3"
           />
@@ -60,9 +62,9 @@
         >
           <input-tooltip tooltip="SMTP admin password.">
             <v-text-field
+              v-model="$props.modelValue.password"
               label="Admin Password"
               placeholder="email@example.com"
-              v-model="$props.modelValue.password"
               v-bind="{ ...props, ...validatorProps }"
             />
           </input-tooltip>
@@ -70,19 +72,19 @@
       </password-input-wrapper>
 
       <input-validator
+        v-if="email"
         :value="$props.modelValue.email"
         :rules="[
           validators.required('Email is required.'),
           validators.isEmail('Please provide a valid email address.'),
         ]"
-        v-if="email"
         #="{ props }"
       >
         <input-tooltip tooltip="From email address.">
           <v-text-field
+            v-model="$props.modelValue.email"
             label="From Email Address"
             placeholder="email@example.com"
-            v-model="$props.modelValue.email"
             v-bind="props"
           />
         </input-tooltip>
@@ -95,9 +97,9 @@
       >
         <input-tooltip tooltip="SMTP host server.">
           <v-text-field
+            v-model="$props.modelValue.hostname"
             label="Hostname"
             placeholder="email@example.com"
-            v-model="$props.modelValue.hostname"
             v-bind="props"
           />
         </input-tooltip>
@@ -109,7 +111,7 @@
         #="{ props }"
       >
         <input-tooltip tooltip="SMTP port server.">
-          <v-text-field label="Port" v-model.number="$props.modelValue.port" v-bind="props" />
+          <v-text-field v-model.number="$props.modelValue.port" label="Port" v-bind="props" />
         </input-tooltip>
       </input-validator>
 

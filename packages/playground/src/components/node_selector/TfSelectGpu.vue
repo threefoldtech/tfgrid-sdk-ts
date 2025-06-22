@@ -1,5 +1,7 @@
 <template>
-  <v-alert class="mb-4" type="info" variant="tonal"> Choose a GPU card to deploy your VM. </v-alert>
+  <v-alert class="mb-4" type="info" variant="tonal">
+    Choose a GPU card to deploy your VM.
+  </v-alert>
   <div ref="input">
     <input-tooltip
       tooltip="Please select at least one card from the available GPU cards. Note that if you have a deployment that already uses certain cards, they will not appear in the selection area. You have the option to select one or more cards.."
@@ -11,10 +13,6 @@
         multiple
         :model-value="$props.modelValue"
         item-value="id"
-        @update:model-value="
-          bindModelValue($event);
-          bindStatus($event.length === 0 ? ValidatorStatus.Invalid : ValidatorStatus.Valid);
-        "
         :items="(cardsTask.data as GPUCardInfo[])"
         item-title="device"
         :loading="cardsTask.loading"
@@ -27,6 +25,10 @@
         :disabled="!$props.validNode"
         :hint="$props.validNode ? undefined : 'Please select a valid node to load its GPU cards.'"
         :persistent-hint="!$props.validNode"
+        @update:model-value="
+          bindModelValue($event);
+          bindStatus($event.length === 0 ? ValidatorStatus.Invalid : ValidatorStatus.Valid);
+        "
         @update:menu="opened => !opened && $props.modelValue.length === 0 && bindStatus(ValidatorStatus.Invalid)"
       />
     </input-tooltip>

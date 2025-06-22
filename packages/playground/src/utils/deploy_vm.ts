@@ -71,10 +71,13 @@ function createQsfsDisks(disks: QsfsDisk[] = []): QSFSDiskModel[] {
 }
 
 function createEnvs(envs: Env[] = []): { [key: string]: string } {
-  return envs.reduce((result, env) => {
-    result[env.key] = env.value;
-    return result;
-  }, {} as { [key: string]: string });
+  return envs.reduce(
+    (result, env) => {
+      result[env.key] = env.value;
+      return result;
+    },
+    {} as { [key: string]: string },
+  );
 }
 
 function createDisks(disks: Disk[] = []): DiskModel[] {

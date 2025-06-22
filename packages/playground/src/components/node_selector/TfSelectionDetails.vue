@@ -1,72 +1,76 @@
 <template>
   <section class="mt-4">
     <template v-if="!disableNodeSelection">
-      <h3 class="bg-primary pa-2 text-h6 rounded">Node Selection</h3>
-      <p class="text-h6 mb-4 mt-2 ml-2">Choose a way to select Node</p>
+      <h3 class="bg-primary pa-2 text-h6 rounded">
+        Node Selection
+      </h3>
+      <p class="text-h6 mb-4 mt-2 ml-2">
+        Choose a way to select Node
+      </p>
 
       <v-radio-group v-model="wayToSelect" color="primary" inline>
         <InputTooltip
           align-center
           tooltip="Automatically select your node by filtering with Region, country, or farm name"
         >
-          <v-radio label="Automated" value="automated"></v-radio>
+          <v-radio label="Automated" value="automated" />
         </InputTooltip>
         <InputTooltip align-center tooltip="Manually select your node by entering its id">
-          <v-radio label="Manual" value="manual" class="ml-5"></v-radio>
+          <v-radio label="Manual" value="manual" class="ml-5" />
         </InputTooltip>
       </v-radio-group>
 
       <div ref="input">
         <template v-if="wayToSelect === 'automated'">
           <TfSelectLocation v-model="location" title="Choose a Location" :status="NodeStatus.Up" />
-          <TfSelectFarm :valid-filters="validFilters" :filters="filters" :location="location" v-model="farm" />
+          <TfSelectFarm v-model="farm" :valid-filters="validFilters" :filters="filters" :location="location" />
           <TfAutoNodeSelector
+            v-model="node"
+            v-model:status="nodeStatus"
             :selected-machines="selectedMachines"
             :nodes-lock="nodesLock"
             :valid-filters="validFilters"
             :filters="filters"
             :location="location"
             :farm="farm"
-            v-model="node"
-            v-model:status="nodeStatus"
             :load-farm="loadFarm"
             :get-farm="getFarm"
           />
         </template>
 
         <TfManualNodeSelector
+          v-else
+          v-model="node"
+          v-model:status="nodeStatus"
           :selected-machines="selectedMachines"
           :nodes-lock="nodesLock"
           :valid-filters="validFilters"
           :filters="filters"
-          v-model="node"
-          v-model:status="nodeStatus"
           :load-farm="loadFarm"
           :get-farm="getFarm"
-          v-else
         />
       </div>
 
       <VExpandTransition>
         <TfSelectGpu
-          :node="node"
-          :valid-node="nodeStatus === ValidatorStatus.Valid"
+          v-if="filters.hasGPU"
           v-model="gpuCards"
           v-model:status="gpuStatus"
-          v-if="filters.hasGPU"
+          :node="node"
+          :valid-node="nodeStatus === ValidatorStatus.Valid"
         />
       </VExpandTransition>
     </template>
 
     <VExpandTransition>
       <TfDomainName
+        v-if="requireDomain"
+        v-model="domain"
+        v-model:status="domainStatus"
         :filters="filters"
         :farm="farm"
         :hide-title="$props.disableNodeSelection"
-        v-model="domain"
-        v-model:status="domainStatus"
         :use-fqdn="$props.useFqdn"
-        v-if="requireDomain"
         :interfaces="domainNameInterfaces"
       />
     </VExpandTransition>

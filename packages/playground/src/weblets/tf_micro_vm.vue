@@ -1,26 +1,26 @@
 <template>
   <weblet-layout
     ref="layout"
-    @mount="layoutMount"
     :cpu="solution?.cpu"
     :memory="solution?.memory"
     :disk="disks.reduce((total, disk) => total + disk.size, solution?.disk ?? 0)"
     :ipv4="ipv4"
     :dedicated="dedicated"
-    :rentedBy="rentedBy"
-    :SelectedNode="selectionDetails?.node"
+    :rented-by="rentedBy"
+    :selected-node="selectionDetails?.node"
     :valid-filters="selectionDetails?.validFilters"
     title-image="images/icons/vm.png"
+    @mount="layoutMount"
   >
-    <template #title>Deploy a Micro Virtual Machine </template>
+    <template #title> Deploy a Micro Virtual Machine </template>
 
     <d-tabs
+      ref="tabs"
       :tabs="[
         { title: 'Config', value: 'config' },
         { title: 'Environment Variables', value: 'env' },
         { title: 'Disks', value: 'disks' },
       ]"
-      ref="tabs"
     >
       <template #config>
         <input-validator
@@ -35,40 +35,41 @@
           #="{ props }"
         >
           <input-tooltip tooltip="Instance name.">
-            <v-text-field label="Name" v-model="name" v-bind="props" />
+            <v-text-field v-model="name" label="Name" v-bind="props" />
           </input-tooltip>
         </input-validator>
 
-        <SelectVmImage :images="images" v-model="flist" />
+        <SelectVmImage v-model="flist" :images="images" />
         <SelectSolutionFlavor
+          v-model="solution"
           :small="{ cpu: 1, memory: 2, disk: 25 }"
           :medium="{ cpu: 2, memory: 4, disk: 50 }"
           :large="{ cpu: 4, memory: 16, disk: 100 }"
-          v-model="solution"
         />
 
         <Networks
-          required
           v-model:ipv4="ipv4"
           v-model:ipv6="ipv6"
           v-model:planetary="planetary"
           v-model:mycelium="mycelium"
           v-model:wireguard="wireguard"
+          required
         />
 
         <!-- <input-tooltip inline tooltip="" :href="manual"> -->
-        <v-switch color="primary" inset label="Rented By Me" v-model="rentedByMe" hide-details />
+        <v-switch v-model="rentedByMe" color="primary" inset label="Rented By Me" hide-details />
         <!-- </input-tooltip> -->
 
         <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
-          <v-switch color="primary" inset label="Rentable" v-model="dedicated" hide-details />
+          <v-switch v-model="dedicated" color="primary" inset label="Rentable" hide-details />
         </input-tooltip>
 
         <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
-          <v-switch color="primary" inset label="Certified" v-model="certified" hide-details />
+          <v-switch v-model="certified" color="primary" inset label="Certified" hide-details />
         </input-tooltip>
 
         <TfSelectionDetails
+          v-model="selectionDetails"
           :filters="{
             ipv4,
             ipv6,
@@ -83,7 +84,6 @@
             mycelium,
             wireguard,
           }"
-          v-model="selectionDetails"
         />
 
         <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
@@ -92,9 +92,9 @@
       <template #env>
         <ExpandableLayout
           v-model="envs"
-          @add="envs.push({ key: '', value: '' })"
           #="{ index, isRequired }"
           :required="[0]"
+          @add="envs.push({ key: '', value: '' })"
         >
           <input-validator
             :value="envs[index].key"
@@ -107,7 +107,7 @@
             #="{ props }"
           >
             <input-tooltip tooltip="Environment key.">
-              <v-text-field label="Name" v-model="envs[index].key" :disabled="isRequired" v-bind="props" />
+              <v-text-field v-model="envs[index].key" label="Name" :disabled="isRequired" v-bind="props" />
             </input-tooltip>
           </input-validator>
 
@@ -117,7 +117,7 @@
             #="{ props }"
           >
             <input-tooltip tooltip="Environment Value.">
-              <v-textarea label="Value" v-model="envs[index].value" no-resize :spellcheck="false" />
+              <v-textarea v-model="envs[index].value" label="Value" no-resize :spellcheck="false" />
             </input-tooltip>
           </input-validator>
         </ExpandableLayout>
@@ -126,9 +126,9 @@
       <template #disks>
         <ExpandableLayout
           v-model="disks"
-          @add="addDisk"
           title="Add additional disk space to your micro virtual machine"
           #="{ index }"
+          @add="addDisk"
         >
           <p class="text-h6 mb-4">Disk #{{ index + 1 }}</p>
           <input-validator
@@ -145,7 +145,7 @@
             #="{ props }"
           >
             <input-tooltip tooltip="Disk name.">
-              <v-text-field label="Name" v-model="disks[index].name" v-bind="props" />
+              <v-text-field v-model="disks[index].name" label="Name" v-bind="props" />
             </input-tooltip>
           </input-validator>
           <input-validator
@@ -159,7 +159,7 @@
             #="{ props }"
           >
             <input-tooltip tooltip="Disk Size.">
-              <v-text-field label="Size (GB)" type="number" v-model.number="disks[index].size" v-bind="props" />
+              <v-text-field v-model.number="disks[index].size" label="Size (GB)" type="number" v-bind="props" />
             </input-tooltip>
           </input-validator>
           <input-validator
@@ -173,7 +173,7 @@
             #="{ props }"
           >
             <input-tooltip tooltip="Disk Size.">
-              <v-text-field label="Mount Point" type="text" v-model="disks[index].mountPoint" v-bind="props" />
+              <v-text-field v-model="disks[index].mountPoint" label="Mount Point" type="text" v-bind="props" />
             </input-tooltip>
           </input-validator>
         </ExpandableLayout>
@@ -184,15 +184,15 @@
       <v-btn
         variant="elevated"
         class="text-primery px-10 py-3 h-auto text-subtitle-1"
-        @click="validateBeforeDeploy(deploy)"
         text="Deploy"
+        @click="validateBeforeDeploy(deploy)"
       />
     </template>
   </weblet-layout>
 </template>
 
 <script lang="ts" setup>
-import { computed, type Ref, ref, watch } from "vue";
+import { computed, type Ref, ref } from "vue";
 
 import { manual } from "@/utils/manual";
 
@@ -210,7 +210,7 @@ const flists = [
   FLISTS.MICROVMS_UBUNTU_24,
   FLISTS.MICROVMS_UBUNTU_23,
   FLISTS.MICROVMS_UBUNTU_22,
-  FLISTS.MICROVMS_NIXOS,
+  // FLISTS.MICROVMS_NIXOS,
   FLISTS.MICROVMS_DEBIAN_12,
   FLISTS.MICROVMS_CENTOS_9,
   FLISTS.MICROVMS_ARCH,
@@ -298,9 +298,8 @@ async function deploy() {
 
 function updateSSHkeyEnv(selectedKeys: string) {
   selectedSSHKeys.value = selectedKeys;
+  layoutMount();
 }
-
-watch(selectedSSHKeys, layoutMount, { deep: true });
 </script>
 
 <script lang="ts">

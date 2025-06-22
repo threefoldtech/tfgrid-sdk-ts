@@ -4,10 +4,10 @@
       tooltip="Choosing the appropriate computing resources and performance capabilities for a virtual instance or server. When provisioning a virtual machine or cloud instance, the 'Select instance capacity' step allows users to specify the desired CPU, memory, storage, and network resources for their virtual environment."
     >
       <v-select
-        label="Select instance capacity"
         v-bind="props"
-        :items="packages"
         v-model="solution"
+        label="Select instance capacity"
+        :items="packages"
         :disabled="props.disabled"
       />
     </input-tooltip>
@@ -18,13 +18,13 @@
         :rules="[
           validators.required('CPU is required.'),
           validators.isInt('CPU must be a valid integer.'),
-          validators.min('CPU min is 1 cores.', 1),
+          validators.min(`CPU min is ${minCpuSize} cores.`, minCpuSize),
           validators.max('CPU max is 32 cores.', 32),
         ]"
         #="{ props }"
       >
         <input-tooltip tooltip="The number of virtual cores allocated to your instance.">
-          <v-text-field label="CPU (vCores)" type="number" v-model.number="cpu" v-bind="props" />
+          <v-text-field v-model.number="cpu" label="CPU (vCores)" type="number" v-bind="props" />
         </input-tooltip>
       </input-validator>
 
@@ -33,13 +33,13 @@
         :rules="[
           validators.required('Memory is required.'),
           validators.isInt('Memory must be a valid integer.'),
-          validators.min('Minimum allowed memory is 256 MB.', 256),
+          validators.min(`Minimum allowed memory is ${minMemorySize} MB.`, minMemorySize),
           validators.max('Maximum allowed memory is 256 GB.', 256 * 1024),
         ]"
         #="{ props }"
       >
         <input-tooltip tooltip="The amount of RAM (Random Access Memory) allocated to your instance.">
-          <v-text-field label="Memory (MB)" type="number" v-model.number="memory" v-bind="props" />
+          <v-text-field v-model.number="memory" label="Memory (MB)" type="number" v-bind="props" />
         </input-tooltip>
       </input-validator>
 
@@ -56,7 +56,7 @@
         <input-tooltip
           tooltip="The storage capacity allocated to your instance, indicating the amount of space available to store files, data, and applications."
         >
-          <v-text-field label="SSD Storage (GB)" type="number" v-model.number="disk" v-bind="props" />
+          <v-text-field v-model.number="disk" label="SSD Storage (GB)" type="number" v-bind="props" />
         </input-tooltip>
       </input-validator>
     </div>
@@ -82,7 +82,9 @@ const props = defineProps({
 });
 const emits = defineEmits<{ (event: "update:model-value", value?: solutionFlavor): void }>();
 
-const minDiskSize = computed(() => Math.min(15, props.small.disk, props.medium.disk, props.large.disk));
+const minDiskSize = computed(() => props.small.disk);
+const minMemorySize = computed(() => props.small.memory * 1024);
+const minCpuSize = computed(() => props.small.cpu);
 
 const packages = computed(() => {
   const { small, medium, large } = props;

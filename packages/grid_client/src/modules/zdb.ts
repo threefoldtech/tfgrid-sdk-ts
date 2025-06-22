@@ -1,4 +1,3 @@
-import { Contract } from "@threefold/tfchain_client";
 import { ValidationError } from "@threefold/types";
 
 import { GridClientConfig } from "../config";

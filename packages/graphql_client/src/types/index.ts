@@ -12,8 +12,8 @@ export type PartialBoolean<T> = {
       ? PartialBoolean<Q>
       : true
     : T[K] extends object
-    ? PartialBoolean<T[K]>
-    : true;
+      ? PartialBoolean<T[K]>
+      : true;
 };
 
 type __BaseWhere<T> = { eq: T; not_eq: T; gt: T; gte: T; lt: T; lte: T; in: T[]; not_in: T[]; }; // prettier-ignore

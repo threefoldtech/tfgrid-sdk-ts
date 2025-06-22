@@ -63,7 +63,6 @@ test("TC1248 - Algorand: Import Account", async () => {
   //Test Data
   const accountName = "Test" + generateString(5);
   const newAccountName = "Test" + generateString(5);
-  const blockchainType = "algorand";
 
   //Create Account
   const account: AlgorandAccountCreateModel = {
@@ -135,7 +134,6 @@ test("TC1250 - Algorand: Check if Account exists", async () => {
 
   //Test Data
   const accountName = "Test" + generateString(5);
-  const blockchainType = "algorand";
 
   //Create Account
   const account: AlgorandAccountCreateModel = {
@@ -234,7 +232,6 @@ test.skip("TC1253 - Algorand: Get Account assets by address", async () => {
 
   //Test Data
   const accountName = "Test" + generateString(5);
-  const blockchainType = "algorand";
 
   //Create Account
   const account: AlgorandAccountCreateModel = {
