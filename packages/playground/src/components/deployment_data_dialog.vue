@@ -229,7 +229,7 @@ const getStorage = (disk: number) => {
   return Math.ceil(disk / (1024 * 1024 * 1024));
 };
 
-const getTotalStorage = (contract: any) => {
+const getTotalStorage = (contract: DeploymentContract) => {
   let total = getStorage(contract.rootfs_size);
 
   if (contract.mounts) {
@@ -307,14 +307,14 @@ function getType(key: string): string {
   return "text";
 }
 
-function getDiskLabel(contract: any, disk: Disk) {
+function getDiskLabel(contract: DeploymentContract, disk: Disk) {
   if (contract.metadata.includes("fullvm") && contract.mounts.indexOf(disk) > 0) {
     return "Disk( " + disk.name + " ) GB";
   }
   return "Disk( " + disk.mountPoint + " ) GB";
 }
 
-function getMetadata(contract: any): { type: string; projectName: string } {
+function getMetadata(contract: DeploymentContract): { type: string; projectName: string } {
   try {
     const metadata = JSON.parse(contract.metadata);
     return {
@@ -326,12 +326,12 @@ function getMetadata(contract: any): { type: string; projectName: string } {
   }
 }
 
-function hasMaster(contract: any): boolean {
+function hasMaster(contract: DeploymentContract): boolean {
   const meta = getMetadata(contract);
   return meta.type === "kubernetes" || meta.projectName === "caprover";
 }
 
-function getTooltipText(contract: any, index: number) {
+function getTooltipText(contract: DeploymentContract, index: number) {
   if (index === 0 && getMetadata(contract).projectName === "caprover") {
     return "Leader";
   }
@@ -350,7 +350,7 @@ function getTooltipText(contract: any, index: number) {
 import type { GridClient } from "@threefold/grid_client";
 import { onMounted } from "vue";
 
-import { ContractType } from "@/utils/contracts";
+import { ContractType, type DeploymentContract } from "@/utils/contracts";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
 import { GrafanaStatistics } from "@/utils/get_metrics_url";
 
