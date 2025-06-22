@@ -33,7 +33,7 @@
         :rules="[
           validators.required('Memory is required.'),
           validators.isInt('Memory must be a valid integer.'),
-          validators.min(`Minimum allowed memory is ${minMemorySize} MB.`, minMemorySize * 1024),
+          validators.min(`Minimum allowed memory is ${minMemorySize} MB.`, minMemorySize),
           validators.max('Maximum allowed memory is 256 GB.', 256 * 1024),
         ]"
         #="{ props }"
@@ -83,7 +83,7 @@ const props = defineProps({
 const emits = defineEmits<{ (event: "update:model-value", value?: solutionFlavor): void }>();
 
 const minDiskSize = computed(() => props.small.disk);
-const minMemorySize = computed(() => props.small.memory);
+const minMemorySize = computed(() => props.small.memory * 1024);
 const minCpuSize = computed(() => props.small.cpu);
 
 const packages = computed(() => {
