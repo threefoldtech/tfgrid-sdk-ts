@@ -1,13 +1,21 @@
 <template>
   <div class="border px-4 pb-4 rounded position-relative">
     <v-card color="primary" class="d-flex justify-center items-center mt-3 pa-3 text-center">
-      <v-icon size="30" class="pr-3"> mdi-account-arrow-right-outline </v-icon>
-      <v-card-title class="pa-0"> Transfer TFTs on the TFChain </v-card-title>
+      <v-icon size="30" class="pr-3">
+        mdi-account-arrow-right-outline
+      </v-icon>
+      <v-card-title class="pa-0">
+        Transfer TFTs on the TFChain
+      </v-card-title>
     </v-card>
     <v-card>
       <v-tabs v-model="activeTab" align-tabs="center">
-        <v-tab :value="0" color="secondary"> By Twin ID </v-tab>
-        <v-tab :value="1" color="secondary"> By Address </v-tab>
+        <v-tab :value="0" color="secondary">
+          By Twin ID
+        </v-tab>
+        <v-tab :value="1" color="secondary">
+          By Address
+        </v-tab>
       </v-tabs>
       <v-window v-model="activeTab">
         <!-- TwinID Transfer -->
@@ -51,7 +59,9 @@
               </input-validator>
             </form-validator>
             <v-card-actions class="justify-end mb-1 mr-2">
-              <v-btn color="anchor" :disabled="loadingTwinIDTransfer" @click="clearInput"> Clear </v-btn>
+              <v-btn color="anchor" :disabled="loadingTwinIDTransfer" @click="clearInput">
+                Clear
+              </v-btn>
               <v-btn
                 color="secondary"
                 :loading="loadingTwinIDTransfer"
@@ -103,7 +113,9 @@
             </form-validator>
             <v-card-actions>
               <v-spacer />
-              <v-btn color="anchor" :disabled="loadingAddressTransfer" @click="clearInput"> Clear </v-btn>
+              <v-btn color="anchor" :disabled="loadingAddressTransfer" @click="clearInput">
+                Clear
+              </v-btn>
 
               <v-btn
                 color="secondary"

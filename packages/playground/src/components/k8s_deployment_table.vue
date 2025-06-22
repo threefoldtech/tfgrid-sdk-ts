@@ -6,7 +6,8 @@
       <span>
         This might happen because the node is down or it's not reachable
         <span v-if="showEncryption">
-          or the deployment{{ count - items.length > 1 ? "s are" : " is" }} encrypted by another key </span>.
+          or the deployment{{ count - items.length > 1 ? "s are" : " is" }} encrypted by another key
+        </span>.
       </span>
       <v-tooltip location="top" text="Show failed deployments">
         <template #activator="{ props: tooltipProps }">

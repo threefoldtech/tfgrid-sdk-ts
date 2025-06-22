@@ -8,7 +8,9 @@
       @update:model-value="$emit('close')"
     >
       <weblet-layout ref="layout" @back="onBack">
-        <template #title> Manage Domains ({{ vm ? vm.name : k8s?.masters[0].name }}) </template>
+        <template #title>
+          Manage Domains ({{ vm ? vm.name : k8s?.masters[0].name }})
+        </template>
         <v-tabs v-model="gatewayTab" align-tabs="center" color="secondary" class="mb-6" :disabled="deleting">
           <v-tab>Domains List</v-tab>
           <v-tab>Add new domain</v-tab>
@@ -33,7 +35,9 @@
 
         <v-dialog v-model="failedDomainDialog" max-width="400px" scrollable attach="#modals">
           <v-card>
-            <v-card-title class="bg-warning"> Failed Domains </v-card-title>
+            <v-card-title class="bg-warning">
+              Failed Domains
+            </v-card-title>
             <v-card-text>
               <ul style="list-style: square">
                 <li v-for="gw in failedToListGws" :key="gw">
@@ -106,7 +110,7 @@
               <v-text-field v-model="networkName" label="Network name" readonly v-bind="props" />
             </copy-input-wrapper>
 
-            <copy-input-wrapper #="{ props }" :data="selectedIPAddress as any">
+            <copy-input-wrapper #="{ props }" :data="(selectedIPAddress as any)">
               <v-text-field v-model="selectedIPAddress" :readonly="true" label="Selected IP Address" v-bind="props" />
             </copy-input-wrapper>
 
@@ -151,7 +155,9 @@
         </div>
 
         <template #footer-actions>
-          <v-btn color="anchor" @click="$emit('close')"> Close </v-btn>
+          <v-btn color="anchor" @click="$emit('close')">
+            Close
+          </v-btn>
           <v-btn
             v-if="gatewayTab === 0"
             color="error"
@@ -160,7 +166,9 @@
           >
             Delete
           </v-btn>
-          <v-btn v-else color="secondary" :disabled="!valid" @click="deployGateway"> Add </v-btn>
+          <v-btn v-else color="secondary" :disabled="!valid" @click="deployGateway">
+            Add
+          </v-btn>
         </template>
       </weblet-layout>
     </v-dialog>
@@ -176,7 +184,9 @@
         </v-card-text>
 
         <v-card-actions class="justify-end mb-1 mr-2">
-          <v-btn color="anchor" @click="requestDelete = false"> Cancel </v-btn>
+          <v-btn color="anchor" @click="requestDelete = false">
+            Cancel
+          </v-btn>
           <v-btn
             color="error"
             :disabled="loadingGateways || deleting"

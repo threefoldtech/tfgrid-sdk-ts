@@ -10,7 +10,9 @@
         <v-alert v-if="selectedKeys.length === 0" type="warning" class="mt-2">
           Attention: It appears that no SSH keys have been selected. In order to access your deployment, you must send
           at least one SSH key. You can manage your SSH keys from the
-          <router-link :to="DashboardRoutes.Deploy.SSHKey"> SSH keys management page </router-link>
+          <router-link :to="DashboardRoutes.Deploy.SSHKey">
+            SSH keys management page
+          </router-link>
           and add more as needed.
         </v-alert>
         <v-alert type="info" class="mt-3">
@@ -90,10 +92,11 @@ export default defineComponent({
 
     function chipClass(key: SSHKeyData) {
       if (isKeySelected(key)) return ["bg-primary", "v-chip--selected"];
-
+      
       const keys = document.querySelectorAll(".keys .v-chip");
       keys.forEach(key => key.classList.remove("v-chip--selected"));
       return "anchor";
+      
     }
 
     function selectKey(key: SSHKeyData) {

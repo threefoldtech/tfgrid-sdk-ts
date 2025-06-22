@@ -25,7 +25,10 @@
       "
     />
 
-    <input-tooltip tooltip="Node ID to deploy on." align-center>
+    <input-tooltip
+      tooltip="Node ID to deploy on."
+      align-center
+    >
       <VTextField
         v-model.number="nodeId"
         label="Node ID"
@@ -37,9 +40,9 @@
         :disabled="!validFilters"
         :persistent-hint="
           (nodeId && !validationTask.initialized) ||
-          !validFilters ||
-          validationTask.loading ||
-          (validationTask.initialized && validationTask.data === true)
+            !validFilters ||
+            validationTask.loading ||
+            (validationTask.initialized && validationTask.data === true)
         "
         :hint="
           !validFilters

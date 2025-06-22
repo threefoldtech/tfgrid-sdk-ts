@@ -5,7 +5,12 @@
   </VAlert>
   <v-container>
     <v-row class="text-center flex justify-center mt-4">
-      <v-btn color="secondary" class="text-subtitle-1 px-6 mr-2" :href="'https://bootstrap.grid.tf/'" target="blank">
+      <v-btn
+        color="secondary"
+        class="text-subtitle-1 px-6 mr-2"
+        :href="'https://bootstrap.grid.tf/'"
+        target="blank"
+      >
         Bootstrap Node Image
       </v-btn>
 
@@ -23,7 +28,9 @@
     <v-container v-if="showDialogue">
       <v-dialog v-model="showDialogue" max-width="600" attach="#modals">
         <v-card>
-          <v-card-title class="bg-primary"> Create Farm </v-card-title>
+          <v-card-title class="bg-primary">
+            Create Farm
+          </v-card-title>
           <v-card-text>
             <form-validator v-model="valid">
               <input-validator
@@ -45,7 +52,9 @@
             </form-validator>
           </v-card-text>
           <v-card-actions class="justify-end my-1 mr-2">
-            <v-btn color="anchor" @click="showDialogue = false"> Close </v-btn>
+            <v-btn color="anchor" @click="showDialogue = false">
+              Close
+            </v-btn>
             <v-tooltip
               text="A minimum of 2 TFTs is required to create a farm."
               location="top"

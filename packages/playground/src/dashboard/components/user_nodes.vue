@@ -1,7 +1,9 @@
 <template v-if="nodes">
   <div class="my-6">
     <v-card color="primary rounded-0">
-      <v-card-title class="py-1 text-subtitle-1 text-center"> Your Nodes </v-card-title>
+      <v-card-title class="py-1 text-subtitle-1 text-center">
+        Your Nodes
+      </v-card-title>
     </v-card>
     <v-data-table-server
       v-model:page="page"
@@ -44,7 +46,9 @@
 
             <v-card class="mt-4">
               <v-alert class="pa-5" style="height: 20px">
-                <h4 class="text-center font-weight-medium">Resource Units Reserved</h4>
+                <h4 class="text-center font-weight-medium">
+                  Resource Units Reserved
+                </h4>
               </v-alert>
               <v-card-text class="pb-8">
                 <NodeResources :node="item" />
@@ -53,7 +57,9 @@
 
             <v-card v-if="network == 'main'" class="mt-4" focusable single model-value>
               <v-alert class="pa-5" style="height: 20px">
-                <h4 class="text-center font-weight-medium">Node Statistics</h4>
+                <h4 class="text-center font-weight-medium">
+                  Node Statistics
+                </h4>
               </v-alert>
               <v-card-item>
                 <NodeMintingDetails :node="item" />

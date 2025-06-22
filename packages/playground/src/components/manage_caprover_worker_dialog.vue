@@ -9,7 +9,9 @@
     @back="updateCaprover"
     @click:outside="updateCaprover"
   >
-    <template #title> Manage Caprover({{ $props.master.name }}) Workers </template>
+    <template #title>
+      Manage Caprover({{ $props.master.name }}) Workers
+    </template>
 
     <template #list>
       <ListTable
@@ -49,7 +51,9 @@
         <template #[`item.status`]="{ item }">
           <v-chip :color="getNodeHealthColor(item.status as string).color">
             <v-tooltip v-if="item.status == NodeHealth.Error" activator="parent" location="top">
-              {{ item.message }}
+              {{
+                item.message
+              }}
             </v-tooltip>
             <v-tooltip v-if="item.status == NodeHealth.Paused" activator="parent" location="top">
               The deployment contract is in grace period
@@ -99,7 +103,9 @@
 
       <v-card-actions>
         <v-spacer />
-        <v-btn color="anchor" @click="deployedDialog = false"> Close </v-btn>
+        <v-btn color="anchor" @click="deployedDialog = false">
+          Close
+        </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

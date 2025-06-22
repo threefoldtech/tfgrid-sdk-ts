@@ -21,10 +21,10 @@ const vueTsGeneratedConfigs = defineConfigWithVueTs(pluginVue.configs["flat/reco
     "vue/require-explicit-emits": "off",
     "vue/require-default-prop": "off",
     "@typescript-eslint/no-unused-expressions": "off",
-
+    
     // --- WARN rules ---
     "@typescript-eslint/no-duplicate-enum-values": "warn",
-
+    
     // --- ERROR rules ---
     "vue/multi-word-component-names": "error",
     "@typescript-eslint/no-unused-vars": "error",

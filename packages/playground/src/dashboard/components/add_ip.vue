@@ -6,7 +6,9 @@
     <v-container v-if="showDialogue">
       <v-dialog v-model="showDialogue" max-width="600" attach="#modals">
         <v-card>
-          <v-card-title class="bg-primary"> Add Public IP to Farm </v-card-title>
+          <v-card-title class="bg-primary">
+            Add Public IP to Farm
+          </v-card-title>
           <v-card-text>
             <form-validator ref="formValidator" v-model="valid">
               <v-select
@@ -85,7 +87,9 @@
           </v-card-text>
           <v-dialog v-model="showIPs" max-width="600" attach="#modals">
             <v-card>
-              <v-card-title class="bg-primary"> IPs range </v-card-title>
+              <v-card-title class="bg-primary">
+                IPs range
+              </v-card-title>
               <v-card-text>
                 <v-row>
                   <v-col>
@@ -94,17 +98,21 @@
                         <v-row>
                           <v-col sm="4">
                             <p>Network:</p>
-</v-col><v-col>
+                          </v-col><v-col>
                             <p>{{ network }}</p>
                           </v-col>
                         </v-row>
                       </v-list-item>
                       <v-list-item>
                         <v-row>
-                          <v-col sm="4"> IP Addresses: </v-col>
+                          <v-col sm="4">
+                            IP Addresses:
+                          </v-col>
                           <v-col>
                             <v-chip v-for="ip in ipsRangeTable" :key="ip" type="warning" variant="tonal" class="ma-1">
-                              {{ ip }}
+                              {{
+                                ip
+                              }}
                             </v-chip>
                           </v-col>
                         </v-row>
@@ -116,13 +124,17 @@
               </v-card-text>
 
               <v-card-actions class="justify-end mb-1 mr-2">
-                <v-btn color="anchor" @click="showIPs = false"> Close </v-btn>
+                <v-btn color="anchor" @click="showIPs = false">
+                  Close
+                </v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
 
           <v-card-actions class="justify-end mb-1 mr-2">
-            <v-btn color="anchor" @click="showDialogue = false"> Close </v-btn>
+            <v-btn color="anchor" @click="showDialogue = false">
+              Close
+            </v-btn>
 
             <v-btn :disabled="!valid || type === IPType.single || !toPublicIP" @click="showRange">
               Show IPs Range

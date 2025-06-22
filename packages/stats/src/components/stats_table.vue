@@ -14,7 +14,7 @@
         <v-icon color="error" size="x-large">mdi-close-circle-outline</v-icon>
         <v-container class="text-error">
           Failed to get stats data, Please check you internet connection or try again later
-        </v-container>
+</v-container>
         <v-btn class="text-capitalize" color="secondary" @click="getStatsData(true)">Try again </v-btn>
       </v-container>
     </v-sheet>

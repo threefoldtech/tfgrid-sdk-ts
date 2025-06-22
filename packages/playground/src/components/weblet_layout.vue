@@ -10,7 +10,7 @@
             :style="{
               filter: `brightness(${!theme.global.current.value.dark ? 0.2 : 1})`,
             }"
-          />
+          >
           <slot name="title" />
         </v-card-title>
         <v-card-subtitle v-if="$slots.subtitle" :style="{ whiteSpace: 'initial' }">
@@ -25,7 +25,9 @@
     <v-card-text>
       <slot v-if="disableAlerts" />
       <template v-else>
-        <v-alert v-show="!profileManager.profile" variant="tonal" type="info"> Please connect your wallet </v-alert>
+        <v-alert v-show="!profileManager.profile" variant="tonal" type="info">
+          Please connect your wallet
+        </v-alert>
 
         <div ref="msgAlert">
           <v-alert v-show="profileManager.profile && status" variant="tonal" :type="alertType">
@@ -40,7 +42,9 @@
     </v-card-text>
 
     <template v-if="dedicated && !status">
-      <v-alert class="mb-4 mx-4" type="info" variant="tonal"> You need to rent a node before deploying on it. </v-alert>
+      <v-alert class="mb-4 mx-4" type="info" variant="tonal">
+        You need to rent a node before deploying on it.
+      </v-alert>
     </template>
 
     <template v-if="$slots['footer-actions'] && (profileManager.profile || disableAlerts)">
@@ -55,7 +59,7 @@
         <div v-if="ipv4 && dedicated">
           <span>
             There are no fees will be added since the selected node is rented by you and the cost already included in
-            the rent contract. <br />Please be aware that an additional fee of
+            the rent contract. <br>Please be aware that an additional fee of
             <span class="font-weight-black">
               {{ costLoading ? "Calculating..." : normalizeBalance(onlyIPV4TftPrice) }}
             </span>
@@ -84,7 +88,9 @@
             You selected a certified node. Please note that this deployment costs more TFT.
           </div>
         </div>
-        <div v-if="ipv4">Please Note that the Bandwidth affects the total cost (1 Bandwidth = 0.01 TFT/hour).</div>
+        <div v-if="ipv4">
+          Please Note that the Bandwidth affects the total cost (1 Bandwidth = 0.01 TFT/hour).
+        </div>
         <a :href="manual.pricing" target="_blank" class="app-link">
           Learn more about the pricing and how to unlock discounts.
         </a>
@@ -92,7 +98,9 @@
       <v-divider class="mt-3" />
       <v-card-actions class="justify-end my-1 mr-2 py-4">
         <slot v-if="!status" name="footer-actions" :validate-before-deploy="validateBeforeDeploy" />
-        <v-btn v-else color="secondary" :loading="status === 'deploy'" @click="reset"> Back </v-btn>
+        <v-btn v-else color="secondary" :loading="status === 'deploy'" @click="reset">
+          Back
+        </v-btn>
       </v-card-actions>
     </template>
   </v-card>
@@ -229,8 +237,8 @@ function validateBeforeDeploy(fn: () => void, documentScrollend = false) {
       __input && typeof __input === "object" && "value" in __input && __input.value instanceof HTMLElement
         ? __input.value
         : __input instanceof HTMLElement
-          ? __input
-          : null;
+        ? __input
+        : null;
 
     if (!input || !__setTab) {
       return;

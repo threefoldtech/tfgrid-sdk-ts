@@ -26,7 +26,9 @@
       <template v-if="showSSHError">
         <VAlert variant="tonal" type="error" class="mb-4">
           {{ title }} requires a public SSH key. You can generate or import it from the
-          <router-link :to="DashboardRoutes.Deploy.SSHKey"> SSH Keys </router-link> page.
+          <router-link :to="DashboardRoutes.Deploy.SSHKey">
+            SSH Keys
+          </router-link> page.
         </VAlert>
       </template>
       <template v-if="showKYCError">

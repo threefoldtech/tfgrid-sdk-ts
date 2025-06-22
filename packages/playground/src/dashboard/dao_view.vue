@@ -1,8 +1,12 @@
 <template>
   <div class="border px-4 pb-4 rounded position-relative">
     <v-card color="primary" class="d-flex justify-center items-center mt-3 pa-3 text-center">
-      <v-icon size="30" class="pr-3"> mdi-note-check-outline </v-icon>
-      <v-card-title class="pa-0"> DAO </v-card-title>
+      <v-icon size="30" class="pr-3">
+        mdi-note-check-outline
+      </v-icon>
+      <v-card-title class="pa-0">
+        DAO
+      </v-card-title>
     </v-card>
 
     <div v-if="loadingProposals" class="d-flex my-6 align-center justify-center">
@@ -18,7 +22,9 @@
       <v-card>
         <h4 class="d-flex justify-center pa-4">
           You can now vote on proposals!
-          <v-icon class="mx-3" @click="openInfoModal = true"> mdi-information-outline </v-icon>
+          <v-icon class="mx-3" @click="openInfoModal = true">
+            mdi-information-outline
+          </v-icon>
         </h4>
         <v-tabs v-model="activeTab" align-tabs="center">
           <v-tab v-for="(tab, index) in tabs" :key="index" color="secondary" :value="`${index}`">
@@ -57,24 +63,34 @@
                 {{ proposal.action }}
               </v-card-title>
               <div class="d-flex justify-between">
-                <v-btn color="secondary" :href="proposal.link" :target="'blank'" class="mx-3"> Go to Proposal </v-btn>
-                <v-btn @click="shareProposal(proposal.hash, proposal.end)"> Share </v-btn>
+                <v-btn color="secondary" :href="proposal.link" :target="'blank'" class="mx-3">
+                  Go to Proposal
+                </v-btn>
+                <v-btn @click="shareProposal(proposal.hash, proposal.end)">
+                  Share
+                </v-btn>
               </div>
             </div>
             <v-divider class="mt-1 mb-5 text-red-700" />
 
             <v-card-text class="pb-0">
               <v-row class="my-1 mb-3">
-                <p class="font-weight-bold mr-3">Description:</p>
+                <p class="font-weight-bold mr-3">
+                  Description:
+                </p>
 
                 <span> {{ proposal.description }}</span>
               </v-row>
               <v-row v-if="expired(proposal.end)" class="my-1">
-                <p class="font-weight-bold mr-3">You can vote until:</p>
+                <p class="font-weight-bold mr-3">
+                  You can vote until:
+                </p>
                 <span class="text--secondary">{{ proposal.end }}</span>
               </v-row>
               <v-row v-else class="my-1">
-                <p class="font-weight-bold mr-3">Voting ended on:</p>
+                <p class="font-weight-bold mr-3">
+                  Voting ended on:
+                </p>
                 <span class="text--secondary">{{ proposal.end }}</span>
               </v-row>
             </v-card-text>
@@ -86,8 +102,7 @@
                       Yes <v-divider class="mx-3" vertical />{{ proposal.ayes.length }}
                     </v-btn>
                     <div class="d-flex align-center text-center pr-2">
-                      <span class="px-1"
-                        >Threshold: {{ proposal.nayes.length + proposal.ayes.length }}/{{ proposal.threshold }}
+                      <span class="px-1">Threshold: {{ proposal.nayes.length + proposal.ayes.length }}/{{ proposal.threshold }}
                       </span>
                     </div>
                     <v-btn color="anchor" :disabled="loadingVote" @click="openVoteDialog(proposal.hash, false)">
@@ -107,11 +122,9 @@
                           marginRight: 'auto',
                         }"
                       >
-                        <span class=""
-                          >{{
-                            !!(proposal.ayesProgress % 1) ? proposal.ayesProgress.toFixed(2) : proposal.ayesProgress
-                          }}%</span
-                        >
+                        <span class="">{{
+                          !!(proposal.ayesProgress % 1) ? proposal.ayesProgress.toFixed(2) : proposal.ayesProgress
+                        }}%</span>
                       </v-progress-linear>
                     </div>
                     <div :style="{ width: `${proposal.nayesProgress}%` }">
@@ -125,13 +138,11 @@
                         }"
                       >
                         <v-row class="d-flex justify-center">
-                          <span class="text-black"
-                            >{{
-                              !!(proposal.nayesProgress % 1)
-                                ? proposal.nayesProgress.toFixed(2)
-                                : proposal.nayesProgress
-                            }}%</span
-                          >
+                          <span class="text-black">{{
+                            !!(proposal.nayesProgress % 1)
+                              ? proposal.nayesProgress.toFixed(2)
+                              : proposal.nayesProgress
+                          }}%</span>
                         </v-row>
                       </v-progress-linear>
                     </div>
@@ -246,27 +257,30 @@
             </form-validator>
           </v-card-text>
           <v-card-actions class="justify-end mb-1 mr-2">
-            <v-btn color="anchor" @click="openVDialog = false"> Close </v-btn>
-            <v-btn :loading="loadingVote" color="secondary" :disabled="!isValidFarm" @click="castVote"> Vote </v-btn>
+            <v-btn color="anchor" @click="openVDialog = false">
+              Close
+            </v-btn>
+            <v-btn :loading="loadingVote" color="secondary" :disabled="!isValidFarm" @click="castVote">
+              Vote
+            </v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
       <v-dialog v-model="openInfoModal" width="50vw" attach="#modals">
         <v-card>
-          <v-card-title class="text-h5 my-2"> Proposals Information </v-card-title>
+          <v-card-title class="text-h5 my-2">
+            Proposals Information
+          </v-card-title>
           <v-divider />
           <v-card-text>
             <div class="textContainer">
               <h2>General</h2>
-              <span
-                >TFChain council members have exclusive authority to generate proposals, while owners of farms
-                containing one or more up nodes can cast votes.</span
-              >
+              <span>TFChain council members have exclusive authority to generate proposals, while owners of farms
+                containing one or more up nodes can cast votes.</span>
               <span> The voting process concludes at the designated maturity date and time of the proposal.</span>
               <span>
                 Decisions regarding the proposal's acceptance or rejection are determined by the majority of weighted
-                votes.</span
-              >
+                votes.</span>
               <span>
                 However, a minimum participation threshold must be attained in order for the voting process to be
                 considered valid.
@@ -275,19 +289,14 @@
                 If the vote count is insufficient and the time limit is reached, the proposal will be rejected.
               </span>
               <a :href="manual.dao" target="_blank">How to vote?</a>
-              <br />
-              <br />
+              <br>
+              <br>
               <h3>How do we count weight:</h3>
-              <span
-                >Votes are weighted based on the farmers stake in the network. One vote by default is 1 weight.</span
-              >
+              <span>Votes are weighted based on the farmers stake in the network. One vote by default is 1 weight.</span>
               <span> If the farmers has nodes, the weight of the vote is calulcated as following:</span>
-              <span
-                ><b>
-                  The farmer's vote weight is the sum of all the farmer's nodes weight. A node's weight is calculated
-                  as: node CU * 2 + node SU.</b
-                ></span
-              >
+              <span><b>
+                The farmer's vote weight is the sum of all the farmer's nodes weight. A node's weight is calculated
+                as: node CU * 2 + node SU.</b></span>
             </div>
           </v-card-text>
 
@@ -295,7 +304,9 @@
 
           <v-card-actions>
             <v-spacer />
-            <v-btn color="anchor" @click="openInfoModal = false"> Close </v-btn>
+            <v-btn color="anchor" @click="openInfoModal = false">
+              Close
+            </v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>

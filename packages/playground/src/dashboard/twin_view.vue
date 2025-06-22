@@ -10,13 +10,19 @@
     <v-container v-if="editingTwin">
       <v-dialog v-model="editingTwin" max-width="600" attach="#modals">
         <v-card>
-          <v-toolbar color="primary" dark class="custom-toolbar"> Edit Twin </v-toolbar>
+          <v-toolbar color="primary" dark class="custom-toolbar">
+            Edit Twin
+          </v-toolbar>
           <div class="text-h2 pa-10">
             <v-text-field v-model="relay" outlined label="Relay" :error-messages="errorMsg" />
           </div>
           <v-card-actions class="justify-end mb-1 mr-2">
-            <v-btn color="anchor" @click="editingTwin = false"> Close </v-btn>
-            <v-btn @click="UpdateRelay"> Save </v-btn>
+            <v-btn color="anchor" @click="editingTwin = false">
+              Close
+            </v-btn>
+            <v-btn @click="UpdateRelay">
+              Save
+            </v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -24,18 +30,28 @@
 
     <v-dialog v-model="openVotePopup" max-width="600" attach="#modals">
       <v-card>
-        <v-toolbar color="primary" dark class="custom-toolbar bold-text"> Vote Reminder </v-toolbar>
+        <v-toolbar color="primary" dark class="custom-toolbar bold-text">
+          Vote Reminder
+        </v-toolbar>
         <v-card-text>There are {{ numberOfProposalsToVoteOn }} active proposals you can vote on now</v-card-text>
         <v-card-actions class="justify-end mb-1 mr-2">
-          <v-btn variant="elevated" @click="redirectToDao"> Vote </v-btn>
-          <v-btn color="anchor" @click="openVotePopup = false"> Close </v-btn>
+          <v-btn variant="elevated" @click="redirectToDao">
+            Vote
+          </v-btn>
+          <v-btn color="anchor" @click="openVotePopup = false">
+            Close
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
     <div class="border px-4 pb-4 rounded position-relative">
       <v-card color="primary" class="d-flex justify-center items-center mt-3 pa-3 text-center">
-        <v-icon size="30" class="pr-3"> mdi-account-supervisor-outline </v-icon>
-        <v-card-title class="pa-0"> Twin Details </v-card-title>
+        <v-icon size="30" class="pr-3">
+          mdi-account-supervisor-outline
+        </v-icon>
+        <v-card-title class="pa-0">
+          Twin Details
+        </v-card-title>
       </v-card>
 
       <v-card>
@@ -44,7 +60,9 @@
             <v-list class="custom-list" density="compact">
               <v-row class="row-style">
                 <v-col cols="3" class="px-0">
-                  <v-list-item class="px-0"> ID : </v-list-item>
+                  <v-list-item class="px-0">
+                    ID :
+                  </v-list-item>
                 </v-col>
                 <v-col cols="9" class="px-0">
                   <v-list-item class="px-0">
@@ -62,13 +80,17 @@
               </v-row>
               <v-row class="row-style">
                 <v-col cols="3" class="px-0">
-                  <v-list-item class="px-0"> E-mail : </v-list-item>
+                  <v-list-item class="px-0">
+                    E-mail :
+                  </v-list-item>
                 </v-col>
                 <v-col cols="9" class="px-0">
                   <v-list-item v-if="!editEmail" class="px-0">
                     <div class="edit_pen" style="display: flex; justify-content: space-between">
                       {{ profileManager.profile?.email }}
-                      <v-icon @click="editEmail = true"> mdi-pencil </v-icon>
+                      <v-icon @click="editEmail = true">
+                        mdi-pencil
+                      </v-icon>
                     </div>
                   </v-list-item>
 
@@ -110,14 +132,18 @@
               </v-row>
               <v-row class="row-style">
                 <v-col cols="3" class="px-0">
-                  <v-list-item class="px-0"> Address : </v-list-item>
+                  <v-list-item class="px-0">
+                    Address :
+                  </v-list-item>
                 </v-col>
                 <v-col cols="9" class="px-0">
                   <v-list-item class="px-0">
                     <div style="display: flex; justify-content: space-between; align-items: center">
                       <div class="pr-2" style="overflow: hidden; word-wrap: normal">
                         <span class="mr-2">{{ profileManager.profile?.address }}</span>
-                        <v-icon @click="copy(profileManager.profile?.address as string)"> mdi-content-copy </v-icon>
+                        <v-icon @click="copy(profileManager.profile?.address as string)">
+                          mdi-content-copy
+                        </v-icon>
                       </div>
 
                       <input-tooltip
@@ -132,7 +158,9 @@
               </v-row>
               <v-row class="row-style">
                 <v-col cols="3" class="px-0">
-                  <v-list-item class="px-0"> Relay : </v-list-item>
+                  <v-list-item class="px-0">
+                    Relay :
+                  </v-list-item>
                 </v-col>
                 <v-col cols="9" class="px-0">
                   <v-list-item class="px-0">
@@ -150,13 +178,17 @@
               </v-row>
               <v-row class="row-style">
                 <v-col cols="3" class="px-0">
-                  <v-list-item class="px-0"> KYC : </v-list-item>
+                  <v-list-item class="px-0">
+                    KYC :
+                  </v-list-item>
                 </v-col>
                 <v-col cols="9" class="px-0">
                   <v-list-item class="px-0">
                     <div style="display: flex; justify-content: space-between; align-items: center">
                       <div v-if="kyc.status == KycStatus.verified">
-                        <v-chip prepend-icon="mdi-shield-check"> Verified </v-chip>
+                        <v-chip prepend-icon="mdi-shield-check">
+                          Verified
+                        </v-chip>
                       </div>
                       <div v-else>
                         <v-btn
@@ -202,7 +234,9 @@
           </v-col>
         </v-row>
         <v-card-actions v-if="updateRelay" class="justify-end mb-1 mr-2">
-          <v-btn variant="elevated" class="custom-button" @click="editTwin"> Edit </v-btn>
+          <v-btn variant="elevated" class="custom-button" @click="editTwin">
+            Edit
+          </v-btn>
         </v-card-actions>
       </v-card>
     </div>

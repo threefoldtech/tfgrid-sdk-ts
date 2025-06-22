@@ -59,7 +59,9 @@
                       </v-row>
                       <v-row class="row-style">
                         <v-col class="py-1" cols="1" sm="2" style="min-width: fit-content">
-                          <v-list-item style="text-transform: uppercase"> CU : </v-list-item>
+                          <v-list-item style="text-transform: uppercase">
+                            CU :
+                          </v-list-item>
                         </v-col>
                         <v-col class="py-1">
                           <v-list-item>
@@ -77,7 +79,9 @@
                       </v-row>
                       <v-row class="row-style">
                         <v-col class="py-1" cols="1" sm="2" style="min-width: fit-content">
-                          <v-list-item style="text-transform: uppercase"> SU : </v-list-item>
+                          <v-list-item style="text-transform: uppercase">
+                            SU :
+                          </v-list-item>
                         </v-col>
                         <v-col class="py-1">
                           <v-list-item>
@@ -95,7 +99,9 @@
                       </v-row>
                       <v-row class="row-style">
                         <v-col class="py-1" cols="1" sm="2" style="min-width: fit-content">
-                          <v-list-item style="text-transform: uppercase"> NU : </v-list-item>
+                          <v-list-item style="text-transform: uppercase">
+                            NU :
+                          </v-list-item>
                         </v-col>
                         <v-col class="py-1">
                           <v-list-item>
@@ -120,11 +126,15 @@
         </v-row>
       </div>
       <div v-else>
-        <v-card-text class="font-weight-bold"> No receipts found for this month </v-card-text>
+        <v-card-text class="font-weight-bold">
+          No receipts found for this month
+        </v-card-text>
       </div>
       <v-card-actions>
         <v-spacer />
-        <v-btn color="secondary" :disabled="!node.receipts" @click="downloadNodeReceipt"> Download Node Receipt </v-btn>
+        <v-btn color="secondary" :disabled="!node.receipts" @click="downloadNodeReceipt">
+          Download Node Receipt
+        </v-btn>
       </v-card-actions>
     </v-card>
   </v-container>

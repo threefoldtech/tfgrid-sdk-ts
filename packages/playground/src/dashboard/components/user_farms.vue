@@ -46,7 +46,9 @@
     >
       <template #top>
         <v-toolbar flat color="primary">
-          <v-toolbar-title class="mb-6 text-subtitle-1 text-center"> Your Farms </v-toolbar-title>
+          <v-toolbar-title class="mb-6 text-subtitle-1 text-center">
+            Your Farms
+          </v-toolbar-title>
         </v-toolbar>
       </template>
       <template #expanded-row="{ columns, item }">
@@ -90,7 +92,9 @@
           <v-dialog v-model="showDialogue" max-width="600" attach="#modals" @update:model-value="closeDialog">
             <v-card>
               <v-toolbar color="primary" dark>
-                <v-toolbar-title class="custom-toolbar_title mb-6"> Add/Edit Stellar V2 Address </v-toolbar-title>
+                <v-toolbar-title class="custom-toolbar_title mb-6">
+                  Add/Edit Stellar V2 Address
+                </v-toolbar-title>
               </v-toolbar>
               <div class="pt-6 px-6">
                 <form-validator v-model="valid">
@@ -115,7 +119,9 @@
                 </form-validator>
               </div>
               <v-card-actions class="justify-end px-5 pb-5 pt-0">
-                <v-btn color="anchor" @click="closeDialog"> Close </v-btn>
+                <v-btn color="anchor" @click="closeDialog">
+                  Close
+                </v-btn>
                 <v-btn
                   color="secondary"
                   :loading="isAdding"

@@ -1,8 +1,12 @@
 <template>
   <view-layout>
     <v-card color="primary" class="d-flex justify-center items-center pa-3 mb-3 text-center">
-      <v-icon size="30" class="pr-3"> mdi-key-plus </v-icon>
-      <v-card-title class="pa-0"> SSH keys </v-card-title>
+      <v-icon size="30" class="pr-3">
+        mdi-key-plus
+      </v-icon>
+      <v-card-title class="pa-0">
+        SSH keys
+      </v-card-title>
     </v-card>
 
     <v-card class="mt-3 mb-1" color="transparent">
@@ -23,13 +27,13 @@
           color="secondary"
           :disabled="
             !allKeys ||
-            allKeys.length === 0 ||
-            loading ||
-            deleting ||
-            generatingSSH ||
-            savingKey ||
-            isExporting ||
-            activating
+              allKeys.length === 0 ||
+              loading ||
+              deleting ||
+              generatingSSH ||
+              savingKey ||
+              isExporting ||
+              activating
           "
           :loading="isExporting"
           @click="exportAllKeys"

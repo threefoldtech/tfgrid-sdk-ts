@@ -10,7 +10,9 @@
       </VCardText>
 
       <VCardActions v-if="failed" class="d-flex justify-center mb-4">
-        <VBtn prepend-icon="mdi-reload" variant="outlined" color="secondary" @click="reload"> Reload Now </VBtn>
+        <VBtn prepend-icon="mdi-reload" variant="outlined" color="secondary" @click="reload">
+          Reload Now
+        </VBtn>
       </VCardActions>
     </VCard>
   </VDialog>

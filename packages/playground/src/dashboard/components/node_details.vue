@@ -209,6 +209,7 @@ import CardDetails from "@/components/node_details_cards/card_details.vue";
 import GPUDetailsCard from "@/components/node_details_cards/gpu_details_card.vue";
 
 export default {
+   
   name: "NodeDetails",
   components: {
     CardDetails,

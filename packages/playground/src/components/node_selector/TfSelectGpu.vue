@@ -1,5 +1,7 @@
 <template>
-  <v-alert class="mb-4" type="info" variant="tonal"> Choose a GPU card to deploy your VM. </v-alert>
+  <v-alert class="mb-4" type="info" variant="tonal">
+    Choose a GPU card to deploy your VM.
+  </v-alert>
   <div ref="input">
     <input-tooltip
       tooltip="Please select at least one card from the available GPU cards. Note that if you have a deployment that already uses certain cards, they will not appear in the selection area. You have the option to select one or more cards.."
@@ -11,7 +13,7 @@
         multiple
         :model-value="$props.modelValue"
         item-value="id"
-        :items="cardsTask.data as GPUCardInfo[]"
+        :items="(cardsTask.data as GPUCardInfo[])"
         item-title="device"
         :loading="cardsTask.loading"
         :error="!!cardsTask.error"

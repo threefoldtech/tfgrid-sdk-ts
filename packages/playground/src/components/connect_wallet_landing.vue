@@ -1,13 +1,17 @@
 <template>
   <div>
     <v-alert color="warning" variant="tonal">
-      <v-icon size="24" class="pb-1"> mdi-alert-circle </v-icon>
+      <v-icon size="24" class="pb-1">
+        mdi-alert-circle
+      </v-icon>
       Connect your TFChain
       <a class="app-link" @click="$emit('openProfile')">Wallet</a>
       to view {{ pageTitle }}
     </v-alert>
     <v-container class="custom-container">
-      <h4 class="text-center text-h5 text-lg-h4 my-4">A Co-Owned Global Sovereign Internet</h4>
+      <h4 class="text-center text-h5 text-lg-h4 my-4">
+        A Co-Owned Global Sovereign Internet
+      </h4>
       <v-container class="d-flex justify-center">
         <p class="home_text text-center text-subtitle w-75 sm-w-auto">
           ThreeFold is
@@ -29,7 +33,9 @@
         }"
       >
         <div class="d-flex justify-center mb-4">
-          <h4 class="text-center text-h5">Live and Operational</h4>
+          <h4 class="text-center text-h5">
+            Live and Operational
+          </h4>
         </div>
         <v-container fluid>
           <div class="d-flex flex-column">
@@ -56,18 +62,24 @@
           </div>
         </v-container>
         <div class="d-flex justify-center mt-5">
-          <v-btn variant="elevated" target="_blank" :href="statsUrl"> Explore ThreeFold Grid Capacity </v-btn>
+          <v-btn variant="elevated" target="_blank" :href="statsUrl">
+            Explore ThreeFold Grid Capacity
+          </v-btn>
         </div>
       </div>
       <div class="text-center my-8">
-        <h4 class="text-h5 mb-4">The <strong>Layer Zero</strong> for a Decentralized World</h4>
+        <h4 class="text-h5 mb-4">
+          The <strong>Layer Zero</strong> for a Decentralized World
+        </h4>
         <p class="home_text w-75 mx-auto text-subtitle-1">
           Anything that runs on Linux can run on ThreeFold – with more security, more sustainably, and in true
           decentralization. The ThreeFold Grid can support workloads from Blockchain to Web2 to Web3 to IoT and
           Metaverse and more.
         </p>
         <div class="d-flex justify-center align-center flex-wrap my-4">
-          <v-btn variant="elevated" class="mr-2" target="_blank" :href="MANUAL_URL"> Learn about the grid </v-btn>
+          <v-btn variant="elevated" class="mr-2" target="_blank" :href="MANUAL_URL">
+            Learn about the grid
+          </v-btn>
         </div>
       </div>
     </v-container>

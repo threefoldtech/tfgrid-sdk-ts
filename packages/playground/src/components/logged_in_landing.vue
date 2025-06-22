@@ -4,7 +4,9 @@
       <v-col lg="6" sm="12" class="border mt-3">
         <div>
           <div class="d-flex justify-center my-3">
-            <h4 class="tf-header">Live and Operational</h4>
+            <h4 class="tf-header">
+              Live and Operational
+            </h4>
           </div>
           <div
             :style="{
@@ -55,7 +57,7 @@
                   <v-card-title class="d-flex text-subtitle-1 align-baseline">
                     <v-icon size="small" class="mr-2">
                       {{ card.icon }}
-</v-icon>{{ card.title }}
+                    </v-icon>{{ card.title }}
                   </v-card-title>
                   <v-card-text>{{ card.text }}</v-card-text>
                 </v-card>
@@ -76,7 +78,9 @@
               </p>
 
               <div class="d-flex justify-center align-center flex-wrap my-4">
-                <v-btn variant="elevated" class="mr-2" target="_blank" :href="MANUAL_URL"> Learn about the grid </v-btn>
+                <v-btn variant="elevated" class="mr-2" target="_blank" :href="MANUAL_URL">
+                  Learn about the grid
+                </v-btn>
               </div>
             </div>
           </v-card>

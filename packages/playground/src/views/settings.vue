@@ -1,21 +1,44 @@
 <template>
   <view-layout>
-    <v-card color="primary" class="d-flex justify-center items-center mt-3 pa-3 text-center">
-      <v-icon size="30" class="pr-3"> mdi-cog </v-icon>
-      <v-card-title class="pa-0"> Settings </v-card-title>
+    <v-card
+      color="primary"
+      class="d-flex justify-center items-center mt-3 pa-3 text-center"
+    >
+      <v-icon
+        size="30"
+        class="pr-3"
+      >
+        mdi-cog
+      </v-icon>
+      <v-card-title class="pa-0">
+        Settings
+      </v-card-title>
     </v-card>
     <v-card class="my-5">
       <v-card-title>Theme</v-card-title> <v-card-text>Pick an application theme!</v-card-text>
 
-      <v-select v-model="selectedTheme" class="pa-3 capitalize" :items="themes" />
+      <v-select
+        v-model="selectedTheme"
+        class="pa-3 capitalize"
+        :items="themes"
+      />
 
       <v-card-actions class="justify-end mb-3 mx-3">
-        <v-btn :disabled="isCurrentTheme()" class="justify-end ml-auto" @click="UpdateTheme"> Update </v-btn>
+        <v-btn
+          :disabled="isCurrentTheme()"
+          class="justify-end ml-auto"
+          @click="UpdateTheme"
+        >
+          Update
+        </v-btn>
       </v-card-actions>
     </v-card>
     <v-card class="my-5">
       <v-card-title>Password</v-card-title> <v-card-text>Change your password</v-card-text>
-      <form-validator ref="passFormRef" v-model="isValidPassword">
+      <form-validator
+        ref="passFormRef"
+        v-model="isValidPassword"
+      >
         <PasswordInputWrapper #="{ props: passwordInputProps }">
           <InputValidator
             v-model:value="currentPassword"
@@ -88,7 +111,13 @@
         </PasswordInputWrapper>
       </form-validator>
       <v-card-actions class="justify-end mb-3 mx-3">
-        <v-btn :disabled="!isValidPassword" class="justify-end ml-auto" @click="UpdatePassword"> Update </v-btn>
+        <v-btn
+          :disabled="!isValidPassword"
+          class="justify-end ml-auto"
+          @click="UpdatePassword"
+        >
+          Update
+        </v-btn>
       </v-card-actions>
     </v-card>
     <v-card class="my-5">
@@ -99,7 +128,9 @@
           Adjust Query Timeout
           <v-tooltip location="end">
             <template #activator="{ props: tooltipProps }">
-              <v-icon v-bind="tooltipProps"> mdi-information-outline </v-icon>
+              <v-icon v-bind="tooltipProps">
+                mdi-information-outline
+              </v-icon>
             </template>
             <span>Set desired queries timeout in seconds</span>
           </v-tooltip>
@@ -130,7 +161,9 @@
           Adjust Deployment Timeout
           <v-tooltip location="end">
             <template #activator="{ props: tooltipProps }">
-              <v-icon v-bind="tooltipProps"> mdi-information-outline </v-icon>
+              <v-icon v-bind="tooltipProps">
+                mdi-information-outline
+              </v-icon>
             </template>
             <span>Set desired deployment timeout in seconds</span>
           </v-tooltip>
@@ -160,16 +193,22 @@
             <v-tooltip location="top">
               <template #activator="{ props: tooltipProps }">
                 <span v-bind="tooltipProps">
-                  <v-btn :disabled="isOnDefaultTimeout" class="mr-2" @click="ResetTimeoutToDefault"
-                    >Set Default Values</v-btn
-                  >
+                  <v-btn
+                    :disabled="isOnDefaultTimeout"
+                    class="mr-2"
+                    @click="ResetTimeoutToDefault"
+                  >Set Default Values</v-btn>
                 </span>
               </template>
               <span v-if="isOnDefaultTimeout">Values are already set to defaults (query: 120s, deployment: 600s)</span>
               <span v-else>Sets query timeout to 120s and deployment timeout to 600s. Click Update to apply.</span>
             </v-tooltip>
           </div>
-          <v-btn :disabled="!isValidTimeout || isCurrentTimeout()" class="justify-end" @click="UpdateTimeout">
+          <v-btn
+            :disabled="!isValidTimeout || isCurrentTimeout()"
+            class="justify-end"
+            @click="UpdateTimeout"
+          >
             Update
           </v-btn>
         </v-card-actions>

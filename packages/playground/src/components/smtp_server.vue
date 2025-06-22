@@ -2,7 +2,9 @@
   <div>
     <v-alert variant="tonal" type="warning" :class="{ 'mb-4': persistent }">
       <slot v-if="$slots.default" />
-      <p v-else>Configure your SMTP Server.</p>
+      <p v-else>
+        Configure your SMTP Server.
+      </p>
     </v-alert>
 
     <v-alert variant="tonal" type="warning" class="mt-3">
@@ -26,9 +28,9 @@
           (v: string) => {
             return (
               validators.isEmail('Please provide a valid email address.')(v) &&
-              validators.IsAlphanumericExpectDashAndUnderscore(
-                'Username should consist of letters, numbers, dashs and underscores only.',
-              )(v)
+              (validators.IsAlphanumericExpectDashAndUnderscore(
+                'Username should consist of letters, numbers, dashs and underscores only.' 
+              )(v))
             );
           },
         ]"

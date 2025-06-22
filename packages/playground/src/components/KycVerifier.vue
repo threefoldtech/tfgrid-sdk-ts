@@ -24,12 +24,14 @@
       <v-card>
         <v-card-title class="bg-primary d-flex align-center">
           <v-icon icon="mdi-security" />
-          <div class="pl-2">Terms & Conditions</div>
+          <div class="pl-2">
+            Terms & Conditions
+          </div>
         </v-card-title>
 
         <v-card-text class="pb-0">
           We use iDenfy to verify your identity.
-          <br />
+          <br>
           Please ensure you review iDenfy’s <span class="font-weight-bold">Security and Compliance</span>, which
           includes their <span class="font-weight-bold">Terms & Conditions, Privacy Policy</span>, and other relevant
           documents.
@@ -44,8 +46,12 @@
           </v-checkbox>
         </v-card-text>
         <v-card-actions class="justify-end my-1 mr-2">
-          <v-btn color="anchor" @click="handleAgreementDialog(false)"> Cancel </v-btn>
-          <v-btn :disabled="!agreedCheckbox" @click="handleAgreementDialog(true)"> Continue </v-btn>
+          <v-btn color="anchor" @click="handleAgreementDialog(false)">
+            Cancel
+          </v-btn>
+          <v-btn :disabled="!agreedCheckbox" @click="handleAgreementDialog(true)">
+            Continue
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>

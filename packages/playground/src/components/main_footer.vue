@@ -21,16 +21,18 @@
               href="https://github.com/threefoldtech/tfgrid-sdk-ts"
               target="_blank"
               :style="{ color: 'rgb(var(--v-footer-color-link)) !important' }"
-              ><v-btn color="anchor" icon="mdi-github" variant="text" /></a>
+            ><v-btn color="anchor" icon="mdi-github" variant="text" /></a>
             <a
               href="mailto:info@threefold.io"
               target="_blank"
               :style="{ color: 'rgb(var(--v-footer-color)) !important' }"
-              ><v-btn color="anchor" icon="mdi-email-outline" variant="text" /></a>
+            ><v-btn color="anchor" icon="mdi-email-outline" variant="text" /></a>
           </div>
         </v-col>
         <v-col class="mb-2" cols="12" sm="3" md="2">
-          <p class="text-subtitle-1 footer_header" color="secondary">Take Action</p>
+          <p class="text-subtitle-1 footer_header" color="secondary">
+            Take Action
+          </p>
           <div>
             <a color="error" :href="manual.buy_sell_tft" class="app-link text-subtitle-2" target="_blank">Buy the Token</a>
           </div>
@@ -42,7 +44,9 @@
           </div>
         </v-col>
         <v-col class="mx-3 mb-3" cols="12" sm="3" md="2">
-          <p color="primary" class="text-subtitle-1 footer_header">About Us</p>
+          <p color="primary" class="text-subtitle-1 footer_header">
+            About Us
+          </p>
           <div>
             <a
               href="https://threefold.io/"
@@ -50,7 +54,7 @@
               variant="text"
               class="app-link text-subtitle-2"
               target="_blank"
-              >ThreeFold</a>
+            >ThreeFold</a>
           </div>
           <div>
             <a href="https://www.threefold.io/blog/" class="app-link text-subtitle-2" target="_blank">Blog</a>
@@ -61,7 +65,9 @@
         </v-col>
 
         <v-col class="mx-3" cols="12" sm="3" md="2">
-          <p class="text-subtitle-1 footer_header" color="secondary">Contact</p>
+          <p class="text-subtitle-1 footer_header" color="secondary">
+            Contact
+          </p>
           <div>
             <a href="https://t.me/threefold" class="app-link text-subtitle-2" target="_blank">Main Chat</a>
           </div>

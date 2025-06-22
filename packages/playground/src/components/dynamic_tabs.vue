@@ -11,7 +11,7 @@
         :style="{
           filter: `brightness(${!theme.global.current.value.dark ? 0.2 : 1})`,
         }"
-      />
+      >
       {{ tab.title }}
       <v-chip v-if="tab.workers && tab.workers > 0" color="info" class="ml-1">
         {{ tab.workers }}
@@ -20,7 +20,9 @@
         Validating
         <v-progress-circular class="ml-1" indeterminate size="20" width="2" />
       </v-chip>
-      <v-chip v-else-if="forms[tabs.indexOf(tab)]?.invalid" color="error" class="ml-1"> invalid </v-chip>
+      <v-chip v-else-if="forms[tabs.indexOf(tab)]?.invalid" color="error" class="ml-1">
+        invalid
+      </v-chip>
     </v-tab>
   </v-tabs>
 
@@ -36,7 +38,9 @@
           :tabs="tabs"
         />
         <slot v-else-if="$slots.default" :index="index" :tab="tab" :active-tab="activeTab" :tabs="tabs" />
-        <template v-else> Please add content for this tab! </template>
+        <template v-else>
+          Please add content for this tab!
+        </template>
       </form-validator>
     </template>
   </v-tab-item>

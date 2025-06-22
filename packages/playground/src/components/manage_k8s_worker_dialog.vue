@@ -8,7 +8,9 @@
     @delete="onDelete"
     @back="worker = createWorker()"
   >
-    <template #title> Manage Kubernetes({{ data.deploymentName }}) Workers </template>
+    <template #title>
+      Manage Kubernetes({{ data.deploymentName }}) Workers
+    </template>
 
     <template #list>
       <ListTable
