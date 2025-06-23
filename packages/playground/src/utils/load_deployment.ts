@@ -106,7 +106,8 @@ export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
     }
   });
 
-  const items = await Promise.all(machinePromises);
+  const results = await Promise.allSettled(machinePromises);
+  const items = results.map(result => (result.status === "fulfilled" ? result.value : null));
   const vms = items
     .map((item: any, index) => {
       if (item) {
@@ -136,16 +137,17 @@ export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
 
   const BATCH_SIZE = 10;
   const consumptions = await batchProcess(vms, BATCH_SIZE, async batch => {
-    return Promise.all(
+    const results = await Promise.allSettled(
       batch.map(vm => {
         const gridIndex = vms.indexOf(vm);
         return grids[gridIndex].contracts.getConsumption({ id: vm[0].contractId }).catch(() => undefined);
       }),
     );
+    return results.map(r => (r.status === "fulfilled" ? r.value : undefined));
   });
 
   const wireguards = await batchProcess(vms, BATCH_SIZE, async batch => {
-    return Promise.all(
+    const results = await Promise.allSettled(
       batch.map(vm => {
         const gridIndex = vms.indexOf(vm);
         return getWireguardConfig(grids[gridIndex], vm[0].interfaces[0].network, vm[0].interfaces[0].ip).catch(
@@ -153,6 +155,7 @@ export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
         );
       }),
     );
+    return results.map(r => (r.status === "fulfilled" ? r.value : []));
   });
 
   const data = vms.map((vm, index) => {

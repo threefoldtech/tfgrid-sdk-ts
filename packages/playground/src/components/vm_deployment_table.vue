@@ -244,13 +244,21 @@ async function loadDeployments() {
   loading.value = true;
   const grid = await getGrid(profileManager.profile!, props.projectName);
   try {
-    const [chunk1, chunk2, chunk3] = await Promise.all([
+    const results = await Promise.allSettled([
       loadVms(grid!),
       loadVms(updateGrid(grid!, { projectName: props.projectName.toLowerCase() })),
       showAllDeployments.value && props.projectName.toLowerCase() === ProjectName.VM.toLowerCase()
         ? loadVms(updateGrid(grid!, { projectName: "" }))
         : Promise.resolve({ count: 0, items: [], failedDeployments: [] }),
     ]);
+    const [chunk1, chunk2, chunk3] = results.map((result, index) => {
+      if (result.status === "fulfilled") {
+        return result.value;
+      } else {
+        console.warn(`Failed to load VM chunk ${index + 1}:`, result.reason);
+        return { count: 0, items: [], failedDeployments: [] };
+      }
+    });
 
     if (migrateGateways) {
       await Promise.all([
