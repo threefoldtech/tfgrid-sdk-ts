@@ -58,26 +58,32 @@ export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
 
   const projectName = grid.clientOptions.projectName || "";
 
-  const grids = await Promise.all(
+  const gridsResults = await Promise.allSettled(
     machines.map(n => getGridClient(grid.clientOptions, projectName ? `${projectName}/${n}` : n)),
   );
+  const grids = gridsResults.map(r => (r.status === "fulfilled" ? r.value : undefined));
 
   const machinePromises = machines.map(async (name, index) => {
     try {
-      const [contracts, nodeIds] = await Promise.all([
-        getDeploymentContracts(grids[index], name, projectName),
-        grids[index].machines._getDeploymentNodeIds(name),
+      if (!grids[index]) {
+        throw new Error("Grid client unavailable");
+      }
+      const [contractsResult, nodeIdsResult] = await Promise.allSettled([
+        getDeploymentContracts(grids[index]!, name, projectName),
+        grids[index]!.machines._getDeploymentNodeIds(name),
       ]);
+      const contracts = contractsResult.status === "fulfilled" ? contractsResult.value : [];
+      const nodeIds = nodeIdsResult.status === "fulfilled" ? nodeIdsResult.value : [];
 
       if (contracts.length === 0) {
         count--;
         return null;
       }
 
-      const machinePromise = grids[index].machines.getObj(name).then(res => {
+      const machinePromise = grids[index]!.machines.getObj(name).then(res => {
         if (!projectName && (!Array.isArray(res) || res.length === 0)) {
-          grids[index] = updateGrid(grids[index], { projectName: "" });
-          return grids[index].machines.getObj(name);
+          grids[index] = updateGrid(grids[index]!, { projectName: "" });
+          return grids[index]!.machines.getObj(name);
         }
         return res;
       });
@@ -112,10 +118,10 @@ export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
     .map((item: any, index) => {
       if (item) {
         item.deploymentName = machines[index];
-        item.projectName = grids[index].clientOptions!.projectName;
+        item.projectName = grids[index]?.clientOptions?.projectName;
         item.forEach((i: any) => {
           i.deploymentName = machines[index];
-          i.projectName = grids[index].clientOptions!.projectName;
+          i.projectName = grids[index]?.clientOptions?.projectName;
         });
       }
       return item;
@@ -140,7 +146,8 @@ export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
     const results = await Promise.allSettled(
       batch.map(vm => {
         const gridIndex = vms.indexOf(vm);
-        return grids[gridIndex].contracts.getConsumption({ id: vm[0].contractId }).catch(() => undefined);
+        if (!grids[gridIndex]) return Promise.resolve(undefined);
+        return grids[gridIndex]!.contracts.getConsumption({ id: vm[0].contractId }).catch(() => undefined);
       }),
     );
     return results.map(r => (r.status === "fulfilled" ? r.value : undefined));
@@ -150,7 +157,8 @@ export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
     const results = await Promise.allSettled(
       batch.map(vm => {
         const gridIndex = vms.indexOf(vm);
-        return getWireguardConfig(grids[gridIndex], vm[0].interfaces[0].network, vm[0].interfaces[0].ip).catch(
+        if (!grids[gridIndex]) return Promise.resolve([]);
+        return getWireguardConfig(grids[gridIndex]!, vm[0].interfaces[0].network, vm[0].interfaces[0].ip).catch(
           () => [],
         );
       }),
@@ -201,46 +209,56 @@ export async function loadK8s(grid: GridClient) {
   }
 
   const projectName = grid.clientOptions.projectName;
-  const grids = (await Promise.all(
+  const gridsK8sResults = await Promise.allSettled(
     clusters.map(n => getGrid(grid.clientOptions, projectName ? `${projectName}/${n}` : n)),
-  )) as GridClient[];
+  );
+  const grids = gridsK8sResults.map(r => (r.status === "fulfilled" ? r.value : undefined)) as (
+    | GridClient
+    | undefined
+  )[];
   const failedDeployments: FailedDeployment[] = [];
 
   const BATCH_SIZE = 5;
-  const contractsAndNodeIds: { contracts: any[]; nodeIds: number[]; success: boolean }[] = await batchProcess(
-    clusters,
-    BATCH_SIZE,
-    async batch => {
-      return await Promise.all(
-        batch.map(async name => {
-          const globalIndex = clusters.indexOf(name);
-          try {
-            const [contracts, nodeIds] = await Promise.all([
-              grids[globalIndex].k8s.getDeploymentContracts(name),
-              grids[globalIndex].k8s._getDeploymentNodeIds(name),
-            ]);
-            return { contracts, nodeIds, success: true };
-          } catch {
-            failedDeployments.push({ name, contracts: [], nodes: [] });
-            return { contracts: [], nodeIds: [], success: false };
-          }
-        }),
-      );
-    },
-  );
+  const contractsAndNodeIdsResults = await batchProcess(clusters, BATCH_SIZE, async batch => {
+    const results = await Promise.allSettled(
+      batch.map(async name => {
+        const globalIndex = clusters.indexOf(name);
+        if (!grids[globalIndex]) return { contracts: [], nodeIds: [], success: false };
+        try {
+          const [contractsResult, nodeIdsResult] = await Promise.allSettled([
+            grids[globalIndex]!.k8s.getDeploymentContracts(name),
+            grids[globalIndex]!.k8s._getDeploymentNodeIds(name),
+          ]);
+          const contracts = contractsResult.status === "fulfilled" ? contractsResult.value : [];
+          const nodeIds = nodeIdsResult.status === "fulfilled" ? nodeIdsResult.value : [];
+          return { contracts, nodeIds, success: true };
+        } catch {
+          failedDeployments.push({ name, contracts: [], nodes: [] });
+          return { contracts: [], nodeIds: [], success: false };
+        }
+      }),
+    );
+    return results.map(r => (r.status === "fulfilled" ? r.value : { contracts: [], nodeIds: [], success: false }));
+  });
 
-  const clusterObjs: any[] = await batchProcess(clusters, BATCH_SIZE, async batch => {
-    return await Promise.all(
+  const contractsAndNodeIds = contractsAndNodeIdsResults.flat();
+
+  const clusterObjsResults = await batchProcess(clusters, BATCH_SIZE, async batch => {
+    const results = await Promise.allSettled(
       batch.map(async name => {
         const index = clusters.indexOf(name);
-        const { contracts, nodeIds, success } = contractsAndNodeIds[index];
-        if (!success) return null;
+        const { contracts, nodeIds, success } = contractsAndNodeIds[index] || {
+          contracts: [],
+          nodeIds: [],
+          success: false,
+        };
+        if (!success || !grids[index]) return null;
 
         try {
-          const clusterPromise = grids[index].k8s.getObj(name).then(res => {
+          const clusterPromise = grids[index]!.k8s.getObj(name).then(res => {
             if (!projectName && res && res.masters && res.masters.length === 0) {
-              grids[index] = updateGrid(grids[index], { projectName: "" });
-              return grids[index].k8s.getObj(name);
+              grids[index] = updateGrid(grids[index]!, { projectName: "" });
+              return grids[index]!.k8s.getObj(name);
             }
             return res;
           });
@@ -270,45 +288,53 @@ export async function loadK8s(grid: GridClient) {
         }
       }),
     );
+    return results.map(r => (r.status === "fulfilled" ? r.value : null));
   });
+  const clusterObjs = clusterObjsResults.flat();
 
   const items = clusterObjs.filter(Boolean) as any[];
   const k8s = items
     .map(item => {
       if (item) {
         item.deploymentName = clusters[clusterObjs.indexOf(item)];
-        item.projectName = grids[clusterObjs.indexOf(item)].clientOptions!.projectName;
+        item.projectName = grids[clusterObjs.indexOf(item)]?.clientOptions?.projectName;
       }
       return item;
     })
     .filter(item => item && item.masters.length > 0) as K8S[];
 
-  const consumptions = await batchProcess(k8s, BATCH_SIZE, async batch => {
-    return Promise.all(
+  const consumptionsResults = await batchProcess(k8s, BATCH_SIZE, async batch => {
+    const results = await Promise.allSettled(
       batch.map(cluster => {
         const gridIndex = clusters.findIndex(name => name === cluster.deploymentName);
-        return grids[gridIndex].contracts.getConsumption({ id: cluster.masters[0].contractId }).catch(() => undefined);
+        if (!grids[gridIndex]) return Promise.resolve(undefined);
+        return grids[gridIndex]!.contracts.getConsumption({ id: cluster.masters[0].contractId }).catch(() => undefined);
       }),
     );
+    return results.map(r => (r.status === "fulfilled" ? r.value : undefined));
   });
+  const consumptions = consumptionsResults.flat();
 
-  const wireguards = await batchProcess(k8s, BATCH_SIZE, async batch => {
-    return Promise.all(
+  const wireguardsResults = await batchProcess(k8s, BATCH_SIZE, async batch => {
+    const results = await Promise.allSettled(
       batch.map(cluster => {
         const gridIndex = clusters.findIndex(name => name === cluster.deploymentName);
+        if (!grids[gridIndex]) return Promise.resolve([]);
         return getWireguardConfig(
-          grids[gridIndex],
+          grids[gridIndex]!,
           cluster.masters[0].interfaces[0].network,
           cluster.masters[0].interfaces[0].ip,
         ).catch(() => []);
       }),
     );
+    return results.map(r => (r.status === "fulfilled" ? r.value : []));
   });
+  const wireguards = wireguardsResults.flat();
 
   const data = k8s.map((cluster, index) => {
     cluster.masters[0].billing = formatConsumption(consumptions[index]?.amountBilled as number);
 
-    if (wireguards && wireguards[index]) {
+    if (wireguards[index] && wireguards[index].length > 0) {
       cluster.wireguard = wireguards[index][0];
     }
     return cluster as K8S;

@@ -196,13 +196,19 @@ async function loadDeployments() {
       loading.value = false;
       return;
     }
-    const [chunk1, chunk2, chunk3] = await Promise.all([
+    const results = await Promise.allSettled([
       loadK8s(grid),
       loadK8s(updateGrid(grid, { projectName: props.projectName.toLowerCase() })),
       showAllDeployments.value
         ? loadK8s(updateGrid(grid, { projectName: "" }))
         : Promise.resolve({ count: 0, items: [], failedDeployments: [] }),
     ]);
+    const chunk1 =
+      results[0].status === "fulfilled" ? results[0].value : { count: 0, items: [], failedDeployments: [] };
+    const chunk2 =
+      results[1].status === "fulfilled" ? results[1].value : { count: 0, items: [], failedDeployments: [] };
+    const chunk3 =
+      results[2].status === "fulfilled" ? results[2].value : { count: 0, items: [], failedDeployments: [] };
     if (chunk3.items) {
       chunk3.items = chunk3.items.map(i => {
         return !i.projectName || i.projectName === "Kubernetes" ? markAsFromAnotherClient(i) : i;

@@ -220,7 +220,10 @@ async function loadDomains() {
     loading.value = true;
     const grid = await getGrid(profileManager.profile!, props.projectName.toLowerCase());
     const gateways = await grid!.gateway.list();
-    const gws = await Promise.all(gateways.map(name => grid!.gateway.get_name({ name })));
+    const gwsResults = await Promise.allSettled(gateways.map(name => grid!.gateway.get_name({ name })));
+    const gws = gwsResults
+      .filter(result => result.status === "fulfilled")
+      .map(result => (result as PromiseFulfilledResult<any>).value);
     items.value = gws.map(gw => {
       (gw as any).name = gw[0].workloads[0].name;
       return gw;
@@ -261,7 +264,7 @@ async function loadDeployments() {
     });
 
     if (migrateGateways) {
-      await Promise.all([
+      await Promise.allSettled([
         chunk1.count > 0 && migrateModule(grid!.gateway),
         chunk2.count > 0 && migrateModule(grid!.gateway),
         chunk3.count > 0 && migrateModule(grid!.gateway),

@@ -20,15 +20,15 @@
       class="app-link font-weight-medium"
       target="_blank"
       href="https://manual.grid.tf/labs/documentation/developers/tfchain/"
-    >Contract Documentation,
+      >Contract Documentation,
     </a>
     and to explore further contract details, check
     <a
       class="app-link font-weight-medium"
       target="_blank"
       href="https://manual.grid.tf/labs/documentation/dashboard/deploy/your_contracts"
-    >Node Contract Documentation.</a>
-    <br>
+      >Node Contract Documentation.</a>
+    <br />
   </v-alert>
 
   <v-card variant="text" class="my-3">
@@ -340,7 +340,7 @@ async function loadContractsByType(
 
   table.loading.value = true;
   try {
-    const [response] = await Promise.all([
+    const results = await Promise.allSettled([
       gridProxyClient.contracts.list({
         twinId: profileManager.profile!.twinId,
         state: [ContractState.Created, ContractState.GracePeriod],
@@ -354,9 +354,15 @@ async function loadContractsByType(
       getNodeInfoWithCache(nodeIDs.value),
     ]);
 
-    table.count.value = response.count ?? 0;
-    const normalizedContracts = await _normalizeContracts(response.data, contractType);
-    contractsRef.value = normalizedContracts;
+    if (results[0].status === "fulfilled") {
+      const response = results[0].value;
+      table.count.value = response.count ?? 0;
+      const normalizedContracts = await _normalizeContracts(response.data, contractType);
+      contractsRef.value = normalizedContracts;
+    } else {
+      loadingErrorMessage.value = `Error while listing ${contractType} contracts: ${results[0].reason?.message || results[0].reason}`;
+      createCustomToast(loadingErrorMessage.value, ToastType.danger, {});
+    }
   } catch (error: any) {
     loadingErrorMessage.value = `Error while listing ${contractType} contracts: ${error.message}`;
     createCustomToast(loadingErrorMessage.value, ToastType.danger, {});
@@ -392,11 +398,18 @@ async function loadContracts(type?: ContractType, options?: { sort: { key: strin
           break;
       }
     } else {
-      await Promise.all([
+      const results = await Promise.allSettled([
         loadContractsByType(ContractType.Name, nameContracts, options),
         loadContractsByType(ContractType.Node, nodeContracts, options),
         loadContractsByType(ContractType.Rent, rentContracts, options),
       ]);
+      results.forEach((result, idx) => {
+        if (result.status === "rejected") {
+          const type = [ContractType.Name, ContractType.Node, ContractType.Rent][idx];
+          loadingErrorMessage.value = `Error while loading ${type} contracts: ${result.reason?.message || result.reason}`;
+          createCustomToast(loadingErrorMessage.value, ToastType.danger, {});
+        }
+      });
     }
     const failedContractsLength = failedContracts.value.length;
     if (failedContractsLength > 0)
