@@ -9,9 +9,7 @@
     <template #default>
       <v-card>
         <v-toolbar color="primary" class="custom-toolbar">
-          <p class="mb-5">
-            SSH-Key Details
-          </p>
+          <p class="mb-5">SSH-Key Details</p>
         </v-toolbar>
         <v-card-text>
           <template v-for="[_key, value] of Object.entries(selectedKey).sort()" :key="_key">
@@ -22,7 +20,10 @@
                   v-model="currentKey[_key as keyof SSHKeyData]"
                   :label="_key"
                   :readonly="_key === 'fingerPrint'"
-                  :rules="[(value: string) => !!value || `${_key} is required.`, _key === 'name' ? validateName(currentKey.name): true]"
+                  :rules="[
+                    (value: string) => !!value || `${_key} is required.`,
+                    _key === 'name' ? validateName(currentKey.name) : true,
+                  ]"
                 />
               </CopyInputWrapper>
               <CopyInputWrapper v-else :data="value" #="{ props: copyInputProps }">
@@ -41,12 +42,8 @@
 
           <v-tooltip text="Key status">
             <template #activator="{ props }">
-              <v-chip v-if="selectedKey.isActive" v-bind="props">
-                Active
-              </v-chip>
-              <v-chip v-else v-bind="props" color="anchor">
-                Inactive
-              </v-chip>
+              <v-chip v-if="selectedKey.isActive" v-bind="props"> Active </v-chip>
+              <v-chip v-else v-bind="props" color="anchor"> Inactive </v-chip>
             </template>
           </v-tooltip>
 
@@ -62,7 +59,7 @@
 
         <v-card-actions class="justify-end mb-1 mr-2">
           <v-btn color="anchor" text="Close" @click="$emit('close')" />
-          <v-btn text="Save" :loading="loading" @click="updateKey" />
+          <v-btn text="Save" :loading="loading" :disabled="!hasChanges" @click="updateKey" />
         </v-card-actions>
       </v-card>
     </template>
@@ -95,15 +92,42 @@ export default defineComponent({
   setup(props, ctx) {
     const currentKey = ref<SSHKeyData>(props.selectedKey);
     const loading = ref<boolean>(false);
+    const hasChanges = ref<boolean>(true);
+    const originalKey = ref<SSHKeyData>({ ...props.selectedKey });
 
     watch(
       () => props.open,
       newValue => {
         if (newValue) {
           currentKey.value = { ...props.selectedKey };
+          originalKey.value = { ...props.selectedKey };
+          hasChanges.value =
+            currentKey.value.name !== originalKey.value.name ||
+            currentKey.value.fingerPrint !== originalKey.value.fingerPrint ||
+            currentKey.value.publicKey !== originalKey.value.publicKey;
           loading.value = false;
         }
       },
+    );
+    // watch currentKey to detect changes
+    watch(
+      () => currentKey.value,
+      (newValue, oldValue) => {
+        if (
+          oldValue.name.length &&
+          oldValue.fingerPrint &&
+          oldValue.publicKey &&
+          (newValue.name !== originalKey.value.name ||
+            (oldValue.publicKey.length && newValue.publicKey !== originalKey.value.publicKey) ||
+            (oldValue.fingerPrint.length && newValue.fingerPrint !== originalKey.value.fingerPrint))
+        ) {
+          hasChanges.value = true;
+        } else {
+          hasChanges.value = false;
+        }
+      },
+
+      { deep: true },
     );
 
     const notNeededFields = ["id", "activating", "deleting", "isActive", "createdAt"];
@@ -145,6 +169,7 @@ export default defineComponent({
       sshRules,
       loading,
       validateName,
+      hasChanges,
     };
   },
 });
