@@ -1,19 +1,18 @@
 <template>
-  <v-alert class="mb-4" type="info" variant="tonal">
-    Choose a GPU card to deploy your VM.
-  </v-alert>
-  <div ref="input">
+  <v-alert class="mb-4" type="info" variant="tonal"> Choose a GPU card to deploy your VM. </v-alert>
+  <div ref="input" class="gpu-card-selector" data-validation-target="gpu-cards">
     <input-tooltip
       tooltip="Please select at least one card from the available GPU cards. Note that if you have a deployment that already uses certain cards, they will not appear in the selection area. You have the option to select one or more cards.."
     >
       <VSelect
+        ref="gpuSelect"
         label="GPU Cards"
         placeholder="Select GPU Cards"
         class="w-100"
         multiple
         :model-value="$props.modelValue"
         item-value="id"
-        :items="(cardsTask.data as GPUCardInfo[])"
+        :items="cardsTask.data as GPUCardInfo[]"
         item-title="device"
         :loading="cardsTask.loading"
         :error="!!cardsTask.error"
@@ -27,9 +26,11 @@
         :persistent-hint="!$props.validNode"
         @update:model-value="
           bindModelValue($event);
-          bindStatus($event.length === 0 ? ValidatorStatus.Invalid : ValidatorStatus.Valid);
+          bindStatus();
         "
-        @update:menu="opened => !opened && $props.modelValue.length === 0 && bindStatus(ValidatorStatus.Invalid)"
+        @update:menu="
+          opened => !opened && $props.modelValue.length === 0 && $props.validNode && bindStatus(ValidatorStatus.Invalid)
+        "
       />
     </input-tooltip>
   </div>
@@ -38,7 +39,7 @@
 <script lang="ts">
 import type { GPUCardInfo, NodeInfo } from "@threefold/grid_client";
 import { noop } from "lodash";
-import { getCurrentInstance, onMounted, onUnmounted, type PropType, ref } from "vue";
+import { getCurrentInstance, onMounted, onUnmounted, type PropType, ref, computed } from "vue";
 
 import type { InputValidatorService } from "@/hooks/input_validator";
 
@@ -62,6 +63,7 @@ export default {
   setup(props, ctx) {
     const gridStore = useGrid();
     const input = ref<HTMLElement>();
+    const gpuSelect = ref<HTMLElement>();
     const cardsTask = useAsync(getNodeAvailableGpuCards, { default: [] });
 
     onUnmounted(() => {
@@ -82,39 +84,109 @@ export default {
     const { uid } = getCurrentInstance() as { uid: number };
     const form = useForm();
 
+    const targetElement = computed(() => {
+      if (gpuSelect.value) {
+        const vSelectElement = (gpuSelect.value as any)?.$el || gpuSelect.value;
+        if (vSelectElement) {
+          return vSelectElement;
+        }
+      }
+
+      if (input.value) {
+        const selectElement =
+          input.value.querySelector(".v-select") || input.value.querySelector(".v-field") || input.value;
+        return selectElement;
+      }
+
+      return input.value;
+    });
+
     const fakeService: InputValidatorService = {
       validate: () => Promise.resolve(true),
       setStatus: noop,
       reset: noop,
       status: ValidatorStatus.Init,
       error: null,
-      $el: input,
+      $el: targetElement,
+      highlightOnError: true,
     };
+
+    const registrationId = uid.toString();
+    let isRegistered = false;
+
+    const registerService = () => {
+      if (!isRegistered && form) {
+        form.register(registrationId, fakeService);
+        isRegistered = true;
+      }
+    };
+
+    const unregisterService = () => {
+      if (isRegistered && form) {
+        form.unregister(registrationId);
+        isRegistered = false;
+      }
+    };
+
+    onMounted(() => {
+      if (props.validNode && props.node) {
+        registerService();
+      }
+    });
+
+    onUnmounted(() => {
+      unregisterService();
+    });
 
     useWatchDeep(
       () => [props.validNode, props.node],
       ([valid, node]) => {
         bindModelValue();
         if (valid && node) {
+          registerService();
           return cardsTask.value.run(gridStore, node as NodeInfo);
+        } else {
+          unregisterService();
+          bindStatus(ValidatorStatus.Init);
+          cardsTask.value.initialized && cardsTask.value.reset();
         }
-        bindStatus();
-        cardsTask.value.initialized && cardsTask.value.reset();
       },
       { immediate: true, deep: true },
     );
 
-    onMounted(() => form?.register(uid.toString(), fakeService));
-    onUnmounted(() => form?.unregister(uid.toString()));
+    useWatchDeep(
+      () => props.modelValue,
+      cards => {
+        if (props.validNode && props.node) {
+          bindStatus(cards.length === 0 ? ValidatorStatus.Invalid : ValidatorStatus.Valid);
+        } else {
+          bindStatus(ValidatorStatus.Init);
+        }
+      },
+      { immediate: true, deep: true },
+    );
 
     function bindStatus(status?: ValidatorStatus) {
-      const s = status || ValidatorStatus.Init;
+      let s = status;
+
+      if (!s) {
+        if (props.validNode && props.node && props.modelValue.length === 0) {
+          s = ValidatorStatus.Invalid;
+        } else if (props.validNode && props.node && props.modelValue.length > 0) {
+          s = ValidatorStatus.Valid;
+        } else {
+          s = ValidatorStatus.Init;
+        }
+      }
+
       fakeService.status = s;
-      form?.updateStatus(uid.toString(), s);
+      if (isRegistered) {
+        form?.updateStatus(registrationId, s);
+      }
       ctx.emit("update:status", s);
     }
 
-    return { input, ValidatorStatus, cardsTask, bindModelValue, bindStatus };
+    return { input, gpuSelect, ValidatorStatus, cardsTask, bindModelValue, bindStatus };
   },
 };
 </script>

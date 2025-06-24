@@ -1,12 +1,8 @@
 <template>
   <section class="mt-4">
     <template v-if="!disableNodeSelection">
-      <h3 class="bg-primary pa-2 text-h6 rounded">
-        Node Selection
-      </h3>
-      <p class="text-h6 mb-4 mt-2 ml-2">
-        Choose a way to select Node
-      </p>
+      <h3 class="bg-primary pa-2 text-h6 rounded">Node Selection</h3>
+      <p class="text-h6 mb-4 mt-2 ml-2">Choose a way to select Node</p>
 
       <v-radio-group v-model="wayToSelect" color="primary" inline>
         <InputTooltip
@@ -211,24 +207,21 @@ export default {
     const invalid = computed(() => {
       return (
         (!props.disableNodeSelection && nodeStatus.value === ValidatorStatus.Invalid) ||
-        (props.requireDomain && domainStatus.value === ValidatorStatus.Invalid) ||
-        (props.filters.hasGPU && gpuStatus.value === ValidatorStatus.Invalid)
+        (props.requireDomain && domainStatus.value === ValidatorStatus.Invalid)
       );
     });
 
     const pending = computed(() => {
       return (
         (!props.disableNodeSelection && nodeStatus.value === ValidatorStatus.Pending) ||
-        (props.requireDomain && domainStatus.value === ValidatorStatus.Pending) ||
-        (props.filters.hasGPU && gpuStatus.value === ValidatorStatus.Pending)
+        (props.requireDomain && domainStatus.value === ValidatorStatus.Pending)
       );
     });
 
     const valid = computed(() => {
       return (
         (props.disableNodeSelection || (!props.disableNodeSelection && nodeStatus.value === ValidatorStatus.Valid)) &&
-        (!props.requireDomain || (props.requireDomain && domainStatus.value === ValidatorStatus.Valid)) &&
-        (!props.filters.hasGPU || (props.filters.hasGPU && gpuStatus.value === ValidatorStatus.Valid))
+        (!props.requireDomain || (props.requireDomain && domainStatus.value === ValidatorStatus.Valid))
       );
     });
 
