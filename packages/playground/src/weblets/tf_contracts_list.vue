@@ -256,7 +256,7 @@ import { manual } from "@/utils/manual";
 
 import { gridProxyClient, queryClient } from "../clients";
 import { useGrid } from "../stores";
-
+import { getNodeInfoWithCache } from "@/utils/get_nodeInfo_with_cache";
 const profileManagerController = useProfileManagerController();
 const balance = profileManagerController.balance;
 const freeBalance = computed(() => balance.value?.free ?? 0);
@@ -293,7 +293,6 @@ const nodeIDs = computed(() => {
 });
 // To avoid multiple requests
 const cachedNodeIDs = ref<number[]>([]);
-const nodeInfoCache = new Map();
 onMounted(() => {
   loadContracts();
 });
@@ -302,28 +301,41 @@ async function _normalizeContracts(
   contracts: Contract[],
   contractType: ContractType.Node | ContractType.Name | ContractType.Rent,
 ): Promise<NormalizedContract[]> {
-  const batchSize = 10;
+  const batchSize = Math.max(5, Math.floor(contracts.length / 5));
   const batches = [];
   for (let i = 0; i < contracts.length; i += batchSize) {
     batches.push(contracts.slice(i, i + batchSize));
   }
 
-  const normalizedContracts: NormalizedContract[] = [];
-  for (const batch of batches) {
-    const results = await Promise.all(
-      batch.map(async contract => {
-        try {
+  const batchResults = await Promise.allSettled(
+    batches.map(async batch => {
+      const results = await Promise.allSettled(
+        batch.map(async contract => {
           const normalized = await normalizeContract(grid, contract, contractType);
           return normalized;
-        } catch (error) {
-          failedContracts.value.push(contract.contract_id);
-          return undefined;
-        }
-      }),
-    );
-    const validResults = results.filter((contract): contract is NormalizedContract => contract !== undefined);
-    normalizedContracts.push(...validResults);
-  }
+        }),
+      );
+
+      return results
+        .map((result, index) => {
+          if (result.status === "fulfilled") {
+            return result.value;
+          } else {
+            failedContracts.value.push(batch[index].contract_id);
+            return undefined;
+          }
+        })
+        .filter((contract): contract is NormalizedContract => contract !== undefined);
+    }),
+  );
+
+  const normalizedContracts: NormalizedContract[] = [];
+  batchResults.forEach(result => {
+    if (result.status === "fulfilled") {
+      normalizedContracts.push(...result.value);
+    }
+  });
+
   return normalizedContracts;
 }
 
@@ -416,12 +428,29 @@ async function loadContracts(type?: ContractType, options?: { sort: { key: strin
       loadingErrorMessage.value = `Failed to load details of the following contract${
         failedContractsLength > 1 ? "s" : ""
       }: ${failedContracts.value.join(", ")}.`;
-    await getContractsLockDetails();
+
     contracts.value = [...nodeContracts.value, ...nameContracts.value, ...rentContracts.value];
-    if (!type) await getTotalCost();
-    // Get the node info e.g. node status.
-    nodeInfo.value = await getNodeInfo(nodeIDs.value, cachedNodeIDs.value);
-    cachedNodeIDs.value.push(...nodeIDs.value);
+
+    const parallelCalls = [getContractsLockDetails(), getNodeInfo(nodeIDs.value, cachedNodeIDs.value)];
+
+    if (!type) {
+      parallelCalls.push(getTotalCost());
+    }
+
+    const results = await Promise.allSettled(parallelCalls);
+
+    if (results[1].status === "fulfilled") {
+      nodeInfo.value = results[1].value || {};
+      cachedNodeIDs.value.push(...nodeIDs.value);
+    }
+
+    results.forEach((result, index) => {
+      if (result.status === "rejected") {
+        const callNames = ["getContractsLockDetails", "getNodeInfo", "getTotalCost"];
+        const callName = index < 2 ? callNames[index] : callNames[2];
+        console.warn(`${callName} failed:`, result.reason);
+      }
+    });
   } catch (error: any) {
     loadingErrorMessage.value = `Error while loading contracts: ${error.message}`;
     createCustomToast(loadingErrorMessage.value, ToastType.danger, {});
@@ -539,16 +568,6 @@ async function getContractsLockDetails() {
   lockedContracts.value = await grid.contracts.getTotalOverdue();
 }
 
-async function getNodeInfoWithCache(nodeIds: number[]) {
-  const uncachedIds = nodeIds.filter(id => !nodeInfoCache.has(id));
-  if (uncachedIds.length > 0) {
-    const newInfo = await getNodeInfo(uncachedIds, []);
-    for (const [id, info] of Object.entries(newInfo)) {
-      nodeInfoCache.set(Number(id), info);
-    }
-  }
-  return nodeIds.map(id => nodeInfoCache.get(id));
-}
 // Define base table headers for contracts tables
 const baseTableHeaders: VDataTableHeader = [
   { title: "PLACEHOLDER", key: "data-table-select" },
