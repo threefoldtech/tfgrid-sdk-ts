@@ -194,6 +194,7 @@ async function loadDeployments() {
     const grid = await getGrid(profileManager.profile!, props.projectName);
     if (!grid) {
       loading.value = false;
+      console.error("Failed to initialize grid connection");
       return;
     }
     const results = await Promise.allSettled([
@@ -204,11 +205,26 @@ async function loadDeployments() {
         : Promise.resolve({ count: 0, items: [], failedDeployments: [] }),
     ]);
     const chunk1 =
-      results[0].status === "fulfilled" ? results[0].value : { count: 0, items: [], failedDeployments: [] };
+      results[0].status === "fulfilled"
+        ? results[0].value
+        : (() => {
+            console.error("Failed to load K8s deployments from default project:", results[0].reason);
+            return { count: 0, items: [], failedDeployments: [] };
+          })();
     const chunk2 =
-      results[1].status === "fulfilled" ? results[1].value : { count: 0, items: [], failedDeployments: [] };
+      results[1].status === "fulfilled"
+        ? results[1].value
+        : (() => {
+            console.error(`Failed to load K8s deployments from project "${props.projectName}":`, results[1].reason);
+            return { count: 0, items: [], failedDeployments: [] };
+          })();
     const chunk3 =
-      results[2].status === "fulfilled" ? results[2].value : { count: 0, items: [], failedDeployments: [] };
+      results[2].status === "fulfilled"
+        ? results[2].value
+        : (() => {
+            console.error("Failed to load K8s deployments from all projects:", results[2].reason);
+            return { count: 0, items: [], failedDeployments: [] };
+          })();
     if (chunk3.items) {
       chunk3.items = chunk3.items.map(i => {
         return !i.projectName || i.projectName === "Kubernetes" ? markAsFromAnotherClient(i) : i;
@@ -233,9 +249,7 @@ async function loadDeployments() {
       };
     });
 
-    setTimeout(() => {
-      items.value.forEach(item => fetchClusterDetails(item));
-    }, 0);
+    await Promise.allSettled(items.value.map(item => fetchClusterDetails(item)));
   } catch (error) {
     console.error("Error loading deployments:", error);
     items.value = [];
@@ -257,15 +271,20 @@ async function fetchClusterDetails(item: any) {
       item.detailsLoading = false;
       return;
     }
-    const consumption = await grid.contracts.getConsumption({ id: item.masters[0].contractId }).catch(() => undefined);
-    item.billing = consumption ? consumption.amountBilled : "No Data Available";
-    item.wireguard = await grid.networks
-      .getWireGuardConfigs({
+
+    const [consumption, wireguardConfig] = await Promise.allSettled([
+      grid.contracts.getConsumption({ id: item.masters[0].contractId }),
+      grid.networks.getWireGuardConfigs({
         name: item.masters[0].interfaces[0].network,
         ipRange: item.masters[0].interfaces[0].ip,
-      })
-      .then(res => res[0])
-      .catch(() => undefined);
+      }),
+    ]);
+
+    item.billing =
+      consumption.status === "fulfilled" && consumption.value ? consumption.value.amountBilled : "No Data Available";
+
+    item.wireguard =
+      wireguardConfig.status === "fulfilled" && wireguardConfig.value?.[0] ? wireguardConfig.value[0] : undefined;
   } finally {
     item.detailsLoading = false;
   }
