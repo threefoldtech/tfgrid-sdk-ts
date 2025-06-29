@@ -158,6 +158,16 @@ export interface IsAlphanumeric {
   locale?: validator.AlphanumericLocale;
   options?: validator.IsAlphanumericOptions;
 }
+export function isAlphanumericWithSpace(msg: string) {
+  return (value: string) => {
+    // Must contain only alphanumeric and spaces, but no leading/trailing space, and not only spaces
+    // Regex: at least one alphanumeric, may have spaces inside, but not at start/end
+    if (!/^[a-zA-Z0-9]+( [a-zA-Z0-9]+)*$/.test(value)) {
+      return { message: msg };
+    }
+  };
+}
+
 export function isAlphanumeric(msg: string, config: IsAlphanumeric = {}) {
   const { locale, options } = config;
   return (value: string) => {
