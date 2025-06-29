@@ -1,12 +1,14 @@
+import { Keyring } from "@polkadot/keyring";
+import { waitReady } from "@polkadot/wasm-crypto";
 import { plainToInstance } from "class-transformer";
 import { validate } from "class-validator";
-
-import { Deployment, SignatureRequirement, SignatureRequest, Signature, KeypairType } from "../../src/zos/deployment";
-import { Workload, WorkloadTypes } from "../../src/zos/workload";
-import { Zmachine, ZmachineNetwork, MyceliumIP } from "../../src/zos/zmachine";
-import { ComputeCapacity } from "../../src/zos/computecapacity";
 import { default as md5 } from "crypto-js/md5";
+
 import { FLISTS } from "../../src/helpers/flists";
+import { ComputeCapacity } from "../../src/zos/computecapacity";
+import { Deployment, KeypairType, Signature, SignatureRequest, SignatureRequirement } from "../../src/zos/deployment";
+import { Workload, WorkloadTypes } from "../../src/zos/workload";
+import { MyceliumIP, Zmachine, ZmachineNetwork } from "../../src/zos/zmachine";
 
 const TEST_CONSTANTS = {
   TWIN_ID: 123,
@@ -253,7 +255,11 @@ describe("SignatureRequirement", () => {
       signatureRequirement.weight_required = 15;
 
       const request1 = createSignatureRequest({ twin_id: 1, weight: 5 });
-      const request2 = createSignatureRequest({ twin_id: 2, required: false, weight: 10 });
+      const request2 = createSignatureRequest({
+        twin_id: 2,
+        required: false,
+        weight: 10,
+      });
 
       signatureRequirement.requests = [request1, request2];
 
@@ -353,6 +359,24 @@ describe("Deployment", () => {
       expect(challenge).toContain("second_workload");
       expect(challenge).toContain(TEST_CONSTANTS.WEIGHT_REQUIRED.toString());
     });
+
+    it("should generate correct challenge string with no workloads", () => {
+      const deployment = createDeployment();
+      deployment.workloads = [];
+
+      const challenge = deployment.challenge();
+
+      const expectedChallenge =
+        "1" +
+        TEST_CONSTANTS.TWIN_ID +
+        TEST_CONSTANTS.METADATA +
+        TEST_CONSTANTS.DESCRIPTION +
+        TEST_CONSTANTS.EXPIRATION +
+        TEST_CONSTANTS.WEIGHT_REQUIRED;
+
+      expect(challenge).toBe(expectedChallenge);
+      expect(challenge).not.toContain("test_workload");
+    });
   });
 
   describe("challenge_hash method", () => {
@@ -395,6 +419,22 @@ describe("Deployment", () => {
       const result = deployment.to_hex(new Uint8Array(0));
       expect(result).toBe("");
     });
+
+    it("should handle invalid hex string with non-hex characters", () => {
+      const deployment = createDeployment();
+      const invalidHex = "48656c6c6g";
+      const result = deployment.from_hex(invalidHex);
+
+      expect(result).toEqual(new Uint8Array([72, 101, 108, 108, 6]));
+    });
+
+    it("should handle invalid hex string with odd length", () => {
+      const deployment = createDeployment();
+      const invalidHex = "48656c6c6";
+      const result = deployment.from_hex(invalidHex);
+
+      expect(result).toEqual(new Uint8Array([72, 101, 108, 108]));
+    });
   });
 
   describe("validation", () => {
@@ -425,6 +465,33 @@ describe("Deployment", () => {
 
 describe("Deployment signing", () => {
   let deployment: Deployment;
+
+  const verifySignature = async (
+    message: string,
+    signature: string,
+    mnemonic: string,
+    keypairType: KeypairType,
+  ): Promise<boolean> => {
+    try {
+      await waitReady();
+      const keyring = new Keyring({ type: keypairType });
+      const keypair = keyring.addFromUri(mnemonic);
+
+      const signatureBytes = new Uint8Array(signature.length / 2);
+      for (let i = 0; i < signature.length / 2; i++) {
+        signatureBytes[i] = parseInt(signature.slice(2 * i, 2 * i + 2), 16);
+      }
+
+      const messageBytes = new Uint8Array(message.length / 2);
+      for (let i = 0; i < message.length / 2; i++) {
+        messageBytes[i] = parseInt(message.slice(2 * i, 2 * i + 2), 16);
+      }
+
+      return keypair.verify(messageBytes, signatureBytes, keypair.publicKey);
+    } catch {
+      return false;
+    }
+  };
 
   beforeEach(() => {
     deployment = createDeployment();
@@ -461,13 +528,201 @@ describe("Deployment signing", () => {
     });
   });
 
+  describe("signature verification", () => {
+    it("should create a valid signature that can be verified with sr25519", async () => {
+      await deployment.sign(TEST_CONSTANTS.TWIN_ID, TEST_CONSTANTS.MNEMONIC, KeypairType.sr25519);
+
+      const signature = deployment.signature_requirement.signatures[0];
+      const challengeHash = deployment.challenge_hash();
+
+      const isValid = await verifySignature(
+        challengeHash,
+        signature.signature,
+        TEST_CONSTANTS.MNEMONIC,
+        KeypairType.sr25519,
+      );
+
+      expect(isValid).toBe(true);
+    });
+
+    it("should create a valid signature that can be verified with ed25519", async () => {
+      await deployment.sign(TEST_CONSTANTS.TWIN_ID, TEST_CONSTANTS.MNEMONIC, KeypairType.ed25519);
+
+      const signature = deployment.signature_requirement.signatures[0];
+      const challengeHash = deployment.challenge_hash();
+
+      const isValid = await verifySignature(
+        challengeHash,
+        signature.signature,
+        TEST_CONSTANTS.MNEMONIC,
+        KeypairType.ed25519,
+      );
+
+      expect(isValid).toBe(true);
+    });
+
+    it("should create a valid signature with custom hash", async () => {
+      const customHash = "deadbeefcafebabe1234567890abcdef";
+      await deployment.sign(TEST_CONSTANTS.TWIN_ID, TEST_CONSTANTS.MNEMONIC, KeypairType.sr25519, customHash);
+
+      const signature = deployment.signature_requirement.signatures[0];
+
+      const isValid = await verifySignature(
+        customHash,
+        signature.signature,
+        TEST_CONSTANTS.MNEMONIC,
+        KeypairType.sr25519,
+      );
+
+      expect(isValid).toBe(true);
+    });
+
+    it("should fail verification with wrong mnemonic", async () => {
+      const wrongMnemonic =
+        "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon";
+      await deployment.sign(TEST_CONSTANTS.TWIN_ID, TEST_CONSTANTS.MNEMONIC, KeypairType.sr25519);
+
+      const signature = deployment.signature_requirement.signatures[0];
+      const challengeHash = deployment.challenge_hash();
+
+      const isValid = await verifySignature(challengeHash, signature.signature, wrongMnemonic, KeypairType.sr25519);
+
+      expect(isValid).toBe(false);
+    });
+
+    it("should fail verification with wrong signature type", async () => {
+      await deployment.sign(TEST_CONSTANTS.TWIN_ID, TEST_CONSTANTS.MNEMONIC, KeypairType.sr25519);
+
+      const signature = deployment.signature_requirement.signatures[0];
+      const challengeHash = deployment.challenge_hash();
+
+      const isValid = await verifySignature(
+        challengeHash,
+        signature.signature,
+        TEST_CONSTANTS.MNEMONIC,
+        KeypairType.ed25519,
+      );
+
+      expect(isValid).toBe(false);
+    });
+  });
+
+  describe("edge cases", () => {
+    it("should handle non-standard mnemonic inputs", async () => {
+      const nonStandardInputs = ["simple seed phrase", "//Alice", "//Bob//stash"];
+
+      for (const input of nonStandardInputs) {
+        await expect(deployment.sign(TEST_CONSTANTS.TWIN_ID, input, KeypairType.sr25519)).resolves.not.toThrow();
+        expect(deployment.signature_requirement.signatures.length).toBeGreaterThan(0);
+
+        deployment.signature_requirement.signatures = [];
+      }
+    });
+
+    it("should throw error with null/undefined mnemonic", async () => {
+      await expect(deployment.sign(TEST_CONSTANTS.TWIN_ID, null as any, KeypairType.sr25519)).rejects.toThrow();
+      await expect(deployment.sign(TEST_CONSTANTS.TWIN_ID, undefined as any, KeypairType.sr25519)).rejects.toThrow();
+    });
+
+    it("should handle signing with twin_id of 0", async () => {
+      await deployment.sign(0, TEST_CONSTANTS.MNEMONIC, KeypairType.sr25519);
+
+      expect(deployment.signature_requirement.signatures).toHaveLength(1);
+      expect(deployment.signature_requirement.signatures[0].twin_id).toBe(0);
+    });
+
+    it("should handle signing with negative twin_id", async () => {
+      await deployment.sign(-1, TEST_CONSTANTS.MNEMONIC, KeypairType.sr25519);
+
+      expect(deployment.signature_requirement.signatures).toHaveLength(1);
+      expect(deployment.signature_requirement.signatures[0].twin_id).toBe(-1);
+    });
+
+    it("should handle empty custom hash", async () => {
+      await deployment.sign(TEST_CONSTANTS.TWIN_ID, TEST_CONSTANTS.MNEMONIC, KeypairType.sr25519, "");
+
+      const signature = deployment.signature_requirement.signatures[0];
+      const challengeHash = deployment.challenge_hash();
+
+      const isValid = await verifySignature(
+        challengeHash,
+        signature.signature,
+        TEST_CONSTANTS.MNEMONIC,
+        KeypairType.sr25519,
+      );
+
+      expect(isValid).toBe(true);
+    });
+
+    it("should handle odd-length hex custom hash", async () => {
+      const oddLengthHash = "deadbeef1";
+      await deployment.sign(TEST_CONSTANTS.TWIN_ID, TEST_CONSTANTS.MNEMONIC, KeypairType.sr25519, oddLengthHash);
+
+      expect(deployment.signature_requirement.signatures).toHaveLength(1);
+      expect(deployment.signature_requirement.signatures[0].signature).toBeDefined();
+    });
+
+    it("should handle invalid hex characters in custom hash", async () => {
+      const invalidHexHash = "deadbeefzz";
+      await deployment.sign(TEST_CONSTANTS.TWIN_ID, TEST_CONSTANTS.MNEMONIC, KeypairType.sr25519, invalidHexHash);
+
+      expect(deployment.signature_requirement.signatures).toHaveLength(1);
+      expect(deployment.signature_requirement.signatures[0].signature).toBeDefined();
+    });
+  });
+
+  describe("signature behavior issues", () => {
+    it("should demonstrate the bug where multiple signatures are added for same twin_id", async () => {
+      await deployment.sign(TEST_CONSTANTS.TWIN_ID, TEST_CONSTANTS.MNEMONIC, KeypairType.sr25519);
+      expect(deployment.signature_requirement.signatures).toHaveLength(1);
+
+      await deployment.sign(TEST_CONSTANTS.TWIN_ID, TEST_CONSTANTS.MNEMONIC, KeypairType.ed25519);
+
+      expect(deployment.signature_requirement.signatures).toHaveLength(2);
+
+      expect(deployment.signature_requirement.signatures[0].twin_id).toBe(TEST_CONSTANTS.TWIN_ID);
+      expect(deployment.signature_requirement.signatures[1].twin_id).toBe(TEST_CONSTANTS.TWIN_ID);
+
+      expect(deployment.signature_requirement.signatures[0].signature_type).toBe(KeypairType.ed25519);
+      expect(deployment.signature_requirement.signatures[1].signature_type).toBe(KeypairType.ed25519);
+    });
+
+    it("should update existing signature and add new one when signing with same twin_id", async () => {
+      await deployment.sign(TEST_CONSTANTS.TWIN_ID, TEST_CONSTANTS.MNEMONIC, KeypairType.sr25519);
+      const firstSignature = deployment.signature_requirement.signatures[0].signature;
+
+      await deployment.sign(TEST_CONSTANTS.TWIN_ID, TEST_CONSTANTS.MNEMONIC, KeypairType.ed25519);
+
+      expect(deployment.signature_requirement.signatures).toHaveLength(2);
+
+      expect(deployment.signature_requirement.signatures[0].signature).not.toBe(firstSignature);
+      expect(deployment.signature_requirement.signatures[0].signature_type).toBe(KeypairType.ed25519);
+    });
+
+    it("should not affect signatures with different twin_ids", async () => {
+      const twinId1 = 123;
+      const twinId2 = 456;
+
+      await deployment.sign(twinId1, TEST_CONSTANTS.MNEMONIC, KeypairType.sr25519);
+      await deployment.sign(twinId2, TEST_CONSTANTS.MNEMONIC, KeypairType.ed25519);
+
+      expect(deployment.signature_requirement.signatures).toHaveLength(2);
+
+      const sig1 = deployment.signature_requirement.signatures.find(s => s.twin_id === twinId1);
+      const sig2 = deployment.signature_requirement.signatures.find(s => s.twin_id === twinId2);
+
+      expect(sig1).toBeDefined();
+      expect(sig1?.signature_type).toBe(KeypairType.sr25519);
+      expect(sig2).toBeDefined();
+      expect(sig2?.signature_type).toBe(KeypairType.ed25519);
+    });
+  });
+
   describe("signature management", () => {
     it("should add new signature for different twin_id", async () => {
-      // Add initial signature for twin_id 123
       const initialSignature = createSignature({ signature: "signature_123" });
       deployment.signature_requirement.signatures.push(initialSignature);
 
-      // Sign for different twin_id
       const differentTwinId = 456;
       await deployment.sign(differentTwinId, TEST_CONSTANTS.MNEMONIC, KeypairType.ed25519);
 
