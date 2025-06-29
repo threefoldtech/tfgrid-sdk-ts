@@ -3,6 +3,7 @@ import crypto from "crypto";
 import { useProfileManager } from "@/stores/profile_manager";
 import type { SSHKeyData } from "@/types";
 
+import { isAlphanumericWithSpace } from "../utils/validators";
 import { createCustomToast, ToastType } from "./custom_toast";
 import { getGrid, storeSSH } from "./grid";
 import { downloadAsJson } from "./helpers";
@@ -11,7 +12,6 @@ import { downloadAsJson } from "./helpers";
  * Manages SSH key operations including migration, updating, exporting, deleting, and listing.
  */
 class SSHKeysManagement {
-  private oldKey = "";
   updateCost = 0.01;
   private words = [
     "moon",
@@ -52,10 +52,13 @@ class SSHKeysManagement {
    * @returns An array containing the migrated SSHKeyData.
    */
   migrate(): SSHKeyData[] {
+    if (this.migrated()) {
+      return this.oldKeys as SSHKeyData[];
+    }
     const userKeys: SSHKeyData[] = [];
 
     let keyName = "";
-    const parts = this.oldKey.split(" ");
+    const parts = (this.oldKeys as string).split(" ");
 
     if (parts.length < 3) {
       keyName = this.generateName()!;
@@ -67,7 +70,7 @@ class SSHKeysManagement {
       name: keyName,
       id: 1,
       isActive: true,
-      publicKey: this.oldKey,
+      publicKey: this.oldKeys as string,
     };
     userKeys.push(newKey);
     return userKeys;
@@ -100,6 +103,7 @@ class SSHKeysManagement {
 
     await storeSSH(grid!, copiedKeys);
     profileManager.updateSSH(copiedKeys);
+    this.oldKeys = profileManager.profile?.ssh;
   }
 
   /**
@@ -107,17 +111,40 @@ class SSHKeysManagement {
    * @returns The generated SSH key name.
    * @throws Error if all names are blocked.
    */
-  generateName(): string | null {
-    // Filter out names that are already used
-    const blockedNames = this.list().map(key => key.name);
-    const availableNames = this.words.filter(name => !blockedNames.includes(name));
-
-    if (availableNames.length === 0) {
-      return null;
+  /**
+   * Generates a unique name for an SSH key.
+   * Tries to use the words list for random names, falls back to 'default', 'default1', ...
+   * @param existingNames Set of already used names
+   * @param useWords Whether to use the words list (default: true)
+   */
+  private getUniqueName(existingNames: Set<string>, useWords: boolean = true): string {
+    if (useWords) {
+      const availableNames = this.words.filter(name => !existingNames.has(name));
+      if (availableNames.length > 0) {
+        const name = availableNames[Math.floor(Math.random() * availableNames.length)];
+        existingNames.add(name);
+        return name;
+      }
     }
+    // Fallback to default naming
+    let i = 0;
+    let name = "default";
+    while (existingNames.has(name)) {
+      i++;
+      name = `default${i}`;
+    }
+    existingNames.add(name);
+    return name;
+  }
 
-    // Generate a random name from the available names
-    return availableNames[Math.floor(Math.random() * availableNames.length)];
+  /**
+   * Generates a random name for an SSH key that is not included in the blocked names<user keys>.
+   * @returns The generated SSH key name.
+   */
+  generateName(): string {
+    const blockedNames = new Set(this.list().map(key => key.name));
+    // Try to use words, fallback to default naming if all words are used
+    return this.getUniqueName(blockedNames, true);
   }
 
   /**
@@ -223,6 +250,32 @@ class SSHKeysManagement {
    */
   availablePublicKey(publicKey: string): boolean {
     return !this.list().some(key => key.publicKey === publicKey);
+  }
+  needsDefaultNameAssignment(keys?: SSHKeyData[]): boolean {
+    if (!keys) {
+      keys = this.list();
+    }
+    return keys.some(key => !isAlphanumericWithSpace("Invalid name")(key.name));
+  }
+
+  /**
+   * Checks all user keys for empty names and assigns a unique default name (default, default1, ...).
+   * Updates the keys in-place and returns the updated array.
+   * @param keys The SSH keys to check and update.
+   * @returns The updated array of SSH keys.
+   */
+  assignDefaultNames(keys?: SSHKeyData[]): SSHKeyData[] {
+    if (!keys) {
+      keys = this.list();
+    }
+    const existingNames = new Set(keys.map(k => k.name).filter(Boolean));
+    for (const key of keys) {
+      if (!!isAlphanumericWithSpace("Invalid name")(key.name)) {
+        console.log("key", key);
+        key.name = this.getUniqueName(existingNames, false);
+      }
+    }
+    return keys;
   }
 }
 
