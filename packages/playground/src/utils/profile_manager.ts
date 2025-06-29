@@ -33,8 +33,18 @@ export async function handlePostLogin(grid: GridClient, password: string, email?
 
   // Migrate the ssh-key
   const sshKeysManagement = new SSHKeysManagement();
-  if (!sshKeysManagement.migrated()) {
-    const newKeys = sshKeysManagement.migrate();
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  console.log(sshKeysManagement.list(), "inside the key");
+  console.log("testing", sshKeysManagement.needsDefaultNameAssignment());
+  if (!sshKeysManagement.migrated() || sshKeysManagement.needsDefaultNameAssignment()) {
+    let newKeys: SSHKeyData[] = [];
+    console.log("testing", sshKeysManagement.needsDefaultNameAssignment());
+    if (!sshKeysManagement.migrated()) {
+      newKeys = sshKeysManagement.migrate();
+    } else {
+      newKeys = sshKeysManagement.assignDefaultNames();
+      console.log("inside");
+    }
     await sshKeysManagement.update(newKeys);
   }
 }

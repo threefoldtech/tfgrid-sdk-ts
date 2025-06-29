@@ -218,6 +218,45 @@ class SSHKeysManagement {
   availablePublicKey(publicKey: string): boolean {
     return !this.list().some(key => key.publicKey === publicKey);
   }
+
+  needsDefaultNameAssignment(keys?: SSHKeyData[]): boolean {
+    if (!keys) {
+      keys = this.list();
+    }
+    return keys.some(key => !key.name || key.name.trim() === "" || key.name === "-");
+  }
+
+  /**
+   * Checks all user keys for empty names and assigns a unique default name (default, default1, ...).
+   * Updates the keys in-place and returns the updated array.
+   * @param keys The SSH keys to check and update.
+   * @returns The updated array of SSH keys.
+   */
+  assignDefaultNames(keys?: SSHKeyData[]): SSHKeyData[] {
+    if (!keys) {
+      keys = this.list();
+    }
+    // Collect all current names for quick lookup
+    const existingNames = new Set(keys.map(k => k.name).filter(Boolean));
+    // Helper to find the next available default name
+    function getNextDefaultName(): string {
+      let i = 0;
+      let name = "default";
+      while (existingNames.has(name)) {
+        i++;
+        name = `default${i}`;
+      }
+      existingNames.add(name);
+      return name;
+    }
+    // Assign names
+    for (const key of keys) {
+      if (!key.name || key.name.trim() === "" || key.name === "-") {
+        key.name = getNextDefaultName();
+      }
+    }
+    return keys;
+  }
 }
 
 export default SSHKeysManagement;
