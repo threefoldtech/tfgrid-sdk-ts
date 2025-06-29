@@ -74,8 +74,8 @@ async function login() {
           : KeypairType.sr25519;
 
         const grid = await getGrid({ mnemonic: mnemonic, keypairType: keypairType as KeypairType });
-        await handlePostLogin(grid!, password.value);
         profileManager.set({ ...(await loadProfile(grid!)), mnemonic });
+        await handlePostLogin(grid!, password.value);
         emit("closeDialog");
       }
     } else {
