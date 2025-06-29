@@ -224,6 +224,25 @@ async function loadDomains() {
     const gws = gwsResults
       .filter(result => result.status === "fulfilled")
       .map(result => (result as PromiseFulfilledResult<any>).value);
+
+    const failedGateways = gwsResults
+      .map((result, index) => ({ result, index }))
+      .filter(({ result }) => result.status === "rejected")
+      .map(({ result, index }) => ({
+        name: gateways[index],
+        reason: (result as PromiseRejectedResult).reason,
+      }));
+
+    if (failedGateways.length > 0) {
+      console.error("Failed to load some gateway deployments:", failedGateways);
+
+      count.value = gateways.length;
+      failedDeployments.value = failedGateways.map(fg => ({
+        name: fg.name,
+        error: fg.reason?.message || fg.reason || "Unknown error",
+      }));
+    }
+
     items.value = gws.map(gw => {
       (gw as any).name = gw[0].workloads[0].name;
       return gw;
@@ -247,10 +266,12 @@ async function loadDeployments() {
   loading.value = true;
   const grid = await getGrid(profileManager.profile!, props.projectName);
   try {
+    const shouldLoadAllDeployments =
+      showAllDeployments.value && props.projectName.toLowerCase() === ProjectName.VM.toLowerCase();
     const results = await Promise.allSettled([
       loadVms(grid!),
       loadVms(updateGrid(grid!, { projectName: props.projectName.toLowerCase() })),
-      showAllDeployments.value && props.projectName.toLowerCase() === ProjectName.VM.toLowerCase()
+      shouldLoadAllDeployments
         ? loadVms(updateGrid(grid!, { projectName: "" }))
         : Promise.resolve({ count: 0, items: [], failedDeployments: [] }),
     ]);
@@ -258,17 +279,16 @@ async function loadDeployments() {
       if (result.status === "fulfilled") {
         return result.value;
       } else {
-        console.warn(`Failed to load VM chunk ${index + 1}:`, result.reason);
+        console.error(`Failed to load VM chunk ${index + 1}:`, result.reason);
         return { count: 0, items: [], failedDeployments: [] };
       }
     });
 
     if (migrateGateways) {
-      await Promise.allSettled([
-        chunk1.count > 0 && migrateModule(grid!.gateway),
-        chunk2.count > 0 && migrateModule(grid!.gateway),
-        chunk3.count > 0 && migrateModule(grid!.gateway),
-      ]);
+      const hasDeployments = chunk1.count > 0 || chunk2.count > 0 || chunk3.count > 0;
+      if (hasDeployments) {
+        await migrateModule(grid!.gateway);
+      }
     }
 
     if (chunk3.items) {

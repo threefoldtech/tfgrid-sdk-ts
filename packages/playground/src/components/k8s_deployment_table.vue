@@ -197,10 +197,11 @@ async function loadDeployments() {
       console.error("Failed to initialize grid connection");
       return;
     }
+    const shouldLoadAllDeployments = showAllDeployments.value;
     const results = await Promise.allSettled([
       loadK8s(grid),
       loadK8s(updateGrid(grid, { projectName: props.projectName.toLowerCase() })),
-      showAllDeployments.value
+      shouldLoadAllDeployments
         ? loadK8s(updateGrid(grid, { projectName: "" }))
         : Promise.resolve({ count: 0, items: [], failedDeployments: [] }),
     ]);
