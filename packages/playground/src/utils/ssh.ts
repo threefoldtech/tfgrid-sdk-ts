@@ -36,9 +36,15 @@ class SSHKeysManagement {
     "cosmos",
   ];
 
+  /**
+   * Can be a string (legacy), SSHKeyData[] (current), or undefined.
+   * The string type is only for migration and should be removed after migration is complete.
+   */
+  private oldKeys: string | SSHKeyData[] | undefined;
+
   constructor() {
     const profileManager = useProfileManager();
-    this.oldKey = profileManager.profile?.ssh as unknown as string;
+    this.oldKeys = profileManager.profile?.ssh;
   }
 
   /**
@@ -72,7 +78,7 @@ class SSHKeysManagement {
    * @returns A boolean indicating whether the key has not been migrated.
    */
   migrated(): boolean {
-    return typeof this.oldKey !== "string";
+    return typeof this.oldKeys !== "string";
   }
 
   /**
@@ -166,7 +172,7 @@ class SSHKeysManagement {
     let keys: SSHKeyData[] = [];
 
     if (this.migrated()) {
-      keys = this.oldKey as unknown as SSHKeyData[];
+      keys = this.oldKeys as unknown as SSHKeyData[];
     }
 
     // Profile created for the first time.
