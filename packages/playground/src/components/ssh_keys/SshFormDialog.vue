@@ -3,8 +3,16 @@
     v-model="$props.open"
     max-width="800"
     attach="#modals"
-    @click:outside="() => $emit('close')"
-    @keydown.esc="() => $emit('close')"
+    @click:outside="
+      () => {
+        if (!generating && !savingKey) $emit('close');
+      }
+    "
+    @keydown.esc="
+      () => {
+        if (!generating && !savingKey) $emit('close');
+      }
+    "
   >
     <template #default>
       <v-form v-model="isValidForm">
@@ -68,7 +76,7 @@
           </v-card-text>
 
           <v-card-actions class="justify-end mb-1 mr-2">
-            <v-btn color="anchor" text="Close" @click="$emit('close')" />
+            <v-btn color="anchor" :disabled="generating || savingKey" text="Close" @click="$emit('close')" />
 
             <v-btn
               v-if="$props.dialogType === SSHCreationMethod.Generate"
@@ -256,6 +264,7 @@ function sshRules(value: any) {
 
 function sshNameRules(value: any) {
   return [
+    (v: string) => !!v || "Key name is required.",
     (v: string) => v.length < 30 || "Please enter a key name with fewer than 30 characters.",
     (v: string) => !v.includes(" ") || "Key names cannot include spaces. Please use a name without spaces.",
     (v: string) => sshKeysManagement.availableName(v) || "You have another key with the same name.",
