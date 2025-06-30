@@ -170,10 +170,8 @@ export default {
       let s = status;
 
       if (!s) {
-        if (props.validNode && props.node && props.modelValue.length === 0) {
-          s = ValidatorStatus.Invalid;
-        } else if (props.validNode && props.node && props.modelValue.length > 0) {
-          s = ValidatorStatus.Valid;
+        if (props.validNode && props.node) {
+          s = props.modelValue.length === 0 ? ValidatorStatus.Invalid : ValidatorStatus.Valid;
         } else {
           s = ValidatorStatus.Init;
         }
