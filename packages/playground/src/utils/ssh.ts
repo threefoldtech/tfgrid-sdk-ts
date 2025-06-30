@@ -253,9 +253,9 @@ class SSHKeysManagement {
   }
   needsDefaultNameAssignment(keys?: SSHKeyData[]): boolean {
     if (!keys) {
-      keys = this.list();
+      keys = this.oldKeys as SSHKeyData[];
     }
-    return keys.some(key => !isAlphanumericWithSpace("Invalid name")(key.name));
+    return keys.some(key => !!isAlphanumericWithSpace("Invalid name")(key.name));
   }
 
   /**
@@ -266,12 +266,11 @@ class SSHKeysManagement {
    */
   assignDefaultNames(keys?: SSHKeyData[]): SSHKeyData[] {
     if (!keys) {
-      keys = this.list();
+      keys = this.oldKeys as SSHKeyData[];
     }
     const existingNames = new Set(keys.map(k => k.name).filter(Boolean));
     for (const key of keys) {
       if (!!isAlphanumericWithSpace("Invalid name")(key.name)) {
-        console.log("key", key);
         key.name = this.getUniqueName(existingNames, false);
       }
     }

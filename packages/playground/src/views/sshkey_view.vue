@@ -139,11 +139,12 @@ const sshKeysManagement = new SSHKeysManagement();
 
 onMounted(async () => {
   loading.value = true;
-  if (!sshKeysManagement.migrated()) {
+  if (!sshKeysManagement.migrated() || sshKeysManagement.needsDefaultNameAssignment()) {
     tableLoadingMessage.value = "Migrating your old key...";
     const migrationInterval = setInterval(async () => {
-      const migrated = !sshKeysManagement.migrated();
-      if (migrated) {
+      const migrated = sshKeysManagement.migrated();
+      const nameUpdated = !sshKeysManagement.needsDefaultNameAssignment();
+      if (migrated && nameUpdated) {
         clearInterval(migrationInterval);
         allKeys.value = sshKeysManagement.list();
         tableLoadingMessage.value = "";
