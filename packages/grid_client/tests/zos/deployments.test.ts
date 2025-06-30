@@ -181,6 +181,26 @@ describe("SignatureRequest", () => {
       expect(errors.length).toBeGreaterThan(0);
       expect(errors[0].constraints?.min).toBeDefined();
     });
+
+    it("should fail validation with null twin_id", async () => {
+      const signatureRequest = plainToInstance(SignatureRequest, {
+        ...createValidSignatureRequestData(),
+        twin_id: null,
+      });
+
+      const errors = await validate(signatureRequest);
+      expect(errors.length).toBeGreaterThan(0);
+    });
+
+    it("should fail validation with undefined twin_id", async () => {
+      const signatureRequest = plainToInstance(SignatureRequest, {
+        ...createValidSignatureRequestData(),
+        twin_id: undefined,
+      });
+
+      const errors = await validate(signatureRequest);
+      expect(errors.length).toBeGreaterThan(0);
+    });
   });
 });
 
@@ -234,6 +254,26 @@ describe("Signature", () => {
       const errors = await validate(signature);
       expect(errors.length).toBeGreaterThan(0);
       expect(errors[0].constraints?.isEnum).toBeDefined();
+    });
+
+    it("should fail validation with null twin_id", async () => {
+      const signature = plainToInstance(Signature, {
+        ...createValidSignatureData(),
+        twin_id: null,
+      });
+
+      const errors = await validate(signature);
+      expect(errors.length).toBeGreaterThan(0);
+    });
+
+    it("should fail validation with undefined twin_id", async () => {
+      const signature = plainToInstance(Signature, {
+        ...createValidSignatureData(),
+        twin_id: undefined,
+      });
+
+      const errors = await validate(signature);
+      expect(errors.length).toBeGreaterThan(0);
     });
   });
 });
@@ -459,6 +499,20 @@ describe("Deployment", () => {
       const errors = await validate(deployment);
       expect(errors.length).toBeGreaterThan(0);
       expect(errors[0].constraints?.min).toBeDefined();
+    });
+
+    it("should fail validation with null twin_id", async () => {
+      const deployment = createDeployment({ twin_id: null as any });
+
+      const errors = await validate(deployment);
+      expect(errors.length).toBeGreaterThan(0);
+    });
+
+    it("should fail validation with undefined twin_id", async () => {
+      const deployment = createDeployment({ twin_id: undefined as any });
+
+      const errors = await validate(deployment);
+      expect(errors.length).toBeGreaterThan(0);
     });
   });
 });
