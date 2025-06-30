@@ -295,8 +295,11 @@ export default {
     });
     watch(selectedK8SNodeName, getSupportedNetworks, { deep: true });
 
-    watch(gatewayTab, newValue => {
-      if (newValue === 1) {
+    watch([dialogVisible, gatewayTab], ([newDialogVisible, newGatewayTab], [oldDialogVisible, oldGatewayTab]) => {
+      const dialogJustOpened = newDialogVisible && !oldDialogVisible;
+      const switchedToAddTab = newGatewayTab === 1 && oldGatewayTab !== 1;
+
+      if (dialogJustOpened || switchedToAddTab) {
         suggestName();
       }
     });
