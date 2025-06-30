@@ -111,6 +111,7 @@ import { type Profile, useProfileManager } from "@/stores/profile_manager";
 import { SSHCreationMethod, type SSHKeyData } from "@/types";
 import { type Balance, loadBalance } from "@/utils/grid";
 import SSHKeysManagement from "@/utils/ssh";
+import { isAlphanumericWithSpace } from "@/utils/validators";
 
 const props = defineProps({
   open: {
@@ -265,8 +266,8 @@ function sshRules(value: any) {
 function sshNameRules(value: any) {
   return [
     (v: string) => !!v || "Key name is required.",
+    isAlphanumericWithSpace("Key name must only contain letters, numbers, and spaces within the name."),
     (v: string) => v.length < 30 || "Please enter a key name with fewer than 30 characters.",
-    (v: string) => !v.includes(" ") || "Key names cannot include spaces. Please use a name without spaces.",
     (v: string) => sshKeysManagement.availableName(v) || "You have another key with the same name.",
   ];
 }
