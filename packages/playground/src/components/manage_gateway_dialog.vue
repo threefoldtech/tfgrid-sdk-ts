@@ -295,8 +295,8 @@ export default {
     });
     watch(selectedK8SNodeName, getSupportedNetworks, { deep: true });
 
-    watch(dialogVisible, newValue => {
-      if (newValue) {
+    watch(gatewayTab, newValue => {
+      if (newValue === 1) {
         suggestName();
       }
     });
