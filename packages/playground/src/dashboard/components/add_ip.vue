@@ -6,9 +6,7 @@
     <v-container v-if="showDialogue">
       <v-dialog v-model="showDialogue" max-width="600" attach="#modals">
         <v-card>
-          <v-card-title class="bg-primary">
-            Add Public IP to Farm
-          </v-card-title>
+          <v-card-title class="bg-primary"> Add Public IP to Farm </v-card-title>
           <v-card-text>
             <form-validator ref="formValidator" v-model="valid">
               <v-select
@@ -87,9 +85,7 @@
           </v-card-text>
           <v-dialog v-model="showIPs" max-width="600" attach="#modals">
             <v-card>
-              <v-card-title class="bg-primary">
-                IPs range
-              </v-card-title>
+              <v-card-title class="bg-primary"> IPs range </v-card-title>
               <v-card-text>
                 <v-row>
                   <v-col>
@@ -98,21 +94,18 @@
                         <v-row>
                           <v-col sm="4">
                             <p>Network:</p>
-                          </v-col><v-col>
+                          </v-col>
+                          <v-col>
                             <p>{{ network }}</p>
                           </v-col>
                         </v-row>
                       </v-list-item>
                       <v-list-item>
                         <v-row>
-                          <v-col sm="4">
-                            IP Addresses:
-                          </v-col>
+                          <v-col sm="4"> IP Addresses: </v-col>
                           <v-col>
                             <v-chip v-for="ip in ipsRangeTable" :key="ip" type="warning" variant="tonal" class="ma-1">
-                              {{
-                                ip
-                              }}
+                              {{ ip }}
                             </v-chip>
                           </v-col>
                         </v-row>
@@ -124,30 +117,16 @@
               </v-card-text>
 
               <v-card-actions class="justify-end mb-1 mr-2">
-                <v-btn color="anchor" @click="showIPs = false">
-                  Close
-                </v-btn>
+                <v-btn color="anchor" @click="showIPs = false"> Close </v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
 
           <v-card-actions class="justify-end mb-1 mr-2">
-            <v-btn color="anchor" @click="showDialogue = false">
-              Close
-            </v-btn>
+            <v-btn color="anchor" @click="showDialogue = false"> Close </v-btn>
 
-            <v-btn :disabled="!valid || type === IPType.single || !toPublicIP" @click="showRange">
-              Show IPs Range
-            </v-btn>
-            <v-btn
-              color="secondary"
-              :loading="isAdding"
-              :disabled="!valid || isAdding"
-              @click="addFarmIp($props.farmId, gateway)"
-              @update:model-value="$emit('update:isAdded', $event)"
-            >
-              Add
-            </v-btn>
+            <v-btn :disabled="type === IPType.single || !toPublicIP" @click="showRange"> Show IPs Range </v-btn>
+            <v-btn color="secondary" :loading="isAdding" :disabled="isAdding" @click="handleAddFarmIp"> Add </v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -176,7 +155,7 @@ export default {
     },
   },
 
-  setup(_, context) {
+  setup(props, context) {
     const gridStore = useGrid();
     const IPs = ref<string[]>();
     const items = ref<string[]>([IPType.single, IPType.range]);
@@ -195,15 +174,6 @@ export default {
     const network = ref("");
     const ipsRangeTable = ref<string[]>([]);
     const formValidator = ref();
-
-    watch(
-      [publicIP, toPublicIP, gateway],
-      async () => {
-        if (publicIP.value.length || toPublicIP.value.length || gateway.value.length)
-          await formValidator.value.validate();
-      },
-      { deep: true },
-    );
 
     watch(
       type,
@@ -225,34 +195,33 @@ export default {
       return undefined;
     }
     function toIpCheck() {
-      if (toPublicIP.value.split("/")[1] !== publicIP.value.split("/")[1]) {
+      if (!publicIP.value || !toPublicIP.value) {
+        return;
+      }
+
+      const fromParts = publicIP.value.split("/");
+      const toParts = toPublicIP.value.split("/");
+
+      if (toParts[1] !== fromParts[1]) {
         return {
           message: "Subnet is different.",
         };
       }
 
-      if (
-        parseInt(toPublicIP.value.split("/")[0].split(".")[3]) <= parseInt(publicIP.value.split("/")[0].split(".")[3])
-      ) {
+      if (parseInt(toParts[0].split(".")[3]) <= parseInt(fromParts[0].split(".")[3])) {
         return {
           message: "To IP must be bigger than From IP.",
         };
       }
 
       if (
-        toPublicIP.value.substring(0, toPublicIP.value.lastIndexOf(".")) !=
-        publicIP.value.substring(0, publicIP.value.lastIndexOf("."))
+        toParts[0].substring(0, toParts[0].lastIndexOf(".")) != fromParts[0].substring(0, fromParts[0].lastIndexOf("."))
       ) {
         return {
-          message: "IPs are not the same.",
+          message: "IPs are not in the same network.",
         };
       }
-      if (
-        parseInt(toPublicIP.value.split("/")[0].split(".")[3]) -
-          parseInt(publicIP.value.split("/")[0].split(".")[3]) +
-          1 >
-        16
-      ) {
+      if (parseInt(toParts[0].split(".")[3]) - parseInt(fromParts[0].split(".")[3]) + 1 > 16) {
         return {
           message: "Range must not exceed 16.",
         };
@@ -260,6 +229,10 @@ export default {
     }
 
     function gatewayCheck() {
+      if (!gateway.value || !publicIP.value) {
+        return;
+      }
+
       const firstIP = publicIP?.value.split("/")[0];
       const lastIP = toPublicIP?.value.split("/")[0];
       let isRange = false;
@@ -276,13 +249,13 @@ export default {
         };
       }
 
-      if (firstIP === gateway.value || lastIP === gateway.value) {
+      if (firstIP === gateway.value || (lastIP && lastIP === gateway.value)) {
         return {
           message: "IPs cannot be the same.",
         };
       }
 
-      if (type.value !== IPType.single) {
+      if (type.value !== IPType.single && lastIP) {
         try {
           const range = getIPRange(firstIP, lastIP);
           if (range.includes(gateway.value)) {
@@ -333,6 +306,21 @@ export default {
       IPs.value.forEach((ip, i) => {
         IPs.value![i] = ip + "/" + sub;
       });
+    }
+
+    async function handleAddFarmIp() {
+      if (!formValidator.value) {
+        createCustomToast("Form validation error. Please check your inputs.", ToastType.danger);
+        return;
+      }
+
+      const isValid = await formValidator.value.validate();
+      if (!isValid) {
+        createCustomToast("Please fix errors before submitting.", ToastType.danger);
+        return;
+      }
+
+      await addFarmIp(props.farmId, gateway.value);
     }
 
     async function addFarmIp(farmId: number, gw: string) {
@@ -403,6 +391,7 @@ export default {
 
       showRange,
       addIPs,
+      handleAddFarmIp,
       addFarmIp,
       isExistingIp,
       toIpCheck,
