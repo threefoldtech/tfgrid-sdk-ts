@@ -101,10 +101,6 @@ export default defineComponent({
         if (newValue) {
           currentKey.value = { ...props.selectedKey };
           originalKey.value = { ...props.selectedKey };
-          hasChanges.value =
-            currentKey.value.name !== originalKey.value.name ||
-            currentKey.value.fingerPrint !== originalKey.value.fingerPrint ||
-            currentKey.value.publicKey !== originalKey.value.publicKey;
           loading.value = false;
         }
       },
