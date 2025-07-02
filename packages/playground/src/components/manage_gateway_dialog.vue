@@ -501,7 +501,8 @@ export default {
           grid.config.twinId;
         prefix.value = oldPrefix.value + props.vm.name;
       }
-      subdomain.value = generateName({ prefix: prefix.value }, 4).toLowerCase();
+      const randomSuffix = generateName({}, 2);
+      subdomain.value = `${prefix.value}${randomSuffix}`.toLowerCase();
     }
 
     const subdomainRules = [
