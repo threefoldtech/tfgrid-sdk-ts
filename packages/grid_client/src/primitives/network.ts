@@ -761,7 +761,7 @@ class Network {
         (e as Error).message = formatErrorMessage(`Couldn't get the network interfaces for node ${node_id}`, e);
         throw e;
       }
-      events.emit("logs", `Node ${node_id} network interfaces: ${JSON.stringify(result)}`);
+      console.log(`Node ${node_id} network interfaces: ${JSON.stringify(result)}`);
 
       if (result) {
         for (const iface of Object.keys(result)) {
