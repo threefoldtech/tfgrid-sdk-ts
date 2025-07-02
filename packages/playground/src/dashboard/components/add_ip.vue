@@ -208,17 +208,16 @@ export default {
         };
       }
 
-      if (parseInt(toParts[0].split(".")[3]) <= parseInt(fromParts[0].split(".")[3])) {
-        return {
-          message: "To IP must be bigger than From IP.",
-        };
-      }
-
       if (
         toParts[0].substring(0, toParts[0].lastIndexOf(".")) != fromParts[0].substring(0, fromParts[0].lastIndexOf("."))
       ) {
         return {
           message: "IPs are not in the same network.",
+        };
+      }
+      if (parseInt(toParts[0].split(".")[3]) <= parseInt(fromParts[0].split(".")[3])) {
+        return {
+          message: "To IP must be bigger than From IP.",
         };
       }
       if (parseInt(toParts[0].split(".")[3]) - parseInt(fromParts[0].split(".")[3]) + 1 > 16) {
