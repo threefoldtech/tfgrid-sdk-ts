@@ -24,7 +24,7 @@ const TEST_CONSTANTS = {
   WORKLOAD_DESCRIPTION: "workload_description",
 
   CPU: 1,
-  MEMORY: 1024 * 1024 * 1024, // 1GB in bytes
+  MEMORY: 1024**3,  // 1GB in bytes
   SIZE: 10 * 1024 ** 2, // 10MB in bytes
   PUBLIC_IP: "10.0.0.1",
   NETWORK_NAME: "test_network",
