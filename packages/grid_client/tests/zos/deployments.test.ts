@@ -5,10 +5,16 @@ import { validate } from "class-validator";
 import { default as md5 } from "crypto-js/md5";
 
 import { FLISTS } from "../../src/helpers/flists";
+import { toByteArray } from "../../src/helpers/toByteArray";
 import { ComputeCapacity } from "../../src/zos/computecapacity";
 import { Deployment, KeypairType, Signature, SignatureRequest, SignatureRequirement } from "../../src/zos/deployment";
 import { Workload, WorkloadTypes } from "../../src/zos/workload";
 import { MyceliumIP, Zmachine, ZmachineNetwork } from "../../src/zos/zmachine";
+import config from "../config.json";
+
+if (!config.mnemonic || config.mnemonic.trim() === "") {
+  throw new Error("Mnemonic is required in config.json. Please add a valid mnemonic to the 'mnemonic' field.");
+}
 
 const TEST_CONSTANTS = {
   TWIN_ID: 123,
@@ -24,14 +30,14 @@ const TEST_CONSTANTS = {
   WORKLOAD_DESCRIPTION: "workload_description",
 
   CPU: 1,
-  MEMORY: 1024**3,  // 1GB in bytes
+  MEMORY: 1024 ** 3, // 1GB in bytes
   SIZE: 10 * 1024 ** 2, // 10MB in bytes
   PUBLIC_IP: "10.0.0.1",
   NETWORK_NAME: "test_network",
   NETWORK_SEED: "test_seed",
 
-  MNEMONIC: "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about",
-} as const;
+  MNEMONIC: config.mnemonic,
+};
 
 const createSignatureRequest = (overrides: Partial<SignatureRequest> = {}): SignatureRequest => {
   const request = new SignatureRequest();
@@ -531,15 +537,8 @@ describe("Deployment signing", () => {
       const keyring = new Keyring({ type: keypairType });
       const keypair = keyring.addFromUri(mnemonic);
 
-      const signatureBytes = new Uint8Array(signature.length / 2);
-      for (let i = 0; i < signature.length / 2; i++) {
-        signatureBytes[i] = parseInt(signature.slice(2 * i, 2 * i + 2), 16);
-      }
-
-      const messageBytes = new Uint8Array(message.length / 2);
-      for (let i = 0; i < message.length / 2; i++) {
-        messageBytes[i] = parseInt(message.slice(2 * i, 2 * i + 2), 16);
-      }
+      const signatureBytes = toByteArray(signature);
+      const messageBytes = toByteArray(message);
 
       return keypair.verify(messageBytes, signatureBytes, keypair.publicKey);
     } catch {
