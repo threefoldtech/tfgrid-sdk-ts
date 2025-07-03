@@ -10,9 +10,9 @@ import {
   MachinesModel,
   randomChoice,
 } from "../../../src";
+import { FLISTS } from "../../../src/helpers/flists";
 import { config, getClient } from "../../client_loader";
 import { generateInt, getOnlineNode, log } from "../../utils";
-import { FLISTS } from "../../../src/helpers/flists";
 
 jest.setTimeout(1250000);
 

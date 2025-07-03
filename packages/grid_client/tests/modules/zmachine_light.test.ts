@@ -1,6 +1,5 @@
 import { plainToClass } from "class-transformer";
 
-import { FLISTS } from "../../src/helpers/flists";
 import {
   ComputeCapacity,
   MachineInterface,
@@ -10,10 +9,7 @@ import {
   ZmachineLightNetwork,
   ZNetworkInterface,
 } from "../../src";
-<<<<<<<<< Temporary merge branch 1
 import { FLISTS } from "../../src/helpers/flists";
-=========
->>>>>>>>> Temporary merge branch 2
 
 let zmachineLight = new ZmachineLight();
 const computeCapacity = new ComputeCapacity();
