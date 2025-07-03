@@ -1,15 +1,16 @@
 <template>
   <div
+    ref="viewLayoutContainer"
     class="border px-4 pb-4 rounded position-relative mt-1"
     :class="{ 'pt-10': hasInfo, 'pt-3': !hasInfo }"
-    ref="viewLayoutContainer"
   >
     <div
-      :style="{ opacity: $vuetify.theme.name === 'dark' ? 'var(--v-medium-emphasis-opacity)' : '' }"
       v-if="$slots.description"
+      :style="{ opacity: theme.global.current.value.dark ? 'var(--v-medium-emphasis-opacity)' : '' }"
     />
 
     <div
+      v-if="hasInfo"
       class="position-absolute pa-1 rounded-circle border"
       :style="{
         top: 0,
@@ -18,7 +19,6 @@
         zIndex: 99,
         backgroundColor: 'rgb(var(--v-theme-background))',
       }"
-      v-if="hasInfo"
     >
       <AppInfo />
     </div>
@@ -26,33 +26,35 @@
       <template v-if="showSSHError">
         <VAlert variant="tonal" type="error" class="mb-4">
           {{ title }} requires a public SSH key. You can generate or import it from the
-          <router-link :to="DashboardRoutes.Deploy.SSHKey">SSH Keys</router-link> page.
+          <router-link :to="DashboardRoutes.Deploy.SSHKey">
+            SSH Keys
+          </router-link> page.
         </VAlert>
       </template>
       <template v-if="showKYCError">
         <VAlert variant="tonal" type="error">
           <template #prepend>
-            <v-icon icon="mdi-shield-remove"></v-icon>
+            <v-icon icon="mdi-shield-remove" />
           </template>
           <div class="d-flex justify-space-between align-baseline">
             <div>{{ title }} requires a KYC verification.</div>
-            <v-btn text="Verify now" size="small" color="error" @click="kycDialog = true" :loading="kycDialogLoading" />
+            <v-btn text="Verify now" size="small" color="error" :loading="kycDialogLoading" @click="kycDialog = true" />
           </div>
         </VAlert>
       </template>
     </template>
     <slot v-else :key="tick" />
 
-    <div class="mt-4" v-if="$slots.list">
+    <div v-if="$slots.list" class="mt-4">
       <slot name="list" />
     </div>
   </div>
   <KycVerifier
     v-if="kycDialog"
     :loading="kycDialogLoading"
+    :module-value="kycDialog"
     @update:loading="kycDialogLoading = $event"
-    :moduleValue="kycDialog"
-    @update:moduleValue="kycDialog = $event"
+    @update:module-value="kycDialog = $event"
   />
 </template>
 
@@ -60,6 +62,7 @@
 import { KycStatus } from "@threefold/grid_client";
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import { useRoute } from "vue-router";
+import { useTheme } from "vuetify";
 
 import { DashboardRoutes } from "@/router/routes";
 import { useProfileManager } from "@/stores";
@@ -75,6 +78,7 @@ export default {
     const route = useRoute();
     const profileManager = useProfileManager();
     const kyc = useKYC();
+    const theme = useTheme();
     const viewLayoutContainer = ref<HTMLElement>();
     const tick = ref(0);
     const kycDialog = ref(false);
@@ -82,7 +86,9 @@ export default {
     const requireSSH = computed(() => route.meta.requireSSH);
     const requireKYC = computed(() => route.meta.requireKYC || route.path.match(/\/(applications|orchestrators)\/.+$/));
     const showKYCError = computed(() => requireKYC.value && kyc.status !== KycStatus.verified);
-    const showSSHError = computed(() => requireSSH.value && profileManager.profile?.ssh.length == 0);
+    const showSSHError = computed(
+      () => requireSSH.value && (!profileManager.profile?.ssh || profileManager.profile?.ssh?.length == 0),
+    );
     function reRender(e: Event) {
       e.stopPropagation();
       tick.value++;
@@ -109,6 +115,7 @@ export default {
       KycStatus,
       kycDialog,
       kycDialogLoading,
+      theme,
     };
   },
 };

@@ -153,7 +153,7 @@ class QueryDao {
       const proposalJson = await this.client.api.query.dao.proposalOf(hash);
       const proposalRemark: DaoProposalRemark = proposalJson.toPrimitive() as unknown as DaoProposalRemark;
       return proposalRemark;
-    } catch (error) {
+    } catch {
       console.warn("Couldn't decode a proposal");
     }
   }

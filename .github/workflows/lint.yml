@@ -7,18 +7,16 @@ on:
   push:
     branches: 
       - development
-      - development_2.7
   pull_request:
     branches: 
       - development
-      - development_2.7
 
 jobs:
   lint:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [18.x]
+        node-version: [22.15]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:

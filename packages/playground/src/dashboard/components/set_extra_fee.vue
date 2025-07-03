@@ -44,22 +44,23 @@
                     label="Additional Fees"
                     :disabled="isSetting || loading"
                     :loading="loading"
-                  ></v-text-field>
+                  />
                 </input-tooltip>
               </input-validator>
             </form-validator>
 
-            <v-divider></v-divider>
+            <v-divider />
           </v-card-text>
           <v-card-actions class="justify-end my-1 mr-2">
-            <v-btn @click="showDialogue = false" color="anchor">Close</v-btn>
+            <v-btn color="anchor" @click="showDialogue = false">Close</v-btn>
             <v-btn
               color="secondary"
-              @click="setExtraFee()"
               :loading="isSetting"
               :disabled="!valid || isSetting || isDisabled"
-              >Save</v-btn
+              @click="setExtraFee()"
             >
+              Save
+            </v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>

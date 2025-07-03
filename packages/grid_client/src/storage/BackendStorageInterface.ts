@@ -1,4 +1,4 @@
-import { ExtrinsicResult, KVStoreSetOptions } from "@threefold/tfchain_client";
+import { ExtrinsicResult } from "@threefold/tfchain_client";
 
 interface BackendStorageInterface {
   // get a value from the storage

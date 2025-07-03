@@ -14,6 +14,7 @@ import {
 } from "class-validator";
 
 import { ValidateMembers } from "../helpers";
+import { WorkloadTypes } from ".";
 import { ComputeCapacity } from "./computecapacity";
 import { WorkloadData, WorkloadDataResult } from "./workload_base";
 
@@ -61,6 +62,7 @@ class Mount {
 
 @ValidateMembers()
 class Zmachine extends WorkloadData {
+  @Expose() __type: WorkloadTypes = WorkloadTypes.zmachine;
   @Expose() @IsString() @IsNotEmpty() @IsUrl() flist: string;
   @Expose() @Type(() => ZmachineNetwork) @ValidateNested() network: ZmachineNetwork;
   @Expose() @IsInt() @Min(0) @Max(10 * 1024 ** 4) size: number; // in bytes

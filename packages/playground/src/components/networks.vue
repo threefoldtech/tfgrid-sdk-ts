@@ -89,6 +89,7 @@ export function useNetworks(options: Partial<CreateNetworksOptions> = {}) {
 }
 
 export default {
+  // eslint-disable-next-line vue/multi-word-component-names
   name: "Network",
   components: { NetworkItem },
   props: {
@@ -173,7 +174,7 @@ export default {
         const fn = attrs["onUpdate:ipv4"];
         if (required && typeof fn === "function") {
           fn(true);
-        } else if (typeof fn === "function") fn(false);
+        }
       },
       { immediate: true },
     );

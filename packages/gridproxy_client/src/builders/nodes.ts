@@ -182,7 +182,10 @@ const NODES_VALIDATOR: BuilderValidator<NodesQuery> = {
 };
 
 export class NodesBuilder extends AbstractBuilder<NodesQuery> {
-  constructor(public uri: string, queries: Partial<NodesQuery> = {}) {
+  constructor(
+    public uri: string,
+    queries: Partial<NodesQuery> = {},
+  ) {
     super({
       mapper: NODES_MAPPER,
       validator: NODES_VALIDATOR,
@@ -191,5 +194,4 @@ export class NodesBuilder extends AbstractBuilder<NodesQuery> {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface NodesBuilder extends BuilderMethods<NodesQuery, NodesBuilder> {}

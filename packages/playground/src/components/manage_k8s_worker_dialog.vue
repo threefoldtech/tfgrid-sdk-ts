@@ -1,17 +1,20 @@
 <template>
   <ManageWorkerDialog
     :workers="data.workers"
-    :selectedWorkers="selectedWorkers"
+    :selected-workers="selectedWorkers"
     :deleting="deleting"
     @close="$emit('close')"
     @deploy="deploy"
     @delete="onDelete"
     @back="worker = createWorker()"
   >
-    <template #title>Manage Kubernetes({{ data.deploymentName }}) Workers</template>
+    <template #title>
+      Manage Kubernetes({{ data.deploymentName }}) Workers
+    </template>
 
     <template #list>
       <ListTable
+        v-model="selectedWorkers"
         :headers="[
           { title: 'PLACEHOLDER', key: 'data-table-select' },
           { title: 'Contract ID', key: 'contractId' },
@@ -25,7 +28,6 @@
         :items="data.workers"
         :loading="false"
         :deleting="deleting"
-        v-model="selectedWorkers"
       >
         <template #[`item.index`]="{ item }">
           {{ data.workers.indexOf(item?.value) + 1 }}

@@ -89,7 +89,7 @@ class SSHKeysManagement {
     }
 
     const copiedKeys = keys.map(
-      ({ fingerPrint, activating, deleting, ...keyWithoutSensitiveProps }) => keyWithoutSensitiveProps,
+      ({ fingerPrint, activating, deleting, ...keyWithoutSensitiveProps }) => keyWithoutSensitiveProps, //eslint-disable-line @typescript-eslint/no-unused-vars
     );
 
     await storeSSH(grid!, copiedKeys);
@@ -154,7 +154,7 @@ class SSHKeysManagement {
    * @param keys The SSH keys to export.
    */
   async export(keys: SSHKeyData[]): Promise<void> {
-    const exportKeys: SSHKeyData[] = keys.map(({ deleting, activating, ...rest }) => rest);
+    const exportKeys: SSHKeyData[] = keys.map(({ deleting, activating, ...rest }) => rest); // eslint-disable-line @typescript-eslint/no-unused-vars
     downloadAsJson(exportKeys, `ssh_keys.json`);
   }
 

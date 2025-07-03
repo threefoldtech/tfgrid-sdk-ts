@@ -15,21 +15,21 @@
       >
         <span>Filters</span>
         <VSpacer />
-        <VBtn variant="outlined" :disabled="loading || empty" @click.stop="clear" text="Clear" density="compact" />
+        <VBtn variant="outlined" :disabled="loading || empty" text="Clear" density="compact" @click.stop="clear" />
         <VBtn
           variant="outlined"
           color="secondary"
           density="compact"
-          @click.stop="apply"
           :text="!valid || !changed ? 'Refresh' : 'Apply'"
           :loading="loading"
           class="mx-2"
+          @click.stop="apply"
         />
         <VBtn
+          v-if="collapsible"
           :icon="filterOpened ? 'mdi-chevron-up' : 'mdi-chevron-down'"
           density="compact"
           variant="flat"
-          v-if="collapsible"
         />
       </VCardTitle>
     </div>
@@ -37,15 +37,15 @@
     <VDivider />
 
     <div>
-      <VRow no-gutters v-show="valid && (changed || (!loading && !empty))">
+      <VRow v-show="valid && (changed || (!loading && !empty))" no-gutters>
         <VAlert color="info" variant="tonal" class="rounded-0">
           <span>
             {{ changed ? "Filter options were updated but not applied." : "" }} Click
             <VCard
               class="d-inline pa-1"
-              v-text="changed ? 'Apply' : 'Clear'"
               flat
-              :color="$vuetify.theme.global.name === 'light' ? 'info' : undefined"
+              :color="!theme.global.current.value.dark ? 'info' : undefined"
+              v-text="changed ? 'Apply' : 'Clear'"
             />
             {{ changed ? "in order to reload your data." : "to reset your selected filters." }}
           </span>
@@ -61,8 +61,8 @@
     >
       <div>
         <VExpandTransition mode="in-out">
-          <VForm :disabled="loading" v-show="!collapsible || filterOpened">
-            <FormValidator valid-on-init v-model="valid">
+          <VForm v-show="!collapsible || filterOpened" :disabled="loading">
+            <FormValidator v-model="valid" valid-on-init>
               <VContainer fluid>
                 <VRow no-gutters>
                   <slot />
@@ -80,6 +80,7 @@
 import { onUnmounted } from "vue";
 import { computed, type ComputedRef, inject, onMounted, provide, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import { useTheme } from "vuetify";
 
 const key = Symbol("key:filters-container");
 
@@ -108,6 +109,7 @@ export default {
   setup(_, ctx) {
     const router = useRouter();
     const route = useRoute();
+    const theme = useTheme();
     const filters = ref(new Map<string, ComputedRef<FilterService>>());
 
     const valid = ref(false);
@@ -154,10 +156,13 @@ export default {
       const applys = services.value.map(service => service.value.apply());
 
       router.replace({
-        query: applys.reduce((query, [name, value]) => {
-          query[name] = value;
-          return query;
-        }, {} as { [name: string]: string | undefined }),
+        query: applys.reduce(
+          (query, [name, value]) => {
+            query[name] = value;
+            return query;
+          },
+          {} as { [name: string]: string | undefined },
+        ),
       });
 
       ctx.emit("apply");
@@ -183,7 +188,7 @@ export default {
 
     typeof breakpoint === "number" && onResize();
 
-    return { empty, changed, clear, apply, valid, collapsible, filterOpened };
+    return { empty, changed, clear, apply, valid, collapsible, filterOpened, theme };
   },
 };
 </script>

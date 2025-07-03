@@ -1,6 +1,6 @@
 ---
-title: Capserlabs
+title: Casperlabs
 ---
 
 Casper Network is a blockchain protocol built from the ground up to remain true to core Web3 principles and adapt to the needs of our evolving world.
-For more details, check [Capserlabs documentation](https://www.manual.grid.tf/documentation/dashboard/solutions/casper.html).
+For more details, check [Casperlabs documentation](https://manual.grid.tf/labs/documentation/dashboard/deploy/applications/casper).

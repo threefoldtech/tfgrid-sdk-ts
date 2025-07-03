@@ -4,31 +4,40 @@
       <v-btn
         v-bind="props"
         color="anchor"
-        @click="light = !light"
         :icon="light ? 'mdi-moon-waning-crescent' : 'mdi-brightness-4'"
+        @click="changeTheme()"
       />
     </template>
   </v-tooltip>
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref, watch } from "vue";
+import { computed, onMounted } from "vue";
 import { useTheme } from "vuetify";
 
-import { LocalStorageSettingsKey } from "@/utils/settings";
+import { LocalStorageSettingsKey, updateThemeInLocalStorage } from "@/utils/settings";
 
 const theme = useTheme();
-const light = ref(false);
 
-watch(light, light => (theme.global.name.value = light ? "light" : "dark"));
-watch(theme.global.name, theme => {
-  localStorage.setItem(LocalStorageSettingsKey.THEME_KEY, theme);
-  light.value = theme === "light";
+const light = computed(() => {
+  return theme.global.name.value === "light";
 });
 
+function setTheme(themeName: string) {
+  theme.global.name.value = themeName;
+  updateThemeInLocalStorage(themeName);
+}
+
+function changeTheme() {
+  const newTheme = light.value ? "dark" : "light";
+  setTheme(newTheme);
+}
+
 onMounted(() => {
-  const theme = localStorage.getItem(LocalStorageSettingsKey.THEME_KEY);
-  light.value = theme === "light";
+  const storedTheme = localStorage.getItem(LocalStorageSettingsKey.THEME_KEY);
+  if (storedTheme) {
+    setTheme(storedTheme);
+  }
 });
 </script>
 

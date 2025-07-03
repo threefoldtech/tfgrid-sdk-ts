@@ -29,11 +29,14 @@ async function newClient(mnemonic: string) {
     const gridClient = new GridClient(options);
     await gridClient.connect();
 
-    setTimeout(async () => {
-      console.log(`Request the grid to get the twin id.`);
-      const twinID = await gridClient.twins.get_my_twin_id();
-      console.log(`Twin id: ${twinID}`);
-    }, 10 * 60 * 1000);
+    setTimeout(
+      async () => {
+        console.log(`Request the grid to get the twin id.`);
+        const twinID = await gridClient.twins.get_my_twin_id();
+        console.log(`Twin id: ${twinID}`);
+      },
+      10 * 60 * 1000,
+    );
   } catch (error) {
     console.error("Error connecting to Grid:", error);
   }
@@ -45,9 +48,12 @@ async function main() {
   await newClient(clientMnemonic2);
   console.log(`Please disconnect your internet connection.`);
 
-  setTimeout(async () => {
-    console.log(`Please re-connect your internet connection.`);
-  }, 9 * 60 * 1000);
+  setTimeout(
+    async () => {
+      console.log(`Please re-connect your internet connection.`);
+    },
+    9 * 60 * 1000,
+  );
 }
 
 main();

@@ -2,12 +2,12 @@
   <weblet-layout ref="layout" @mount="() => {}">
     <v-data-table-server
       v-if="$props.tableHeaders"
+      v-model="selectedContracts"
       :headers="$props.tableHeaders"
       :loading="$props.loading.value || deleting"
       loading-text="Loading contracts..."
-      v-model="selectedContracts"
       :deleting="deleting"
-      v-bind:onClick:row="loading || deleting ? undefined : onClickRow"
+      :on-click:row="loading || deleting ? undefined : onClickRow"
       :no-data-text="capitalize(`No ${props.contractsType} contracts found on your account.`)"
       class="elevation-1 v-data-table-header"
       density="compact"
@@ -42,9 +42,9 @@
         >
           <p class="mr-2 text-no-wrap" cols="8">{{ item.consumption.toFixed(3) }} TFT/hour</p>
 
-          <v-tooltip bottom color="primary" close-delay="100" v-if="item.discountPackage" cols="2">
-            <template v-slot:activator="{ props }">
-              <v-icon class="scale_beat" color="warning" v-bind="props">mdi-brightness-percent</v-icon>
+          <v-tooltip v-if="item.discountPackage" bottom color="primary" close-delay="100" cols="2">
+            <template #activator="{ props: discountProps }">
+              <v-icon class="scale_beat" color="warning" v-bind="discountProps"> mdi-brightness-percent </v-icon>
             </template>
 
             <a
@@ -92,8 +92,14 @@
           :text="'Click here to check the amount of tokens needed to unlock your contract and resume your workload.'"
           location="top center"
         >
-          <template #activator="{ props }">
-            <VProgressCircular v-bind="props" :color="getStateColor(item.state)" indeterminate size="20" width="3" />
+          <template #activator="{ props: progressProps }">
+            <VProgressCircular
+              v-bind="progressProps"
+              :color="getStateColor(item.state)"
+              indeterminate
+              size="20"
+              width="3"
+            />
           </template>
         </v-tooltip>
         <v-tooltip
@@ -101,11 +107,11 @@
           :text="'Click here to check the amount of tokens needed to unlock your contract and resume your workload.'"
           location="top center"
         >
-          <template #activator="{ props }">
+          <template #activator="{ props: chipProps }">
             <v-chip
-              @click.stop="contractLockDetails(item as unknown as Contract)"
-              v-bind="props"
+              v-bind="chipProps"
               :color="getStateColor(item.state)"
+              @click.stop="contractLockDetails(item as unknown as Contract)"
             >
               {{ item.state === ContractStates.GracePeriod ? "Grace Period" : item.state }}
             </v-chip>
@@ -118,17 +124,17 @@
 
       <template #[`item.actions`]="{ item }">
         <v-tooltip :text="failedContractId == item.contract_id ? 'Retry' : 'Show Details'">
-          <template #activator="{ props }">
+          <template #activator="{ props: actionProps }">
             <v-btn
               :color="failedContractId == item.contract_id ? 'error' : ''"
               variant="tonal"
-              @click="showDetails(item)"
               :disabled="(loadingShowDetails && loadingContractId !== item.contract_id) || deleting"
               :loading="loadingContractId == item.contract_id"
-              v-bind="props"
+              v-bind="actionProps"
+              @click="showDetails(item)"
             >
-              <v-icon class="pt-1" v-if="failedContractId == item.contract_id">mdi-refresh</v-icon>
-              <v-icon v-else>mdi-eye-outline</v-icon>
+              <v-icon v-if="failedContractId == item.contract_id" class="pt-1"> mdi-refresh </v-icon>
+              <v-icon v-else> mdi-eye-outline </v-icon>
             </v-btn>
           </template>
         </v-tooltip>
@@ -141,8 +147,9 @@
         :disabled="!selectedLockedContracts"
         color="warning"
         @click="openUnlockDialog"
-        >Unlock</v-btn
       >
+        Unlock
+      </v-btn>
 
       <v-btn
         color="anchor"
@@ -165,7 +172,7 @@
     </template>
   </weblet-layout>
 
-  <v-dialog width="800" v-model="contractStateDialog" attach="#modals">
+  <v-dialog v-model="contractStateDialog" width="800" attach="#modals">
     <v-card>
       <v-card-title class="bg-primary"> Contract lock Details </v-card-title>
       <v-card-text class="mt-5">
@@ -179,11 +186,11 @@
           contract <span class="font-weight-black">{{ rentContracts[selectedItem.details.nodeId] }}</span>
         </v-alert>
 
-        <v-alert class="mt-4" type="info" variant="tonal"
-          >The Contracts in Grace Period, which means that your workloads are suspended but not deleted; in order to
+        <v-alert class="mt-4" type="info" variant="tonal">
+          The Contracts in Grace Period, which means that your workloads are suspended but not deleted; in order to
           resume your workloads and restore their functionality for up to one hour, Please fund your account with the
-          amount mentioned above.</v-alert
-        >
+          amount mentioned above.
+        </v-alert>
         <v-divider class="mt-3" />
       </v-card-text>
       <v-card-actions class="justify-end mb-1 mr-2">
@@ -196,15 +203,15 @@
           "
           location="top center"
         >
-          <template #activator="{ props }">
-            <div v-bind="props">
+          <template #activator="{ props: unlockProps }">
+            <div v-bind="unlockProps">
               <v-btn
                 v-if="!isNodeInRentContracts"
                 :disabled="freeBalance < getAmountLocked || loadingShowDetails"
                 color="warning"
                 class="mr-2 px-3"
-                @click="unlockContract([selectedItem.contract_id])"
                 :loading="unlockContractLoading"
+                @click="unlockContract([selectedItem.contract_id])"
               >
                 Unlock Contract
               </v-btn>
@@ -215,17 +222,17 @@
     </v-card>
   </v-dialog>
 
-  <v-dialog width="800" v-model="deletingDialog" attach="#modals">
+  <v-dialog v-model="deletingDialog" width="800" attach="#modals">
     <v-card>
       <v-card-title class="bg-primary"> Delete the following contracts? </v-card-title>
-      <v-alert class="ma-4" type="warning" variant="tonal"
-        >It is advisable to remove the contract from its solution page, especially when multiple contracts may be linked
-        to the same instance.</v-alert
-      >
+      <v-alert class="ma-4" type="warning" variant="tonal">
+        It is advisable to remove the contract from its solution page, especially when multiple contracts may be linked
+        to the same instance.
+      </v-alert>
 
-      <v-alert class="mx-4" type="warning" variant="tonal">Deleting contracts may take a while to complete.</v-alert>
+      <v-alert class="mx-4" type="warning" variant="tonal"> Deleting contracts may take a while to complete. </v-alert>
       <v-card-text>
-        <v-chip class="ma-1" label v-for="c in selectedContracts" :key="c.contract_id">
+        <v-chip v-for="c in selectedContracts" :key="c.contract_id" class="ma-1" label>
           {{ c.contract_id }}
         </v-chip>
         <v-divider class="mt-3" />
@@ -237,7 +244,7 @@
     </v-card>
   </v-dialog>
 
-  <v-dialog width="800" v-model="unlockDialog" attach="#modals">
+  <v-dialog v-model="unlockDialog" width="800" attach="#modals">
     <v-card>
       <v-card-title class="bg-primary">
         Unlock the following Contract<span v-if="selectedContracts.length > 1">s</span>
@@ -266,12 +273,12 @@
             </div>
           </div>
         </v-alert>
-        <v-chip class="ma-1" label v-for="c in selectedContracts" :key="c.contract_id">
+        <v-chip v-for="c in selectedContracts" :key="c.contract_id" class="ma-1" label>
           {{ c.contract_id }}
         </v-chip>
         <v-tooltip text="Rent contract associated with some of the selected contracts" location="top center">
-          <template #activator="{ props }">
-            <v-chip v-bind="props" class="ma-1" color="default" label v-for="id in selectedRentContracts" :key="id">
+          <template #activator="{ props: rentProps }">
+            <v-chip v-for="id in selectedRentContracts" v-bind="rentProps" :key="id" class="ma-1" color="default" label>
               {{ id }}
             </v-chip>
           </template>
@@ -289,8 +296,8 @@
           "
           location="top center"
         >
-          <template #activator="{ props }">
-            <div v-bind="props">
+          <template #activator="{ props: batchUnlockProps }">
+            <div v-bind="batchUnlockProps">
               <v-btn
                 :disabled="selectedLockedAmount > freeBalance || loadingShowDetails"
                 color="warning"
@@ -310,7 +317,7 @@
 
 <script lang="ts" setup>
 // Import necessary types and libraries
-import { ContractStates, discountPackages, type GridClient, type OverdueDetails } from "@threefold/grid_client";
+import { ContractStates, type GridClient, type OverdueDetails } from "@threefold/grid_client";
 import { type Contract, ContractState, type NodeStatus } from "@threefold/gridproxy_client";
 import { TFChainError } from "@threefold/tfchain_client";
 import { DeploymentKeyDeletionError } from "@threefold/types";

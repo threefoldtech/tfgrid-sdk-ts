@@ -1,7 +1,7 @@
 <template>
   <ManageWorkerDialog
     :workers="data"
-    :selectedWorkers="selectedWorkers"
+    :selected-workers="selectedWorkers"
     :deleting="deleting"
     @close="$emit('close')"
     @deploy="deploy"
@@ -9,10 +9,13 @@
     @back="updateCaprover"
     @click:outside="updateCaprover"
   >
-    <template #title>Manage Caprover({{ $props.master.name }}) Workers</template>
+    <template #title>
+      Manage Caprover({{ $props.master.name }}) Workers
+    </template>
 
     <template #list>
       <ListTable
+        v-model="selectedWorkers"
         :headers="[
           { title: 'PLACEHOLDER', key: 'data-table-select' },
           { title: 'Name', key: 'name' },
@@ -31,7 +34,6 @@
         :items="data"
         :loading="false"
         :deleting="deleting"
-        v-model="selectedWorkers"
         :sort-by="sortBy"
       >
         <template #[`item.index`]="{ item }">
@@ -48,12 +50,14 @@
 
         <template #[`item.status`]="{ item }">
           <v-chip :color="getNodeHealthColor(item.status as string).color">
-            <v-tooltip v-if="item.status == NodeHealth.Error" activator="parent" location="top">{{
-              item.message
-            }}</v-tooltip>
-            <v-tooltip v-if="item.status == NodeHealth.Paused" activator="parent" location="top"
-              >The deployment contract is in grace period</v-tooltip
-            >
+            <v-tooltip v-if="item.status == NodeHealth.Error" activator="parent" location="top">
+              {{
+                item.message
+              }}
+            </v-tooltip>
+            <v-tooltip v-if="item.status == NodeHealth.Paused" activator="parent" location="top">
+              The deployment contract is in grace period
+            </v-tooltip>
             <span class="text-uppercase">
               {{ getNodeHealthColor(item.status as string).type }}
             </span>
@@ -81,8 +85,7 @@
           <li>
             Go to
             <a :href="'http://captain.' + master.env.CAPROVER_ROOT_DOMAIN" target="_blank" class="app-link">
-              Admin Panel </a
-            >.
+              Admin Panel </a>.
           </li>
           <li>Go to the <strong>cluster</strong> tab.</li>
           <li>
@@ -100,7 +103,9 @@
 
       <v-card-actions>
         <v-spacer />
-        <v-btn color="anchor" @click="deployedDialog = false">Close</v-btn>
+        <v-btn color="anchor" @click="deployedDialog = false">
+          Close
+        </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

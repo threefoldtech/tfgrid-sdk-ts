@@ -6,7 +6,6 @@ on:
   push:
     branches:
       - development
-      - development_2.7
     paths:
       - "packages/playground/**"
   workflow_dispatch:
@@ -25,7 +24,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [18.x]
+        node-version: [22.15]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:

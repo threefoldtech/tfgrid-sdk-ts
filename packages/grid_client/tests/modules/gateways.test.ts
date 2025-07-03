@@ -31,7 +31,7 @@ async function waitForGateway(domain: string) {
     try {
       await axios.get(domain);
       return true;
-    } catch (error) {
+    } catch {
       await setTimeout(5000, "Waiting for gateway to be ready");
     }
   }

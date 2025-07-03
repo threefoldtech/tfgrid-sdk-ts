@@ -16,6 +16,7 @@ async function getDeployment(client, k8s) {
   log("================= Getting deployment information =================");
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function cancel(client, k8s) {
   const res = await client.k8s.delete(k8s);
   log("================= Canceling the deployment =================");

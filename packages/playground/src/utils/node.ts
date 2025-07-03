@@ -132,7 +132,6 @@ export async function generateNodeSummary(doc: jsPDF, nodes: NodeInterface[]) {
   const topY = 20;
   const topX = 60;
   const lineOffset = 10;
-  const cellOffset = 40;
   const cellX = 15;
   const cellY = topY + lineOffset;
 
@@ -236,9 +235,7 @@ export async function generateReceipt(doc: jsPDF, node: NodeInterface) {
   doc.setFontSize(15);
   const topY = 20;
   const lineOffset = 5;
-  const cellOffset = 30;
   const cellX = 15;
-  const cellY = topY + lineOffset * 8;
 
   // Add header information on the first page
   doc.text(`Node ${node.nodeId} Summary`, 80, topY);

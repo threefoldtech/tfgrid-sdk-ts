@@ -2,19 +2,20 @@
   <div>
     <input-tooltip inline #="{ props }" tooltip="Enable this option to set custom resources.">
       <v-switch
+        v-model="custom"
         color="primary"
         inset
         label="Set Custom Capacity"
-        v-model="custom"
         v-bind="props"
         :disabled="disabled"
       />
     </input-tooltip>
 
-    <slot></slot>
+    <slot />
 
     <template v-if="custom">
       <input-validator
+        ref="cpuInput"
         :value="cpu"
         :rules="[
           validators.required('CPU is required.'),
@@ -22,14 +23,14 @@
           customCpuValidation(validators),
         ]"
         #="{ props }"
-        ref="cpuInput"
       >
         <input-tooltip tooltip="The number of virtual cores allocated to your instance.">
-          <v-text-field label="CPU (vCores)" type="number" v-model.number="cpu" v-bind="props" :disabled="disabled" />
+          <v-text-field v-model.number="cpu" label="CPU (vCores)" type="number" v-bind="props" :disabled="disabled" />
         </input-tooltip>
       </input-validator>
 
       <input-validator
+        ref="memoryInput"
         :value="memory"
         :rules="[
           validators.required('Memory is required.'),
@@ -37,14 +38,14 @@
           customMemoryValidation(validators),
         ]"
         #="{ props }"
-        ref="memoryInput"
       >
         <input-tooltip tooltip="The amount of RAM (Random Access Memory) allocated to your instance.">
-          <v-text-field label="Memory (MB)" type="number" v-model.number="memory" v-bind="props" :disabled="disabled" />
+          <v-text-field v-model.number="memory" label="Memory (MB)" type="number" v-bind="props" :disabled="disabled" />
         </input-tooltip>
       </input-validator>
 
       <input-validator
+        ref="storageInput"
         :value="storage"
         :rules="[
           validators.required('Storage size is required.'),
@@ -52,15 +53,14 @@
           customStorageValidation(validators),
         ]"
         #="{ props }"
-        ref="storageInput"
       >
         <input-tooltip
           tooltip="The storage capacity allocated to your instance, indicating the amount of space available to store files, data, and applications."
         >
           <v-text-field
+            v-model.number="storage"
             label="Storage Size (GB)"
             type="number"
-            v-model.number="storage"
             v-bind="props"
             :disabled="disabled"
           />

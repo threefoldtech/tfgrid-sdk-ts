@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [18.x]
+        node-version: [22.15]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
     env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

@@ -3,14 +3,18 @@
     <v-row justify="center">
       <v-col cols="8">
         <h2 class="node-resources-title text-center text-h5 flex justify-center items-center">
-          <v-icon size="32" class="mr-2">mdi-chart-pie</v-icon>
+          <v-icon size="32" class="mr-2">
+            mdi-chart-pie
+          </v-icon>
           Node {{ node.nodeId }} Resources
 
           <v-chip v-if="isLiveStats" :color="getNodeStatusColor(node.status).color">
             {{ node.status === NodeStatus.Up ? "Online" : node.status === NodeStatus.Standby ? "Standby" : "Offline" }}
           </v-chip>
           <!-- As isLiveStats=False means we can't reach the node to get the stats from it live. -->
-          <v-chip v-else :color="getNodeStatusColor(NodeStatus.Down).color"> Offline </v-chip>
+          <v-chip v-else :color="getNodeStatusColor(NodeStatus.Down).color">
+            Offline
+          </v-chip>
         </h2>
       </v-col>
     </v-row>
@@ -21,10 +25,14 @@
       <div class="d-flex my-6 align-center justify-center">
         <v-progress-circular v-if="loading" indeterminate class="mt-10 mb-10" />
       </div>
-      <v-btn rounded="md" variant="flat" class="mt-10" @click="getNodeHealthUrl"> Check Node Health </v-btn>
+      <v-btn rounded="md" variant="flat" class="mt-10" @click="getNodeHealthUrl">
+        Check Node Health
+      </v-btn>
     </v-row>
     <v-row justify="center" class="w-50 mt-10" style="margin: 0 auto">
-      <v-alert variant="tonal" type="warning" v-if="hintMessage">{{ hintMessage }}</v-alert>
+      <v-alert v-if="hintMessage" variant="tonal" type="warning">
+        {{ hintMessage }}
+      </v-alert>
     </v-row>
   </div>
 </template>

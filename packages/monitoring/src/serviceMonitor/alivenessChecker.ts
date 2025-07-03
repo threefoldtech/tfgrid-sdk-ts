@@ -12,7 +12,12 @@ export class ServiceMonitor {
    * @param retries - The number of retries in case a service is determined to be down (default is 2 retries).
    * @param retryInterval - The interval, in seconds, between retries (default is 2 seconds).
    */
-  constructor(public services: ILivenessChecker[], public interval = 2, public retries = 2, public retryInterval = 2) {}
+  constructor(
+    public services: ILivenessChecker[],
+    public interval = 2,
+    public retries = 2,
+    public retryInterval = 2,
+  ) {}
 
   /**
    * Checks the liveness of each service once and logs events accordingly.

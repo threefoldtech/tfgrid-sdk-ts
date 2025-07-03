@@ -1,59 +1,44 @@
 <template>
-  <td :colspan="columnsLen" v-if="dNodeLoading" style="text-align: center">
+  <td v-if="dNodeLoading" :colspan="columnsLen" style="text-align: center">
     <div class="pa-1">
       <div class="d-flex my-6 align-center justify-center">
         <v-progress-circular :size="20" />
       </div>
     </div>
   </td>
-  <td :colspan="columnsLen" v-else-if="dNodeError" style="text-align: center">
+  <td v-else-if="dNodeError" :colspan="columnsLen" style="text-align: center">
     <div class="pt-4">
       <v-alert variant="tonal" class="d-flex justify-between" dense outlined type="error" style="text-align: center">
         <div style="display: flex; align-items: center">Failed to retrieve Node details.</div>
-        <template v-slot:append>
-          <v-icon @click="reloadNodeDetails" style="cursor: pointer">mdi-reload</v-icon>
+        <template #append>
+          <v-icon style="cursor: pointer" @click="reloadNodeDetails"> mdi-reload </v-icon>
         </template>
       </v-alert>
     </div>
   </td>
 
-  <td :style="{ backgroundColor: 'rgb(var(--v-theme-background))' }" :colspan="columnsLen" v-else>
+  <td v-else :style="{ backgroundColor: 'rgb(var(--v-theme-background))' }" :colspan="columnsLen">
     <v-row class="ma-2">
       <v-col :cols="getColSize">
         <div class="mt-3">
-          <card-details
-            :loading="false"
-            title="Node Resources"
-            icon="mdi-harddisk"
-            :items="getNodeResourceCard()"
-          ></card-details>
+          <card-details :loading="false" title="Node Resources" icon="mdi-harddisk" :items="getNodeResourceCard()" />
         </div>
       </v-col>
 
       <v-col :cols="getColSize">
         <div class="mt-3">
-          <card-details
-            :loading="false"
-            title="Location"
-            icon="mdi-map-marker"
-            :items="getCountryResourceCard()"
-          ></card-details>
+          <card-details :loading="false" title="Location" icon="mdi-map-marker" :items="getCountryResourceCard()" />
         </div>
       </v-col>
 
       <v-col :cols="getColSize" class="{ 'mt-n8': getColSize() === 6 }">
         <div class="mt-3">
-          <card-details
-            :loading="false"
-            title="Farm details"
-            icon="mdi-silo"
-            :items="getFarmResourceCard()"
-          ></card-details>
+          <card-details :loading="false" title="Farm details" icon="mdi-silo" :items="getFarmResourceCard()" />
         </div>
       </v-col>
     </v-row>
     <v-row class="d-flex" style="justify-content: center">
-      <div class="pa-1 pb-4" v-if="gpuLoading">
+      <div v-if="gpuLoading" class="pa-1 pb-4">
         <div style="bottom: 10rem; top: 10rem">
           <p
             :style="{
@@ -78,21 +63,22 @@
             style="text-align: center"
           >
             <div style="display: flex; align-items: center">Failed to receive node GPUs information</div>
-            <template v-slot:append>
-              <v-icon @click="getGpuDetails" style="cursor: pointer">mdi-reload</v-icon>
+            <template #append>
+              <v-icon style="cursor: pointer" @click="getGpuDetails"> mdi-reload </v-icon>
             </template>
           </v-alert>
         </div>
       </v-row>
       <v-col
-        v-if="node.num_gpu > 0"
+        v-if="nodeData.num_gpu > 0"
         cols="getColSize"
         style="max-width: 93rem; min-height: 400px; justify-content: center"
       >
         <div class="mt-3">
-          <GPUDetailsCard :node="node" />
-        </div> </v-col
-    ></v-row>
+          <GPUDetailsCard :node="nodeData" />
+        </div>
+      </v-col>
+    </v-row>
   </td>
 </template>
 
@@ -112,7 +98,7 @@ const gpuLoading = ref(false);
 const gpuError = ref(false);
 const farmName = ref("");
 const publicIps = ref(0);
-const node = ref<GridNode>(nodeInitializer);
+const nodeData = ref<GridNode>(nodeInitializer);
 const dots = ref(".");
 const interval = ref<number | null>(null);
 
@@ -164,7 +150,7 @@ async function getGpuDetails() {
 
       gpuError.value = false;
       const _node: GridNode = await getNode(props.node.nodeId);
-      node.value = _node;
+      nodeData.value = _node;
     }
     gpuLoading.value = false;
   } catch (e) {
@@ -223,7 +209,8 @@ import CardDetails from "@/components/node_details_cards/card_details.vue";
 import GPUDetailsCard from "@/components/node_details_cards/gpu_details_card.vue";
 
 export default {
-  name: "Node Details",
+   
+  name: "NodeDetails",
   components: {
     CardDetails,
     GPUDetailsCard,

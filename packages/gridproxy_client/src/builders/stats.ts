@@ -17,7 +17,10 @@ const STATS_VALIDATOR: BuilderValidator<StatsQuery> = {
 };
 
 export class StatsBuilder extends AbstractBuilder<StatsQuery> {
-  constructor(public uri: string, queries: Partial<StatsQuery> = {}) {
+  constructor(
+    public uri: string,
+    queries: Partial<StatsQuery> = {},
+  ) {
     super({
       mapper: STATS_MAPPER,
       validator: STATS_VALIDATOR,
@@ -26,5 +29,4 @@ export class StatsBuilder extends AbstractBuilder<StatsQuery> {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface StatuBuilder extends BuilderMethods<StatsQuery, StatuBuilder> {}

@@ -1,16 +1,21 @@
 <template>
   <v-container>
     <v-dialog
-      transition="dialog-bottom-transition"
       v-model="withdrawDialog"
-      @update:model-value="closeDialog"
+      transition="dialog-bottom-transition"
       attach="#modals"
+      @update:model-value="closeDialog"
     >
       <v-card>
-        <v-card-title class="bg-primary"> Withdraw TFT </v-card-title>
+        <v-card-title class="bg-primary">
+          Withdraw TFT
+        </v-card-title>
         <v-card-text>
-          Interact with the bridge in order to withdraw your TFT to
-          {{ selectedName?.charAt(0).toUpperCase() + selectedName!.slice(1) }} (withdraw fee is: {{ withdrawFee }} TFT)
+          <VAlert type="info">
+            Interact with the bridge in order to withdraw your TFT to
+            {{ selectedName?.charAt(0).toUpperCase() + selectedName!.slice(1) }} (withdraw fee is:
+            {{ withdrawFee }} TFT)
+          </VAlert>
         </v-card-text>
         <v-card-text>
           <FormValidator v-model="valid">
@@ -26,41 +31,42 @@
                 :label="selectedName?.charAt(0).toUpperCase() + selectedName!.slice(1) + ' Target Wallet Address'"
                 :disabled="validatingAddress"
                 :loading="validationProps.loading"
-              >
-              </v-text-field>
+              />
             </InputValidator>
             <InputValidator
               :value="amount"
               #="{ props: validationProps }"
               :rules="[
-              validators.required('This field is required'),
-              validators.min('Amount should be at least 2 TFT', 2),
-              validators.max( 'Amount cannot exceed balance',freeBalance!),
-              validators.isValidDecimalNumber(3,'Amount must have 3 decimals only')
-            ]"
+                validators.required('This field is required'),
+                validators.min('Amount should be at least 2 TFT', 2),
+                validators.max('Amount cannot exceed balance with fees',freeBalance! - withdrawFee!),
+                validators.isValidDecimalNumber(3,'Amount must have 3 decimals only')
+              ]"
             >
               <v-text-field
                 v-bind="{ ...validationProps }"
-                @paste.prevent
-                label="Amount (TFT)"
                 v-model="amount"
+                label="Amount (TFT)"
                 type="number"
                 onkeydown="javascript: return event.keyCode == 69 || /^\+$/.test(event.key) ? false : true"
-              >
-              </v-text-field>
+                @paste.prevent
+              />
             </InputValidator>
           </FormValidator>
           <v-divider />
         </v-card-text>
         <v-card-actions class="justify-end mb-1 mr-2">
-          <v-btn color="anchor" @click="closeDialog"> Close </v-btn>
+          <v-btn color="anchor" @click="closeDialog">
+            Close
+          </v-btn>
           <v-btn
             color="secondary"
-            @click="withdrawTFT(target, amount)"
             :disabled="!valid || validatingAddress"
             :loading="loadingWithdraw"
-            >Send</v-btn
+            @click="withdrawTFT(target, amount)"
           >
+            Send
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -68,7 +74,7 @@
 </template>
 
 <script setup lang="ts">
-import { StrKey } from "stellar-sdk";
+import { StrKey } from "@stellar/stellar-sdk";
 import { onMounted, ref } from "vue";
 
 import { useProfileManagerController } from "../components/profile_manager_controller.vue";
@@ -124,10 +130,11 @@ async function validateAddress() {
 }
 
 async function withdrawTFT(targetAddress: string, withdrawAmount: number) {
+  if (!props.withdrawFee) return;
   loadingWithdraw.value = true;
   try {
     updateGrid(grid, { projectName: "" });
-    await grid?.bridge.swapToStellar({ amount: +withdrawAmount, target: targetAddress });
+    await grid?.bridge.swapToStellar({ amount: +withdrawAmount + props.withdrawFee, target: targetAddress });
 
     await ProfileManagerController.reloadBalance();
     createCustomToast("Transaction Succeeded", ToastType.success);

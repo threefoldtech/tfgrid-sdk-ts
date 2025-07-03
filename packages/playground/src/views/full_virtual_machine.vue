@@ -10,8 +10,8 @@
 
 <script lang="ts">
 import { ProjectName } from "../types";
-import FullVm from "../weblets/full_vm.vue";
 import TfDeploymentList from "../weblets/tf_deployment_list.vue";
+import FullVm from "../weblets/tf_full_vm.vue";
 
 export default {
   name: "FullVirtualMachine",

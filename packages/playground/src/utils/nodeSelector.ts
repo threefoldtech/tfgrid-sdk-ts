@@ -272,10 +272,18 @@ export async function loadValidNodes(
   pagination: ReturnType<typeof usePagination>,
   nodesLock?: AwaitLock,
 ): Promise<NodeInfo[]> {
-  if (nodesLock) {
-    await nodesLock.acquireAsync();
+  try {
+    if (nodesLock) {
+      await nodesLock.acquireAsync();
+    }
+    return await _loadValidNodes(gridStore, selectionFitlers, filters, pagination);
+  } catch (error) {
+    throw error;
+  } finally {
+    if (nodesLock) {
+      release(nodesLock);
+    }
   }
-  return _loadValidNodes(gridStore, selectionFitlers, filters, pagination);
 }
 
 async function _loadValidNodes(
@@ -463,7 +471,7 @@ function normalizeFiltersValidators(
     }),
     rootFilesystemSize: normalizeNumericValidator(validators.rootFilesystemSize, {
       type: "number",
-      min: 500 / 1024,
+      min: 0,
       max: 10000,
     }),
     solutionDisk: normalizeNumericValidator(validators.solutionDisk, {

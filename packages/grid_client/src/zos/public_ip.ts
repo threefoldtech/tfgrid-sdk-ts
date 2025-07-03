@@ -2,10 +2,12 @@ import { Expose } from "class-transformer";
 import { IsBoolean } from "class-validator";
 
 import { ValidateMembers } from "../helpers";
+import { WorkloadTypes } from ".";
 import { WorkloadData, WorkloadDataResult } from "./workload_base";
 
 @ValidateMembers()
 class PublicIP extends WorkloadData {
+  @Expose() __type: WorkloadTypes = WorkloadTypes.ip;
   @Expose() @IsBoolean() v4: boolean;
   @Expose() @IsBoolean() v6: boolean;
   challenge(): string {

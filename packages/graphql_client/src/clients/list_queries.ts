@@ -3,7 +3,6 @@ import {
   Account,
   ArrayWhere,
   BaseWhere,
-  BigInt,
   BoolWhere,
   BurnTransaction,
   City,

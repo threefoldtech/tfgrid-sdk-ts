@@ -16,17 +16,17 @@
             { value: 50, title: '50' },
           ]"
           :page="$props.page"
-          @update:page="$emit('update:page', $event)"
-          @update:items-per-page="$emit('update:size', $event)"
           class="nodes-table"
           :disable-sort="true"
+          @update:page="$emit('update:page', $event)"
+          @update:items-per-page="$emit('update:size', $event)"
         >
-          <template #headers> </template>
+          <template #headers />
 
           <template #item="{ index }">
             <TfNodeDetailsCard
-              class="mb-4"
               v-model:node="$props.modelValue[index]"
+              class="mb-4"
               @click="$emit('open-dialog', modelValue[index])"
             />
           </template>
@@ -45,7 +45,9 @@ import { getNodeStatusColor, getNodeTypeColor } from "@/utils/get_nodes";
 
 import TfNodeDetailsCard from "./node_selector/TfNodeDetailsCard.vue";
 export default {
-  emits: ["update:page", "update:size", "open-dialog"],
+  components: {
+    TfNodeDetailsCard,
+  },
   props: {
     size: {
       required: true,
@@ -69,9 +71,7 @@ export default {
     },
     maxHeight: String,
   },
-  components: {
-    TfNodeDetailsCard,
-  },
+  emits: ["update:page", "update:size", "open-dialog"],
   setup() {
     return {
       getNodeStatusColor,

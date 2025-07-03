@@ -1,15 +1,17 @@
 <template v-if="nodes">
   <div class="my-6">
     <v-card color="primary rounded-0">
-      <v-card-title class="py-1 text-subtitle-1 text-center">Your Nodes</v-card-title>
+      <v-card-title class="py-1 text-subtitle-1 text-center">
+        Your Nodes
+      </v-card-title>
     </v-card>
     <v-data-table-server
+      v-model:page="page"
+      v-model:items-per-page="pageSize"
       :loading="loading"
       :items="nodes"
       :items-length="nodesCount"
       :headers="headers"
-      v-model:page="page"
-      v-model:items-per-page="pageSize"
       :items-per-page-options="[
         { value: 5, title: '5' },
         { value: 10, title: '10' },
@@ -18,6 +20,9 @@
       ]"
       show-expand
       :expanded="expanded"
+      :hover="true"
+      expand-on-click
+      return-object
       @update:expanded="
         $event => {
           if ($event.length > 0) {
@@ -28,32 +33,33 @@
         }
       "
       @update:options="getUserNodes"
-      :hover="true"
-      expand-on-click
-      return-object
     >
-      <template v-slot:expanded-row="{ columns, item }">
+      <template #expanded-row="{ columns, item }">
         <tr>
           <td
+            :key="item.id"
             class="py-4 px-8 border border-anchor"
             :style="{ backgroundColor: 'rgb(var(--v-theme-background))' }"
             :colspan="columns.length"
-            :key="item.id"
           >
-            <card-details :loading="false" title="Node Details" :items="getNodeDetails(item)"></card-details>
+            <card-details :loading="false" title="Node Details" :items="getNodeDetails(item)" />
 
             <v-card class="mt-4">
               <v-alert class="pa-5" style="height: 20px">
-                <h4 class="text-center font-weight-medium">Resource Units Reserved</h4>
+                <h4 class="text-center font-weight-medium">
+                  Resource Units Reserved
+                </h4>
               </v-alert>
               <v-card-text class="pb-8">
                 <NodeResources :node="item" />
               </v-card-text>
             </v-card>
 
-            <v-card class="mt-4" v-if="network == 'main'" focusable single model-value>
+            <v-card v-if="network == 'main'" class="mt-4" focusable single model-value>
               <v-alert class="pa-5" style="height: 20px">
-                <h4 class="text-center font-weight-medium">Node Statistics</h4>
+                <h4 class="text-center font-weight-medium">
+                  Node Statistics
+                </h4>
               </v-alert>
               <v-card-item>
                 <NodeMintingDetails :node="item" />
@@ -72,19 +78,19 @@
       <template #[`item.actions`]="{ item }">
         <PublicConfig
           class="me-2"
-          :nodeId="item.nodeId"
-          :farmId="item.farmId"
+          :node-id="item.nodeId"
+          :farm-id="item.farmId"
           @remove-config="config => toggleConfig(item, config)"
           @add-config="config => toggleConfig(item, config)"
         />
-        <SetExtraFee class="me-2" :nodeId="item.nodeId" />
+        <SetExtraFee class="me-2" :node-id="item.nodeId" />
       </template>
 
-      <template v-slot:[`item.country`]="{ item }">
+      <template #[`item.country`]="{ item }">
         {{ item.country || "-" }}
       </template>
 
-      <template v-slot:[`item.serialNumber`]="{ item }">
+      <template #[`item.serialNumber`]="{ item }">
         {{ item.serialNumber || "-" }}
       </template>
     </v-data-table-server>
@@ -196,12 +202,12 @@ export default {
             node.receipts = [];
             try {
               if (network == "main") node.receipts = await getNodeMintingFixupReceipts(node.nodeId);
-            } catch (e) {
+            } catch {
               createCustomToast(`Failed to get node ${node.nodeId} minting receipts!`, ToastType.danger);
             }
             node.availability = await getNodeAvailability(node.nodeId);
             node.uptime = +calculateUptime(node.availability.currentPeriod, node.availability.downtime);
-          } catch (error) {
+          } catch {
             node.receipts = [];
             node.used_resources = {
               sru: 0,

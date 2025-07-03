@@ -40,6 +40,7 @@ export class TFGridGqlClient extends AbstractClient {
   public merge<T extends MergableQuery>(queries: T) {
     const options: RequestOptions[] = [];
     for (const query in queries) {
+      // eslint-disable-next-line prefer-spread
       options.push(this[`__${query}` as any].apply(this, queries[query]));
     }
 
@@ -68,14 +69,14 @@ type NormalizeMerge<T> = {
       ? Q[]
       : unknown
     : K extends keyof ByIdQueries
-    ? ReturnType<ByIdQueries[K]> extends Promise<infer Q>
-      ? Q
-      : unknown
-    : K extends keyof ConnectionQueries
-    ? ReturnType<ConnectionQueries[K]> extends Promise<infer Q>
-      ? Q
-      : unknown
-    : unknown;
+      ? ReturnType<ByIdQueries[K]> extends Promise<infer Q>
+        ? Q
+        : unknown
+      : K extends keyof ConnectionQueries
+        ? ReturnType<ConnectionQueries[K]> extends Promise<infer Q>
+          ? Q
+          : unknown
+        : unknown;
 };
 
 export interface TFGridGqlClient extends ListQueries, ByIdQueries, ConnectionQueries {}

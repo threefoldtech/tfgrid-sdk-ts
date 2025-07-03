@@ -18,7 +18,7 @@ window.env = {
   STATS_STACKS: ["https://stats.dev.grid.tf", "https://stats.02.dev.grid.tf"],
   TIMEOUT: +"10000",
   PAGE_SIZE: +"20",
-  MANUAL_URL: "https://www.manual.grid.tf",
+  MANUAL_URL: "https://manual.grid.tf",
   SENTRY_DSN: "https://b9af6796f176d1f02837a06f0da3caee@dev.sentry.grid.tf/2",
   ENABLE_TELEMETRY: "false",
 };

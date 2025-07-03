@@ -2,23 +2,23 @@
   <div>
     <v-dialog
       v-model="dialogVisible"
-      @update:model-value="$emit('close')"
       scrollable
       :persistent="deleting || layout?.status === 'deploy'"
       attach="#modals"
+      @update:model-value="$emit('close')"
     >
       <weblet-layout ref="layout" @back="onBack">
-        <template #title>Manage Domains ({{ vm ? vm.name : k8s?.masters[0].name }})</template>
-        <v-tabs align-tabs="center" color="secondary" class="mb-6" v-model="gatewayTab" :disabled="deleting">
+        <template #title> Manage Domains ({{ vm ? vm.name : k8s?.masters[0].name }}) </template>
+        <v-tabs v-model="gatewayTab" align-tabs="center" color="secondary" class="mb-6" :disabled="deleting">
           <v-tab>Domains List</v-tab>
           <v-tab>Add new domain</v-tab>
         </v-tabs>
 
         <v-alert
+          v-if="errorMessage && gatewayTab === 0 && !loadingGateways"
           type="warning"
           variant="tonal"
           class="mb-4"
-          v-if="errorMessage && gatewayTab === 0 && !loadingGateways"
         >
           Failed to list {{ failedToListGws.length }} domain(s).
           <template #append>
@@ -33,7 +33,7 @@
 
         <v-dialog v-model="failedDomainDialog" max-width="400px" scrollable attach="#modals">
           <v-card>
-            <v-card-title class="bg-warning">Failed Domains</v-card-title>
+            <v-card-title class="bg-warning"> Failed Domains </v-card-title>
             <v-card-text>
               <ul style="list-style: square">
                 <li v-for="gw in failedToListGws" :key="gw">
@@ -50,17 +50,18 @@
               color="secondary"
               :loading="loadingGateways"
               :disabled="deleting"
-              @click="loadGateways"
               variant="outlined"
-              >Reload</v-btn
+              @click="loadGateways"
             >
+              Reload
+            </v-btn>
           </div>
           <list-table
+            v-model="gatewaysToDelete"
             :headers="tableHeaders"
             :items="gateways"
             return-object
             :loading="loadingGateways"
-            v-model="gatewaysToDelete"
             :deleting="deleting"
             no-data-text="No domains attached to this virtual machine."
           >
@@ -68,7 +69,9 @@
               {{ item.name }}
             </template>
 
-            <template #[`item.tls_passthrough`]="{ item }"> {{ item.tls_passthrough ? "Yes" : "No" }} </template>
+            <template #[`item.tls_passthrough`]="{ item }">
+              {{ item.tls_passthrough ? "Yes" : "No" }}
+            </template>
 
             <template #[`item.backends`]="{ item }">
               {{ (Array.isArray(item.backends) ? item.backends[0] : item.backends) ?? "-" }}
@@ -90,48 +93,48 @@
         <div v-if="gatewayTab === 1">
           <form-validator v-model="valid">
             <v-select
+              v-if="k8s"
+              v-model="selectedK8SNodeName"
               label="Select node"
               class="mt-4"
               :items="availableK8SNodesNames"
-              v-model="selectedK8SNodeName"
-              v-if="k8s"
             />
 
-            <v-select label="Supported Interfaces" :items="networks" v-model="selectedIPAddress" />
+            <v-select v-model="selectedIPAddress" label="Supported Interfaces" :items="networks" />
 
-            <copy-input-wrapper #="{ props }" :data="networkName" v-if="isWireGuard">
-              <v-text-field label="Network name" v-model="networkName" readonly v-bind="props" />
+            <copy-input-wrapper v-if="isWireGuard" #="{ props }" :data="networkName">
+              <v-text-field v-model="networkName" label="Network name" readonly v-bind="props" />
             </copy-input-wrapper>
 
-            <copy-input-wrapper #="{ props }" :data="(selectedIPAddress as any)">
-              <v-text-field :readonly="true" label="Selected IP Address" v-model="selectedIPAddress" v-bind="props" />
+            <copy-input-wrapper #="{ props }" :data="selectedIPAddress as any">
+              <v-text-field v-model="selectedIPAddress" :readonly="true" label="Selected IP Address" v-bind="props" />
             </copy-input-wrapper>
 
             <input-validator :value="port" :rules="portRules" #="{ props }">
-              <v-text-field label="Port" v-model.number="port" type="number" v-bind="props" />
+              <v-text-field v-model.number="port" label="Port" type="number" v-bind="props" />
             </input-validator>
             <input-tooltip
               tooltip="When enabled, the backend service will terminate the TLS traffic, otherwise the gateway service will do the TLS traffic termination."
               :align-center="true"
             >
               <v-switch
+                v-model="passThrough"
                 label="TLS Passthrough"
                 hide-details
                 inset
                 density="compact"
                 variant="tonal"
                 color="primary"
-                v-model="passThrough"
               />
             </input-tooltip>
             <div style="margin-top: -15px">
               <TfSelectionDetails
+                v-model="selectionDetails"
                 :align-center="true"
                 disable-node-selection
                 require-domain
                 use-fqdn
                 :interfaces="interfaceFeature"
-                v-model="selectionDetails"
               />
             </div>
             <input-tooltip tooltip="Selecting custom domain sets subdomain as gateway name.">
@@ -141,23 +144,23 @@
                 :async-rules="gatewayTab === 1 ? [validateSubdomain] : []"
                 #="{ props }"
               >
-                <v-text-field label="Subdomain" v-model.trim="subdomain" v-bind="props" />
+                <v-text-field v-model.trim="subdomain" label="Subdomain" v-bind="props" />
               </input-validator>
             </input-tooltip>
           </form-validator>
         </div>
 
         <template #footer-actions>
-          <v-btn color="anchor" @click="$emit('close')">Close</v-btn>
+          <v-btn color="anchor" @click="$emit('close')"> Close </v-btn>
           <v-btn
+            v-if="gatewayTab === 0"
             color="error"
             :disabled="gatewaysToDelete.length === 0 || deleting || loadingGateways"
-            v-if="gatewayTab === 0"
             @click="requestDelete = true"
           >
             Delete
           </v-btn>
-          <v-btn color="secondary" @click="deployGateway" :disabled="!valid" v-else> Add </v-btn>
+          <v-btn v-else color="secondary" :disabled="!valid" @click="deployGateway"> Add </v-btn>
         </template>
       </weblet-layout>
     </v-dialog>
@@ -166,14 +169,14 @@
       <v-card>
         <v-card-title> Are you sure you want to delete the following gateways? </v-card-title>
         <v-card-text class="d-flex flex-wrap">
-          <v-chip label class="mr-1 mb-5" v-for="gw in gatewaysToDelete" :key="gw.name">
+          <v-chip v-for="gw in gatewaysToDelete" :key="gw.name" label class="mr-1 mb-5">
             {{ gw.name }}
           </v-chip>
           <v-divider />
         </v-card-text>
 
         <v-card-actions class="justify-end mb-1 mr-2">
-          <v-btn color="anchor" @click="requestDelete = false">Cancel</v-btn>
+          <v-btn color="anchor" @click="requestDelete = false"> Cancel </v-btn>
           <v-btn
             color="error"
             :disabled="loadingGateways || deleting"
@@ -183,8 +186,9 @@
                 deleteSelectedGateways();
               }
             "
-            >Delete</v-btn
           >
+            Delete
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -242,7 +246,6 @@ export default {
     const layout = useLayout();
     const gatewayTab = ref(0);
     const dialogVisible = ref(true);
-    const isWireGuard = ref(false);
 
     const oldPrefix = ref("");
     const prefix = ref("");
@@ -270,6 +273,7 @@ export default {
     const availableK8SNodesNames = availableK8SNodes.map(node => node.name);
     const selectedK8SNodeName = ref(availableK8SNodesNames[0]);
     const selectedNode = ref();
+
     const interfaceFeature = computed<NetworkFeatures[]>(() => {
       const net = networks.value.find(net => net.value == selectedIPAddress.value);
       switch (net?.title) {
@@ -286,7 +290,9 @@ export default {
       }
     });
     const errorMessage = ref("");
-
+    const isWireGuard = computed(() => {
+      return networks.value.find(net => net.value === selectedIPAddress.value)?.title === NetworkInterfaces.WireGuard;
+    });
     watch(selectedK8SNodeName, getSupportedNetworks, { deep: true });
     const tableHeaders = ref([
       { title: "Name", key: "name" },
@@ -347,8 +353,18 @@ export default {
 
         updateGrid(grid, { projectName: props.vm ? props.vm.projectName : props.k8s!.projectName });
 
+        let deploymentIps: string[] = [];
+        if (props.vm) {
+          deploymentIps = getDeploymentIps(props.vm);
+        } else if (props.k8s) {
+          deploymentIps = [...props.k8s.masters, ...props.k8s.workers].flatMap(deployment => getDeploymentIps(deployment));
+        }
+
         const { gateways: gws, failedToList } = await loadDeploymentGateways(grid, {
-          filter: gw => true,
+          filter:
+            deploymentIps.length > 0
+              ? gw => gw.backends.some(bk => deploymentIps.some(ip => bk.includes(ip)))
+              : () => true,
         });
         gateways.value = gws;
 
@@ -398,6 +414,7 @@ export default {
         layout.value.setStatus("success", "Successfully deployed gateway.");
       } catch (error) {
         errorMessage.value = "Failed to add domain";
+        console.error(errorMessage.value, error);
         layout.value.setStatus("failed", normalizeError(errorMessage.value, "Something went wrong."));
       }
     }
@@ -456,15 +473,6 @@ export default {
       }
       selectedIPAddress.value = networks.value[0].value;
     }
-
-    watch(
-      selectedIPAddress,
-      () => {
-        isWireGuard.value =
-          networks.value.find(net => net.value === selectedIPAddress.value)?.title === NetworkInterfaces.WireGuard;
-      },
-      { deep: true },
-    );
 
     function formatDomainName(gw: string) {
       if (gw.startsWith(prefix.value)) {

@@ -21,20 +21,20 @@
       )
     "
     :ipv4="true"
-    :rentedBy="leader.rentedBy"
+    :rented-by="leader.rentedBy"
     :dedicated="leader.dedicated"
-    :SelectedNode="leader.selectionDetails?.node"
+    :selected-node="leader.selectionDetails?.node"
     :valid-filters="leader.selectionDetails?.validFilters"
     title-image="images/icons/caprover.png"
   >
-    <template #title>Deploy a Caprover Instance</template>
+    <template #title> Deploy a Caprover Instance </template>
     <d-tabs
+      ref="tabs"
       :tabs="[
         { title: 'Config', value: 'config' },
         { title: 'Leader', value: 'leader' },
         { title: 'Workers', value: 'workers', workers: workers.length },
       ]"
-      ref="tabs"
     >
       <template #config>
         <input-validator
@@ -48,7 +48,7 @@
           #="{ props }"
         >
           <input-tooltip tooltip="Domain name.">
-            <v-text-field label="Domain" v-model="domain" v-bind="props" />
+            <v-text-field v-model="domain" label="Domain" v-bind="props" />
           </input-tooltip>
         </input-validator>
 
@@ -78,7 +78,7 @@
             #="{ props: validationProps }"
           >
             <input-tooltip tooltip="Instance admin password.">
-              <v-text-field label="Password" v-model="password" v-bind="{ ...props, ...validationProps }" />
+              <v-text-field v-model="password" label="Password" v-bind="{ ...props, ...validationProps }" />
             </input-tooltip>
           </input-validator>
         </password-input-wrapper>
@@ -91,7 +91,7 @@
       </template>
 
       <template #workers>
-        <ExpandableLayout v-model="workers" @add="addWorker" #="{ index }">
+        <ExpandableLayout v-model="workers" #="{ index }" @add="addWorker">
           <CaproverWorker
             v-model="workers[index]"
             :other-workers="[workers, leader].flat(1).filter((_, i) => i !== index)"
@@ -105,8 +105,8 @@
       <v-btn
         variant="elevated"
         class="text-primery px-10 py-3 h-auto text-subtitle-1"
-        @click="validateBeforeDeploy(deploy)"
         text="Deploy"
+        @click="validateBeforeDeploy(deploy)"
       />
     </template>
   </weblet-layout>

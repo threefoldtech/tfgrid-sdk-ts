@@ -99,6 +99,6 @@ async function main() {
 main();
 ```
 
-And then run this file by `yarn run ts-node test_contracts.ts`
+And then run this file by `yarn run ts-node --transpileOnly test_contracts.ts`
 
 see more examples in [modules](../grid_client/docs/module.md)
