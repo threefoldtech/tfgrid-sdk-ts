@@ -3,25 +3,16 @@ name: Playground Selenium Tests
 on:
   workflow_dispatch:
     inputs:
-      network:
+      env:
         type: choice
-        description: "Target network"
+        description: "Target environment"
         required: true
         default: "dev"
         options:
-          - dev
-          - qa
-          - test
-          - main
-      branch:
-        description: "Branch to checkout"
-        required: false
-        default: ""
-      build_locally:
-        type: boolean
-        description: "Build dashboard locally"
-        required: true
-        default: true
+          - "dev"
+          - "qa"
+          - "test"
+          - "main"
   schedule:
     - cron: "0 6 * * *"
 
@@ -29,12 +20,10 @@ jobs:
   selenium-run:
     runs-on: ubuntu-latest
     env:
-      NETWORK: ${{ github.event.inputs.network || 'dev' }}
+      ENV: ${{ github.event.inputs.env || 'dev' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.inputs.branch || github.ref }}
       - name: Setting up Python
         uses: actions/setup-python@v5
         with:
@@ -44,28 +33,22 @@ jobs:
       - name: Installing all necessary packages
         run: pip install -r  packages/playground/tests/frontend_selenium/requirements.txt
       - name: Node install
-        if: ${{ github.event.inputs.build_locally != 'false' }}
         uses: actions/setup-node@v4
         with:
           node-version: 22.15
       - name: Yarn install
-        if: ${{ github.event.inputs.build_locally != 'false' }}
         run: yarn install
+      - name: Set environment
+        run: sed -i "s/^net = .*/net = $ENV/" packages/playground/tests/frontend_selenium/Config.ini
       - name: Lerna Build
-        if: ${{ github.event.inputs.build_locally != 'false' }}
+        if: ${{ env.ENV == 'dev' }}
         run: yarn lerna run build
       - name: Yarn Serve
-        if: ${{ github.event.inputs.build_locally != 'false' }}
+        if: ${{ env.ENV == 'dev' }}
         run: make run project=playground &
       - name: Wait for localhost
-        if: ${{ github.event.inputs.build_locally != 'false' }}
+        if: ${{ env.ENV == 'dev' }}
         run: sleep 60
-      - name: Configure network for deployed site
-        if: ${{ github.event.inputs.build_locally == 'false' }}
-        run: sed -i "s/^net = .*/net = ${NETWORK}/" packages/playground/tests/frontend_selenium/Config.ini
-      - name: Configure network for local build
-        if: ${{ github.event.inputs.build_locally != 'false' }}
-        run: sed -i 's/^net = .*/net = local/' packages/playground/tests/frontend_selenium/Config.ini
       - name: Run tests
         working-directory: ./packages/playground/tests/frontend_selenium
         env:
@@ -73,4 +56,10 @@ jobs:
           TFCHAIN_NODE_MNEMONICS: ${{ secrets.TFCHAIN_NODE_MNEMONICS }}
           STELLAR_ADDRESS: ${{ secrets.STELLAR_ADDRESS }}
           EMAIL: ${{ secrets.EMAIL }}
-        run: python -m pytest -v
+        run: python -m pytest -v --html=report.html
+      - name: Upload test report
+        if: success() || failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: selenium-report-${{ env.ENV }}
+          path: packages/playground/tests/frontend_selenium/report.html
