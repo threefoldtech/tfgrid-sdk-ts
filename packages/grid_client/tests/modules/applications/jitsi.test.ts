@@ -2,9 +2,9 @@ import axios from "axios";
 import { setTimeout } from "timers/promises";
 
 import { Features, FilterOptions, GatewayNameModel, generateString, GridClient, MachinesModel } from "../../../src";
+import { FLISTS } from "../../../src/helpers/flists";
 import { config, getClient } from "../../client_loader";
 import { generateInt, getOnlineNode, log } from "../../utils";
-import { FLISTS } from "../../../src/helpers/flists";
 
 jest.setTimeout(1250000);
 

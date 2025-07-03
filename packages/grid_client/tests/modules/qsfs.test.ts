@@ -10,6 +10,7 @@ import {
 } from "../../src";
 import { config, getClient } from "../client_loader";
 import { GBToBytes, generateInt, getOnlineNode, k8sWait, log, RemoteRun, splitIP } from "../utils";
+import { FLISTS } from "../../src/helpers/flists";
 
 jest.setTimeout(300000);
 
@@ -200,8 +201,8 @@ test("TC1234 - QSFS: Deploy QSFS underneath a VM", async () => {
         memory: memory,
         rootfs_size: rootfsSize,
         disks: disks,
-        flist: "https://hub.grid.tf/tf-official-apps/base:latest.flist",
-        entrypoint: "/sbin/zinit init",
+        flist: FLISTS.MICROVMS_UBUNTU_24.flist,
+        entrypoint: FLISTS.MICROVMS_UBUNTU_24.entryPoint,
         public_ip: publicIP,
         planetary: true,
         mycelium: true,
