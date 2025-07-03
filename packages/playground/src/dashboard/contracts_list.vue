@@ -1,6 +1,8 @@
 <template>
   <view-layout>
-    <template #description>Details about your owned contracts</template>
+    <template #description>
+      Details about your owned contracts
+    </template>
 
     <TfContractsList />
   </view-layout>

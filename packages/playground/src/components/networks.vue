@@ -89,6 +89,7 @@ export function useNetworks(options: Partial<CreateNetworksOptions> = {}) {
 }
 
 export default {
+  // eslint-disable-next-line vue/multi-word-component-names
   name: "Network",
   components: { NetworkItem },
   props: {

@@ -89,7 +89,10 @@ const GATEWAYS_VALIDATOR: BuilderValidator<GatewaysQuery> = {
 };
 
 export class GatewayBuilder extends AbstractBuilder<GatewaysQuery> {
-  constructor(public uri: string, queries: Partial<GatewaysQuery> = {}) {
+  constructor(
+    public uri: string,
+    queries: Partial<GatewaysQuery> = {},
+  ) {
     super({
       mapper: GATEWAYS_MAPPER,
       validator: GATEWAYS_VALIDATOR,
@@ -97,5 +100,5 @@ export class GatewayBuilder extends AbstractBuilder<GatewaysQuery> {
     });
   }
 }
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
+
 export interface GatewayBuilder extends BuilderMethods<GatewaysQuery, GatewayBuilder> {}

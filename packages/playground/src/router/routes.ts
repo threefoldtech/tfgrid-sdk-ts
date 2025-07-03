@@ -16,11 +16,6 @@ enum VirtualMachinesRoutes {
   MicroVirtualMachine = "/deploy/virtual-machines/micro-virtual-machine/",
 }
 
-enum OrchestratorsRoutes {
-  Kubernetes = "/deploy/orchestrators/kubernetes/",
-  CapRover = "/deploy/orchestrators/caprover/",
-}
-
 enum FarmRoutes {
   BaseRoute = "/farms/",
   YourFarms = "/farms/your-farms/",

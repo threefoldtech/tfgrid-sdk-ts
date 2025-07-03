@@ -2,8 +2,8 @@ import { Expose } from "class-transformer";
 import { IsBoolean } from "class-validator";
 
 import { ValidateMembers } from "../helpers";
-import { WorkloadData, WorkloadDataResult } from "./workload_base";
 import { WorkloadTypes } from ".";
+import { WorkloadData, WorkloadDataResult } from "./workload_base";
 
 @ValidateMembers()
 class PublicIP extends WorkloadData {

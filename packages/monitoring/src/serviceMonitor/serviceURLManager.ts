@@ -155,7 +155,7 @@ export class ServiceUrlManager<N extends boolean = false> {
     }
 
     const entries = Object.entries(result);
-    const values = await Promise.all(entries.map(([_, promise]) => promise));
+    const values = await Promise.all(entries.map(([_, promise]) => promise)); // eslint-disable-line @typescript-eslint/no-unused-vars
     for (let i = 0; i < entries.length; i++) {
       this.results[entries[i][0]] = values[i];
     }

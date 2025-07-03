@@ -1,16 +1,16 @@
 <template>
   <view-layout>
     <v-card color="primary" class="d-flex justify-center items-center pa-3 mb-3 text-center">
-      <v-icon size="30" class="pr-3">mdi-lan-connect</v-icon>
-      <v-card-title class="pa-0">Farm Finder</v-card-title>
+      <v-icon size="30" class="pr-3"> mdi-lan-connect </v-icon>
+      <v-card-title class="pa-0"> Farm Finder </v-card-title>
     </v-card>
     <v-alert type="info" variant="tonal" class="mb-6"> Click on the row to view farm details. </v-alert>
     <TfFiltersLayout>
       <template #filters>
-        <TfFiltersContainer @apply="loadFarms(true)" class="mb-4" :loading="loading">
+        <TfFiltersContainer class="mb-4" :loading="loading" @apply="loadFarms(true)">
           <TfFilter
-            query-route="farm-id"
             v-model="filters.farmId"
+            query-route="farm-id"
             :rules="[
               validators.isNumeric('This field accepts numbers only.', {
                 no_symbols: true,
@@ -20,12 +20,18 @@
               validators.validateResourceMaxNumber('This is not a valid ID.'),
             ]"
           >
-            <template #input="{ props }">
-              <VTextField label="Farm ID" variant="outlined" v-model="filters.farmId" density="compact" v-bind="props">
+            <template #input="{ props: inputProps }">
+              <VTextField
+                v-model="filters.farmId"
+                label="Farm ID"
+                variant="outlined"
+                density="compact"
+                v-bind="inputProps"
+              >
                 <template #append-inner>
                   <VTooltip text="Filter by farm id">
-                    <template #activator="{ props }">
-                      <VIcon icon="mdi-information-outline" v-bind="props" />
+                    <template #activator="{ props: tooltipProps }">
+                      <VIcon icon="mdi-information-outline" v-bind="tooltipProps" />
                     </template>
                   </VTooltip>
                 </template>
@@ -33,7 +39,7 @@
             </template>
           </TfFilter>
 
-          <TfFilter query-route="farm-name" v-model="filters.farmName">
+          <TfFilter v-model="filters.farmName" query-route="farm-name">
             <template #unwrap="{ colProps }">
               <VCol v-bind="colProps">
                 <TfSelectFarm
@@ -41,16 +47,16 @@
                   variant="outlined"
                   tooltip="Filter by farm name."
                   :model-value="filters.farmName ? ({ name: filters.farmName } as any) : undefined"
-                  @update:model-value="filters.farmName = $event?.name || ''"
                   density="compact"
+                  @update:model-value="filters.farmName = $event?.name || ''"
                 />
               </VCol>
             </template>
           </TfFilter>
 
           <TfFilter
-            query-route="free-public-ips"
             v-model="filters.freePublicIps"
+            query-route="free-public-ips"
             :rules="[
               validators.isNumeric('This field accepts numbers only.', {
                 no_symbols: true,
@@ -62,16 +68,16 @@
           >
             <template #input="{ props }">
               <VTextField
+                v-model="filters.freePublicIps"
                 label="Free Public IPs"
                 variant="outlined"
-                v-model="filters.freePublicIps"
                 density="compact"
                 v-bind="props"
               >
                 <template #append-inner>
                   <VTooltip text="Filter by free public IPs">
-                    <template #activator="{ props }">
-                      <VIcon icon="mdi-information-outline" v-bind="props" />
+                    <template #activator="{ props: ipsTooltipProps }">
+                      <VIcon icon="mdi-information-outline" v-bind="ipsTooltipProps" />
                     </template>
                   </VTooltip>
                 </template>
@@ -96,11 +102,11 @@
           { value: 20, title: '20' },
           { value: 50, title: '50' },
         ]"
+        :page="page"
         @update:items-per-page="
           size = $event;
           loadFarms();
         "
-        :page="page"
         @update:page="
           page = $event;
           loadFarms();
@@ -129,7 +135,7 @@
         <v-toolbar :height="35">
           <div class="ml-auto">
             <v-btn icon @click="() => (dialog = false)">
-              <v-icon color="anchor">mdi-close</v-icon>
+              <v-icon color="anchor"> mdi-close </v-icon>
             </v-btn>
           </div>
         </v-toolbar>
@@ -266,6 +272,7 @@ import TfFiltersLayout from "../components/filters/TfFiltersLayout.vue";
 import TfSelectFarm from "../components/node_selector/TfSelectFarm.vue";
 
 export default {
+  // eslint-disable-next-line vue/multi-word-component-names
   name: "Farms",
   components: {
     FarmDetailsCard,

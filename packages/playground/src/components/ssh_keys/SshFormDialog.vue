@@ -1,12 +1,12 @@
 <template>
   <v-dialog
-    @click:outside="() => $emit('close')"
-    @keydown.esc="() => $emit('close')"
     v-model="$props.open"
     max-width="800"
     attach="#modals"
+    @click:outside="() => $emit('close')"
+    @keydown.esc="() => $emit('close')"
   >
-    <template v-slot:default>
+    <template #default>
       <v-form v-model="isValidForm">
         <v-card>
           <v-toolbar color="primary" class="custom-toolbar">
@@ -22,10 +22,10 @@
               tooltip="Enter a descriptive name for your SSH key to easily identify it later, e.g., 'My-Laptop-Key' or 'Work-Server-Key'."
             >
               <v-text-field
+                v-model="keyName"
                 hint="Leave this field empty to generate a name automatically, or enter a custom name to save it with your key."
                 class="mb-4"
                 hide-details="auto"
-                v-model="keyName"
                 label="Name"
                 :rules="sshNameRules(keyName)"
               />
@@ -44,7 +44,7 @@
               </v-alert>
             </div>
 
-            <div class="import" v-if="$props.dialogType === SSHCreationMethod.Import">
+            <div v-if="$props.dialogType === SSHCreationMethod.Import" class="import">
               <input-tooltip
                 class="mt-4"
                 width="500"
@@ -54,14 +54,13 @@
               >
                 <CopyInputWrapper :data="sshKey" #="{ props: copyInputProps }">
                   <v-textarea
-                    hide-details="auto"
                     v-model.trim="sshKey"
+                    hide-details="auto"
                     no-resize
                     label="Public SSH Key"
                     v-bind="{ ...props, ...copyInputProps }"
                     :rules="sshRules(sshKey)"
-                  >
-                  </v-textarea>
+                  />
                 </CopyInputWrapper>
               </input-tooltip>
             </div>
@@ -69,14 +68,14 @@
           </v-card-text>
 
           <v-card-actions class="justify-end mb-1 mr-2">
-            <v-btn color="anchor" text="Close" @click="$emit('close')"></v-btn>
+            <v-btn color="anchor" text="Close" @click="$emit('close')" />
 
             <v-btn
               v-if="$props.dialogType === SSHCreationMethod.Generate"
-              @click="generateSSHKey"
               :loading="generating"
               :disabled="!isValidForm || generating || !!generatedSshKey"
               color="secondary"
+              @click="generateSSHKey"
             >
               Generate and Save
             </v-btn>
@@ -87,7 +86,7 @@
               color="secondary"
               text="Save"
               @click="createNewSSHKey"
-            ></v-btn>
+            />
           </v-card-actions>
         </v-card>
       </v-form>

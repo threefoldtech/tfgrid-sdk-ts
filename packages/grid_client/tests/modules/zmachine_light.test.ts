@@ -1,6 +1,14 @@
 import { plainToClass } from "class-transformer";
 
-import { ComputeCapacity, MachineInterface, Mount, MyceliumIP, ZmachineLight, ZmachineLightNetwork, ZNetworkInterface } from "../../src";
+import {
+  ComputeCapacity,
+  MachineInterface,
+  Mount,
+  MyceliumIP,
+  ZmachineLight,
+  ZmachineLightNetwork,
+  ZNetworkInterface,
+} from "../../src";
 
 let zmachineLight = new ZmachineLight();
 const computeCapacity = new ComputeCapacity();
@@ -12,11 +20,9 @@ beforeEach(() => {
   computeCapacity.cpu = 1;
   computeCapacity.memory = 256 * 1024 ** 2;
 
-  networkInterface.ip = "10.20.2.2"
-  networkInterface.network= "znetwork"
-  network.interfaces = [
-    networkInterface
-  ];
+  networkInterface.ip = "10.20.2.2";
+  networkInterface.network = "znetwork";
+  network.interfaces = [networkInterface];
 
   const myceliumInstance = new MyceliumIP();
   myceliumInstance.hex_seed = "abc123";

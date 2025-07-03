@@ -1,15 +1,17 @@
 <template>
   <v-dialog
-    @click:outside="() => $emit('close')"
-    @keydown.esc="() => $emit('close')"
     v-model="$props.open"
     max-width="800"
     attach="#modals"
+    @click:outside="() => $emit('close')"
+    @keydown.esc="() => $emit('close')"
   >
-    <template v-slot:default>
+    <template #default>
       <v-card>
         <v-toolbar color="primary" class="custom-toolbar">
-          <p class="mb-5">SSH-Key Details</p>
+          <p class="mb-5">
+            SSH-Key Details
+          </p>
         </v-toolbar>
         <v-card-text>
           <template v-for="[_key, value] of Object.entries(selectedKey).sort()" :key="_key">
@@ -17,20 +19,20 @@
               <CopyInputWrapper v-if="_key !== 'publicKey'" :data="value" #="{ props: copyInputProps }">
                 <v-text-field
                   v-bind="{ ...copyInputProps }"
-                  :label="_key"
                   v-model="currentKey[_key as keyof SSHKeyData]"
+                  :label="_key"
                   :readonly="_key === 'fingerPrint'"
                   :rules="[(value: string) => !!value || `${_key} is required.`, _key === 'name' ? validateName(currentKey.name): true]"
                 />
               </CopyInputWrapper>
               <CopyInputWrapper v-else :data="value" #="{ props: copyInputProps }">
                 <v-textarea
-                  :class="value.length ? 'ssh-key' : ''"
                   v-model="currentKey[_key]"
+                  :class="value.length ? 'ssh-key' : ''"
                   label="Public SSH Key"
                   no-resize
                   :spellcheck="false"
-                  :rules="sshRules(currentKey[_key])"
+                  :rules="sshRules()"
                   v-bind="{ ...copyInputProps }"
                 />
               </CopyInputWrapper>
@@ -39,22 +41,28 @@
 
           <v-tooltip text="Key status">
             <template #activator="{ props }">
-              <v-chip v-bind="props" v-if="selectedKey.isActive">Active</v-chip>
-              <v-chip v-bind="props" color="anchor" v-else>Inactive</v-chip>
+              <v-chip v-if="selectedKey.isActive" v-bind="props">
+                Active
+              </v-chip>
+              <v-chip v-else v-bind="props" color="anchor">
+                Inactive
+              </v-chip>
             </template>
           </v-tooltip>
 
           <v-tooltip text="Created at">
             <template #activator="{ props }">
-              <v-chip v-bind="props" class="ma-2">{{ selectedKey.createdAt }}</v-chip>
+              <v-chip v-bind="props" class="ma-2">
+                {{ selectedKey.createdAt }}
+              </v-chip>
             </template>
           </v-tooltip>
           <v-divider />
         </v-card-text>
 
         <v-card-actions class="justify-end mb-1 mr-2">
-          <v-btn color="anchor" text="Close" @click="$emit('close')"></v-btn>
-          <v-btn text="Save" @click="updateKey" :loading="loading"></v-btn>
+          <v-btn color="anchor" text="Close" @click="$emit('close')" />
+          <v-btn text="Save" :loading="loading" @click="updateKey" />
         </v-card-actions>
       </v-card>
     </template>
@@ -69,7 +77,6 @@ import SSHKeysManagement from "@/utils/ssh";
 
 export default defineComponent({
   name: "SSHDataDialog",
-  emits: ["close", "update"],
   props: {
     open: {
       type: Boolean,
@@ -84,6 +91,7 @@ export default defineComponent({
       required: true,
     },
   },
+  emits: ["close", "update"],
   setup(props, ctx) {
     const currentKey = ref<SSHKeyData>(props.selectedKey);
     const loading = ref<boolean>(false);
@@ -105,7 +113,7 @@ export default defineComponent({
       ctx.emit("update", currentKey.value);
     };
 
-    function sshRules(value: any) {
+    function sshRules() {
       return [
         (v: string) => !!v || " The SSH key is required.",
         (v: string) =>

@@ -22,7 +22,7 @@ async function pingNodes(client: GridClient, nodes: NodeInfo[]): Promise<number>
     try {
       await client.zos.pingNode({ nodeId: node.nodeId });
       return node.nodeId;
-    } catch (error) {
+    } catch {
       log("node " + node.nodeId + " is not responding, trying different node.");
     }
   }

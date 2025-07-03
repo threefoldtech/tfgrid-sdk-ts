@@ -1,20 +1,20 @@
 <template>
   <VContainer>
     <VRow class="mx-2" align="center">
-      <span v-if="showPrice" v-text="usdPrice + ' USD'" :class="{ 'order-0': swap, 'order-2': !swap }" />
+      <span v-if="showPrice" :class="{ 'order-0': swap, 'order-2': !swap }" v-text="usdPrice + ' USD'" />
       <VTooltip :text="priceTask.error || ''" :disabled="!priceTask.error">
         <template #activator="{ props }">
           <VBtn
             icon="mdi-swap-horizontal"
             class="mx-1 order-1"
-            @click="priceTask.error ? priceTask.run() : toggleSwap()"
             :loading="priceTask.loading"
             :color="priceTask.error ? 'error' : 'anchor'"
             v-bind="props"
+            @click="priceTask.error ? priceTask.run() : toggleSwap()"
           />
         </template>
       </VTooltip>
-      <span v-if="showPrice" v-text="tftPrice + ' TFT'" :class="{ 'order-2': swap, 'order-0': !swap }" />
+      <span v-if="showPrice" :class="{ 'order-2': swap, 'order-0': !swap }" v-text="tftPrice + ' TFT'" />
 
       <VTooltip text="More information" location="left">
         <template #activator="{ props }">

@@ -7,25 +7,29 @@
 
   <v-dialog
     :model-value="openInfo"
-    @update:model-value="setOpenInfo($event)"
     :width="loading ? 'auto' : '60%'"
     scrollable
     attach="#modals"
+    @update:model-value="setOpenInfo($event)"
   >
     <v-card v-if="loading" class="d-flex justify-center align-center pa-10">
       <v-progress-circular indeterminate />
     </v-card>
     <v-card v-else class="markdown">
-      <v-card-title class="font-weight-bold d-flex align-center text-h5 my-2" v-if="title">
+      <v-card-title v-if="title" class="font-weight-bold d-flex align-center text-h5 my-2">
         {{ title }}
       </v-card-title>
-      <v-card-subtitle :style="{ whiteSpace: 'initial' }" v-if="subtitle">{{ subtitle }}</v-card-subtitle>
+      <v-card-subtitle v-if="subtitle" :style="{ whiteSpace: 'initial' }">
+        {{ subtitle }}
+      </v-card-subtitle>
       <v-divider v-if="title || subtitle" />
       <v-card-text class="pb-8" v-html="html" />
 
       <v-divider class="mb-2" />
       <v-card-actions class="d-flex justify-end">
-        <v-btn color="anchor" class="mr-2 my-1" @click="setOpenInfo(false)">Close</v-btn>
+        <v-btn color="anchor" class="mr-2 my-1" @click="setOpenInfo(false)">
+          Close
+        </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

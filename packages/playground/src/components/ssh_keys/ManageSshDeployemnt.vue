@@ -10,7 +10,9 @@
         <v-alert v-if="selectedKeys.length === 0" type="warning" class="mt-2">
           Attention: It appears that no SSH keys have been selected. In order to access your deployment, you must send
           at least one SSH key. You can manage your SSH keys from the
-          <router-link :to="DashboardRoutes.Deploy.SSHKey">SSH keys management page</router-link>
+          <router-link :to="DashboardRoutes.Deploy.SSHKey">
+            SSH keys management page
+          </router-link>
           and add more as needed.
         </v-alert>
         <v-alert type="info" class="mt-3">
@@ -18,7 +20,7 @@
           wish to select/deselect.
         </v-alert>
       </v-card-text>
-      <v-chip-group class="keys ml-3" v-model="selectedKey" multiple>
+      <v-chip-group v-model="selectedKey" class="keys ml-3" multiple>
         <v-tooltip
           v-for="_key of sshKeysManagement.list()"
           :key="_key.id"

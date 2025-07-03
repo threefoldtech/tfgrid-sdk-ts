@@ -13,7 +13,7 @@
       #="{ props }"
     >
       <input-tooltip tooltip="Node name.">
-        <v-text-field label="Name" v-model="$props.modelValue.name" v-bind="props" />
+        <v-text-field v-model="$props.modelValue.name" label="Name" v-bind="props" />
       </input-tooltip>
     </input-validator>
 
@@ -28,7 +28,7 @@
       #="{ props }"
     >
       <input-tooltip tooltip="The number of virtual cores allocated to your instance.">
-        <v-text-field label="CPU (vCores)" type="number" v-model.number="$props.modelValue.cpu" v-bind="props" />
+        <v-text-field v-model.number="$props.modelValue.cpu" label="CPU (vCores)" type="number" v-bind="props" />
       </input-tooltip>
     </input-validator>
 
@@ -43,7 +43,7 @@
       #="{ props }"
     >
       <input-tooltip tooltip="The amount of RAM (Random Access Memory) allocated to your instance.">
-        <v-text-field label="Memory (MB)" type="number" v-model.number="$props.modelValue.memory" v-bind="props" />
+        <v-text-field v-model.number="$props.modelValue.memory" label="Memory (MB)" type="number" v-bind="props" />
       </input-tooltip>
     </input-validator>
 
@@ -58,7 +58,7 @@
       #="{ props }"
     >
       <input-tooltip tooltip="Disk Size.">
-        <v-text-field label="Size (GB)" type="number" v-model.number="$props.modelValue.diskSize" v-bind="props" />
+        <v-text-field v-model.number="$props.modelValue.diskSize" label="Size (GB)" type="number" v-bind="props" />
       </input-tooltip>
     </input-validator>
 
@@ -71,23 +71,24 @@
     />
 
     <RootFsSize
+      v-model.number="$props.modelValue.rootFsSize"
       :cpu="$props.modelValue.cpu"
       :memory="$props.modelValue.memory"
-      v-model.number="$props.modelValue.rootFsSize"
     />
 
     <!-- <input-tooltip inline tooltip="" :href="manual"> -->
-    <v-switch color="primary" inset label="Rented By Me" v-model="$props.modelValue.rentedByMe" hide-details />
+    <v-switch v-model="$props.modelValue.rentedByMe" color="primary" inset label="Rented By Me" hide-details />
     <!-- </input-tooltip> -->
     <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
-      <v-switch color="primary" inset label="Rentable" v-model="$props.modelValue.dedicated" hide-details />
+      <v-switch v-model="$props.modelValue.dedicated" color="primary" inset label="Rentable" hide-details />
     </input-tooltip>
 
     <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
-      <v-switch color="primary" inset label="Certified" v-model="$props.modelValue.certified" hide-details />
+      <v-switch v-model="$props.modelValue.certified" color="primary" inset label="Certified" hide-details />
     </input-tooltip>
 
     <TfSelectionDetails
+      v-model="$props.modelValue.selectionDetails"
       :selected-machines="selectedMachines"
       :nodes-lock="nodesLock"
       :filters-validators="{
@@ -112,7 +113,6 @@
         mycelium: $props.modelValue.mycelium,
         wireguard: $props.modelValue.wireguard,
       }"
-      v-model="$props.modelValue.selectionDetails"
     />
   </div>
 </template>

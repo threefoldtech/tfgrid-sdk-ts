@@ -7,9 +7,9 @@
 
       <v-expansion-panel-text>
         <form-validator
+          ref="formRef"
           v-model="isValidForm"
           valid-on-init
-          ref="formRef"
           @update:model-value="$emit('update:valid', $event)"
         >
           <v-container fluid>
@@ -17,31 +17,31 @@
               <v-col v-for="key in Object.keys($props.modelValue)" :key="key" v-bind="fitlerColProps">
                 <input-validator
                   v-if="$props.modelValue[key].label"
-                  :rules="$props.modelValue[key].value ? $props.modelValue[key].rules?.[0] ?? [] : []"
+                  ref="inputRef"
+                  :rules="$props.modelValue[key].value ? ($props.modelValue[key].rules?.[0] ?? []) : []"
                   :async-rules="$props.modelValue[key].rules?.[1] ?? []"
                   :value="$props.modelValue[key].value"
                   #="{ props }"
-                  ref="inputRef"
                 >
                   <v-text-field
                     v-bind="props"
-                    variant="outlined"
                     v-model="$props.modelValue[key].value"
+                    variant="outlined"
                     :label="$props.modelValue[key].label"
                     :type="$props.modelValue[key].type"
                     :disabled="loading"
                   >
                     <template #append-inner>
                       <v-tooltip :text="$props.modelValue[key].tooltip">
-                        <template #activator="{ props }">
-                          <VIcon icon="mdi-information-outline" v-bind="props" />
+                        <template #activator="{ props: tooltipProps }">
+                          <VIcon icon="mdi-information-outline" v-bind="tooltipProps" />
                         </template>
                       </v-tooltip>
                     </template>
                   </v-text-field>
                 </input-validator>
               </v-col>
-              <slot name="options" :props="fitlerColProps"> </slot>
+              <slot name="options" :props="fitlerColProps" />
             </v-row>
           </v-container>
           <v-alert v-if="Object.keys(route.query).length > 0" class="mb-4 mx-8" type="info" variant="tonal">
@@ -54,9 +54,9 @@
           <v-row justify="end">
             <v-btn
               :disabled="!isValidForm || loading || !(formHasValues || Object.keys(route.query).length > 0)"
-              @click="resetFilters"
               color="anchor"
               text="Clear"
+              @click="resetFilters"
             />
             <v-btn
               :disabled="
@@ -64,10 +64,10 @@
               "
               class="ml-4 mr-7"
               :loading="loading"
-              @click="applyFilters"
               variant="outlined"
               color="secondary"
               text="Apply"
+              @click="applyFilters"
             />
           </v-row>
         </v-container>
@@ -223,6 +223,7 @@ const fitlerColProps = { class: "py-2 px-4", cols: 12, md: 6, lg: 3 };
 
 <script lang="ts">
 export default defineComponent({
+  // eslint-disable-next-line vue/multi-word-component-names
   name: "Filters",
 });
 </script>

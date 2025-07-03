@@ -14,10 +14,10 @@ import {
 } from "class-validator";
 
 import { ValidateMembers } from "../helpers";
+import { WorkloadTypes } from ".";
 import { ComputeCapacity } from "./computecapacity";
 import { WorkloadData, WorkloadDataResult } from "./workload_base";
 import { Mount, MyceliumIP } from "./zmachine";
-import { WorkloadTypes } from ".";
 
 class MachineInterface {
   @Expose() @IsString() @IsNotEmpty() network: string;

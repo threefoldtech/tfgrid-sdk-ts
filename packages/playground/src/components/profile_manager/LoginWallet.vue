@@ -1,14 +1,14 @@
 <template>
   <form id="wallet-login-tab__form" @submit.prevent="login()">
     <FormValidator id="wallet-login-tab__form-validator" v-model="isValidForm">
-      <div class="pa-4" id="wallet-login-tab">
+      <div id="wallet-login-tab" class="pa-4">
         <v-alert id="wallet-login-tab__info-alert" type="info" variant="tonal" class="mb-6">
           <p id="wallet-login-tab__info-text" :style="{ maxWidth: '880px' }">
             You will need to provide the password used while connecting your wallet.
           </p>
         </v-alert>
-        <WalletPassword id="wallet-login-tab__password-input" mode="Login" v-model="password" :disabled="loading" />
-        <v-alert id="wallet-login-tab__error-alert" type="error" variant="tonal" class="mt-2 mb-4" v-if="loginError">
+        <WalletPassword id="wallet-login-tab__password-input" v-model="password" mode="Login" :disabled="loading" />
+        <v-alert v-if="loginError" id="wallet-login-tab__error-alert" type="error" variant="tonal" class="mt-2 mb-4">
           {{ loginError }}
         </v-alert>
         <div id="wallet-login-tab__button-group" class="d-flex justify-center mt-2">

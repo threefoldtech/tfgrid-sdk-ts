@@ -2,8 +2,8 @@ import { Expose, Type } from "class-transformer";
 import { IsNotEmpty, IsOptional, IsString, ValidateNested } from "class-validator";
 
 import { ValidateMembers } from "../helpers";
-import { WorkloadData } from "./workload_base";
 import { WorkloadTypes } from "./workload";
+import { WorkloadData } from "./workload_base";
 
 class Mycelium {
   @Expose() @IsString() @IsNotEmpty() hex_key: string;

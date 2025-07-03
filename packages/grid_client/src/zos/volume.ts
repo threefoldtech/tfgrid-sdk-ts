@@ -2,8 +2,8 @@ import { Expose } from "class-transformer";
 import { IsInt, Max, Min } from "class-validator";
 
 import { ValidateMembers } from "../helpers";
-import { WorkloadData, WorkloadDataResult } from "./workload_base";
 import { WorkloadTypes } from "./workload";
+import { WorkloadData, WorkloadDataResult } from "./workload_base";
 
 @ValidateMembers()
 class Volume extends WorkloadData {

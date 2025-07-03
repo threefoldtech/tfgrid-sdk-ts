@@ -1,12 +1,16 @@
 <template>
   <div class="border px-4 pb-4 rounded position-relative mt-2">
     <v-card color="primary" class="d-flex justify-center items-center mt-3 pa-3 text-center">
-      <v-icon size="30" class="pr-3">mdi-silo</v-icon>
-      <v-card-title class="pa-0">Farms</v-card-title>
+      <v-icon size="30" class="pr-3">
+        mdi-silo
+      </v-icon>
+      <v-card-title class="pa-0">
+        Farms
+      </v-card-title>
     </v-card>
 
     <CreateFarm @farm-created="handleFarmCreated" />
-    <UserFarms :ref="el => (userFarms = el)" :reloadFarms="farmsReload" />
+    <UserFarms :ref="el => (userFarms = el)" :reload-farms="farmsReload" />
     <UserNodes />
   </div>
 </template>

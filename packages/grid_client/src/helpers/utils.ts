@@ -84,6 +84,7 @@ function zeroPadding(length: number, num: number) {
 function convertObjectToQueryString(obj: Record<string, any>): string {
   // Filter out undefined or empty string values
   const filteredParams = Object.fromEntries(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     Object.entries(obj).filter(([_, value]) => value !== undefined && value !== ""),
   );
 

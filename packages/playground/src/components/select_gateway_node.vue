@@ -19,12 +19,12 @@
           error: items.length == 0 ? false : props.error,
           errorMessages: items.length == 0 ? undefined : props.errorMessages,
         }"
-        @update:model-value="$emit('update:model-value', $event)"
         :loading="items.length === 0 && loading"
         :disabled="items.length === 0 && loading"
         :model-value="$props.modelValue"
+        @update:model-value="$emit('update:model-value', $event)"
       >
-        <template v-slot:append-item v-if="page !== -1">
+        <template v-if="page !== -1" #append-item>
           <div class="px-4 mt-4">
             <v-btn
               block
@@ -32,8 +32,8 @@
               variant="tonal"
               rounded="large"
               size="large"
-              @click="loadNextPage"
               :loading="loading"
+              @click="loadNextPage"
             >
               {{ loadMoreText }}
             </v-btn>

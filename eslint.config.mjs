@@ -9,13 +9,29 @@ import { defineConfigWithVueTs, vueTsConfigs } from "@vue/eslint-config-typescri
 // This returns an ARRAY of config objects optimized for Vue+TS
 const vueTsGeneratedConfigs = defineConfigWithVueTs(pluginVue.configs["flat/recommended"], vueTsConfigs.recommended, {
   rules: {
-    "@typescript-eslint/no-explicit-any": "warn",
-    "vue/multi-word-component-names": "warn",
+    // --- OFF rules ---
+    // TODO: enable this rule after https://github.com/threefoldtech/tfgrid-sdk-ts/issues/4075
+    "@typescript-eslint/no-explicit-any": "off",
     "vue/no-v-text-v-html-on-component": "off",
-    "@typescript-eslint/no-unused-expressions": "warn",
-    "@typescript-eslint/no-unused-vars": `warn`,
+    "vue/max-attributes-per-line": "off",
+    "vue/no-v-html": "off",
+    "vue/singleline-html-element-content-newline": "off",
+    "vue/html-self-closing": "off",
+    "vue/html-indent": "off",
+    "vue/require-explicit-emits": "off",
+    "vue/require-default-prop": "off",
+    "@typescript-eslint/no-unused-expressions": "off",
+    
+    // --- WARN rules ---
     "@typescript-eslint/no-duplicate-enum-values": "warn",
-    "vue/no-dupe-keys": "warn",
+    
+    // --- ERROR rules ---
+    "vue/multi-word-component-names": "error",
+    "@typescript-eslint/no-unused-vars": "error",
+    "vue/no-template-shadow": "error",
+    "vue/multiline-html-element-content-newline": "error",
+    "vue/component-definition-name-casing": "error",
+    "vue/no-dupe-keys": "error",
   },
 });
 
@@ -62,23 +78,24 @@ export default [
     },
     rules: {
       ...tseslint.configs.eslintRecommended.rules,
-      "@typescript-eslint/no-unused-vars": "warn",
 
+      // --- OFF rules ---
       "no-console": "off",
-      "prettier/prettier": "warn",
-      "simple-import-sort/imports": "warn",
-
       "@typescript-eslint/no-var-requires": "off",
+      // TODO: enable this rule after https://github.com/threefoldtech/tfgrid-sdk-ts/issues/4075
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-empty-function": "off",
       "@typescript-eslint/ban-ts-comment": "off",
       "@typescript-eslint/no-non-null-assertion": "off",
+      "@typescript-eslint/no-empty-object-type": "off",
+
+      // --- WARN rules ---
+      "prettier/prettier": "warn",
       "prefer-spread": "warn",
       "@typescript-eslint/no-restricted-types": [
         "warn",
         {
           types: {
-            "{}": "Use `unknown` instead.",
             "Function": "Use specific function types instead.",
             "Object": "Use `Record<string, unknown>` or specific object types instead.",
             "String": "Use `string` instead.",
@@ -87,9 +104,12 @@ export default [
           },
         },
       ],
-      "@typescript-eslint/no-empty-object-type": "warn",
       "@typescript-eslint/no-unsafe-function-type": "warn",
       "@typescript-eslint/no-wrapper-object-types": "warn",
+
+      // --- ERROR rules ---
+      "@typescript-eslint/no-unused-vars": "error",
+      "simple-import-sort/imports": "error",
     },
   },
   ...vueConfig,

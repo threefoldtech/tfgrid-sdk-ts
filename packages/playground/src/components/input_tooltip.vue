@@ -1,10 +1,10 @@
 <template>
-  <div class="d-flex" v-if="!disabled" v-bind="$attrs">
+  <div v-if="!disabled" class="d-flex" v-bind="$attrs">
     <v-tooltip :text="tooltip || 'None!'" :location="location" :width="width ? width : ''">
       <template #activator="{ props }">
         {{ getPropsRef(props) }}
         <div class="d-flex" :class="{ 'w-100': !inline, 'align-center': alignCenter, 'justify-center': justifyCenter }">
-          <slot></slot>
+          <slot />
           <span
             :style="{
               cursor: 'help',

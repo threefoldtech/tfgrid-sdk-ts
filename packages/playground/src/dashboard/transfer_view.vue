@@ -1,13 +1,21 @@
 <template>
   <div class="border px-4 pb-4 rounded position-relative">
     <v-card color="primary" class="d-flex justify-center items-center mt-3 pa-3 text-center">
-      <v-icon size="30" class="pr-3">mdi-account-arrow-right-outline</v-icon>
-      <v-card-title class="pa-0">Transfer TFTs on the TFChain</v-card-title>
+      <v-icon size="30" class="pr-3">
+        mdi-account-arrow-right-outline
+      </v-icon>
+      <v-card-title class="pa-0">
+        Transfer TFTs on the TFChain
+      </v-card-title>
     </v-card>
     <v-card>
       <v-tabs v-model="activeTab" align-tabs="center">
-        <v-tab :value="0" color="secondary">By Twin ID</v-tab>
-        <v-tab :value="1" color="secondary">By Address</v-tab>
+        <v-tab :value="0" color="secondary">
+          By Twin ID
+        </v-tab>
+        <v-tab :value="1" color="secondary">
+          By Address
+        </v-tab>
       </v-tabs>
       <v-window v-model="activeTab">
         <!-- TwinID Transfer -->
@@ -27,13 +35,13 @@
                 #="{ props }"
               >
                 <input-tooltip tooltip="Twin ID of Recipient Account">
-                  <v-text-field label="Recipient Twin ID:" v-bind="props" v-model="recipientTwinId"></v-text-field>
+                  <v-text-field v-bind="props" v-model="recipientTwinId" label="Recipient Twin ID:" />
                 </input-tooltip>
               </input-validator>
 
               <input-validator
-                :value="transferAmount"
                 ref="amountRef"
+                :value="transferAmount"
                 :rules="[
                   validators.required('Transfer amount is required '),
                   validators.isNumeric('Amount should be a number.'),
@@ -46,19 +54,22 @@
                 #="{ props }"
               >
                 <input-tooltip tooltip="Up to 0.01 transaction fee will be deducted">
-                  <v-text-field label="Transfer Amount:" v-bind="props" v-model.number="transferAmount"></v-text-field>
+                  <v-text-field v-bind="props" v-model.number="transferAmount" label="Transfer Amount:" />
                 </input-tooltip>
               </input-validator>
             </form-validator>
             <v-card-actions class="justify-end mb-1 mr-2">
-              <v-btn @click="clearInput" color="anchor" :disabled="loadingTwinIDTransfer">Clear</v-btn>
+              <v-btn color="anchor" :disabled="loadingTwinIDTransfer" @click="clearInput">
+                Clear
+              </v-btn>
               <v-btn
                 color="secondary"
                 :loading="loadingTwinIDTransfer"
                 :disabled="!isValidTwinIDTransfer"
                 @click="submitFormTwinID"
-                >Send</v-btn
               >
+                Send
+              </v-btn>
             </v-card-actions>
           </v-card>
         </v-window-item>
@@ -78,12 +89,12 @@
                 #="{ props }"
               >
                 <input-tooltip tooltip="Address of Recipient Account">
-                  <v-text-field label="Recipient Address:" v-model="recipientAddress" v-bind="props"> </v-text-field>
+                  <v-text-field v-model="recipientAddress" label="Recipient Address:" v-bind="props" />
                 </input-tooltip>
               </input-validator>
               <input-validator
-                :value="transferAmount"
                 ref="amountRef"
+                :value="transferAmount"
                 :rules="[
                   validators.required('Transfer amount is required '),
                   validators.isNumeric('Amount should be a number.'),
@@ -96,21 +107,24 @@
                 #="{ props }"
               >
                 <input-tooltip tooltip="Up to 0.01 transaction fee will be deducted">
-                  <v-text-field label="Transfer Amount:" v-bind="props" v-model.number="transferAmount"></v-text-field>
+                  <v-text-field v-bind="props" v-model.number="transferAmount" label="Transfer Amount:" />
                 </input-tooltip>
               </input-validator>
             </form-validator>
             <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn @click="clearInput" color="anchor" :disabled="loadingAddressTransfer">Clear</v-btn>
+              <v-spacer />
+              <v-btn color="anchor" :disabled="loadingAddressTransfer" @click="clearInput">
+                Clear
+              </v-btn>
 
               <v-btn
                 color="secondary"
                 :loading="loadingAddressTransfer"
                 :disabled="!isValidAddressTransfer"
                 @click="submitFormAddress"
-                >Send</v-btn
               >
+                Send
+              </v-btn>
             </v-card-actions>
           </v-card>
         </v-window-item>
@@ -182,7 +196,7 @@ async function isValidAddress() {
   const keyring = new Keyring({ type: "sr25519" });
   try {
     keyring.addFromAddress(recipientAddress.value.trim());
-  } catch (error) {
+  } catch {
     return { message: "Invalid address." };
   }
   try {
@@ -197,7 +211,7 @@ async function isValidAddress() {
         return { message: "Twin ID doesn't exist" };
       }
     }
-  } catch (err) {
+  } catch {
     return { message: "Invalid address. Twin ID doesn't exist" };
   }
 }
@@ -219,7 +233,7 @@ async function transfer(recipientTwin: Twin) {
       createCustomToast("Transaction Complete!", ToastType.success);
       profileManagerController.reloadBalance();
     }
-  } catch (err) {
+  } catch {
     createInvalidTransferToast("transfer failed!");
   }
 }

@@ -62,7 +62,10 @@ class QueryClient {
   council: QueryCouncil = new QueryCouncil(this);
   __disconnectHandler = this.newProvider.bind(this);
 
-  constructor(public url: string, public keepReconnecting: boolean = false) {}
+  constructor(
+    public url: string,
+    public keepReconnecting: boolean = false,
+  ) {}
 
   async loadKeyPairOrSigner(): Promise<void> {} // to be overridden in the full client
   checkInputs(): void {
@@ -320,7 +323,7 @@ class Client extends QueryClient {
       try {
         this.keypair = keyring.addFromUri(this.mnemonicOrSecret);
         this.address = this.keypair.address;
-      } catch (error) {
+      } catch {
         throw new ValidationError("Invalid mnemonic or secret seed! Please check your input.");
       }
     }
@@ -350,7 +353,7 @@ class Client extends QueryClient {
             console.log(`phase: ${phase}, section: ${section}, method: ${method}, data: ${data}`);
             if (section === SYSTEM && method === ExtrinsicState.ExtrinsicFailed) {
               try {
-                const [dispatchError, _] = data;
+                const [dispatchError, _] = data; // eslint-disable-line @typescript-eslint/no-unused-vars
                 reject(dispatchError);
               } catch (e) {
                 reject(e);
@@ -409,7 +412,6 @@ class Client extends QueryClient {
   }
 
   patchExtrinsic<R>(extrinsic: Extrinsic, options: PatchExtrinsicOptions<R> = {}): ExtrinsicResult<R> {
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this;
     (<any>extrinsic).apply = async () => {
       const res = await self.applyExtrinsic(extrinsic, options.resultSections, options.resultEvents, options.map);

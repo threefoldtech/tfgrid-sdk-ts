@@ -1,11 +1,13 @@
 <template>
   <section>
     <div class="d-flex my-6">
-      <v-card-subtitle class="text-subtitle-1 mt-3" v-if="title">{{ title }}</v-card-subtitle>
+      <v-card-subtitle v-if="title" class="text-subtitle-1 mt-3">
+        {{ title }}
+      </v-card-subtitle>
       <v-spacer />
       <v-tooltip text="Add">
-        <template #activator="{ props }">
-          <v-btn icon="mdi-plus" color="secondary" @click="$emit('add')" v-bind="props" :disabled="disabled" />
+        <template #activator="{ props: addBtnProps }">
+          <v-btn icon="mdi-plus" color="secondary" v-bind="addBtnProps" :disabled="disabled" @click="$emit('add')" />
         </template>
       </v-tooltip>
     </div>
@@ -13,24 +15,24 @@
     <div v-for="(item, index) in modelValue" :key="item">
       <div class="d-flex">
         <div class="flex-grow-1 mr-4">
-          <slot :item="item" :index="index" :isRequired="required.includes(index)" />
+          <slot :item="item" :index="index" :is-required="required.includes(index)" />
         </div>
         <div class="d-flex">
           <v-spacer />
           <v-tooltip text="Remove">
-            <template #activator="{ props }">
+            <template #activator="{ props: removeBtnProps }">
               <v-btn
+                v-if="!required.includes(index)"
                 color="error"
                 icon="mdi-delete-outline"
+                v-bind="removeBtnProps"
                 @click="remove(index)"
-                v-if="!required.includes(index)"
-                v-bind="props"
               />
             </template>
           </v-tooltip>
         </div>
       </div>
-      <v-divider class="mb-4" v-if="index + 1 < modelValue.length" />
+      <v-divider v-if="index + 1 < modelValue.length" class="mb-4" />
     </div>
   </section>
 </template>

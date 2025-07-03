@@ -2,8 +2,8 @@ import { Expose, Type } from "class-transformer";
 import { ArrayNotEmpty, IsDefined, IsInt, IsNotEmpty, IsOptional, IsString, ValidateNested } from "class-validator";
 
 import { ValidateMembers } from "../helpers";
-import { WorkloadData } from "./workload_base";
 import { WorkloadTypes } from "./workload";
+import { WorkloadData } from "./workload_base";
 
 class Peer {
   @Expose() @IsString() @IsNotEmpty() subnet: string;

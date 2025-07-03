@@ -6,12 +6,12 @@
     :disk="storage + (type === 'indexer' ? 50 : 0)"
     :ipv4="ipv4"
     :dedicated="dedicated"
-    :rentedBy="rentedBy"
-    :SelectedNode="selectionDetails?.node"
+    :rented-by="rentedBy"
+    :selected-node="selectionDetails?.node"
     :valid-filters="selectionDetails?.validFilters"
     title-image="images/icons/algorand.png"
   >
-    <template #title>Deploy an Algorand Instance</template>
+    <template #title> Deploy an Algorand Instance </template>
     <d-tabs :tabs="[{ title: 'Config', value: 'config' }]">
       <input-validator
         :value="name"
@@ -25,7 +25,7 @@
         #="{ props }"
       >
         <input-tooltip tooltip="Instance name.">
-          <v-text-field label="Name" v-model="name" v-bind="props" />
+          <v-text-field v-model="name" label="Name" v-bind="props" />
         </input-tooltip>
       </input-validator>
       <Networks
@@ -36,14 +36,15 @@
         v-model:wireguard="wireguard"
       />
       <AlgorandCapacity
-        :network="network"
-        :type="type"
         v-model:cpu.number="cpu"
         v-model:memory.number="memory"
         v-model:storage.number="storage"
+        :network="network"
+        :type="type"
       >
         <input-tooltip tooltip="Select a network to work against.">
           <v-select
+            v-model="network"
             label="Network"
             :items="[
               { title: 'Mainnet', value: 'mainnet' },
@@ -51,35 +52,35 @@
               { title: 'Betanet', value: 'betanet' },
               { title: 'Devnet', value: 'devnet' },
             ]"
-            v-model="network"
           />
         </input-tooltip>
 
         <input-tooltip tooltip="Select node type.">
           <v-select
+            v-model="type"
             label="Node Type"
             :items="[
               { title: 'Default', value: 'default' },
               { title: 'Relay', value: 'relay' },
               { title: 'Indexer', value: 'indexer' },
             ]"
-            v-model="type"
           />
         </input-tooltip>
       </AlgorandCapacity>
 
       <!-- <input-tooltip inline tooltip="" :href="manual"> -->
-      <v-switch color="primary" inset label="Rented By Me" v-model="rentedByMe" hide-details />
+      <v-switch v-model="rentedByMe" color="primary" inset label="Rented By Me" hide-details />
       <!-- </input-tooltip> -->
       <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
-        <v-switch color="primary" inset label="Rentable" v-model="dedicated" hide-details />
+        <v-switch v-model="dedicated" color="primary" inset label="Rentable" hide-details />
       </input-tooltip>
 
       <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
-        <v-switch color="primary" inset label="Certified" v-model="certified" hide-details />
+        <v-switch v-model="certified" color="primary" inset label="Certified" hide-details />
       </input-tooltip>
 
       <TfSelectionDetails
+        v-model="selectionDetails"
         :filters-validators="{
           cpu: { min: type === 'relay' || type === 'indexer' ? 4 : 2 },
           memory: { min: type === 'relay' || type === 'indexer' ? 8192 : 4096 },
@@ -87,8 +88,8 @@
             type === 'relay'
               ? { min: 950, max: 1150 }
               : type === 'indexer'
-              ? { min: 1500, max: 1700 }
-              : { min: 100, max: 300 },
+                ? { min: 1500, max: 1700 }
+                : { min: 100, max: 300 },
         }"
         :filters="{
           ipv4,
@@ -105,7 +106,6 @@
           mycelium,
           wireguard,
         }"
-        v-model="selectionDetails"
       />
 
       <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
@@ -114,8 +114,8 @@
       <v-btn
         variant="elevated"
         class="text-primery px-10 py-3 h-auto text-subtitle-1"
-        @click="validateBeforeDeploy(deploy)"
         text="Deploy"
+        @click="validateBeforeDeploy(deploy)"
       />
     </template>
   </weblet-layout>

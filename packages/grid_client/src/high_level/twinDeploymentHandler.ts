@@ -333,11 +333,14 @@ class TwinDeploymentHandler {
   }
 
   async checkNodesCapacity(twinDeployments: TwinDeployment[]) {
-    const deployments = twinDeployments.reduce((res, twinDeployment) => {
-      res[twinDeployment.nodeId] = res[twinDeployment.nodeId] || [];
-      res[twinDeployment.nodeId].push(twinDeployment);
-      return res;
-    }, {} as { [nodeId: number]: TwinDeployment[] });
+    const deployments = twinDeployments.reduce(
+      (res, twinDeployment) => {
+        res[twinDeployment.nodeId] = res[twinDeployment.nodeId] || [];
+        res[twinDeployment.nodeId].push(twinDeployment);
+        return res;
+      },
+      {} as { [nodeId: number]: TwinDeployment[] },
+    );
     await Promise.all(Object.keys(deployments).map(nodeId => this._checkNodeCapacity(+nodeId, deployments[nodeId])));
   }
 

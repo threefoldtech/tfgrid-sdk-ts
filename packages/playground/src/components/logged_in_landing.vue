@@ -4,7 +4,9 @@
       <v-col lg="6" sm="12" class="border mt-3">
         <div>
           <div class="d-flex justify-center my-3">
-            <h4 class="tf-header">Live and Operational</h4>
+            <h4 class="tf-header">
+              Live and Operational
+            </h4>
           </div>
           <div
             :style="{
@@ -18,7 +20,7 @@
           />
           <div class="d-flex flex-column justify-center">
             <v-row>
-              <v-col lg="3" xs="12" v-for="s in stats" :key="s.value" class="stats px-2">
+              <v-col v-for="s in stats" :key="s.value" lg="3" xs="12" class="stats px-2">
                 <v-card class="mt-4">
                   <v-img
                     cover
@@ -42,20 +44,21 @@
       </v-col>
       <v-col lg="6" md="12" class="d-flex flex-wrap">
         <v-row>
-          <v-col :lg="6" :md="6" :sm="12" v-for="card in cards" :key="card.path">
+          <v-col v-for="card in cards" :key="card.path" :lg="6" :md="6" :sm="12">
             <v-hover>
-              <template v-slot:default="{ isHovering, props }">
+              <template #default="{ isHovering, props }">
                 <v-card
                   class="p-1 border d-flex flex-wrap align-center h-100"
                   v-bind="props"
                   :class="isHovering ? 'card-opacity' : undefined"
-                  @click="$router.push(card.path)"
                   height="100%"
+                  @click="$router.push(card.path)"
                 >
-                  <v-card-title class="d-flex text-subtitle-1 align-baseline"
-                    ><v-icon size="small" class="mr-2">{{ card.icon }}</v-icon
-                    >{{ card.title }}</v-card-title
-                  >
+                  <v-card-title class="d-flex text-subtitle-1 align-baseline">
+                    <v-icon size="small" class="mr-2">
+                      {{ card.icon }}
+                    </v-icon>{{ card.title }}
+                  </v-card-title>
                   <v-card-text>{{ card.text }}</v-card-text>
                 </v-card>
               </template>
@@ -75,7 +78,9 @@
               </p>
 
               <div class="d-flex justify-center align-center flex-wrap my-4">
-                <v-btn variant="elevated" class="mr-2" target="_blank" :href="MANUAL_URL"> Learn about the grid </v-btn>
+                <v-btn variant="elevated" class="mr-2" target="_blank" :href="MANUAL_URL">
+                  Learn about the grid
+                </v-btn>
               </div>
             </div>
           </v-card>

@@ -6,14 +6,14 @@
     :disk="disks.reduce((total, disk) => total + disk.size, rootFilesystemSize)"
     :ipv4="ipv4"
     :dedicated="dedicated"
-    :rentedBy="rentedBy"
-    :SelectedNode="selectionDetails?.node"
+    :rented-by="rentedBy"
+    :selected-node="selectionDetails?.node"
     :valid-filters="selectionDetails?.validFilters"
     title-image="images/icons/nostr.png"
   >
-    <template #title>Deploy a Nostr Instance </template>
+    <template #title> Deploy a Nostr Instance </template>
 
-    <d-tabs :tabs="[{ title: 'Config', value: 'config' }]" ref="tabs">
+    <d-tabs ref="tabs" :tabs="[{ title: 'Config', value: 'config' }]">
       <template #config>
         <input-validator
           :value="name"
@@ -27,39 +27,40 @@
           #="{ props }"
         >
           <input-tooltip tooltip="Instance name.">
-            <v-text-field label="Name" v-model="name" v-bind="props" />
+            <v-text-field v-model="name" label="Name" v-bind="props" />
           </input-tooltip>
         </input-validator>
 
         <SelectSolutionFlavor
+          v-model="solution"
           :small="{ cpu: 1, memory: 2, disk: 25 }"
           :medium="{ cpu: 2, memory: 4, disk: 50 }"
           :large="{ cpu: 4, memory: 16, disk: 100 }"
-          v-model="solution"
         />
 
         <Networks
-          required
           v-model:ipv4="ipv4"
           v-model:ipv6="ipv6"
           v-model:planetary="planetary"
           v-model:mycelium="mycelium"
           v-model:wireguard="wireguard"
+          required
           :has-custom-domain="selectionDetails?.domain?.enabledCustomDomain"
           require-domain
         />
         <!-- <input-tooltip inline tooltip="" :href="manual"> -->
-        <v-switch color="primary" inset label="Rented By Me" v-model="rentedByMe" hide-details />
+        <v-switch v-model="rentedByMe" color="primary" inset label="Rented By Me" hide-details />
         <!-- </input-tooltip> -->
         <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
-          <v-switch color="primary" inset label="Rentable" v-model="dedicated" hide-details />
+          <v-switch v-model="dedicated" color="primary" inset label="Rentable" hide-details />
         </input-tooltip>
 
         <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
-          <v-switch color="primary" inset label="Certified" v-model="certified" hide-details />
+          <v-switch v-model="certified" color="primary" inset label="Certified" hide-details />
         </input-tooltip>
 
         <TfSelectionDetails
+          v-model="selectionDetails"
           :filters="{
             ipv4,
             ipv6,
@@ -75,7 +76,6 @@
             mycelium,
             wireguard,
           }"
-          v-model="selectionDetails"
           require-domain
         />
 
@@ -84,7 +84,12 @@
     </d-tabs>
 
     <template #footer-actions="{ validateBeforeDeploy }">
-      <v-btn color="secondary" variant="outlined" @click="validateBeforeDeploy(deploy)" text="Deploy" />
+      <v-btn
+        text="Deploy"
+        variant="elevated"
+        class="text-primery px-10 py-3 h-auto text-subtitle-1"
+        @click="validateBeforeDeploy(deploy)"
+      />
     </template>
   </weblet-layout>
 </template>
@@ -227,6 +232,7 @@ import { normalizeError } from "../utils/helpers";
 const solution = ref() as Ref<SolutionFlavor>;
 
 export default {
+  // eslint-disable-next-line vue/multi-word-component-names
   name: "Nostr",
   components: {
     ManageSshDeployemnt,

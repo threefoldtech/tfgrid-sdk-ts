@@ -2,6 +2,7 @@
   <PasswordInputWrapper id="wallet-password__input-wrapper" #="{ props: passwordInputProps }">
     <InputValidator
       id="wallet-password__input-validator"
+      ref="passwordInput"
       :value="modelValue"
       :rules="[
         validators.required('Password is required.'),
@@ -9,7 +10,6 @@
         validatePassword,
       ]"
       #="{ props: validationProps }"
-      ref="passwordInput"
     >
       <v-tooltip
         id="wallet-password__tooltip"
@@ -21,11 +21,11 @@
             <VTextField
               id="wallet-password__text-field"
               label="Password"
-              :modelValue="modelValue"
-              @update:modelValue="$emit('update:modelValue', $event)"
+              :model-value="modelValue"
               v-bind="{ ...passwordInputProps, ...validationProps }"
               autocomplete="off"
               :disabled="props.disabled"
+              @update:model-value="$emit('update:modelValue', $event)"
             />
           </div>
         </template>
@@ -38,7 +38,6 @@
 import md5 from "md5";
 import { ref } from "vue";
 
-import { ValidatorStatus } from "@/hooks/form_validator";
 import { getCredentials } from "@/utils/credentials";
 
 const props = defineProps({
@@ -49,7 +48,6 @@ const props = defineProps({
   mode: {
     required: true,
     type: String as () => "Login" | "Create",
-    default: "Create",
   },
   disabled: {
     required: false,

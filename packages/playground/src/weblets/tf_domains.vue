@@ -1,8 +1,10 @@
 <template>
   <weblet-layout ref="layout">
-    <template #title
-      ><span><v-icon class="pr-3">mdi-web-box</v-icon></span
-      >Deploy Domains Instance
+    <template #title>
+      <span>
+        <v-icon class="pr-3">mdi-web-box</v-icon>
+      </span>
+      Deploy Domains Instance
     </template>
 
     <d-tabs :tabs="[{ title: 'Config', value: 'config' }]">
@@ -21,12 +23,12 @@
             :async-rules="[validateSubdomain]"
             #="{ props }"
           >
-            <v-text-field label="Subdomain" v-model.trim="subdomain" v-bind="props" />
+            <v-text-field v-model.trim="subdomain" label="Subdomain" v-bind="props" />
           </input-validator>
         </input-tooltip>
 
         <div :style="{ marginTop: '-10px' }">
-          <TfSelectionDetails disable-node-selection require-domain use-fqdn v-model="selectionDetails" />
+          <TfSelectionDetails v-model="selectionDetails" disable-node-selection require-domain use-fqdn />
         </div>
 
         <input-tooltip
@@ -41,7 +43,7 @@
             ]"
             #="{ props }"
           >
-            <v-text-field label="IP" v-model="ip" v-bind="props" />
+            <v-text-field v-model="ip" label="IP" v-bind="props" />
           </input-validator>
         </input-tooltip>
 
@@ -51,7 +53,7 @@
             :rules="[validators.required('Port is required.'), validators.isPort('Please provide a valid port.')]"
             #="{ props }"
           >
-            <v-text-field label="Port" v-model.number="port" type="number" v-bind="props" />
+            <v-text-field v-model.number="port" label="Port" type="number" v-bind="props" />
           </input-validator>
         </input-tooltip>
 
@@ -59,7 +61,7 @@
           tooltip="When enabled, the backend service will terminate the TLS traffic, otherwise the gateway service will do the TLS traffic termination."
           inline
         >
-          <v-switch label="TLS Passthrough" hide-details inset variant="tonal" color="primary" v-model="passThrough" />
+          <v-switch v-model="passThrough" label="TLS Passthrough" hide-details inset variant="tonal" color="primary" />
         </input-tooltip>
       </template>
     </d-tabs>
@@ -68,8 +70,8 @@
       <v-btn
         variant="elevated"
         class="text-primery px-10 py-3 h-auto text-subtitle-1"
-        @click="validateBeforeDeploy(deploy)"
         text="Deploy"
+        @click="validateBeforeDeploy(deploy)"
       />
     </template>
   </weblet-layout>

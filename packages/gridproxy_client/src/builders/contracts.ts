@@ -91,7 +91,10 @@ const CONTRACTS_VALIDATOR: BuilderValidator<ContractsQuery> = {
 };
 
 export class ContractsBuilder extends AbstractBuilder<ContractsQuery> {
-  constructor(public readonly uri: string, queries: Partial<ContractsQuery> = {}) {
+  constructor(
+    public readonly uri: string,
+    queries: Partial<ContractsQuery> = {},
+  ) {
     super({
       mapper: CONTRACTS_MAPPER,
       validator: CONTRACTS_VALIDATOR,
@@ -99,5 +102,5 @@ export class ContractsBuilder extends AbstractBuilder<ContractsQuery> {
     });
   }
 }
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
+
 export interface ContractsBuilder extends BuilderMethods<ContractsQuery, ContractsBuilder> {}

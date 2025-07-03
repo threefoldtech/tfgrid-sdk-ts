@@ -9,9 +9,9 @@
 
     <v-card-text>
       <v-data-table
+        v-model="selectedKeys"
         show-select
         :no-data-text="capitalize(`No keys found.`)"
-        v-model="selectedKeys"
         :sort-by="sortBy"
         :loading="loading"
         :headers="headers"
@@ -27,7 +27,7 @@
         @click:row="(_: any, { item }: any) => $emit('view', item)"
       >
         <template #loading>
-          <div class="text-center" v-if="loading && loadingMessage">
+          <div v-if="loading && loadingMessage" class="text-center">
             <small>{{ loadingMessage }}</small>
           </div>
         </template>
@@ -77,21 +77,15 @@
             "
           >
             <template #activator="{ props }">
-              <v-progress-circular
-                v-if="item.activating"
-                :size="20"
-                :width="2"
-                color="info"
-                indeterminate
-              ></v-progress-circular>
+              <v-progress-circular v-if="item.activating" :size="20" :width="2" color="info" indeterminate />
               <VCheckboxBtn
                 v-else
                 class="d-inline"
                 v-bind="props"
                 color="secondary"
-                @click.stop="toggleKeyActivation(item)"
                 :model-value="item.isActive"
                 :disabled="deleting"
+                @click.stop="toggleKeyActivation(item)"
               />
             </template>
           </v-tooltip>

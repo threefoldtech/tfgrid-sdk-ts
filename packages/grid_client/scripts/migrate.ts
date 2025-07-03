@@ -20,7 +20,7 @@ async function main() {
         await newDB.get({ key: oldKey });
         alreadyMigratedCount++;
         console.log(`${oldKey} key is migrated`);
-      } catch (error) {
+      } catch {
         failedCount++;
       }
     }

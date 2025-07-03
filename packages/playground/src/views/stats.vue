@@ -2,24 +2,24 @@
   <div>
     <div class="border px-4 pb-4 rounded position-relative mt-2">
       <v-card color="primary" class="d-flex justify-center items-center mt-3 pa-3 text-center">
-        <v-icon size="30" class="pr-3" color="white">mdi-chart-scatter-plot</v-icon>
-        <v-card-title class="pa-0">Statistics</v-card-title>
+        <v-icon size="30" class="pr-3" color="white"> mdi-chart-scatter-plot </v-icon>
+        <v-card-title class="pa-0"> Statistics </v-card-title>
       </v-card>
       <div class="text-center">
         <v-row align="center" justify="center">
           <v-col cols="12" sm="6" md="4">
             <div class="d-flex my-6 align-center justify-center">
-              <v-progress-circular indeterminate v-if="loading" />
+              <v-progress-circular v-if="loading" indeterminate />
             </div>
           </v-col>
         </v-row>
       </div>
       <v-card class="d-flex">
         <v-row align="center" class="pa-5">
-          <v-col color="red" v-if="failed">
+          <v-col v-if="failed" color="red">
             <v-alert type="error" variant="tonal">
               Failed to get stats data after 3 attempts, Feel free to contact the support team or try again later.
-              <v-btn @click="fetchData" color="transparent">
+              <v-btn color="transparent" @click="fetchData">
                 <v-icon> mdi-refresh</v-icon>
               </v-btn>
             </v-alert>
@@ -63,19 +63,22 @@ let stats: Stats | null | undefined = null;
 function mergeNodeDistribution(stats: Stats["nodesDistribution"][]) {
   const keys = new Set(stats.map(obj => Object.keys(obj)).flat());
 
-  return Array.from(keys).reduce((res, key) => {
-    res[key] = 0;
-    stats.forEach(country => {
-      res[key] += country[key] ?? 0;
-    });
+  return Array.from(keys).reduce(
+    (res, key) => {
+      res[key] = 0;
+      stats.forEach(country => {
+        res[key] += country[key] ?? 0;
+      });
 
-    if (key === "The Netherlands" && res["The Netherlands"]) {
-      res["Netherlands"] = res["The Netherlands"];
-      delete res["The Netherlands"];
-    }
+      if (key === "The Netherlands" && res["The Netherlands"]) {
+        res["Netherlands"] = res["The Netherlands"];
+        delete res["The Netherlands"];
+      }
 
-    return res;
-  }, {} as { [key: string]: number });
+      return res;
+    },
+    {} as { [key: string]: number },
+  );
 }
 
 function mergeStatsData(stats: Stats[]): Stats {
@@ -153,6 +156,13 @@ const fetchData = async () => {
 };
 
 onMounted(fetchData);
+</script>
+
+<script lang="ts">
+export default {
+  // eslint-disable-next-line vue/multi-word-component-names
+  name: "Stats",
+};
 </script>
 
 <style scoped>

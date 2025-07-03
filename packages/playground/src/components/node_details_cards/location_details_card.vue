@@ -1,6 +1,6 @@
 <template>
   <card-details
-    :isMap="true"
+    :is-map="true"
     :loading="loading"
     title="Location Details"
     :items="locationFields"

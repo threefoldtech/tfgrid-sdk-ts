@@ -19,12 +19,12 @@
             <v-list>
               <template v-for="route in routes" :key="route.title">
                 <v-list-group v-if="route.items.length > 1" :value="route.title">
-                  <template v-slot:activator="{ props }">
+                  <template #activator="{ props }">
                     <v-list-item style="font-weight: 500" v-bind="props" :prepend-icon="route.icon">
                       <v-list-item-title class="font-weight-bold">
                         <v-tooltip :text="route.tooltip" :disabled="!route.tooltip">
-                          <template #activator="{ props }">
-                            <span v-bind="props">
+                          <template #activator="{ props: tooltipProps }">
+                            <span v-bind="tooltipProps">
                               {{ route.title }}
                             </span>
                           </template>
@@ -36,11 +36,11 @@
                     v-for="item in route.items"
                     :key="item.route"
                     :value="item.route"
-                    @click="clickHandler(item)"
                     :color="theme.name.value === AppThemeSelection.light ? 'primary' : 'info'"
                     :active="$route.path === item.route"
+                    @click="clickHandler(item)"
                   >
-                    <template v-slot:prepend v-if="item.icon">
+                    <template v-if="item.icon" #prepend>
                       <v-img
                         v-if="item.icon.includes('.')"
                         class="mr-7"
@@ -48,7 +48,9 @@
                         :src="baseUrl + 'images/icons/' + item.icon"
                         :alt="item.title"
                       />
-                      <v-icon v-else width="26">{{ item.icon }}</v-icon>
+                      <v-icon v-else width="26">
+                        {{ item.icon }}
+                      </v-icon>
                     </template>
 
                     <v-list-item-title class="font-weight-bold">
@@ -58,26 +60,26 @@
                             {{ item.title }}
                           </span>
                           <v-badge
+                            v-if="item.releaseDate && isReleasedOverMon(item.releaseDate, new Date())"
                             dot
                             inline
                             color="primary"
-                            v-if="item.releaseDate && isReleasedOverMon(item.releaseDate, new Date())"
-                          ></v-badge>
+                          />
                         </template>
                       </v-tooltip>
                     </v-list-item-title>
                   </v-list-item>
                 </v-list-group>
                 <v-list-item
-                  v-else
                   v-for="item in route.items"
+                  v-else
                   :key="item.route"
                   :value="item.route"
-                  @click="clickHandler(item)"
                   :active="$route.path === item.route"
                   :color="theme.name.value === AppThemeSelection.light ? 'primary' : 'info'"
+                  @click="clickHandler(item)"
                 >
-                  <template v-slot:prepend v-if="item.icon">
+                  <template v-if="item.icon" #prepend>
                     <v-img
                       v-if="item.icon.includes('.')"
                       class="mr-7"
@@ -85,7 +87,9 @@
                       :src="baseUrl + 'images/icons/' + item.icon"
                       :alt="item.title"
                     />
-                    <v-icon v-else width="26">{{ item.icon }}</v-icon>
+                    <v-icon v-else width="26">
+                      {{ item.icon }}
+                    </v-icon>
                   </template>
 
                   <v-list-item-title class="font-weight-bold">
@@ -95,11 +99,11 @@
                           {{ item.title }}
                         </span>
                         <v-badge
+                          v-if="item.releaseDate && isReleasedOverMon(item.releaseDate, new Date())"
                           dot
                           inline
                           color="primary"
-                          v-if="item.releaseDate && isReleasedOverMon(item.releaseDate, new Date())"
-                        ></v-badge>
+                        />
                       </template>
                     </v-tooltip>
                   </v-list-item-title>
@@ -119,7 +123,7 @@
           :elevation="permanent ? '1' : '15'"
         >
           <template #extension>
-            <v-card class="w-100 ma-0 pa-0" v-if="toolbarExtended">
+            <v-card v-if="toolbarExtended" class="w-100 ma-0 pa-0">
               <div class="pa-1">
                 <div class="d-flex justify-center">
                   <div class="">
@@ -133,10 +137,12 @@
                   <div class="">
                     <ProfileManager
                       :model-value="openProfile"
-                      @update:modelValue="(e: boolean) => {
-                    toolbarExtended = e;
-                    openProfile = e;
-                    }"
+                      @update:model-value="
+                        (e: boolean) => {
+                          toolbarExtended = e;
+                          openProfile = e;
+                        }
+                      "
                     />
                   </div>
                 </div>
@@ -151,13 +157,13 @@
                   : baseUrl + 'images/logoTF_light.png'
               }`"
               :width="permanent ? '140px' : '120px'"
-              @click="navigateToHome"
               class="clickable-logo"
+              @click="navigateToHome"
             />
           </v-toolbar-title>
 
           <v-spacer>
-            <div class="d-flex align-center justify-start" v-if="permanent">
+            <div v-if="permanent" class="d-flex align-center justify-start">
               <TfSwapPrice>
                 <FundsCard v-if="hasActiveProfile" />
               </TfSwapPrice>
@@ -169,19 +175,19 @@
           <v-divider vertical class="mx-2" />
           <AppTheme />
           <v-divider vertical class="mx-2" />
-          <ProfileManager v-model="openProfile" v-if="permanent" />
+          <ProfileManager v-if="permanent" v-model="openProfile" />
 
-          <div class="d-flex align-center" v-if="!permanent">
+          <div v-if="!permanent" class="d-flex align-center">
             <v-btn
               :color="theme.name.value !== AppThemeSelection.light ? 'white' : 'black'"
+              icon="mdi-menu"
+              class="mr-2"
               @click="
                 () => {
                   openSidebar = false;
                   toolbarExtended = !toolbarExtended;
                 }
               "
-              icon="mdi-menu"
-              class="mr-2"
             />
           </div>
         </v-toolbar>
@@ -200,10 +206,10 @@
         >
           <v-row>
             <v-breadcrumbs class="ma-3" :items="navbarConfig.path">
-              <template v-slot:divider>
-                <v-icon icon="mdi-chevron-right"></v-icon>
+              <template #divider>
+                <v-icon icon="mdi-chevron-right" />
               </template>
-              <template v-slot:item="{ item }">
+              <template #item="{ item }">
                 <component
                   :is="item.to ? 'router-link' : 'span'"
                   :to="item.to"
@@ -230,14 +236,14 @@
               <v-btn
                 v-if="!openSidebar"
                 color="secondary"
-                @click="openSidebar = true"
                 icon="mdi-menu"
                 variant="tonal"
                 class="mr-2 mb-4"
+                @click="openSidebar = true"
               />
             </div>
 
-            <TfRouterView @openProfile="openProfile = true" :isAuth="hasActiveProfile && hasGrid" />
+            <TfRouterView :is-auth="hasActiveProfile && hasGrid" @open-profile="openProfile = true" />
           </v-container>
         </DeploymentListManager>
         <TFNotification v-if="hasActiveProfile && hasGrid" />
@@ -272,7 +278,6 @@ const navbarConfig = ref();
 const hasGrid = computed(() => !!gridStore.grid);
 const hasClient = computed(() => !!gridStore.client);
 
-// eslint-disable-next-line no-undef
 const permanent = ref(window.innerWidth > 980);
 const openSidebar = ref(permanent.value);
 const toolbarExtended = ref(false);
@@ -359,7 +364,6 @@ async function setTimeouts() {
     }
   }
 }
-// eslint-disable-next-line no-undef
 
 const routes: AppRoute[] = [
   {

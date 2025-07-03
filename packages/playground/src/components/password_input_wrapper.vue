@@ -1,5 +1,5 @@
 <template :x="5">
-  <slot :props="props"></slot>
+  <slot :props="props" />
 </template>
 
 <script lang="ts" setup>

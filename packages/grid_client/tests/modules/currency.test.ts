@@ -45,7 +45,7 @@ describe("Testing TFT module", () => {
     const result = () => currency.convertTFTtoUSD({ amount: -1 });
     try {
       expect(result).toThrow();
-    } catch (error) {
+    } catch {
       expect(result).toBeInstanceOf(ValidationError);
     }
   });
@@ -63,7 +63,7 @@ describe("Testing TFT module", () => {
 
     try {
       expect(result).toThrow();
-    } catch (error) {
+    } catch {
       expect(result).toBeInstanceOf(ValidationError);
     }
   });
@@ -82,7 +82,7 @@ describe("Testing TFT module", () => {
 
     try {
       expect(result).toThrow();
-    } catch (error) {
+    } catch {
       expect(result).toBeInstanceOf(ValidationError);
     }
   });
@@ -101,7 +101,7 @@ describe("Testing TFT module", () => {
 
     try {
       expect(result).toThrow();
-    } catch (error) {
+    } catch {
       expect(result).toBeInstanceOf(ValidationError);
     }
   });
@@ -120,7 +120,7 @@ describe("Testing TFT module", () => {
 
     try {
       expect(result).toThrow();
-    } catch (error) {
+    } catch {
       expect(result).toBeInstanceOf(ValidationError);
     }
   });
@@ -139,7 +139,7 @@ describe("Testing TFT module", () => {
 
     try {
       expect(result).toThrow();
-    } catch (error) {
+    } catch {
       expect(result).toBeInstanceOf(ValidationError);
     }
   });
@@ -158,7 +158,7 @@ describe("Testing TFT module", () => {
 
     try {
       expect(result).toThrow();
-    } catch (error) {
+    } catch {
       expect(result).toBeInstanceOf(ValidationError);
     }
   });
@@ -177,7 +177,7 @@ describe("Testing TFT module", () => {
 
     try {
       expect(result).toThrow();
-    } catch (error) {
+    } catch {
       expect(result).toBeInstanceOf(ValidationError);
     }
   });
