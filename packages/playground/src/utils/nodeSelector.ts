@@ -107,6 +107,9 @@ export function normalizeFarmFilters(
     nodeCertified: filters.certified || undefined,
     nodeHasGPU: filters.hasGPU || undefined,
     nodeHasIPv6: filters.ipv6 || undefined,
+    wireguard: filters.wireguard || undefined,
+    planetary: filters.planetary || undefined,
+    mycelium: filters.mycelium || undefined,
   };
 }
 
