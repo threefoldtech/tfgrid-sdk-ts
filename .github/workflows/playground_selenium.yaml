@@ -4,113 +4,73 @@ on:
   workflow_dispatch:
     inputs:
       network:
-        description: "Select network (dev, qa, test, main)"
-        required: true
-        default: dev
         type: choice
-        options: [dev, qa, test, main]
-      mode:
-        description: "Select mode (build|remote)"
+        description: "Target network"
         required: true
-        default: remote
-        type: choice
-        options: [build, remote]
+        default: "dev"
+        options:
+          - dev
+          - qa
+          - test
+          - main
+      branch:
+        description: "Branch to checkout"
+        required: false
+        default: ""
+      build_locally:
+        type: boolean
+        description: "Build dashboard locally"
+        required: true
+        default: true
   schedule:
     - cron: "0 6 * * *"
 
 jobs:
   selenium-run:
     runs-on: ubuntu-latest
-
-    # Pass secrets in for Config.ini
     env:
-      TFCHAIN_MNEMONICS: ${{ secrets.TFCHAIN_MNEMONICS }}
-      TFCHAIN_NODE_MNEMONICS: ${{ secrets.TFCHAIN_NODE_MNEMONICS }}
-      STELLAR_ADDRESS: ${{ secrets.STELLAR_ADDRESS }}
-      EMAIL: ${{ secrets.EMAIL }}
-
+      NETWORK: ${{ github.event.inputs.network || 'dev' }}
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Determine network + mode
-        id: vars
-        run: |
-          echo "network=${{ github.event.inputs.network }}" >> $GITHUB_OUTPUT
-          echo "mode=${{ github.event.inputs.mode }}"       >> $GITHUB_OUTPUT
-
-      - name: Set up Python 3.10
+        with:
+          ref: ${{ github.event.inputs.branch || github.ref }}
+      - name: Setting up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
-
-      - name: Install Python deps (including pytest-html)
-        run: |
-          python3 -m pip install --upgrade pip
-          python3 -m pip install -r packages/playground/tests/frontend_selenium/requirements.txt
-          python3 -m pip install pytest-html
-
-      - name: Set up Node.js 18
+      - name: Install system dependencies
+        run: sudo apt-get update && sudo apt-get install -y xclip
+      - name: Installing all necessary packages
+        run: pip install -r  packages/playground/tests/frontend_selenium/requirements.txt
+      - name: Node install
+        if: ${{ github.event.inputs.build_locally != 'false' }}
         uses: actions/setup-node@v4
         with:
-          node-version: "18"
-
-      - name: Install Node deps
+          node-version: 22.15
+      - name: Yarn install
+        if: ${{ github.event.inputs.build_locally != 'false' }}
         run: yarn install
-
-      - name: Build & serve (only build mode)
-        if: ${{ steps.vars.outputs.mode == 'build' }}
-        run: |
-          yarn lerna run build
-          nohup make run project=playground > server.log 2>&1 &
-          echo "Waiting for http://localhost:5173…"
-          for i in {1..60}; do
-            curl -sf http://localhost:5173 && break
-            sleep 1
-          done
-
-      - name: Generate Config.ini via Python
-        working-directory: packages/playground/tests/frontend_selenium
+      - name: Lerna Build
+        if: ${{ github.event.inputs.build_locally != 'false' }}
+        run: yarn lerna run build
+      - name: Yarn Serve
+        if: ${{ github.event.inputs.build_locally != 'false' }}
+        run: make run project=playground &
+      - name: Wait for localhost
+        if: ${{ github.event.inputs.build_locally != 'false' }}
+        run: sleep 60
+      - name: Configure network for deployed site
+        if: ${{ github.event.inputs.build_locally == 'false' }}
+        run: sed -i "s/^net = .*/net = ${NETWORK}/" packages/playground/tests/frontend_selenium/Config.ini
+      - name: Configure network for local build
+        if: ${{ github.event.inputs.build_locally != 'false' }}
+        run: sed -i 's/^net = .*/net = local/' packages/playground/tests/frontend_selenium/Config.ini
+      - name: Run tests
+        working-directory: ./packages/playground/tests/frontend_selenium
         env:
-          NETWORK: ${{ steps.vars.outputs.network }}
-          MODE: ${{ steps.vars.outputs.mode }}
-        run: |
-          python3 - <<'EOF'
-          import os, configparser
-
-          def flatten(var):
-              return os.getenv(var, "").replace("\n", " ").strip()
-
-          net   = os.environ["NETWORK"]
-          mode  = os.environ["MODE"]
-          base_url = ("http://localhost:5173" if mode=="build"
-                      else f"https://dashboard.{net}.grid.tf/")
-
-          cfg = configparser.ConfigParser()
-          cfg["Base"] = {
-              "port":     "5173",
-              "net":      net,
-              "base_url": base_url
-          }
-          cfg["Utils"] = {
-              "seed":      flatten("TFCHAIN_MNEMONICS"),
-              "node_seed": flatten("TFCHAIN_NODE_MNEMONICS"),
-              "address":   flatten("STELLAR_ADDRESS"),
-              "email":     flatten("EMAIL")
-          }
-          with open("Config.ini", "w") as f:
-              cfg.write(f)
-          EOF
-
-      - name: Verify Config.ini exists and contents
-        working-directory: packages/playground/tests/frontend_selenium
-        run: |
-          echo "→ Files in $(pwd):"
-          ls -1
-          echo ""
-          echo "→ Config.ini contents:"
-          nl Config.ini
-
-      - name: Run Selenium tests
-        working-directory: packages/playground/tests/frontend_selenium
-        run: python3 -m pytest -v --html=report.html
+          TFCHAIN_MNEMONICS: ${{ secrets.TFCHAIN_MNEMONICS }}
+          TFCHAIN_NODE_MNEMONICS: ${{ secrets.TFCHAIN_NODE_MNEMONICS }}
+          STELLAR_ADDRESS: ${{ secrets.STELLAR_ADDRESS }}
+          EMAIL: ${{ secrets.EMAIL }}
+        run: python -m pytest -v
