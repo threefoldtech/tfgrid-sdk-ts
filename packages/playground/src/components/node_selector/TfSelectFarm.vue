@@ -149,11 +149,17 @@ export default {
 
     const reloadFarms = () => farmsTask.value.run(gridStore, filters.value, props.filters.exclusiveFor);
 
-    useWatchDeep(filters, farmsTask.value.reset, { ignoreFields: ["page"] });
+    // useWatchDeep(filters, farmsTask.value.reset, { ignoreFields: ["page"] });
     useWatchDeep(
       filters,
-      async filters => {
-        await pageCountTask.value.run(gridStore, filters);
+      async (newFilters, oldFilters) => {
+        const compareNew = { ...newFilters, node_features: undefined };
+        const compareOld = { ...oldFilters, node_features: undefined };
+        if (JSON.stringify(compareNew) === JSON.stringify(compareOld)) {
+          return;
+        }
+
+        await pageCountTask.value.run(gridStore, newFilters);
         pagination.value.reset(pageCountTask.value.data as number);
         await nextTick();
         loadedFarms.value = [];
