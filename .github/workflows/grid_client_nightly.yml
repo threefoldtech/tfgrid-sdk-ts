@@ -171,6 +171,6 @@ jobs:
             - **Vmq QSFS**: skipped https://github.com/threefoldtech/tfgrid-sdk-ts/issues/3611
             - **Kubernetes QSFS**: skipped https://github.com/threefoldtech/tfgrid-sdk-ts/issues/3611
             - **Kvstore**: ${{ steps.kvstore.outcome }}
-            - **Zdb**: ${{ steps.zdb.outcome }}
+            - **Zdb**: skipped https://github.com/threefoldtech/tfgrid-sdk-ts/issues/3611
             - **Delete all contracts**: ${{ steps.delete_all.outcome }}
           labels: type_bug, grid_client
