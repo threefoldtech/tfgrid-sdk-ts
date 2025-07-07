@@ -9,7 +9,14 @@
     >
       <weblet-layout ref="layout" @back="onBack">
         <template #title> Manage Domains ({{ vm ? vm.name : k8s?.masters[0].name }}) </template>
-        <v-tabs v-model="gatewayTab" align-tabs="center" color="secondary" class="mb-6" :disabled="deleting">
+        <v-tabs
+          v-model="gatewayTab"
+          align-tabs="center"
+          color="secondary"
+          class="mb-6"
+          :disabled="deleting"
+          @update:model-value="onTabChange"
+        >
           <v-tab>Domains List</v-tab>
           <v-tab>Add new domain</v-tab>
         </v-tabs>
@@ -295,14 +302,11 @@ export default {
     });
     watch(selectedK8SNodeName, getSupportedNetworks, { deep: true });
 
-    watch([dialogVisible, gatewayTab], ([newDialogVisible, newGatewayTab], [oldDialogVisible, oldGatewayTab]) => {
-      const dialogJustOpened = newDialogVisible && !oldDialogVisible;
-      const switchedToAddTab = newGatewayTab === 1 && oldGatewayTab !== 1;
-
-      if (dialogJustOpened || switchedToAddTab) {
+    function onTabChange(newTab: unknown) {
+      if (newTab === 1) {
         suggestName();
       }
-    });
+    }
 
     const tableHeaders = ref([
       { title: "Name", key: "name" },
@@ -546,6 +550,7 @@ export default {
       getSupportedNetworks,
       formatDomainName,
       onBack,
+      onTabChange,
       getDomainNode,
       tableHeaders,
       subdomainRules,
