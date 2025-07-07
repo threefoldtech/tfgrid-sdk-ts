@@ -9,6 +9,7 @@ import {
   ZmachineLightNetwork,
   ZNetworkInterface,
 } from "../../src";
+import { FLISTS } from "../../src/helpers/flists";
 
 let zmachineLight = new ZmachineLight();
 const computeCapacity = new ComputeCapacity();
@@ -35,11 +36,10 @@ beforeEach(() => {
   disks.name = "zdisk";
   disks.mountpoint = "/mnt/data";
 
-  zmachineLight.flist = "https://hub.grid.tf/tf-official-vms/ubuntu-22.04.flist";
-  zmachineLight.network = network;
+  flist: FLISTS.MICROVMS_UBUNTU_22.flist, (zmachineLight.network = network);
   zmachineLight.size = rootfs_size * 1024 ** 3;
   zmachineLight.mounts = [disks];
-  zmachineLight.entrypoint = "/sbin/zinit init";
+  zmachineLight.entrypoint = FLISTS.MICROVMS_UBUNTU_24.entryPoint;
   zmachineLight.compute_capacity = computeCapacity;
   zmachineLight.env = { key: "value" };
   zmachineLight.corex = false;

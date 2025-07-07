@@ -367,8 +367,18 @@ export default {
 
         updateGrid(grid, { projectName: props.vm ? props.vm.projectName : props.k8s!.projectName });
 
+        let deploymentIps: string[] = [];
+        if (props.vm) {
+          deploymentIps = getDeploymentIps(props.vm);
+        } else if (props.k8s) {
+          deploymentIps = [...props.k8s.masters, ...props.k8s.workers].flatMap(deployment => getDeploymentIps(deployment));
+        }
+
         const { gateways: gws, failedToList } = await loadDeploymentGateways(grid, {
-          filter: () => true,
+          filter:
+            deploymentIps.length > 0
+              ? gw => gw.backends.some(bk => deploymentIps.some(ip => bk.includes(ip)))
+              : () => true,
         });
         gateways.value = gws;
 

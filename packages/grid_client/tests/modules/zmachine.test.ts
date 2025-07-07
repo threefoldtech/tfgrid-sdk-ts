@@ -1,6 +1,7 @@
 import { plainToClass } from "class-transformer";
 
 import { ComputeCapacity, Mount, MyceliumIP, Zmachine, ZmachineNetwork, ZNetworkInterface } from "../../src";
+import { FLISTS } from "../../src/helpers/flists";
 
 let zmachine = new Zmachine();
 const computeCapacity = new ComputeCapacity();
@@ -28,11 +29,11 @@ beforeEach(() => {
   disks.name = "zdisk";
   disks.mountpoint = "/mnt/data";
 
-  zmachine.flist = "https://hub.grid.tf/tf-official-vms/ubuntu-22.04.flist";
+  zmachine.flist = FLISTS.MICROVMS_UBUNTU_22.flist;
   zmachine.network = network;
   zmachine.size = rootfs_size * 1024 ** 3;
   zmachine.mounts = [disks];
-  zmachine.entrypoint = "/sbin/zinit init";
+  zmachine.entrypoint = FLISTS.MICROVMS_UBUNTU_24.entryPoint;
   zmachine.compute_capacity = computeCapacity;
   zmachine.env = { key: "value" };
   zmachine.corex = false;
