@@ -147,19 +147,19 @@ export default {
     const pageCountTask = useAsync(getFarmPageCount, { default: 1, shouldRun: () => props.validFilters });
     const pagination = usePagination();
 
-    const reloadFarms = () => farmsTask.value.run(gridStore, filters.value, props.filters.exclusiveFor);
+    const reloadFarms = () => farmsTask.value.run(gridStore, { ...filters.value }, props.filters.exclusiveFor);
 
-    useWatchDeep(filters, farmsTask.value.reset, { ignoreFields: ["page", "node_features"] });
     useWatchDeep(
       filters,
       async filters => {
+        farmsTask.value.reset();
         await pageCountTask.value.run(gridStore, filters);
         pagination.value.reset(pageCountTask.value.data as number);
         await nextTick();
         loadedFarms.value = [];
         return reloadFarms();
       },
-      { immediate: true, deep: true, debounce: 1000, ignoreFields: ["page", "node_features"] },
+      { immediate: true, deep: true, debounce: 1000, ignoreFields: ["page"] },
     );
 
     /* Load farms with search */
