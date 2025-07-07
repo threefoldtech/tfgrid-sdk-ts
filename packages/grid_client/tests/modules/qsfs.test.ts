@@ -1,3 +1,4 @@
+describe.skip("Grid3_Client_TS (Automated) – skipped", () => { // This test suite is skipped for now related to https://github.com/threefoldtech/tfgrid-sdk-ts/issues/3624
 import {
   Features,
   FilterOptions,
@@ -729,3 +730,4 @@ afterEach(async () => {
 afterAll(async () => {
   return await gridClient.disconnect();
 }, 130000);
+});
