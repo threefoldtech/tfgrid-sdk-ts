@@ -126,7 +126,9 @@
             <v-btn color="anchor" @click="showDialogue = false"> Close </v-btn>
 
             <v-btn :disabled="type === IPType.single || !toPublicIP" @click="showRange"> Show IPs Range </v-btn>
-            <v-btn color="secondary" :loading="isAdding" :disabled="isAdding" @click="handleAddFarmIp"> Add </v-btn>
+            <v-btn color="secondary" :loading="isAdding" :disabled="isAdding || !valid" @click="handleAddFarmIp">
+              Add
+            </v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
