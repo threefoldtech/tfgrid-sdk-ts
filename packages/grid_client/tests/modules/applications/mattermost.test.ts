@@ -10,6 +10,7 @@ import {
   MachinesModel,
   randomChoice,
 } from "../../../src";
+import { FLISTS } from "../../../src/helpers/flists";
 import { config, getClient } from "../../client_loader";
 import { GBToBytes, generateInt, getOnlineNode, log, splitIP } from "../../utils";
 
@@ -113,8 +114,8 @@ test("TC2689 - Applications: Deploy Mattermost", async () => {
             mountpoint: mountPoint,
           },
         ],
-        flist: "https://hub.grid.tf/tf-official-apps/mattermost-latest.flist",
-        entrypoint: "/sbin/zinit init",
+        flist: FLISTS.MATTERMOST.value,
+        entrypoint: FLISTS.MATTERMOST.entryPoint,
         public_ip: publicIp,
         planetary: true,
         mycelium: true,

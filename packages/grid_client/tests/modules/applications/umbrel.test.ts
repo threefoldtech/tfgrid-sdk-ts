@@ -10,6 +10,7 @@ import {
   MachinesModel,
   randomChoice,
 } from "../../../src";
+import { FLISTS } from "../../../src/helpers/flists";
 import { config, getClient } from "../../client_loader";
 import { GBToBytes, generateInt, getOnlineNode, log, splitIP } from "../../utils";
 
@@ -116,8 +117,8 @@ test("TC2694 - Applications: Deploy Umbrel", async () => {
             mountpoint: mountPoint2,
           },
         ],
-        flist: "https://hub.grid.tf/tf-official-apps/umbrel-latest.flist",
-        entrypoint: "/sbin/zinit init",
+        flist: FLISTS.UMBREL.value,
+        entrypoint: FLISTS.UMBREL.entryPoint,
         public_ip: publicIp,
         planetary: true,
         mycelium: true,
