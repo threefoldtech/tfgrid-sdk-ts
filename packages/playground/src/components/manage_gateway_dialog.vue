@@ -417,7 +417,7 @@ export default {
         await loadGateways();
         const deployedGateway = gateways.value.find(gw => gw.name == gwConfig.subdomain);
 
-        layout.value.setStatus("success", `Successfully deployed gateway at htps://${deployedGateway!.domain}`);
+        layout.value.setStatus("success", `Successfully deployed gateway at https://${deployedGateway!.domain}`);
       } catch (error) {
         errorMessage.value = "Failed to add domain";
         console.error(errorMessage.value, error);
