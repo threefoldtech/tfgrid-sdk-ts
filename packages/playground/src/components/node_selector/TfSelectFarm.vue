@@ -149,23 +149,17 @@ export default {
 
     const reloadFarms = () => farmsTask.value.run(gridStore, filters.value, props.filters.exclusiveFor);
 
-    // useWatchDeep(filters, farmsTask.value.reset, { ignoreFields: ["page"] });
+    useWatchDeep(filters, farmsTask.value.reset, { ignoreFields: ["page", "node_features"] });
     useWatchDeep(
       filters,
-      async (newFilters, oldFilters) => {
-        const compareNew = { ...newFilters, node_features: undefined };
-        const compareOld = { ...oldFilters, node_features: undefined };
-        if (JSON.stringify(compareNew) === JSON.stringify(compareOld)) {
-          return;
-        }
-
-        await pageCountTask.value.run(gridStore, newFilters);
+      async filters => {
+        await pageCountTask.value.run(gridStore, filters);
         pagination.value.reset(pageCountTask.value.data as number);
         await nextTick();
         loadedFarms.value = [];
         return reloadFarms();
       },
-      { immediate: true, deep: true, debounce: 1000, ignoreFields: ["page"] },
+      { immediate: true, deep: true, debounce: 1000, ignoreFields: ["page", "node_features"] },
     );
 
     /* Load farms with search */
