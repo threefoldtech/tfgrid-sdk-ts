@@ -256,7 +256,7 @@ import { manual } from "@/utils/manual";
 
 import { gridProxyClient, queryClient } from "../clients";
 import { useGrid } from "../stores";
-import { getNodeInfoWithCache } from "@/utils/get_nodeInfo_with_cache";
+import { getNodeInfoWithCache } from "@/utils/get_nodes";
 const profileManagerController = useProfileManagerController();
 const balance = profileManagerController.balance;
 const freeBalance = computed(() => balance.value?.free ?? 0);

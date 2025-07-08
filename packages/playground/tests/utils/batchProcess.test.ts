@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { batchProcess, BatchProcessOptions } from "../../src/utils/batch_process";
+import { batchProcess } from "../../src/utils/batch_process";
 
 describe("batchProcess", () => {
   const mockProcessFn = vi.fn();
@@ -55,7 +55,7 @@ describe("batchProcess", () => {
     });
   });
 
-  describe("error handling - resilient mode (default)", () => {
+  describe("error handling - resilient mode", () => {
     it("should continue processing when some batches fail", async () => {
       const items = [1, 2, 3, 4, 5, 6];
       const batchSize = 2;
@@ -92,36 +92,6 @@ describe("batchProcess", () => {
       expect(result.errors[0].error.message).toBe("String error");
 
       consoleSpy.mockRestore();
-    });
-  });
-
-  describe("error handling - fail fast mode", () => {
-    it("should throw on first error when failFast is true", async () => {
-      const items = [1, 2, 3, 4];
-      const batchSize = 2;
-      const error = new Error("First batch failed");
-
-      mockProcessFn.mockRejectedValueOnce(error).mockResolvedValueOnce(["c", "d"]);
-
-      const options: BatchProcessOptions = { failFast: true };
-
-      await expect(batchProcess(items, batchSize, mockProcessFn, options)).rejects.toThrow(error);
-
-      expect(mockProcessFn).toHaveBeenCalledTimes(2);
-    });
-
-    it("should return successful results when no errors in fail fast mode", async () => {
-      const items = [1, 2, 3, 4];
-      const batchSize = 2;
-
-      mockProcessFn.mockResolvedValueOnce(["a", "b"]).mockResolvedValueOnce(["c", "d"]);
-
-      const options: BatchProcessOptions = { failFast: true };
-      const result = await batchProcess(items, batchSize, mockProcessFn, options);
-
-      expect(result.results).toEqual(["a", "b", "c", "d"]);
-      expect(result.hasErrors).toBe(false);
-      expect(result.errors).toHaveLength(0);
     });
   });
 

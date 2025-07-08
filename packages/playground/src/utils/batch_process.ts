@@ -1,7 +1,3 @@
-export interface BatchProcessOptions {
-  failFast?: boolean;
-}
-
 export interface BatchProcessResult<R> {
   results: R[];
   errors: Array<{ batchIndex: number; error: Error }>;
@@ -12,52 +8,41 @@ export async function batchProcess<T, R>(
   items: T[],
   batchSize: number,
   processFn: (batch: T[]) => Promise<R[]>,
-  options: BatchProcessOptions = {},
 ): Promise<BatchProcessResult<R>> {
-  const { failFast = false } = options;
   const batches: T[][] = [];
 
   for (let i = 0; i < items.length; i += batchSize) {
     batches.push(items.slice(i, i + batchSize));
   }
 
-  if (failFast) {
-    const batchResults = await Promise.all(batches.map(batch => processFn(batch)));
-    return {
-      results: batchResults.flat(),
-      errors: [],
-      hasErrors: false,
-    };
-  } else {
-    const batchResults = await Promise.allSettled(batches.map(batch => processFn(batch)));
+  const batchResults = await Promise.allSettled(batches.map(batch => processFn(batch)));
 
-    const results: R[] = [];
-    const errors: Array<{ batchIndex: number; error: Error }> = [];
+  const results: R[] = [];
+  const errors: Array<{ batchIndex: number; error: Error }> = [];
 
-    batchResults.forEach((result, index) => {
-      if (result.status === "fulfilled") {
-        const batchResult = result.value;
-        if (Array.isArray(batchResult)) {
-          results.push(...batchResult);
-        } else {
-          console.error(`Batch ${index} returned non-array result:`, batchResult);
-        }
+  batchResults.forEach((result, index) => {
+    if (result.status === "fulfilled") {
+      const batchResult = result.value;
+      if (Array.isArray(batchResult)) {
+        results.push(...batchResult);
       } else {
-        errors.push({
-          batchIndex: index,
-          error: result.reason instanceof Error ? result.reason : new Error(String(result.reason)),
-        });
+        console.error(`Batch ${index} returned non-array result:`, batchResult);
       }
-    });
-
-    if (errors.length > 0) {
-      console.error(`Batch processing completed with ${errors.length} failed batches:`, errors);
+    } else {
+      errors.push({
+        batchIndex: index,
+        error: result.reason instanceof Error ? result.reason : new Error(String(result.reason)),
+      });
     }
+  });
 
-    return {
-      results,
-      errors,
-      hasErrors: errors.length > 0,
-    };
+  if (errors.length > 0) {
+    console.error(`Batch processing completed with ${errors.length} failed batches:`, errors);
   }
+
+  return {
+    results,
+    errors,
+    hasErrors: errors.length > 0,
+  };
 }

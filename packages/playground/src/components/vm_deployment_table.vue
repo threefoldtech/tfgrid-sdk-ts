@@ -179,6 +179,7 @@
 
 <script lang="ts" setup>
 import { capitalize, computed, onMounted, ref } from "vue";
+import type { GridClient } from "@threefold/grid_client";
 
 import { getNodeHealthColor, NodeHealth } from "@/utils/get_nodes";
 
@@ -254,6 +255,21 @@ async function loadDomains() {
   }
 }
 
+async function loadDeploymentChunks(grid: GridClient, projectName: string, showAll: boolean) {
+  const loadTasks = [loadVms(grid), loadVms(updateGrid(grid, { projectName: projectName.toLowerCase() }))];
+
+  // Only load all deployments for VM projects when showAll is enabled
+  const shouldLoadAllDeployments = showAll && projectName.toLowerCase() === ProjectName.VM.toLowerCase();
+  if (shouldLoadAllDeployments) {
+    loadTasks.push(loadVms(updateGrid(grid, { projectName: "" })));
+  } else {
+    // Add a resolved promise to maintain consistent array length
+    loadTasks.push(Promise.resolve({ count: 0, items: [], failedDeployments: [] }));
+  }
+
+  return Promise.allSettled(loadTasks);
+}
+
 async function loadDeployments() {
   const start = performance.now();
   if (props.projectName.toLowerCase() === ProjectName.Domains.toLowerCase()) {
@@ -266,15 +282,7 @@ async function loadDeployments() {
   loading.value = true;
   const grid = await getGrid(profileManager.profile!, props.projectName);
   try {
-    const shouldLoadAllDeployments =
-      showAllDeployments.value && props.projectName.toLowerCase() === ProjectName.VM.toLowerCase();
-    const results = await Promise.allSettled([
-      loadVms(grid!),
-      loadVms(updateGrid(grid!, { projectName: props.projectName.toLowerCase() })),
-      shouldLoadAllDeployments
-        ? loadVms(updateGrid(grid!, { projectName: "" }))
-        : Promise.resolve({ count: 0, items: [], failedDeployments: [] }),
-    ]);
+    const results = await loadDeploymentChunks(grid!, props.projectName, showAllDeployments.value);
     const [chunk1, chunk2, chunk3] = results.map((result, index) => {
       if (result.status === "fulfilled") {
         return result.value;
