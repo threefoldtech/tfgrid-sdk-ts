@@ -168,9 +168,9 @@ export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
 
   const data = vms.map((vm, index) => {
     for (let i = 0; i < vm.length; i++) {
-      vm[i].billing = formatConsumption(consumptions[index]?.amountBilled as number);
-      if (wireguards[index] && wireguards[index].length > 0) {
-        vm[i].wireguard = wireguards[index][0];
+      vm[i].billing = formatConsumption(consumptions.results[index]?.amountBilled as number);
+      if (wireguards.results[index] && wireguards.results[index].length > 0) {
+        vm[i].wireguard = wireguards.results[index][0];
       }
     }
 
@@ -241,7 +241,7 @@ export async function loadK8s(grid: GridClient) {
     return results.map(r => (r.status === "fulfilled" ? r.value : { contracts: [], nodeIds: [], success: false }));
   });
 
-  const contractsAndNodeIds = contractsAndNodeIdsResults.flat();
+  const contractsAndNodeIds = contractsAndNodeIdsResults.results;
 
   const clusterObjsResults = await batchProcess(clusters, BATCH_SIZE, async batch => {
     const results = await Promise.allSettled(
@@ -290,7 +290,7 @@ export async function loadK8s(grid: GridClient) {
     );
     return results.map(r => (r.status === "fulfilled" ? r.value : null));
   });
-  const clusterObjs = clusterObjsResults.flat();
+  const clusterObjs = clusterObjsResults.results;
 
   const items = clusterObjs.filter(Boolean) as any[];
   const k8s = items
@@ -313,7 +313,7 @@ export async function loadK8s(grid: GridClient) {
     );
     return results.map(r => (r.status === "fulfilled" ? r.value : undefined));
   });
-  const consumptions = consumptionsResults.flat();
+  const consumptions = consumptionsResults.results;
 
   const wireguardsResults = await batchProcess(k8s, BATCH_SIZE, async batch => {
     const results = await Promise.allSettled(
@@ -329,7 +329,7 @@ export async function loadK8s(grid: GridClient) {
     );
     return results.map(r => (r.status === "fulfilled" ? r.value : []));
   });
-  const wireguards = wireguardsResults.flat();
+  const wireguards = wireguardsResults.results;
 
   const data = k8s.map((cluster, index) => {
     cluster.masters[0].billing = formatConsumption(consumptions[index]?.amountBilled as number);
