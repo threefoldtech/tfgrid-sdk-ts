@@ -10,12 +10,8 @@
 
   <!-- Contracts List Card -->
   <v-card color="primary" class="d-flex justify-center items-center mb-4 pa-3 text-center">
-    <v-icon size="30" class="pr-3">
-      mdi-file-document-edit
-    </v-icon>
-    <v-card-title class="pa-0">
-      Contracts List
-    </v-card-title>
+    <v-icon size="30" class="pr-3"> mdi-file-document-edit </v-icon>
+    <v-card-title class="pa-0"> Contracts List </v-card-title>
   </v-card>
 
   <v-alert class="mb-4 text-subtitle-2 font-weight-regular" type="info" variant="tonal">
@@ -24,15 +20,15 @@
       class="app-link font-weight-medium"
       target="_blank"
       href="https://manual.grid.tf/labs/documentation/developers/tfchain/"
-    >Contract Documentation,
+      >Contract Documentation,
     </a>
     and to explore further contract details, check
     <a
       class="app-link font-weight-medium"
       target="_blank"
       href="https://manual.grid.tf/labs/documentation/dashboard/deploy/your_contracts"
-    >Node Contract Documentation.</a>
-    <br>
+      >Node Contract Documentation.</a>
+    <br />
   </v-alert>
 
   <v-card variant="text" class="my-3">
@@ -77,9 +73,7 @@
     <template #title>
       <v-row>
         <v-col class="d-flex justify-start">
-          <p class="text-subtitle-1">
-            Total cost of contracts
-          </p>
+          <p class="text-subtitle-1">Total cost of contracts</p>
         </v-col>
       </v-row>
     </template>
@@ -120,9 +114,7 @@
       <v-card-text v-if="loadingLockDetails" class="d-flex flex-column justify-center align-center pb-0 pt-6">
         <v-progress-circular indeterminate />
 
-        <div class="text-subtitle-2 pt">
-          Loading contracts lock details
-        </div>
+        <div class="text-subtitle-2 pt">Loading contracts lock details</div>
         <v-divider class="mt-3" />
       </v-card-text>
       <v-card-text v-else>
@@ -146,9 +138,7 @@
         <v-divider class="mt-3" />
       </v-card-text>
       <v-card-actions class="justify-end mb-1 mr-2">
-        <v-btn color="anchor" @click="unlockDialog = false">
-          Close
-        </v-btn>
+        <v-btn color="anchor" @click="unlockDialog = false"> Close </v-btn>
         <v-tooltip
           :text="
             freeBalance < lockedContracts?.totalOverdueAmount
@@ -178,9 +168,7 @@
   <!-- delete all dialog-->
   <v-dialog v-model="deleteDialog" width="800" attach="#modals">
     <v-card>
-      <v-card-title class="bg-primary">
-        Delete all your contracts
-      </v-card-title>
+      <v-card-title class="bg-primary"> Delete all your contracts </v-card-title>
       <v-alert class="mx-4 mt-4" type="warning" variant="tonal">
         <template #prepend>
           <v-icon class="pt-4" icon="$warning" />
@@ -189,12 +177,8 @@
         <div>Deleting contracts may take a while to complete.</div>
       </v-alert>
       <v-card-actions class="justify-end my-1 mr-2">
-        <v-btn color="anchor" @click="deleteDialog = false">
-          Cancel
-        </v-btn>
-        <v-btn color="error" @click="deleteAll">
-          Delete
-        </v-btn>
+        <v-btn color="anchor" @click="deleteDialog = false"> Cancel </v-btn>
+        <v-btn color="error" @click="deleteAll"> Delete </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -258,14 +242,8 @@ import { computed, defineComponent, onMounted, type Ref, ref } from "vue";
 import ContractsTable from "@/components/contracts_list/contracts_table.vue";
 import { useProfileManagerController } from "@/components/profile_manager_controller.vue";
 import { useProfileManager } from "@/stores/profile_manager";
-import type { VDataTableHeader } from "@/types";
-import {
-  type ContractsTableType,
-  ContractType,
-  getNodeInfo,
-  normalizeContract,
-  type NormalizedContract,
-} from "@/utils/contracts";
+import { solutionType, type VDataTableHeader } from "@/types";
+import { type ContractsTableType, ContractType, getNodeInfo, type NormalizedContract } from "@/utils/contracts";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
 import { normalizeError } from "@/utils/helpers";
 import { manual } from "@/utils/manual";
@@ -320,7 +298,7 @@ async function _normalizeContracts(
   const normalizedContracts = await Promise.all(
     contracts.map(async contract => {
       try {
-        return await normalizeContract(grid, contract, contractType);
+        return await normalizeContractWithConsumptionCache(grid, contract, contractType);
       } catch (error) {
         failedContracts.value.push(contract.contract_id);
       }
@@ -328,6 +306,76 @@ async function _normalizeContracts(
   );
   return normalizedContracts.filter(Boolean) as NormalizedContract[];
 }
+
+function parseProjectName(projectName: string) {
+  const parts = projectName.split("/");
+  if (parts.length) {
+    projectName = solutionType[parts[0]];
+  }
+  return projectName;
+}
+
+async function normalizeContractWithConsumptionCache(
+  grid: GridClient,
+  c: { [key: string]: any },
+  type: ContractType.Node | ContractType.Name | ContractType.Rent,
+): Promise<NormalizedContract> {
+  const id = +c.contract_id;
+
+  let data: { [key: string]: string };
+  try {
+    data = JSON.parse(c.details.deployment_data);
+    data.projectName = parseProjectName(data.projectName);
+  } catch {
+    data = { name: c.details.name };
+  }
+
+  let expiration = "-";
+  if (c.state === ContractState.GracePeriod) {
+    const exp = await grid.contracts.getDeletionTime({ id });
+    expiration = new Date(exp).toLocaleString();
+  }
+
+  let consumption = { amountBilled: 0, discountReceived: "None" as any };
+  const cached = consumptionCache.value.get(id);
+  if (cached) {
+    consumption = { amountBilled: cached.consumption, discountReceived: cached.discountPackage };
+  } else {
+    try {
+      consumption = await grid.contracts.getConsumption({ id });
+      consumptionCache.value.set(id, {
+        consumption: consumption.amountBilled,
+        discountPackage: consumption.discountReceived,
+      });
+    } catch {
+      consumptionCache.value.set(id, {
+        consumption: 0,
+        discountPackage: "None",
+      });
+    }
+  }
+
+  return {
+    contract_id: id,
+    twin_id: c.twin_id,
+    type,
+    deploymentType: data.type,
+    state: c.state,
+    created_at: c.created_at,
+    details: {
+      nodeId: c.details.nodeId || "-",
+      deployment_data: c.details.deployment_data ? JSON.parse(c.details.deployment_data) : undefined,
+      farm_id: c.details.farm_id || "-",
+    },
+    solutionName: data.name || "-",
+    solutionType: data.projectName || data.type || "-",
+    expiration,
+    consumption: consumption.amountBilled,
+    discountPackage: consumption.discountReceived,
+  };
+}
+
+const consumptionCache = ref<Map<number, { consumption: number; discountPackage: any }>>(new Map());
 
 async function loadContractsByType(
   contractType: ContractType.Node | ContractType.Name | ContractType.Rent,
@@ -368,6 +416,7 @@ async function loadContracts(type?: ContractType, options?: { sort: { key: strin
   if (!type) {
     lockedContracts.value = undefined;
     totalCost.value = undefined;
+    consumptionCache.value.clear();
   }
   totalCostUSD.value = undefined;
   loadingErrorMessage.value = undefined;
@@ -479,7 +528,7 @@ const nodeStatus = computed(() => {
   return statusObject;
 });
 
-// Calculate the total cost of contracts
+// Calculate the total cost of contracts - optimized to use cached data when possible
 async function getTotalCost() {
   totalCost.value = 0;
 
