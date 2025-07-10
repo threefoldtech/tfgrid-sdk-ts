@@ -8,52 +8,17 @@
         When selecting a node with GPU resources, please make sure that you have a rented node. To rent a node and gain access to GPU capabilities, you can use our dashboard.
       "
     >
-      <v-switch
-        color="primary"
-        inset
-        label="GPU"
-        :model-value="hasGPUModel"
-        hide-details
-        @update:model-value="onUpdateHasGPU"
-      />
+      <v-switch v-model="hasGPUModel" color="primary" inset label="GPU" hide-details />
     </input-tooltip>
 
-    <v-switch
-      color="primary"
-      inset
-      label="Rented By Me"
-      :model-value="rentedByMeModel"
-      hide-details
-      @update:model-value="onUpdateRentedByMe"
-    />
+    <v-switch v-model="rentedByMeModel" color="primary" inset label="Rented By Me" hide-details />
 
-    <input-tooltip
-      inline
-      tooltip="Click to know more about dedicated machines."
-      :href="manual?.dedicated_machines"
-    >
-      <v-switch
-        color="primary"
-        inset
-        label="Rentable"
-        :model-value="dedicatedModel"
-        hide-details
-        @update:model-value="onUpdateDedicated"
-      />
+    <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual?.dedicated_machines">
+      <v-switch v-model="dedicatedModel" color="primary" inset label="Rentable" hide-details />
     </input-tooltip>
 
-    <input-tooltip
-      inline
-      tooltip="Renting capacity on certified nodes is charged 25% extra."
-    >
-      <v-switch
-        color="primary"
-        inset
-        label="Certified"
-        :model-value="certifiedModel"
-        hide-details
-        @update:model-value="onUpdateCertified"
-      />
+    <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
+      <v-switch v-model="certifiedModel" color="primary" inset label="Certified" hide-details />
     </input-tooltip>
   </div>
 </template>
@@ -97,22 +62,6 @@ const hasGPUModel = computed({
 });
 
 const showGPU = computed(() => route.meta.title == solutionType.fullvm || route.meta.title == solutionType.openwebui);
-
-function onUpdateRentedByMe(val: boolean | null) {
-  rentedByMeModel.value = !!val;
-}
-
-function onUpdateDedicated(val: boolean | null) {
-  dedicatedModel.value = !!val;
-}
-
-function onUpdateCertified(val: boolean | null) {
-  certifiedModel.value = !!val;
-}
-
-function onUpdateHasGPU(val: boolean | null) {
-  hasGPUModel.value = !!val;
-}
 </script>
 
 <script lang="ts">
