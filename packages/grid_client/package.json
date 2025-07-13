@@ -13,7 +13,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@jimber/pkid": "1.0.4",
+    "@jimber/pkid": "1.0.5",
     "@noble/secp256k1": "1.7.1",
     "@stellar/stellar-sdk": "^13.3.0",
     "@threefold/gridproxy_client": "2.8.1",
