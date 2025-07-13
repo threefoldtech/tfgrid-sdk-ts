@@ -184,7 +184,6 @@ import type { GridClient } from "@threefold/grid_client";
 import { getNodeHealthColor, NodeHealth } from "@/utils/get_nodes";
 
 import { useGrid } from "../stores";
-import { updateGrid } from "../utils/grid";
 import { markAsFromAnotherClient } from "../utils/helpers";
 import { loadVms, mergeLoadedDeployments, getGridClient } from "../utils/load_deployment";
 
@@ -219,7 +218,7 @@ onMounted(loadDeployments);
 async function loadDomains() {
   try {
     loading.value = true;
-    updateGrid(grid, { projectName: props.projectName.toLowerCase() });
+    const grid = await getGridClient(gridStore.client.clientOptions, props.projectName.toLowerCase());
     const gateways = await grid!.gateway.list();
     const gwsResults = await Promise.allSettled(gateways.map(name => grid!.gateway.get_name({ name })));
     const gws = gwsResults
@@ -280,7 +279,6 @@ async function loadDeployments() {
 
   items.value = [];
   loading.value = true;
-  updateGrid(grid, { projectName: props.projectName });
   try {
     const results = await loadDeploymentChunks(grid!, props.projectName, showAllDeployments.value);
     const [chunk1, chunk2, chunk3] = results.map((result, index) => {

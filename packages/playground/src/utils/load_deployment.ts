@@ -81,7 +81,8 @@ export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
       }
 
       const machinePromise = grids[index]!.machines.getObj(name).then(res => {
-        if (!projectName && (!Array.isArray(res) || res.length === 0)) {
+        // If we have contracts but no deployment data, try with different project contexts
+        if ((!Array.isArray(res) || res.length === 0) && contracts.length > 0) {
           return getGridClient(grid.clientOptions, "").then(emptyProjectGrid => {
             grids[index] = emptyProjectGrid;
             return emptyProjectGrid.machines.getObj(name);
@@ -96,20 +97,20 @@ export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
         }, window.env.TIMEOUT);
       });
 
-      try {
-        const result = await Promise.race([machinePromise, timeoutPromise]);
-        if (result instanceof Error && result.message === "Timeout") {
-          console.error(`Timeout loading deployment with name ${name}`);
-          return null;
-        }
-        return result;
-      } catch (e) {
-        console.error(`Failed to load deployment with name ${name}:\n${normalizeError(e, "No errors were provided.")}`);
-        failedDeployments.push({ name, nodes: nodeIds, contracts });
+      const result = await Promise.race([machinePromise, timeoutPromise]);
+      if (result instanceof Error && result.message === "Timeout") {
+        console.error(`Timeout loading deployment with name ${name}`);
+        return null;
+      } else if (Array.isArray(result) && result.length === 0) {
+        console.error(`Failed to load deployment with name ${name}`);
+        failedDeployments.push({ name, nodes: nodeIds, contracts: contracts });
         return null;
       }
-    } catch {
-      failedDeployments.push({ name, contracts: [], nodes: [] });
+
+      return result;
+    } catch (e) {
+      console.error(`Failed to load deployment with name ${name}:\n${normalizeError(e, "No errors were provided.")}`);
+      failedDeployments.push({ name, nodes: [], contracts: [] });
       return null;
     }
   });
@@ -192,7 +193,6 @@ export async function getWireguardConfig(grid: GridClient, name: string, ipRange
     ipRange = parts.join(".") + "/16";
   }
 
-  // Use cached getGridClient with empty project name instead of updateGrid
   const emptyProjectGrid = await getGridClient(grid.clientOptions, "");
   return emptyProjectGrid.networks.getWireGuardConfigs({ name, ipRange });
 }
