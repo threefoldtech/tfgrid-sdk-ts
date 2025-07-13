@@ -183,12 +183,10 @@ import type { GridClient } from "@threefold/grid_client";
 
 import { getNodeHealthColor, NodeHealth } from "@/utils/get_nodes";
 
-import { useProfileManager } from "../stores";
-import { getGrid } from "../utils/grid";
+import { useGrid } from "../stores";
+import { updateGrid } from "../utils/grid";
 import { markAsFromAnotherClient } from "../utils/helpers";
 import { loadVms, mergeLoadedDeployments, getGridClient } from "../utils/load_deployment";
-
-const profileManager = useProfileManager();
 
 const props = defineProps<{
   projectName: string;
@@ -282,7 +280,7 @@ async function loadDeployments() {
 
   items.value = [];
   loading.value = true;
-  updateGrid(grid, { projectName: props.projectName});
+  updateGrid(grid, { projectName: props.projectName });
   try {
     const results = await loadDeploymentChunks(grid!, props.projectName, showAllDeployments.value);
     const [chunk1, chunk2, chunk3] = results.map((result, index) => {
@@ -507,7 +505,6 @@ import { ProjectName } from "../types";
 import { migrateModule } from "../utils/migration";
 import AccessDeploymentAlert from "./AccessDeploymentAlert.vue";
 import ListTable from "./list_table.vue";
-import { GridClient } from '@threefold/grid_client';
 
 export default {
   name: "VmDeploymentTable",
