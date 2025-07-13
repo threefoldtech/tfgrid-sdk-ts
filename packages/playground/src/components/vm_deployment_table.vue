@@ -423,7 +423,6 @@ const filteredHeaders = computed(() => {
 });
 
 const failedDeploymentList = computed(() => {
-  console.log(failedDeployments.value);
   return failedDeployments.value.map(({ name, nodes = [], contracts = [] }) => {
     if (nodes.length === 0 && contracts.length === 0) {
       showEncryption.value = true;
