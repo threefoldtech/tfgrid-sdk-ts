@@ -2,7 +2,7 @@ import { type ClientOptions, type GridClient } from "@threefold/grid_client";
 
 import { batchProcess } from "./batch_process";
 import { formatConsumption } from "./contracts";
-import { getGrid, updateGrid } from "./grid";
+import { getGrid } from "./grid";
 import { normalizeError } from "./helpers";
 import { migrateModule } from "./migration";
 export interface LoadedDeployments<T> {
@@ -43,8 +43,8 @@ async function getDeploymentContracts(grid: GridClient, name: string, projectNam
     return contracts1;
   }
 
-  // will raise error if can't decrypt
-  const contracts2 = await updateGrid(grid, { projectName }).machines.getDeploymentContracts(name);
+  const gridWithProject = await getGridClient(grid.clientOptions, projectName);
+  const contracts2 = await gridWithProject.machines.getDeploymentContracts(name);
   return contracts2;
 }
 
@@ -82,8 +82,10 @@ export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
 
       const machinePromise = grids[index]!.machines.getObj(name).then(res => {
         if (!projectName && (!Array.isArray(res) || res.length === 0)) {
-          grids[index] = updateGrid(grids[index]!, { projectName: "" });
-          return grids[index]!.machines.getObj(name);
+          return getGridClient(grid.clientOptions, "").then(emptyProjectGrid => {
+            grids[index] = emptyProjectGrid;
+            return emptyProjectGrid.machines.getObj(name);
+          });
         }
         return res;
       });
@@ -183,16 +185,16 @@ export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
     failedDeployments,
   };
 }
-export function getWireguardConfig(grid: GridClient, name: string, ipRange: string) {
-  const projectName = grid.clientOptions!.projectName;
+export async function getWireguardConfig(grid: GridClient, name: string, ipRange: string) {
   if (!ipRange.endsWith("/16")) {
     const parts = ipRange.split(".");
     parts[2] = parts[3] = "0";
     ipRange = parts.join(".") + "/16";
   }
-  return updateGrid(grid, { projectName: "" })
-    .networks.getWireGuardConfigs({ name, ipRange })
-    .finally(() => updateGrid(grid, { projectName }));
+
+  // Use cached getGridClient with empty project name instead of updateGrid
+  const emptyProjectGrid = await getGridClient(grid.clientOptions, "");
+  return emptyProjectGrid.networks.getWireGuardConfigs({ name, ipRange });
 }
 
 export type K8S = { masters: any[]; workers: any[]; deploymentName: string; projectName: string; wireguard?: any };
@@ -257,8 +259,10 @@ export async function loadK8s(grid: GridClient) {
         try {
           const clusterPromise = grids[index]!.k8s.getObj(name).then(res => {
             if (!projectName && res && res.masters && res.masters.length === 0) {
-              grids[index] = updateGrid(grids[index]!, { projectName: "" });
-              return grids[index]!.k8s.getObj(name);
+              return getGridClient(grid.clientOptions, "").then(emptyProjectGrid => {
+                grids[index] = emptyProjectGrid;
+                return emptyProjectGrid.k8s.getObj(name);
+              });
             }
             return res;
           });

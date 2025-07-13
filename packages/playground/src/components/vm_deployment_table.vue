@@ -184,9 +184,9 @@ import type { GridClient } from "@threefold/grid_client";
 import { getNodeHealthColor, NodeHealth } from "@/utils/get_nodes";
 
 import { useProfileManager } from "../stores";
-import { getGrid, updateGrid } from "../utils/grid";
+import { getGrid } from "../utils/grid";
 import { markAsFromAnotherClient } from "../utils/helpers";
-import { loadVms, mergeLoadedDeployments } from "../utils/load_deployment";
+import { loadVms, mergeLoadedDeployments, getGridClient } from "../utils/load_deployment";
 
 const profileManager = useProfileManager();
 
@@ -256,12 +256,12 @@ async function loadDomains() {
 }
 
 async function loadDeploymentChunks(grid: GridClient, projectName: string, showAll: boolean) {
-  const loadTasks = [loadVms(grid), loadVms(updateGrid(grid, { projectName: projectName.toLowerCase() }))];
+  const loadTasks = [loadVms(grid), loadVms(await getGridClient(grid.clientOptions, projectName.toLowerCase()))];
 
   // Only load all deployments for VM projects when showAll is enabled
   const shouldLoadAllDeployments = showAll && projectName.toLowerCase() === ProjectName.VM.toLowerCase();
   if (shouldLoadAllDeployments) {
-    loadTasks.push(loadVms(updateGrid(grid, { projectName: "" })));
+    loadTasks.push(loadVms(await getGridClient(grid.clientOptions, "")));
   } else {
     // Add a resolved promise to maintain consistent array length
     loadTasks.push(Promise.resolve({ count: 0, items: [], failedDeployments: [] }));

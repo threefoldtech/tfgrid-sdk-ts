@@ -165,9 +165,9 @@ import { onMounted, ref } from "vue";
 import { getNodeHealthColor, NodeHealth } from "@/utils/get_nodes";
 
 import { useProfileManager } from "../stores";
-import { getGrid, updateGrid } from "../utils/grid";
+import { getGrid } from "../utils/grid";
 import { markAsFromAnotherClient } from "../utils/helpers";
-import { loadK8s, mergeLoadedDeployments } from "../utils/load_deployment";
+import { loadK8s, mergeLoadedDeployments, getGridClient } from "../utils/load_deployment";
 const profileManager = useProfileManager();
 const showDialog = ref(false);
 const showEncryption = ref(false);
@@ -200,9 +200,9 @@ async function loadDeployments() {
     const shouldLoadAllDeployments = showAllDeployments.value;
     const results = await Promise.allSettled([
       loadK8s(grid),
-      loadK8s(updateGrid(grid, { projectName: props.projectName.toLowerCase() })),
+      loadK8s(await getGridClient(grid.clientOptions, props.projectName.toLowerCase())),
       shouldLoadAllDeployments
-        ? loadK8s(updateGrid(grid, { projectName: "" }))
+        ? loadK8s(await getGridClient(grid.clientOptions, ""))
         : Promise.resolve({ count: 0, items: [], failedDeployments: [] }),
     ]);
     const chunk1 =
