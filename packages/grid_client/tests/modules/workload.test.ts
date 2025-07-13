@@ -36,6 +36,7 @@ import {
   Zmount,
   Znet,
 } from "../../src";
+import { FLISTS } from "../../src/helpers/flists";
 import { PublicIPv4Result } from "../../src/zos/ipv4";
 
 let workload: Workload;
@@ -98,8 +99,7 @@ const createDataInstance = (type: WorkloadTypes) => {
       break;
     case WorkloadTypes.zmachinelight:
       instance = new ZmachineLight();
-      instance.flist = "https://hub.grid.tf/tf-official-vms/ubuntu-22.04.flist";
-      networklight.interfaces = [networkInterface];
+      (instance.flist = FLISTS.MICROVMS_UBUNTU_22.flist), (networklight.interfaces = [networkInterface]);
       myceliumip.network = "mycelium_net";
       myceliumip.hex_seed = "abc123";
       networklight.mycelium = myceliumip;
@@ -108,8 +108,7 @@ const createDataInstance = (type: WorkloadTypes) => {
       instance.compute_capacity = computeCapacity;
       instance.mounts = [disks];
       instance.env = { key: "value" };
-      instance.entrypoint = "/sbin/zinit init";
-      instance.corex = false;
+      (instance.entrypoint = FLISTS.MICROVMS_UBUNTU_24.entryPoint), (instance.corex = false);
       instance.gpu = ["AMD", "NIVIDIA"];
       break;
     case WorkloadTypes.zmount:

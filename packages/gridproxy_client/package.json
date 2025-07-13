@@ -1,6 +1,6 @@
 {
   "name": "@threefold/gridproxy_client",
-  "version": "2.8.0",
+  "version": "2.8.1",
   "description": "gridproxy_client help to interact with gridproxy based on network",
   "main": "./dist/node/public_api.js",
   "module": "./dist/es6/public_api.js",
@@ -12,7 +12,11 @@
   "files": [
     "/dist"
   ],
-  "repository": "git@github.com:MohamedElmdary/gridproxy_client.git",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/threefoldtech/tfgrid-sdk-ts.git",
+    "directory": "packages/gridproxy_client"
+  },
   "author": "MohamedElmdary <engm5081@gmail.com>",
   "license": "MIT",
   "private": false,

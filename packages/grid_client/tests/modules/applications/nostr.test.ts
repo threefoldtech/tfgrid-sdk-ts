@@ -10,6 +10,7 @@ import {
   MachinesModel,
   randomChoice,
 } from "../../../src";
+import { FLISTS } from "../../../src/helpers/flists";
 import { config, getClient } from "../../client_loader";
 import { generateInt, getOnlineNode, log } from "../../utils";
 
@@ -107,8 +108,8 @@ test("TC2954 - Applications: Deploy Nostr", async () => {
             mountpoint: mountPoint,
           },
         ],
-        flist: "https://hub.grid.tf/tf-official-apps/nostr_relay-mycelium.flist",
-        entrypoint: "/sbin/zinit init",
+        flist: FLISTS.NOSTR.value,
+        entrypoint: FLISTS.NOSTR.entryPoint,
         public_ip: publicIp,
         planetary: true,
         mycelium: true,

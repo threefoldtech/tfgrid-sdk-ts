@@ -1,6 +1,7 @@
 <template>
   <v-dialog
     v-model="$props.openDialog"
+    v-if="$props.openDialog"
     transition="dialog-bottom-transition"
     hide-overlay
     attach="#modals"
