@@ -39,7 +39,7 @@
 <script lang="ts">
 import type { GPUCardInfo, NodeInfo } from "@threefold/grid_client";
 import { noop } from "lodash";
-import { getCurrentInstance, onMounted, onUnmounted, type PropType, ref, computed } from "vue";
+import { getCurrentInstance, onMounted, onUnmounted, type PropType, ref } from "vue";
 
 import type { InputValidatorService } from "@/hooks/input_validator";
 
@@ -84,31 +84,15 @@ export default {
     const { uid } = getCurrentInstance() as { uid: number };
     const form = useForm();
 
-    const targetElement = computed(() => {
-      if (gpuSelect.value) {
-        const vSelectElement = (gpuSelect.value as any)?.$el || gpuSelect.value;
-        if (vSelectElement) {
-          return vSelectElement;
-        }
-      }
-
-      if (input.value) {
-        const selectElement =
-          input.value.querySelector(".v-select") || input.value.querySelector(".v-field") || input.value;
-        return selectElement;
-      }
-
-      return input.value;
-    });
-
     const fakeService: InputValidatorService = {
       validate: () => Promise.resolve(true),
       setStatus: noop,
       reset: noop,
       status: ValidatorStatus.Init,
       error: null,
-      $el: targetElement,
+      $el: input,
       highlightOnError: true,
+      validationTarget: "gpu-cards",
     };
 
     const registrationId = uid.toString();
