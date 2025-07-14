@@ -10,6 +10,7 @@ import {
   MachinesModel,
   randomChoice,
 } from "../../src";
+import { FLISTS } from "../../src/helpers/flists";
 import { config, getClient } from "../client_loader";
 import { generateInt, getOnlineNode, log, splitIP } from "../utils";
 
@@ -176,8 +177,8 @@ test("TC1237 - Gateways: Expose a VM Over Gateway", async () => {
         memory: memory,
         rootfs_size: rootfsSize,
         disks: disks,
-        flist: "https://hub.grid.tf/tf-official-vms/ubuntu-24.04-latest.flist",
-        entrypoint: "/usr/bin/python3 -m http.server --bind ::",
+        flist: FLISTS.GATEWAY.flist,
+        entrypoint: FLISTS.GATEWAY.entrypoint,
         public_ip: true,
         public_ip6: true,
         planetary: true,

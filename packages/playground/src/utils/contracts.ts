@@ -143,7 +143,47 @@ export interface ContractDetails {
   number_of_public_ips?: number;
   farm_id: number;
 }
+export interface DeploymentContract {
+  billing: string; // e.g., "0.225 TFT/hour"
+  capacity: Capacity;
+  contractId: number;
+  corex: boolean;
+  created: number;
+  deploymentName: string;
+  description: string;
+  entrypoint: string;
+  env: EnvVariables;
+  flist: string;
+  gpu: any[];
+  interfaces: DeploymentInterface[];
+  message: string;
+  metadata: string;
+  mounts: any[];
+  myceliumIP: string;
+  name: string;
+  nodeId: number;
+  planetary?: any;
+  projectName: string;
+  publicIP: any | null;
+  rootfs_size: number;
+  status: string;
+  type: string;
+  version: number;
+}
 
+interface Capacity {
+  cpu: number;
+  memory: number;
+}
+
+interface EnvVariables {
+  SSH_KEY: string;
+}
+
+interface DeploymentInterface {
+  network: string;
+  ip: string;
+}
 export interface NormalizedContract {
   contract_id: number;
   twin_id: number;

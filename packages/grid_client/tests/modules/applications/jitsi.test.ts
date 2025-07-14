@@ -2,6 +2,7 @@ import axios from "axios";
 import { setTimeout } from "timers/promises";
 
 import { Features, FilterOptions, GatewayNameModel, generateString, GridClient, MachinesModel } from "../../../src";
+import { FLISTS } from "../../../src/helpers/flists";
 import { config, getClient } from "../../client_loader";
 import { generateInt, getOnlineNode, log } from "../../utils";
 
@@ -100,8 +101,8 @@ test("TCXXXX - Applications: Deploy Jitsi", async () => {
             mountpoint: mountPoint,
           },
         ],
-        flist: "https://hub.grid.tf/tf-official-apps/jitsi-latest.flist",
-        entrypoint: "/sbin/zinit init",
+        flist: FLISTS.JITSI.value,
+        entrypoint: FLISTS.JITSI.entryPoint,
         public_ip: publicIp,
         planetary: true,
         mycelium: true,
