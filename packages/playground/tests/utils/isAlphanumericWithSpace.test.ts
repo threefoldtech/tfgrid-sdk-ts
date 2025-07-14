@@ -12,9 +12,14 @@ describe("isAlphanumericWithSpace", () => {
     expect(validator("abc 123 xyz")).toBe(true);
   });
 
-  it("should not allow leading or trailing spaces, or only spaces", () => {
+  it("Should allow single trailing space", () => {
+    expect(validator("Hello World ")).toBe(true);
+  });
+
+  it("should not allow leading or multiple trailing spaces, or only spaces", () => {
     expect(validator(" HelloWorld")).toBe("Invalid input");
-    expect(validator("HelloWorld ")).toBe("Invalid input");
+    expect(validator("HelloWorld  ")).toBe("Invalid input");
+    expect(validator("Hello  World")).toBe("Invalid input");
     expect(validator(" ")).toBe("Invalid input");
     expect(validator("")).toBe("Invalid input");
     expect(validator("   ")).toBe("Invalid input");
