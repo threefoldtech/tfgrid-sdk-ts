@@ -29,6 +29,7 @@ import { expose } from "../helpers/expose";
 import { validateInput } from "../helpers/validator";
 import { Nodes } from "../primitives/nodes";
 import { BaseModule } from "./base";
+import { currency } from "./currency";
 import {
   BatchCancelContractsModel,
   ContractCancelModel,
@@ -553,6 +554,29 @@ class Contracts {
   @validateInput
   async getConsumption(options: ContractConsumption): Promise<Consumption> {
     return this.client.contracts.getConsumption({ id: options.id, graphqlURL: this.config.graphqlURL });
+  }
+
+  /**
+   * Get the contract cost details per hour in TFT.
+   *
+   * @param  {number} contractId - The contract cost parameters.
+   * @returns {Promise<number>} A promise resolving to the cost details,
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   */
+  @expose
+  async getContractCost(contractId: number): Promise<number> {
+    const HOURS_ONE_MONTH = 24 * 30;
+    const proxy = new GridProxyClient(this.config.proxyURL);
+    const contractInfo = (await proxy.contracts.list({ contractId })).data[0];
+    /** Cost in USD */
+    const contractMonthlyCost = await this.client.contracts.getContractCost(contractInfo, proxy);
+    /** Cost in TFT */
+    const tftPrice = (await this.client.tftPrice.get()) ?? 0;
+    const contractMonthlyCostTFT = Number(new currency(tftPrice, 15).convertUSDtoTFT({ amount: contractMonthlyCost }));
+    /** contract cost per hour in TFT */
+    const contractCost = contractMonthlyCostTFT / HOURS_ONE_MONTH;
+    return contractCost;
   }
 
   /**
