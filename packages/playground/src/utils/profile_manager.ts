@@ -41,5 +41,8 @@ export async function handlePostLogin(grid: GridClient, password: string, email?
   if (sshKeysManagement.needsDefaultNameAssignment()) {
     newKeys = sshKeysManagement.assignDefaultNames();
   }
-  if (newKeys.length > 0) await sshKeysManagement.update(newKeys);
+  if (newKeys.length > 0) {
+    await sshKeysManagement.update(newKeys);
+    createCustomToast("SSH keys have been recovered successfully.", ToastType.success);
+  }
 }
