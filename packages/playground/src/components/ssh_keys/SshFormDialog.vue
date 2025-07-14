@@ -31,7 +31,7 @@
             >
               <v-text-field
                 v-model="keyName"
-                hint="Leave this field empty to generate a name automatically, or enter a custom name to save it with your key."
+                hint="Enter a unique name (letters, numbers, and spaces only, less than 30 characters) to identify your SSH key."
                 class="mb-4"
                 hide-details="auto"
                 label="Name"
@@ -165,7 +165,7 @@ function generateSSHKey() {
     id: keyId,
     publicKey: "",
     createdAt: sshKeysManagement.formatDate(now),
-    name: keyName.value,
+    name: keyName.value.trimEnd(),
     isActive: true,
   };
 
@@ -180,7 +180,7 @@ function createNewSSHKey() {
     id: keyId,
     publicKey: sshKey.value,
     createdAt: sshKeysManagement.formatDate(now),
-    name: keyName.value,
+    name: keyName.value.trimEnd(),
     isActive: true,
   };
 
@@ -194,7 +194,7 @@ function createNewSSHKey() {
     }
   }
 
-  createdKey.value.name = keyName.value;
+  createdKey.value.name = keyName.value.trimEnd();
 
   emits("save", createdKey.value);
 }
