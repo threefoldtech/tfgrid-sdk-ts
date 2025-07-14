@@ -414,10 +414,10 @@ export default {
         await deployGatewayName(grid, selectionDetails.value!.domain, gwConfig);
         suggestName();
         // get gateway url
-        await loadGateways();
-        const deployedGateway = gateways.value.find(gw => gw.name == gwConfig.subdomain);
-
-        layout.value.setStatus("success", `Successfully deployed gateway at https://${deployedGateway!.domain}`);
+        const gatewayUrl = selectionDetails.value!.domain!.useFQDN
+          ? `https://${selectionDetails.value!.domain!.customDomain}`
+          : `https://${gwConfig.subdomain}.${selectionDetails.value!.domain!.selectedDomain!.publicConfig.domain}`;
+        layout.value.setStatus("success", `Successfully deployed gateway at ${gatewayUrl}`);
       } catch (error) {
         errorMessage.value = "Failed to add domain";
         console.error(errorMessage.value, error);
