@@ -9,9 +9,7 @@
     <template #default>
       <v-card>
         <v-toolbar color="primary" class="custom-toolbar">
-          <p class="mb-5">
-            SSH-Key Details
-          </p>
+          <p class="mb-5">SSH-Key Details</p>
         </v-toolbar>
         <v-card-text>
           <template v-for="[_key, value] of Object.entries(selectedKey).sort()" :key="_key">
@@ -22,7 +20,10 @@
                   v-model="currentKey[_key as keyof SSHKeyData]"
                   :label="_key"
                   :readonly="_key === 'fingerPrint'"
-                  :rules="[(value: string) => !!value || `${_key} is required.`, _key === 'name' ? validateName(currentKey.name): true]"
+                  :rules="[
+                    (value: string) => !!value || `${_key} is required.`,
+                    _key === 'name' ? validateName(currentKey.name) : true,
+                  ]"
                 />
               </CopyInputWrapper>
               <CopyInputWrapper v-else :data="value" #="{ props: copyInputProps }">
@@ -41,12 +42,8 @@
 
           <v-tooltip text="Key status">
             <template #activator="{ props }">
-              <v-chip v-if="selectedKey.isActive" v-bind="props">
-                Active
-              </v-chip>
-              <v-chip v-else v-bind="props" color="anchor">
-                Inactive
-              </v-chip>
+              <v-chip v-if="selectedKey.isActive" v-bind="props"> Active </v-chip>
+              <v-chip v-else v-bind="props" color="anchor"> Inactive </v-chip>
             </template>
           </v-tooltip>
 
@@ -74,6 +71,7 @@ import { capitalize, defineComponent, type PropType, ref, watch } from "vue";
 
 import type { SSHKeyData } from "@/types";
 import SSHKeysManagement from "@/utils/ssh";
+import { isAlphanumericWithSpace } from "@/utils/validators";
 
 export default defineComponent({
   name: "SSHDataDialog",
@@ -132,6 +130,12 @@ export default defineComponent({
     function validateName(name: string): string | boolean {
       if (name === props.selectedKey.name) {
         return true;
+      }
+      if (isAlphanumericWithSpace("Invalid name")(name) !== true) {
+        return "Key name must only contain letters, numbers, and spaces within the name.";
+      }
+      if (name.length > 30) {
+        return "Please enter a key name with fewer than 30 characters.";
       }
       const found = props.allKeys.find(key => key.name === name);
       return found ? "You have another key with the same name." : true;
