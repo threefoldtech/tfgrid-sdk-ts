@@ -99,7 +99,7 @@ export default defineComponent({
   setup(props, ctx) {
     const currentKey = ref<SSHKeyData>(props.selectedKey);
     const loading = ref<boolean>(false);
-    const hasChanges = ref<boolean>(true);
+    const hasChanges = ref<boolean>(false);
     const originalKey = ref<SSHKeyData>({ ...props.selectedKey });
     const showTooltip = computed(() => !hasChanges.value);
     watch(
@@ -115,19 +115,9 @@ export default defineComponent({
     // watch currentKey to detect changes
     watch(
       () => currentKey.value,
-      (newValue, oldValue) => {
-        if (
-          oldValue.name.length &&
-          oldValue.fingerPrint &&
-          oldValue.publicKey &&
-          (newValue.name !== originalKey.value.name ||
-            (oldValue.publicKey.length && newValue.publicKey !== originalKey.value.publicKey) ||
-            (oldValue.fingerPrint.length && newValue.fingerPrint !== originalKey.value.fingerPrint))
-        ) {
-          hasChanges.value = true;
-        } else {
-          hasChanges.value = false;
-        }
+      newValue => {
+        hasChanges.value =
+          newValue.name !== originalKey.value.name || newValue.publicKey !== originalKey.value.publicKey;
       },
 
       { deep: true },
