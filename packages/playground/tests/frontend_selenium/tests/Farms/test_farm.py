@@ -4,6 +4,7 @@ from utils.grid_proxy import GridProxy
 from pages.dashboard import DashboardPage
 from utils.base import Base
 from selenium.common.exceptions import TimeoutException
+import pytest
 
 #  Time required for the run (17 cases) is approximately 13 minutes.
 
@@ -18,7 +19,7 @@ def before_test_setup(browser):
     farm_page.navigetor()
     return farm_page, farm_name
 
-
+@pytest.mark.skipif(Base.net == "main", reason="Skipped on Mainnet environment")
 def test_create_farm(browser):
     """
     Test Case: TC907-Create farm with valid name
@@ -50,7 +51,7 @@ def test_create_farm(browser):
     farm_page.create_farm_invalid_name(farm_name)
     assert farm_page.wait_for('Farm name already exists!')
 
-
+@pytest.mark.skipif(Base.net == "main", reason="Skipped on Mainnet environment")
 def test_create_farm_invalid_name(browser):
     """
     Test Case: TC912 - create a farm with invalid name
