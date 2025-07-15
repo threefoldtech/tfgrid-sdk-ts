@@ -742,7 +742,7 @@ class Network {
     } catch (e) {
       console.log(`Couldn't get public config for node ${node_id} due to ${e}`);
     }
-    events.emit("logs", `Node ${node_id} public config: ${JSON.stringify(result)}`);
+    console.log(`Node ${node_id} public config: ${JSON.stringify(result)}`);
 
     let endpoint;
     if (result) {
