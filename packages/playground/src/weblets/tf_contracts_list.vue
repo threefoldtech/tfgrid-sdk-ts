@@ -234,7 +234,7 @@
 </template>
 
 <script lang="ts" setup>
-import type { ContractsOverdue, GridClient } from "@threefold/grid_client";
+import type { Consumption, ContractsOverdue, GridClient } from "@threefold/grid_client";
 import { type Contract, ContractState, NodeStatus, SortByContracts, SortOrder } from "@threefold/gridproxy_client";
 import { DeploymentKeyDeletionError } from "@threefold/types";
 import { computed, defineComponent, onMounted, type Ref, ref } from "vue";
@@ -298,7 +298,7 @@ async function _normalizeContracts(
   const normalizedContracts = await Promise.all(
     contracts.map(async contract => {
       try {
-        return await normalizeContractWithConsumptionCache(grid, contract, contractType);
+        return await normalizeContract(grid, contract, contractType);
       } catch (error) {
         failedContracts.value.push(contract.contract_id);
       }
@@ -315,7 +315,7 @@ function parseProjectName(projectName: string) {
   return projectName;
 }
 
-async function normalizeContractWithConsumptionCache(
+async function normalizeContract(
   grid: GridClient,
   c: { [key: string]: any },
   type: ContractType.Node | ContractType.Name | ContractType.Rent,
@@ -336,23 +336,11 @@ async function normalizeContractWithConsumptionCache(
     expiration = new Date(exp).toLocaleString();
   }
 
-  let consumption = { amountBilled: 0, discountReceived: "None" as any };
-  const cached = consumptionCache.value.get(id);
-  if (cached) {
-    consumption = { amountBilled: cached.consumption, discountReceived: cached.discountPackage };
-  } else {
-    try {
-      consumption = await grid.contracts.getConsumption({ id });
-      consumptionCache.value.set(id, {
-        consumption: consumption.amountBilled,
-        discountPackage: consumption.discountReceived,
-      });
-    } catch {
-      consumptionCache.value.set(id, {
-        consumption: 0,
-        discountPackage: "None",
-      });
-    }
+  let consumption: Consumption;
+  try {
+    consumption = await grid.contracts.getConsumption({ id });
+  } catch {
+    consumption = { amountBilled: 0, discountReceived: "None" };
   }
 
   return {
@@ -374,8 +362,6 @@ async function normalizeContractWithConsumptionCache(
     discountPackage: consumption.discountReceived,
   };
 }
-
-const consumptionCache = ref<Map<number, { consumption: number; discountPackage: any }>>(new Map());
 
 async function loadContractsByType(
   contractType: ContractType.Node | ContractType.Name | ContractType.Rent,
@@ -416,7 +402,6 @@ async function loadContracts(type?: ContractType, options?: { sort: { key: strin
   if (!type) {
     lockedContracts.value = undefined;
     totalCost.value = undefined;
-    consumptionCache.value.clear();
   }
   totalCostUSD.value = undefined;
   loadingErrorMessage.value = undefined;
