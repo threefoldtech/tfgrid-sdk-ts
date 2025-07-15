@@ -3,7 +3,7 @@
     <v-alert v-if="errorMessage" type="error" variant="tonal">
       {{ errorMessage }}
     </v-alert>
-    <v-alert v-if="!loading && count && items.length < count" type="warning" variant="tonal">
+    <v-alert v-if="!loading && count && items.length < count" type="error" variant="tonal">
       Failed to load <strong>{{ count - items.length }}</strong> deployment{{ count - items.length > 1 ? "s" : "" }}.
 
       <span>
@@ -20,18 +20,9 @@
 
       <v-dialog v-model="showDialog" transition="dialog-bottom-transition" scrollable attach="#modals">
         <v-card>
-          <v-card-title style="font-weight: bold"> Failed Deployments </v-card-title>
+          <v-card-title style="font-weight: bold"> Failed Deployments Details </v-card-title>
           <v-divider color="#FFCC00" />
           <v-card-text>
-            <v-alert type="error" variant="tonal">
-              Failed to load
-              <strong>{{ count - items.length }}</strong> deployment{{ count - items.length > 1 ? "s" : "" }}.
-
-              <span>
-                This might happen because the node is down or it's not reachable
-                <span v-if="showEncryption">or the deployment{{ count - items.length > 1 ? "s are" : " is" }} encrypted by another key</span>.
-              </span>
-            </v-alert>
             <v-data-table
               :headers="failedDeploymentsHeader"
               :items="failedDeploymentList"
