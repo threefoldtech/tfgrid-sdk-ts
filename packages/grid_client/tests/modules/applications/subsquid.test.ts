@@ -10,6 +10,7 @@ import {
   MachinesModel,
   randomChoice,
 } from "../../../src";
+import { FLISTS } from "../../../src/helpers/flists";
 import { config, getClient } from "../../client_loader";
 import { GBToBytes, generateInt, getOnlineNode, log, splitIP } from "../../utils";
 
@@ -113,8 +114,8 @@ test("TC2693 - Applications: Deploy Subsquid", async () => {
             mountpoint: mountPoint,
           },
         ],
-        flist: "https://hub.grid.tf/tf-official-apps/subsquid-latest.flist",
-        entrypoint: "/sbin/zinit init",
+        flist: FLISTS.SUBSQUID.value,
+        entrypoint: FLISTS.SUBSQUID.entryPoint,
         public_ip: publicIp,
         planetary: true,
         mycelium: true,
