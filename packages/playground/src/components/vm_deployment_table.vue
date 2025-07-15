@@ -1,33 +1,18 @@
 <template>
   <div>
-    <v-alert
-      v-if="errorMessage"
-      type="error"
-      variant="tonal"
-    >
+    <v-alert v-if="errorMessage" type="error" variant="tonal">
       {{ errorMessage }}
     </v-alert>
-    <v-alert
-      v-if="!loading && count && items.length < count"
-      type="warning"
-      variant="tonal"
-    >
+    <v-alert v-if="!loading && count && items.length < count" type="warning" variant="tonal">
       Failed to load <strong>{{ count - items.length }}</strong> deployment{{ count - items.length > 1 ? "s" : "" }}.
 
       <span>
         This might happen because the node is down or it's not reachable
         <span v-if="showEncryption">or the deployment{{ count - items.length > 1 ? "s are" : " is" }} encrypted by another key</span>.
       </span>
-      <v-tooltip
-        location="top"
-        text="Show failed deployments"
-      >
+      <v-tooltip location="top" text="Show failed deployments">
         <template #activator="{ props: slotProps }">
-          <v-icon
-            v-bind="slotProps"
-            class="custom-icon"
-            @click="showDialog = true"
-          >
+          <v-icon v-bind="slotProps" class="custom-icon" @click="showDialog = true">
             mdi-file-document-refresh-outline
           </v-icon>
         </template>
@@ -41,15 +26,10 @@
         attach="#modals"
       >
         <v-card>
-          <v-card-title style="font-weight: bold">
-            Failed Deployments
-          </v-card-title>
+          <v-card-title style="font-weight: bold"> Failed Deployments </v-card-title>
           <v-divider color="#FFCC00" />
           <v-card-text>
-            <v-alert
-              type="error"
-              variant="tonal"
-            >
+            <v-alert type="error" variant="tonal">
               Failed to load
               <strong>{{ count - items.length }}</strong> deployment{{ count - items.length > 1 ? "s" : "" }}.
 
@@ -58,23 +38,14 @@
                 <span v-if="showEncryption">or the deployment{{ count - items.length > 1 ? "s are" : " is" }} encrypted by another key</span>.
               </span>
             </v-alert>
-            <v-list
-              :items="failedDeploymentList"
-              item-props
-              lines="three"
-            >
+            <v-list :items="failedDeploymentList" item-props lines="three">
               <template #subtitle="{ subtitle }">
                 <div v-html="subtitle" />
               </template>
             </v-list>
           </v-card-text>
           <v-card-actions class="justify-end my-1 mr-2">
-            <v-btn
-              color="anchor"
-              @click="showDialog = false"
-            >
-              Close
-            </v-btn>
+            <v-btn color="anchor" @click="showDialog = false"> Close </v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -139,10 +110,7 @@
       </template>
 
       <template #[`item.flist`]="{ item }">
-        <v-tooltip
-          :text="item.flist"
-          location="bottom right"
-        >
+        <v-tooltip :text="item.flist" location="bottom right">
           <template #activator="{ props: slotProps }">
             <p v-bind="slotProps">
               {{ renameFlist(item.flist) }}
@@ -158,40 +126,18 @@
         {{ toHumanDate(item.created) }}
       </template>
       <template #[`item.actions`]="{ item }">
-        <v-chip
-          v-if="deleting && ($props.modelValue || []).includes(item)"
-          color="error"
-        >
-          Deleting...
-        </v-chip>
-        <v-btn-group
-          v-else
-          variant="tonal"
-        >
-          <slot
-            :name="projectName + '-actions'"
-            :item="item"
-            :update="updateItem"
-          />
+        <v-chip v-if="deleting && ($props.modelValue || []).includes(item)" color="error"> Deleting... </v-chip>
+        <v-btn-group v-else variant="tonal">
+          <slot :name="projectName + '-actions'" :item="item" :update="updateItem" />
         </v-btn-group>
       </template>
 
       <template #[`item.status`]="{ item }">
         <v-chip :color="getNodeHealthColor(item.status as string).color">
-          <v-tooltip
-            v-if="item.status == NodeHealth.Error"
-            activator="parent"
-            location="top"
-          >
-            {{
-              item.message
-            }}
+          <v-tooltip v-if="item.status == NodeHealth.Error" activator="parent" location="top">
+            {{ item.message }}
           </v-tooltip>
-          <v-tooltip
-            v-if="item.status == NodeHealth.Paused"
-            activator="parent"
-            location="top"
-          >
+          <v-tooltip v-if="item.status == NodeHealth.Paused" activator="parent" location="top">
             The deployment contract is in grace period
           </v-tooltip>
           <span class="text-uppercase">
@@ -201,20 +147,10 @@
       </template>
       <template #[`item.health`]="{ item }">
         <v-chip :color="getNodeHealthColor(item[0].workloads[0].result.state as string).color">
-          <v-tooltip
-            v-if="item[0].workloads[0].result.state == NodeHealth.Error"
-            activator="parent"
-            location="top"
-          >
-            {{
-              item.message
-            }}
+          <v-tooltip v-if="item[0].workloads[0].result.state == NodeHealth.Error" activator="parent" location="top">
+            {{ item.message }}
           </v-tooltip>
-          <v-tooltip
-            v-if="item[0].workloads[0].result.state == NodeHealth.Paused"
-            activator="parent"
-            location="top"
-          >
+          <v-tooltip v-if="item[0].workloads[0].result.state == NodeHealth.Paused" activator="parent" location="top">
             The deployment contract is in grace period
           </v-tooltip>
           <span class="text-uppercase">
@@ -224,10 +160,7 @@
       </template>
 
       <template #no-data-text>
-        <div
-          v-if="failedDeploymentList.length > 0"
-          class="text-center"
-        >
+        <div v-if="failedDeploymentList.length > 0" class="text-center">
           <p v-text="'Couldn\'t load any of your ' + projectTitle + ' deployments.'" />
           <VBtn
             class="mt-4"
@@ -238,10 +171,7 @@
             @click="loadDeployments"
           />
         </div>
-        <p
-          v-else
-          v-text="'No ' + projectTitle + ' deployments found on this account.'"
-        />
+        <p v-else v-text="'No ' + projectTitle + ' deployments found on this account.'" />
       </template>
     </ListTable>
   </div>
@@ -252,12 +182,10 @@ import { capitalize, computed, onMounted, ref } from "vue";
 
 import { getNodeHealthColor, NodeHealth } from "@/utils/get_nodes";
 
-import { useGrid, useProfileManager } from "../stores";
+import { useGrid } from "../stores";
 import { updateGrid } from "../utils/grid";
 import { markAsFromAnotherClient } from "../utils/helpers";
 import { type LoadedDeployments, loadVms, mergeLoadedDeployments } from "../utils/load_deployment";
-
-const profileManager = useProfileManager();
 
 const props = defineProps<{
   projectName: string;
@@ -313,7 +241,7 @@ async function loadDeployments() {
 
   items.value = [];
   loading.value = true;
-  updateGrid(grid, { projectName: props.projectName});
+  updateGrid(grid, { projectName: props.projectName });
   try {
     const chunk1 = await loadVms(grid!);
     if (chunk1.count > 0 && migrateGateways) {
@@ -541,7 +469,7 @@ import { ProjectName } from "../types";
 import { migrateModule } from "../utils/migration";
 import AccessDeploymentAlert from "./AccessDeploymentAlert.vue";
 import ListTable from "./list_table.vue";
-import { GridClient } from '@threefold/grid_client';
+import { GridClient } from "@threefold/grid_client";
 
 export default {
   name: "VmDeploymentTable",
