@@ -48,28 +48,13 @@
           :has-custom-domain="selectionDetails?.domain?.enabledCustomDomain"
           require-domain
         />
-        <input-tooltip
-          inline
-          tooltip="
-            Selecting a Node with GPU.
-            When selecting a node with GPU resources, please make sure that you have a rented node. To rent a node and gain access to GPU capabilities, you can use our dashboard.
-            "
-        >
-          <v-switch v-model="hasGPU" color="primary" inset label="GPU" hide-details />
-        </input-tooltip>
-
-        <v-switch v-model="rentedByMe" color="primary" inset label="Rented By Me" hide-details />
-
-        <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
-          <v-switch v-model="dedicated" color="primary" inset label="Rentable" hide-details />
-        </input-tooltip>
-
-        <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
-          <v-switch v-model="certified" color="primary" inset label="Certified" hide-details />
-        </input-tooltip>
 
         <TfSelectionDetails
           v-model="selectionDetails"
+          v-model:rented-by-me="rentedByMe"
+          v-model:dedicated="dedicated"
+          v-model:certified="certified"
+          v-model:has-g-p-u="hasGPU"
           :filters="{
             ipv4,
             ipv6,
@@ -106,8 +91,6 @@
 
 <script lang="ts" setup>
 import { computed, type Ref, ref, watch } from "vue";
-
-import { manual } from "@/utils/manual";
 
 import Networks, { useNetworks } from "../components/networks.vue";
 import { useLayout } from "../components/weblet_layout.vue";
