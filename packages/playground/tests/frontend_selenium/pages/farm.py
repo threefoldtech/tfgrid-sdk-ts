@@ -28,7 +28,7 @@ class FarmPage:
     certification_type_arrow = (By.XPATH ,'//*[@id="app"]/div[1]/div[2]/div/div[1]/div[4]/div[1]/table/thead/tr/th[5]/i')
     pricing_policy_arrow = (By.XPATH ,'//*[@id="app"]/div[1]/div[2]/div/div[1]/div[4]/div[1]/table/thead/tr/th[6]/i')
     add_v2_button = (By.XPATH, "//button[.//span[text()=' Add/Edit Stellar Payout Address ']]")
-    submit_button = (By.XPATH, "//button[.//span[text()='Submit']]")
+    submit_button = (By.XPATH, "//button[contains(@class, 'v-btn') and contains(., 'Submit')]")
     view_bootstrap_button = (By.XPATH, "//a[contains(@href, 'bootstrap.grid.tf') and contains(., 'Bootstrap Node Image')]")
     add_ip_button = (By.XPATH, "//button[.//span[contains(normalize-space(), 'Add IP')]]")
     ip_text_field = (By.XPATH, "//label[text()='IP']/following-sibling::input")
