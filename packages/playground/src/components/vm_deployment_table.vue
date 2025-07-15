@@ -252,12 +252,10 @@ import { capitalize, computed, onMounted, ref } from "vue";
 
 import { getNodeHealthColor, NodeHealth } from "@/utils/get_nodes";
 
-import { useGrid, useProfileManager } from "../stores";
+import { useGrid } from "../stores";
 import { updateGrid } from "../utils/grid";
 import { markAsFromAnotherClient } from "../utils/helpers";
 import { type LoadedDeployments, loadVms, mergeLoadedDeployments } from "../utils/load_deployment";
-
-const profileManager = useProfileManager();
 
 const props = defineProps<{
   projectName: string;

@@ -175,7 +175,7 @@
           <v-divider vertical class="mx-2" />
           <AppTheme />
           <v-divider vertical class="mx-2" />
-          <ProfileManager v-if="permanent" v-model="openProfile" />
+          <ProfileManager v-show="permanent" v-model="openProfile" />
 
           <div v-if="!permanent" class="d-flex align-center">
             <v-btn
@@ -287,11 +287,11 @@ watch(permanent, value => {
   }
 });
 function setSidebarOnResize() {
-  permanent.value =
-    window.innerWidth >
-    ($route.meta && "sidebarBreakpoint" in $route.meta && typeof $route.meta["sidebarBreakpoint"] === "number"
+  const breakpoint = $route.meta && "sidebarBreakpoint" in $route.meta && typeof $route.meta["sidebarBreakpoint"] === "number"
       ? $route.meta.sidebarBreakpoint
-      : 980);
+      : 980;
+  
+  permanent.value = window.innerWidth > breakpoint;
   openSidebar.value = permanent.value;
 }
 
