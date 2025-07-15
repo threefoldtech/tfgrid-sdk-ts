@@ -528,22 +528,20 @@ const nodeStatus = computed(() => {
   return statusObject;
 });
 
-// Calculate the total cost of contracts - optimized to use cached data when possible
 async function getTotalCost() {
-  totalCost.value = 0;
-
   try {
     const res = await gridProxyClient.twins.getConsumption(profileManager.profile!.twinId);
     totalCost.value = +res.last_hour_consumption.toFixed(3);
     const tftPrice = await queryClient.tftPrice.get();
     totalCostUSD.value = totalCost.value * (tftPrice / 1000);
   } catch (error: any) {
+    totalCost.value = 0;
+    totalCostUSD.value = 0;
     loadingErrorMessage.value = `Error calculating total cost: ${error.message}`;
     createCustomToast(loadingErrorMessage.value, ToastType.danger, {});
   }
 }
 
-// Handle updates when contracts are deleted
 async function onDeletedContracts(_contracts: NormalizedContract[]) {
   if (_contracts.length) {
     switch (_contracts[0].type) {
