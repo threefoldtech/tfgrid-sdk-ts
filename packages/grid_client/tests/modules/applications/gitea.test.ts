@@ -10,6 +10,7 @@ import {
   MachinesModel,
   randomChoice,
 } from "../../../src";
+import { FLISTS } from "../../../src/helpers/flists";
 import { config, getClient } from "../../client_loader";
 import { generateInt, getOnlineNode, log } from "../../utils";
 
@@ -109,8 +110,8 @@ test("TC2954 - Applications: Deploy Gitea", async () => {
             mountpoint: mountPoint,
           },
         ],
-        flist: "https://hub.grid.tf/petep.3bot/threefolddev-gitea-latest.flist",
-        entrypoint: "/sbin/zinit init",
+        flist: FLISTS.GITEA.value,
+        entrypoint: FLISTS.GITEA.entryPoint,
         public_ip: publicIp,
         planetary: true,
         mycelium: true,

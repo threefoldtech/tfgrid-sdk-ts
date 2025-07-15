@@ -10,6 +10,7 @@ import {
   MachinesModel,
   randomChoice,
 } from "../../../src";
+import { FLISTS } from "../../../src/helpers/flists";
 import { config, getClient } from "../../client_loader";
 import { GBToBytes, generateInt, getOnlineNode, log, splitIP } from "../../utils";
 
@@ -113,8 +114,8 @@ test("TC2684 - Applications: Deploy Peertube", async () => {
             mountpoint: mountPoint,
           },
         ],
-        flist: "https://hub.grid.tf/tf-official-apps/peertube-v3.1.1.flist",
-        entrypoint: "/sbin/zinit init",
+        flist: FLISTS.PEERTUBE.value,
+        entrypoint: FLISTS.PEERTUBE.entryPoint,
         public_ip: publicIp,
         planetary: true,
         mycelium: true,

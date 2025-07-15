@@ -252,8 +252,8 @@ import { capitalize, computed, onMounted, ref } from "vue";
 
 import { getNodeHealthColor, NodeHealth } from "@/utils/get_nodes";
 
-import { useProfileManager } from "../stores";
-import { getGrid, updateGrid } from "../utils/grid";
+import { useGrid, useProfileManager } from "../stores";
+import { updateGrid } from "../utils/grid";
 import { markAsFromAnotherClient } from "../utils/helpers";
 import { type LoadedDeployments, loadVms, mergeLoadedDeployments } from "../utils/load_deployment";
 
@@ -282,13 +282,15 @@ const failedDeployments = ref<
     contracts?: { contractID: number; node_id: number }[];
   }[]
 >([]);
+const gridStore = useGrid();
+const grid = gridStore.client as GridClient;
 
 onMounted(loadDeployments);
 
 async function loadDomains() {
   try {
     loading.value = true;
-    const grid = await getGrid(profileManager.profile!, props.projectName.toLowerCase());
+    updateGrid(grid, { projectName: props.projectName.toLowerCase() });
     const gateways = await grid!.gateway.list();
     const gws = await Promise.all(gateways.map(name => grid!.gateway.get_name({ name })));
     items.value = gws.map(gw => {
@@ -311,7 +313,7 @@ async function loadDeployments() {
 
   items.value = [];
   loading.value = true;
-  const grid = await getGrid(profileManager.profile!, props.projectName);
+  updateGrid(grid, { projectName: props.projectName});
   try {
     const chunk1 = await loadVms(grid!);
     if (chunk1.count > 0 && migrateGateways) {
@@ -539,6 +541,7 @@ import { ProjectName } from "../types";
 import { migrateModule } from "../utils/migration";
 import AccessDeploymentAlert from "./AccessDeploymentAlert.vue";
 import ListTable from "./list_table.vue";
+import { GridClient } from '@threefold/grid_client';
 
 export default {
   name: "VmDeploymentTable",
