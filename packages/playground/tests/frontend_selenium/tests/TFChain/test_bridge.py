@@ -161,13 +161,14 @@ def test_check_withdraw_tft_amount(browser):
     """
     bridge_page = before_test_setup(browser)
     balance = bridge_page.setup_withdraw_address(get_stellar_address())
+    #decrease the locked TFT & withdraw fee before transfer
+    withdraw_fee = 1
     locked_balance = bridge_page.get_locked_balance()
-    #decrease the locked TFT before transfer
-    cases = [2, 8.001, 10.111]
-    withdraw_fee = float(1)
-    cases.append(format(float(balance)-float(locked_balance)-withdraw_fee, '.3f'))
+    max_withdraw_balance = format(float(balance)-float(locked_balance)-withdraw_fee, '.3f')
+    cases = [max_withdraw_balance, 2, 8.001, 10.111, 03.030]
     for case in cases:
         assert bridge_page.check_withdraw_tft_amount(case) == True
+
 
 
 def test_check_withdraw_invalid_tft_amount(browser):
