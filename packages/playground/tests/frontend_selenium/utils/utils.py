@@ -194,7 +194,7 @@ def convert_to_scaled_float(number):
 def byte_converter(value):
     # Define the unit and the numeric value before checking conditions
     unit = value[-2].upper()  # Last character represents the unit (P, T, G)
-    number_str = value[:-3].strip()  # Everything except the last two characters is the number
+    number_str = value[:-3].strip().replace(",", "")  # Everything except the last two characters is the number
 
     if value != '0':
         # Convert based on the unit

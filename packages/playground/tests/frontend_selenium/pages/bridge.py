@@ -18,10 +18,10 @@ class BridgePage:
     bridge_page = (By.XPATH, "//span[text()='TF Token Bridge']")
     transfer_tft_title = (By.XPATH, "//*[contains(text(), 'Transfer TFT Across Chains')]")
     stellar_choose = (By.XPATH, "//*[contains(text(), 'stellar')]")
-    withdraw = (By.XPATH, "//button[.//span[text()='Withdraw']]")
-    deposit =  (By.XPATH, "//button[.//span[text()='Deposit']]")
-    howdone =  (By.XPATH, "//button[.//span[text()='Learn How?']]")
-    deposite_bridge_address = (By.XPATH, "(//label[text()='Destination'])[1]/following-sibling::input")
+    withdraw = (By.XPATH, "//button[contains(@class, 'v-btn')]//span[normalize-space()='Withdraw']")
+    deposit =  (By.XPATH, "//button[contains(@class, 'v-btn')]//span[normalize-space()='Deposit']")
+    learn_how =  (By.XPATH, "//button[.//span[normalize-space()='Learn How?']]")
+    deposit_bridge_address = (By.XPATH, "(//label[text()='Destination'])[1]/following-sibling::input")
     twin_id_text = (By.XPATH,"(//label[text()='Memo Text'])[1]/following-sibling::input")
     twin_address_text = (By.XPATH, '/html/body/div[1]/div/div/main/div/div[2]/div/div/div/div[2]/div[2]/div[1]/div/div[3]/div[2]/div/div/div/div[1]/span')
     twin_page = (By.XPATH, "//span[text()='Your Profile']")
@@ -29,7 +29,7 @@ class BridgePage:
     deposit_learn_button = (By.XPATH, "//a[.//span[text()='Learn more?']]")
     stellar_address = (By.XPATH, "//label[text()='Stellar Target Wallet Address']/following-sibling::input")
     amount_tft = (By.XPATH, "//input[@class='v-field__input' and @type='number']")
-    submit_button = (By.XPATH, "//button[.//span[text()='Send']]")
+    submit_button = (By.XPATH, "//button[.//span[normalize-space()='Send']]")
     balance_text = (By.XPATH,"//p[contains(text(), 'Balance:')]")
     locked_balance_text = (By.XPATH,"//p[contains(text(), 'Locked:')]")
     tft_amount_text = (By.XPATH, "//*[contains(text(), 'Deposit fee is 1 TFT')]")
@@ -61,7 +61,7 @@ class BridgePage:
         self.browser.find_element(*self.withdraw).click()
 
     def how_it_done(self):
-        self.browser.find_element(*self.howdone).click()
+        self.browser.find_element(*self.learn_how).click()
         WebDriverWait(self.browser, 30).until(EC.number_of_windows_to_be(2))
         self.browser.switch_to.window(self.browser.window_handles[1])
         url = self.browser.current_url
@@ -69,7 +69,7 @@ class BridgePage:
         self.browser.switch_to.window(self.browser.window_handles[0])
         return url
 
-    def deposite_learn_more(self):
+    def deposit_learn_more(self):
         self.browser.find_element(*self.deposit).click()
         self.wait_for_button(self.browser.find_element(*self.deposit_learn_button)).click()
         WebDriverWait(self.browser, 30).until(EC.number_of_windows_to_be(2))
@@ -79,7 +79,7 @@ class BridgePage:
     def check_deposit(self):
         self.browser.find_element(*self.deposit).click() 
         amount_text = self.browser.find_element(*self.tft_amount_text).text
-        bridge_address =  self.browser.find_element(*self.deposite_bridge_address).get_attribute("value")
+        bridge_address =  self.browser.find_element(*self.deposit_bridge_address).get_attribute("value")
         twin_id = self.browser.find_element(*self.twin_id_text).get_attribute("value")
         return twin_id, amount_text, bridge_address
 
@@ -89,7 +89,7 @@ class BridgePage:
         self.browser.find_element(*self.amount_tft).send_keys(Keys.DELETE)
         self.browser.find_element(*self.amount_tft).send_keys(data)
     
-    def setup_widthdraw_address(self, data):
+    def setup_withdraw_address(self, data):
         balance = 'Loadin'
         while(balance == 'Loadin'):
             while True:
@@ -128,7 +128,7 @@ class BridgePage:
 
     def check_withdraw(self, address, amount):
         self.browser.find_element(*self.withdraw).click()
-        self.wait_for('Interact with the bridge in order to withdraw your TFT to Stellar (withdraw fee is: 1 TFT)')
+        self.wait_for_note('Interact with the bridge in order to withdraw your TFT to Stellar (withdraw fee is: 1 TFT)')
         self.browser.find_element(*self.amount_tft).send_keys(Keys.CONTROL + "a")
         self.browser.find_element(*self.amount_tft).send_keys(Keys.DELETE)
         self.browser.find_element(*self.amount_tft).send_keys(amount)
@@ -198,5 +198,13 @@ class BridgePage:
         return button
 
     def wait_for(self, keyword):
-        WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located((By.XPATH, "//*[contains(text(), '"+ keyword +"')]")))
+        WebDriverWait(self.browser, 20).until(EC.visibility_of_element_located((By.XPATH, "//*[contains(text(), '"+ keyword +"')]")))
+        return True
+    
+    def wait_for_note(self, keyword):
+        WebDriverWait(self.browser, 20).until(
+            EC.visibility_of_element_located(
+                (By.XPATH, f"//div[contains(@class, 'v-alert__content') and contains(normalize-space(), '{keyword}')]")
+            )
+        )
         return True
