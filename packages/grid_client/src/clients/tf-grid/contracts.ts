@@ -308,11 +308,9 @@ class TFContracts extends Contracts {
       const response = await gqlClient.query(body, { contractId: options.id });
       const gqlConsumption: GqlConsumption = response["data"] as GqlConsumption;
       const billReports = gqlConsumption.contractBillReports;
-      const contractCostUSD = await this.getContractCost(contract, proxy);
-      // USD per month
-      const contractCostTFT = await this.convertToTFT(Decimal(contractCostUSD));
-
       if (billReports.length === 0) {
+        const contractCostUSD = await this.getContractCost(contract, proxy);
+        const contractCostTFT = await this.convertToTFT(Decimal(contractCostUSD));
         return {
           amountBilled: contractCostTFT.div(HOURS_ONE_MONTH).toNumber(),
           discountReceived: "None",
