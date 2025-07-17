@@ -123,5 +123,5 @@ class TransferPage:
         return self.browser.find_element(*self.submit_id_button)
 
     def wait_for(self, keyword):
-        WebDriverWait(self.browser, 30).until(EC.presence_of_element_located((By.XPATH, "//*[contains(text(), '"+ keyword +"')]")))
+        WebDriverWait(self.browser, 10).until(EC.presence_of_element_located((By.XPATH, "//*[contains(text(), '"+ keyword +"')]")))
         return True

@@ -2,7 +2,6 @@ from utils.utils import get_email, generate_email, generate_string, get_seed
 from pages.twin import TwinPage
 from utils.grid_proxy import GridProxy
 from pages.dashboard import DashboardPage
-import pytest
 from utils.base import Base
 
 #  Time required for the run (6 cases) is approximately 3 minutes.
@@ -14,7 +13,7 @@ def before_test_setup(browser):
     password = generate_string()
     dashboard_page.open_and_load()
     dashboard_page.import_account(get_seed())
-    dashboard_page.click_button(dashboard_page.connect_your_wallet(get_email(), password))
+    dashboard_page.click_button(dashboard_page.connect_your_wallet(password, get_email()))
     twin_page.navigate()
     return twin_page
 
@@ -80,7 +79,7 @@ def test_get_tft(browser):
         assert twin_page.get_tft() == get_tft_url # Get TFT button was removed from dashboard for dev and qa networks.
         assert '/html' in browser.page_source
     # NO checking as devnet don't direct to TF Connect page https://gettft.com/auth/login?next_url=/gettft/shop/#/buy
-    if Base.net in ['dev', 'local']:
+    if Base.net in ['dev']:
         locked_info = 'https://manual.dev.grid.tf/labs/documentation/developers/tfchain/#contract-locking'
     else:
         locked_info = 'https://manual.grid.tf/labs/documentation/developers/tfchain/#contract-locking'

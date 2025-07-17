@@ -58,7 +58,7 @@ def generate_string():
     chars = string.ascii_uppercase + string.digits
     return (''.join(random.choice(chars) for _ in range(10)))
 
-def generate_leters():
+def generate_letters():
     chars = string.digits
     return (''.join(random.choice(chars) for _ in range(10)))
 
@@ -134,7 +134,7 @@ def generate_inavalid_ip():
     ip += str(port)
     return ip
 
-def generate_inavalid_gateway():
+def generate_invalid_gateway():
     first = ['6', '7', '8', '9']
     second = ['6', '7', '8', '9']
     gateway = ''.join(random.choice(

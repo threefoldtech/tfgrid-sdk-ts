@@ -1,6 +1,7 @@
-from utils.utils import generate_leters, generate_string, get_email, get_seed, valid_amount, invalid_address, invalid_amount, invalid_amount_negtive
+from utils.utils import generate_letters, generate_string, get_email, get_seed, valid_amount, invalid_address, invalid_amount, invalid_amount_negtive
 from pages.transfer import TransferPage
 from pages.dashboard import DashboardPage
+import time
 
 #  Time required for the run (10 cases) is approximately 2 minutes.
 
@@ -10,7 +11,7 @@ def before_test_setup(browser):
     password = generate_string()
     dashboard_page.open_and_load()
     dashboard_page.import_account(get_seed())
-    dashboard_page.click_button(dashboard_page.connect_your_wallet(get_email(), password))
+    dashboard_page.click_button(dashboard_page.connect_your_wallet(password))
     transfer_page.navigate()
     return transfer_page
 
@@ -61,9 +62,10 @@ def test_invalid_address(browser):
     transfer_page.recipient_input(twin_address)
     assert transfer_page.wait_for('Cannot transfer to yourself')
     assert transfer_page.get_address_submit().is_enabled() == False
-    cases = [' ', generate_string(), invalid_address(), generate_leters()]
+    cases = [' ', generate_string(), invalid_address(), generate_letters()]
     for case in cases:
       transfer_page.recipient_input(case)
+      time.sleep(0.5)
       assert transfer_page.wait_for('Invalid Address')
       assert transfer_page.get_address_submit().is_enabled() == False
 
@@ -88,7 +90,7 @@ def test_twin_id(browser):
     transfer_page.recipient_id_input(999999999)
     assert transfer_page.wait_for('This twin id doesn')
     assert transfer_page.get_id_submit().is_enabled() == False
-    cases = [' ', generate_string(), invalid_address(), generate_leters()]
+    cases = [' ', generate_string(), invalid_address(), generate_letters()]
     for case in cases:
       transfer_page.recipient_id_input(case)
       assert transfer_page.wait_for('Twin ID should be a valid integer')

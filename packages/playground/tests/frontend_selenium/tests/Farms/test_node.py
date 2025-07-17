@@ -1,4 +1,4 @@
-from utils.utils import get_email, generate_inavalid_gateway, generate_inavalid_ip, generate_ip, generate_leters, generate_string, get_node_seed, randomize_public_ipv4, valid_amount
+from utils.utils import generate_invalid_gateway, generate_inavalid_ip, generate_letters, generate_string, get_node_seed, randomize_public_ipv4, valid_amount
 from pages.node import NodePage
 from utils.grid_proxy import GridProxy
 from pages.dashboard import DashboardPage
@@ -17,7 +17,7 @@ def before_test_setup(browser):
     password = generate_string()
     dashboard_page.open_and_load()
     dashboard_page.import_account(get_node_seed())
-    dashboard_page.click_button(dashboard_page.connect_your_wallet(get_email(), password))
+    dashboard_page.click_button(dashboard_page.connect_your_wallet(password))
     node_page.navigate()
     return node_page, grid_proxy
 
@@ -158,13 +158,13 @@ def test_config_validation(browser):
     assert node_page.wait_for('Private IP addresses are not allowed.')
     assert node_page.get_save_button().is_enabled()==False
     assert node_page.add_config_input( "1.1.1.1/16", '1.1.1.2', '::2/16', '::1', 'tf.grid').is_enabled() == True
-    cases = [generate_inavalid_gateway(), '1.0.0.',  '1:1:1:1', '522.255.255.255', '.239.35.78', '1.1.1.1/16', '239.15.35.78.5', ' ', '*.#.@.!|+-']
+    cases = [generate_invalid_gateway(), '1.0.0.',  '1:1:1:1', '522.255.255.255', '.239.35.78', '1.1.1.1/16', '239.15.35.78.5', ' ', '*.#.@.!|+-']
     for case in cases:
         node_page.add_config_input( 0, case, 0, 0, 0)
         assert node_page.wait_for('Gateway is not valid.')
         assert node_page.get_save_button().is_enabled()==False
     assert node_page.add_config_input( "1.1.1.1/16", '1.1.1.2', '::2/16', '::1', 'tf.grid').is_enabled() == True
-    cases = [' ', '::g', '::+', ':: /6  5', '1:2:3', ':a', '1:2:3:4:5:6:7:8:9', generate_string(), generate_leters()]
+    cases = [' ', '::g', '::+', ':: /6  5', '1:2:3', ':a', '1:2:3:4:5:6:7:8:9', generate_string(), generate_letters()]
     for case in cases:
         node_page.add_config_input( 0, 0, case, 0, 0)
         assert node_page.wait_for('IP is not valid.')
@@ -173,13 +173,13 @@ def test_config_validation(browser):
     assert node_page.wait_for('Private IP addresses are not allowed.')
     assert node_page.get_save_button().is_enabled()==False
     assert node_page.add_config_input( "1.1.1.1/16", '1.1.1.2', '::2/16', '::1', 'tf.grid').is_enabled() == True
-    cases = [' ', '::g', '1:2:3', ':a', '1:2:3:4:5:6:7:8:9', generate_string(), generate_leters()]
+    cases = [' ', '::g', '1:2:3', ':a', '1:2:3:4:5:6:7:8:9', generate_string(), generate_letters()]
     for case in cases:
         node_page.add_config_input( 0, 0, 0, case, 0)
         assert node_page.wait_for('Gateway is not valid.')
         assert node_page.get_save_button().is_enabled()==False
     assert node_page.add_config_input( "1.1.1.1/16", '1.1.1.2', '::2/16', '::1', 'tf.grid').is_enabled() == True
-    cases = [generate_inavalid_ip(), generate_inavalid_gateway(), generate_string(), generate_leters(), '     ', '.', '/', 'q', '1', 'ww', 'ww/ww', '22.22']
+    cases = [generate_inavalid_ip(), generate_invalid_gateway(), generate_string(), generate_letters(), '     ', '.', '/', 'q', '1', 'ww', 'ww/ww', '22.22']
     for case in cases:
         node_page.add_config_input( 0, 0, 0, 0, case)
         assert node_page.wait_for('Please provide a valid domain.')
@@ -270,7 +270,7 @@ def test_additional_fee(browser):
         node_page.set_fee(case)
         assert node_page.wait_for('Fee must be a 0 or more.')
         assert node_page.get_fee_button().is_enabled()==False
-    cases = [generate_inavalid_gateway(), generate_inavalid_ip(), generate_string(), '*d', '_3']
+    cases = [generate_invalid_gateway(), generate_inavalid_ip(), generate_string(), '*d', '_3']
     for case in cases:
         node_page.set_fee(case)
         assert node_page.wait_for('Fee must be a valid number.')

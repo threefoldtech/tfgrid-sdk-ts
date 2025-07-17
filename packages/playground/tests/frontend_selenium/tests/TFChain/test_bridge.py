@@ -1,8 +1,7 @@
-from utils.utils import generate_leters, generate_string, get_email, get_seed, get_stellar_address
+from utils.utils import generate_letters, generate_string, get_seed, get_stellar_address
 from pages.dashboard import DashboardPage
 from utils.grid_proxy import GridProxy
 from pages.bridge import BridgePage
-import pytest
 from utils.base import Base
 
 #  Time required for the run (11 cases) is approximately 3 minutes.
@@ -14,7 +13,7 @@ def before_test_setup(browser):
     password = generate_string()
     dashboard_page.open_and_load()
     dashboard_page.import_account(get_seed())
-    dashboard_page.click_button(dashboard_page.connect_your_wallet(get_email(), password))
+    dashboard_page.click_button(dashboard_page.connect_your_wallet(password))
     bridge_page.navigate_to_bridge()
     return bridge_page
 
@@ -76,8 +75,12 @@ def test_how_it_done(browser):
       Result: it will go to link
     """
     bridge_page = before_test_setup(browser)
-    tfchain_stellar_bridge_url = 'https://manual.grid.tf/labs/documentation/threefold_token/tft_bridges/tfchain_stellar_bridge/'
-    tft_bridges_url = 'https://manual.grid.tf/labs/documentation/threefold_token/tft_bridges/'
+    if Base.net in ['dev']:
+        tfchain_stellar_bridge_url = 'https://manual.dev.grid.tf/labs/documentation/threefold_token/tft_bridges/tfchain_stellar_bridge/'
+        tft_bridges_url = 'https://manual.dev.grid.tf/labs/documentation/threefold_token/tft_bridges/'
+    else:
+        tfchain_stellar_bridge_url = 'https://manual.grid.tf/labs/documentation/threefold_token/tft_bridges/tfchain_stellar_bridge/'
+        tft_bridges_url = 'https://manual.grid.tf/labs/documentation/threefold_token/tft_bridges/'
     assert bridge_page.how_it_done() == tfchain_stellar_bridge_url
     assert bridge_page.deposit_learn_more() == tft_bridges_url
 
@@ -136,7 +139,7 @@ def test_check_withdraw_invalid_stellar(browser):
     """
     bridge_page = before_test_setup(browser)
     bridge_page.setup_withdraw_tft(3)
-    cases = [' ', generate_string(), generate_leters(), '!@##$%$E^/>|ز%^(;:^*)']
+    cases = [' ', generate_string(), generate_letters(), '!@##$%$E^/>|ز%^(;:^*)']
     for case in cases:
         assert bridge_page.check_withdraw_invalid_stellar(case) == False
         assert bridge_page.wait_for('Invalid address')
@@ -162,7 +165,7 @@ def test_check_withdraw_tft_amount(browser):
     bridge_page = before_test_setup(browser)
     balance = bridge_page.setup_withdraw_address(get_stellar_address())
     #decrease the locked TFT & withdraw fee before transfer
-    withdraw_fee = 1
+    withdraw_fee = 1.001
     locked_balance = bridge_page.get_locked_balance()
     max_withdraw_balance = format(float(balance)-float(locked_balance)-withdraw_fee, '.3f')
     cases = [max_withdraw_balance, 2, 8.001, 10.111, 03.030]
