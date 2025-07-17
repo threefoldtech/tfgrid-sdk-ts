@@ -3,7 +3,7 @@
     <v-alert v-if="errorMessage" type="error" variant="tonal">
       {{ errorMessage }}
     </v-alert>
-    <v-alert v-if="!loading && count && items.length < count" type="warning" variant="tonal">
+    <v-alert v-if="!loading && count && items.length < count" type="error" variant="tonal">
       Failed to load <strong>{{ count - items.length }}</strong> deployment{{ count - items.length > 1 ? "s" : "" }}.
 
       <span>
@@ -18,31 +18,28 @@
         </template>
       </v-tooltip>
 
-      <v-dialog
-        v-model="showDialog"
-        transition="dialog-bottom-transition"
-        max-width="500px"
-        scrollable
-        attach="#modals"
-      >
+      <v-dialog v-model="showDialog" transition="dialog-bottom-transition" scrollable attach="#modals">
         <v-card>
-          <v-card-title style="font-weight: bold"> Failed Deployments </v-card-title>
+          <v-card-title style="font-weight: bold"> Failed Deployments Details </v-card-title>
           <v-divider color="#FFCC00" />
           <v-card-text>
-            <v-alert type="error" variant="tonal">
-              Failed to load
-              <strong>{{ count - items.length }}</strong> deployment{{ count - items.length > 1 ? "s" : "" }}.
-
-              <span>
-                This might happen because the node is down or it's not reachable
-                <span v-if="showEncryption">or the deployment{{ count - items.length > 1 ? "s are" : " is" }} encrypted by another key</span>.
-              </span>
-            </v-alert>
-            <v-list :items="failedDeploymentList" item-props lines="three">
-              <template #subtitle="{ subtitle }">
-                <div v-html="subtitle" />
-              </template>
-            </v-list>
+            <v-data-table
+              :headers="failedDeploymentsHeader"
+              :items="failedDeploymentList"
+              :items-per-page-options="
+                failedDeploymentList.length > 5
+                  ? [
+                      { value: 5, title: '5' },
+                      { value: 10, title: '10' },
+                      { value: 20, title: '20' },
+                      { value: 50, title: '50' },
+                    ]
+                  : undefined
+              "
+              :hide-default-footer="failedDeploymentList.length <= 5"
+              class="mt-3"
+              hover
+            ></v-data-table>
           </v-card-text>
           <v-card-actions class="justify-end my-1 mr-2">
             <v-btn color="anchor" @click="showDialog = false"> Close </v-btn>
@@ -184,8 +181,9 @@ import type { GridClient } from "@threefold/grid_client";
 import { getNodeHealthColor, NodeHealth } from "@/utils/get_nodes";
 
 import { useGrid } from "../stores";
+import { updateGrid } from "../utils/grid";
 import { markAsFromAnotherClient } from "../utils/helpers";
-import { loadVms, mergeLoadedDeployments, getGridClient } from "../utils/load_deployment";
+import { type LoadedDeployments, loadVms, mergeLoadedDeployments, getGridClient } from "../utils/load_deployment";
 
 const props = defineProps<{
   projectName: string;
@@ -212,7 +210,11 @@ const failedDeployments = ref<
 >([]);
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
-
+const failedDeploymentsHeader = ref([
+  { title: "Name", key: "name", sortable: false },
+  { title: "Node ID", key: "nodes", sortable: false },
+  { title: "Contract ID", key: "contracts", sortable: false },
+]);
 onMounted(loadDeployments);
 
 async function loadDomains() {
@@ -447,36 +449,17 @@ const filteredHeaders = computed(() => {
 });
 
 const failedDeploymentList = computed(() => {
-  return failedDeployments.value
-    .map(({ name, nodes = [], contracts = [] }, index) => {
-      const nodeMessage =
-        nodes.length > 0
-          ? `<span class="ml-4 text-primary font-weight-bold">On Node:</span> ${nodes.join(", ")}.<br/>`
-          : "";
-      const contractMessage =
-        contracts.length > 0
-          ? ` <span class="ml-4 text-primary font-weight-bold">With Contract ID:</span> ${contracts
-              .map(c => c.contractID)
-              .join(", ")}.`
-          : "";
+  return failedDeployments.value.map(({ name, nodes = [], contracts = [] }) => {
+    if (nodes.length === 0 && contracts.length === 0) {
+      showEncryption.value = true;
+    }
 
-      const subtitle =
-        nodeMessage + contractMessage === ""
-          ? `<span class="ml-4 text-error font-weight-bold">Error:</span> Failed to decrypt deployment data.`
-          : nodeMessage + contractMessage;
-      if (subtitle.includes("Failed to decrypt deployment data.")) {
-        showEncryption.value = true;
-      }
-
-      const item: any[] = [{ title: name, subtitle }];
-
-      if (index + 1 !== failedDeployments.value.length) {
-        item.push({ type: "divider", inset: false });
-      }
-
-      return item;
-    })
-    .flat(1);
+    return {
+      name,
+      nodes: nodes.length > 0 ? nodes.join(", ") : "N/A",
+      contracts: contracts.length > 0 ? contracts.map(c => c.contractID).join(", ") : "N/A",
+    };
+  });
 });
 
 function updateItem(newItem: any) {
@@ -503,6 +486,7 @@ import { ProjectName } from "../types";
 import { migrateModule } from "../utils/migration";
 import AccessDeploymentAlert from "./AccessDeploymentAlert.vue";
 import ListTable from "./list_table.vue";
+import { GridClient } from "@threefold/grid_client";
 
 export default {
   name: "VmDeploymentTable",
