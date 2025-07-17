@@ -36,8 +36,8 @@
       </template>
 
       <template #[`item.consumption`]="{ item }">
-        <div v-if="item?.contractCost !== undefined" class="d-flex justify-center align-center">
-          <p class="mr-2 text-no-wrap" cols="8">{{ item.contractCost.toFixed(3) }} TFT/hour</p>
+        <div v-if="item?.consumption !== undefined" class="d-flex justify-center align-center">
+          <p class="mr-2 text-no-wrap" cols="8">{{ item.consumption?.toFixed(3) }} TFT/hour</p>
 
           <v-tooltip v-if="item.discountPackage !== 'None'" bottom color="primary" close-delay="100" cols="2">
             <template #activator="{ props: discountProps }">

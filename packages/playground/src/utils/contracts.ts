@@ -60,16 +60,6 @@ export async function normalizeContract(
     consumption = { amountBilled: 0, discountReceived: "None" };
   }
 
-  let contractCost: number;
-  try {
-    contractCost = await grid.contracts.getContractCost(id);
-  } catch {
-    console.log("Error fetching contract cost");
-    contractCost = 0;
-  }
-
-  console.log("contractCost", contractCost, id);
-
   return {
     contract_id: id,
     twin_id: c.twin_id,
@@ -87,7 +77,6 @@ export async function normalizeContract(
     expiration,
     consumption: consumption.amountBilled,
     discountPackage: consumption.discountReceived,
-    contractCost: contractCost,
   };
 }
 
@@ -208,7 +197,6 @@ export interface NormalizedContract {
   deploymentType?: string;
   expiration?: string;
   discountPackage?: DiscountLevel;
-  contractCost?: number;
 }
 
 export enum ContractType {

@@ -282,7 +282,11 @@ class TFContracts extends Contracts {
    * @returns {Promise<Consumption>} A promise resolving to the consumption details,
    * including the amount billed and the discount received.
    */
-  async getConsumption(options: GetConsumptionOptions): Promise<Consumption> {
+  async getConsumption(
+    options: GetConsumptionOptions,
+    contract: Contract,
+    proxy: GridProxyClient,
+  ): Promise<Consumption> {
     const gqlClient = new Graphql(options.graphqlURL);
     const body = `query getConsumption($contractId: BigInt!){
             contractBillReports(where: {contractID_eq: $contractId}, limit: 2 , orderBy: timestamp_DESC) {
@@ -304,9 +308,13 @@ class TFContracts extends Contracts {
       const response = await gqlClient.query(body, { contractId: options.id });
       const gqlConsumption: GqlConsumption = response["data"] as GqlConsumption;
       const billReports = gqlConsumption.contractBillReports;
+      const contractCostUSD = await this.getContractCost(contract, proxy);
+      // USD per month
+      const contractCostTFT = await this.convertToTFT(Decimal(contractCostUSD));
+
       if (billReports.length === 0) {
         return {
-          amountBilled: 0,
+          amountBilled: contractCostTFT.div(HOURS_ONE_MONTH).toNumber(),
           discountReceived: "None",
         };
       } else {
@@ -328,6 +336,7 @@ class TFContracts extends Contracts {
             }
           }
         }
+
         return {
           amountBilled: amountBilled
             .div(duration || 1)
