@@ -181,9 +181,8 @@ import type { GridClient } from "@threefold/grid_client";
 import { getNodeHealthColor, NodeHealth } from "@/utils/get_nodes";
 
 import { useGrid } from "../stores";
-import { updateGrid } from "../utils/grid";
 import { markAsFromAnotherClient } from "../utils/helpers";
-import { type LoadedDeployments, loadVms, mergeLoadedDeployments, getGridClient } from "../utils/load_deployment";
+import { loadVms, mergeLoadedDeployments, getGridClient } from "../utils/load_deployment";
 
 const props = defineProps<{
   projectName: string;
@@ -486,7 +485,6 @@ import { ProjectName } from "../types";
 import { migrateModule } from "../utils/migration";
 import AccessDeploymentAlert from "./AccessDeploymentAlert.vue";
 import ListTable from "./list_table.vue";
-import { GridClient } from "@threefold/grid_client";
 
 export default {
   name: "VmDeploymentTable",
