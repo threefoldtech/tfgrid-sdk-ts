@@ -1,4 +1,4 @@
-from utils.utils import generate_invalid_gateway, generate_inavalid_ip, generate_letters, generate_string, get_node_seed, randomize_public_ipv4, valid_amount
+from utils.utils import generate_invalid_gateway, generate_invalid_ip, generate_letters, generate_string, get_node_seed, randomize_public_ipv4, valid_amount
 from pages.node import NodePage
 from utils.grid_proxy import GridProxy
 from pages.dashboard import DashboardPage
@@ -179,7 +179,7 @@ def test_config_validation(browser):
         assert node_page.wait_for('Gateway is not valid.')
         assert node_page.get_save_button().is_enabled()==False
     assert node_page.add_config_input( "1.1.1.1/16", '1.1.1.2', '::2/16', '::1', 'tf.grid').is_enabled() == True
-    cases = [generate_inavalid_ip(), generate_invalid_gateway(), generate_string(), generate_letters(), '     ', '.', '/', 'q', '1', 'ww', 'ww/ww', '22.22']
+    cases = [generate_invalid_ip(), generate_invalid_gateway(), generate_string(), generate_letters(), '     ', '.', '/', 'q', '1', 'ww', 'ww/ww', '22.22']
     for case in cases:
         node_page.add_config_input( 0, 0, 0, 0, case)
         assert node_page.wait_for('Please provide a valid domain.')
@@ -270,7 +270,7 @@ def test_additional_fee(browser):
         node_page.set_fee(case)
         assert node_page.wait_for('Fee must be a 0 or more.')
         assert node_page.get_fee_button().is_enabled()==False
-    cases = [generate_invalid_gateway(), generate_inavalid_ip(), generate_string(), '*d', '_3']
+    cases = [generate_invalid_gateway(), generate_invalid_ip(), generate_string(), '*d', '_3']
     for case in cases:
         node_page.set_fee(case)
         assert node_page.wait_for('Fee must be a valid number.')

@@ -37,7 +37,6 @@ def test_statistics_details(browser):
     assert grid_statistics_details['countries'] == statistics_details_converted['countries']
     assert grid_statistics_details['totalCru'] == statistics_details_converted['totalCru']
     assert math.isclose(convert_to_scaled_float(grid_statistics_details['totalSru']), convert_to_scaled_float(byte_converter(statistics_details_converted['totalSru'])), abs_tol=0.002)
-    # assert math.isclose(convert_to_scaled_float(grid_statistics_details['totalHru']), convert_to_scaled_float(byte_converter(statistics_details_converted['totalHru'])), abs_tol=0.002)
     assert math.isclose(convert_to_scaled_float(grid_statistics_details['totalMru']), convert_to_scaled_float(byte_converter(statistics_details_converted['totalMru'])), abs_tol=0.002)
     assert grid_statistics_details['gpus'] == statistics_details_converted['gpus']
     assert grid_statistics_details['accessNodes'] == statistics_details_converted['accessNodes']

@@ -1,4 +1,4 @@
-from utils.utils import generate_letters, generate_string, get_email, get_seed, valid_amount, invalid_address, invalid_amount, invalid_amount_negtive
+from utils.utils import generate_letters, generate_string, get_seed, valid_amount, invalid_address, invalid_amount, invalid_amount_negative
 from pages.transfer import TransferPage
 from pages.dashboard import DashboardPage
 import time
@@ -134,7 +134,7 @@ def test_invalid_amount(browser):
     transfer_page.amount_tft_input(2)
     transfer_page.recipient_input('5FWW1F7XHaiRgPEqJdkv9nVgz94AVKXkTKNyfbLcY4rqpaNM')
     balance = transfer_page.get_balance()
-    cases = ['-900.009', invalid_amount_negtive()]
+    cases = ['-900.009', invalid_amount_negative()]
     for case in cases:
       transfer_page.amount_tft_input(case)
       assert transfer_page.wait_for('Amount must be greater than 0')

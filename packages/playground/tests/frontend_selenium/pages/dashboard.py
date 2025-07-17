@@ -77,7 +77,7 @@ class DashboardPage:
             assert email_value.strip() != "", "Email input is empty!"
 
     def connect_your_wallet(self, password, email=None):
-        element = WebDriverWait(self.browser, 20).until(EC.presence_of_element_located(self.email_input))
+        WebDriverWait(self.browser, 20).until(EC.presence_of_element_located(self.email_input))
         if email is not None:
             email_field = self.browser.find_element(*self.email_input)
             email_field.send_keys(Keys.CONTROL + "a")

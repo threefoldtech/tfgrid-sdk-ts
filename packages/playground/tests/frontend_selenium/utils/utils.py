@@ -119,7 +119,7 @@ def increment_ip(ipv4):
     incremented_ip = str(incremented_ip_obj)
     return f"{incremented_ip}/{port}"
 
-def generate_inavalid_ip():
+def generate_invalid_ip():
     first = ['6', '7', '8', '9']
     second = ['6', '7', '8', '9']
     port = random.randrange(0, 15)
@@ -161,7 +161,7 @@ def invalid_amount():
     rational = (str(random.uniform(100, 10000)))
     return rational
 
-def invalid_amount_negtive():
+def invalid_amount_negative():
     negative = (str(random.randrange(1, 99)))
     negative = '-'+negative
     return negative

@@ -1,4 +1,4 @@
-from utils.utils import generate_gateway, generate_invalid_gateway, generate_inavalid_ip, generate_ip, increment_ip, generate_gateway_from_ip, generate_string, get_seed, get_email, randomize_public_ipv4
+from utils.utils import generate_gateway, generate_invalid_gateway, generate_invalid_ip, generate_ip, increment_ip, generate_gateway_from_ip, generate_string, get_seed, randomize_public_ipv4
 from pages.farm import FarmPage
 from utils.grid_proxy import GridProxy
 from pages.dashboard import DashboardPage
@@ -206,7 +206,7 @@ def test_ip(browser):
     farm_page.search_functionality(farm_name)
     assert farm_page.wait_for_farm_name(farm_name)
     farm_page.search_functionality("")
-    cases = [generate_inavalid_ip(), '1.0.0.0/66', '239.255.255/17', '239.15.35.78.5/25', '239.15.35.78.5', ' ', '*.#.@.!|+-']
+    cases = [generate_invalid_ip(), '1.0.0.0/66', '239.255.255/17', '239.15.35.78.5/25', '239.15.35.78.5', ' ', '*.#.@.!|+-']
     farm_page.setup_gateway(generate_gateway()+'/16', generate_gateway(), farm_name, True)
     for case in cases:
         farm_page.add_ip(case)
@@ -299,7 +299,7 @@ def test_range_ips(browser):
     assert farm_page.wait_for_farm_name(farm_name)
     farm_page.search_functionality("")
     farm_page.change_to_range_ip(farm_name)
-    cases = [generate_inavalid_ip(), '1.0.0.0/66', '239.255.255/17', '239.15.35.78.5/25', '239.15.35.78.5', ' ', '*.#.@.!|+-']
+    cases = [generate_invalid_ip(), '1.0.0.0/66', '239.255.255/17', '239.15.35.78.5/25', '239.15.35.78.5', ' ', '*.#.@.!|+-']
     for case in cases:
         farm_page.add_range_ips(case, 0, 0).is_enabled()
         assert farm_page.wait_for('Not a valid IP')
