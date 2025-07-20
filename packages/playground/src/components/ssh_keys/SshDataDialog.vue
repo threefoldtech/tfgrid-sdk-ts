@@ -7,6 +7,7 @@
     @keydown.esc="() => $emit('close')"
   >
     <template #default>
+      <v-form v-model="isValidForm">
       <v-card>
         <v-toolbar color="primary" class="custom-toolbar">
           <p class="mb-5">SSH-Key Details</p>
@@ -59,9 +60,10 @@
 
         <v-card-actions class="justify-end mb-1 mr-2">
           <v-btn color="anchor" text="Close" @click="$emit('close')" />
-          <v-btn text="Save" :loading="loading" @click="updateKey" />
+          <v-btn text="Save" :disabled="!isValidForm" :loading="loading" @click="updateKey" />
         </v-card-actions>
       </v-card>
+    </v-form>
     </template>
   </v-dialog>
 </template>
@@ -93,6 +95,7 @@ export default defineComponent({
   setup(props, ctx) {
     const currentKey = ref<SSHKeyData>(props.selectedKey);
     const loading = ref<boolean>(false);
+    const isValidForm = ref<boolean>(false);
 
     watch(
       () => props.open,
@@ -148,6 +151,7 @@ export default defineComponent({
       currentKey,
       sshRules,
       loading,
+      isValidForm,
       validateName,
     };
   },
