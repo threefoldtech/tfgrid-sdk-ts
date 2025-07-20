@@ -27,6 +27,7 @@
     "cidr-tools": "^11.0.3",
     "country-code-lookup": "^0.1.3",
     "cryptr": "^6.3.0",
+    "class-transformer": "^0.5.1",
     "decimal.js": "^10.5.0",
     "front-matter": "^4.0.2",
     "get-ip-range": "^4.0.1",
