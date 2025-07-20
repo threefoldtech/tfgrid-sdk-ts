@@ -29,9 +29,7 @@
 
           <v-row v-for="item in items" :key="item.name" class="bb-gray">
             <v-col v-if="$props.iperf" class="font-14 d-flex justify-space-between">
-              <p class="ml-20 font-14">
-                {{ item.name }}/{{ item.type }}
-              </p>
+              <p class="ml-20 font-14">{{ item.name }}/{{ item.type }}</p>
               <div>
                 <v-icon icon="mdi-arrow-up" />
                 <span class="mx-3">{{ item.uploadSpeed }}</span>
@@ -69,15 +67,13 @@
                 </template>
               </v-tooltip>
 
+              <p class="font-14">
+                {{
+                  item.value && item.value.length > maxLenChar ? item.value.slice(0, maxLenChar) + "..." : item.value
+                }}
+              </p>
               <v-tooltip v-if="item.hint && item.icon" class="overflowText" location="top" :text="item.hint">
                 <template #activator="{ props }">
-                  <p class="font-14" v-bind="props">
-                    {{
-                      item.value && item.value.length > maxLenChar
-                        ? item.value.slice(0, maxLenChar) + "..."
-                        : item.value
-                    }}
-                  </p>
                   <v-icon
                     v-if="item.value && item.value.length && item.value != '-'"
                     class="ml-1"
@@ -90,7 +86,7 @@
 
               <v-tooltip v-else-if="item.imgSrc" location="top" :text="item.hint">
                 <template #activator="{ props }">
-                  <img alt="flag" width="40" v-bind="props" :src="item.imgSrc">
+                  <img alt="flag" width="40" v-bind="props" :src="item.imgSrc" />
                 </template>
               </v-tooltip>
             </v-col>

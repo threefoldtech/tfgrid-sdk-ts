@@ -76,19 +76,11 @@
       :memory="$props.modelValue.memory"
     />
 
-    <!-- <input-tooltip inline tooltip="" :href="manual"> -->
-    <v-switch v-model="$props.modelValue.rentedByMe" color="primary" inset label="Rented By Me" hide-details />
-    <!-- </input-tooltip> -->
-    <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
-      <v-switch v-model="$props.modelValue.dedicated" color="primary" inset label="Rentable" hide-details />
-    </input-tooltip>
-
-    <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
-      <v-switch v-model="$props.modelValue.certified" color="primary" inset label="Certified" hide-details />
-    </input-tooltip>
-
     <TfSelectionDetails
       v-model="$props.modelValue.selectionDetails"
+      v-model:rented-by-me="$props.modelValue.rentedByMe"
+      v-model:dedicated="$props.modelValue.dedicated"
+      v-model:certified="$props.modelValue.certified"
       :selected-machines="selectedMachines"
       :nodes-lock="nodesLock"
       :filters-validators="{
@@ -124,7 +116,6 @@ import { computed, type PropType } from "vue";
 
 import { useGrid } from "@/stores";
 import type { SelectedMachine } from "@/types/nodeSelector";
-import { manual } from "@/utils/manual";
 
 import Networks from "../components/networks.vue";
 import type { K8SWorker } from "../types";
@@ -193,7 +184,7 @@ export default {
       }, [] as SelectedMachine[]);
     });
 
-    return { calculateRootFileSystem, manual, selectedMachines, rentedBy };
+    return { calculateRootFileSystem, selectedMachines, rentedBy };
   },
 };
 </script>

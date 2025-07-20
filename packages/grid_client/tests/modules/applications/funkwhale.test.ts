@@ -10,6 +10,7 @@ import {
   MachinesModel,
   randomChoice,
 } from "../../../src";
+import { FLISTS } from "../../../src/helpers/flists";
 import { config, getClient } from "../../client_loader";
 import { GBToBytes, generateInt, getOnlineNode, log, splitIP } from "../../utils";
 
@@ -113,8 +114,8 @@ test("TC2685 - Applications: Deploy Funkwhale", async () => {
             mountpoint: mountPoint,
           },
         ],
-        flist: "https://hub.grid.tf/tf-official-apps/funkwhale-dec21.flist",
-        entrypoint: "/init.sh",
+        flist: FLISTS.FUNKWHALE.value,
+        entrypoint: FLISTS.FUNKWHALE.entryPoint,
         public_ip: publicIp,
         planetary: true,
         mycelium: true,

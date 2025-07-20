@@ -8,6 +8,7 @@ import {
   QSFSZDBSModel,
   randomChoice,
 } from "../../src";
+import { FLISTS } from "../../src/helpers/flists";
 import { config, getClient } from "../client_loader";
 import { GBToBytes, generateInt, getOnlineNode, k8sWait, log, RemoteRun, splitIP } from "../utils";
 
@@ -200,8 +201,8 @@ test("TC1234 - QSFS: Deploy QSFS underneath a VM", async () => {
         memory: memory,
         rootfs_size: rootfsSize,
         disks: disks,
-        flist: "https://hub.grid.tf/tf-official-apps/base:latest.flist",
-        entrypoint: "/sbin/zinit init",
+        flist: FLISTS.MICROVMS_UBUNTU_24.flist,
+        entrypoint: FLISTS.MICROVMS_UBUNTU_24.entryPoint,
         public_ip: publicIP,
         planetary: true,
         mycelium: true,

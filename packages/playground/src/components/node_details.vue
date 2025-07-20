@@ -1,5 +1,6 @@
 <template>
   <v-dialog
+    v-if="$props.openDialog"
     v-model="$props.openDialog"
     transition="dialog-bottom-transition"
     hide-overlay
