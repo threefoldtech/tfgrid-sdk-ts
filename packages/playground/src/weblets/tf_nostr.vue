@@ -48,19 +48,12 @@
           :has-custom-domain="selectionDetails?.domain?.enabledCustomDomain"
           require-domain
         />
-        <!-- <input-tooltip inline tooltip="" :href="manual"> -->
-        <v-switch v-model="rentedByMe" color="primary" inset label="Rented By Me" hide-details />
-        <!-- </input-tooltip> -->
-        <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
-          <v-switch v-model="dedicated" color="primary" inset label="Rentable" hide-details />
-        </input-tooltip>
-
-        <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
-          <v-switch v-model="certified" color="primary" inset label="Certified" hide-details />
-        </input-tooltip>
 
         <TfSelectionDetails
           v-model="selectionDetails"
+          v-model:rented-by-me="rentedByMe"
+          v-model:dedicated="dedicated"
+          v-model:certified="certified"
           :filters="{
             ipv4,
             ipv6,
@@ -96,8 +89,6 @@
 
 <script lang="ts" setup>
 import { computed, type Ref, ref } from "vue";
-
-import { manual } from "@/utils/manual";
 
 import Networks, { useNetworks } from "../components/networks.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";

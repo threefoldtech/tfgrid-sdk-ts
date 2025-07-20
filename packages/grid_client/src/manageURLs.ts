@@ -101,16 +101,17 @@ function mapResult(result: { [key: string]: string | null }, services: string[])
 export async function getAvailableURLs(clientOptions: ClientOptions) {
   const { proxyURL, relayURL, substrateURL, graphqlURL, activationURL, network } = clientOptions;
   const currentURLs = { proxyURL, relayURL, substrateURL, graphqlURL, activationURL };
-  const base = network === NetworkEnv.main ? "grid.tf" : `${network}.grid.tf`;
+  const base_tf = network === NetworkEnv.main ? "grid.tf" : `${network}.grid.tf`;
+  const base_me = network === NetworkEnv.main ? `grid.threefold.me` : `${network}.threefold.me`;
   const URLS = {
-    relayURL: [`wss://relay.${base}`, `wss://relay.02.${base}`],
-    proxyURL: [`https://gridproxy.${base}`, `https://gridproxy.02.${base}`],
+    relayURL: [`wss://relay.${base_tf}`, `wss://relay.${base_me}`],
+    proxyURL: [`https://gridproxy.${base_tf}`, `https://gridproxy.${base_me}`],
     activationURL: [
-      `https://activation.${base}/activation/activate`,
-      `https://activation.02.${base}/activation/activate`,
+      `https://activation.${base_tf}/activation/activate`,
+      `https://activation.${base_me}/activation/activate`,
     ],
-    graphqlURL: [`https://graphql.${base}/graphql`, `https://graphql.02.${base}/graphql`],
-    substrateURL: [`wss://tfchain.${base}/ws`, `wss://tfchain.02.${base}/ws`],
+    graphqlURL: [`https://graphql.${base_tf}/graphql`, `https://graphql.${base_me}/graphql`],
+    substrateURL: [`wss://tfchain.${base_tf}/ws`, `wss://tfchain.${base_me}/ws`],
   };
   const missingServicesURLS = getServicesWithoutURLs(currentURLs);
 
