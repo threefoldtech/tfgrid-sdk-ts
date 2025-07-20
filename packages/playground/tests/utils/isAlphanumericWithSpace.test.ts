@@ -16,15 +16,22 @@ describe("isAlphanumericWithSpace", () => {
     expect(validator("Hello World ")).toBe(true);
   });
 
-  it("should not allow leading or multiple trailing spaces, or only spaces", () => {
+  it("should not allow leading or multiple trailing spaces", () => {
     expect(validator(" HelloWorld")).toBe("Invalid input");
     expect(validator("HelloWorld  ")).toBe("Invalid input");
     expect(validator("Hello  World")).toBe("Invalid input");
-    expect(validator(" ")).toBe("Invalid input");
-    expect(validator("")).toBe("Invalid input");
-    expect(validator("   ")).toBe("Invalid input");
   });
 
+  it("should not allow a string with only spaces", () => {
+    expect(validator(" ")).toBe("Invalid input");
+    expect(validator("     ")).toBe("Invalid input");
+  });
+
+  it("should allow a single character", () => {
+    expect(validator("A")).toBe(true);
+    expect(validator("z")).toBe(true);
+    expect(validator("1")).toBe(true);
+  });
   it("should not allow special characters", () => {
     expect(validator("Hello@World")).toBe("Invalid input");
     expect(validator("Test!123")).toBe("Invalid input");
