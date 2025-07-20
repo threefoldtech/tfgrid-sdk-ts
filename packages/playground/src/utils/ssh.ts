@@ -268,10 +268,14 @@ class SSHKeysManagement {
     if (!keys) {
       keys = this.oldKeys as SSHKeyData[];
     }
-    const existingNames = new Set(keys.map(k => k.name).filter(Boolean));
+    const existingValidNames = new Set(
+      keys.map(k => k.name).filter(name => name && isAlphanumericWithSpace("Invalid name")(name) === true),
+    );
     for (const key of keys) {
-      if (isAlphanumericWithSpace("Invalid name")(key.name) !== true) {
-        key.name = this.getUniqueName(existingNames, false);
+      if (!key.name || isAlphanumericWithSpace("Invalid name")(key.name) !== true) {
+        key.name = this.getUniqueName(existingValidNames, false);
+      } else {
+        existingValidNames.add(key.name);
       }
     }
     return keys;

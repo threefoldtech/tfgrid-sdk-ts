@@ -169,11 +169,7 @@ export interface IsAlphanumeric {
  */
 export function isAlphanumericWithSpace(msg: string) {
   return (value: string) => {
-    if (value.endsWith("  ")) {
-      return msg;
-    }
-    value = value.trimEnd();
-    if (!/^[a-zA-Z0-9]+( [a-zA-Z0-9]+)*$/.test(value)) {
+    if (value.endsWith("  ") || !/^[a-zA-Z0-9]+( [a-zA-Z0-9]+)*$/.test(value.trimEnd())) {
       return msg;
     }
     return true;
