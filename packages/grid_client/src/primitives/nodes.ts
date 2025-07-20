@@ -387,9 +387,10 @@ class Nodes {
     }
     return nodes;
   }
-  async filterFarms(options: FilterOptions = {}, url = ""): Promise<FarmInfo[]> {
+  async filterFarms(options: FarmFilterOptions = {}, url = ""): Promise<FarmInfo[]> {
     let farms: FarmInfo[] = [];
     url = url || this.proxyURL;
+    options.node_features = this.getFeaturesFromFilters(options);
     const query = this.getFarmUrlQuery(options);
     farms = await send("get", urlJoin(url, `/farms?${query}`), "", {});
     return farms;
@@ -403,8 +404,9 @@ class Nodes {
    * @returns A Promise that resolves to the count of available farms as a number.
    * @throws Error if there is an issue with the HTTP request or response.
    */
-  async getFarmsCount(options: FilterOptions = {}, url = ""): Promise<number> {
+  async getFarmsCount(options: FarmFilterOptions = {}, url = ""): Promise<number> {
     const _options = { ...options };
+    _options.node_features = this.getFeaturesFromFilters(options);
     url = url || this.proxyURL;
     _options.ret_count = true;
     _options.page = 1;
@@ -504,6 +506,7 @@ class Nodes {
       randomize: options.randomize,
       ret_count: options.ret_count,
       region: options.region,
+      node_features: options.node_features,
     };
 
     return convertObjectToQueryString(params);

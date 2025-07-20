@@ -4,26 +4,62 @@
       <h3 class="bg-primary pa-2 text-h6 rounded">
         Node Selection
       </h3>
-      <p class="text-h6 mb-4 mt-2 ml-2">
+
+      <TfRentalFilterSwitches
+        :rented-by-me="rentedByMe"
+        :dedicated="dedicated"
+        :certified="certified"
+        :has-g-p-u="hasGPU"
+        class="my-2"
+        @update:rented-by-me="$emit('update:rentedByMe', $event)"
+        @update:dedicated="$emit('update:dedicated', $event)"
+        @update:certified="$emit('update:certified', $event)"
+        @update:has-g-p-u="$emit('update:hasGPU', $event)"
+      />
+
+      <p class="text-h6 mb-4 ml-2">
         Choose a way to select Node
       </p>
 
-      <v-radio-group v-model="wayToSelect" color="primary" inline>
+      <v-radio-group
+        v-model="wayToSelect"
+        color="primary"
+        inline
+      >
         <InputTooltip
           align-center
           tooltip="Automatically select your node by filtering with Region, country, or farm name"
         >
-          <v-radio label="Automated" value="automated" />
+          <v-radio
+            label="Automated"
+            value="automated"
+          />
         </InputTooltip>
-        <InputTooltip align-center tooltip="Manually select your node by entering its id">
-          <v-radio label="Manual" value="manual" class="ml-5" />
+        <InputTooltip
+          align-center
+          tooltip="Manually select your node by entering its id"
+        >
+          <v-radio
+            label="Manual"
+            value="manual"
+            class="ml-5"
+          />
         </InputTooltip>
       </v-radio-group>
 
       <div ref="input">
         <template v-if="wayToSelect === 'automated'">
-          <TfSelectLocation v-model="location" title="Choose a Location" :status="NodeStatus.Up" />
-          <TfSelectFarm v-model="farm" :valid-filters="validFilters" :filters="filters" :location="location" />
+          <TfSelectLocation
+            v-model="location"
+            title="Choose a Location"
+            :status="NodeStatus.Up"
+          />
+          <TfSelectFarm
+            v-model="farm"
+            :valid-filters="validFilters"
+            :filters="filters"
+            :location="location"
+          />
           <TfAutoNodeSelector
             v-model="node"
             v-model:status="nodeStatus"
@@ -99,6 +135,7 @@ import type {
   SelectionDetailsFiltersValidators,
 } from "../../types/nodeSelector";
 import { createSelectionDetailsFiltersValidator } from "../../utils/nodeSelector";
+import TfRentalFilterSwitches from "../filters/TfRentalFilterSwitches.vue";
 import TfAutoNodeSelector from "./TfAutoNodeSelector.vue";
 import TfDomainName from "./TfDomainName.vue";
 import TfManualNodeSelector from "./TfManualNodeSelector.vue";
@@ -108,7 +145,15 @@ import TfSelectLocation from "./TfSelectLocation.vue";
 
 export default {
   name: "TfSelectionDetails",
-  components: { TfSelectLocation, TfSelectFarm, TfAutoNodeSelector, TfManualNodeSelector, TfSelectGpu, TfDomainName },
+  components: {
+    TfRentalFilterSwitches,
+    TfSelectLocation,
+    TfSelectFarm,
+    TfAutoNodeSelector,
+    TfManualNodeSelector,
+    TfSelectGpu,
+    TfDomainName,
+  },
   props: {
     modelValue: Object as PropType<SelectionDetails>,
     filters: {
@@ -132,10 +177,18 @@ export default {
       default: () => [],
     },
     nodesLock: Object as PropType<AwaitLock>,
+    rentedByMe: Boolean,
+    dedicated: Boolean,
+    certified: Boolean,
+    hasGPU: Boolean,
   },
   emits: {
     "update:model-value": (value: SelectionDetails) => true || value,
     "update:status": (value: ValidatorStatus) => true || value,
+    "update:rentedByMe": (value: boolean) => value,
+    "update:dedicated": (value: boolean) => value,
+    "update:certified": (value: boolean) => value,
+    "update:hasGPU": (value: boolean) => value,
   },
   setup(props, ctx) {
     const input = ref<HTMLElement>();
