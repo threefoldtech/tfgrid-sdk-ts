@@ -110,6 +110,7 @@ export interface GetConsumptionOptions {
 export interface Consumption {
   amountBilled: number;
   discountReceived: DiscountLevel;
+  inFirstBillingCycle: boolean;
 }
 
 export interface GetDiscountPackageOptions {
@@ -282,11 +283,7 @@ class TFContracts extends Contracts {
    * @returns {Promise<Consumption>} A promise resolving to the consumption details,
    * including the amount billed and the discount received.
    */
-  async getConsumption(
-    options: GetConsumptionOptions,
-    contract: Contract,
-    proxy: GridProxyClient,
-  ): Promise<Consumption> {
+  async getConsumption(options: GetConsumptionOptions): Promise<Consumption> {
     const gqlClient = new Graphql(options.graphqlURL);
     const body = `query getConsumption($contractId: BigInt!){
             contractBillReports(where: {contractID_eq: $contractId}, limit: 2 , orderBy: timestamp_DESC) {
@@ -309,11 +306,10 @@ class TFContracts extends Contracts {
       const gqlConsumption: GqlConsumption = response["data"] as GqlConsumption;
       const billReports = gqlConsumption.contractBillReports;
       if (billReports.length === 0) {
-        const contractCostUSD = await this.getContractCost(contract, proxy);
-        const contractCostTFT = await this.convertToTFT(Decimal(contractCostUSD));
         return {
-          amountBilled: contractCostTFT.div(HOURS_ONE_MONTH).toNumber(),
+          amountBilled: 0,
           discountReceived: "None",
+          inFirstBillingCycle: true,
         };
       } else {
         let duration = 1;
@@ -334,15 +330,42 @@ class TFContracts extends Contracts {
             }
           }
         }
-
         return {
           amountBilled: amountBilled
             .div(duration || 1)
             .div(10 ** 7)
             .toNumber(),
           discountReceived: billReports[0].discountReceived,
+          inFirstBillingCycle: false,
         };
       }
+    } catch (err) {
+      (err as Error).message = formatErrorMessage(`Error getting consumption for contract ${options.id}.`, err);
+      throw err;
+    }
+  }
+
+  /**
+   *  Get the estimated contract consumption details per hour in TFT.
+   *
+   * @param  {GetConsumptionOptions} options
+   * @returns {Promise<Consumption>} A promise resolving to the consumption details,
+   * including the amount billed and the discount received.
+   */
+  async getConsumptionWithEstimation(options: GetConsumptionOptions, proxy: GridProxyClient): Promise<Consumption> {
+    try {
+      const consumption = await this.getConsumption(options);
+      if (consumption.inFirstBillingCycle) {
+        const contract = (await proxy.contracts.list({ contractId: options.id }))[0];
+        const contractCostUSD = await this.getContractCost(contract, proxy);
+        const contractCostTFT = await this.convertToTFT(Decimal(contractCostUSD));
+        return {
+          amountBilled: contractCostTFT.div(HOURS_ONE_MONTH).toNumber(),
+          discountReceived: "None",
+          inFirstBillingCycle: true,
+        };
+      }
+      return consumption;
     } catch (err) {
       (err as Error).message = formatErrorMessage(`Error getting consumption for contract ${options.id}.`, err);
       throw err;

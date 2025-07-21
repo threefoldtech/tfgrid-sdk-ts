@@ -55,9 +55,9 @@ export async function normalizeContract(
 
   let consumption: Consumption;
   try {
-    consumption = await grid.contracts.getConsumption({ id });
+    consumption = await grid.contracts.getConsumptionWithEstimation({ id });
   } catch {
-    consumption = { amountBilled: 0, discountReceived: "None" };
+    consumption = { amountBilled: 0, discountReceived: "None", inFirstBillingCycle: false };
   }
 
   return {

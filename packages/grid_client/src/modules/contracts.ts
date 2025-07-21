@@ -552,12 +552,25 @@ class Contracts {
   @expose
   @validateInput
   async getConsumption(options: ContractConsumption): Promise<Consumption> {
+    return this.client.contracts.getConsumption({ id: options.id, graphqlURL: this.config.graphqlURL });
+  }
+
+  /**
+   * Get the estimated contract consumption details per hour in TFT.
+   *
+   * @param  {ContractConsumption} options - The contract consumption parameters.
+   * @returns {Promise<Consumption>} A promise resolving to the consumption details,
+   * including the amount billed and the discount received.
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   */
+  @expose
+  @validateInput
+  async getConsumptionWithEstimation(options: ContractConsumption): Promise<Consumption> {
     const proxy = new GridProxyClient(this.config.proxyURL);
-    const contractId = options.id;
-    const contractInfo = (await proxy.contracts.list({ contractId })).data[0];
-    return this.client.contracts.getConsumption(
+    return this.client.contracts.getConsumptionWithEstimation(
       { id: options.id, graphqlURL: this.config.graphqlURL },
-      contractInfo,
       proxy,
     );
   }
