@@ -264,24 +264,21 @@ export default {
     const invalid = computed(() => {
       return (
         (!props.disableNodeSelection && nodeStatus.value === ValidatorStatus.Invalid) ||
-        (props.requireDomain && domainStatus.value === ValidatorStatus.Invalid) ||
-        (props.filters.hasGPU && gpuStatus.value === ValidatorStatus.Invalid)
+        (props.requireDomain && domainStatus.value === ValidatorStatus.Invalid)
       );
     });
 
     const pending = computed(() => {
       return (
         (!props.disableNodeSelection && nodeStatus.value === ValidatorStatus.Pending) ||
-        (props.requireDomain && domainStatus.value === ValidatorStatus.Pending) ||
-        (props.filters.hasGPU && gpuStatus.value === ValidatorStatus.Pending)
+        (props.requireDomain && domainStatus.value === ValidatorStatus.Pending)
       );
     });
 
     const valid = computed(() => {
       return (
         (props.disableNodeSelection || (!props.disableNodeSelection && nodeStatus.value === ValidatorStatus.Valid)) &&
-        (!props.requireDomain || (props.requireDomain && domainStatus.value === ValidatorStatus.Valid)) &&
-        (!props.filters.hasGPU || (props.filters.hasGPU && gpuStatus.value === ValidatorStatus.Valid))
+        (!props.requireDomain || (props.requireDomain && domainStatus.value === ValidatorStatus.Valid))
       );
     });
 

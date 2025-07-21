@@ -1,19 +1,18 @@
 <template>
-  <v-alert class="mb-4" type="info" variant="tonal">
-    Choose a GPU card to deploy your VM.
-  </v-alert>
-  <div ref="input">
+  <v-alert class="mb-4" type="info" variant="tonal"> Choose a GPU card to deploy your VM. </v-alert>
+  <div ref="input" class="gpu-card-selector" data-validation-target="gpu-cards">
     <input-tooltip
       tooltip="Please select at least one card from the available GPU cards. Note that if you have a deployment that already uses certain cards, they will not appear in the selection area. You have the option to select one or more cards.."
     >
       <VSelect
+        ref="gpuSelect"
         label="GPU Cards"
         placeholder="Select GPU Cards"
         class="w-100"
         multiple
         :model-value="$props.modelValue"
         item-value="id"
-        :items="(cardsTask.data as GPUCardInfo[])"
+        :items="cardsTask.data as GPUCardInfo[]"
         item-title="device"
         :loading="cardsTask.loading"
         :error="!!cardsTask.error"
@@ -27,9 +26,11 @@
         :persistent-hint="!$props.validNode"
         @update:model-value="
           bindModelValue($event);
-          bindStatus($event.length === 0 ? ValidatorStatus.Invalid : ValidatorStatus.Valid);
+          bindStatus();
         "
-        @update:menu="opened => !opened && $props.modelValue.length === 0 && bindStatus(ValidatorStatus.Invalid)"
+        @update:menu="
+          opened => !opened && $props.modelValue.length === 0 && $props.validNode && bindStatus(ValidatorStatus.Invalid)
+        "
       />
     </input-tooltip>
   </div>
@@ -62,6 +63,7 @@ export default {
   setup(props, ctx) {
     const gridStore = useGrid();
     const input = ref<HTMLElement>();
+    const gpuSelect = ref<HTMLElement>();
     const cardsTask = useAsync(getNodeAvailableGpuCards, { default: [] });
 
     onUnmounted(() => {
@@ -89,32 +91,84 @@ export default {
       status: ValidatorStatus.Init,
       error: null,
       $el: input,
+      highlightOnError: true,
+      validationTarget: "gpu-cards",
     };
+
+    const registrationId = uid.toString();
+    let isRegistered = false;
+
+    const registerService = () => {
+      if (!isRegistered && form) {
+        form.register(registrationId, fakeService);
+        isRegistered = true;
+      }
+    };
+
+    const unregisterService = () => {
+      if (isRegistered && form) {
+        form.unregister(registrationId);
+        isRegistered = false;
+      }
+    };
+
+    onMounted(() => {
+      if (props.validNode && props.node) {
+        registerService();
+      }
+    });
+
+    onUnmounted(() => {
+      unregisterService();
+    });
 
     useWatchDeep(
       () => [props.validNode, props.node],
       ([valid, node]) => {
         bindModelValue();
         if (valid && node) {
+          registerService();
           return cardsTask.value.run(gridStore, node as NodeInfo);
+        } else {
+          unregisterService();
+          bindStatus(ValidatorStatus.Init);
+          cardsTask.value.initialized && cardsTask.value.reset();
         }
-        bindStatus();
-        cardsTask.value.initialized && cardsTask.value.reset();
       },
       { immediate: true, deep: true },
     );
 
-    onMounted(() => form?.register(uid.toString(), fakeService));
-    onUnmounted(() => form?.unregister(uid.toString()));
+    useWatchDeep(
+      () => props.modelValue,
+      cards => {
+        if (props.validNode && props.node) {
+          bindStatus(cards.length === 0 ? ValidatorStatus.Invalid : ValidatorStatus.Valid);
+        } else {
+          bindStatus(ValidatorStatus.Init);
+        }
+      },
+      { immediate: true, deep: true },
+    );
 
     function bindStatus(status?: ValidatorStatus) {
-      const s = status || ValidatorStatus.Init;
+      let s = status;
+
+      if (!s) {
+        if (props.validNode && props.node) {
+          s = props.modelValue.length === 0 ? ValidatorStatus.Invalid : ValidatorStatus.Valid;
+        } else {
+          s = ValidatorStatus.Init;
+        }
+      }
+
       fakeService.status = s;
-      form?.updateStatus(uid.toString(), s);
+      if (isRegistered) {
+        form?.updateStatus(registrationId, s);
+      }
       ctx.emit("update:status", s);
     }
 
-    return { input, ValidatorStatus, cardsTask, bindModelValue, bindStatus };
+    return { input, gpuSelect, ValidatorStatus, cardsTask, bindModelValue, bindStatus };
   },
 };
 </script>
