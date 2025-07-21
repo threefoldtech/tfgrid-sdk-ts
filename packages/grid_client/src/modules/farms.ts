@@ -10,6 +10,7 @@ import {
   CreateFarmModel,
   FarmIdModel,
   RemoveFarmIPModel,
+  RemoveFarmIPsModel,
 } from "./models";
 import { checkBalance } from "./utils";
 
@@ -99,7 +100,7 @@ class Farms {
   @expose
   @validateInput
   @checkBalance
-  async removeFarmIps(options: RemoveFarmIPModel[]): Promise<void> {
+  async removeFarmIps(options: RemoveFarmIPsModel): Promise<void> {
     return await this.client.farms.removeFarmIps(options);
   }
 
