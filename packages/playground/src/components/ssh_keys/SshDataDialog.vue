@@ -9,9 +9,7 @@
     <template #default>
       <v-card>
         <v-toolbar color="primary" class="custom-toolbar">
-          <p class="mb-5">
-            SSH-Key Details
-          </p>
+          <p class="mb-5">SSH-Key Details</p>
         </v-toolbar>
         <v-card-text>
           <template v-for="[_key, value] of Object.entries(selectedKey).sort()" :key="_key">
@@ -22,7 +20,10 @@
                   v-model="currentKey[_key as keyof SSHKeyData]"
                   :label="_key"
                   :readonly="_key === 'fingerPrint'"
-                  :rules="[(value: string) => !!value || `${_key} is required.`, _key === 'name' ? validateName(currentKey.name): true]"
+                  :rules="[
+                    (value: string) => !!value || `${_key} is required.`,
+                    _key === 'name' ? validateName(currentKey.name) : true,
+                  ]"
                 />
               </CopyInputWrapper>
               <CopyInputWrapper v-else :data="value" #="{ props: copyInputProps }">
@@ -41,12 +42,8 @@
 
           <v-tooltip text="Key status">
             <template #activator="{ props }">
-              <v-chip v-if="selectedKey.isActive" v-bind="props">
-                Active
-              </v-chip>
-              <v-chip v-else v-bind="props" color="anchor">
-                Inactive
-              </v-chip>
+              <v-chip v-if="selectedKey.isActive" v-bind="props"> Active </v-chip>
+              <v-chip v-else v-bind="props" color="anchor"> Inactive </v-chip>
             </template>
           </v-tooltip>
 
@@ -61,8 +58,15 @@
         </v-card-text>
 
         <v-card-actions class="justify-end mb-1 mr-2">
-          <v-btn color="anchor" text="Close" @click="$emit('close')" />
-          <v-btn text="Save" :loading="loading" @click="updateKey" />
+          <v-btn color="anchor" text @click="$emit('close')">Close</v-btn>
+
+          <v-tooltip v-model="showTooltip" text="No changes have been made" bottom>
+            <template #activator="{ props }">
+              <div v-on="props">
+                <v-btn text :loading="loading" :disabled="!hasChanges" v-bind="props" @click="updateKey"> Save </v-btn>
+              </div>
+            </template>
+          </v-tooltip>
         </v-card-actions>
       </v-card>
     </template>
@@ -70,7 +74,7 @@
 </template>
 
 <script lang="ts">
-import { capitalize, defineComponent, type PropType, ref, watch } from "vue";
+import { capitalize, defineComponent, computed, type PropType, ref, watch } from "vue";
 
 import type { SSHKeyData } from "@/types";
 import SSHKeysManagement from "@/utils/ssh";
@@ -95,15 +99,28 @@ export default defineComponent({
   setup(props, ctx) {
     const currentKey = ref<SSHKeyData>(props.selectedKey);
     const loading = ref<boolean>(false);
-
+    const hasChanges = ref<boolean>(false);
+    const originalKey = ref<SSHKeyData>({ ...props.selectedKey });
+    const showTooltip = computed(() => !hasChanges.value);
     watch(
       () => props.open,
       newValue => {
         if (newValue) {
           currentKey.value = { ...props.selectedKey };
+          originalKey.value = { ...props.selectedKey };
           loading.value = false;
         }
       },
+    );
+    // watch currentKey to detect changes
+    watch(
+      () => currentKey.value,
+      newValue => {
+        hasChanges.value =
+          newValue.name !== originalKey.value.name || newValue.publicKey !== originalKey.value.publicKey;
+      },
+
+      { deep: true },
     );
 
     const notNeededFields = ["id", "activating", "deleting", "isActive", "createdAt"];
@@ -145,6 +162,8 @@ export default defineComponent({
       sshRules,
       loading,
       validateName,
+      hasChanges,
+      showTooltip,
     };
   },
 });
