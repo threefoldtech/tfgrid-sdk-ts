@@ -1,5 +1,7 @@
 import { ValidationError } from "@threefold/types";
 
+import { discountPackages } from "./calculator";
+
 /**
  * Decorator function to check if the balance is enough to apply an extrinsic.
  *
@@ -20,4 +22,29 @@ function checkBalance(target, propertyKey: string, descriptor: PropertyDescripto
   };
 }
 
-export { checkBalance };
+/**
+ * Calculates discount packages based on balance and prices.
+ * 
+ * @param balance - The user's balance amount
+ * @param dedicatedPrice - The price for dedicated resources
+ * @param sharedPrice - The price for shared resources
+ * @returns An object containing the determined discount package levels for dedicated and shared resources
+ */
+function calculateDiscountPackage(
+  balance: number,
+  dedicatedPrice: number,
+  sharedPrice: number,
+): { dedicatedPackage: string; sharedPackage: string } {
+  let dedicatedPackage = "none";
+  let sharedPackage = "none";
+  for (const pkg in discountPackages) {
+    if (balance > dedicatedPrice * discountPackages[pkg].duration) {
+      dedicatedPackage = pkg;
+    }
+    if (balance > sharedPrice * discountPackages[pkg].duration) {
+      sharedPackage = pkg;
+    }
+  }
+  return { dedicatedPackage, sharedPackage };
+}
+export { checkBalance, calculateDiscountPackage };
