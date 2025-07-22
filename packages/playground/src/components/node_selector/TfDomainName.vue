@@ -8,7 +8,7 @@
       </div>
     </input-tooltip>
 
-    <div ref="input">
+    <div ref="input" class="domain-selector" data-validation-target="domain-selection">
       <form-validator ref="domainFormRef">
         <VExpandTransition>
           <input-tooltip v-if="enableCustomDomain" tooltip="Domain name that will point to this instance">
@@ -254,6 +254,8 @@ export default {
       status: ValidatorStatus.Init,
       error: null,
       $el: input,
+      highlightOnError: true,
+      validationTarget: "domain-selection",
     };
 
     onMounted(() => {

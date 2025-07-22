@@ -811,6 +811,10 @@ class RemoveFarmIPModel {
   @Expose() @IsNotEmpty() @IsString() ip: string;
 }
 
+class RemoveFarmIPsModel {
+  @Expose() @IsArray() @ValidateNested({ each: true }) ips: RemoveFarmIPModel[];
+}
+
 class AddStellarAddressToFarmModel {
   @Expose() @IsInt() @IsNotEmpty() @Min(1) farmId: number;
   @Expose() @IsString() @IsNotEmpty() stellarAddress: string;
@@ -1066,6 +1070,7 @@ export {
   ListenToMintCompletedModel,
   AddFarmIPModel,
   RemoveFarmIPModel,
+  RemoveFarmIPsModel,
   AddStellarAddressToFarmModel,
   AddPublicConfig,
   GetActiveContractsModel,

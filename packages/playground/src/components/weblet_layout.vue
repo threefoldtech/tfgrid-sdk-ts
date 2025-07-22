@@ -10,7 +10,7 @@
             :style="{
               filter: `brightness(${!theme.global.current.value.dark ? 0.2 : 1})`,
             }"
-          >
+          />
           <slot name="title" />
         </v-card-title>
         <v-card-subtitle v-if="$slots.subtitle" :style="{ whiteSpace: 'initial' }">
@@ -25,9 +25,7 @@
     <v-card-text>
       <slot v-if="disableAlerts" />
       <template v-else>
-        <v-alert v-show="!profileManager.profile" variant="tonal" type="info">
-          Please connect your wallet
-        </v-alert>
+        <v-alert v-show="!profileManager.profile" variant="tonal" type="info"> Please connect your wallet </v-alert>
 
         <div ref="msgAlert">
           <v-alert v-show="profileManager.profile && status" variant="tonal" :type="alertType">
@@ -42,9 +40,7 @@
     </v-card-text>
 
     <template v-if="dedicated && !status">
-      <v-alert class="mb-4 mx-4" type="info" variant="tonal">
-        You need to rent a node before deploying on it.
-      </v-alert>
+      <v-alert class="mb-4 mx-4" type="info" variant="tonal"> You need to rent a node before deploying on it. </v-alert>
     </template>
 
     <template v-if="$slots['footer-actions'] && (profileManager.profile || disableAlerts)">
@@ -59,7 +55,7 @@
         <div v-if="ipv4 && dedicated">
           <span>
             There are no fees will be added since the selected node is rented by you and the cost already included in
-            the rent contract. <br>Please be aware that an additional fee of
+            the rent contract. <br />Please be aware that an additional fee of
             <span class="font-weight-black">
               {{ costLoading ? "Calculating..." : normalizeBalance(onlyIPV4TftPrice) }}
             </span>
@@ -88,9 +84,7 @@
             You selected a certified node. Please note that this deployment costs more TFT.
           </div>
         </div>
-        <div v-if="ipv4">
-          Please Note that the Bandwidth affects the total cost (1 Bandwidth = 0.01 TFT/hour).
-        </div>
+        <div v-if="ipv4">Please Note that the Bandwidth affects the total cost (1 Bandwidth = 0.01 TFT/hour).</div>
         <a :href="manual.pricing" target="_blank" class="app-link">
           Learn more about the pricing and how to unlock discounts.
         </a>
@@ -98,9 +92,7 @@
       <v-divider class="mt-3" />
       <v-card-actions class="justify-end my-1 mr-2 py-4">
         <slot v-if="!status" name="footer-actions" :validate-before-deploy="validateBeforeDeploy" />
-        <v-btn v-else color="secondary" :loading="status === 'deploy'" @click="reset">
-          Back
-        </v-btn>
+        <v-btn v-else color="secondary" :loading="status === 'deploy'" @click="reset"> Back </v-btn>
       </v-card-actions>
     </template>
   </v-card>
@@ -121,6 +113,11 @@ import { computed, ref, watch } from "vue";
 import { useTheme } from "vuetify";
 
 import { manual } from "@/utils/manual";
+import {
+  resolveValidationTargetFromService,
+  findFocusableInput,
+  applyErrorHighlight,
+} from "@/utils/form_validation_helpers";
 
 import { useGrid, useProfileManager } from "../stores";
 import { loadBalance, updateGrid } from "../utils/grid";
@@ -209,7 +206,7 @@ provideService({
 function validateBeforeDeploy(fn: () => void, documentScrollend = false) {
   const forms = __forms;
 
-  let errorInput: [number, any, boolean] | null = null;
+  let errorInput: [number, InputValidatorService, boolean] | null = null;
 
   out: for (let i = 0; i < forms.length; i++) {
     const form = forms[i];
@@ -218,29 +215,24 @@ function validateBeforeDeploy(fn: () => void, documentScrollend = false) {
     for (const input of inputs) {
       const status = typeof input.status === "string" ? input.status : (input.status as any)?.value;
       if (status === ValidatorStatus.Invalid) {
-        errorInput = [i, input.$el, input.highlightOnError || false];
+        errorInput = [i, input, input.highlightOnError || false];
         break out;
       }
 
       const valid = status === ValidatorStatus.Valid || (status === ValidatorStatus.Init && form.validOnInit);
 
       if ((!status || !valid) && !errorInput) {
-        errorInput = [i, input.$el, input.highlightOnError || false];
+        errorInput = [i, input, input.highlightOnError || false];
       }
     }
   }
 
   if (errorInput) {
-    const [tab, __input, highlightOnError] = errorInput;
+    const [tab, inputService, highlightOnError] = errorInput;
 
-    const input =
-      __input && typeof __input === "object" && "value" in __input && __input.value instanceof HTMLElement
-        ? __input.value
-        : __input instanceof HTMLElement
-        ? __input
-        : null;
+    const targetElement = resolveValidationTargetFromService(inputService);
 
-    if (!input || !__setTab) {
+    if (!targetElement || !__setTab) {
       return;
     }
 
@@ -248,30 +240,22 @@ function validateBeforeDeploy(fn: () => void, documentScrollend = false) {
 
     // Timeout so the ui gets render before scroll
     setTimeout(() => {
-      const _input = input.querySelector("textarea") || input.querySelector("input") || input;
-      if (!(_input instanceof HTMLElement)) {
-        return;
-      }
+      const focusableInput = findFocusableInput(targetElement);
 
       documentScrollend && document.addEventListener("scrollend", _improveUx, { once: true });
       !documentScrollend && setTimeout(_improveUx, 500);
-      _input.scrollIntoView({ behavior: "smooth", block: "center" });
+      focusableInput.scrollIntoView({ behavior: "smooth", block: "center" });
 
       async function _improveUx() {
-        if (!(_input instanceof HTMLElement)) return;
-
-        if (_input instanceof HTMLInputElement || _input instanceof HTMLTextAreaElement) {
+        if (focusableInput instanceof HTMLInputElement || focusableInput instanceof HTMLTextAreaElement) {
           // use `requestAnimationFrame` to avoid browser possible lagging
-          requestAnimationFrame(() => _input.focus());
-          requestAnimationFrame(() => _input.blur());
-          requestAnimationFrame(() => _input.focus());
+          requestAnimationFrame(() => focusableInput.focus());
+          requestAnimationFrame(() => focusableInput.blur());
+          requestAnimationFrame(() => focusableInput.focus());
         }
 
-        if (input instanceof HTMLElement && highlightOnError) {
-          input.classList.add("weblet-layout-error-transition");
-          requestAnimationFrame(() => {
-            input.classList.add("weblet-layout-error");
-          });
+        if (highlightOnError && targetElement instanceof HTMLElement) {
+          applyErrorHighlight(targetElement);
         }
       }
     }, 250);

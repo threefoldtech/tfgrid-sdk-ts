@@ -59,8 +59,15 @@
         </v-card-text>
 
         <v-card-actions class="justify-end mb-1 mr-2">
-          <v-btn color="anchor" text="Close" @click="$emit('close')" />
-          <v-btn text="Save" :disabled="!isValidForm" :loading="loading" @click="updateKey" />
+          <v-btn color="anchor" text @click="$emit('close')">Close</v-btn>
+
+          <v-tooltip v-model="showTooltip" text="No changes have been made" bottom>
+            <template #activator="{ props }">
+              <div v-on="props">
+                <v-btn text :loading="loading" :disabled="!hasChanges" v-bind="props" @click="updateKey"> Save </v-btn>
+              </div>
+            </template>
+          </v-tooltip>
         </v-card-actions>
       </v-card>
     </v-form>
@@ -69,7 +76,7 @@
 </template>
 
 <script lang="ts">
-import { capitalize, defineComponent, type PropType, ref, watch } from "vue";
+import { capitalize, defineComponent, computed, type PropType, ref, watch } from "vue";
 
 import type { SSHKeyData } from "@/types";
 import SSHKeysManagement from "@/utils/ssh";
@@ -95,16 +102,29 @@ export default defineComponent({
   setup(props, ctx) {
     const currentKey = ref<SSHKeyData>(props.selectedKey);
     const loading = ref<boolean>(false);
-    const isValidForm = ref<boolean>(false);
+    const hasChanges = ref<boolean>(false);
+    const originalKey = ref<SSHKeyData>({ ...props.selectedKey });
+    const showTooltip = computed(() => !hasChanges.value);    const isValidForm = ref<boolean>(false);
 
     watch(
       () => props.open,
       newValue => {
         if (newValue) {
           currentKey.value = { ...props.selectedKey };
+          originalKey.value = { ...props.selectedKey };
           loading.value = false;
         }
       },
+    );
+    // watch currentKey to detect changes
+    watch(
+      () => currentKey.value,
+      newValue => {
+        hasChanges.value =
+          newValue.name !== originalKey.value.name || newValue.publicKey !== originalKey.value.publicKey;
+      },
+
+      { deep: true },
     );
 
     const notNeededFields = ["id", "activating", "deleting", "isActive", "createdAt"];
@@ -153,6 +173,8 @@ export default defineComponent({
       loading,
       isValidForm,
       validateName,
+      hasChanges,
+      showTooltip,
     };
   },
 });
