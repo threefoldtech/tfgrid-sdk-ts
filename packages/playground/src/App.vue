@@ -278,7 +278,12 @@ const navbarConfig = ref();
 const hasGrid = computed(() => !!gridStore.grid);
 const hasClient = computed(() => !!gridStore.client);
 
-const permanent = ref(window.innerWidth > 980);
+const getSidebarBreakpoint = () =>
+  $route.meta && "sidebarBreakpoint" in $route.meta && typeof $route.meta.sidebarBreakpoint === "number"
+    ? $route.meta.sidebarBreakpoint || 980
+    : 980;
+
+const permanent = ref(window.innerWidth > getSidebarBreakpoint());
 const openSidebar = ref(permanent.value);
 const toolbarExtended = ref(false);
 watch(permanent, value => {
@@ -287,11 +292,8 @@ watch(permanent, value => {
   }
 });
 function setSidebarOnResize() {
-  const breakpoint = $route.meta && "sidebarBreakpoint" in $route.meta && typeof $route.meta["sidebarBreakpoint"] === "number"
-      ? $route.meta.sidebarBreakpoint
-      : 980;
-  
-  permanent.value = window.innerWidth > breakpoint;
+  const sidebarBreakpoint = getSidebarBreakpoint();
+  permanent.value = window.innerWidth > sidebarBreakpoint;
   openSidebar.value = permanent.value;
 }
 
