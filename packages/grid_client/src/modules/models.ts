@@ -682,12 +682,27 @@ class FarmFilterOptions {
 }
 
 class CalculatorModel {
-  @Expose() @IsInt() @IsNotEmpty() @Min(0) cru: number; // vCores
-  @Expose() @IsNumber() @IsNotEmpty() @Min(0) mru: number; // GB
-  @Expose() @IsNumber() @IsNotEmpty() @Min(0) sru: number; // GB
-  @Expose() @IsNumber() @IsNotEmpty() @Min(0) hru: number; // GB
+  /**
+   * vCores
+   */
+  @Expose() @IsInt() @IsNotEmpty() @Min(0) cru: number;
+  /**
+   * GB
+   */
+  @Expose() @IsNumber() @IsNotEmpty() @Min(0) mru: number;
+  /**
+   * GB
+   */
+  @Expose() @IsNumber() @IsNotEmpty() @Min(0) sru: number;
+  /**
+   * GB
+   */
+  @Expose() @IsNumber() @IsNotEmpty() @Min(0) hru: number;
   @Expose() @IsBoolean() @IsNotEmpty() ipv4u: boolean;
   @Expose() @IsBoolean() @IsOptional() certified?: boolean;
+  /**
+   * Balance in TFT
+   */
   @Expose() @IsOptional() @IsNumber() @Min(0) balance?: number;
   @Expose() @IsOptional() @IsNumber() @Min(0) nu?: number;
 }

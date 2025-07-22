@@ -41,7 +41,7 @@ export const discountPackages = {
     discount: 60,
   },
 };
-
+const UNIT_FACTOR = 10 ** 7;
 class Calculator {
   client: TFClient | QueryClient;
   private _policy: PricingPolicy;
@@ -122,7 +122,6 @@ class Calculator {
    * @returns {Promise<PricingPolicy>} A promise that resolves to the pricing policies.
    */
   async getPrices(): Promise<PricingPolicy> {
-    console.log("getPrices");
     this._policy = await this.client.pricingPolicies.get({ id: 1 });
     return this._policy;
   }
@@ -176,15 +175,15 @@ class Calculator {
   }
 
   /**
-   * Asynchronously calculates the monthly cost in musd (milli USD) based on the provided options.
+   * Asynchronously calculates the monthly cost unit-USD based on the provided options.
    *
    * @param {CalculatorModel} options - The calculator model options containing, sru, mru, and some other fields.
-   * @returns {Promise<{ musd_month: number, dedicatedDiscount: number }>} A promise that resolves to an object containing the calculated monthly cost in musd and the discount for dedication nodes.
+   * @returns {Promise<{ cost: number, dedicatedDiscount: number }>} A promise that resolves to an object containing the calculated monthly cost in unit-USD and the discount for dedication nodes.
    * @decorators
    * - `@validateInput`: Validates the input parameters before execution.
    */
   @validateInput
-  private async pricing(options: CalculatorModel): Promise<{ musd_month: number; dedicatedDiscount: number }> {
+  private async pricing(options: CalculatorModel): Promise<{ cost: number; dedicatedDiscount: number }> {
     await this._getPrices();
     const cu = this.calCU({ cru: options.cru, mru: options.mru });
     const su = this.calSU({ hru: options.hru, sru: options.sru });
@@ -195,7 +194,8 @@ class Calculator {
     // certified node cotsts 25% more than DIY node
     const certifiedFactor = options.certified ? 1.25 : 1;
 
-    const musd_month =
+    // const in Unit-USD
+    const cost =
       (cu * +this._policy.cu.value +
         su * +this._policy.su.value +
         ipv4u * this._policy.ipu.value +
@@ -203,11 +203,11 @@ class Calculator {
       certifiedFactor *
       24 *
       30;
-    return { musd_month: musd_month, dedicatedDiscount: this._policy.discountForDedicationNodes };
+    return { cost: cost, dedicatedDiscount: this._policy.discountForDedicationNodes };
   }
 
   /**
-   * Asynchronously calculates the monthly cost and discount packages based on the provided options.
+   * Asynchronously calculates the monthly cost in USD and discount packages based on the provided options.
    *
    * @param {CalculatorModel} options - The calculator model options containing various parameters.
    * @returns {Promise<PricingInfo>} A promise that resolves to an object containing the calculated prices and discount packages.
@@ -217,28 +217,46 @@ class Calculator {
   @expose
   @validateInput
   async calculate(options: CalculatorModel): Promise<PricingInfo> {
-    let balance = 0;
     const pricing = await this.pricing(options);
+    const TFTPrice = await this.tftPrice();
 
     // discount for Dedicated Nodes
     const discount = pricing.dedicatedDiscount;
-    let dedicatedPrice = pricing.musd_month - pricing.musd_month * (+discount / 100);
-    let sharedPrice = pricing.musd_month;
-    const TFTPrice = await this.tftPrice();
+    /**
+     * Dedicated price in Unit-USD
+     */
+    let dedicatedPrice = pricing.cost - pricing.cost * (+discount / 100);
+    /**
+     * Shared price in Unit-USD
+     */
+    let sharedPrice = pricing.cost;
+
+    /**
+     * Balance in Unit-USD
+     */
+    let balance_in_unitUSD = 0;
     if (options.balance) {
-      balance = TFTPrice * options.balance * 10000000;
+      // convert balance to from TFT to Unit-USD
+      balance_in_unitUSD = TFTPrice * options.balance * UNIT_FACTOR;
     }
 
-    const { dedicatedPackage, sharedPackage } = calculateDiscountPackage(balance, dedicatedPrice, sharedPrice);
-    dedicatedPrice = (dedicatedPrice - dedicatedPrice * (discountPackages[dedicatedPackage].discount / 100)) / 10000000;
-    sharedPrice = (sharedPrice - sharedPrice * (discountPackages[sharedPackage].discount / 100)) / 10000000;
+    const { dedicatedPackage, sharedPackage } = calculateDiscountPackage(
+      balance_in_unitUSD,
+      dedicatedPrice,
+      sharedPrice,
+    );
+    dedicatedPrice = dedicatedPrice - dedicatedPrice * (discountPackages[dedicatedPackage].discount / 100);
+    sharedPrice = sharedPrice - sharedPrice * (discountPackages[sharedPackage].discount / 100);
+
+    const dedicatedPriceUSD = dedicatedPrice / UNIT_FACTOR;
+    const sharedPriceUSD = sharedPrice / UNIT_FACTOR;
     return {
-      dedicatedPrice: dedicatedPrice,
+      dedicatedPrice: dedicatedPriceUSD,
       dedicatedPackage: {
         package: dedicatedPackage,
         discount: discountPackages[dedicatedPackage].discount,
       },
-      sharedPrice: sharedPrice,
+      sharedPrice: sharedPriceUSD,
       sharedPackage: {
         package: sharedPackage,
         discount: discountPackages[sharedPackage].discount,
