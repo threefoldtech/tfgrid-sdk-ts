@@ -43,7 +43,10 @@ export const discountPackages = {
 
 class Calculator {
   client: TFClient | QueryClient;
-
+  private _policy: PricingPolicy;
+  private _priceTFT: number;
+  private lastTftPriceFetchTime: number = 0;
+  private TFT_PRICE_CACHE_DURATION: number = 60 * 60 * 1000; // 1 hour
   /**
    * Calculator class for performing various calculations related to pricing and resources.
    *
@@ -118,8 +121,20 @@ class Calculator {
    * @returns {Promise<PricingPolicy>} A promise that resolves to the pricing policies.
    */
   async getPrices(): Promise<PricingPolicy> {
-    const pricing = await this.client.pricingPolicies.get({ id: 1 });
-    return pricing;
+    console.log("getPrices");
+    this._policy = await this.client.pricingPolicies.get({ id: 1 });
+    return this._policy;
+  }
+
+  /**
+   * This is a private helper method to retrieve the pricing policies from the client if they are not already initialized.
+   *
+   * @returns {Promise<void>} A promise that resolves when initialization is complete.
+   */
+  private async _getPrices(): Promise<void> {
+    if (!this._policy) {
+      await this.getPrices();
+    }
   }
 
   /**
@@ -132,7 +147,8 @@ class Calculator {
    */
   @validateInput
   async namePricing() {
-    const uniqueNamePricePerHour = (await this.getPrices()).uniqueName.value;
+    await this._getPrices();
+    const uniqueNamePricePerHour = this._policy.uniqueName.value;
     const priceInUSD = uniqueNamePricePerHour / 10 ** 7;
     // return cost per month
     return priceInUSD * 24 * 30;
@@ -149,8 +165,13 @@ class Calculator {
   @expose
   @validateInput
   async tftPrice(): Promise<number> {
+    if (Date.now() - this.lastTftPriceFetchTime < this.TFT_PRICE_CACHE_DURATION) {
+      return this._priceTFT;
+    }
     const pricing = await this.client.tftPrice.get();
-    return this.client instanceof TFClient ? pricing : pricing / 1000;
+    this._priceTFT = this.client instanceof TFClient ? pricing : pricing / 1000;
+    this.lastTftPriceFetchTime = Date.now();
+    return this._priceTFT;
   }
 
   /**
@@ -163,7 +184,7 @@ class Calculator {
    */
   @validateInput
   private async pricing(options: CalculatorModel): Promise<{ musd_month: number; dedicatedDiscount: number }> {
-    const price = await this.getPrices();
+    await this._getPrices();
     const cu = this.calCU({ cru: options.cru, mru: options.mru });
     const su = this.calSU({ hru: options.hru, sru: options.sru });
     const nu = this.calNU({ nu: options.nu ? options.nu : 0 });
@@ -174,11 +195,14 @@ class Calculator {
     const certifiedFactor = options.certified ? 1.25 : 1;
 
     const musd_month =
-      (cu * +price?.cu.value + su * +price?.su.value + ipv4u * price?.ipu.value + nu * +price?.nu.value) *
+      (cu * +this._policy.cu.value +
+        su * +this._policy.su.value +
+        ipv4u * this._policy.ipu.value +
+        nu * +this._policy.nu.value) *
       certifiedFactor *
       24 *
       30;
-    return { musd_month: musd_month, dedicatedDiscount: price.discountForDedicationNodes };
+    return { musd_month: musd_month, dedicatedDiscount: this._policy.discountForDedicationNodes };
   }
 
   /**
