@@ -5,6 +5,7 @@ import { GridClientConfig } from "../config";
 import { expose } from "../helpers/expose";
 import { validateInput } from "../helpers/validator";
 import { CalculatorModel, CUModel, NUModel, SUModel } from "./models";
+import { calculateDiscountPackage } from "./utils";
 
 export interface PricingInfo {
   dedicatedPrice: number;
@@ -228,16 +229,7 @@ class Calculator {
       balance = TFTPrice * options.balance * 10000000;
     }
 
-    let dedicatedPackage = "none";
-    let sharedPackage = "none";
-    for (const pkg in discountPackages) {
-      if (balance > dedicatedPrice * discountPackages[pkg].duration) {
-        dedicatedPackage = pkg;
-      }
-      if (balance > sharedPrice * discountPackages[pkg].duration) {
-        sharedPackage = pkg;
-      }
-    }
+    const { dedicatedPackage, sharedPackage } = calculateDiscountPackage(balance, dedicatedPrice, sharedPrice);
     dedicatedPrice = (dedicatedPrice - dedicatedPrice * (discountPackages[dedicatedPackage].discount / 100)) / 10000000;
     sharedPrice = (sharedPrice - sharedPrice * (discountPackages[sharedPackage].discount / 100)) / 10000000;
     return {
