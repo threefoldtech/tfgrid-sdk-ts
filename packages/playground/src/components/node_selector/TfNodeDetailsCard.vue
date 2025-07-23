@@ -271,7 +271,7 @@
         <reserve-btn
           v-if="node?.dedicated && node?.status !== 'down'"
           class="ml-4"
-          :node="node as GridNode"
+          :node="(node as GridNode)"
           @update:status="$emit('update:status', $event as ValidatorStatus)"
           @update:node="$emit('update:node', $event as NodeInfo)"
         />
@@ -341,10 +341,7 @@ export default {
         return "";
       }
 
-      const imageUrl =
-        countryCode.toLowerCase() !== "ch"
-          ? `https://www.worldatlas.com/r/w425/img/flag/${countryCode.toLowerCase()}-flag.jpg`
-          : `https://www.worldatlas.com/r/w425/img/flag/${countryCode.toLowerCase()}-flag.png`;
+      const imageUrl = `https://flagcdn.com/w640/${countryCode.toLowerCase()}.png`;
 
       return imageUrl;
     });
