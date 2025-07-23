@@ -143,7 +143,7 @@ class Calculator {
    * This function retrieves the price per hour for a unique name, and calculates the total cost in mUSD.
    *
    *
-   * @returns {Promise<number>} - The price in mUSD for the unique name usage per month.
+   * @returns {Promise<number>} - The price in USD for the unique name usage per month.
    */
   @validateInput
   async namePricing() {
@@ -172,6 +172,12 @@ class Calculator {
     this._priceTFT = this.client instanceof TFClient ? pricing : pricing / 1000;
     this.lastTftPriceFetchTime = Date.now();
     return this._priceTFT;
+  }
+  @expose
+  @validateInput
+  async convertTFTtoUSD(balanceTFT: number): Promise<number> {
+    const price = await this.tftPrice();
+    return price * balanceTFT;
   }
 
   /**

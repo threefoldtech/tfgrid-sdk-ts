@@ -4,6 +4,7 @@ import GridProxyClient, {
   ContractsQuery,
   ContractState,
   ContractType,
+  GridNode,
 } from "@threefold/gridproxy_client";
 import {
   ContractLock,
@@ -20,6 +21,7 @@ import { Decimal } from "decimal.js";
 import { bytesToGB, formatErrorMessage } from "../../helpers";
 import { calculator, ContractStates, currency } from "../../modules";
 import { Graphql } from "../graphql/client";
+import { calculateDiscountPackage } from "../../modules/utils";
 
 export type DiscountLevel = "None" | "Default" | "Bronze" | "Silver" | "Gold";
 
@@ -531,17 +533,66 @@ class TFContracts extends Contracts {
     });
     const { cru, sru, mru, hru } = usedREsources.used;
     const USDCost = (
-      await calc.calculateWithMyBalance({
+      await calc.calculate({
         ipv4u: !!contract.details.number_of_public_ips,
         certified: isCertified,
         cru: cru,
         mru: bytesToGB(mru),
         hru: bytesToGB(hru),
         sru: bytesToGB(sru),
+        balance: balance,
       })
     ).sharedPrice;
 
     return USDCost;
+  }
+
+  private async calculateRentContractCost(
+    nodeDetails: GridNode,
+    calc: calculator,
+    isCertified: boolean,
+    balanceTFT: number,
+  ) {
+    const { cru, sru, mru, hru } = nodeDetails.total_resources;
+    /**node extra fees in mille USD per month */
+    const extraFeesInMilliUsd = await this.client.contracts.getDedicatedNodeExtraFee({ nodeId: nodeDetails.nodeId });
+    const extraFeeUSD = extraFeesInMilliUsd / 1000;
+    const USDCost = (
+      await calc.calculate({
+        ipv4u: false,
+        certified: isCertified,
+        cru: cru,
+        mru: bytesToGB(mru),
+        hru: bytesToGB(hru),
+        sru: bytesToGB(sru),
+        balance: balanceTFT,
+      })
+    ).dedicatedPrice;
+
+    return USDCost + extraFeeUSD;
+  }
+
+  async calculateContractCost(contract: Contract, proxy: GridProxyClient, calc: calculator, balanceTFT: number) {
+    const balanceUSD = await calc.convertTFTtoUSD(balanceTFT);
+    if (contract.type == ContractType.Name) {
+      const cost = await calc.namePricing();
+      const discountPackage = calculateDiscountPackage(balanceUSD, 0, cost);
+      return discountPackage.sharedPackage;
+    }
+
+    const nodeDetails = await proxy.nodes.byId(contract.details.nodeId);
+
+    const isCertified = nodeDetails.certificationType === CertificationType.Certified;
+
+    if (contract.type == ContractType.Rent) {
+      return await this.calculateRentContractCost(nodeDetails, calc, isCertified, balanceTFT);
+    }
+
+    if (contract.type == ContractType.Node) {
+      return await this.calculateNodeContractCost(nodeDetails, calc, isCertified, balanceTFT);
+    }
+
+    return 0;
   }
 
   /**
