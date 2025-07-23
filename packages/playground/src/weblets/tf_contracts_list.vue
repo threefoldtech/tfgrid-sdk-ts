@@ -27,7 +27,8 @@
       class="app-link font-weight-medium"
       target="_blank"
       href="https://manual.grid.tf/labs/documentation/dashboard/deploy/your_contracts"
-      >Node Contract Documentation.</a>
+      >Node Contract Documentation.</a
+    >
     <br />
   </v-alert>
 
@@ -235,20 +236,20 @@
 
 <script lang="ts" setup>
 import type { ContractsOverdue, GridClient } from "@threefold/grid_client";
-import { ContractState, NodeStatus, SortByContracts, SortOrder } from "@threefold/gridproxy_client";
+import { type Contract, ContractState, NodeStatus, SortByContracts, SortOrder } from "@threefold/gridproxy_client";
 import { DeploymentKeyDeletionError } from "@threefold/types";
 import { computed, defineComponent, onMounted, type Ref, ref } from "vue";
 
 import ContractsTable from "@/components/contracts_list/contracts_table.vue";
 import { useProfileManagerController } from "@/components/profile_manager_controller.vue";
 import { useProfileManager } from "@/stores/profile_manager";
-import { type VDataTableHeader } from "@/types";
+import type { VDataTableHeader } from "@/types";
 import {
   type ContractsTableType,
   ContractType,
   getNodeInfo,
-  type NormalizedContract,
   normalizeContract,
+  type NormalizedContract,
 } from "@/utils/contracts";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
 import { normalizeError } from "@/utils/helpers";
@@ -297,6 +298,22 @@ onMounted(() => {
   loadContracts();
 });
 
+async function _normalizeContracts(
+  contracts: Contract[],
+  contractType: ContractType.Node | ContractType.Name | ContractType.Rent,
+): Promise<NormalizedContract[]> {
+  const normalizedContracts = await Promise.all(
+    contracts.map(async contract => {
+      try {
+        return await normalizeContract(grid, contract, contractType);
+      } catch (error) {
+        failedContracts.value.push(contract.contract_id);
+      }
+    }),
+  );
+  return normalizedContracts.filter(Boolean) as NormalizedContract[];
+}
+
 async function loadContractsByType(
   contractType: ContractType.Node | ContractType.Name | ContractType.Rent,
   contractsRef: Ref<NormalizedContract[]>,
@@ -322,16 +339,8 @@ async function loadContractsByType(
     });
 
     table.count.value = response.count ?? 0;
-    const normalizedContracts = await Promise.all(
-      response.data.map(async contract => {
-        try {
-          return await normalizeContract(grid, contract, contractType);
-        } catch (error) {
-          failedContracts.value.push(contract.contract_id);
-        }
-      }),
-    );
-    contractsRef.value = normalizedContracts.filter(Boolean) as NormalizedContract[];
+    const normalizedContracts = await _normalizeContracts(response.data, contractType);
+    contractsRef.value = normalizedContracts;
   } catch (error: any) {
     loadingErrorMessage.value = `Error while listing ${contractType} contracts: ${error.message}`;
     createCustomToast(loadingErrorMessage.value, ToastType.danger, {});
@@ -455,6 +464,7 @@ const nodeStatus = computed(() => {
   return statusObject;
 });
 
+// Calculate the total cost of contracts
 async function getTotalCost() {
   try {
     const res = await gridProxyClient.twins.getConsumption(profileManager.profile!.twinId);
@@ -469,6 +479,7 @@ async function getTotalCost() {
   }
 }
 
+// Handle updates when contracts are deleted
 async function onDeletedContracts(_contracts: NormalizedContract[]) {
   if (_contracts.length) {
     switch (_contracts[0].type) {
