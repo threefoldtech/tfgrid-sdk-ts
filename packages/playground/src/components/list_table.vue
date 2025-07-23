@@ -6,7 +6,6 @@
     item-title="title"
     item-value="key"
     hover
-    :hide-default-footer="items.length <= 5"
     show-select
     hide-no-data
     :return-object="returnObject"
