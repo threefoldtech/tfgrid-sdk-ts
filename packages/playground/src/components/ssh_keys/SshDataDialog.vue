@@ -7,6 +7,7 @@
     @keydown.esc="() => $emit('close')"
   >
     <template #default>
+      <v-form v-model="isValidForm">
       <v-card>
         <v-toolbar color="primary" class="custom-toolbar">
           <p class="mb-5">SSH-Key Details</p>
@@ -60,24 +61,26 @@
         <v-card-actions class="justify-end mb-1 mr-2">
           <v-btn color="anchor" text @click="$emit('close')">Close</v-btn>
 
-          <v-tooltip v-model="showTooltip" text="No changes have been made" bottom>
+          <v-tooltip :disabled="hasChanges" text="No changes have been made" bottom>
             <template #activator="{ props }">
-              <div v-on="props">
-                <v-btn text :loading="loading" :disabled="!hasChanges" v-bind="props" @click="updateKey"> Save </v-btn>
+              <div v-bind="props">
+                <v-btn text :loading="loading" :disabled="!hasChanges || !isValidForm" v-bind="props" @click="updateKey"> Save </v-btn>
               </div>
             </template>
           </v-tooltip>
         </v-card-actions>
       </v-card>
+    </v-form>
     </template>
   </v-dialog>
 </template>
 
 <script lang="ts">
-import { capitalize, defineComponent, computed, type PropType, ref, watch } from "vue";
+import { capitalize, defineComponent, type PropType, ref, watch } from "vue";
 
 import type { SSHKeyData } from "@/types";
 import SSHKeysManagement from "@/utils/ssh";
+import { isAlphanumericWithSpace } from "@/utils/validators";
 
 export default defineComponent({
   name: "SSHDataDialog",
@@ -101,7 +104,8 @@ export default defineComponent({
     const loading = ref<boolean>(false);
     const hasChanges = ref<boolean>(false);
     const originalKey = ref<SSHKeyData>({ ...props.selectedKey });
-    const showTooltip = computed(() => !hasChanges.value);
+    const isValidForm = ref<boolean>(false);
+
     watch(
       () => props.open,
       newValue => {
@@ -150,6 +154,12 @@ export default defineComponent({
       if (name === props.selectedKey.name) {
         return true;
       }
+      if (isAlphanumericWithSpace("Invalid name")(name) !== true) {
+        return "Key name must only contain letters, numbers, and spaces within the name.";
+      }
+      if (name.length > 30) {
+        return "Please enter a key name with fewer than 30 characters.";
+      }
       const found = props.allKeys.find(key => key.name === name);
       return found ? "You have another key with the same name." : true;
     }
@@ -161,9 +171,9 @@ export default defineComponent({
       currentKey,
       sshRules,
       loading,
+      isValidForm,
       validateName,
       hasChanges,
-      showTooltip,
     };
   },
 });

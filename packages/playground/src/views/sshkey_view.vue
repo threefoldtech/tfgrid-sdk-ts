@@ -139,21 +139,23 @@ const sshKeysManagement = new SSHKeysManagement();
 
 onMounted(async () => {
   loading.value = true;
-  if (!sshKeysManagement.migrated()) {
-    tableLoadingMessage.value = "Migrating your old key...";
+  if (!sshKeysManagement.migrated() || sshKeysManagement.needsDefaultNameAssignment()) {
+    tableLoadingMessage.value = "Recovering your old key...";
     const migrationInterval = setInterval(async () => {
-      const migrated = !sshKeysManagement.migrated();
-      if (migrated) {
+      const migrated = sshKeysManagement.migrated();
+      const nameUpdated = !sshKeysManagement.needsDefaultNameAssignment();
+      if (migrated && nameUpdated) {
         clearInterval(migrationInterval);
         allKeys.value = sshKeysManagement.list();
         tableLoadingMessage.value = "";
+        loading.value = false;
       }
     }, 1000);
   } else {
     allKeys.value = sshKeysManagement.list();
     tableLoadingMessage.value = "";
+    loading.value = false;
   }
-  loading.value = false;
 });
 
 const openDialog = (type: SSHCreationMethod) => {

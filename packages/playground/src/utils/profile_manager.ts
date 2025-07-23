@@ -1,6 +1,7 @@
 import type { GridClient } from "@threefold/grid_client";
 
 import router from "@/router";
+import type { SSHKeyData } from "@/types";
 
 import { createCustomToast, ToastType } from "./custom_toast";
 import { readEmail } from "./grid";
@@ -33,8 +34,15 @@ export async function handlePostLogin(grid: GridClient, password: string, email?
 
   // Migrate the ssh-key
   const sshKeysManagement = new SSHKeysManagement();
+  let newKeys: SSHKeyData[] = [];
   if (!sshKeysManagement.migrated()) {
-    const newKeys = sshKeysManagement.migrate();
+    newKeys = sshKeysManagement.migrate();
+  }
+  if (sshKeysManagement.needsDefaultNameAssignment()) {
+    newKeys = sshKeysManagement.assignDefaultNames();
+  }
+  if (newKeys.length > 0) {
     await sshKeysManagement.update(newKeys);
+    createCustomToast("SSH keys have been recovered successfully.", ToastType.success);
   }
 }

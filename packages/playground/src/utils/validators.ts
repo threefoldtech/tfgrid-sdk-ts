@@ -158,6 +158,24 @@ export interface IsAlphanumeric {
   locale?: validator.AlphanumericLocale;
   options?: validator.IsAlphanumericOptions;
 }
+/**
+ * Validates that a string contains only alphanumeric characters and spaces.
+ * - No leading spaces allowed
+ * - No consecutive spaces allowed
+ * - Must contain at least one alphanumeric character
+ * - Spaces can only appear between alphanumeric characters
+ * @param msg - The error message to return if validation fails
+ * @returns A validation function that checks if a string meets the alphanumeric with space criteria
+ */
+export function isAlphanumericWithSpace(msg: string) {
+  return (value: string) => {
+    if (value.endsWith("  ") || !/^[a-zA-Z0-9]+( [a-zA-Z0-9]+)*$/.test(value.trimEnd())) {
+      return msg;
+    }
+    return true;
+  };
+}
+
 export function isAlphanumeric(msg: string, config: IsAlphanumeric = {}) {
   const { locale, options } = config;
   return (value: string) => {
