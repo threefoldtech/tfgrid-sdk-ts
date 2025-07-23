@@ -77,11 +77,4 @@ jobs:
           TFCHAIN_NODE_MNEMONICS: ${{ secrets.TFCHAIN_NODE_MNEMONICS }}
           STELLAR_ADDRESS: ${{ secrets.STELLAR_ADDRESS }}
           EMAIL: ${{ secrets.EMAIL }}
-        run: python -m pytest -v --html=report.html
-
-      - name: Upload test report
-        if: success() || failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: selenium-report-${{ env.ENV }}
-          path: packages/playground/tests/frontend_selenium/report.html
+        run: python -m pytest -v
