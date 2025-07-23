@@ -3,6 +3,7 @@
     <v-alert v-if="errorMessage" type="error" variant="tonal">
       {{ errorMessage }}
     </v-alert>
+
     <v-alert v-if="!loading && count && items.length < count" type="error" variant="tonal">
       Failed to load <strong>{{ count - items.length }}</strong> deployment{{ count - items.length > 1 ? "s" : "" }}.
 
