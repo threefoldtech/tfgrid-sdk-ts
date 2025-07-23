@@ -7,9 +7,7 @@
       @update:model-value="closeDialog"
     >
       <v-card>
-        <v-card-title class="bg-primary">
-          Withdraw TFT
-        </v-card-title>
+        <v-card-title class="bg-primary"> Withdraw TFT </v-card-title>
         <v-card-text>
           <VAlert type="info">
             Interact with the bridge in order to withdraw your TFT to
@@ -39,8 +37,8 @@
               :rules="[
                 validators.required('This field is required'),
                 validators.min('Amount should be at least 2 TFT', 2),
-                validators.max('Amount cannot exceed balance with fees',freeBalance! - withdrawFee!),
-                validators.isValidDecimalNumber(3,'Amount must have 3 decimals only')
+                validators.max('Amount cannot exceed balance with fees', freeBalance! - withdrawFee!),
+                validators.isValidDecimalNumber(3, 'Amount must have 3 decimals only'),
               ]"
             >
               <v-text-field
@@ -49,16 +47,13 @@
                 label="Amount (TFT)"
                 type="number"
                 onkeydown="javascript: return event.keyCode == 69 || /^\+$/.test(event.key) ? false : true"
-                @paste.prevent
               />
             </InputValidator>
           </FormValidator>
           <v-divider />
         </v-card-text>
         <v-card-actions class="justify-end mb-1 mr-2">
-          <v-btn color="anchor" @click="closeDialog">
-            Close
-          </v-btn>
+          <v-btn color="anchor" @click="closeDialog"> Close </v-btn>
           <v-btn
             color="secondary"
             :disabled="!valid || validatingAddress"
