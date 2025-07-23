@@ -82,7 +82,7 @@
                 :value="recipientAddress"
                 :rules="[
                   validators.required('Recipient address is required '),
-                  validators.isAlphanumeric('Invalid Address'),
+                  validators.isAlphanumeric(INVALID_ADDRESS),
                   isSameAddress,
                 ]"
                 :async-rules="[isValidAddress]"
@@ -192,12 +192,13 @@ function isSameAddress(value: string) {
     return { message: "Cannot transfer to yourself" };
   }
 }
+const INVALID_ADDRESS = 'Invalid Address';
 async function isValidAddress() {
   const keyring = new Keyring({ type: "sr25519" });
   try {
     keyring.addFromAddress(recipientAddress.value.trim());
   } catch {
-    return { message: "Invalid address." };
+    return { message: INVALID_ADDRESS };
   }
   try {
     if (gridStore) {
@@ -212,7 +213,7 @@ async function isValidAddress() {
       }
     }
   } catch {
-    return { message: "Invalid address. Twin ID doesn't exist" };
+    return { message: INVALID_ADDRESS + " Twin ID doesn't exist" };
   }
 }
 function clearInput() {
