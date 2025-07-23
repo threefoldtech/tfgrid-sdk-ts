@@ -3,8 +3,16 @@
     v-model="$props.open"
     max-width="800"
     attach="#modals"
-    @click:outside="() => $emit('close')"
-    @keydown.esc="() => $emit('close')"
+    @click:outside="
+      () => {
+        if (!generating && !savingKey) $emit('close');
+      }
+    "
+    @keydown.esc="
+      () => {
+        if (!generating && !savingKey) $emit('close');
+      }
+    "
   >
     <template #default>
       <v-form v-model="isValidForm">
@@ -23,7 +31,7 @@
             >
               <v-text-field
                 v-model="keyName"
-                hint="Leave this field empty to generate a name automatically, or enter a custom name to save it with your key."
+                hint="Enter a unique name (letters, numbers, and spaces only, less than 30 characters) to identify your SSH key."
                 class="mb-4"
                 hide-details="auto"
                 label="Name"
@@ -68,7 +76,7 @@
           </v-card-text>
 
           <v-card-actions class="justify-end mb-1 mr-2">
-            <v-btn color="anchor" text="Close" @click="$emit('close')" />
+            <v-btn color="anchor" :disabled="generating || savingKey" text="Close" @click="$emit('close')" />
 
             <v-btn
               v-if="$props.dialogType === SSHCreationMethod.Generate"
@@ -103,6 +111,7 @@ import { type Profile, useProfileManager } from "@/stores/profile_manager";
 import { SSHCreationMethod, type SSHKeyData } from "@/types";
 import { type Balance, loadBalance } from "@/utils/grid";
 import SSHKeysManagement from "@/utils/ssh";
+import { isAlphanumericWithSpace } from "@/utils/validators";
 
 const props = defineProps({
   open: {
@@ -156,7 +165,7 @@ function generateSSHKey() {
     id: keyId,
     publicKey: "",
     createdAt: sshKeysManagement.formatDate(now),
-    name: keyName.value,
+    name: keyName.value.trimEnd(),
     isActive: true,
   };
 
@@ -171,7 +180,7 @@ function createNewSSHKey() {
     id: keyId,
     publicKey: sshKey.value,
     createdAt: sshKeysManagement.formatDate(now),
-    name: keyName.value,
+    name: keyName.value.trimEnd(),
     isActive: true,
   };
 
@@ -185,7 +194,7 @@ function createNewSSHKey() {
     }
   }
 
-  createdKey.value.name = keyName.value;
+  createdKey.value.name = keyName.value.trimEnd();
 
   emits("save", createdKey.value);
 }
@@ -256,8 +265,9 @@ function sshRules(value: any) {
 
 function sshNameRules(value: any) {
   return [
+    (v: string) => !!v || "Key name is required.",
+    isAlphanumericWithSpace("Key name must only contain letters, numbers, and spaces within the name."),
     (v: string) => v.length < 30 || "Please enter a key name with fewer than 30 characters.",
-    (v: string) => !v.includes(" ") || "Key names cannot include spaces. Please use a name without spaces.",
     (v: string) => sshKeysManagement.availableName(v) || "You have another key with the same name.",
   ];
 }

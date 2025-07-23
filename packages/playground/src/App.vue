@@ -175,7 +175,7 @@
           <v-divider vertical class="mx-2" />
           <AppTheme />
           <v-divider vertical class="mx-2" />
-          <ProfileManager v-if="permanent" v-model="openProfile" />
+          <ProfileManager v-show="permanent" v-model="openProfile" />
 
           <div v-if="!permanent" class="d-flex align-center">
             <v-btn
@@ -278,7 +278,12 @@ const navbarConfig = ref();
 const hasGrid = computed(() => !!gridStore.grid);
 const hasClient = computed(() => !!gridStore.client);
 
-const permanent = ref(window.innerWidth > 980);
+const getSidebarBreakpoint = () =>
+  $route.meta && "sidebarBreakpoint" in $route.meta && typeof $route.meta.sidebarBreakpoint === "number"
+    ? $route.meta.sidebarBreakpoint || 980
+    : 980;
+
+const permanent = ref(window.innerWidth > getSidebarBreakpoint());
 const openSidebar = ref(permanent.value);
 const toolbarExtended = ref(false);
 watch(permanent, value => {
@@ -287,11 +292,8 @@ watch(permanent, value => {
   }
 });
 function setSidebarOnResize() {
-  permanent.value =
-    window.innerWidth >
-    ($route.meta && "sidebarBreakpoint" in $route.meta && typeof $route.meta["sidebarBreakpoint"] === "number"
-      ? $route.meta.sidebarBreakpoint
-      : 980);
+  const sidebarBreakpoint = getSidebarBreakpoint();
+  permanent.value = window.innerWidth > sidebarBreakpoint;
   openSidebar.value = permanent.value;
 }
 

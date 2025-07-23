@@ -72,19 +72,11 @@
         require-domain
       />
 
-      <!-- <input-tooltip inline tooltip="" :href="manual"> -->
-      <v-switch v-model="rentedByMe" color="primary" inset label="Rented By Me" hide-details />
-      <!-- </input-tooltip> -->
-      <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
-        <v-switch v-model="dedicated" color="primary" inset label="Rentable" hide-details />
-      </input-tooltip>
-
-      <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
-        <v-switch v-model="certified" color="primary" inset label="Certified" hide-details />
-      </input-tooltip>
-
       <TfSelectionDetails
         v-model="selectionDetails"
+        v-model:rented-by-me="rentedByMe"
+        v-model:dedicated="dedicated"
+        v-model:certified="certified"
         :filters="{
           ipv4,
           ipv6,
@@ -119,15 +111,13 @@
 import { calculateRootFileSystem, FLISTS, type GridClient } from "@threefold/grid_client";
 import { computed, type Ref, ref } from "vue";
 
-import { manual } from "@/utils/manual";
-
 import { useLayout } from "../components/weblet_layout.vue";
 import { useGrid, useProfileManager } from "../stores";
 import type { Flist, solutionFlavor as SolutionFlavor } from "../types";
 import { ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
 import { deployGatewayName, getSubdomain, rollbackDeployment } from "../utils/gateway";
-import { getGrid } from "../utils/grid";
+import { updateGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
 import { generateName } from "../utils/strings";
 
@@ -184,12 +174,11 @@ async function deploy() {
       : subdomain + "." + selectionDetails.value?.domain?.selectedDomain?.publicConfig.domain;
   }
 
-  let grid: GridClient | null;
   let vm: any;
 
   try {
     layout.value?.validateSSH();
-    grid = await getGrid(profileManager.profile!, projectName);
+    updateGrid(grid, { projectName });
 
     await layout.value.validateBalance(grid!);
 

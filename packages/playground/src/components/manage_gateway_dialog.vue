@@ -357,7 +357,9 @@ export default {
         if (props.vm) {
           deploymentIps = getDeploymentIps(props.vm);
         } else if (props.k8s) {
-          deploymentIps = [...props.k8s.masters, ...props.k8s.workers].flatMap(deployment => getDeploymentIps(deployment));
+          deploymentIps = [...props.k8s.masters, ...props.k8s.workers].flatMap(deployment =>
+            getDeploymentIps(deployment),
+          );
         }
 
         const { gateways: gws, failedToList } = await loadDeploymentGateways(grid, {
@@ -411,7 +413,11 @@ export default {
 
         await deployGatewayName(grid, selectionDetails.value!.domain, gwConfig);
         suggestName();
-        layout.value.setStatus("success", "Successfully deployed gateway.");
+        // get gateway url
+        const gatewayUrl = selectionDetails.value!.domain!.useFQDN
+          ? `https://${selectionDetails.value!.domain!.customDomain}`
+          : `https://${gwConfig.subdomain}.${selectionDetails.value!.domain!.selectedDomain!.publicConfig.domain}`;
+        layout.value.setStatus("success", `Successfully deployed gateway at ${gatewayUrl}`);
       } catch (error) {
         errorMessage.value = "Failed to add domain";
         console.error(errorMessage.value, error);

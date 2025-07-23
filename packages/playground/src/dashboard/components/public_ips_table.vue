@@ -87,7 +87,8 @@
 </template>
 
 <script lang="ts">
-import type { RemoveFarmIPModel } from "@threefold/grid_client";
+import { RemoveFarmIPModel } from "@threefold/grid_client";
+import { plainToInstance } from "class-transformer";
 import type { PublicIp } from "@threefold/gridproxy_client";
 import * as ip from "ip";
 import { ref, watch } from "vue";
@@ -184,7 +185,8 @@ export default {
           ip: item.ip,
           farmId: props.farmId,
         }));
-        await gridStore.grid.farms.removeFarmIps(items.value);
+        const modelItems = items.value.map(item => plainToInstance(RemoveFarmIPModel, item));
+        await gridStore.grid.farms.removeFarmIps({ips:modelItems});
         setTimeout(async () => {
           await getFarmPublicIp(true, { page: page.value, size: pageSize.value });
           createCustomToast("IP is deleted successfully!", ToastType.success);

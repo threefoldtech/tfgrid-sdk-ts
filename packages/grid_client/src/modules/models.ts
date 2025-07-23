@@ -675,6 +675,10 @@ class FarmFilterOptions {
   @Expose() @IsOptional() @IsBoolean() randomize?: boolean;
   @Expose() @IsOptional() @IsBoolean() ret_count?: boolean;
   @Expose() @IsOptional() @IsString() region?: string;
+  @Expose() @IsOptional() @IsBoolean() planetary?: boolean;
+  @Expose() @IsOptional() @IsBoolean() mycelium?: boolean;
+  @Expose() @IsOptional() @IsBoolean() wireguard?: boolean;
+  @Expose() @IsOptional() node_features?: Features[];
 }
 
 class CalculatorModel {
@@ -805,6 +809,10 @@ class AddPublicConfig {
 class RemoveFarmIPModel {
   @Expose() @IsInt() @IsNotEmpty() @Min(1) farmId: number;
   @Expose() @IsNotEmpty() @IsString() ip: string;
+}
+
+class RemoveFarmIPsModel {
+  @Expose() @IsArray() @ValidateNested({ each: true }) ips: RemoveFarmIPModel[];
 }
 
 class AddStellarAddressToFarmModel {
@@ -1062,6 +1070,7 @@ export {
   ListenToMintCompletedModel,
   AddFarmIPModel,
   RemoveFarmIPModel,
+  RemoveFarmIPsModel,
   AddStellarAddressToFarmModel,
   AddPublicConfig,
   GetActiveContractsModel,

@@ -7,6 +7,7 @@ import { computed, ref, watch } from "vue";
 
 import { type FormValidatorService, provideForm, ValidatorStatus } from "@/hooks/form_validator";
 import type { InputValidatorService } from "@/hooks/input_validator";
+import { resolveValidationTargetFromService, removeErrorHighlight } from "@/utils/form_validation_helpers";
 
 export default {
   name: "FormValidator",
@@ -63,21 +64,11 @@ export default {
           statusMap.value.set(uid, status);
         }
 
-        const el = serviceMap.value.get(uid)?.$el;
-        if (status === ValidatorStatus.Valid && el) {
-          const input =
-            el instanceof HTMLElement
-              ? el
-              : el &&
-                  typeof el === "object" &&
-                  "value" in el &&
-                  (el as { value: HTMLElement }).value instanceof HTMLElement
-                ? (el as { value: HTMLElement }).value
-                : null;
-
-          if (input) {
-            input.classList.remove("weblet-layout-error");
-            setTimeout(() => input.classList.remove("weblet-layout-error-transition"), 152);
+        const service = serviceMap.value.get(uid) as InputValidatorService;
+        if (status === ValidatorStatus.Valid && service) {
+          const targetElement = resolveValidationTargetFromService(service);
+          if (targetElement) {
+            removeErrorHighlight(targetElement);
           }
         }
       },
