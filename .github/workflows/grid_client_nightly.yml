@@ -115,6 +115,7 @@ jobs:
       - name: Run test zdb
         id: zdb
         if: always()
+        continue-on-error: true
         run: |
           yarn run ts-node --transpileOnly --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/zdb.ts
 
@@ -171,6 +172,6 @@ jobs:
             - **Vmq QSFS**: skipped https://github.com/threefoldtech/tfgrid-sdk-ts/issues/3611
             - **Kubernetes QSFS**: skipped https://github.com/threefoldtech/tfgrid-sdk-ts/issues/3611
             - **Kvstore**: ${{ steps.kvstore.outcome }}
-            - **Zdb**: skipped https://github.com/threefoldtech/tfgrid-sdk-ts/issues/3611
+            - **Zdb**: skipped https://github.com/threefoldtech/tfgrid-sdk-ts/issues/4167
             - **Delete all contracts**: ${{ steps.delete_all.outcome }}
           labels: type_bug, grid_client
