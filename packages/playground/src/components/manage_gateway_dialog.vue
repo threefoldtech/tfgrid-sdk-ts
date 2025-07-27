@@ -9,7 +9,14 @@
     >
       <weblet-layout ref="layout" @back="onBack">
         <template #title> Manage Domains ({{ vm ? vm.name : k8s?.masters[0].name }}) </template>
-        <v-tabs v-model="gatewayTab" align-tabs="center" color="secondary" class="mb-6" :disabled="deleting">
+        <v-tabs
+          v-model="gatewayTab"
+          align-tabs="center"
+          color="secondary"
+          class="mb-6"
+          :disabled="deleting"
+          @update:model-value="onTabChange"
+        >
           <v-tab>Domains List</v-tab>
           <v-tab>Add new domain</v-tab>
         </v-tabs>
@@ -294,6 +301,13 @@ export default {
       return networks.value.find(net => net.value === selectedIPAddress.value)?.title === NetworkInterfaces.WireGuard;
     });
     watch(selectedK8SNodeName, getSupportedNetworks, { deep: true });
+
+    function onTabChange(newTab: unknown) {
+      if (newTab === 1) {
+        suggestName();
+      }
+    }
+
     const tableHeaders = ref([
       { title: "Name", key: "name" },
       { title: "Contract ID", key: "contractId" },
@@ -507,7 +521,8 @@ export default {
           grid.config.twinId;
         prefix.value = oldPrefix.value + props.vm.name;
       }
-      subdomain.value = generateName({ prefix: prefix.value }, 4).toLowerCase();
+      const randomSuffix = generateName({}, 2);
+      subdomain.value = `${prefix.value}${randomSuffix}`.toLowerCase();
     }
 
     const subdomainRules = [
@@ -551,6 +566,7 @@ export default {
       getSupportedNetworks,
       formatDomainName,
       onBack,
+      onTabChange,
       getDomainNode,
       tableHeaders,
       subdomainRules,
