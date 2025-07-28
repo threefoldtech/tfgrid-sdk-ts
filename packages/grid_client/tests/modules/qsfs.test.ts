@@ -1,4 +1,3 @@
-describe.skip("Grid3_Client_TS (Automated) – skipped", () => { // This test suite is skipped for now related to https://github.com/threefoldtech/tfgrid-sdk-ts/issues/3624
 import {
   Features,
   FilterOptions,
@@ -29,8 +28,8 @@ beforeAll(async () => {
 //Private IP Regex
 const ipRegex = /(^127\.)|(^10\.)|(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1]\.)|(^192\.168\.)/;
 
-test.skip("TC1234 - QSFS: Deploy QSFS underneath a VM", async () => {
-  /**********************************************
+// Skipping due to issue https://github.com/threefoldtech/tfgrid-sdk-ts/issues/4280
+test.skip("TC1234 - QSFS: Deploy QSFS underneath a VM", async () => {  /**********************************************
      Test Suite: Grid3_Client_TS (Automated)
      Test Cases: TC1234 - QSFS: Deploy QSFS underneath a VM
      Scenario:
@@ -310,7 +309,7 @@ test.skip("TC1234 - QSFS: Deploy QSFS underneath a VM", async () => {
     await ssh.dispose();
   }
 });
-
+// Skipping due to issue https://github.com/threefoldtech/tfgrid-sdk-ts/issues/4280
 test.skip("TC1235 - QSFS: Deploy QSFS Underneath a Kubernetes Cluster", async () => {
   /**********************************************
      Test Suite: Grid3_Client_TS (Automated)
@@ -730,4 +729,3 @@ afterEach(async () => {
 afterAll(async () => {
   return await gridClient.disconnect();
 }, 130000);
-});
