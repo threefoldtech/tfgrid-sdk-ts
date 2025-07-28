@@ -32,9 +32,6 @@ jobs:
         with:
           python-version: "3.10"
 
-      - name: Install system dependencies
-        run: sudo apt-get update && sudo apt-get install -y xclip
-
       - name: Install Python requirements
         run: pip install -r packages/playground/tests/frontend_selenium/requirements.txt
 
@@ -67,7 +64,7 @@ jobs:
         run: |
           CONFIG=packages/playground/tests/frontend_selenium/Config.ini
           if [ -f "$CONFIG" ]; then
-            if [ "${{ inputs.local }}" = "true" ]; then
+            if [ "${{ inputs.local }}" == "true" ]; then
               sed -i 's/^net =.*/net = local/' "$CONFIG"
             else
               sed -i "s/^net =.*/net = ${{ inputs.env }}/" "$CONFIG"
