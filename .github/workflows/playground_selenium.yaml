@@ -15,70 +15,59 @@ on:
           - "main"
       local:
         type: boolean
-        description: "Run tests using local build"
+        description: "Run tests using a local build"
         default: false
-
   schedule:
     - cron: "0 6 * * *"
 
 jobs:
-  run-selenium-tests:
-    name: Run Selenium Tests (${{ github.event.inputs.env || 'scheduled' }})
+  selenium-run:
     runs-on: ubuntu-latest
-
     env:
       ENV: ${{ github.event.inputs.env || 'dev' }}
       LOCAL: ${{ github.event.inputs.local || 'false' }}
-
     steps:
-      - name: Checkout Code
+      - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Set up Python
+      - name: Setting up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
-
-      - name: Install System Dependencies
+      - name: Install system dependencies
         run: sudo apt-get update && sudo apt-get install -y xclip
-
-      - name: Install Python Dependencies
-        run: pip install -r packages/playground/tests/frontend_selenium/requirements.txt
-
-      - name: Set up Node.js
+      - name: Installing all necessary packages
+        run: pip install -r  packages/playground/tests/frontend_selenium/requirements.txt
+      - name: Install Python dependencies
+        working-directory: packages/playground/tests/frontend_selenium
+        run: pip install -r requirements.txt
+      - name: Node install
         uses: actions/setup-node@v4
         with:
-          node-version: "22.15"
-
-      - name: Install Node Dependencies
+          node-version: 22.15
+      - name: Yarn install
         run: yarn install
-
-      - name: Configure Environment File
+      - name: Set environment
+        working-directory: packages/playground/tests/frontend_selenium
         run: |
-          if [ "$LOCAL" == "true" ]; then
-            sed -i "s/^net = .*/net = local/" packages/playground/tests/frontend_selenium/Config.ini
+          if [ "$LOCAL" = 'true' ]; then
+            sed -i "s/^net = .*/net = local/" Config.ini
           else
-            sed -i "s/^net = .*/net = $ENV/" packages/playground/tests/frontend_selenium/Config.ini
+            sed -i "s/^net = .*/net = $ENV/" Config.ini
           fi
-
-      - name: Lerna Build (Local Only)
-        if: env.LOCAL == 'true'
+      - name: Lerna Build
+        if: ${{ env.LOCAL == 'true' }}
         run: yarn lerna run build
-
-      - name: Generate Local Config (Local Only)
-        if: env.LOCAL == 'true'
+      - name: Generate local config
+        if: ${{ env.LOCAL == 'true' }}
         working-directory: packages/playground/public
         run: MODE=$ENV bash ../scripts/build-env.sh
-
-      - name: Start Playground Server (Local Only)
-        if: env.LOCAL == 'true'
+      - name: Yarn Serve
+        if: ${{ env.LOCAL == 'true' }}
         run: make run project=playground &
-
-      - name: Wait for Local Server
-        if: env.LOCAL == 'true'
+      - name: Wait for localhost
+        if: ${{ env.LOCAL == 'true' }}
         run: sleep 60
-
-      - name: Run Selenium Tests
+      - name: Run tests
         working-directory: ./packages/playground/tests/frontend_selenium
         env:
           TFCHAIN_MNEMONICS: ${{ secrets.TFCHAIN_MNEMONICS }}
