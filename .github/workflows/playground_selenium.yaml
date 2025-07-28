@@ -13,7 +13,7 @@ on:
           - test
           - main
       local:
-        description: "Run against local build"
+        description: "Build Local Environment"
         type: boolean
         default: false
   schedule:
