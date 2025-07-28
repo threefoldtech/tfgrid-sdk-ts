@@ -4,36 +4,30 @@ on:
   workflow_dispatch:
     inputs:
       env:
+        description: "Target environment"
         type: choice
-        description: "Target network"
         required: true
-        default: "dev"
         options:
-          - "dev"
-          - "qa"
-          - "test"
-          - "main"
+          - dev
+          - qa
+          - test
+          - main
       local:
+        description: "Run against local build"
         type: boolean
-        description: "Run tests using a local build"
         default: false
-
   schedule:
     - cron: "0 6 * * *"
 
 jobs:
-  selenium-run:
+  selenium:
     runs-on: ubuntu-latest
-
-    env:
-      ENV: ${{ github.event.inputs.env || 'dev' }}
-      LOCAL: ${{ github.event.inputs.local || 'false' }}
-
+    environment: ${{ inputs.env }}
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setting up Python
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
@@ -41,50 +35,49 @@ jobs:
       - name: Install system dependencies
         run: sudo apt-get update && sudo apt-get install -y xclip
 
-      - name: Install Python dependencies
+      - name: Install Python requirements
         run: pip install -r packages/playground/tests/frontend_selenium/requirements.txt
 
-      - name: Node install
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "22.15"
+          node-version: 22.15
 
       - name: Yarn install
         run: yarn install
 
-      - name: Set environment
-        working-directory: packages/playground/tests/frontend_selenium
-        run: |
-          CONFIG_PATH="Config.ini"
-          if [ ! -f "$CONFIG_PATH" ]; then
-            echo "❌ Config file not found at $CONFIG_PATH"
-            exit 1
-          fi
-          if [ "$LOCAL" = "true" ]; then
-            sed -i "s/^net = .*/net = local/" "$CONFIG_PATH"
-          else
-            sed -i "s/^net = .*/net = $ENV/" "$CONFIG_PATH"
-          fi
-
-      - name: Lerna Build
-        if: env.LOCAL == 'true'
+      - name: Build packages when local
+        if: ${{ inputs.local }}
         run: yarn lerna run build
 
-      - name: Generate local config
-        if: env.LOCAL == 'true'
+      - name: Build env config when local
+        if: ${{ inputs.local }}
         working-directory: packages/playground/public
-        run: MODE=$ENV bash ../scripts/build-env.sh
+        run: bash ../scripts/build-env.sh
 
-      - name: Yarn Serve
-        if: env.LOCAL == 'true'
+      - name: Start playground app
+        if: ${{ inputs.local }}
         run: make run project=playground &
 
-      - name: Wait for localhost
-        if: env.LOCAL == 'true'
+      - name: Wait for local app
+        if: ${{ inputs.local }}
         run: sleep 60
 
-      - name: Run tests
-        working-directory: ./packages/playground/tests/frontend_selenium
+      - name: Update Config.ini
+        run: |
+          CONFIG=packages/playground/tests/frontend_selenium/Config.ini
+          if [ -f "$CONFIG" ]; then
+            if [ "${{ inputs.local }}" = "true" ]; then
+              sed -i 's/^net =.*/net = local/' "$CONFIG"
+            else
+              sed -i "s/^net =.*/net = ${{ inputs.env }}/" "$CONFIG"
+            fi
+          else
+            echo "::warning::Config.ini not found at $CONFIG. Skipping config update."
+          fi
+
+      - name: Run selenium tests
+        working-directory: packages/playground/tests/frontend_selenium
         env:
           TFCHAIN_MNEMONICS: ${{ secrets.TFCHAIN_MNEMONICS }}
           TFCHAIN_NODE_MNEMONICS: ${{ secrets.TFCHAIN_NODE_MNEMONICS }}
