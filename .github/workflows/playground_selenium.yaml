@@ -43,6 +43,13 @@ jobs:
       - name: Yarn install
         run: yarn install
 
+
+      - name: Generate local config
+        if: ${{ inputs.local }}
+        working-directory: packages/playground/public
+        run: MODE=${{ inputs.env }} bash ../scripts/build-env.sh
+
+
       - name: Build packages when local
         if: ${{ inputs.local }}
         run: yarn lerna run build
