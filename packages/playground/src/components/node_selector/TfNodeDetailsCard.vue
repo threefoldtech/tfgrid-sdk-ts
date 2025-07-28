@@ -271,7 +271,7 @@
         <reserve-btn
           v-if="node?.dedicated && node?.status !== 'down'"
           class="ml-4"
-          :node="(node as GridNode)"
+          :node="node as GridNode"
           @update:status="$emit('update:status', $event as ValidatorStatus)"
           @update:node="$emit('update:node', $event as NodeInfo)"
         />
@@ -336,14 +336,19 @@ export default {
       return props.node?.rentedByTwinId === profileManager.profile?.twinId;
     });
     const countryFlagSrc = computed(() => {
-      const countryCode = getCountryCode(props.node as GridNode);
-      if (countryCode.length > 2) {
+      try {
+        const countryCode = getCountryCode(props.node as GridNode);
+        if (countryCode.length > 2) {
+          return "";
+        }
+
+        const imageUrl = `https://flagcdn.com/w640/${countryCode.toLowerCase()}.png`;
+
+        return imageUrl;
+      } catch (error) {
+        console.log("Failed to generate country flag URL:", error);
         return "";
       }
-
-      const imageUrl = `https://flagcdn.com/w640/${countryCode.toLowerCase()}.png`;
-
-      return imageUrl;
     });
 
     onMounted(async () => {

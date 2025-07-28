@@ -46,14 +46,18 @@ export default {
     };
 
     const getCountryFlagSrc = () => {
-      const conuntryCode = getCountryCode(props.node);
+      try {
+        const conuntryCode = getCountryCode(props.node);
 
-      if (conuntryCode.length > 2) {
+        if (conuntryCode.length > 2) {
+          return "";
+        }
+        const imageUrl = `https://flagcdn.com/w640/${conuntryCode.toLocaleLowerCase()}.png`;
+        return imageUrl;
+      } catch (error) {
+        console.log("Failed to generate country flag URL:", error);
         return "";
       }
-      const imageUrl = `https://flagcdn.com/w640/${conuntryCode.toLocaleLowerCase()}.png`;
-
-      return imageUrl;
     };
 
     return {
