@@ -13,52 +13,91 @@ on:
           - "qa"
           - "test"
           - "main"
+      branch:
+        type: choice
+        description: "Git branch to test"
+        required: true
+        default: "development"
+        options:
+          - "development"
+          - "main"
       local:
         type: boolean
-        description: "Run tests using a local build"
+        description: "Run tests using local build"
         default: false
+
   schedule:
-    - cron: "0 6 * * *"
+    - cron: "0 6 * * *" 
 
 jobs:
-  selenium-run:
+  run-selenium-tests:
+    name: Run Selenium Tests (${{ matrix.env }})
     runs-on: ubuntu-latest
-    if: github.event_name == 'schedule' || github.event.inputs.env == matrix.env
+
     strategy:
       matrix:
-        env: ["dev", "qa", "test", "main"]
+        env: [dev, qa, test, main]
+
+    if: |
+      github.event_name == 'schedule' ||
+      github.event.inputs.env == matrix.env
+
     env:
       ENV: ${{ matrix.env }}
+      BRANCH: ${{ github.event.inputs.branch || 'development' }}
       LOCAL: ${{ github.event.inputs.local || 'false' }}
+
     steps:
-      - name: Checkout
+      - name: Checkout Code
         uses: actions/checkout@v4
-      - name: Setting up Python
+        with:
+          ref: ${{ env.BRANCH }}
+
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
-      - name: Install system dependencies
+
+      - name: Install System Dependencies
         run: sudo apt-get update && sudo apt-get install -y xclip
-      - name: Installing all necessary packages
-        run: pip install -r  packages/playground/tests/frontend_selenium/requirements.txt
-      - name: Node install
+
+      - name: Install Python Dependencies
+        run: pip install -r packages/playground/tests/frontend_selenium/requirements.txt
+
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22.15
-      - name: Yarn install
+          node-version: "22.15"
+
+      - name: Install Node Dependencies
         run: yarn install
-      - name: Set environment
-        run: sed -i "s/^net = .*/net = $ENV/" packages/playground/tests/frontend_selenium/Config.ini
-      - name: Lerna Build
-        if: ${{ env.LOCAL == 'true' }}
+
+      - name: Configure Environment File
+        run: |
+          if [ "$LOCAL" == "true" ]; then
+            sed -i "s/^net = .*/net = local/" packages/playground/tests/frontend_selenium/Config.ini
+          else
+            sed -i "s/^net = .*/net = $ENV/" packages/playground/tests/frontend_selenium/Config.ini
+          fi
+
+      - name: Lerna Build (Local Only)
+        if: env.LOCAL == 'true'
         run: yarn lerna run build
-      - name: Yarn Serve
-        if: ${{ env.LOCAL == 'true' }}
+
+      - name: Generate Local Config (Local Only)
+        if: env.LOCAL == 'true'
+        working-directory: packages/playground/public
+        run: MODE=$ENV bash ../scripts/build-env.sh
+
+      - name: Start Playground Server (Local Only)
+        if: env.LOCAL == 'true'
         run: make run project=playground &
-      - name: Wait for localhost
-        if: ${{ env.LOCAL == 'true' }}
+
+      - name: Wait for Local Server
+        if: env.LOCAL == 'true'
         run: sleep 60
-      - name: Run tests
+
+      - name: Run Selenium Tests
         working-directory: ./packages/playground/tests/frontend_selenium
         env:
           TFCHAIN_MNEMONICS: ${{ secrets.TFCHAIN_MNEMONICS }}
