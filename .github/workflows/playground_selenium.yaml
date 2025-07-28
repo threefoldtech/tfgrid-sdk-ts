@@ -23,11 +23,11 @@ on:
           - "main"
       local:
         type: boolean
-        description: "Run tests using local build"
+        description: "Build Local Environment"
         default: false
 
   schedule:
-    - cron: "0 6 * * *" 
+    - cron: "0 6 * * *"
 
 jobs:
   run-selenium-tests:
@@ -38,16 +38,16 @@ jobs:
       matrix:
         env: [dev, qa, test, main]
 
-    if: |
-      github.event_name == 'schedule' ||
-      github.event.inputs.env == matrix.env
-
     env:
       ENV: ${{ matrix.env }}
       BRANCH: ${{ github.event.inputs.branch || 'development' }}
       LOCAL: ${{ github.event.inputs.local || 'false' }}
 
     steps:
+      - name: Skip if manual env input doesn't match matrix
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.env != matrix.env
+        run: echo "Skipping job because env mismatch" && exit 0
+
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
