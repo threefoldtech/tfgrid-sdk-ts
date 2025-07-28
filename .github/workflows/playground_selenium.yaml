@@ -13,17 +13,9 @@ on:
           - "qa"
           - "test"
           - "main"
-      branch:
-        type: choice
-        description: "Git branch to test"
-        required: true
-        default: "development"
-        options:
-          - "development"
-          - "main"
       local:
         type: boolean
-        description: "Build Local Environment"
+        description: "Run tests using local build"
         default: false
 
   schedule:
@@ -31,27 +23,16 @@ on:
 
 jobs:
   run-selenium-tests:
-    name: Run Selenium Tests (${{ matrix.env }})
+    name: Run Selenium Tests (${{ github.event.inputs.env || 'scheduled' }})
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        env: [dev, qa, test, main]
-
     env:
-      ENV: ${{ matrix.env }}
-      BRANCH: ${{ github.event.inputs.branch || 'development' }}
+      ENV: ${{ github.event.inputs.env || 'dev' }}
       LOCAL: ${{ github.event.inputs.local || 'false' }}
 
     steps:
-      - name: Skip if manual env input doesn't match matrix
-        if: github.event_name == 'workflow_dispatch' && github.event.inputs.env != matrix.env
-        run: echo "Skipping job because env mismatch" && exit 0
-
       - name: Checkout Code
         uses: actions/checkout@v4
-        with:
-          ref: ${{ env.BRANCH }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
