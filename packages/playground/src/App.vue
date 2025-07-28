@@ -18,58 +18,69 @@
           >
             <v-list>
               <template v-for="route in routes" :key="route.title">
-                <v-list-group v-if="route.items.length > 1" :value="route.title">
-                  <template #activator="{ props }">
-                    <v-list-item style="font-weight: 500" v-bind="props" :prepend-icon="route.icon">
-                      <v-list-item-title class="font-weight-bold">
-                        <v-tooltip :text="route.tooltip" :disabled="!route.tooltip">
-                          <template #activator="{ props: tooltipProps }">
-                            <span v-bind="tooltipProps">
-                              {{ route.title }}
-                            </span>
-                          </template>
-                        </v-tooltip>
-                      </v-list-item-title>
-                    </v-list-item>
-                  </template>
+                <template v-if="route.items.length > 1">
                   <v-list-item
-                    v-for="item in route.items"
-                    :key="item.route"
-                    :value="item.route"
-                    :color="theme.name.value === AppThemeSelection.light ? 'primary' : 'info'"
-                    :active="$route.path === item.route"
-                    @click="clickHandler(item)"
+                    style="font-weight: 500"
+                    :prepend-icon="route.icon"
+                    @click="handleGroupClick(route.title)"
                   >
-                    <template v-if="item.icon" #prepend>
-                      <v-img
-                        v-if="item.icon.includes('.')"
-                        class="mr-7"
-                        width="24"
-                        :src="baseUrl + 'images/icons/' + item.icon"
-                        :alt="item.title"
-                      />
-                      <v-icon v-else width="26">
-                        {{ item.icon }}
-                      </v-icon>
-                    </template>
-
                     <v-list-item-title class="font-weight-bold">
-                      <v-tooltip :text="item.tooltip" :disabled="!item.tooltip">
-                        <template #activator="{ props }">
-                          <span v-bind="props">
-                            {{ item.title }}
+                      <v-tooltip :text="route.tooltip" :disabled="!route.tooltip">
+                        <template #activator="{ props: tooltipProps }">
+                          <span v-bind="tooltipProps">
+                            {{ route.title }}
                           </span>
-                          <v-badge
-                            v-if="item.releaseDate && isReleasedOverMon(item.releaseDate, new Date())"
-                            dot
-                            inline
-                            color="primary"
-                          />
                         </template>
                       </v-tooltip>
                     </v-list-item-title>
+                    <template #append>
+                      <v-icon :icon="isGroupOpen(route.title) ? 'mdi-chevron-up' : 'mdi-chevron-down'" />
+                    </template>
                   </v-list-item>
-                </v-list-group>
+
+                  <v-expand-transition>
+                    <div v-if="isGroupOpen(route.title)">
+                      <v-list-item
+                        v-for="item in route.items"
+                        :key="item.route"
+                        :value="item.route"
+                        :color="theme.name.value === AppThemeSelection.light ? 'primary' : 'info'"
+                        :active="$route.path === item.route"
+                        class="pl-10"
+                        @click="clickHandler(item)"
+                      >
+                        <template v-if="item.icon" #prepend>
+                          <v-img
+                            v-if="item.icon.includes('.')"
+                            class="mr-7"
+                            width="24"
+                            :src="baseUrl + 'images/icons/' + item.icon"
+                            :alt="item.title"
+                          />
+                          <v-icon v-else width="26">
+                            {{ item.icon }}
+                          </v-icon>
+                        </template>
+
+                        <v-list-item-title class="font-weight-bold">
+                          <v-tooltip :text="item.tooltip" :disabled="!item.tooltip">
+                            <template #activator="{ props }">
+                              <span v-bind="props">
+                                {{ item.title }}
+                              </span>
+                              <v-badge
+                                v-if="item.releaseDate && isReleasedOverMon(item.releaseDate, new Date())"
+                                dot
+                                inline
+                                color="primary"
+                              />
+                            </template>
+                          </v-tooltip>
+                        </v-list-item-title>
+                      </v-list-item>
+                    </div>
+                  </v-expand-transition>
+                </template>
                 <v-list-item
                   v-for="item in route.items"
                   v-else
@@ -286,6 +297,9 @@ const getSidebarBreakpoint = () =>
 const permanent = ref(window.innerWidth > getSidebarBreakpoint());
 const openSidebar = ref(permanent.value);
 const toolbarExtended = ref(false);
+const openListGroup = ref<string | null>(null);
+
+const isGroupOpen = (groupTitle: string) => openListGroup.value === groupTitle;
 watch(permanent, value => {
   if (value) {
     toolbarExtended.value = false;
@@ -333,6 +347,18 @@ watch(
 );
 function navigateToHome() {
   return $router.push(DashboardRoutes.Other.HomePage);
+}
+function handleGroupClick(groupTitle: string, event?: Event) {
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
+  if (openListGroup.value === groupTitle) {
+    openListGroup.value = null;
+  } else {
+    openListGroup.value = groupTitle;
+  }
 }
 
 onMounted(async () => {
@@ -539,6 +565,27 @@ const routes: AppRoute[] = [
     ],
   },
 ];
+
+watch(
+  () => $route.path,
+  newPath => {
+    if (newPath === DashboardRoutes.Other.HomePage) {
+      openListGroup.value = null;
+      return;
+    }
+
+    for (const route of routes) {
+      const hasCurrentRoute = route.items.some(item => item.route === newPath);
+      if (hasCurrentRoute) {
+        if (openListGroup.value !== route.title) {
+          openListGroup.value = route.title;
+        }
+        break;
+      }
+    }
+  },
+  { immediate: true },
+);
 
 const baseUrl = import.meta.env.BASE_URL;
 
