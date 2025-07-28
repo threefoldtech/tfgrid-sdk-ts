@@ -17,53 +17,72 @@ on:
         type: boolean
         description: "Run tests using a local build"
         default: false
+
   schedule:
     - cron: "0 6 * * *"
 
 jobs:
   selenium-run:
     runs-on: ubuntu-latest
+
     env:
       ENV: ${{ github.event.inputs.env || 'dev' }}
       LOCAL: ${{ github.event.inputs.local || 'false' }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Setting up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
+
       - name: Install system dependencies
         run: sudo apt-get update && sudo apt-get install -y xclip
+
       - name: Install Python dependencies
-         run: pip install -r packages/playground/tests/frontend_selenium/requirements.txt
+        run: pip install -r packages/playground/tests/frontend_selenium/requirements.txt
+
       - name: Node install
         uses: actions/setup-node@v4
         with:
-          node-version: 22.15
+          node-version: "22.15"
+
       - name: Yarn install
         run: yarn install
+
       - name: Set environment
         working-directory: packages/playground/tests/frontend_selenium
         run: |
-          if [ "$LOCAL" = 'true' ]; then
-            sed -i "s/^net = .*/net = local/" Config.ini
-          else
-            sed -i "s/^net = .*/net = $ENV/" Config.ini
+          CONFIG_PATH="Config.ini"
+          if [ ! -f "$CONFIG_PATH" ]; then
+            echo "❌ Config file not found at $CONFIG_PATH"
+            exit 1
           fi
+          if [ "$LOCAL" = "true" ]; then
+            sed -i "s/^net = .*/net = local/" "$CONFIG_PATH"
+          else
+            sed -i "s/^net = .*/net = $ENV/" "$CONFIG_PATH"
+          fi
+
       - name: Lerna Build
-        if: ${{ env.LOCAL == 'true' }}
+        if: env.LOCAL == 'true'
         run: yarn lerna run build
+
       - name: Generate local config
-        if: ${{ env.LOCAL == 'true' }}
+        if: env.LOCAL == 'true'
         working-directory: packages/playground/public
         run: MODE=$ENV bash ../scripts/build-env.sh
+
       - name: Yarn Serve
-        if: ${{ env.LOCAL == 'true' }}
+        if: env.LOCAL == 'true'
         run: make run project=playground &
+
       - name: Wait for localhost
-        if: ${{ env.LOCAL == 'true' }}
+        if: env.LOCAL == 'true'
         run: sleep 60
+
       - name: Run tests
         working-directory: ./packages/playground/tests/frontend_selenium
         env:
