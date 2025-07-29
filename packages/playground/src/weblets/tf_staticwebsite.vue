@@ -117,7 +117,7 @@ import type { Flist, solutionFlavor as SolutionFlavor } from "../types";
 import { ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
 import { deployGatewayName, getSubdomain, rollbackDeployment } from "../utils/gateway";
-import { updateGrid } from "../utils/grid";
+import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
 import { generateName } from "../utils/strings";
 
@@ -174,11 +174,12 @@ async function deploy() {
       : subdomain + "." + selectionDetails.value?.domain?.selectedDomain?.publicConfig.domain;
   }
 
+  let grid: GridClient | null;
   let vm: any;
 
   try {
     layout.value?.validateSSH();
-    updateGrid(grid, { projectName });
+    grid = await getGrid(profileManager.profile!, projectName);
 
     await layout.value.validateBalance(grid!);
 
