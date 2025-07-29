@@ -475,6 +475,11 @@ class TwinDeploymentHandler {
           events.emit("logs", `Check the name contract for the workload with name: ${workload.name}`);
           const extrinsic = await this.createNameContract(workload.data["name"]);
           nameExtrinsics.push(extrinsic);
+        } else if (workload.type === WorkloadTypes.gatewayfqdnproxy) {
+          events.emit("logs", `Check the name contract for the FQDN workload with name: ${workload.name}`);
+          const contractName = workload.name.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+          const extrinsic = await this.createNameContract(contractName);
+          nameExtrinsics.push(extrinsic);
         }
       }
       const extrinsic = await this.tfclient.contracts.createNode({
@@ -491,6 +496,11 @@ class TwinDeploymentHandler {
         if (workload.type === WorkloadTypes.gatewaynameproxy) {
           events.emit("logs", `Check the name contract for the workload with name: ${workload.name}`);
           const extrinsic = await this.createNameContract(workload.data["name"]);
+          nameExtrinsics.push(extrinsic);
+        } else if (workload.type === WorkloadTypes.gatewayfqdnproxy) {
+          events.emit("logs", `Check the name contract for the FQDN workload with name: ${workload.name}`);
+          const contractName = workload.name.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+          const extrinsic = await this.createNameContract(contractName);
           nameExtrinsics.push(extrinsic);
         }
       }
@@ -509,6 +519,11 @@ class TwinDeploymentHandler {
         if (workload.type === WorkloadTypes.gatewaynameproxy) {
           events.emit("logs", `Check the name contract for the workload with name: ${workload.name}`);
           const extrinsic = await this.deleteNameContract(workload.data["name"]);
+          if (extrinsic) deletedExtrinsics.push(extrinsic);
+        } else if (workload.type === WorkloadTypes.gatewayfqdnproxy) {
+          events.emit("logs", `Check the name contract for the FQDN workload with name: ${workload.name}`);
+          const contractName = workload.name.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+          const extrinsic = await this.deleteNameContract(contractName);
           if (extrinsic) deletedExtrinsics.push(extrinsic);
         }
       }
