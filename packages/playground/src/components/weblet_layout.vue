@@ -120,7 +120,7 @@ import {
 } from "@/utils/form_validation_helpers";
 
 import { useGrid, useProfileManager } from "../stores";
-import { loadBalance, updateGrid } from "../utils/grid";
+import { loadBalance } from "../utils/grid";
 import { normalizeBalance } from "../utils/helpers";
 
 const props = defineProps({
@@ -389,7 +389,6 @@ async function loadCost(profile: { mnemonic: string }) {
   }
 
   costLoading.value = true;
-  updateGrid(grid, { projectName: "" });
   const { sharedPrice, dedicatedPrice } = await grid!.calculator.calculateWithMyBalance({
     cru: typeof props.cpu === "number" ? props.cpu : 0,
     sru: typeof props.disk === "number" ? props.disk : 0,
