@@ -10,12 +10,8 @@
 
   <!-- Contracts List Card -->
   <v-card color="primary" class="d-flex justify-center items-center mb-4 pa-3 text-center">
-    <v-icon size="30" class="pr-3">
-      mdi-file-document-edit
-    </v-icon>
-    <v-card-title class="pa-0">
-      Contracts List
-    </v-card-title>
+    <v-icon size="30" class="pr-3"> mdi-file-document-edit </v-icon>
+    <v-card-title class="pa-0"> Contracts List </v-card-title>
   </v-card>
 
   <v-alert class="mb-4 text-subtitle-2 font-weight-regular" type="info" variant="tonal">
@@ -24,15 +20,15 @@
       class="app-link font-weight-medium"
       target="_blank"
       href="https://manual.grid.tf/labs/documentation/developers/tfchain/"
-    >Contract Documentation,
+      >Contract Documentation,
     </a>
     and to explore further contract details, check
     <a
       class="app-link font-weight-medium"
       target="_blank"
       href="https://manual.grid.tf/labs/documentation/dashboard/deploy/your_contracts"
-    >Node Contract Documentation.</a>
-    <br>
+      >Node Contract Documentation.</a>
+    <br />
   </v-alert>
 
   <v-card variant="text" class="my-3">
@@ -77,9 +73,7 @@
     <template #title>
       <v-row>
         <v-col class="d-flex justify-start">
-          <p class="text-subtitle-1">
-            Total cost of contracts
-          </p>
+          <p class="text-subtitle-1">Total cost of contracts</p>
         </v-col>
       </v-row>
     </template>
@@ -120,9 +114,7 @@
       <v-card-text v-if="loadingLockDetails" class="d-flex flex-column justify-center align-center pb-0 pt-6">
         <v-progress-circular indeterminate />
 
-        <div class="text-subtitle-2 pt">
-          Loading contracts lock details
-        </div>
+        <div class="text-subtitle-2 pt">Loading contracts lock details</div>
         <v-divider class="mt-3" />
       </v-card-text>
       <v-card-text v-else>
@@ -146,9 +138,7 @@
         <v-divider class="mt-3" />
       </v-card-text>
       <v-card-actions class="justify-end mb-1 mr-2">
-        <v-btn color="anchor" @click="unlockDialog = false">
-          Close
-        </v-btn>
+        <v-btn color="anchor" @click="unlockDialog = false"> Close </v-btn>
         <v-tooltip
           :text="
             freeBalance < lockedContracts?.totalOverdueAmount
@@ -178,9 +168,7 @@
   <!-- delete all dialog-->
   <v-dialog v-model="deleteDialog" width="800" attach="#modals">
     <v-card>
-      <v-card-title class="bg-primary">
-        Delete all your contracts
-      </v-card-title>
+      <v-card-title class="bg-primary"> Delete all your contracts </v-card-title>
       <v-alert class="mx-4 mt-4" type="warning" variant="tonal">
         <template #prepend>
           <v-icon class="pt-4" icon="$warning" />
@@ -189,12 +177,8 @@
         <div>Deleting contracts may take a while to complete.</div>
       </v-alert>
       <v-card-actions class="justify-end my-1 mr-2">
-        <v-btn color="anchor" @click="deleteDialog = false">
-          Cancel
-        </v-btn>
-        <v-btn color="error" @click="deleteAll">
-          Delete
-        </v-btn>
+        <v-btn color="anchor" @click="deleteDialog = false"> Cancel </v-btn>
+        <v-btn color="error" @click="deleteAll"> Delete </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -481,14 +465,14 @@ const nodeStatus = computed(() => {
 
 // Calculate the total cost of contracts
 async function getTotalCost() {
-  totalCost.value = 0;
-
   try {
     const res = await gridProxyClient.twins.getConsumption(profileManager.profile!.twinId);
     totalCost.value = +res.last_hour_consumption.toFixed(3);
     const tftPrice = await queryClient.tftPrice.get();
     totalCostUSD.value = totalCost.value * (tftPrice / 1000);
   } catch (error: any) {
+    totalCost.value = 0;
+    totalCostUSD.value = 0;
     loadingErrorMessage.value = `Error calculating total cost: ${error.message}`;
     createCustomToast(loadingErrorMessage.value, ToastType.danger, {});
   }
