@@ -23,7 +23,13 @@
       <VTooltip :text="node?.location.country" :disabled="!node">
         <template #activator="{ props }">
           <VAvatar size="40">
-            <span v-if="countryFlagSrc.length === 0" class="flag-avatar">NA</span>
+            <img
+              v-if="countryFlagSrc.length === 0"
+              :src="baseUrl + 'images/icons/globe-svgrepo-com.svg'"
+              class="h-100"
+              :alt="(node?.location.country ?? 'node') + '-flag'"
+              v-bind="props"
+            />
             <img
               v-else
               :src="countryFlagSrc"
@@ -332,6 +338,7 @@ export default {
     const discountTableItems = ref<discountItems[]>([]);
     const tftMarketPrice = ref<number>(0);
     const calculator = new Calculator(new QueryClient(window.env.SUBSTRATE_URL));
+    const baseUrl = import.meta.env.BASE_URL;
     const rentedByUser = computed(() => {
       return props.node?.rentedByTwinId === profileManager.profile?.twinId;
     });
@@ -630,6 +637,7 @@ export default {
       loadingdiscountTableItems,
       gridStore,
       handleNodeClick,
+      baseUrl,
     };
   },
 };
@@ -638,9 +646,9 @@ export default {
 <style scoped>
 .flag-avatar {
   padding: 20px;
-  background-color: var(--primary);
+  /* background-color: var(--primary); */
   border-radius: 50%;
-  color: white;
+  /* color: white; */
   font-weight: 700;
 }
 
