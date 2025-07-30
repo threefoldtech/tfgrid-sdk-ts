@@ -644,14 +644,6 @@ export default {
 </script>
 
 <style scoped>
-.flag-avatar {
-  padding: 20px;
-  /* background-color: var(--primary); */
-  border-radius: 50%;
-  /* color: white; */
-  font-weight: 700;
-}
-
 .speed-chip {
   display: flex;
   flex-direction: column !important;
