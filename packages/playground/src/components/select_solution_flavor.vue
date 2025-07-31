@@ -83,9 +83,9 @@ const props = defineProps({
 });
 const emits = defineEmits<{ (event: "update:model-value", value?: solutionFlavor): void }>();
 
-const minDiskSize = computed(() => props.micro?.disk || props.small.disk);
-const minMemorySize = computed(() => props.micro?.memory * 1024 || props.small.memory * 1024);
-const minCpuSize = computed(() => props.micro?.cpu || props.small.cpu);
+const minDiskSize = computed(() => props?.micro?.disk || props?.small.disk);
+const minMemorySize = computed(() => (props?.micro?.memory ? props.micro.memory * 1024 : props.small.memory * 1024));
+const minCpuSize = computed(() => props?.micro?.cpu || props?.small.cpu);
 
 const packages = computed(() => {
   const { small, medium, large } = props;
