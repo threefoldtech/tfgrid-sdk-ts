@@ -52,10 +52,20 @@ jobs:
         run: yarn install
 
 
+      # - name: Generate local config
+      #   if: ${{ inputs.local }}
+      #   working-directory: packages/playground/public
+      #   run: MODE=${{ inputs.env }} bash ../scripts/build-env.sh
       - name: Generate local config
         if: ${{ inputs.local }}
         working-directory: packages/playground/public
-        run: MODE=${{ inputs.env }} bash ../scripts/build-env.sh
+        run: |
+          if [[ "${{ inputs.env }}" == "dev" || "${{ inputs.env }}" == "qa" ]]; then
+            export STELLAR_NETWORK="test"
+          else
+            export STELLAR_NETWORK="main"
+          fi
+          export MODE=${{ inputs.env }}
 
 
       - name: Build packages when local
