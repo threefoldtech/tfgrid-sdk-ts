@@ -12,6 +12,14 @@ on:
           - qa
           - test
           - main
+      branch:
+        type: choice
+        description: "Git branch to test"
+        required: true
+        default: "development"
+        options:
+          - "development"
+          - "main"
       local:
         description: "Build Local Environment"
         type: boolean
@@ -84,6 +92,7 @@ jobs:
         working-directory: packages/playground/tests/frontend_selenium
         env:
           TFCHAIN_MNEMONICS: ${{ secrets.TFCHAIN_MNEMONICS }}
+          # TFCHAIN_MNEMONICS: ${{ secrets.TFCHAIN_MNEMONICS.${{ inputs.env }} }}
           TFCHAIN_NODE_MNEMONICS: ${{ secrets.TFCHAIN_NODE_MNEMONICS }}
           STELLAR_ADDRESS: ${{ secrets.STELLAR_ADDRESS }}
           EMAIL: ${{ secrets.EMAIL }}
