@@ -19,7 +19,7 @@ on:
         default: "development"
         options:
           - "development"
-          - "main"
+          - "development_seleium_2.8.0_fixes"
       local:
         description: "Build Local Environment"
         type: boolean
