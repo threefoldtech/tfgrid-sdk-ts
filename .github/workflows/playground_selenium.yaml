@@ -66,6 +66,7 @@ jobs:
             export STELLAR_NETWORK="main"
           fi
           export MODE=${{ inputs.env }}
+          echo "Using MODE=$MODE and STELLAR_NETWORK=$STELLAR_NETWORK"
 
 
       - name: Build packages when local
@@ -106,4 +107,4 @@ jobs:
           TFCHAIN_NODE_MNEMONICS: ${{ secrets.TFCHAIN_NODE_MNEMONICS }}
           STELLAR_ADDRESS: ${{ secrets.STELLAR_ADDRESS }}
           EMAIL: ${{ secrets.EMAIL }}
-        run: python -m pytest -v tests/Farms/test_node.py
+        run: python -m pytest -v tests/Farms/test_node.py::test_node_details
