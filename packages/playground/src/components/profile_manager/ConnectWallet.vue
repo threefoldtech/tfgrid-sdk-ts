@@ -109,11 +109,14 @@
       <!-- Email -->
       <input-validator
         id="email-validator"
+        ref="emailInput"
         :value="email"
-        :rules="[
-          validators.required('Email is required.'),
-          validators.isEmail('Please provide a valid email address.'),
-        ]"
+        :rules="
+          mnemonic && mnemonicInput?.status === ValidatorStatus.Valid
+            ? [validators.required('Email is required.'), validators.isEmail('Please provide a valid email address.')]
+            : []
+        "
+        :disable-validation="!!isEmailDisabled"
         #="{ props }"
       >
         <v-text-field
@@ -124,7 +127,7 @@
           label="Email"
           placeholder="email@example.com"
           :loading="loadEmail"
-          :disabled="creatingAccount || connecting || loadEmail || mnemonicInput?.status !== ValidatorStatus.Valid"
+          :disabled="isEmailDisabled"
           autocomplete="off"
         />
       </input-validator>
@@ -191,7 +194,7 @@ import { TwinNotExistError } from "@threefold/types";
 import { validateMnemonic } from "bip39";
 import Cryptr from "cryptr";
 import md5 from "md5";
-import { ref, watch } from "vue";
+import { ref, watch, nextTick, computed } from "vue";
 
 import { ValidatorStatus } from "@/hooks/form_validator";
 import { useInputRef } from "@/hooks/input_validator";
@@ -209,6 +212,17 @@ const keypairType = ref(KeypairType.sr25519);
 const keyType = ["sr25519", "ed25519"];
 const confirmPasswordInput = useInputRef();
 const mnemonicInput = useInputRef();
+const emailInput = useInputRef();
+
+const isEmailDisabled = computed(() => {
+  return (
+    creatingAccount.value ||
+    connecting.value ||
+    loadEmail.value ||
+    (mnemonic.value && mnemonicInput.value?.status !== ValidatorStatus.Valid)
+  );
+});
+
 // loading
 const loadEmail = ref(false);
 const creatingAccount = ref(false);
@@ -239,7 +253,22 @@ const emit = defineEmits(["closeDialog", "update:loading"]);
 watch([connecting, creatingAccount], () => {
   emit("update:loading", connecting.value || creatingAccount.value);
 });
+
+watch(mnemonic, async newValue => {
+  if (!newValue) {
+    email.value = "";
+    await nextTick();
+    if (mnemonicInput.value) {
+      mnemonicInput.value.reset();
+    }
+    if (emailInput.value) {
+      emailInput.value.reset();
+    }
+  }
+});
 async function getEmail(grid: GridClient) {
+  if (!mnemonic.value) return;
+
   loadEmail.value = true;
   try {
     email.value = await readEmail(grid);
@@ -263,27 +292,43 @@ function reloadValidation() {
 }
 const validateMnemonicInput = async (input: string) => {
   isNonActiveMnemonic.value = false;
-  if (
-    validateMnemonic(input) ||
-    ((input.length === 64 || input.length === 66) && isAddress(input.length === 66 ? input : `0x${input}`))
-  ) {
-    try {
-      const grid = await getGrid({ mnemonic: mnemonic.value, keypairType: keypairType.value });
-      getEmail(grid!);
-    } catch (e) {
-      if (e instanceof TwinNotExistError) {
-        isNonActiveMnemonic.value = true;
-      } else {
-        console.error("ValidateMnemonicInput error", e);
-        enableReload.value = true;
-        return { message: normalizeError(e, "Something went wrong. please try again.") };
-      }
+
+  if (!input) {
+    email.value = "";
+    if (emailInput.value) {
+      emailInput.value.reset();
     }
-    return;
+    return {
+      message: "Mnemonic or Hex Seed is required.",
+    };
   }
-  return {
-    message: "Mnemonic or Hex Seed doesn't seem to be valid.",
-  };
+
+  if (
+    !validateMnemonic(input) &&
+    !((input.length === 64 || input.length === 66) && isAddress(input.length === 66 ? input : `0x${input}`))
+  ) {
+    email.value = "";
+    if (emailInput.value) {
+      emailInput.value.reset();
+    }
+    return {
+      message: "Mnemonic or Hex Seed doesn't seem to be valid.",
+    };
+  }
+
+  try {
+    const grid = await getGrid({ mnemonic: mnemonic.value, keypairType: keypairType.value });
+    getEmail(grid!);
+  } catch (e) {
+    if (e instanceof TwinNotExistError) {
+      isNonActiveMnemonic.value = true;
+    } else {
+      console.error("ValidateMnemonicInput error", e);
+      enableReload.value = true;
+      return { message: normalizeError(e, "Something went wrong. please try again.") };
+    }
+  }
+  return;
 };
 
 function validateConfirmPassword(value: string) {
