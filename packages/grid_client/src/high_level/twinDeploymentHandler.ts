@@ -412,6 +412,42 @@ class TwinDeploymentHandler {
     return await this.deploymentFactory.fromObj(deployment);
   }
 
+  private async handleGatewayWorkloads(
+    workloads: Workload[],
+    operation: Operations,
+  ): Promise<{
+    nameExtrinsics: ExtrinsicResult<Contract>[];
+    deletedExtrinsics: ExtrinsicResult<number>[];
+  }> {
+    const nameExtrinsics: ExtrinsicResult<Contract>[] = [];
+    const deletedExtrinsics: ExtrinsicResult<number>[] = [];
+
+    for (const workload of workloads) {
+      if (workload.type === WorkloadTypes.gatewaynameproxy) {
+        events.emit("logs", `Check the name contract for the workload with name: ${workload.name}`);
+        if (operation === Operations.delete) {
+          const extrinsic = await this.deleteNameContract(workload.data["name"]);
+          if (extrinsic) deletedExtrinsics.push(extrinsic);
+        } else {
+          const extrinsic = await this.createNameContract(workload.data["name"]);
+          nameExtrinsics.push(extrinsic);
+        }
+      } else if (workload.type === WorkloadTypes.gatewayfqdnproxy) {
+        events.emit("logs", `Check the name contract for the FQDN workload with name: ${workload.name}`);
+        const contractName = workload.name.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+        if (operation === Operations.delete) {
+          const extrinsic = await this.deleteNameContract(contractName);
+          if (extrinsic) deletedExtrinsics.push(extrinsic);
+        } else {
+          const extrinsic = await this.createNameContract(contractName);
+          nameExtrinsics.push(extrinsic);
+        }
+      }
+    }
+
+    return { nameExtrinsics, deletedExtrinsics };
+  }
+
   async rollback(contracts) {
     // cancel all created contracts and leave the updated ones.
     events.emit("logs", "Rolling back deployments");
@@ -465,23 +501,14 @@ class TwinDeploymentHandler {
 
   async PrepareExtrinsic(twinDeployment: TwinDeployment, contracts) {
     const nodeExtrinsics: ExtrinsicResult<Contract>[] = [];
-    const nameExtrinsics: ExtrinsicResult<Contract>[] = [];
-    const deletedExtrinsics: ExtrinsicResult<number>[] = [];
+    let nameExtrinsics: ExtrinsicResult<Contract>[] = [];
+    let deletedExtrinsics: ExtrinsicResult<number>[] = [];
+
     if (twinDeployment.operation === Operations.deploy) {
       events.emit("logs", `Deploying on node_id: ${twinDeployment.nodeId}`);
-      for (const workload of twinDeployment.deployment.workloads) {
-        // check if the deployment need name contract
-        if (workload.type === WorkloadTypes.gatewaynameproxy) {
-          events.emit("logs", `Check the name contract for the workload with name: ${workload.name}`);
-          const extrinsic = await this.createNameContract(workload.data["name"]);
-          nameExtrinsics.push(extrinsic);
-        } else if (workload.type === WorkloadTypes.gatewayfqdnproxy) {
-          events.emit("logs", `Check the name contract for the FQDN workload with name: ${workload.name}`);
-          const contractName = workload.name.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
-          const extrinsic = await this.createNameContract(contractName);
-          nameExtrinsics.push(extrinsic);
-        }
-      }
+      const gatewayResults = await this.handleGatewayWorkloads(twinDeployment.deployment.workloads, Operations.deploy);
+      nameExtrinsics = gatewayResults.nameExtrinsics;
+
       const extrinsic = await this.tfclient.contracts.createNode({
         hash: twinDeployment.deployment.challenge_hash(),
         data: twinDeployment.metadata,
@@ -491,19 +518,9 @@ class TwinDeploymentHandler {
       });
       nodeExtrinsics.push(extrinsic);
     } else if (twinDeployment.operation === Operations.update) {
-      for (const workload of twinDeployment.deployment.workloads) {
-        // check if the deployment need name contract
-        if (workload.type === WorkloadTypes.gatewaynameproxy) {
-          events.emit("logs", `Check the name contract for the workload with name: ${workload.name}`);
-          const extrinsic = await this.createNameContract(workload.data["name"]);
-          nameExtrinsics.push(extrinsic);
-        } else if (workload.type === WorkloadTypes.gatewayfqdnproxy) {
-          events.emit("logs", `Check the name contract for the FQDN workload with name: ${workload.name}`);
-          const contractName = workload.name.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
-          const extrinsic = await this.createNameContract(contractName);
-          nameExtrinsics.push(extrinsic);
-        }
-      }
+      const gatewayResults = await this.handleGatewayWorkloads(twinDeployment.deployment.workloads, Operations.update);
+      nameExtrinsics = gatewayResults.nameExtrinsics;
+
       const old_contract = await this.tfclient.contracts.get({ id: twinDeployment.deployment.contract_id });
       const extrinsic = await this.tfclient.contracts.updateNode({
         id: twinDeployment.deployment.contract_id,
@@ -514,19 +531,9 @@ class TwinDeploymentHandler {
       contracts.updated.push(old_contract);
     } else if (twinDeployment.operation === Operations.delete) {
       events.emit("logs", `Deleting deployment with contract_id: ${twinDeployment.deployment.contract_id}`);
-      for (const workload of twinDeployment.deployment.workloads) {
-        // check if the deployment needs to delete a name contract
-        if (workload.type === WorkloadTypes.gatewaynameproxy) {
-          events.emit("logs", `Check the name contract for the workload with name: ${workload.name}`);
-          const extrinsic = await this.deleteNameContract(workload.data["name"]);
-          if (extrinsic) deletedExtrinsics.push(extrinsic);
-        } else if (workload.type === WorkloadTypes.gatewayfqdnproxy) {
-          events.emit("logs", `Check the name contract for the FQDN workload with name: ${workload.name}`);
-          const contractName = workload.name.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
-          const extrinsic = await this.deleteNameContract(contractName);
-          if (extrinsic) deletedExtrinsics.push(extrinsic);
-        }
-      }
+      const gatewayResults = await this.handleGatewayWorkloads(twinDeployment.deployment.workloads, Operations.delete);
+      deletedExtrinsics = gatewayResults.deletedExtrinsics;
+
       const extrinsic = await this.tfclient.contracts.cancel({ id: twinDeployment.deployment.contract_id });
       deletedExtrinsics.push(extrinsic);
     }
