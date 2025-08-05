@@ -61,7 +61,7 @@
                     alt="flag"
                     width="20"
                     v-bind="props"
-                    :src="baseUrl + 'images/icons/globe-svgrepo-com.svg'"
+                    src="/images/icons/globe-svgrepo-com.svg"
                   />
                   <p class="font-14" v-bind="props">
                     {{
@@ -154,7 +154,6 @@ export default {
   setup(props) {
     const maxLenChar = 30;
     const transformedObject = ref<string>("");
-    const baseUrl = import.meta.env.BASE_URL;
 
     onMounted(() => {
       if (props.node) {
@@ -165,7 +164,7 @@ export default {
       }
     });
 
-    return { maxLenChar, transformedObject, baseUrl };
+    return { maxLenChar, transformedObject };
   },
 };
 </script>
