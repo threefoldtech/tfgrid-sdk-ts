@@ -56,7 +56,13 @@
 
               <v-tooltip v-if="item.hint && !item.icon" class="overflowText" location="top" :text="item.hint">
                 <template #activator="{ props }">
-                  <span v-if="item.name === 'Flag' && !item.imgSrc" class="flag-avatar">NA</span>
+                  <img
+                    v-if="item.name === 'Flag' && !item.imgSrc"
+                    alt="flag"
+                    width="20"
+                    v-bind="props"
+                    src="/images/icons/globe-svgrepo-com.svg"
+                  />
                   <p class="font-14" v-bind="props">
                     {{
                       item.value && item.value.length > maxLenChar

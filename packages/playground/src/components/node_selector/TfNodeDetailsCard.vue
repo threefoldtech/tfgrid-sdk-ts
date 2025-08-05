@@ -23,7 +23,13 @@
       <VTooltip :text="node?.location.country" :disabled="!node">
         <template #activator="{ props }">
           <VAvatar size="40">
-            <span v-if="countryFlagSrc.length === 0" class="flag-avatar">NA</span>
+            <img
+              v-if="countryFlagSrc.length === 0"
+              src="/images/icons/globe-svgrepo-com.svg"
+              class="h-100"
+              :alt="(node?.location.country ?? 'node') + '-flag'"
+              v-bind="props"
+            />
             <img
               v-else
               :src="countryFlagSrc"
@@ -336,17 +342,19 @@ export default {
       return props.node?.rentedByTwinId === profileManager.profile?.twinId;
     });
     const countryFlagSrc = computed(() => {
-      const countryCode = getCountryCode(props.node as GridNode);
-      if (countryCode.length > 2) {
+      try {
+        const countryCode = getCountryCode(props.node as GridNode);
+        if (countryCode.length > 2) {
+          return "";
+        }
+
+        const imageUrl = `https://flagcdn.com/w640/${countryCode.toLowerCase()}.png`;
+
+        return imageUrl;
+      } catch (error) {
+        console.log("Failed to generate country flag URL:", error);
         return "";
       }
-
-      const imageUrl =
-        countryCode.toLowerCase() !== "ch"
-          ? `https://www.worldatlas.com/r/w425/img/flag/${countryCode.toLowerCase()}-flag.jpg`
-          : `https://www.worldatlas.com/r/w425/img/flag/${countryCode.toLowerCase()}-flag.png`;
-
-      return imageUrl;
     });
 
     onMounted(async () => {
@@ -634,14 +642,6 @@ export default {
 </script>
 
 <style scoped>
-.flag-avatar {
-  padding: 20px;
-  background-color: var(--primary);
-  border-radius: 50%;
-  color: white;
-  font-weight: 700;
-}
-
 .speed-chip {
   display: flex;
   flex-direction: column !important;
