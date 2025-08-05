@@ -1,8 +1,7 @@
-from utils.utils import generate_leters, generate_string, get_email, get_seed, get_stellar_address
+from utils.utils import generate_letters, generate_string, get_seed, get_stellar_address
 from pages.dashboard import DashboardPage
 from utils.grid_proxy import GridProxy
 from pages.bridge import BridgePage
-import pytest
 from utils.base import Base
 
 #  Time required for the run (11 cases) is approximately 3 minutes.
@@ -14,7 +13,7 @@ def before_test_setup(browser):
     password = generate_string()
     dashboard_page.open_and_load()
     dashboard_page.import_account(get_seed())
-    dashboard_page.click_button(dashboard_page.connect_your_wallet(get_email(), password))
+    dashboard_page.click_button(dashboard_page.connect_your_wallet(password))
     bridge_page.navigate_to_bridge()
     return bridge_page
 
@@ -76,14 +75,14 @@ def test_how_it_done(browser):
       Result: it will go to link
     """
     bridge_page = before_test_setup(browser)
-    if Base.net in ['dev', 'local']:
+    if Base.net in ['dev']:
         tfchain_stellar_bridge_url = 'https://manual.dev.grid.tf/labs/documentation/threefold_token/tft_bridges/tfchain_stellar_bridge/'
         tft_bridges_url = 'https://manual.dev.grid.tf/labs/documentation/threefold_token/tft_bridges/'
     else:
         tfchain_stellar_bridge_url = 'https://manual.grid.tf/labs/documentation/threefold_token/tft_bridges/tfchain_stellar_bridge/'
         tft_bridges_url = 'https://manual.grid.tf/labs/documentation/threefold_token/tft_bridges/'
     assert bridge_page.how_it_done() == tfchain_stellar_bridge_url
-    assert bridge_page.deposite_learn_more() == tft_bridges_url
+    assert bridge_page.deposit_learn_more() == tft_bridges_url
 
 
 def test_check_deposit(browser):
@@ -96,7 +95,7 @@ def test_check_deposit(browser):
           - Click on chain list.
           - Click on deposit button.
           - Click on close button.
-      Result: Assert that Destination and memo text will come from drid proxy.
+      Result: Assert that Destination and memo text will come from grid proxy.
     """
     bridge_page = before_test_setup(browser)
     grid_proxy = GridProxy(browser)
@@ -119,7 +118,7 @@ def test_check_withdraw_stellar(browser):
           - Click on withdraw button.
           - Put stellar Address.
           - Click on close button.
-      Result: Assert that stellar address is right.
+      Result: Assert that stellar address is correct.
     """
     bridge_page = before_test_setup(browser)
     assert bridge_page.check_withdraw(get_stellar_address(), '2.01').is_enabled() == True
@@ -140,7 +139,7 @@ def test_check_withdraw_invalid_stellar(browser):
     """
     bridge_page = before_test_setup(browser)
     bridge_page.setup_withdraw_tft(3)
-    cases = [' ', generate_string(), generate_leters(), '!@##$%$E^/>|ز%^(;:^*)']
+    cases = [' ', generate_string(), generate_letters(), '!@##$%$E^/>|ز%^(;:^*)']
     for case in cases:
         assert bridge_page.check_withdraw_invalid_stellar(case) == False
         assert bridge_page.wait_for('Invalid address')
@@ -164,13 +163,15 @@ def test_check_withdraw_tft_amount(browser):
       Result: Assert that the amount of tft is right.
     """
     bridge_page = before_test_setup(browser)
-    balance = bridge_page.setup_widthdraw_address(get_stellar_address())
+    balance = bridge_page.setup_withdraw_address(get_stellar_address())
+    #decrease the locked TFT & withdraw fee before transfer
+    withdraw_fee = 1.001
     locked_balance = bridge_page.get_locked_balance()
-    #decrease the locked TFT before transfer
-    cases = [2, 8.001, 10.111]
-    cases.append(format(float(balance)-float(locked_balance), '.3f'))
+    max_withdraw_balance = format(float(balance)-float(locked_balance)-withdraw_fee, '.3f')
+    cases = [max_withdraw_balance, 2, 8.001, 10.111, 03.030]
     for case in cases:
         assert bridge_page.check_withdraw_tft_amount(case) == True
+
 
 
 def test_check_withdraw_invalid_tft_amount(browser):
@@ -187,7 +188,7 @@ def test_check_withdraw_invalid_tft_amount(browser):
       Result: Alert with message "Amount cannot be negative or 0" should be displayed.
     """
     bridge_page = before_test_setup(browser)
-    balance = bridge_page.setup_widthdraw_address(get_stellar_address())
+    balance = bridge_page.setup_withdraw_address(get_stellar_address())
     cases = [0, 0.000, 0.0, -0.1, -1, -22.2, -1.111, 0.123, 1.999]
     for case in cases:
         assert bridge_page.check_withdraw_invalid_tft_amount(case) == False
@@ -216,8 +217,9 @@ def test_check_withdraw(browser):
     """
     bridge_page = before_test_setup(browser)
     balance = bridge_page.get_balance()
-    min_balance = float(balance)-2
-    max_balance = float(balance)-2.11
+    withdraw_fee = float(1)
+    min_balance = float(balance)-2 - withdraw_fee
+    max_balance = float(balance)-2.11 - withdraw_fee
     bridge_page.check_withdraw(get_stellar_address(), '2.1').click()
     assert bridge_page.wait_for('Transaction Succeeded')
     assert format(float(max_balance), '.3f') <= format(float(bridge_page.get_balance_withdraw(balance)), '.3f') <= format(float(min_balance), '.3f')

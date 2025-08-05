@@ -58,7 +58,7 @@ def generate_string():
     chars = string.ascii_uppercase + string.digits
     return (''.join(random.choice(chars) for _ in range(10)))
 
-def generate_leters():
+def generate_letters():
     chars = string.digits
     return (''.join(random.choice(chars) for _ in range(10)))
 
@@ -119,7 +119,7 @@ def increment_ip(ipv4):
     incremented_ip = str(incremented_ip_obj)
     return f"{incremented_ip}/{port}"
 
-def generate_inavalid_ip():
+def generate_invalid_ip():
     first = ['6', '7', '8', '9']
     second = ['6', '7', '8', '9']
     port = random.randrange(0, 15)
@@ -134,7 +134,7 @@ def generate_inavalid_ip():
     ip += str(port)
     return ip
 
-def generate_inavalid_gateway():
+def generate_invalid_gateway():
     first = ['6', '7', '8', '9']
     second = ['6', '7', '8', '9']
     gateway = ''.join(random.choice(
@@ -161,7 +161,7 @@ def invalid_amount():
     rational = (str(random.uniform(100, 10000)))
     return rational
 
-def invalid_amount_negtive():
+def invalid_amount_negative():
     negative = (str(random.randrange(1, 99)))
     negative = '-'+negative
     return negative
@@ -194,7 +194,7 @@ def convert_to_scaled_float(number):
 def byte_converter(value):
     # Define the unit and the numeric value before checking conditions
     unit = value[-2].upper()  # Last character represents the unit (P, T, G)
-    number_str = value[:-3].strip()  # Everything except the last two characters is the number
+    number_str = value[:-3].strip().replace(",", "")  # Everything except the last two characters is the number
 
     if value != '0':
         # Convert based on the unit

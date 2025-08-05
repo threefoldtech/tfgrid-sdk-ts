@@ -60,33 +60,37 @@ class DashboardPage:
     def open_and_load(self):
         self.browser.get(Base.base_url)
         WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.profile_load_label))
-        time.sleep(5)
     
     def press_esc_key(self):
         webdriver.ActionChains(self.browser).send_keys(Keys.ESCAPE).perform()
     
     def import_account(self, seed, validation=True):
+        WebDriverWait(self.browser, 30).until(EC.presence_of_element_located(self.mnemonic_input))
         self.browser.find_element(*self.mnemonic_input).send_keys(Keys.CONTROL + "a")
         self.browser.find_element(*self.mnemonic_input).send_keys(Keys.DELETE)
         self.browser.find_element(*self.mnemonic_input).send_keys(seed)
         if(validation):
-            WebDriverWait(self.browser, 60).until(EC.element_to_be_clickable(self.email_input))
+            WebDriverWait(self.browser, 30).until(EC.element_to_be_clickable(self.email_input))
+            email_input = self.browser.find_element(*self.email_input)
+            assert email_input.is_enabled()
+            email_value = email_input.get_attribute("value")
+            assert email_value.strip() != "", "Email input is empty!"
 
-    def connect_your_wallet(self, email, password):
-        element = WebDriverWait(self.browser, 10).until(EC.presence_of_element_located(self.email_input))
-        for _ in range(10):
-            if element.is_enabled():
-                self.browser.find_element(*self.email_input).send_keys(Keys.CONTROL + "a")
-                self.browser.find_element(*self.email_input).send_keys(Keys.DELETE)
-                self.browser.find_element(*self.email_input).send_keys(email)
-            else:
-                time.sleep(3)
-        self.browser.find_element(*self.password_input).send_keys(Keys.CONTROL + "a")
-        self.browser.find_element(*self.password_input).send_keys(Keys.DELETE)
-        self.browser.find_element(*self.password_input).send_keys(password)
-        self.browser.find_element(*self.confirm_password_input).send_keys(Keys.CONTROL + "a")
-        self.browser.find_element(*self.confirm_password_input).send_keys(Keys.DELETE)
-        self.browser.find_element(*self.confirm_password_input).send_keys(password)
+    def connect_your_wallet(self, password, email=None):
+        WebDriverWait(self.browser, 30).until(EC.presence_of_element_located(self.email_input))
+        if email is not None:
+            email_field = self.browser.find_element(*self.email_input)
+            email_field.send_keys(Keys.CONTROL + "a")
+            email_field.send_keys(Keys.DELETE)
+            email_field.send_keys(email)
+        password_field = self.browser.find_element(*self.password_input)
+        password_field.send_keys(Keys.CONTROL + "a")
+        password_field.send_keys(Keys.DELETE)
+        password_field.send_keys(password)
+        confirm_password_field = self.browser.find_element(*self.confirm_password_input)
+        confirm_password_field.send_keys(Keys.CONTROL + "a")
+        confirm_password_field.send_keys(Keys.DELETE)
+        confirm_password_field.send_keys(password)
         return self.browser.find_element(*self.connect_button)
 
     def logout_account(self):
