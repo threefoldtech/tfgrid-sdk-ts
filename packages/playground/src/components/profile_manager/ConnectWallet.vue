@@ -111,12 +111,10 @@
         id="email-validator"
         ref="emailInput"
         :value="email"
-        :rules="
-          mnemonic && mnemonicInput?.status === ValidatorStatus.Valid
-            ? [validators.required('Email is required.'), validators.isEmail('Please provide a valid email address.')]
-            : []
-        "
-        :disable-validation="!!isEmailDisabled"
+        :rules="[
+          validators.required('Email is required.'),
+          validators.isEmail('Please provide a valid email address.'),
+        ]"
         #="{ props }"
       >
         <v-text-field
@@ -129,6 +127,8 @@
           :loading="loadEmail"
           :disabled="isEmailDisabled"
           autocomplete="off"
+          @blur="() => emailInput?.validate()"
+          @update:model-value="() => emailInput?.validate()"
         />
       </input-validator>
       <!-- Passwords -->
@@ -136,7 +136,7 @@
         id="password-input"
         v-model="password"
         mode="Create"
-        :disabled="creatingAccount || connecting"
+        :disabled="creatingAccount || connecting || !isMnemonicValid"
         @update:model-value="confirmPassword ? confirmPasswordInput?.validate() : null"
       />
       <PasswordInputWrapper id="confirm-password-wrapper" #="{ props: confirmPasswordInputProps }">
@@ -155,7 +155,7 @@
               ...confirmPasswordInputProps,
               ...validationProps,
             }"
-            :disabled="creatingAccount || connecting"
+            :disabled="creatingAccount || connecting || !isMnemonicValid"
             autocomplete="off"
           />
         </InputValidator>
@@ -202,6 +202,7 @@ import { useProfileManager } from "@/stores";
 import { setCredentials } from "@/utils/credentials";
 import { activateAccountAndCreateTwin, createAccount, getGrid, loadProfile, readEmail, storeEmail } from "@/utils/grid";
 import { normalizeError } from "@/utils/helpers";
+import * as validators from "@/utils/validators";
 const profileManager = useProfileManager();
 const mnemonic = ref("");
 const email = ref("");
@@ -214,12 +215,13 @@ const confirmPasswordInput = useInputRef();
 const mnemonicInput = useInputRef();
 const emailInput = useInputRef();
 
+const isMnemonicValid = computed(() => {
+  return mnemonic.value && mnemonicInput.value?.status === ValidatorStatus.Valid;
+});
+
 const isEmailDisabled = computed(() => {
   return (
-    creatingAccount.value ||
-    connecting.value ||
-    loadEmail.value ||
-    (mnemonic.value && mnemonicInput.value?.status !== ValidatorStatus.Valid)
+    creatingAccount.value || connecting.value || loadEmail.value || !isMnemonicValid.value || isNonActiveMnemonic.value
   );
 });
 
@@ -269,13 +271,11 @@ watch(mnemonic, async newValue => {
 async function getEmail(grid: GridClient) {
   if (!mnemonic.value) return;
 
-  loadEmail.value = true;
   try {
     email.value = await readEmail(grid);
   } catch (e) {
     console.error("error", e);
-  } finally {
-    loadEmail.value = false;
+    throw e;
   }
 }
 
@@ -318,7 +318,29 @@ const validateMnemonicInput = async (input: string) => {
 
   try {
     const grid = await getGrid({ mnemonic: mnemonic.value, keypairType: keypairType.value });
-    getEmail(grid!);
+
+    // Check if twin exists first
+    try {
+      await grid!.twins.get_my_twin_id();
+      // Twin exists, so get email with loading state
+      loadEmail.value = true;
+      try {
+        getEmail(grid!);
+      } finally {
+        loadEmail.value = false;
+      }
+    } catch (twinError) {
+      if (twinError instanceof TwinNotExistError) {
+        // This is a new account, don't call getEmail
+        isNonActiveMnemonic.value = true;
+        email.value = "";
+        if (emailInput.value) {
+          emailInput.value.reset();
+        }
+      } else {
+        throw twinError;
+      }
+    }
   } catch (e) {
     if (e instanceof TwinNotExistError) {
       isNonActiveMnemonic.value = true;
