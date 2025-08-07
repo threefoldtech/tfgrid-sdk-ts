@@ -425,27 +425,31 @@ class TwinDeploymentHandler {
     for (const workload of workloads) {
       if (workload.type === WorkloadTypes.gatewaynameproxy) {
         events.emit("logs", `Check the name contract for the workload with name: ${workload.name}`);
-        if (operation === Operations.delete) {
-          const extrinsic = await this.deleteNameContract(workload.data["name"]);
-          if (extrinsic) deletedExtrinsics.push(extrinsic);
-        } else {
-          const extrinsic = await this.createNameContract(workload.data["name"]);
-          nameExtrinsics.push(extrinsic);
-        }
+        const contractName = workload.data["name"];
+        await this.handleNameContract(contractName, operation, nameExtrinsics, deletedExtrinsics);
       } else if (workload.type === WorkloadTypes.gatewayfqdnproxy) {
         events.emit("logs", `Check the name contract for the FQDN workload with name: ${workload.name}`);
         const contractName = workload.data["fqdn"].replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
-        if (operation === Operations.delete) {
-          const extrinsic = await this.deleteNameContract(contractName);
-          if (extrinsic) deletedExtrinsics.push(extrinsic);
-        } else {
-          const extrinsic = await this.createNameContract(contractName);
-          nameExtrinsics.push(extrinsic);
-        }
+        await this.handleNameContract(contractName, operation, nameExtrinsics, deletedExtrinsics);
       }
     }
 
     return { nameExtrinsics, deletedExtrinsics };
+  }
+
+  private async handleNameContract(
+    contractName: string,
+    operation: Operations,
+    nameExtrinsics: ExtrinsicResult<Contract>[],
+    deletedExtrinsics: ExtrinsicResult<number>[],
+  ): Promise<void> {
+    if (operation === Operations.delete) {
+      const extrinsic = await this.deleteNameContract(contractName);
+      if (extrinsic) deletedExtrinsics.push(extrinsic);
+    } else {
+      const extrinsic = await this.createNameContract(contractName);
+      nameExtrinsics.push(extrinsic);
+    }
   }
 
   async rollback(contracts) {
