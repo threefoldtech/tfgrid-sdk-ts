@@ -25,7 +25,7 @@ def test_validate_homepage_links(browser):
     dashboard_page = before_test_setup(browser)
     assert dashboard_page.navigate_to_find_more() == ('https://threefold.io/')
     assert dashboard_page.navigate_to_explore_capacity() == (Base.stats_url)
-    if Base.net in ['dev']:
+    if Base.net in ['dev', 'local']:
         manual_link = 'https://manual.dev.grid.tf/'
     else:
         manual_link = 'https://manual.grid.tf/'
@@ -98,7 +98,7 @@ def test_import_account(browser):
     dashboard_page.import_account(get_seed())
     dashboard_page.click_button(dashboard_page.connect_your_wallet(password))
     dashboard_page.logout_account()
-    dashboard_page.login_account(password, True)
+    dashboard_page.login_account(password)
 
 
 def test_create_account(browser):
@@ -119,7 +119,7 @@ def test_create_account(browser):
     connect_button = dashboard_page.connect_your_wallet(password, get_email())
     dashboard_page.click_button(connect_button)
     dashboard_page.logout_account()
-    dashboard_page.login_account(password, True)
+    dashboard_page.login_account(password)
 
 
 def test_account_validation(browser):
@@ -172,7 +172,7 @@ def test_account_validation(browser):
     assert dashboard_page.wait_for("We couldn't find a matching wallet for this password. Please connect your wallet first.")
     assert not dashboard_page.login_account('').is_enabled()
     assert dashboard_page.wait_for('Password is required')
-    dashboard_page.login_account('123456', True)
+    dashboard_page.login_account('123456')
 
 
 def test_login_links(browser):
@@ -190,7 +190,7 @@ def test_login_links(browser):
     dashboard_page.import_account(get_seed())
     dashboard_page.click_button(dashboard_page.connect_your_wallet(password))
     dashboard_page.open_profile()
-    if Base.net in ['dev']:
+    if Base.net in ['dev', 'local']:
         wallet_manual_link = 'https://manual.dev.grid.tf/labs/documentation/dashboard/wallet_connector/'
         tf_connect_app_link = 'https://manual.dev.grid.tf/labs/documentation/threefold_token/storing_tft/tf_connect_app/'
     else:
