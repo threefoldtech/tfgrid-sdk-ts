@@ -220,9 +220,7 @@ const isMnemonicValid = computed(() => {
 });
 
 const isEmailDisabled = computed(() => {
-  return (
-    creatingAccount.value || connecting.value || loadEmail.value || !isMnemonicValid.value || isNonActiveMnemonic.value
-  );
+  return creatingAccount.value || connecting.value || loadEmail.value || !isMnemonicValid.value;
 });
 
 // loading
