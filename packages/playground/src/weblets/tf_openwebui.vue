@@ -117,7 +117,7 @@ const flist = ref<Flist>({
 const { ipv4, ipv6, mycelium, planetary, wireguard } = useNetworks();
 const dedicated = ref(false);
 const rentedByMe = ref(false);
-const rentedBy = computed(() => (rentedByMe.value ? grid.twinId : undefined));
+const rentedBy = computed(() => (rentedByMe.value && grid ? grid.twinId : undefined));
 const certified = ref(false);
 const disks = ref<Disk[]>([]);
 const hasGPU = ref(false);
@@ -197,7 +197,7 @@ async function deploy() {
           rootFilesystemSize: rootFilesystemSize.value,
           hasGPU: hasGPU.value,
           nodeId: selectionDetails.value?.node?.nodeId,
-          gpus: hasGPU.value ? selectionDetails.value?.gpuCards.map(card => card.id) : undefined,
+          gpus: hasGPU.value ? selectionDetails.value?.gpuCards?.map(card => card.id) : undefined,
           rentedBy: rentedBy.value,
           certified: certified.value,
         },

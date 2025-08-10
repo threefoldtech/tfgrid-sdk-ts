@@ -140,7 +140,7 @@ const rootFilesystemSize = computed(() =>
 const flist: Flist = FLISTS.JENKINS;
 const dedicated = ref(false);
 const rentedByMe = ref(false);
-const rentedBy = computed(() => (rentedByMe.value ? grid.twinId : undefined));
+const rentedBy = computed(() => (rentedByMe.value && grid ? grid.twinId : undefined));
 const certified = ref(false);
 const { ipv4, ipv6, mycelium, planetary, wireguard } = useNetworks();
 const selectionDetails = ref<SelectionDetails>();

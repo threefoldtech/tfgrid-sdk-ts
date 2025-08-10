@@ -100,7 +100,7 @@ const flist: Flist = FLISTS.NODEPILOT;
 const { ipv4, ipv6, planetary, mycelium, wireguard } = useNetworks({ ipv4: true, ipv6: true });
 const dedicated = ref(false);
 const rentedByMe = ref(false);
-const rentedBy = computed(() => (rentedByMe.value ? grid.twinId : undefined));
+const rentedBy = computed(() => (rentedByMe.value && grid ? grid.twinId : undefined));
 const certified = ref(false);
 const rootFilesystemSize = 2;
 const selectedSSHKeys = ref("");

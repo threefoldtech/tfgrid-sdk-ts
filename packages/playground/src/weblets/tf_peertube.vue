@@ -132,7 +132,7 @@ const solution = ref() as Ref<SolutionFlavor>;
 const flist: Flist = FLISTS.PEERTUBE;
 const dedicated = ref(false);
 const rentedByMe = ref(false);
-const rentedBy = computed(() => (rentedByMe.value ? grid.twinId : undefined));
+const rentedBy = computed(() => (rentedByMe.value && grid ? grid.twinId : undefined));
 const certified = ref(false);
 const { ipv4, ipv6, planetary, mycelium, wireguard } = useNetworks();
 const rootFilesystemSize = computed(() =>

@@ -115,7 +115,7 @@ export default {
   setup(props) {
     const gridStore = useGrid();
     const grid = gridStore.client as GridClient;
-    const rentedBy = computed(() => (props.modelValue.rentedByMe ? grid.twinId : undefined));
+    const rentedBy = computed(() => (props.modelValue.rentedByMe && grid ? grid.twinId : undefined));
 
     const rootFilesystemSize = computed(() => {
       const { cpu = 0, memory = 0 } = props.modelValue.solution || {};

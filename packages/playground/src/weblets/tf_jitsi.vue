@@ -105,7 +105,7 @@ const solution = ref() as Ref<SolutionFlavor>;
 const flist: Flist = FLISTS.JITSI;
 const dedicated = ref(false);
 const rentedByMe = ref(false);
-const rentedBy = computed(() => (rentedByMe.value ? grid.twinId : undefined));
+const rentedBy = computed(() => (rentedByMe.value && grid ? grid.twinId : undefined));
 const certified = ref(false);
 const rootFilesystemSize = computed(() =>
   calculateRootFileSystem({ CPUCores: solution.value?.cpu ?? 0, RAMInMegaBytes: solution.value?.memory ?? 0 }),

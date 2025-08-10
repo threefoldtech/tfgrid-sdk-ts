@@ -110,7 +110,7 @@ const flist: Flist = FLISTS.FREEFLOW;
 const disks = ref<Disk[]>([]);
 const dedicated = ref(false);
 const rentedByMe = ref(false);
-const rentedBy = computed(() => (rentedByMe.value ? grid.twinId : undefined));
+const rentedBy = computed(() => (rentedByMe.value && grid ? grid.twinId : undefined));
 
 const certified = ref(false);
 const { ipv4, ipv6, wireguard, planetary, mycelium } = useNetworks();

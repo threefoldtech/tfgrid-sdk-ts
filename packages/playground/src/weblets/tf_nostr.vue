@@ -107,7 +107,7 @@ const { ipv4, ipv6, planetary, mycelium, wireguard } = useNetworks();
 const disks = ref<Disk[]>([]);
 const dedicated = ref(false);
 const rentedByMe = ref(false);
-const rentedBy = computed(() => (rentedByMe.value ? grid.twinId : undefined));
+const rentedBy = computed(() => (rentedByMe.value && grid ? grid.twinId : undefined));
 const certified = ref(false);
 const rootFilesystemSize = computed(() => solution.value?.disk);
 const selectedSSHKeys = ref("");

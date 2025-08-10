@@ -136,7 +136,7 @@ const firstRound = ref(24000000);
 const lastRound = ref(26000000);
 const dedicated = ref(false);
 const rentedByMe = ref(false);
-const rentedBy = computed(() => (rentedByMe.value ? grid.twinId : undefined));
+const rentedBy = computed(() => (rentedByMe.value && grid ? grid.twinId : undefined));
 const certified = ref(false);
 const rootFilesystemSize = computed(() => storage.value);
 const selectionDetails = ref<SelectionDetails>();

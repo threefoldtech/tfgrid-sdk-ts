@@ -173,7 +173,7 @@ export default {
   setup(props) {
     const gridStore = useGrid();
     const grid = gridStore.client as GridClient;
-    const rentedBy = computed(() => (props.modelValue.rentedByMe ? grid.twinId : undefined));
+    const rentedBy = computed(() => (props.modelValue.rentedByMe && grid ? grid.twinId : undefined));
     const selectedMachines = computed(() => {
       return props.otherWorkers.reduce((res, worker) => {
         const machine = toMachine(worker);

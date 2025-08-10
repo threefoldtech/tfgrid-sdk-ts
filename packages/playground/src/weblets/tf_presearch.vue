@@ -142,7 +142,7 @@ const publicRestoreKey = ref("");
 const flist: Flist = FLISTS.PRESEARCH;
 const dedicated = ref(false);
 const rentedByMe = ref(false);
-const rentedBy = computed(() => (rentedByMe.value ? grid.twinId : undefined));
+const rentedBy = computed(() => (rentedByMe.value && grid ? grid.twinId : undefined));
 const certified = ref(false);
 const selectionDetails = ref<SelectionDetails>();
 const selectedSSHKeys = ref("");

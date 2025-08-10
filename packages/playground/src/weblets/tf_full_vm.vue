@@ -171,7 +171,7 @@ const certified = ref(false);
 const disks = ref<Disk[]>([]);
 const hasGPU = ref(false);
 
-const rentedBy = computed(() => (rentedByMe.value ? grid.twinId : undefined));
+const rentedBy = computed(() => (rentedByMe.value && grid ? grid.twinId : undefined));
 const rootFilesystemSize = computed(() =>
   flist.value?.name === "Ubuntu-24.04" || flist.value?.name === "Other" ? undefined : 2,
 );
@@ -238,7 +238,7 @@ async function deploy() {
           rootFilesystemSize: rootFilesystemSize.value ?? solution.value.disk,
           hasGPU: hasGPU.value,
           nodeId: selectionDetails.value?.node?.nodeId,
-          gpus: hasGPU.value ? selectionDetails.value?.gpuCards.map(card => card.id) : undefined,
+          gpus: hasGPU.value ? selectionDetails.value?.gpuCards?.map(card => card.id) : undefined,
           rentedBy: rentedBy.value,
           certified: certified.value,
         },
