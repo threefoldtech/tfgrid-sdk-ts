@@ -117,7 +117,6 @@ def test_create_account(browser):
     dashboard_page.accept_terms_conditions()
     assert dashboard_page.wait_for('Mnemonic or Hex Seed is valid.')
     email = get_email()
-    print("email: %s" %email)
     connect_button = dashboard_page.connect_your_wallet(password, email)
     dashboard_page.click_button(connect_button)
     dashboard_page.logout_account()
