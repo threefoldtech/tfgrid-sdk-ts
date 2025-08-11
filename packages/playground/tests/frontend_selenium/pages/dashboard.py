@@ -80,10 +80,14 @@ class DashboardPage:
         WebDriverWait(self.browser, 30).until(EC.presence_of_element_located(self.email_input))
         if email is not None:
             email_field = self.browser.find_element(*self.email_input)
-            WebDriverWait(self.browser, 30).until(lambda d: email_field.is_enabled())
-            email_field.click()
-            email_field.clear()
-            email_field.send_keys(email)
+            for _ in range (5):
+                if email_field.is_enabled():
+                    email_field.send_keys(Keys.CONTROL + "a")
+                    email_field.send_keys(Keys.DELETE)
+                    email_field.send_keys(email)
+                    break
+                else:
+                    time.sleep(1)
         password_field = self.browser.find_element(*self.password_input)
         password_field.send_keys(Keys.CONTROL + "a")
         password_field.send_keys(Keys.DELETE)
