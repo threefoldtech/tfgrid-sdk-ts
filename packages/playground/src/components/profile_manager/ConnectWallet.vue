@@ -51,7 +51,14 @@
                       :disabled="creatingAccount || connecting"
                       @focus="(event: Event) => (event.target as HTMLInputElement)?.removeAttribute('readonly')"
                       @blur="(event: Event) => (event.target as HTMLInputElement)?.setAttribute('readonly', 'readonly')"
-                      @update:model-value="isNonActiveMnemonic = false && clearErrors"
+                      @update:model-value="
+                        () => {
+                          isNonActiveMnemonic = false;
+                          clearErrors();
+                          email ? (email = '') : null;
+                          emailInput?.reset();
+                        }
+                      "
                       @click:append="reloadValidation"
                     >
                       <template v-if="validationProps.hint || validationProps.error" #prepend-inner>
@@ -291,24 +298,10 @@ function reloadValidation() {
 const validateMnemonicInput = async (input: string) => {
   isNonActiveMnemonic.value = false;
 
-  if (!input) {
-    email.value = "";
-    if (emailInput.value) {
-      emailInput.value.reset();
-    }
-    return {
-      message: "Mnemonic or Hex Seed is required.",
-    };
-  }
-
   if (
     !validateMnemonic(input) &&
     !((input.length === 64 || input.length === 66) && isAddress(input.length === 66 ? input : `0x${input}`))
   ) {
-    email.value = "";
-    if (emailInput.value) {
-      emailInput.value.reset();
-    }
     return {
       message: "Mnemonic or Hex Seed doesn't seem to be valid.",
     };
@@ -331,10 +324,6 @@ const validateMnemonicInput = async (input: string) => {
       if (twinError instanceof TwinNotExistError) {
         // This is a new account, don't call getEmail
         isNonActiveMnemonic.value = true;
-        email.value = "";
-        if (emailInput.value) {
-          emailInput.value.reset();
-        }
       } else {
         throw twinError;
       }
