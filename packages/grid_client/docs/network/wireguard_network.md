@@ -39,7 +39,7 @@ In case the user needs an access to this network or adding a node that doesn't h
 
 In the example, we will try to make a network with 2 normal nodes, one access node, one hidden node, and give an access to the user to the network.
 
-![example](./assets/network.svg)
+![example](../assets/network.svg)
 
 ### Given
 
