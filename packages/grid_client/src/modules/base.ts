@@ -997,7 +997,10 @@ class BaseModule {
   ): Promise<DeploymentResultContracts> {
     const deployments = await this._get(deployment_name);
     for (const deployment of deployments) {
-      const twinDeployments = await module.delete(deployment, [name]);
+      // Clean up mycelium data before deletion to prevent validation errors
+      const cleanedDeployment = this.cleanupMyceliumData(deployment);
+
+      const twinDeployments = await module.delete(cleanedDeployment, [name]);
       const contracts = await this.twinDeploymentHandler.handle(twinDeployments);
       if (contracts["deleted"].length > 0 || contracts["updated"].length > 0) {
         await this.save(deployment_name, contracts);
@@ -1006,6 +1009,33 @@ class BaseModule {
       }
     }
     throw new ValidationError(`Instance with name ${name} is not found.`);
+  }
+
+  /**
+   * Clean up mycelium network data before deletion to prevent
+   * validation errors
+   */
+  private cleanupMyceliumData(deployment: any): any {
+    if (deployment.workloads && Array.isArray(deployment.workloads)) {
+      deployment.workloads = deployment.workloads.map(workload => {
+        if (workload.data && workload.data.network && workload.data.network.mycelium) {
+          const mycelium = workload.data.network.mycelium;
+
+          let networkValue = mycelium.network;
+          if (!networkValue && mycelium.Network) {
+            networkValue = mycelium.Network;
+            mycelium.network = mycelium.Network;
+            delete mycelium.Network;
+          }
+
+          if (!networkValue || typeof networkValue !== "string" || networkValue.trim() === "") {
+            delete workload.data.network.mycelium;
+          }
+        }
+        return workload;
+      });
+    }
+    return deployment;
   }
 
   /**
@@ -1035,7 +1065,10 @@ class BaseModule {
     const highlvl = new HighLevelBase(this.config);
 
     for (const deployment of deployments) {
-      const twinDeployments = await highlvl._delete(deployment, []);
+      // Clean up mycelium data before deletion to prevent validation errors
+      const cleanedDeployment = this.cleanupMyceliumData(deployment);
+
+      const twinDeployments = await highlvl._delete(cleanedDeployment, []);
       const contract = await this.twinDeploymentHandler.handle(twinDeployments);
       contracts.deleted = contracts.deleted.concat(contract.deleted as unknown as Contract);
       contracts.updated = contracts.updated.concat(contract.updated as unknown as Contract);

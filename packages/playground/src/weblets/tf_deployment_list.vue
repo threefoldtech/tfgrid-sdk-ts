@@ -537,14 +537,16 @@ async function onDelete(k8s = false) {
             item[0].workloads[0].name as string,
           );
         } else {
-          await deleteDeployment(updateGrid(grid!, { projectName: item.projectName }), {
+          const deleteOptions = {
             deploymentName: item.deploymentName,
             name: k8s ? item.deploymentName : item.name,
             projectName: item.projectName,
             ip: getDeploymentIps(item),
             k8s,
             isCaprover: item.projectName?.toLowerCase().includes(ProjectName.Caprover.toLowerCase()),
-          });
+          };
+
+          await deleteDeployment(updateGrid(grid!, { projectName: item.projectName }), deleteOptions);
         }
       } catch (e: any) {
         createCustomToast(`Failed to delete deployment with name: ${item.name}`, ToastType.danger);
