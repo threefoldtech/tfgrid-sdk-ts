@@ -18,7 +18,7 @@
                 capacity</strong>
               (storage, compute, and network) provided by farmers. A decentralized sovereign alternative to today's
               centralized Internet model.
-              <a href="https://threefold.io/" target="_blank" class="app-link text-white">Find More!</a>
+              <a href="https://threefold.io/" target="_blank" class="app-link">Find More</a>!
             </p>
           </VCardText>
           <v-card-actions class="px-2 px-sm-4 pb-4">
@@ -105,7 +105,7 @@
       <div class="d-flex justify-center align-center flex-column flex-sm-row flex-wrap my-4">
         <v-btn
           variant="outlined"
-          class="w-100 w-sm-auto mb-2 mb-sm-0 mr-sm-2"
+          class="text-secondary w-100 w-sm-auto mb-2 mb-sm-0 mr-sm-2"
           size="large"
           target="_blank"
           :href="MANUAL_URL"
