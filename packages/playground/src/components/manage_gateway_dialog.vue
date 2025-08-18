@@ -514,12 +514,13 @@ export default {
         oldPrefix.value = props.k8s.projectName.toLowerCase().includes(ProjectName.Fullvm.toLowerCase())
           ? "k8s"
           : "k8s" + grid.config.twinId;
-        prefix.value = oldPrefix.value + props.k8s.masters[0].name;
+        prefix.value = oldPrefix.value + props.k8s.masters[0].name.replace(/[^a-zA-Z0-9 ]/g, "");
       } else {
         oldPrefix.value =
           (props.vm.projectName.toLowerCase().includes(ProjectName.Fullvm.toLowerCase()) ? "fvm" : "vm") +
           grid.config.twinId;
-        prefix.value = oldPrefix.value + props.vm.name;
+
+        prefix.value = oldPrefix.value + props.vm.name.replace(/[^a-zA-Z0-9 ]/g, "");
       }
       const randomSuffix = generateName({}, 2);
       subdomain.value = `${prefix.value}${randomSuffix}`.toLowerCase();
