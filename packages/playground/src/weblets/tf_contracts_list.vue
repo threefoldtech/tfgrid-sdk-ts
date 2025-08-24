@@ -82,7 +82,7 @@
         <input-tooltip
           inline
           :align-center="true"
-          :tooltip="`${totalCostUSD?.toFixed(3)} USD/hour ≈ ${totalCostUSD === 0 ? 0 : (totalCostUSD! * 24 * 30).toFixed(3)} USD/month`"
+          :tooltip="`${totalCostUSD?.toFixed(3)} USD/hour ≈ ${totalCostUSD === 0 ? 0 : totalCostUSD ? (totalCostUSD * 24 * 30).toFixed(3) : 0} USD/month`"
         >
           {{ totalCost }} TFT/hour ≈ {{ totalCost === 0 ? 0 : (totalCost * 24 * 30).toFixed(3) }} TFT/month
         </input-tooltip>
@@ -467,7 +467,11 @@ const nodeStatus = computed(() => {
 async function getTotalCost() {
   try {
     const res = await gridProxyClient.twins.getConsumption(profileManager.profile!.twinId);
-    totalCost.value = +res.last_hour_consumption.toFixed(3);
+    if (res.last_hour_consumption !== undefined && res.last_hour_consumption !== null) {
+      totalCost.value = +res.last_hour_consumption.toFixed(3);
+    } else {
+      totalCost.value = 0;
+    }
     const tftPrice = await queryClient.tftPrice.get();
     totalCostUSD.value = totalCost.value * (tftPrice / 1000);
   } catch (error: any) {
