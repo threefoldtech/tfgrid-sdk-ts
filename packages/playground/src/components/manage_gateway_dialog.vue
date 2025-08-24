@@ -81,7 +81,21 @@
             </template>
 
             <template #[`item.backends`]="{ item }">
-              {{ (Array.isArray(item.backends) ? item.backends[0] : item.backends) ?? "-" }}
+              <v-tooltip v-if="Array.isArray(item.backends) && item.backends.length > 1" location="top">
+                <template #activator="{ props }">
+                  <v-chip v-bind="props" size="small" color="info" variant="outlined" class="cursor-pointer">
+                    {{ item.backends.length }} backends
+                  </v-chip>
+                </template>
+                <div class="d-flex flex-column gap-1">
+                  <div v-for="(backend, index) in item.backends" :key="index">
+                    <span class="text-caption">{{ backend }}</span>
+                  </div>
+                </div>
+              </v-tooltip>
+              <span v-else>
+                {{ (Array.isArray(item.backends) ? item.backends[0] : item.backends) ?? "-" }}
+              </span>
             </template>
 
             <template #[`item.status`]="{ item }">
@@ -134,6 +148,82 @@
                 color="primary"
               />
             </input-tooltip>
+
+            <input-tooltip
+              tooltip="Enable multiple backend configuration for load balancing and failover"
+              :align-center="true"
+            >
+              <v-switch
+                v-model="multipleBackends"
+                label="Multiple Backends"
+                hide-details
+                inset
+                density="compact"
+                variant="tonal"
+                color="primary"
+              />
+            </input-tooltip>
+
+            <template v-if="multipleBackends">
+              <div class="mt-4">
+                <v-card class="pa-4" outlined>
+                  <v-card-title class="text-subtitle-1 mb-3">Backend Configuration</v-card-title>
+
+                  <div v-for="(backend, index) in managedBackends" :key="index" class="mb-3">
+                    <v-row>
+                      <v-col cols="12" md="5">
+                        <input-validator
+                          :value="backend.ip"
+                          :rules="[validators.required('IP is required.'), validators.isIP('IP is not valid.')]"
+                          #="{ props }"
+                        >
+                          <v-text-field
+                            v-model="backend.ip"
+                            :label="`Backend ${index + 1} IP`"
+                            density="compact"
+                            v-bind="props"
+                          />
+                        </input-validator>
+                      </v-col>
+
+                      <v-col cols="12" md="4">
+                        <input-validator :value="backend.port" :rules="portRules" #="{ props }">
+                          <v-text-field
+                            v-model.number="backend.port"
+                            :label="`Backend ${index + 1} Port`"
+                            type="number"
+                            density="compact"
+                            v-bind="props"
+                          />
+                        </input-validator>
+                      </v-col>
+
+                      <v-col cols="12" md="3" class="d-flex align-center">
+                        <v-btn
+                          v-if="managedBackends.length > 1"
+                          icon="mdi-delete"
+                          variant="outlined"
+                          color="error"
+                          size="small"
+                          @click="removeManagedBackend(index)"
+                        />
+                      </v-col>
+                    </v-row>
+                  </div>
+
+                  <v-btn
+                    variant="outlined"
+                    color="primary"
+                    prepend-icon="mdi-plus"
+                    size="small"
+                    class="mt-2"
+                    @click="addManagedBackend"
+                  >
+                    Add Backend
+                  </v-btn>
+                </v-card>
+              </div>
+            </template>
             <div style="margin-top: -15px">
               <TfSelectionDetails
                 v-model="selectionDetails"
@@ -212,6 +302,7 @@ import type { NetworkFeatures, SelectionDetails } from "../types/nodeSelector";
 import {
   type DeployGatewayConfig,
   deployGatewayName,
+  deployGatewayNameMultiBackend,
   extractDomainIP,
   getDeploymentIps,
   type GridGateway,
@@ -259,8 +350,10 @@ export default {
     const subdomain = ref("");
     const port = ref(props.vm ? 80 : 443);
     const passThrough = ref(false);
+    const multipleBackends = ref(false);
     const valid = ref(false);
     const selectionDetails = ref<SelectionDetails>();
+    const managedBackends = ref([{ ip: "", port: props.vm ? 80 : 443 }]);
     const networks = ref<VMNetwork[]>([]);
     const selectedIPAddress = ref<string>();
     const networkName = props.vm
@@ -399,38 +492,51 @@ export default {
     async function deployGateway() {
       layout.value.setStatus("deploy");
       try {
-        const IP = selectedIPAddress.value as string;
-
-        const gwConfig: DeployGatewayConfig = {
-          subdomain: subdomain.value,
-          ip: IP,
-          port: port.value,
-          tlsPassthrough: passThrough.value,
-        };
-
-        if (isWireGuard.value) {
-          gwConfig.network = networkName;
-          const [x, y] = IP.split(".");
-          const data = {
-            name: networkName,
-            ipRange: `${x}.${y}.0.0/16`,
-            nodeId: selectionDetails.value!.domain!.selectedDomain!.nodeId,
-            mycelium: false,
+        if (multipleBackends.value) {
+          const multiConfig = {
+            subdomain: subdomain.value,
+            backends: managedBackends.value.map(backend => ({
+              ip: backend.ip,
+              port: backend.port,
+            })),
+            tlsPassthrough: passThrough.value,
           };
 
-          const hasNode = await grid.networks.hasNode(data);
+          await deployGatewayNameMultiBackend(grid, selectionDetails.value!.domain, multiConfig);
+        } else {
+          const IP = selectedIPAddress.value as string;
+          const gwConfig: DeployGatewayConfig = {
+            subdomain: subdomain.value,
+            ip: IP,
+            port: port.value,
+            tlsPassthrough: passThrough.value,
+          };
 
-          if (!hasNode) {
-            await grid.networks.addNode(data);
+          if (isWireGuard.value) {
+            gwConfig.network = networkName;
+            const [x, y] = IP.split(".");
+            const data = {
+              name: networkName,
+              ipRange: `${x}.${y}.0.0/16`,
+              nodeId: selectionDetails.value!.domain!.selectedDomain!.nodeId,
+              mycelium: false,
+            };
+
+            const hasNode = await grid.networks.hasNode(data);
+
+            if (!hasNode) {
+              await grid.networks.addNode(data);
+            }
           }
+
+          await deployGatewayName(grid, selectionDetails.value!.domain, gwConfig);
         }
 
-        await deployGatewayName(grid, selectionDetails.value!.domain, gwConfig);
         suggestName();
         // get gateway url
         const gatewayUrl = selectionDetails.value!.domain!.useFQDN
           ? `https://${selectionDetails.value!.domain!.customDomain}`
-          : `https://${gwConfig.subdomain}.${selectionDetails.value!.domain!.selectedDomain!.publicConfig.domain}`;
+          : `https://${subdomain.value}.${selectionDetails.value!.domain!.selectedDomain!.publicConfig.domain}`;
         layout.value.setStatus("success", `Successfully deployed gateway at ${gatewayUrl}`);
       } catch (error) {
         errorMessage.value = `Failed to add domain: ${error}`;
@@ -509,6 +615,16 @@ export default {
       loadGateways();
     }
 
+    function addManagedBackend() {
+      managedBackends.value.push({ ip: "", port: props.vm ? 80 : 443 });
+    }
+
+    function removeManagedBackend(index: number) {
+      if (managedBackends.value.length > 1) {
+        managedBackends.value.splice(index, 1);
+      }
+    }
+
     function suggestName() {
       if (props.k8s) {
         oldPrefix.value = props.k8s.projectName.toLowerCase().includes(ProjectName.Fullvm.toLowerCase())
@@ -546,6 +662,8 @@ export default {
       subdomain,
       port,
       passThrough,
+      multipleBackends,
+      managedBackends,
       valid,
       selectionDetails,
       networks,
@@ -576,6 +694,8 @@ export default {
       availableK8SNodesNames,
       selectedK8SNodeName,
       errorMessage,
+      addManagedBackend,
+      removeManagedBackend,
     };
   },
 };

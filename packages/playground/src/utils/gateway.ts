@@ -37,6 +37,16 @@ export interface DeployGatewayConfig {
   tlsPassthrough?: boolean;
 }
 
+export interface DeployGatewayMultiBackendConfig {
+  subdomain: string;
+  backends: Array<{
+    ip: string;
+    port: number;
+  }>;
+  network?: string;
+  tlsPassthrough?: boolean;
+}
+
 export async function deployGatewayName(
   grid: GridClient | null,
   domain: DomainInfo | undefined,
@@ -67,6 +77,49 @@ export async function deployGatewayName(
   } else {
     gw.backends = [`${config.tlsPassthrough ? "" : "http://"}${config.ip}:${config.port}`];
   }
+
+  if (domain.useFQDN) {
+    (gw as GatewayFQDNModel).fqdn = domain.customDomain;
+    return grid.gateway.deploy_fqdn(gw as GatewayFQDNModel);
+  }
+
+  return grid.gateway.deploy_name(gw);
+}
+
+export async function deployGatewayNameMultiBackend(
+  grid: GridClient | null,
+  domain: DomainInfo | undefined,
+  config: DeployGatewayMultiBackendConfig,
+) {
+  if (!grid) {
+    throw new Error("Fetch Grid Failed");
+  }
+
+  if (!domain || !domain.selectedDomain) {
+    throw new Error("Please provide a valid domain name data.");
+  }
+
+  if (!config.backends || config.backends.length === 0) {
+    throw new Error("Please provide at least one backend.");
+  }
+
+  await grid.gateway.getObj(config.subdomain);
+
+  const id = process.env.INTERNAL_SOLUTION_PROVIDER_ID;
+
+  const gw = new GatewayNameModel();
+  gw.name = config.subdomain;
+  gw.node_id = domain.selectedDomain.nodeId;
+  gw.tls_passthrough = config.tlsPassthrough || false;
+  gw.network = config.network;
+  gw.solutionProviderId = id ? +id : undefined;
+  gw.backends = config.backends.map(backend => {
+    if (validator.isIP(backend.ip, "6")) {
+      return `${config.tlsPassthrough ? "" : "http://"}[${backend.ip}]:${backend.port}`;
+    } else {
+      return `${config.tlsPassthrough ? "" : "http://"}${backend.ip}:${backend.port}`;
+    }
+  });
 
   if (domain.useFQDN) {
     (gw as GatewayFQDNModel).fqdn = domain.customDomain;

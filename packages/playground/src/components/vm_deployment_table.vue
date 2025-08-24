@@ -99,6 +99,20 @@
         {{ item.name }}
       </template>
 
+      <template #[`item.backends`]="{ item }">
+        <div class="d-flex flex-wrap gap-1">
+          <v-chip
+            v-for="(backend, index) in item[0].workloads[0].data.backends"
+            :key="index"
+            size="small"
+            color="primary"
+            variant="outlined"
+          >
+            {{ backend }}
+          </v-chip>
+        </div>
+      </template>
+
       <template #[`item.ipv4`]="{ item }">
         {{ item.publicIP?.ip?.split("/")?.[0] || item.publicIP?.ip || "-" }}
       </template>
