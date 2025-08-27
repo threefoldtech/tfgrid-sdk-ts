@@ -35,7 +35,7 @@
     <section class="d-flex align-center">
       <v-spacer />
       <v-btn
-        v-if="lockedContracts?.totalOverdueAmount && !isLoading"
+        v-if="(totalOverdueAmount > 0 || hasGracePeriodContracts) && !isLoading"
         class="mr-2"
         color="warning"
         prepend-icon="mdi-lock-open"
@@ -91,7 +91,12 @@
     </template>
   </v-card>
   <!-- locked amount Dialog -->
-  <v-dialog v-if="lockedContracts?.totalOverdueAmount" v-model="unlockDialog" width="800" attach="#modals">
+  <v-dialog
+    v-if="totalOverdueAmount > 0 || hasGracePeriodContracts"
+    v-model="unlockDialog"
+    width="800"
+    attach="#modals"
+  >
     <v-card>
       <v-card-title class="bg-primary">
         Unlock All Contracts
@@ -118,21 +123,30 @@
         <v-divider class="mt-3" />
       </v-card-text>
       <v-card-text v-else>
-        <v-alert class="my-4" type="warning" variant="tonal">
-          <div v-if="lockedContracts?.totalOverdueAmount < freeBalance">
+        <v-alert v-if="totalOverdueAmount > 0" class="my-4" type="warning" variant="tonal">
+          <div v-if="totalOverdueAmount < freeBalance">
             You have enough balance to unlock your contracts, this will cost you around
-            <span class="font-weight-bold">{{ Math.ceil(lockedContracts?.totalOverdueAmount) }}</span> TFTs.
+            <span class="font-weight-bold">{{ Math.ceil(totalOverdueAmount) }}</span> TFTs.
           </div>
           <div v-else>
             <div>
               Please fund your account with
               <span class="font-weight-bold">
-                {{ Math.ceil(lockedContracts?.totalOverdueAmount - freeBalance) }}
+                {{ Math.ceil(totalOverdueAmount - freeBalance) }}
                 TFTs
               </span>
             </div>
             Note that this amount will allow you to resume the contracts for up to one hour only. Make sure to complete
             the funding promptly to avoid any interruptions!
+          </div>
+        </v-alert>
+        <v-alert v-else-if="hasGracePeriodContracts" class="my-4" type="info" variant="tonal">
+          <div>
+            You have contracts in grace period, but we couldn't retrieve the exact unlock cost. You can still try to
+            unlock them using the general unlock functionality.
+          </div>
+          <div class="mt-2">
+            <strong>Note:</strong> Make sure you have sufficient balance in your account before proceeding.
           </div>
         </v-alert>
         <v-divider class="mt-3" />
@@ -141,7 +155,7 @@
         <v-btn color="anchor" @click="unlockDialog = false"> Close </v-btn>
         <v-tooltip
           :text="
-            freeBalance < lockedContracts?.totalOverdueAmount
+            totalOverdueAmount > 0 && freeBalance < totalOverdueAmount
               ? `You don't have enough balance to unlock your contracts`
               : `Get your contracts ready again`
           "
@@ -150,7 +164,7 @@
           <template #activator="{ props }">
             <div v-bind="props">
               <v-btn
-                :disabled="freeBalance < lockedContracts.totalOverdueAmount || loadingLockDetails"
+                :disabled="(totalOverdueAmount > 0 && freeBalance < totalOverdueAmount) || loadingLockDetails"
                 color="warning"
                 :loading="unlockContractLoading"
                 class="ml-2"
@@ -235,6 +249,7 @@
 
 <script lang="ts" setup>
 import type { ContractsOverdue, GridClient } from "@threefold/grid_client";
+import { ContractStates } from "@threefold/grid_client";
 import { type Contract, ContractState, NodeStatus, SortByContracts, SortOrder } from "@threefold/gridproxy_client";
 import { DeploymentKeyDeletionError } from "@threefold/types";
 import { computed, defineComponent, onMounted, type Ref, ref } from "vue";
@@ -463,6 +478,14 @@ const nodeStatus = computed(() => {
   return statusObject;
 });
 
+const hasGracePeriodContracts = computed(() => {
+  return contracts.value.some(contract => contract.state === ContractStates.GracePeriod);
+});
+
+const totalOverdueAmount = computed(() => {
+  return lockedContracts.value?.totalOverdueAmount || 0;
+});
+
 // Calculate the total cost of contracts
 async function getTotalCost() {
   try {
@@ -503,7 +526,22 @@ async function onDeletedContracts(_contracts: NormalizedContract[]) {
   contracts.value = [...rentContracts.value, ...nameContracts.value, ...nodeContracts.value];
 }
 async function getContractsLockDetails() {
-  lockedContracts.value = await grid.contracts.getTotalOverdue();
+  try {
+    lockedContracts.value = await grid.contracts.getTotalOverdue();
+  } catch (error: any) {
+    console.log("Failed to get contracts lock details:", error);
+    lockedContracts.value = {
+      nameContracts: {},
+      nodeContracts: {},
+      rentContracts: {},
+      totalOverdueAmount: 0,
+    };
+    const hasGracePeriodContracts = contracts.value.some(contract => contract.state === ContractStates.GracePeriod);
+    if (hasGracePeriodContracts) {
+      loadingErrorMessage.value = "Unable to load contract lock details. Some unlock functionality may be limited.";
+      createCustomToast(loadingErrorMessage.value, ToastType.warning, {});
+    }
+  }
 }
 
 // Define base table headers for contracts tables

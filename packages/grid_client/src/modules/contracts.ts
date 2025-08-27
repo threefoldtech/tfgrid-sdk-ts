@@ -613,8 +613,10 @@ class Contracts {
    *
    * @returns {Promise<number>} - A promise that resolves to the overdue amount for the specified contract.
    */
-  @validateInput
   private async getContractOverdueAmount(contract: GridProxyContract, proxy: GridProxyClient) {
+    if (!contract || !contract.contract_id || !contract.type) {
+      throw new Error(`Invalid contract object: missing required properties`);
+    }
     return await this.client.contracts.calculateContractOverDue({ contractInfo: contract, gridProxyClient: proxy });
   }
 
@@ -681,32 +683,49 @@ class Contracts {
     });
     const rentedNodesIds: number[] = [];
     for (const contract of contracts.data) {
-      switch (contract.type) {
-        case ContractType.Name:
-          result.nameContracts[contract.contract_id] = (
-            await this.getContractOverdueAmount(contract, proxy)
-          ).toNumber();
-          result.totalOverdueAmount += result.nameContracts[contract.contract_id];
-          break;
-
-        case ContractType.Rent:
-          result.rentContracts[contract.contract_id] = (
-            await this.getContractOverdueAmount(contract, proxy)
-          ).toNumber();
-          rentedNodesIds.push(contract.details.nodeId);
-          result.totalOverdueAmount += result.rentContracts[contract.contract_id];
-          break;
-
-        default:
-          /** skip node contracts on rented nodes as it already calculated in the rent contract */
-          if (rentedNodesIds.includes(contract.details.nodeId)) {
-            result.nodeContracts[contract.contract_id] = 0;
-          } else {
-            result.nodeContracts[contract.contract_id] = (
+      try {
+        switch (contract.type) {
+          case ContractType.Name:
+            result.nameContracts[contract.contract_id] = (
               await this.getContractOverdueAmount(contract, proxy)
             ).toNumber();
-            result.totalOverdueAmount += result.nodeContracts[contract.contract_id];
-          }
+            result.totalOverdueAmount += result.nameContracts[contract.contract_id];
+            break;
+
+          case ContractType.Rent:
+            result.rentContracts[contract.contract_id] = (
+              await this.getContractOverdueAmount(contract, proxy)
+            ).toNumber();
+            rentedNodesIds.push(contract.details.nodeId);
+            result.totalOverdueAmount += result.rentContracts[contract.contract_id];
+            break;
+
+          default:
+            /** skip node contracts on rented nodes as it already calculated in the rent contract */
+            if (rentedNodesIds.includes(contract.details.nodeId)) {
+              result.nodeContracts[contract.contract_id] = 0;
+            } else {
+              result.nodeContracts[contract.contract_id] = (
+                await this.getContractOverdueAmount(contract, proxy)
+              ).toNumber();
+              result.totalOverdueAmount += result.nodeContracts[contract.contract_id];
+            }
+        }
+      } catch (error) {
+        console.log(`Failed to get overdue amount for contract ${contract.contract_id}:`, error);
+        switch (contract.type) {
+          case ContractType.Name:
+            result.nameContracts[contract.contract_id] = 0;
+            break;
+          case ContractType.Rent:
+            result.rentContracts[contract.contract_id] = 0;
+            if (contract.details?.nodeId) {
+              rentedNodesIds.push(contract.details.nodeId);
+            }
+            break;
+          default:
+            result.nodeContracts[contract.contract_id] = 0;
+        }
       }
     }
     return result;
