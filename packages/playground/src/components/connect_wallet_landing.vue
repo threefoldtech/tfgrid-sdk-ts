@@ -4,20 +4,20 @@
       <VCol cols="12">
         <v-card class="pa-2 pa-sm-4 pa-md-6">
           <VCardTitle class="px-2 px-sm-4">
-            <h3 class="text-center text-h6 text-sm-h5 text-md-h4 text-lg-h3">Welcome to ThreeFold Dashboard!</h3>
-            <h4 class="text-center text-subtitle-1 text-sm-h6 text-md-h5 text-lg-h4 my-2">
-              A Co-Owned Global Sovereign Internet
+            <h4 class="text-center text-h6 text-sm-h6 text-md-h5 text-lg-h4 font-weight-bold">
+              Welcome to ThreeFold Dashboard!
             </h4>
+            <h5 class="text-center text-subtitle-1 text-sm-h6 text-md-h5 text-lg-h5 my-2">
+              A Co-Owned Global Sovereign Internet
+            </h5>
           </VCardTitle>
           <VCardText class="px-2 px-sm-4">
             <p
               class="home_text text-center text-body-2 text-sm-subtitle-1 text-md-subtitle-1 w-75 w-sm-75 w-md-75 w-lg-75 mx-auto"
             >
-              ThreeFold is
-              <strong>a peer-to-peer open-source Internet platform that connects users directly with local Internet
-                capacity</strong>
-              (storage, compute, and network) provided by farmers. A decentralized sovereign alternative to today's
-              centralized Internet model.
+              ThreeFold is a peer-to-peer open-source Internet platform that connects users directly with local Internet
+              capacity (storage, compute, and network) provided by farmers. A decentralized sovereign alternative to
+              today's centralized Internet model.
               <a href="https://threefold.io/" target="_blank" class="app-link">Find More</a>!
             </p>
           </VCardText>
@@ -29,7 +29,6 @@
               size="large"
               @click="$emit('openProfile')"
             >
-              <v-icon size="20" class="pr-2"> mdi-wallet-outline </v-icon>
               <span class="d-none d-sm-inline">Connect your TFChain Wallet</span>
               <span class="d-sm-none">Connect Wallet</span>
             </v-btn>
@@ -87,6 +86,17 @@
                 <br class="d-none d-sm-block" />
                 truly decentralized and resilient infrastructure
               </p>
+              <div class="d-flex justify-center align-center flex-column flex-sm-row flex-wrap my-4">
+                <v-btn
+                  variant="outlined"
+                  class="text-secondary w-100 w-sm-auto"
+                  size="large"
+                  target="_blank"
+                  :href="statsUrl"
+                >
+                  Explore ThreeFold Grid Capacity
+                </v-btn>
+              </div>
             </v-col>
           </v-row>
         </div>
@@ -105,15 +115,12 @@
       <div class="d-flex justify-center align-center flex-column flex-sm-row flex-wrap my-4">
         <v-btn
           variant="outlined"
-          class="text-secondary w-100 w-sm-auto mb-2 mb-sm-0 mr-sm-2"
+          class="text-secondary w-100 w-sm-auto"
           size="large"
           target="_blank"
           :href="MANUAL_URL"
         >
           Learn about the grid
-        </v-btn>
-        <v-btn variant="elevated" class="w-100 w-sm-auto" size="large" target="_blank" :href="statsUrl">
-          Explore ThreeFold Grid Capacity
         </v-btn>
       </div>
     </div>
