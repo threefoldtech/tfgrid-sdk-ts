@@ -89,11 +89,6 @@ async function main() {
     name: "stellarTest",
   };
 
-  const account: StellarWalletInitModel = {
-    name: "stellarTest2",
-    secret: "SBCWGJ4A4IHDUUXPASQBL7VKGZGNRMVNV66GO5P6FU6Q4NDKHIHZFRKI",
-  };
-
   const getAccount: BlockchainGetModel = {
     name: "stellarTest2",
   };
@@ -115,6 +110,10 @@ async function main() {
   const created_account = await create(grid3, createAccount);
 
   //Initialize account
+  const account: StellarWalletInitModel = {
+    name: "stellarTest2",
+    secret: created_account.secret,
+  };
   await init(grid3, account);
 
   //List accounts
@@ -130,7 +129,7 @@ async function main() {
   const getBalance: StellarWalletBalanceByAddressModel = {
     address: test_account.public_key,
   };
-  await balanceByAddress(grid3, { address: getBalance });
+  await balanceByAddress(grid3, getBalance);
 
   //Get account assets
   await assets(grid3, getAccount);
