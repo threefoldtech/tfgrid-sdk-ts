@@ -136,6 +136,7 @@ class Nodes {
     do {
       nodes = await this.filterNodes({
         accessNodeV4: true,
+        accessNodeV6: true,
         availableFor,
         page,
       });
