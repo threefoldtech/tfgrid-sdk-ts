@@ -238,7 +238,6 @@ async function loadDeployments() {
   if (props.projectName.toLowerCase() === ProjectName.Domains.toLowerCase()) {
     return loadDomains();
   }
-
   const migrateGateways = props.projectName.toLowerCase() !== "fullvm" && props.projectName.toLowerCase() !== "vm";
 
   items.value = [];
@@ -269,7 +268,10 @@ async function loadDeployments() {
       chunk3.items = chunk3.items.map(markAsFromAnotherClient);
     }
 
-    const vms = mergeLoadedDeployments(chunk1, chunk2, chunk3 as any);
+    const vms =
+      props.projectName.toLowerCase() === "fullvm" || props.projectName.toLowerCase() == "vm"
+        ? mergeLoadedDeployments(chunk2, chunk3 as any)
+        : mergeLoadedDeployments(chunk1, chunk2, chunk3 as any);
     failedDeployments.value = vms.failedDeployments;
     count.value = vms.count;
     items.value = mergeCaproverDeployments(vms.items);
