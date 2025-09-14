@@ -267,13 +267,14 @@ class VMHL extends HighLevelBase {
 
           access_node_id = accessNodeId;
         }
+        const accessNodeFeatures = (await this.nodes.getNode(access_node_id)).features;
         access_net_workload = await network.addNode(
           access_node_id,
           mycelium,
           description,
           accessNodeSubnet,
           myceliumNetworkSeeds,
-          nodeFeatures.includes(Features.network) ? Features.network : Features.networklight,
+          accessNodeFeatures.includes(Features.network) ? Features.network : Features.networklight,
         );
         wgConfig = await network.addAccess(access_node_id, true);
       }
