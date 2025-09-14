@@ -214,7 +214,7 @@ class VMHL extends HighLevelBase {
     }
     // Set networkContractMetadata based on node's zos version
     let networkContractMetadata;
-    if (nodeFeatures.includes(Features.network)) {
+    if (nodeFeatures.includes(Features.wireguard)) {
       networkContractMetadata = JSON.stringify({
         version: 3,
         type: "network",
@@ -273,6 +273,7 @@ class VMHL extends HighLevelBase {
           description,
           accessNodeSubnet,
           myceliumNetworkSeeds,
+          nodeFeatures.includes(Features.network) ? Features.network : Features.networklight,
         );
         wgConfig = await network.addAccess(access_node_id, true);
       }
@@ -285,7 +286,14 @@ class VMHL extends HighLevelBase {
       }
     }
 
-    const znet_workload = await network.addNode(nodeId, mycelium, description, userIPsubnet, myceliumNetworkSeeds);
+    const znet_workload = await network.addNode(
+      nodeId,
+      mycelium,
+      description,
+      userIPsubnet,
+      myceliumNetworkSeeds,
+      nodeFeatures.includes(Features.network) ? Features.network : Features.networklight,
+    );
     if (network instanceof Network && (await network.exists()) && (znet_workload || access_net_workload)) {
       // update network
       for (const deployment of network.deployments) {

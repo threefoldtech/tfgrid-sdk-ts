@@ -2,7 +2,7 @@ import { GridClientErrors, ValidationError } from "@threefold/types";
 import { Addr } from "netaddr";
 
 import { GridClientConfig } from "../config";
-import { ZmachineData } from "../helpers";
+import { Features, ZmachineData } from "../helpers";
 import { events } from "../helpers/events";
 import { expose } from "../helpers/expose";
 import { validateInput } from "../helpers/validator";
@@ -145,24 +145,24 @@ class K8sModule extends BaseModule {
       // Sets the network and contractMetadata based on the node's zos version
       const nodeTwinId = await this.capacity.getNodeTwinId(master.node_id);
       const features = await this.rmb.request([nodeTwinId], "zos.system.node_features_get", "", 20, 3);
-      if (features.some(item => item.includes("zmachine-light") || item.includes("network-light"))) {
-        if (!network) {
-          network = new ZNetworkLight(options.network.name, options.network.ip_range, this.config);
-          await network.load();
-        }
-        contractMetadata = JSON.stringify({
-          version: 4,
-          type: "kubernetes",
-          name: options.name,
-          projectName: this.config.projectName || `kubernetes/${options.name}`,
-        });
-      } else {
+      if (features.includes(Features.wireguard)) {
         if (!network) {
           network = new Network(options.network.name, options.network.ip_range, this.config);
           await network.load();
         }
         contractMetadata = JSON.stringify({
           version: 3,
+          type: "kubernetes",
+          name: options.name,
+          projectName: this.config.projectName || `kubernetes/${options.name}`,
+        });
+      } else {
+        if (!network) {
+          network = new ZNetworkLight(options.network.name, options.network.ip_range, this.config);
+          await network.load();
+        }
+        contractMetadata = JSON.stringify({
+          version: 4,
           type: "kubernetes",
           name: options.name,
           projectName: this.config.projectName || `kubernetes/${options.name}`,
@@ -223,24 +223,24 @@ class K8sModule extends BaseModule {
 
       const nodeTwinId = await this.capacity.getNodeTwinId(worker.node_id);
       const features = await this.rmb.request([nodeTwinId], "zos.system.node_features_get", "", 20, 3);
-      if (features.some(item => item.includes("zmachine-light") || item.includes("network-light"))) {
-        if (!network) {
-          network = new ZNetworkLight(options.network.name, options.network.ip_range, this.config);
-          await network.load();
-        }
-        contractMetadata = JSON.stringify({
-          version: 4,
-          type: "kubernetes",
-          name: options.name,
-          projectName: this.config.projectName || `kubernetes/${options.name}`,
-        });
-      } else {
+      if (features.includes(Features.wireguard)) {
         if (!network) {
           network = new Network(options.network.name, options.network.ip_range, this.config);
           await network.load();
         }
         contractMetadata = JSON.stringify({
           version: 3,
+          type: "kubernetes",
+          name: options.name,
+          projectName: this.config.projectName || `kubernetes/${options.name}`,
+        });
+      } else {
+        if (!network) {
+          network = new ZNetworkLight(options.network.name, options.network.ip_range, this.config);
+          await network.load();
+        }
+        contractMetadata = JSON.stringify({
+          version: 4,
           type: "kubernetes",
           name: options.name,
           projectName: this.config.projectName || `kubernetes/${options.name}`,

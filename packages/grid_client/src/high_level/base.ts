@@ -115,12 +115,12 @@ class HighLevelBase {
       if (!network) {
         const networkName = workload.data["network"].interfaces[0].network;
         const networkIpRange = Addr(workload.data["network"].interfaces[0].ip).mask(16).toString();
-        if (workload.type === WorkloadTypes.zmachinelight) {
-          network = new ZNetworkLight(networkName, networkIpRange, this.config);
-        } else {
-          network = new Network(networkName, networkIpRange, this.config);
-        }
+        network = new Network(networkName, networkIpRange, this.config);
         await network.load();
+        if (network.nodes.length == 0 && workload.type === WorkloadTypes.zmachinelight) {
+          network = new ZNetworkLight(networkName, networkIpRange, this.config);
+          await network.load();
+        }
       }
       const machineIp = workload.data["network"].interfaces[0].ip;
       events.emit("logs", `Deleting ip: ${machineIp} from node: ${node_id}, network ${network.name}`);
