@@ -27,7 +27,8 @@
       class="app-link font-weight-medium"
       target="_blank"
       href="https://manual.grid.tf/labs/documentation/dashboard/deploy/your_contracts"
-      >Node Contract Documentation.</a>
+      >Node Contract Documentation.</a
+    >
     <br />
   </v-alert>
 
@@ -483,9 +484,11 @@ async function deleteAll() {
     } else {
       createCustomToast(normalizeError(e, `Failed to delete some contracts.`), ToastType.danger);
     }
+  } finally {
+    deleting.value = false;
+    confirmPasswordDialog.value = false;
+    password.value = "";
   }
-  deleting.value = false;
-  confirmPasswordDialog.value = false;
 }
 const nodeStatus = computed(() => {
   const statusObject: { [x: number]: NodeStatus } = {};
