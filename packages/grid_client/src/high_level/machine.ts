@@ -267,14 +267,12 @@ class VMHL extends HighLevelBase {
 
           access_node_id = accessNodeId;
         }
-        const accessNodeFeatures = (await this.nodes.getNode(access_node_id)).features;
         access_net_workload = await network.addNode(
           access_node_id,
           mycelium,
           description,
           accessNodeSubnet,
           myceliumNetworkSeeds,
-          accessNodeFeatures.includes(Features.network) ? Features.network : Features.networklight,
         );
         wgConfig = await network.addAccess(access_node_id, true);
       }
@@ -287,21 +285,14 @@ class VMHL extends HighLevelBase {
       }
     }
 
-    const znet_workload = await network.addNode(
-      nodeId,
-      mycelium,
-      description,
-      userIPsubnet,
-      myceliumNetworkSeeds,
-      nodeFeatures.includes(Features.network) ? Features.network : Features.networklight,
-    );
+    const znet_workload = await network.addNode(nodeId, mycelium, description, userIPsubnet, myceliumNetworkSeeds);
     if (network instanceof Network && (await network.exists()) && (znet_workload || access_net_workload)) {
       // update network
       for (const deployment of network.deployments) {
         const d = await deploymentFactory.fromObj(deployment);
         for (const workload of d["workloads"]) {
           if (
-            workload.type !== WorkloadTypes.network ||
+            ![WorkloadTypes.network, WorkloadTypes.networklight].includes(workload.type) ||
             !Addr(network.ipRange).contains(Addr(workload.data["subnet"]))
           ) {
             continue;

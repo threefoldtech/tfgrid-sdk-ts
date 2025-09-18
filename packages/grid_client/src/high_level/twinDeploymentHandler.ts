@@ -150,7 +150,7 @@ class TwinDeploymentHandler {
       }
       if (twinDeployment.operation === Operations.deploy) {
         for (const workload of twinDeployment.deployment.workloads) {
-          if (workload.type !== WorkloadTypes.network) continue;
+          if (![WorkloadTypes.network, WorkloadTypes.networklight].includes(workload.type)) continue;
           const contract = contracts.created.filter(c => c.contractId === twinDeployment.deployment.contract_id);
           if (twinDeployment.network instanceof Network) {
             twinDeployment.network.save(contract[0]);
@@ -578,7 +578,8 @@ class TwinDeploymentHandler {
                 twinDeployment.returnNetworkContracts ||
                 !(
                   twinDeployment.deployment.workloads.length === 1 &&
-                  twinDeployment.deployment.workloads[0].type === WorkloadTypes.network
+                  (twinDeployment.deployment.workloads[0].type === WorkloadTypes.network ||
+                    twinDeployment.deployment.workloads[0].type === WorkloadTypes.networklight)
                 )
               )
                 resultContracts.created.push(contract);
@@ -603,7 +604,8 @@ class TwinDeploymentHandler {
                 twinDeployment.returnNetworkContracts ||
                 !(
                   twinDeployment.deployment.workloads.length === 1 &&
-                  twinDeployment.deployment.workloads[0].type === WorkloadTypes.network
+                  (twinDeployment.deployment.workloads[0].type === WorkloadTypes.network ||
+                    twinDeployment.deployment.workloads[0].type === WorkloadTypes.networklight)
                 )
               )
                 resultContracts.updated.push(contract);

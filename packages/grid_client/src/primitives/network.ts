@@ -221,7 +221,6 @@ class Network {
     description = "",
     subnet = "",
     myceliumSeeds: MyceliumNetworkModel[] = [],
-    networkType: Features = Features.network,
   ): Promise<Workload | undefined> {
     if (this.nodeExists(nodeId)) {
       return;
@@ -257,6 +256,9 @@ class Network {
     await this.generatePeers();
     this.updateNetworkDeployments();
     znet = this.getUpdatedNetwork(znet);
+
+    const nodeFeatures = (await this.capacity.getNode(nodeId)).features;
+    const networkType = nodeFeatures.includes(Features.network) ? Features.network : Features.networklight;
 
     const znet_workload = new Workload();
     znet_workload.version = 0;

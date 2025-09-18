@@ -102,7 +102,10 @@ class NetworkHL extends HighLevelBase {
       const d = await deploymentFactory.fromObj(deployment);
       for (const workload of d.workloads) {
         const data = workload.data as Znet;
-        if (workload.type !== WorkloadTypes.network || !Addr(network.ipRange).contains(Addr(data.subnet))) {
+        if (
+          ![WorkloadTypes.network, WorkloadTypes.networklight].includes(workload.type) ||
+          !Addr(network.ipRange).contains(Addr(data.subnet))
+        ) {
           continue;
         }
         workload.data = network.getUpdatedNetwork(data);

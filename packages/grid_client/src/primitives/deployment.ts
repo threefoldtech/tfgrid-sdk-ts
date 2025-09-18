@@ -52,7 +52,7 @@ class DeploymentFactory {
     }
 
     for (const workload of oldDeployment.workloads) {
-      if (workload.type === WorkloadTypes.network) {
+      if (workload.type === WorkloadTypes.network || workload.type === WorkloadTypes.networklight) {
         continue;
       }
       if (!newWorkloadNames.includes(workload.name)) {
@@ -68,7 +68,7 @@ class DeploymentFactory {
           foundUpdate = true;
           continue;
         }
-        if (w.type === WorkloadTypes.network) {
+        if (w.type === WorkloadTypes.network || w.type === WorkloadTypes.networklight) {
           continue;
         }
         if (w.name !== workload.name) {
