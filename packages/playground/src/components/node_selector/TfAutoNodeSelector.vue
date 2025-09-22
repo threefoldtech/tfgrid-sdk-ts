@@ -150,7 +150,7 @@ import type { Farm } from "@threefold/gridproxy_client";
 import { RequestError } from "@threefold/types";
 import type AwaitLock from "await-lock";
 import equals from "lodash/fp/equals.js";
-import { computed, nextTick, onMounted, onUnmounted, onUpdated, type PropType, ref, watch } from "vue";
+import { computed, nextTick, onMounted, onUnmounted, onUpdated, type PropType, ref } from "vue";
 
 import { useAsync, usePagination, useWatchDeep } from "../../hooks";
 import { ValidatorStatus } from "../../hooks/form_validator";
@@ -381,15 +381,6 @@ export default {
         _setValidNode();
       },
       { debounce: 1000 },
-    );
-
-    watch(
-      () => nodesTask.value.loading,
-      (loading: boolean, wasLoading: boolean) => {
-        if (wasLoading && !loading && _loadedNodes.value.length > 0 && !props.modelValue) {
-          _setValidNode();
-        }
-      },
     );
 
     return {
