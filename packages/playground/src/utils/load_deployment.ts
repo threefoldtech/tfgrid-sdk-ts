@@ -120,6 +120,19 @@ export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
       return grids[index].contracts.getConsumption({ id: vm[0].contractId }).catch(() => undefined);
     }),
   );
+  const contractCreatedAts = await Promise.all(
+    vms.map(async (vm, index) => {
+      try {
+        const gqlContracts = await grids[index].contracts.listMyContracts();
+        const all = [...gqlContracts.nameContracts, ...gqlContracts.nodeContracts, ...gqlContracts.rentContracts];
+        const matched = all.find((c: any) => +c.contractID === vm[0].contractId);
+        const ts = matched?.createdAt as unknown;
+        return typeof ts === "number" ? ts : ts ? Number(ts) : undefined;
+      } catch {
+        return undefined;
+      }
+    }),
+  );
   const wireguards = await Promise.all(
     vms.map((vm, index) =>
       getWireguardConfig(grids[index], vm[0].interfaces[0].network, vm[0].interfaces[0].ip).catch(() => []),
@@ -129,6 +142,9 @@ export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
   const data = vms.map((vm, index) => {
     for (let i = 0; i < vm.length; i++) {
       vm[i].billing = formatConsumption(consumptions[index]?.amountBilled as number);
+      if (contractCreatedAts[index]) {
+        vm[i].created = contractCreatedAts[index] as number;
+      }
       if (wireguards[index] && wireguards[index].length > 0) {
         vm[i].wireguard = wireguards[index][0];
       }
