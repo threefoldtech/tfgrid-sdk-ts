@@ -177,13 +177,13 @@
 
 <script lang="ts" setup>
 import { capitalize, computed, onMounted, ref } from "vue";
+import type { GridClient } from "@threefold/grid_client";
 
 import { getNodeHealthColor, NodeHealth } from "@/utils/get_nodes";
 
 import { useGrid } from "../stores";
-import { updateGrid } from "../utils/grid";
 import { markAsFromAnotherClient } from "../utils/helpers";
-import { type LoadedDeployments, loadVms, mergeLoadedDeployments } from "../utils/load_deployment";
+import { loadVms, mergeLoadedDeployments, getGridClient } from "../utils/load_deployment";
 
 const props = defineProps<{
   projectName: string;
@@ -220,9 +220,31 @@ onMounted(loadDeployments);
 async function loadDomains() {
   try {
     loading.value = true;
-    updateGrid(grid, { projectName: props.projectName.toLowerCase() });
+    const grid = await getGridClient(gridStore.client.clientOptions, props.projectName.toLowerCase());
     const gateways = await grid!.gateway.list();
-    const gws = await Promise.all(gateways.map(name => grid!.gateway.get_name({ name })));
+    const gwsResults = await Promise.allSettled(gateways.map(name => grid!.gateway.get_name({ name })));
+    const gws = gwsResults
+      .filter(result => result.status === "fulfilled")
+      .map(result => (result as PromiseFulfilledResult<any>).value);
+
+    const failedGateways = gwsResults
+      .map((result, index) => ({ result, index }))
+      .filter(({ result }) => result.status === "rejected")
+      .map(({ result, index }) => ({
+        name: gateways[index],
+        reason: (result as PromiseRejectedResult).reason,
+      }));
+
+    if (failedGateways.length > 0) {
+      console.error("Failed to load some gateway deployments:", failedGateways);
+
+      count.value = gateways.length;
+      failedDeployments.value = failedGateways.map(fg => ({
+        name: fg.name,
+        error: fg.reason?.message || fg.reason || "Unknown error",
+      }));
+    }
+
     items.value = gws.map(gw => {
       (gw as any).name = gw[0].workloads[0].name;
       return gw;
@@ -234,7 +256,23 @@ async function loadDomains() {
   }
 }
 
+async function loadDeploymentChunks(grid: GridClient, projectName: string, showAll: boolean) {
+  const loadTasks = [loadVms(grid), loadVms(await getGridClient(grid.clientOptions, projectName.toLowerCase()))];
+
+  // Only load all deployments for VM projects when showAll is enabled
+  const shouldLoadAllDeployments = showAll && projectName.toLowerCase() === ProjectName.VM.toLowerCase();
+  if (shouldLoadAllDeployments) {
+    loadTasks.push(loadVms(await getGridClient(grid.clientOptions, "")));
+  } else {
+    // Add a resolved promise to maintain consistent array length
+    loadTasks.push(Promise.resolve({ count: 0, items: [], failedDeployments: [] }));
+  }
+
+  return Promise.allSettled(loadTasks);
+}
+
 async function loadDeployments() {
+  const start = performance.now();
   if (props.projectName.toLowerCase() === ProjectName.Domains.toLowerCase()) {
     return loadDomains();
   }
@@ -243,29 +281,25 @@ async function loadDeployments() {
 
   items.value = [];
   loading.value = true;
-  updateGrid(grid, { projectName: props.projectName });
   try {
-    const chunk1 = await loadVms(grid!);
-    if (chunk1.count > 0 && migrateGateways) {
-      await migrateModule(grid!.gateway);
-    }
+    const results = await loadDeploymentChunks(grid!, props.projectName, showAllDeployments.value);
+    const [chunk1, chunk2, chunk3] = results.map((result, index) => {
+      if (result.status === "fulfilled") {
+        return result.value;
+      } else {
+        console.error(`Failed to load VM chunk ${index + 1}:`, result.reason);
+        return { count: 0, items: [], failedDeployments: [] };
+      }
+    });
 
-    const chunk2 = await loadVms(updateGrid(grid!, { projectName: props.projectName.toLowerCase() }));
-    if (chunk2.count > 0 && migrateGateways) {
-      await migrateModule(grid!.gateway);
-    }
-
-    let chunk3: LoadedDeployments<any[]> = { count: 0, items: [], failedDeployments: [] };
-    if (showAllDeployments.value) {
-      chunk3 =
-        props.projectName.toLowerCase() === ProjectName.VM.toLowerCase()
-          ? await loadVms(updateGrid(grid!, { projectName: "" }))
-          : { count: 0, items: [], failedDeployments: [] };
-
-      if (chunk3.count > 0 && migrateGateways) {
+    if (migrateGateways) {
+      const hasDeployments = chunk1.count > 0 || chunk2.count > 0 || chunk3.count > 0;
+      if (hasDeployments) {
         await migrateModule(grid!.gateway);
       }
+    }
 
+    if (chunk3.items) {
       chunk3.items = chunk3.items.map(markAsFromAnotherClient);
     }
 
@@ -278,8 +312,8 @@ async function loadDeployments() {
   } finally {
     loading.value = false;
   }
-
-  loading.value = false;
+  const end = performance.now();
+  console.log(`Time taken: ${(end - start) / 1000} seconds`);
 }
 
 const filteredHeaders = computed(() => {
@@ -452,7 +486,6 @@ import { ProjectName } from "../types";
 import { migrateModule } from "../utils/migration";
 import AccessDeploymentAlert from "./AccessDeploymentAlert.vue";
 import ListTable from "./list_table.vue";
-import { GridClient } from "@threefold/grid_client";
 
 export default {
   name: "VmDeploymentTable",

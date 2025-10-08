@@ -12,6 +12,7 @@ import { ref } from "vue";
 
 import { gridProxyClient } from "@/clients";
 import type { NodeHealthColor, NodeStatusColor, NodeTypeColor } from "@/types";
+import { getNodeInfo } from "@/utils/contracts";
 const requestPageNumber = ref<number>(1);
 const offlineNodes = ref<NodeInfo[]>([]);
 type NodeFilters = FilterOptions & {
@@ -201,3 +202,32 @@ export function convert(value: string | undefined) {
 }
 
 export const convertToBytes = convert;
+
+// Create module-level cache
+const nodeInfoCache = new Map<number, any>();
+
+/**
+ * Retrieves node information with caching to avoid redundant API calls.
+ * @param {number[]} nodeIds - Array of node IDs to get information for.
+ * @returns {Promise<any[]>} A Promise that resolves to an array of node information objects.
+ */
+export async function getNodeInfoWithCache(nodeIds: number[]) {
+  const uncachedIds = nodeIds.filter(id => !nodeInfoCache.has(id));
+  const uniqueUncachedIds = Array.from(new Set(uncachedIds));
+
+  if (uniqueUncachedIds.length > 0) {
+    const newInfo = await getNodeInfo(uniqueUncachedIds, []);
+    for (const [id, info] of Object.entries(newInfo)) {
+      nodeInfoCache.set(Number(id), info);
+    }
+  }
+  return nodeIds.map(id => nodeInfoCache.get(id));
+}
+
+/**
+ * Clears the node info cache. Primarily used for testing.
+ * @internal
+ */
+export function clearNodeInfoCache() {
+  nodeInfoCache.clear();
+}

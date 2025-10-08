@@ -256,7 +256,7 @@ import { manual } from "@/utils/manual";
 
 import { gridProxyClient, queryClient } from "../clients";
 import { useGrid } from "../stores";
-
+import { getNodeInfoWithCache } from "@/utils/get_nodes";
 const profileManagerController = useProfileManagerController();
 const balance = profileManagerController.balance;
 const freeBalance = computed(() => balance.value?.free ?? 0);
@@ -301,16 +301,42 @@ async function _normalizeContracts(
   contracts: Contract[],
   contractType: ContractType.Node | ContractType.Name | ContractType.Rent,
 ): Promise<NormalizedContract[]> {
-  const normalizedContracts = await Promise.all(
-    contracts.map(async contract => {
-      try {
-        return await normalizeContract(grid, contract, contractType);
-      } catch (error) {
-        failedContracts.value.push(contract.contract_id);
-      }
+  const batchSize = Math.max(5, Math.floor(contracts.length / 5));
+  const batches = [];
+  for (let i = 0; i < contracts.length; i += batchSize) {
+    batches.push(contracts.slice(i, i + batchSize));
+  }
+
+  const batchResults = await Promise.allSettled(
+    batches.map(async batch => {
+      const results = await Promise.allSettled(
+        batch.map(async contract => {
+          const normalized = await normalizeContract(grid, contract, contractType);
+          return normalized;
+        }),
+      );
+
+      return results
+        .map((result, index) => {
+          if (result.status === "fulfilled") {
+            return result.value;
+          } else {
+            failedContracts.value.push(batch[index].contract_id);
+            return undefined;
+          }
+        })
+        .filter((contract): contract is NormalizedContract => contract !== undefined);
     }),
   );
-  return normalizedContracts.filter(Boolean) as NormalizedContract[];
+
+  const normalizedContracts: NormalizedContract[] = [];
+  batchResults.forEach(result => {
+    if (result.status === "fulfilled") {
+      normalizedContracts.push(...result.value);
+    }
+  });
+
+  return normalizedContracts;
 }
 
 async function loadContractsByType(
@@ -326,20 +352,29 @@ async function loadContractsByType(
 
   table.loading.value = true;
   try {
-    const response = await gridProxyClient.contracts.list({
-      twinId: profileManager.profile!.twinId,
-      state: [ContractState.Created, ContractState.GracePeriod],
-      size: table.size.value,
-      page: table.page.value,
-      type: contractType,
-      retCount: true,
-      sortBy: options && options.sort.length ? (options?.sort[0].key as SortByContracts) : undefined,
-      sortOrder: options && options.sort.length ? (options?.sort[0].order as SortOrder) : undefined,
-    });
+    const results = await Promise.allSettled([
+      gridProxyClient.contracts.list({
+        twinId: profileManager.profile!.twinId,
+        state: [ContractState.Created, ContractState.GracePeriod],
+        size: table.size.value,
+        page: table.page.value,
+        type: contractType,
+        retCount: true,
+        sortBy: options?.sort?.[0]?.key as SortByContracts,
+        sortOrder: options?.sort?.[0]?.order as SortOrder,
+      }),
+      getNodeInfoWithCache(nodeIDs.value),
+    ]);
 
-    table.count.value = response.count ?? 0;
-    const normalizedContracts = await _normalizeContracts(response.data, contractType);
-    contractsRef.value = normalizedContracts;
+    if (results[0].status === "fulfilled") {
+      const response = results[0].value;
+      table.count.value = response.count ?? 0;
+      const normalizedContracts = await _normalizeContracts(response.data, contractType);
+      contractsRef.value = normalizedContracts;
+    } else {
+      loadingErrorMessage.value = `Error while listing ${contractType} contracts: ${results[0].reason?.message || results[0].reason}`;
+      createCustomToast(loadingErrorMessage.value, ToastType.danger, {});
+    }
   } catch (error: any) {
     loadingErrorMessage.value = `Error while listing ${contractType} contracts: ${error.message}`;
     createCustomToast(loadingErrorMessage.value, ToastType.danger, {});
@@ -349,6 +384,7 @@ async function loadContractsByType(
 }
 
 async function loadContracts(type?: ContractType, options?: { sort: { key: string; order: "asc" | "desc" }[] }) {
+  const start = performance.now();
   if (!type) {
     lockedContracts.value = undefined;
     totalCost.value = undefined;
@@ -374,27 +410,53 @@ async function loadContracts(type?: ContractType, options?: { sort: { key: strin
           break;
       }
     } else {
-      await Promise.all([
+      const results = await Promise.allSettled([
         loadContractsByType(ContractType.Name, nameContracts, options),
         loadContractsByType(ContractType.Node, nodeContracts, options),
         loadContractsByType(ContractType.Rent, rentContracts, options),
       ]);
+      results.forEach((result, idx) => {
+        if (result.status === "rejected") {
+          const type = [ContractType.Name, ContractType.Node, ContractType.Rent][idx];
+          loadingErrorMessage.value = `Error while loading ${type} contracts: ${result.reason?.message || result.reason}`;
+          createCustomToast(loadingErrorMessage.value, ToastType.danger, {});
+        }
+      });
     }
     const failedContractsLength = failedContracts.value.length;
     if (failedContractsLength > 0)
       loadingErrorMessage.value = `Failed to load details of the following contract${
         failedContractsLength > 1 ? "s" : ""
       }: ${failedContracts.value.join(", ")}.`;
-    await getContractsLockDetails();
+
     contracts.value = [...nodeContracts.value, ...nameContracts.value, ...rentContracts.value];
-    if (!type) await getTotalCost();
-    // Get the node info e.g. node status.
-    nodeInfo.value = await getNodeInfo(nodeIDs.value, cachedNodeIDs.value);
-    cachedNodeIDs.value.push(...nodeIDs.value);
+
+    const parallelCalls = [getContractsLockDetails(), getNodeInfo(nodeIDs.value, cachedNodeIDs.value)];
+
+    if (!type) {
+      parallelCalls.push(getTotalCost());
+    }
+
+    const results = await Promise.allSettled(parallelCalls);
+
+    if (results[1].status === "fulfilled") {
+      nodeInfo.value = results[1].value || {};
+      cachedNodeIDs.value.push(...nodeIDs.value);
+    }
+
+    results.forEach((result, index) => {
+      if (result.status === "rejected") {
+        const callNames = ["getContractsLockDetails", "getNodeInfo", "getTotalCost"];
+        const callName = index < 2 ? callNames[index] : callNames[2];
+        console.warn(`${callName} failed:`, result.reason);
+      }
+    });
   } catch (error: any) {
     loadingErrorMessage.value = `Error while loading contracts: ${error.message}`;
     createCustomToast(loadingErrorMessage.value, ToastType.danger, {});
   }
+  const end = performance.now();
+  console.log(`Contracts load time taken: ${(end - start) / 1000} seconds`);
 }
 
 async function openUnlockDialog() {
