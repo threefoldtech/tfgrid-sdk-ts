@@ -345,6 +345,7 @@ export default {
       try {
         let countryCode = getCountryCode(props.node as GridNode);
         const countryCodeMap: Record<string, string> = {
+          UK: "GB",
           "The Netherlands": "NL",
           Bahamas: "BS",
         };
