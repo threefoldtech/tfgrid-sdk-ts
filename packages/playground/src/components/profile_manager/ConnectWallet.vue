@@ -255,8 +255,10 @@ async function getEmail(grid: GridClient) {
 const handleMnemonicUpdate = () => {
   isNonActiveMnemonic.value = false;
   clearErrors();
-  email.value = "";
-  emailInput.value.reset();
+  if (email.value) {
+    email.value = "";
+    emailInput.value.reset();
+  }
 };
 
 const clearErrors = () => {
