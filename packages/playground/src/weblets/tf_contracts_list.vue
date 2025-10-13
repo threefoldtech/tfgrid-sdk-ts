@@ -27,7 +27,8 @@
       class="app-link font-weight-medium"
       target="_blank"
       href="https://manual.grid.tf/labs/documentation/dashboard/deploy/your_contracts"
-      >Node Contract Documentation.</a>
+      >Node Contract Documentation.</a
+    >
     <br />
   </v-alert>
 
@@ -174,14 +175,37 @@
           <v-icon class="pt-4" icon="$warning" />
         </template>
         <div>You are about to permanently delete all contracts. This action cannot be reversed!</div>
-        <div>Deleting contracts may take a while to complete.</div>
       </v-alert>
       <v-card-actions class="justify-end my-1 mr-2">
         <v-btn color="anchor" @click="deleteDialog = false"> Cancel </v-btn>
-        <v-btn color="error" @click="deleteAll"> Delete </v-btn>
+        <v-btn color="error" @click="confirmPassword"> Delete </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
+
+  <!-- password confirmation dialog -->
+  <v-dialog v-model="confirmPasswordDialog" width="800" attach="#modals">
+    <v-card>
+      <v-card-title class="bg-primary"> Confirm Password </v-card-title>
+      <v-alert class="mx-4 mt-4" type="warning" variant="tonal">
+        <template #prepend>
+          <v-icon class="pt-4" icon="$warning" />
+        </template>
+        <div>Please confirm your password to complete the deletion.</div>
+        <div>Deleting contracts may take a while to complete.</div>
+      </v-alert>
+      <FormValidator v-model="isValidForm">
+        <v-card-item class="px-4">
+          <WalletPassword v-model="password" mode="Login" />
+        </v-card-item>
+        <v-card-actions class="justify-end my-1 mr-2">
+          <v-btn color="anchor" @click="confirmPasswordDialog = false"> Cancel </v-btn>
+          <v-btn color="error" :disabled="!isValidForm" @click="deleteAll"> Confirm </v-btn>
+        </v-card-actions>
+      </FormValidator>
+    </v-card>
+  </v-dialog>
+
   <!-- Contracts Tables -->
   <v-expansion-panels v-model="panel" multiple>
     <v-expansion-panel v-for="(table, idx) of contractsTables" :key="idx" class="mb-4" :elevation="3">
@@ -256,6 +280,7 @@ import { manual } from "@/utils/manual";
 
 import { gridProxyClient, queryClient } from "../clients";
 import { useGrid } from "../stores";
+import WalletPassword from "@/components/profile_manager/WalletPassword.vue";
 
 const profileManagerController = useProfileManagerController();
 const balance = profileManagerController.balance;
@@ -279,8 +304,11 @@ const totalCost = ref<number>();
 const totalCostUSD = ref<number>();
 const lockedContracts = ref<ContractsOverdue>();
 const unlockDialog = ref<boolean>(false);
+const confirmPasswordDialog = ref<boolean>(false);
 const deleteDialog = ref<boolean>(false);
 const deleting = ref<boolean>(false);
+const password = ref("");
+const isValidForm = ref<boolean>(false);
 
 const panel = ref<number[]>([0, 1, 2]);
 const nodeInfo: Ref<{ [nodeId: number]: { status: NodeStatus; farmId: number } }> = ref({});
@@ -432,6 +460,12 @@ async function unlockAllContracts() {
   }
 }
 
+async function confirmPassword() {
+  deleteDialog.value = false;
+  confirmPasswordDialog.value = true;
+  password.value = "";
+}
+
 async function deleteAll() {
   deleteDialog.value = false;
   deleting.value = true;
@@ -450,8 +484,11 @@ async function deleteAll() {
     } else {
       createCustomToast(normalizeError(e, `Failed to delete some contracts.`), ToastType.danger);
     }
+  } finally {
+    deleting.value = false;
+    confirmPasswordDialog.value = false;
+    password.value = "";
   }
-  deleting.value = false;
 }
 const nodeStatus = computed(() => {
   const statusObject: { [x: number]: NodeStatus } = {};
