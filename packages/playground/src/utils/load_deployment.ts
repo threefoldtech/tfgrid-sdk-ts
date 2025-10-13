@@ -232,7 +232,7 @@ export async function loadK8s(grid: GridClient) {
       if (contractIds.length === 0) return undefined;
       try {
         const reports = await Promise.all(
-          contractIds.map(id => grids[index].contracts.getConsumption({ id }).catch(e => console.log(e))),
+          contractIds.map(id => grids[index].contracts.getConsumption({ id }))
         );
         const totalAmountBilled = reports.reduce((sum, r) => sum + (r?.amountBilled ? Number(r.amountBilled) : 0), 0);
         return { amountBilled: totalAmountBilled } as { amountBilled: number };
