@@ -219,7 +219,7 @@ import {
 } from "../utils/gateway";
 import { updateGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
-import { generateName } from "../utils/strings";
+import { generateName, sanitizeAlphanumeric } from "../utils/strings";
 import * as validators from "../utils/validators";
 import { isAvailableName } from "../utils/validators";
 import IconActionBtn from "./icon_action_btn.vue";
@@ -521,6 +521,7 @@ export default {
           grid.config.twinId;
         prefix.value = oldPrefix.value + props.vm.name;
       }
+      prefix.value = sanitizeAlphanumeric(prefix.value);
       const randomSuffix = generateName({}, 2);
       subdomain.value = `${prefix.value}${randomSuffix}`.toLowerCase();
     }
