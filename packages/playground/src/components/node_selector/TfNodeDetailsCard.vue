@@ -343,7 +343,15 @@ export default {
     });
     const countryFlagSrc = computed(() => {
       try {
-        const countryCode = getCountryCode(props.node as GridNode);
+        let countryCode = getCountryCode(props.node as GridNode);
+        const countryCodeMap: Record<string, string> = {
+          UK: "GB",
+          "The Netherlands": "NL",
+          Bahamas: "BS",
+        };
+
+        countryCode = countryCodeMap[countryCode] || countryCode;
+
         if (countryCode.length > 2) {
           return "";
         }
