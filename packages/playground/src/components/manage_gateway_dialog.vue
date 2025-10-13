@@ -433,7 +433,7 @@ export default {
           : `https://${gwConfig.subdomain}.${selectionDetails.value!.domain!.selectedDomain!.publicConfig.domain}`;
         layout.value.setStatus("success", `Successfully deployed gateway at ${gatewayUrl}`);
       } catch (error) {
-        errorMessage.value = "Failed to add domain";
+        errorMessage.value = `Failed to add domain: ${error}`;
         console.error(errorMessage.value, error);
         layout.value.setStatus("failed", normalizeError(errorMessage.value, "Something went wrong."));
       }
