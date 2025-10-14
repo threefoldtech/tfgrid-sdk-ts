@@ -47,12 +47,18 @@ export default {
 
     const getCountryFlagSrc = () => {
       try {
-        const conuntryCode = getCountryCode(props.node);
+        let countryCode = getCountryCode(props.node);
+        const countryCodeMap: Record<string, string> = {
+          UK: "GB",
+          "The Netherlands": "NL",
+          Bahamas: "BS",
+        };
 
-        if (conuntryCode.length > 2) {
+        countryCode = countryCodeMap[countryCode] || countryCode;
+        if (countryCode.length > 2) {
           return "";
         }
-        const imageUrl = `https://flagcdn.com/w640/${conuntryCode.toLocaleLowerCase()}.png`;
+        const imageUrl = `https://flagcdn.com/w640/${countryCode.toLocaleLowerCase()}.png`;
         return imageUrl;
       } catch (error) {
         console.log("Failed to generate country flag URL:", error);

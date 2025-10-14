@@ -24,3 +24,7 @@ function generateString(from: string, length: number): string {
   }
   return str;
 }
+
+export function sanitizeAlphanumeric(value: string): string {
+  return value.replace(/[^a-zA-Z0-9]/g, "");
+}

@@ -33,7 +33,7 @@
     "get-ip-range": "^4.0.1",
     "highlight.js": "^11.11.1",
     "ip": "^2.0.1",
-    "jspdf": "^3.0.1",
+    "jspdf": "^3.0.2",
     "jspdf-autotable": "^5.0.2",
     "lodash": "^4.17.21",
     "logger-interceptor": "1.0.0",
@@ -74,6 +74,7 @@
     "utility-types": "^3.11.0",
     "vite": "^6.3.4",
     "vite-plugin-node-polyfills": "^0.23.0",
+    "vite-plugin-vue-devtools": "^8.0.2",
     "vitest": "^3.1.2",
     "vue-tsc": "^2.2.10"
   }

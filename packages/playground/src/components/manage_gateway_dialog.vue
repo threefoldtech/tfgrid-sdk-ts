@@ -219,7 +219,7 @@ import {
 } from "../utils/gateway";
 import { updateGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
-import { generateName } from "../utils/strings";
+import { generateName, sanitizeAlphanumeric } from "../utils/strings";
 import * as validators from "../utils/validators";
 import { isAvailableName } from "../utils/validators";
 import IconActionBtn from "./icon_action_btn.vue";
@@ -433,7 +433,7 @@ export default {
           : `https://${gwConfig.subdomain}.${selectionDetails.value!.domain!.selectedDomain!.publicConfig.domain}`;
         layout.value.setStatus("success", `Successfully deployed gateway at ${gatewayUrl}`);
       } catch (error) {
-        errorMessage.value = "Failed to add domain";
+        errorMessage.value = `Failed to add domain: ${error}`;
         console.error(errorMessage.value, error);
         layout.value.setStatus("failed", normalizeError(errorMessage.value, "Something went wrong."));
       }
@@ -521,6 +521,7 @@ export default {
           grid.config.twinId;
         prefix.value = oldPrefix.value + props.vm.name;
       }
+      prefix.value = sanitizeAlphanumeric(prefix.value);
       const randomSuffix = generateName({}, 2);
       subdomain.value = `${prefix.value}${randomSuffix}`.toLowerCase();
     }

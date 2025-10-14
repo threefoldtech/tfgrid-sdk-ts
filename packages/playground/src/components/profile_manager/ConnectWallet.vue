@@ -51,7 +51,7 @@
                       :disabled="creatingAccount || connecting"
                       @focus="(event: Event) => (event.target as HTMLInputElement)?.removeAttribute('readonly')"
                       @blur="(event: Event) => (event.target as HTMLInputElement)?.setAttribute('readonly', 'readonly')"
-                      @update:model-value="isNonActiveMnemonic = false && clearErrors"
+                      @update:model-value="handleMnemonicUpdate"
                       @click:append="reloadValidation"
                     >
                       <template v-if="validationProps.hint || validationProps.error" #prepend-inner>
@@ -109,6 +109,7 @@
       <!-- Email -->
       <input-validator
         id="email-validator"
+        ref="emailInput"
         :value="email"
         :rules="[
           validators.required('Email is required.'),
@@ -209,6 +210,7 @@ const keypairType = ref(KeypairType.sr25519);
 const keyType = ["sr25519", "ed25519"];
 const confirmPasswordInput = useInputRef();
 const mnemonicInput = useInputRef();
+const emailInput = useInputRef();
 // loading
 const loadEmail = ref(false);
 const creatingAccount = ref(false);
@@ -249,6 +251,15 @@ async function getEmail(grid: GridClient) {
     loadEmail.value = false;
   }
 }
+
+const handleMnemonicUpdate = () => {
+  isNonActiveMnemonic.value = false;
+  clearErrors();
+  if (email.value) {
+    email.value = "";
+    emailInput.value.reset();
+  }
+};
 
 const clearErrors = () => {
   createOrActivateError.value = "";
