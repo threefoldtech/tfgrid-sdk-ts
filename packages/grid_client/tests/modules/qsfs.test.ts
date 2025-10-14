@@ -29,7 +29,8 @@ beforeAll(async () => {
 const ipRegex = /(^127\.)|(^10\.)|(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1]\.)|(^192\.168\.)/;
 
 // Skipping due to issue https://github.com/threefoldtech/tfgrid-sdk-ts/issues/4280
-test.skip("TC1234 - QSFS: Deploy QSFS underneath a VM", async () => {  /**********************************************
+test.skip("TC1234 - QSFS: Deploy QSFS underneath a VM", async () => {
+  /**********************************************
      Test Suite: Grid3_Client_TS (Automated)
      Test Cases: TC1234 - QSFS: Deploy QSFS underneath a VM
      Scenario:
