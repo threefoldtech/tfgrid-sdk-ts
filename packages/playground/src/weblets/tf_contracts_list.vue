@@ -57,7 +57,7 @@
       <v-btn
         prepend-icon="mdi-refresh"
         color="info"
-        :disabled="totalCost === undefined"
+        :disabled="loadingContracts || loadingTotalCost"
         @click="
           contractsTable.forEach(t => t.reset());
           loadContracts();
@@ -69,7 +69,7 @@
   </v-card>
 
   <!-- Total Cost Card -->
-  <v-card :loading="totalCost === undefined" variant="tonal" class="mb-3 bg-blue-primary-lighten-3">
+  <v-card :loading="loadingTotalCost || loadingContracts" variant="tonal" class="mb-3 bg-blue-primary-lighten-3">
     <template #title>
       <v-row>
         <v-col class="d-flex justify-start">
@@ -78,13 +78,13 @@
       </v-row>
     </template>
     <template #text>
-      <strong v-if="totalCost !== undefined" class="text-primary">
+      <strong v-if="!loadingTotalCost && !loadingContracts" class="text-primary">
         <input-tooltip
           inline
           :align-center="true"
-          :tooltip="`${totalCostUSD?.toFixed(3)} USD/hour ≈ ${totalCostUSD === 0 ? 0 : (totalCostUSD! * 24 * 30).toFixed(3)} USD/month`"
+          :tooltip="`${totalCostUSD} USD/hour ≈ ${totalCostUSDMonthly} USD/month`"
         >
-          {{ totalCost }} TFT/hour ≈ {{ totalCost === 0 ? 0 : (totalCost * 24 * 30).toFixed(3) }} TFT/month
+          {{ totalCost }} TFT/hour ≈ {{ totalCostTFTMonthly }} TFT/month
         </input-tooltip>
       </strong>
       <small v-else> loading total cost...</small>
@@ -274,9 +274,11 @@ const rentContracts = ref<NormalizedContract[]>([]);
 
 const loadingErrorMessage = ref<string>();
 const loadingTablesMessage = ref<string>();
+const loadingTotalCost = ref<boolean>(false);
+const loadingContracts = ref<boolean>(false);
 
-const totalCost = ref<number>();
-const totalCostUSD = ref<number>();
+const totalCost = ref<number>(0);
+const totalCostUSD = ref<number>(0);
 const lockedContracts = ref<ContractsOverdue>();
 const unlockDialog = ref<boolean>(false);
 const deleteDialog = ref<boolean>(false);
@@ -349,11 +351,10 @@ async function loadContractsByType(
 }
 
 async function loadContracts(type?: ContractType, options?: { sort: { key: string; order: "asc" | "desc" }[] }) {
+  loadingContracts.value = true;
   if (!type) {
     lockedContracts.value = undefined;
-    totalCost.value = undefined;
   }
-  totalCostUSD.value = undefined;
   loadingErrorMessage.value = undefined;
   loadingTablesMessage.value = undefined;
   nodeInfo.value = {};
@@ -394,6 +395,8 @@ async function loadContracts(type?: ContractType, options?: { sort: { key: strin
   } catch (error: any) {
     loadingErrorMessage.value = `Error while loading contracts: ${error.message}`;
     createCustomToast(loadingErrorMessage.value, ToastType.danger, {});
+  } finally {
+    loadingContracts.value = false;
   }
 }
 
@@ -463,18 +466,31 @@ const nodeStatus = computed(() => {
   return statusObject;
 });
 
+const totalCostUSDMonthly = computed(() => {
+  return (totalCostUSD.value * 24 * 30).toFixed(3);
+});
+
+const totalCostTFTMonthly = computed(() => {
+  return (totalCost.value * 24 * 30).toFixed(3);
+});
+
 // Calculate the total cost of contracts
 async function getTotalCost() {
   try {
+    totalCost.value = 0;
+    totalCostUSD.value = 0;
+    loadingTotalCost.value = true;
     const res = await gridProxyClient.twins.getConsumption(profileManager.profile!.twinId);
-    totalCost.value = +res.last_hour_consumption.toFixed(3);
+    totalCost.value = +(res.last_hour_consumption || 0).toFixed(3);
     const tftPrice = await queryClient.tftPrice.get();
-    totalCostUSD.value = totalCost.value * (tftPrice / 1000);
+    totalCostUSD.value = +(totalCost.value * (tftPrice / 1000)).toFixed(3);
   } catch (error: any) {
     totalCost.value = 0;
     totalCostUSD.value = 0;
     loadingErrorMessage.value = `Error calculating total cost: ${error.message}`;
     createCustomToast(loadingErrorMessage.value, ToastType.danger, {});
+  } finally {
+    loadingTotalCost.value = false;
   }
 }
 
