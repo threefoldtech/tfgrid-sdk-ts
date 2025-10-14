@@ -467,11 +467,11 @@ const nodeStatus = computed(() => {
 });
 
 const totalCostUSDMonthly = computed(() => {
-  return (totalCostUSD.value * 24 * 30).toFixed(3);
+  return +(totalCostUSD.value * 24 * 30).toFixed(3);
 });
 
 const totalCostTFTMonthly = computed(() => {
-  return (totalCost.value * 24 * 30).toFixed(3);
+  return +(totalCost.value * 24 * 30).toFixed(3);
 });
 
 // Calculate the total cost of contracts
