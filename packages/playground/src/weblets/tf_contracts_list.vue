@@ -79,12 +79,8 @@
     </template>
     <template #text>
       <strong v-if="!loadingTotalCost && !loadingContracts" class="text-primary">
-        <input-tooltip
-          inline
-          :align-center="true"
-          :tooltip="`${totalCostUSD} USD/hour ≈ ${totalCostUSDMonthly} USD/month`"
-        >
-          {{ totalCost }} TFT/hour ≈ {{ totalCostTFTMonthly }} TFT/month
+        <input-tooltip inline :align-center="true" :tooltip="`${totalCostUSD} USD/hour ≈ ${totalUSDMonthly} USD/month`">
+          {{ totalTFT }} TFT/hour ≈ {{ totalTFTMonthly }} TFT/month
         </input-tooltip>
       </strong>
       <small v-else> loading total cost...</small>
@@ -277,7 +273,7 @@ const loadingTablesMessage = ref<string>();
 const loadingTotalCost = ref<boolean>(false);
 const loadingContracts = ref<boolean>(false);
 
-const totalCost = ref<number>(0);
+const totalTFT = ref<number>(0);
 const totalCostUSD = ref<number>(0);
 const lockedContracts = ref<ContractsOverdue>();
 const unlockDialog = ref<boolean>(false);
@@ -466,26 +462,26 @@ const nodeStatus = computed(() => {
   return statusObject;
 });
 
-const totalCostUSDMonthly = computed(() => {
+const totalUSDMonthly = computed(() => {
   return +(totalCostUSD.value * 24 * 30).toFixed(3);
 });
 
-const totalCostTFTMonthly = computed(() => {
-  return +(totalCost.value * 24 * 30).toFixed(3);
+const totalTFTMonthly = computed(() => {
+  return +(totalTFT.value * 24 * 30).toFixed(3);
 });
 
 // Calculate the total cost of contracts
 async function getTotalCost() {
   try {
-    totalCost.value = 0;
+    totalTFT.value = 0;
     totalCostUSD.value = 0;
     loadingTotalCost.value = true;
     const res = await gridProxyClient.twins.getConsumption(profileManager.profile!.twinId);
-    totalCost.value = +(res.last_hour_consumption || 0).toFixed(3);
+    totalTFT.value = +(res.last_hour_consumption || 0).toFixed(3);
     const tftPrice = await queryClient.tftPrice.get();
-    totalCostUSD.value = +(totalCost.value * (tftPrice / 1000)).toFixed(3);
+    totalCostUSD.value = +(totalTFT.value * (tftPrice / 1000)).toFixed(3);
   } catch (error: any) {
-    totalCost.value = 0;
+    totalTFT.value = 0;
     totalCostUSD.value = 0;
     loadingErrorMessage.value = `Error calculating total cost: ${error.message}`;
     createCustomToast(loadingErrorMessage.value, ToastType.danger, {});
