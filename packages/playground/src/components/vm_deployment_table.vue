@@ -250,6 +250,11 @@ async function loadDeployments() {
     if (chunk2.count > 0 && migrateGateways) {
       await migrateModule(grid!.gateway);
     }
+    // remove deployments from full vm if current poject is micro vm
+    chunk2.items = chunk2.items.filter(item => {
+      const projectName = item[0].projectName?.split("/")[0];
+      return projectName === props.projectName.toLowerCase();
+    });
 
     let chunk3: LoadedDeployments<any[]> = { count: 0, items: [], failedDeployments: [] };
     if (showAllDeployments.value) {
