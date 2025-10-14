@@ -21,10 +21,10 @@ def test_statistics_details(browser):
           - Click on Stats.
       Result: Assert that the displayed values should match the data from the grid proxy.
     """
-    statistics_page = before_test_setup(browser)
     grid_proxy = GridProxy(browser)
-    statistics_details = statistics_page.statistics_detials()
     grid_statistics_details = grid_proxy.get_stats()
+    statistics_page = before_test_setup(browser)
+    statistics_details = statistics_page.statistics_details()
     # Convert necessary values from string to integer for comparison, but keeping the dictionary structure
     statistics_details_converted = {
         key: int(value.replace(',', '')) if value is not None and value.replace(',', '').isdigit() else value

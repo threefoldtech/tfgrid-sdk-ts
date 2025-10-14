@@ -27,8 +27,7 @@
       class="app-link font-weight-medium"
       target="_blank"
       href="https://manual.grid.tf/labs/documentation/dashboard/deploy/your_contracts"
-      >Node Contract Documentation.</a
-    >
+      >Node Contract Documentation.</a>
     <br />
   </v-alert>
 

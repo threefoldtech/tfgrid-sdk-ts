@@ -79,7 +79,7 @@ def test_get_tft(browser):
         assert twin_page.get_tft() == get_tft_url # Get TFT button was removed from dashboard for dev and qa networks.
         assert '/html' in browser.page_source
     # NO checking as devnet don't direct to TF Connect page https://gettft.com/auth/login?next_url=/gettft/shop/#/buy
-    if Base.net in ['dev']:
+    if Base.net in ['dev', 'local']:
         locked_info = 'https://manual.dev.grid.tf/labs/documentation/developers/tfchain/#contract-locking'
     else:
         locked_info = 'https://manual.grid.tf/labs/documentation/developers/tfchain/#contract-locking'
