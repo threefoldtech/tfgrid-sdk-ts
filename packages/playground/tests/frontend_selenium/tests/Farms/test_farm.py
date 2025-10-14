@@ -1,9 +1,10 @@
-from utils.utils import generate_gateway, generate_inavalid_gateway, generate_inavalid_ip, generate_ip, increment_ip, generate_gateway_from_ip, generate_string, get_seed, get_email, randomize_public_ipv4
+from utils.utils import generate_gateway, generate_invalid_gateway, generate_invalid_ip, generate_ip, increment_ip, generate_gateway_from_ip, generate_string, get_seed, randomize_public_ipv4
 from pages.farm import FarmPage
 from utils.grid_proxy import GridProxy
 from pages.dashboard import DashboardPage
 from utils.base import Base
 from selenium.common.exceptions import TimeoutException
+import pytest
 
 #  Time required for the run (17 cases) is approximately 13 minutes.
 
@@ -14,11 +15,11 @@ def before_test_setup(browser):
     password = generate_string()
     dashboard_page.open_and_load()
     dashboard_page.import_account(get_seed())
-    dashboard_page.click_button(dashboard_page.connect_your_wallet(get_email(), password))
+    dashboard_page.click_button(dashboard_page.connect_your_wallet(password))
     farm_page.navigetor()
     return farm_page, farm_name
 
-
+@pytest.mark.skipif(Base.net == "main", reason="Skipped on Mainnet environment")
 def test_create_farm(browser):
     """
     Test Case: TC907-Create farm with valid name
@@ -50,7 +51,7 @@ def test_create_farm(browser):
     farm_page.create_farm_invalid_name(farm_name)
     assert farm_page.wait_for('Farm name already exists!')
 
-
+@pytest.mark.skipif(Base.net == "main", reason="Skipped on Mainnet environment")
 def test_create_farm_invalid_name(browser):
     """
     Test Case: TC912 - create a farm with invalid name
@@ -205,7 +206,7 @@ def test_ip(browser):
     farm_page.search_functionality(farm_name)
     assert farm_page.wait_for_farm_name(farm_name)
     farm_page.search_functionality("")
-    cases = [generate_inavalid_ip(), '1.0.0.0/66', '239.255.255/17', '239.15.35.78.5/25', '239.15.35.78.5', ' ', '*.#.@.!|+-']
+    cases = [generate_invalid_ip(), '1.0.0.0/66', '239.255.255/17', '239.15.35.78.5/25', '239.15.35.78.5', ' ', '*.#.@.!|+-']
     farm_page.setup_gateway(generate_gateway()+'/16', generate_gateway(), farm_name, True)
     for case in cases:
         farm_page.add_ip(case)
@@ -262,7 +263,7 @@ def test_gateway(browser):
     assert farm_page.wait_for_farm_name(farm_name)
     farm_page.search_functionality("")
     farm_page.setup_ip(generate_ip(), farm_name)
-    cases = [generate_inavalid_gateway(), '1.0.0.',  '1:1:1:1', '522.255.255.255', '.239.35.78', '1.1.1.1/16', '239.15.35.78.5', ' ', '*.#.@.!|+-']
+    cases = [generate_invalid_gateway(), '1.0.0.',  '1:1:1:1', '522.255.255.255', '.239.35.78', '1.1.1.1/16', '239.15.35.78.5', ' ', '*.#.@.!|+-']
     for case in cases:
         assert farm_page.add_gateway(case).is_enabled()==False
         assert farm_page.wait_for('Gateway is not valid.')
@@ -298,7 +299,7 @@ def test_range_ips(browser):
     assert farm_page.wait_for_farm_name(farm_name)
     farm_page.search_functionality("")
     farm_page.change_to_range_ip(farm_name)
-    cases = [generate_inavalid_ip(), '1.0.0.0/66', '239.255.255/17', '239.15.35.78.5/25', '239.15.35.78.5', ' ', '*.#.@.!|+-']
+    cases = [generate_invalid_ip(), '1.0.0.0/66', '239.255.255/17', '239.15.35.78.5/25', '239.15.35.78.5', ' ', '*.#.@.!|+-']
     for case in cases:
         farm_page.add_range_ips(case, 0, 0).is_enabled()
         assert farm_page.wait_for('Not a valid IP')
@@ -339,7 +340,7 @@ def test_range_ips(browser):
         assert farm_page.wait_for('To IP must be bigger than From IP.')
         assert browser.find_element(*farm_page.save_button).is_enabled()==False
     assert farm_page.wait_for_button(farm_page.add_range_ips('1.1.1.254/16', '1.1.1.255/16', '1.1.1.1')).is_enabled()==True
-    cases = [generate_inavalid_gateway(), '1.0.0.',  '1:1:1:1', '522.255.255.255', '.239.35.78', '1.1.1.1/1', '239.15.35.78.5', ' ', '*.#.@.!|+-']
+    cases = [generate_invalid_gateway(), '1.0.0.',  '1:1:1:1', '522.255.255.255', '.239.35.78', '1.1.1.1/1', '239.15.35.78.5', ' ', '*.#.@.!|+-']
     farm_page.add_range_ips(0, 0, '3')
     assert farm_page.wait_for('Gateway is not valid.')
     for case in cases:

@@ -42,7 +42,7 @@ class StatisticsPage:
         self.browser.find_element(*self.statistics_button).click()
         WebDriverWait(self.browser, 60).until(EC.visibility_of_element_located(self.statistics_label))
 
-    def statistics_detials(self):
+    def statistics_details(self):
         details = {}
         wait = WebDriverWait(self.browser, 60)  # Increased wait time to 60 seconds
         elements_to_fetch = {

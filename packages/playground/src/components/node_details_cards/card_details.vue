@@ -56,7 +56,13 @@
 
               <v-tooltip v-if="item.hint && !item.icon" class="overflowText" location="top" :text="item.hint">
                 <template #activator="{ props }">
-                  <span v-if="item.name === 'Flag' && !item.imgSrc" class="flag-avatar">NA</span>
+                  <img
+                    v-if="item.name === 'Flag' && !item.imgSrc"
+                    alt="flag"
+                    width="20"
+                    v-bind="props"
+                    src="/images/icons/globe-svgrepo-com.svg"
+                  />
                   <p class="font-14" v-bind="props">
                     {{
                       item.value && item.value.length > maxLenChar
@@ -66,23 +72,24 @@
                   </p>
                 </template>
               </v-tooltip>
-
-              <p class="font-14">
-                {{
-                  item.value && item.value.length > maxLenChar ? item.value.slice(0, maxLenChar) + "..." : item.value
-                }}
-              </p>
-              <v-tooltip v-if="item.hint && item.icon" class="overflowText" location="top" :text="item.hint">
-                <template #activator="{ props }">
-                  <v-icon
-                    v-if="item.value && item.value.length && item.value != '-'"
-                    class="ml-1"
-                    v-bind="props"
-                    :icon="item.icon"
-                    @click="item.callback!(item.value!)"
-                  />
-                </template>
-              </v-tooltip>
+              <div v-if="item.hint && item.icon" class="d-flex align-center">
+                <p class="font-14">
+                  {{
+                    item.value && item.value.length > maxLenChar ? item.value.slice(0, maxLenChar) + "..." : item.value
+                  }}
+                </p>
+                <v-tooltip class="overflowText" location="top" :text="item.hint">
+                  <template #activator="{ props }">
+                    <v-icon
+                      v-if="item.value && item.value.length && item.value != '-'"
+                      class="ml-1"
+                      v-bind="props"
+                      :icon="item.icon"
+                      @click="item.callback!(item.value!)"
+                    />
+                  </template>
+                </v-tooltip>
+              </div>
 
               <v-tooltip v-else-if="item.imgSrc" location="top" :text="item.hint">
                 <template #activator="{ props }">

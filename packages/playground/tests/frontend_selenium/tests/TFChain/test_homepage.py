@@ -3,7 +3,6 @@ from utils.grid_proxy import GridProxy
 from pages.dashboard import DashboardPage
 from utils.utils import generate_string, get_seed, get_email
 from utils.base import Base
-import pytest
 
 #  Time required for the run (8 cases) is approximately 03:40 minutes.
 
@@ -97,9 +96,9 @@ def test_import_account(browser):
     dashboard_page = before_test_setup(browser)
     password = generate_string()
     dashboard_page.import_account(get_seed())
-    dashboard_page.click_button(dashboard_page.connect_your_wallet(get_email(), password))
+    dashboard_page.click_button(dashboard_page.connect_your_wallet(password))
     dashboard_page.logout_account()
-    dashboard_page.login_account(password, True)
+    dashboard_page.login_account(password)
 
 
 def test_create_account(browser):
@@ -117,10 +116,11 @@ def test_create_account(browser):
     dashboard_page.create_account()
     dashboard_page.accept_terms_conditions()
     assert dashboard_page.wait_for('Mnemonic or Hex Seed is valid.')
-    connect_button = dashboard_page.connect_your_wallet(get_email(), password)
+    email = get_email()
+    connect_button = dashboard_page.connect_your_wallet(password, email)
     dashboard_page.click_button(connect_button)
     dashboard_page.logout_account()
-    dashboard_page.login_account(password, True)
+    dashboard_page.login_account(password)
 
 
 def test_account_validation(browser):
@@ -152,16 +152,16 @@ def test_account_validation(browser):
     dashboard_page.import_account(get_seed())
     email_cases = [generate_string(), '123456', '!)$%&@#(+?', '1@c@vva.ca', '1f@test,com', '@test.com', 'test@.com', 'test@com']
     for case in email_cases:
-        assert not dashboard_page.connect_your_wallet(case, '123456').is_enabled()
+        assert not dashboard_page.connect_your_wallet('123456', case).is_enabled()
         assert dashboard_page.wait_for('Please provide a valid email address')
-    assert not dashboard_page.connect_your_wallet('', '123456').is_enabled()
+    assert not dashboard_page.connect_your_wallet('123456', '').is_enabled()
     assert dashboard_page.wait_for('Email is required')
-    assert not dashboard_page.connect_your_wallet(get_email(), '12345').is_enabled()
+    assert not dashboard_page.connect_your_wallet('12345', get_email()).is_enabled()
     assert dashboard_page.wait_for('Password must be at least 6 characters')
-    dashboard_page.connect_your_wallet(get_email(), '123456')
+    dashboard_page.connect_your_wallet('123456', get_email())
     dashboard_page.confirm_password('12345')
     assert dashboard_page.wait_for('Passwords should match')
-    dashboard_page.click_button(dashboard_page.connect_your_wallet(get_email(), '123456'))
+    dashboard_page.click_button(dashboard_page.connect_your_wallet('123456', get_email()))
     dashboard_page.open_profile()
     assert dashboard_page.get_mnemonic() == get_seed()
     assert dashboard_page.get_email() == get_email()
@@ -173,7 +173,7 @@ def test_account_validation(browser):
     assert dashboard_page.wait_for("We couldn't find a matching wallet for this password. Please connect your wallet first.")
     assert not dashboard_page.login_account('').is_enabled()
     assert dashboard_page.wait_for('Password is required')
-    dashboard_page.login_account('123456', True)
+    dashboard_page.login_account('123456')
 
 
 def test_login_links(browser):
@@ -189,7 +189,7 @@ def test_login_links(browser):
     dashboard_page = before_test_setup(browser)
     password = generate_string()
     dashboard_page.import_account(get_seed())
-    dashboard_page.click_button(dashboard_page.connect_your_wallet(get_email(), password))
+    dashboard_page.click_button(dashboard_page.connect_your_wallet(password))
     dashboard_page.open_profile()
     if Base.net in ['dev', 'local']:
         wallet_manual_link = 'https://manual.dev.grid.tf/labs/documentation/dashboard/wallet_connector/'

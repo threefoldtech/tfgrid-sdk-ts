@@ -18,8 +18,8 @@ class TransferPage:
     twin_page = (By.XPATH, "//span[text()='Your Profile']")
     twin_address_input = (By.XPATH, "(//label[text()='Recipient Address:']/following-sibling::input)[1]")
     twin_address_amount_input = (By.XPATH, "(//label[text()='Transfer Amount:']/following-sibling::input)[2]")
-    submit_id_button = (By.XPATH, "(//button[.//span[text()='Send']])[1]")
-    submit_address_button =  (By.XPATH, "(//button[.//span[text()='Send']])[2]")
+    submit_id_button = (By.XPATH, "(//button[contains(@class, 'v-btn') and .//span[normalize-space()='Send']])[1]")
+    submit_address_button =  (By.XPATH, "(//button[contains(@class, 'v-btn') and .//span[normalize-space()='Send']])[2]")
     twin_details = (By.XPATH, "//*[contains(text(), 'Twin Details')]")
     transfer_tft_title = (By.XPATH, "//*[contains(text(), 'Transfer TFTs on the TFChain')]")
     balance_text = (By.XPATH,'/html/body/div[1]/div/div/main/header/div/div[3]/div[2]/p[1]/strong')
@@ -27,7 +27,7 @@ class TransferPage:
     twin_id_input = (By.XPATH, "//label[text()='Recipient Twin ID:']/following-sibling::input")
     twin_id_amount_input = (By.XPATH, "//label[text()='Transfer Amount:']/following-sibling::input")
     twin_id_label = (By.XPATH, '/html/body/div[1]/div/div/main/div/div[2]/div/div/div/div[2]/div[2]/div[1]/div/div[1]/div[2]/div/div/div')
-    by_twin_address_button = (By.XPATH, "//button[.//span[text()='By Address']]")
+    by_twin_address_button = (By.XPATH, "//button[.//span[contains(normalize-space(), 'By Address')]]")
 
 
     def __init__(self, browser):
@@ -123,5 +123,5 @@ class TransferPage:
         return self.browser.find_element(*self.submit_id_button)
 
     def wait_for(self, keyword):
-        WebDriverWait(self.browser, 30).until(EC.presence_of_element_located((By.XPATH, "//*[contains(text(), '"+ keyword +"')]")))
+        WebDriverWait(self.browser, 10).until(EC.presence_of_element_located((By.XPATH, "//*[contains(text(), '"+ keyword +"')]")))
         return True

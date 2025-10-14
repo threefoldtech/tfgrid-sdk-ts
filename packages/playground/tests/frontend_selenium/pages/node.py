@@ -34,11 +34,11 @@ class NodePage:
     ipv6_gateway = (By.XPATH, "//label[text()='Gateway IPv6']/following-sibling::input")
     domain = (By.XPATH, "//label[text()='Domain']/following-sibling::input")
     remove = (By.XPATH, "//button[.//span[text()=' Remove Config ']]")
-    cancel = (By.XPATH, "//button[.//span[text()='Close']]")
+    cancel = (By.XPATH, "//div[contains(@class, 'v-overlay--active')]//button[.//span[contains(normalize-space(.), 'Close')]]")
     save = (By.XPATH, "//button[.//span[text()=' Save ']]")
     submit = (By.XPATH, "//button[.//span[text()='Remove']]")
     fee_input = (By.XPATH, "//label[text()='Additional Fees']/following-sibling::input")
-    set_btn = (By.XPATH, "//button[.//span[text()='Save']]")
+    set_btn = (By.XPATH, "//button[contains(@class, 'v-btn') and contains(., 'Save')]")
     fee_id = (By.XPATH, "//*[contains(text(), 'Additional fees will be added to your node')]")
     table_xpath = "//span[text()='Node ID']/ancestor::table/tbody/tr"
 

@@ -57,7 +57,7 @@
       <v-btn
         prepend-icon="mdi-refresh"
         color="info"
-        :disabled="totalCost === undefined"
+        :disabled="loadingContracts || loadingTotalCost"
         @click="
           contractsTable.forEach(t => t.reset());
           loadContracts();
@@ -69,7 +69,7 @@
   </v-card>
 
   <!-- Total Cost Card -->
-  <v-card :loading="totalCost === undefined" variant="tonal" class="mb-3 bg-blue-primary-lighten-3">
+  <v-card :loading="loadingTotalCost || loadingContracts" variant="tonal" class="mb-3 bg-blue-primary-lighten-3">
     <template #title>
       <v-row>
         <v-col class="d-flex justify-start">
@@ -78,13 +78,9 @@
       </v-row>
     </template>
     <template #text>
-      <strong v-if="totalCost !== undefined" class="text-primary">
-        <input-tooltip
-          inline
-          :align-center="true"
-          :tooltip="`${totalCostUSD?.toFixed(3)} USD/hour ≈ ${totalCostUSD === 0 ? 0 : (totalCostUSD! * 24 * 30).toFixed(3)} USD/month`"
-        >
-          {{ totalCost }} TFT/hour ≈ {{ totalCost === 0 ? 0 : (totalCost * 24 * 30).toFixed(3) }} TFT/month
+      <strong v-if="!loadingTotalCost && !loadingContracts" class="text-primary">
+        <input-tooltip inline :align-center="true" :tooltip="`${totalCostUSD} USD/hour ≈ ${totalUSDMonthly} USD/month`">
+          {{ totalTFT }} TFT/hour ≈ {{ totalTFTMonthly }} TFT/month
         </input-tooltip>
       </strong>
       <small v-else> loading total cost...</small>
@@ -174,14 +170,37 @@
           <v-icon class="pt-4" icon="$warning" />
         </template>
         <div>You are about to permanently delete all contracts. This action cannot be reversed!</div>
-        <div>Deleting contracts may take a while to complete.</div>
       </v-alert>
       <v-card-actions class="justify-end my-1 mr-2">
         <v-btn color="anchor" @click="deleteDialog = false"> Cancel </v-btn>
-        <v-btn color="error" @click="deleteAll"> Delete </v-btn>
+        <v-btn color="error" @click="confirmPassword"> Delete </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
+
+  <!-- password confirmation dialog -->
+  <v-dialog v-model="confirmPasswordDialog" width="800" attach="#modals">
+    <v-card>
+      <v-card-title class="bg-primary"> Confirm Password </v-card-title>
+      <v-alert class="mx-4 mt-4" type="warning" variant="tonal">
+        <template #prepend>
+          <v-icon class="pt-4" icon="$warning" />
+        </template>
+        <div>Please confirm your password to complete the deletion.</div>
+        <div>Deleting contracts may take a while to complete.</div>
+      </v-alert>
+      <FormValidator v-model="isValidForm">
+        <v-card-item class="px-4">
+          <WalletPassword v-model="password" mode="Login" />
+        </v-card-item>
+        <v-card-actions class="justify-end my-1 mr-2">
+          <v-btn color="anchor" @click="confirmPasswordDialog = false"> Cancel </v-btn>
+          <v-btn color="error" :disabled="!isValidForm" @click="deleteAll"> Confirm </v-btn>
+        </v-card-actions>
+      </FormValidator>
+    </v-card>
+  </v-dialog>
+
   <!-- Contracts Tables -->
   <v-expansion-panels v-model="panel" multiple>
     <v-expansion-panel v-for="(table, idx) of contractsTables" :key="idx" class="mb-4" :elevation="3">
@@ -256,6 +275,7 @@ import { manual } from "@/utils/manual";
 
 import { gridProxyClient, queryClient } from "../clients";
 import { useGrid } from "../stores";
+import WalletPassword from "@/components/profile_manager/WalletPassword.vue";
 
 const profileManagerController = useProfileManagerController();
 const balance = profileManagerController.balance;
@@ -274,13 +294,18 @@ const rentContracts = ref<NormalizedContract[]>([]);
 
 const loadingErrorMessage = ref<string>();
 const loadingTablesMessage = ref<string>();
+const loadingTotalCost = ref<boolean>(false);
+const loadingContracts = ref<boolean>(false);
 
-const totalCost = ref<number>();
-const totalCostUSD = ref<number>();
+const totalTFT = ref<number>(0);
+const totalCostUSD = ref<number>(0);
 const lockedContracts = ref<ContractsOverdue>();
 const unlockDialog = ref<boolean>(false);
+const confirmPasswordDialog = ref<boolean>(false);
 const deleteDialog = ref<boolean>(false);
 const deleting = ref<boolean>(false);
+const password = ref("");
+const isValidForm = ref<boolean>(false);
 
 const panel = ref<number[]>([0, 1, 2]);
 const nodeInfo: Ref<{ [nodeId: number]: { status: NodeStatus; farmId: number } }> = ref({});
@@ -349,11 +374,10 @@ async function loadContractsByType(
 }
 
 async function loadContracts(type?: ContractType, options?: { sort: { key: string; order: "asc" | "desc" }[] }) {
+  loadingContracts.value = true;
   if (!type) {
     lockedContracts.value = undefined;
-    totalCost.value = undefined;
   }
-  totalCostUSD.value = undefined;
   loadingErrorMessage.value = undefined;
   loadingTablesMessage.value = undefined;
   nodeInfo.value = {};
@@ -394,6 +418,8 @@ async function loadContracts(type?: ContractType, options?: { sort: { key: strin
   } catch (error: any) {
     loadingErrorMessage.value = `Error while loading contracts: ${error.message}`;
     createCustomToast(loadingErrorMessage.value, ToastType.danger, {});
+  } finally {
+    loadingContracts.value = false;
   }
 }
 
@@ -432,6 +458,12 @@ async function unlockAllContracts() {
   }
 }
 
+async function confirmPassword() {
+  deleteDialog.value = false;
+  confirmPasswordDialog.value = true;
+  password.value = "";
+}
+
 async function deleteAll() {
   deleteDialog.value = false;
   deleting.value = true;
@@ -450,8 +482,11 @@ async function deleteAll() {
     } else {
       createCustomToast(normalizeError(e, `Failed to delete some contracts.`), ToastType.danger);
     }
+  } finally {
+    deleting.value = false;
+    confirmPasswordDialog.value = false;
+    password.value = "";
   }
-  deleting.value = false;
 }
 const nodeStatus = computed(() => {
   const statusObject: { [x: number]: NodeStatus } = {};
@@ -463,18 +498,31 @@ const nodeStatus = computed(() => {
   return statusObject;
 });
 
+const totalUSDMonthly = computed(() => {
+  return +(totalCostUSD.value * 24 * 30).toFixed(3);
+});
+
+const totalTFTMonthly = computed(() => {
+  return +(totalTFT.value * 24 * 30).toFixed(3);
+});
+
 // Calculate the total cost of contracts
 async function getTotalCost() {
   try {
+    totalTFT.value = 0;
+    totalCostUSD.value = 0;
+    loadingTotalCost.value = true;
     const res = await gridProxyClient.twins.getConsumption(profileManager.profile!.twinId);
-    totalCost.value = +res.last_hour_consumption.toFixed(3);
+    totalTFT.value = +(res.last_hour_consumption || 0).toFixed(3);
     const tftPrice = await queryClient.tftPrice.get();
-    totalCostUSD.value = totalCost.value * (tftPrice / 1000);
+    totalCostUSD.value = +(totalTFT.value * (tftPrice / 1000)).toFixed(3);
   } catch (error: any) {
-    totalCost.value = 0;
+    totalTFT.value = 0;
     totalCostUSD.value = 0;
     loadingErrorMessage.value = `Error calculating total cost: ${error.message}`;
     createCustomToast(loadingErrorMessage.value, ToastType.danger, {});
+  } finally {
+    loadingTotalCost.value = false;
   }
 }
 

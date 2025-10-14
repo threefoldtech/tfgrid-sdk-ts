@@ -72,7 +72,8 @@ import type { solutionFlavor } from "../types";
 type Package = PropType<solutionFlavor>;
 
 const props = defineProps({
-  small: { type: Object as Package, default: () => ({ cpu: 1, memory: 2, disk: 15 }) },
+  micro: { type: Object as Package, default: undefined },
+  small: { type: Object as Package, default: () => ({ cpu: 1, memory: 2, disk: 20 }) },
   medium: { type: Object as Package, default: () => ({ cpu: 2, memory: 4, disk: 100 }) },
   large: {
     type: Object as Package,
@@ -82,13 +83,14 @@ const props = defineProps({
 });
 const emits = defineEmits<{ (event: "update:model-value", value?: solutionFlavor): void }>();
 
-const minDiskSize = computed(() => props.small.disk);
-const minMemorySize = computed(() => props.small.memory * 1024);
-const minCpuSize = computed(() => props.small.cpu);
+const minDiskSize = computed(() => props?.micro?.disk || props?.small.disk);
+const minMemorySize = computed(() => (props?.micro?.memory ? props.micro.memory * 1024 : props.small.memory * 1024));
+const minCpuSize = computed(() => props?.micro?.cpu || props?.small.cpu);
 
 const packages = computed(() => {
   const { small, medium, large } = props;
-  return [
+  const micro = props.micro;
+  const packages = [
     {
       title: `Small(CPU: ${small.cpu} vCores, Memory: ${small.memory} GB, SSD: ${small.disk} GB)`,
       value: small,
@@ -103,9 +105,18 @@ const packages = computed(() => {
     },
     { title: "Custom", value: "custom" },
   ];
+
+  if (micro) {
+    packages.unshift({
+      title: `Micro(CPU: ${micro.cpu} vCores, Memory: ${micro.memory} GB, SSD: ${micro.disk} GB)`,
+      value: micro,
+    });
+  }
+
+  return packages;
 });
 
-const solution = ref(packages.value[0].value);
+const solution = ref(packages.value[1].value);
 const cpu = ref<number>();
 const memory = ref<number>();
 const disk = ref<number>();

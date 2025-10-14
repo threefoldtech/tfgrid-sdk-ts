@@ -1,5 +1,5 @@
 # choose the Image which has Node installed already
-FROM node:22 AS build
+FROM node:22-alpine AS build
 
 # add arg for the network
 ARG NETWORK
@@ -21,7 +21,7 @@ RUN yarn install
 RUN yarn lerna run build --no-private && yarn workspace @threefold/playground build
 
 # install nginx
-FROM nginx:1.27-alpine
+FROM nginx:1.29.2-alpine
 
 # serve the build files using nginx
 COPY --from=build /app/packages/playground/dist /usr/share/nginx/html

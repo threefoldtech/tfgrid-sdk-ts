@@ -220,8 +220,24 @@ export async function loadK8s(grid: GridClient) {
     })
     .filter(item => item && item.masters.length > 0) as K8S[];
   const consumptions = await Promise.all(
-    k8s.map((cluster, index) => {
-      return grids[index].contracts.getConsumption({ id: cluster.masters[0].contractId }).catch(() => undefined);
+    k8s.map(async (cluster, index) => {
+      const contractIds: number[] = [];
+      if (cluster.masters && cluster.masters[0]?.contractId) contractIds.push(cluster.masters[0].contractId);
+      if (Array.isArray(cluster.workers)) {
+        for (const worker of cluster.workers) {
+          if (worker?.contractId) contractIds.push(worker.contractId);
+        }
+      }
+
+      if (contractIds.length === 0) return undefined;
+      try {
+        const reports = await Promise.all(contractIds.map(id => grids[index].contracts.getConsumption({ id })));
+        const totalAmountBilled = reports.reduce((sum, r) => sum + (r?.amountBilled ? Number(r.amountBilled) : 0), 0);
+        return { amountBilled: totalAmountBilled } as { amountBilled: number };
+      } catch (e) {
+        console.log("Failed to get consumption", e);
+        return undefined;
+      }
     }),
   );
 

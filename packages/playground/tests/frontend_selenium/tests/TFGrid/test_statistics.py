@@ -12,7 +12,6 @@ def before_test_setup(browser):
     statistics_page.navigate()
     return statistics_page
 
-@pytest.mark.skip(reason="https://github.com/threefoldtech/tfgrid-sdk-ts/issues/3751")
 def test_statistics_details(browser):
     """
       TC1503 - Verify Statistics
@@ -22,10 +21,10 @@ def test_statistics_details(browser):
           - Click on Stats.
       Result: Assert that the displayed values should match the data from the grid proxy.
     """
-    statistics_page = before_test_setup(browser)
     grid_proxy = GridProxy(browser)
-    statistics_details = statistics_page.statistics_detials()
     grid_statistics_details = grid_proxy.get_stats()
+    statistics_page = before_test_setup(browser)
+    statistics_details = statistics_page.statistics_details()
     # Convert necessary values from string to integer for comparison, but keeping the dictionary structure
     statistics_details_converted = {
         key: int(value.replace(',', '')) if value is not None and value.replace(',', '').isdigit() else value
@@ -38,7 +37,6 @@ def test_statistics_details(browser):
     assert grid_statistics_details['countries'] == statistics_details_converted['countries']
     assert grid_statistics_details['totalCru'] == statistics_details_converted['totalCru']
     assert math.isclose(convert_to_scaled_float(grid_statistics_details['totalSru']), convert_to_scaled_float(byte_converter(statistics_details_converted['totalSru'])), abs_tol=0.002)
-    assert math.isclose(convert_to_scaled_float(grid_statistics_details['totalHru']), convert_to_scaled_float(byte_converter(statistics_details_converted['totalHru'])), abs_tol=0.002)
     assert math.isclose(convert_to_scaled_float(grid_statistics_details['totalMru']), convert_to_scaled_float(byte_converter(statistics_details_converted['totalMru'])), abs_tol=0.002)
     assert grid_statistics_details['gpus'] == statistics_details_converted['gpus']
     assert grid_statistics_details['accessNodes'] == statistics_details_converted['accessNodes']

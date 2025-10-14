@@ -46,14 +46,24 @@ export default {
     };
 
     const getCountryFlagSrc = () => {
-      const conuntryCode = getCountryCode(props.node);
+      try {
+        let countryCode = getCountryCode(props.node);
+        const countryCodeMap: Record<string, string> = {
+          UK: "GB",
+          "The Netherlands": "NL",
+          Bahamas: "BS",
+        };
 
-      if (conuntryCode.length > 2) {
+        countryCode = countryCodeMap[countryCode] || countryCode;
+        if (countryCode.length > 2) {
+          return "";
+        }
+        const imageUrl = `https://flagcdn.com/w640/${countryCode.toLocaleLowerCase()}.png`;
+        return imageUrl;
+      } catch (error) {
+        console.log("Failed to generate country flag URL:", error);
         return "";
       }
-      return conuntryCode.toLocaleLowerCase() != "ch"
-        ? `https://www.worldatlas.com/r/w425/img/flag/${conuntryCode?.toLocaleLowerCase()}-flag.jpg`
-        : `https://www.worldatlas.com/r/w425/img/flag/${conuntryCode?.toLocaleLowerCase()}-flag.png`;
     };
 
     return {
