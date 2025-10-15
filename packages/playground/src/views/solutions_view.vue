@@ -218,7 +218,7 @@ export default {
         title: "BTC Node",
         excerpt:
           "Deploy a Bitcoin Node on the ThreeFold Grid. Run your own Bitcoin full node to participate in the Bitcoin network, validate transactions, and maintain a complete copy of the blockchain.",
-        icon: "vm.png",
+        icon: "BTC_Node.png",
         route: DashboardRoutes.Applications.BTCNode,
       },
     ];

@@ -9,7 +9,7 @@
     :rented-by="rentedBy"
     :selected-node="selectionDetails?.node"
     :valid-filters="selectionDetails?.validFilters"
-    title-image="images/icons/vm.png"
+    title-image="images/icons/BTC_Node.png"
   >
     <template #title> Deploy a BTC Node Instance </template>
 
