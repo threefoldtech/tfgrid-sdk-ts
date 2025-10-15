@@ -613,7 +613,6 @@ class Contracts {
    *
    * @returns {Promise<number>} - A promise that resolves to the overdue amount for the specified contract.
    */
-  @validateInput
   private async getContractOverdueAmount(contract: GridProxyContract, proxy: GridProxyClient) {
     return await this.client.contracts.calculateContractOverDue({ contractInfo: contract, gridProxyClient: proxy });
   }
