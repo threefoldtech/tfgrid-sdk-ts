@@ -474,7 +474,6 @@ export default {
       const { publicIP, planetary, myceliumIP, interfaces } = selectedNode.value;
 
       if (selectedNode.value.type === WorkloadTypes.zmachine) {
-        addNetwork(NetworkInterfaces.WireGuard, interfaces?.[0]?.ip);
         addNetwork(NetworkInterfaces.PublicIPV4, publicIP?.ip.split("/")[0]);
         /**
          * WARNING:
@@ -491,6 +490,7 @@ export default {
       if (selectedNode.value.type === WorkloadTypes.zmachinelight) {
         addNetwork(NetworkInterfaces.Mycelium, myceliumIP);
       }
+      addNetwork(NetworkInterfaces.WireGuard, interfaces?.[0]?.ip);
       selectedIPAddress.value = networks.value[0].value;
     }
 
