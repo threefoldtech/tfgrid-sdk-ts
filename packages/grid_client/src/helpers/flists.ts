@@ -156,4 +156,8 @@ export const FLISTS = {
     value: "https://hub.grid.tf/tf-official-apps/tfrobot.flist",
     entryPoint: "/sbin/zinit init",
   },
+  BTCNODE: {
+    value: "https://hub.grid.tf/petep.3bot/btc_node-mycelium.flist",
+    entryPoint: "/sbin/zinit init",
+  },
 };

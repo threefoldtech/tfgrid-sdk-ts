@@ -214,6 +214,13 @@ export default {
         route: DashboardRoutes.Applications.Jitsi,
         releaseDate: new Date("2024-11-13"),
       },
+      {
+        title: "BTC Node",
+        excerpt:
+          "Deploy a Bitcoin Node on the ThreeFold Grid. Run your own Bitcoin full node to participate in the Bitcoin network, validate transactions, and maintain a complete copy of the blockchain.",
+        icon: "vm.png",
+        route: DashboardRoutes.Applications.BTCNode,
+      },
     ];
     app_cards = app_cards.sort((a, b) => a.title.localeCompare(b.title));
     orch_cards = orch_cards.sort((a, b) => a.title.localeCompare(b.title));
