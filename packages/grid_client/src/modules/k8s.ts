@@ -89,7 +89,10 @@ class K8sModule extends BaseModule {
     for (const deployment of deployments) {
       const d = deployment instanceof TwinDeployment ? deployment.deployment : deployment;
       for (const workload of d.workloads) {
-        if (workload.type === WorkloadTypes.zmachine && workload.data["env"]["K3S_URL"] !== "") {
+        if (
+          (workload.type === WorkloadTypes.zmachine || workload.type === WorkloadTypes.zmachinelight) &&
+          workload.data["env"]["K3S_URL"] !== ""
+        ) {
           workload["contractId"] = d.contract_id;
           workload["nodeId"] = await this._getNodeIdFromContractId(deploymentName, d.contract_id);
           workloads.push(workload);
