@@ -490,6 +490,7 @@ export default {
       }
       if (selectedNode.value.type === WorkloadTypes.zmachinelight) {
         addNetwork(NetworkInterfaces.Mycelium, myceliumIP);
+        addNetwork(NetworkInterfaces.WireGuard, interfaces?.[0]?.ip);
       }
       selectedIPAddress.value = networks.value[0].value;
     }
