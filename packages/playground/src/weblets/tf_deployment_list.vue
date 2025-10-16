@@ -370,6 +370,14 @@
           />
           <IconActionBtn tooltip="Visit" icon="mdi-web" color="anchor" :href="'https://' + item.env.JITSI_HOSTNAME" />
         </template>
+
+        <template #BTCNode-actions="{ item }">
+          <IconActionBtn
+            tooltip="Show Details"
+            icon="mdi-eye-outline"
+            @click="openDialog(tabs[activeTab].value, item)"
+          />
+        </template>
       </VmDeploymentTable>
 
       <template #Kubernetes>
@@ -503,6 +511,7 @@ const tabs: Tab[] = [
   { title: "Jenkins", value: "Jenkins", imgPath: "images/icons/jenkins.png" },
   { title: "Domains", value: "Domains", imgPath: "images/icons/domains.png" },
   { title: "Jitsi", value: "Jitsi", imgPath: "images/icons/jitsi.png" },
+  { title: "BTC Node", value: "BTCNode", imgPath: "images/icons/BTC_Node.png" },
 ];
 
 const layout = useLayout();

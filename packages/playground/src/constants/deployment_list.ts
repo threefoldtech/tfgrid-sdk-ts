@@ -208,4 +208,8 @@ export const deploymentListEnvironments = {
     SSH_KEY: _ssh,
     NODE_PILOT_HOSTNAME: "Node Pilot Hostname",
   },
+
+  btcnode: {
+    SSH_KEY: _ssh,
+  },
 };

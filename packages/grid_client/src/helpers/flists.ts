@@ -156,4 +156,8 @@ export const FLISTS = {
     value: "https://hub.grid.tf/tf-official-apps/tfrobot.flist",
     entryPoint: "/sbin/zinit init",
   },
+  BTCNODE: {
+    value: "https://hub.grid.tf/tf-official-apps/threefoldtech-tf_btcnode_30.0.flist",
+    entryPoint: "/sbin/zinit init",
+  },
 };

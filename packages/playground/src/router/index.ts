@@ -383,6 +383,31 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
       },
     },
     {
+      path: DashboardRoutes.Applications.BTCNode,
+      component: () => import("../views/btcnode_view.vue"),
+      meta: {
+        title: "BTC Node",
+        info: { page: "info/btcnode.md" },
+        navbarConfig: {
+          back: true,
+          path: [
+            { title: "Deploy" },
+            {
+              title: "Labs",
+              disabled: false,
+              to: DashboardRoutes.Deploy.Applications,
+            },
+            {
+              title: "BTC Node",
+            },
+          ],
+        },
+        requireSSH: true,
+        requireKYC: true,
+        publicPath: false,
+      },
+    },
+    {
       path: DashboardRoutes.Applications.Algorand,
       component: () => import("../views/algorand_view.vue"),
       meta: {

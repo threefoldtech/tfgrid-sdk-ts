@@ -145,6 +145,7 @@ export enum ProjectName {
   Nostr = "Nostr",
   Domains = "Domains",
   Jitsi = "Jitsi",
+  BTCNode = "BTCNode",
 }
 
 export enum SolutionCode {
@@ -178,6 +179,7 @@ export enum SolutionCode {
   nostr = "nt",
   Domains = "dm",
   jitsi = "jt",
+  btcnode = "btc",
 }
 
 export const solutionType: { [key: string]: string } = {
@@ -208,6 +210,7 @@ export const solutionType: { [key: string]: string } = {
   nostr: "Nostr",
   domains: "Domains",
   jitsi: "Jitsi",
+  btcnode: "BTC Node",
 };
 
 export interface solutionFlavor {
