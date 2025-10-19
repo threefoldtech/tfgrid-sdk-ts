@@ -66,6 +66,7 @@ class K8sModule extends BaseModule {
         if (workload.type === WorkloadTypes.zmachine && workload.data["env"]["K3S_URL"] === "") {
           workload["contractId"] = d.contract_id;
           workload["nodeId"] = await this._getNodeIdFromContractId(deploymentName, d.contract_id);
+          workload["contractCreatedAt"] = d["contractCreatedAt"];
           workloads.push(workload);
         }
       }
@@ -92,6 +93,7 @@ class K8sModule extends BaseModule {
         if (workload.type === WorkloadTypes.zmachine && workload.data["env"]["K3S_URL"] !== "") {
           workload["contractId"] = d.contract_id;
           workload["nodeId"] = await this._getNodeIdFromContractId(deploymentName, d.contract_id);
+          workload["contractCreatedAt"] = d["contractCreatedAt"];
           workloads.push(workload);
         }
       }

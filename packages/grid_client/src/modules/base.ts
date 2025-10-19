@@ -450,6 +450,7 @@ class BaseModule {
         if (types.includes(workload.type)) {
           workload["contractId"] = deployment.contract_id;
           workload["nodeId"] = await this._getNodeIdFromContractId(deploymentName, deployment.contract_id);
+          workload["contractCreatedAt"] = deployment["contractCreatedAt"];
           workloads.push(workload);
         }
       }
@@ -507,7 +508,7 @@ class BaseModule {
       contractId: workload["contractId"],
       nodeId: workload["nodeId"],
       name: workload.name,
-      created: workload.result.created,
+      created: workload["contractCreatedAt"] ? parseInt(workload["contractCreatedAt"]) : workload.result.created,
       status: workload.result.state,
       message: workload.result.message,
       flist: data.flist,
@@ -632,6 +633,7 @@ class BaseModule {
         }
       }
       if (found) {
+        deployment["contractCreatedAt"] = contract.createdAt;
         deployments.push(deployment);
       } else {
         await this.save(name, { created: [], updated: [], deleted: [{ contractId: +contract.contractID }] });
