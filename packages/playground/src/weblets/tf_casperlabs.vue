@@ -32,9 +32,9 @@
 
       <SelectSolutionFlavor
         v-model="solution"
-        :small="{ cpu: 2, memory: 4, disk: 100 }"
-        :medium="{ cpu: 4, memory: 16, disk: 500 }"
-        :large="{ cpu: 8, memory: 32, disk: 1000 }"
+        :small="{ cpu: 4, memory: 32, disk: 500 }"
+        :medium="{ cpu: 8, memory: 48, disk: 1000 }"
+        :large="{ cpu: 16, memory: 64, disk: 2000 }"
       />
 
       <Networks

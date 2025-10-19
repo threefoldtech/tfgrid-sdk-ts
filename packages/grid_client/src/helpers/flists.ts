@@ -85,7 +85,7 @@ export const FLISTS = {
     entryPoint: "/sbin/zinit init",
   },
   CASPERLABS: {
-    value: "https://hub.grid.tf/tf-official-apps/casperlabs-latest.flist",
+    value: "https://hub.grid.tf/zaelgohary.3bot/zaelgohary-casper-ubuntu22-latest.flist",
     entryPoint: "/sbin/zinit init",
   },
   DISCOURSE: {
