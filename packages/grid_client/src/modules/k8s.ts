@@ -233,7 +233,7 @@ class K8sModule extends BaseModule {
         contractMetadata = JSON.stringify({
           version: 4,
           type: "kubernetes",
-          name: options.name,
+          name: worker.name,
           projectName: this.config.projectName || `kubernetes/${options.name}`,
         });
       } else {
@@ -244,7 +244,7 @@ class K8sModule extends BaseModule {
         contractMetadata = JSON.stringify({
           version: 3,
           type: "kubernetes",
-          name: options.name,
+          name: worker.name,
           projectName: this.config.projectName || `kubernetes/${options.name}`,
         });
       }
@@ -488,7 +488,7 @@ class K8sModule extends BaseModule {
     const contractMetadata = JSON.stringify({
       version: 3,
       type: "kubernetes",
-      name: options.deployment_name,
+      name: options.name,
       projectName: this.config.projectName || `kubernetes/${options.deployment_name}`,
     });
     const [twinDeployments] = await this.kubernetes.add_worker(
