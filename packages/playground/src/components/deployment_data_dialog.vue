@@ -71,7 +71,7 @@
               <CopyReadonlyInput
                 v-for="disk of contract.mounts"
                 :key="disk.name"
-                :label="getDiskLabel(contract, disk)"
+                :label="getDiskLabel(disk)"
                 :data="Math.ceil(disk.size / (1024 * 1024 * 1024))"
               />
               <CopyReadonlyInput
@@ -307,11 +307,8 @@ function getType(key: string): string {
   return "text";
 }
 
-function getDiskLabel(contract: DeploymentContract, disk: Disk) {
-  if (contract.metadata.includes("fullvm") && contract.mounts.indexOf(disk) > 0) {
-    return "Disk( " + disk.name + " ) GB";
-  }
-  return "Disk( " + disk.mountPoint + " ) GB";
+function getDiskLabel(disk: any) {
+  return `Disk ${disk.name}`;
 }
 
 function getMetadata(contract: DeploymentContract): { type: string; projectName: string } {
@@ -355,7 +352,6 @@ import { createCustomToast, ToastType } from "@/utils/custom_toast";
 import { GrafanaStatistics } from "@/utils/get_metrics_url";
 
 import { useGrid } from "../stores";
-import type { Disk } from "../utils/deploy_vm";
 import CopyReadonlyInput from "./copy_readonly_input.vue";
 import { HighlightDark, HighlightLight } from "./highlight_themes";
 
