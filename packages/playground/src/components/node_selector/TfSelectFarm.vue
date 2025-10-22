@@ -79,7 +79,7 @@
 
 <script lang="ts">
 import type { FarmInfo } from "@threefold/grid_client";
-import { computed, nextTick, onUnmounted, type PropType, ref } from "vue";
+import { computed, nextTick, onUnmounted, type PropType, ref, watch } from "vue";
 
 import { useAsync, usePagination, useWatchDeep } from "../../hooks";
 import { useGrid } from "../../stores";
@@ -165,41 +165,30 @@ export default {
 
     /* Load farms with search */
     const searchTask = useAsync(searchFarms, { shouldRun: () => props.validFilters });
-    let oldSearchQuery = "";
     const searchQuery = ref("");
     let isClearing = false;
 
     const menuOpened = ref(false);
     const focused = ref(false);
-    async function updateFocused(focus: boolean) {
+
+    watch(
+      () => props.modelValue,
+      (newVal, oldVal) => {
+        if (!newVal && oldVal) onClear();
+      },
+    );
+    function updateFocused(focus: boolean) {
       focused.value = focus;
-      if (focus) {
-        await nextTick();
-        searchQuery.value = oldSearchQuery;
-      }
     }
 
     function handleSearchUpdate(value: string) {
-      // IGNORE all updates while clearing is in progress
-      if (isClearing) {
-        return;
-      }
+      if (isClearing) return;
 
       const trimmedValue = value?.trim() || "";
 
-      // IGNORE "All Farms" text - this is VAutocomplete syncing with the default model-value
-      // We only want actual user search input, not the default farm name
-      if (trimmedValue === "All Farms") {
-        return;
-      }
+      if (trimmedValue === "All Farms") return;
+      if (trimmedValue === "" && searchQuery.value !== "" && menuOpened.value) return;
 
-      // IGNORE empty string resets when we have a value and menu is open
-      // This prevents VAutocomplete from resetting the search after each keystroke
-      if (trimmedValue === "" && searchQuery.value !== "" && menuOpened.value) {
-        return;
-      }
-
-      // Only update if different
       if (searchQuery.value !== trimmedValue) {
         searchQuery.value = trimmedValue;
         searchForFarms();
@@ -207,33 +196,21 @@ export default {
     }
 
     function searchForFarms() {
-      if (oldSearchQuery === searchQuery.value) {
-        return;
-      }
-
-      oldSearchQuery = searchQuery.value;
-
-      if (!oldSearchQuery) {
+      if (!searchQuery.value) {
         return searchTask.value.reset();
       }
 
-      return searchTask.value.run(oldSearchQuery);
+      return searchTask.value.run(searchQuery.value);
     }
 
     function onClear() {
-      // Prevent multiple calls
-      if (isClearing) {
-        return;
-      }
+      if (isClearing) return;
 
       isClearing = true;
       searchTask.value.reset();
-      oldSearchQuery = "";
       searchQuery.value = "";
-      // Emit undefined to clear selection, then let model-value fall back to farms[0]
       ctx.emit("update:model-value", undefined);
 
-      // Reset the clearing flag after VAutocomplete finishes its updates
       setTimeout(() => {
         isClearing = false;
       }, 100);
@@ -241,14 +218,10 @@ export default {
 
     /* Farms to be shown */
     const farms = computed(() => {
-      // When searching and we have results, show "All Farms" + search results
       if ((focused.value || menuOpened.value) && searchTask.value.initialized) {
         const searchResults = searchTask.value.data || [];
-        // Only show "All Farms" if we have actual search results
         return searchResults.length > 0 ? [_defaultFarm, ...searchResults] : searchResults;
       }
-
-      // When not searching, show "All Farms" + loaded farms
       return [_defaultFarm, ...loadedFarms.value];
     });
 
