@@ -23,7 +23,7 @@ case $MODE in
         BRIDGE_TFT_ADDRESS="${BRIDGE_TFT_ADDRESS:-GDHJP6TF3UXYXTNEZ2P36J5FH7W4BJJQ4AYYAXC66I2Q2AH5B6O6BCFG}"
         STATS_URL="${STATS_URL:-"https://stats.dev.grid.tf,https://stats.dev.threefold.me"}"
         STELLAR_NETWORK="${STELLAR_NETWORK:-test}"
-        KYC_URL="${KYC_URL:-https://kyc.dev.grid.tf}"
+        KYC_URL="${KYC_URL:-"https://kyc.dev.grid.tf,https://kyc.dev.threefold.me,https://kyc.dev.ninja.tf"}"
         SENTRY_DSN="https://b9af6796f176d1f02837a06f0da3caee@dev.sentry.grid.tf/2"
         MANUAL_URL="${MANUAL_URL:-https://manual.dev.grid.tf}"
     ;;
@@ -36,7 +36,7 @@ case $MODE in
         BRIDGE_TFT_ADDRESS="${BRIDGE_TFT_ADDRESS:-GAQH7XXFBRWXT2SBK6AHPOLXDCLXVFAKFSOJIRMRNCDINWKHGI6UYVKM}"
         STATS_URL="${STATS_URL:-"https://stats.qa.grid.tf,https://stats.qa.threefold.me"}"
         STELLAR_NETWORK="${STELLAR_NETWORK:-test}"
-        KYC_URL="${KYC_URL:-https://kyc.qa.grid.tf}"
+        KYC_URL="${KYC_URL:-"https://kyc.qa.grid.tf,https://kyc.qa.threefold.me,https://kyc.qa.ninja.tf"}"
         SENTRY_DSN="https://b9af6796f176d1f02837a06f0da3caee@dev.sentry.grid.tf/2"
         MANUAL_URL="${MANUAL_URL:-https://manual.grid.tf}"
     ;;
@@ -118,7 +118,7 @@ window.env = {
   STELLAR_HORIZON_URL: '$STELLAR_HORIZON_URL',
   TFT_ASSET_ISSUER: '$TFT_ASSET_ISSUER',
   MINTING_URL: '$MINTING_URL',
-  KYC_URL: '$KYC_URL',
+  KYC_STACKS: "[$(parss_array "$KYC_URL")]",
   STATS_STACKS: "[$(parss_array "$STATS_URL")]",
   TIMEOUT: +'$TIMEOUT',
   PAGE_SIZE: +'$PAGE_SIZE',

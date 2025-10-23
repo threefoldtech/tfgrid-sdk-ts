@@ -88,7 +88,7 @@ export async function setGlobalEnv() {
     RELAY_STACKS,
     SUBSTRATE_STACKS,
     ACTIVATION_SERVICE_STACKS,
-    KYC_URL,
+    KYC_STACKS,
   } = window.env;
 
   const urlManger = new ServiceUrlManager({
@@ -99,7 +99,7 @@ export async function setGlobalEnv() {
       { URLs: SUBSTRATE_STACKS, service: new TFChainMonitor() },
       { URLs: ACTIVATION_SERVICE_STACKS, service: new ActivationMonitor() },
       { URLs: RELAY_STACKS, service: new RMBMonitor() },
-      { URLs: [KYC_URL], service: new KYCMonitor() },
+      { URLs: KYC_STACKS, service: new KYCMonitor() },
     ],
     silent: true,
   });
@@ -109,7 +109,7 @@ export async function setGlobalEnv() {
     window.$$showMonitorError(result);
     return false;
   }
-  const { GridProxy, Stats, TFChain, GraphQl, Activation, RMB } = result;
+  const { GridProxy, Stats, TFChain, GraphQl, Activation, RMB, KYC } = result;
 
   window.env.GRIDPROXY_URL = GridProxy!;
   window.env.STATS_URL = Stats!;
@@ -117,5 +117,6 @@ export async function setGlobalEnv() {
   window.env.SUBSTRATE_URL = TFChain!;
   window.env.ACTIVATION_SERVICE_URL = Activation!;
   window.env.RELAY_DOMAIN = RMB!;
+  window.env.KYC_URL = KYC!;
   return true;
 }
