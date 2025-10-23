@@ -48,6 +48,7 @@ declare global {
       ACTIVATION_SERVICE_STACKS: string[];
       RELAY_STACKS: string[];
       STATS_STACKS: string[];
+      KYC_STACKS: string[];
       NETWORK: NetworkEnv;
       GRAPHQL_URL: string;
       GRIDPROXY_URL: string;
