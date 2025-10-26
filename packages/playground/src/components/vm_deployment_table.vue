@@ -180,9 +180,10 @@ import { capitalize, computed, onMounted, ref } from "vue";
 
 import { getNodeHealthColor, NodeHealth } from "@/utils/get_nodes";
 
-import { useGrid } from "../stores";
-import { updateGrid } from "../utils/grid";
+import { updateGrid, getGrid } from "../utils/grid";
 import { markAsFromAnotherClient } from "../utils/helpers";
+
+import { useProfileManager } from "../stores";
 import { type LoadedDeployments, loadVms, mergeLoadedDeployments } from "../utils/load_deployment";
 
 const props = defineProps<{
@@ -208,19 +209,18 @@ const failedDeployments = ref<
     contracts?: { contractID: number; node_id: number }[];
   }[]
 >([]);
-const gridStore = useGrid();
-const grid = gridStore.client as GridClient;
 const failedDeploymentsHeader = ref([
   { title: "Name", key: "name", sortable: false },
   { title: "Node ID", key: "nodes", sortable: false },
   { title: "Contract ID", key: "contracts", sortable: false },
 ]);
+const profileManager = useProfileManager();
 onMounted(loadDeployments);
 
 async function loadDomains() {
   try {
     loading.value = true;
-    updateGrid(grid, { projectName: props.projectName.toLowerCase() });
+    const grid = await getGrid(profileManager.profile!, props.projectName.toLowerCase());
     const gateways = await grid!.gateway.list();
     const gws = await Promise.all(gateways.map(name => grid!.gateway.get_name({ name })));
     items.value = gws.map(gw => {
@@ -242,7 +242,7 @@ async function loadDeployments() {
 
   items.value = [];
   loading.value = true;
-  updateGrid(grid, { projectName: props.projectName });
+  const grid = await getGrid(profileManager.profile!, props.projectName);
   try {
     const chunk1 = await loadVms(grid!);
     if (chunk1.count > 0 && migrateGateways) {
@@ -456,7 +456,6 @@ import { ProjectName } from "../types";
 import { migrateModule } from "../utils/migration";
 import AccessDeploymentAlert from "./AccessDeploymentAlert.vue";
 import ListTable from "./list_table.vue";
-import { GridClient } from "@threefold/grid_client";
 
 export default {
   name: "VmDeploymentTable",
