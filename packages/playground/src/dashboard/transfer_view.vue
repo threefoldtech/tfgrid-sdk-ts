@@ -1,21 +1,13 @@
 <template>
   <div class="border px-4 pb-4 rounded position-relative">
     <v-card color="primary" class="d-flex justify-center items-center mt-3 pa-3 text-center">
-      <v-icon size="30" class="pr-3">
-        mdi-account-arrow-right-outline
-      </v-icon>
-      <v-card-title class="pa-0">
-        Transfer TFTs on the TFChain
-      </v-card-title>
+      <v-icon size="30" class="pr-3"> mdi-account-arrow-right-outline </v-icon>
+      <v-card-title class="pa-0"> Transfer TFTs on the TFChain </v-card-title>
     </v-card>
     <v-card>
       <v-tabs v-model="activeTab" align-tabs="center">
-        <v-tab :value="0" color="secondary">
-          By Twin ID
-        </v-tab>
-        <v-tab :value="1" color="secondary">
-          By Address
-        </v-tab>
+        <v-tab :value="0" color="secondary"> By Twin ID </v-tab>
+        <v-tab :value="1" color="secondary"> By Address </v-tab>
       </v-tabs>
       <v-window v-model="activeTab">
         <!-- TwinID Transfer -->
@@ -54,14 +46,12 @@
                 #="{ props }"
               >
                 <input-tooltip tooltip="Up to 0.01 transaction fee will be deducted">
-                  <v-text-field v-bind="props" v-model.number="transferAmount" label="Transfer Amount:" />
+                  <v-text-field v-bind="props" v-model="transferAmount" label="Transfer Amount:" />
                 </input-tooltip>
               </input-validator>
             </form-validator>
             <v-card-actions class="justify-end mb-1 mr-2">
-              <v-btn color="anchor" :disabled="loadingTwinIDTransfer" @click="clearInput">
-                Clear
-              </v-btn>
+              <v-btn color="anchor" :disabled="loadingTwinIDTransfer" @click="clearInput"> Clear </v-btn>
               <v-btn
                 color="secondary"
                 :loading="loadingTwinIDTransfer"
@@ -107,15 +97,13 @@
                 #="{ props }"
               >
                 <input-tooltip tooltip="Up to 0.01 transaction fee will be deducted">
-                  <v-text-field v-bind="props" v-model.number="transferAmount" label="Transfer Amount:" />
+                  <v-text-field v-bind="props" v-model="transferAmount" label="Transfer Amount:" />
                 </input-tooltip>
               </input-validator>
             </form-validator>
             <v-card-actions>
               <v-spacer />
-              <v-btn color="anchor" :disabled="loadingAddressTransfer" @click="clearInput">
-                Clear
-              </v-btn>
+              <v-btn color="anchor" :disabled="loadingAddressTransfer" @click="clearInput"> Clear </v-btn>
 
               <v-btn
                 color="secondary"
@@ -147,7 +135,7 @@ const profileManagerController = useProfileManagerController();
 const activeTab = ref(0);
 const recipientTwinId = ref("");
 const isValidTwinIDTransfer = ref(false);
-const transferAmount = ref();
+const transferAmount = ref("");
 const amountRef = ref();
 const loadingTwinIDTransfer = ref(false);
 const loadingAddressTransfer = ref(false);
@@ -192,7 +180,7 @@ function isSameAddress(value: string) {
     return { message: "Cannot transfer to yourself" };
   }
 }
-const INVALID_ADDRESS = 'Invalid Address';
+const INVALID_ADDRESS = "Invalid Address";
 async function isValidAddress() {
   const keyring = new Keyring({ type: "sr25519" });
   try {
@@ -217,7 +205,7 @@ async function isValidAddress() {
   }
 }
 function clearInput() {
-  transferAmount.value = undefined;
+  transferAmount.value = "";
   recipientTwinId.value = "";
   recipientAddress.value = "";
   tick.value++;
@@ -228,7 +216,7 @@ async function transfer(recipientTwin: Twin) {
     if (gridStore) {
       await gridStore.client.balance.transfer({
         address: recipientTwin.accountId,
-        amount: transferAmount.value,
+        amount: parseFloat(transferAmount.value),
       });
       clearInput();
       createCustomToast("Transaction Complete!", ToastType.success);
