@@ -3,7 +3,7 @@ import type { GridClient } from "@threefold/grid_client";
 import { ProjectName } from "@/types";
 
 import { loadVM } from "./deploy_vm";
-import { getSubdomain, loadDeploymentGateways } from "./gateway";
+import { getDeploymentIps, getSubdomain, loadDeploymentGateways } from "./gateway";
 import { updateGrid } from "./grid";
 
 export interface DeleteDeploymentOptions {
@@ -40,14 +40,7 @@ export async function deleteDeployment(grid: GridClient, options: DeleteDeployme
 
   /* Delete deployment */
   if (options.k8s) {
-    const { gateways } = await loadDeploymentGateways(grid, { filter: () => true });
-    for (const gateway of gateways) {
-      try {
-        await grid.gateway.delete_name({ name: gateway.name });
-      } catch (error) {
-        console.error("Error while deleting k8s gateway.", error);
-      }
-    }
+    await deleteK8sGateways(grid, options.name);
     return grid.k8s.delete({ name: options.name });
   }
   // if Caprover deployment should handled by machines.delete
@@ -123,10 +116,12 @@ function isVm(projectName: string) {
   return false;
 }
 
-async function deleteVmGateways(grid: GridClient, ips?: string[]) {
+async function deleteGatewaysByIps(grid: GridClient, ips: string[]) {
+  if (!ips.length) return;
   const { gateways } = await loadDeploymentGateways(grid, {
-    filter: ips ? gw => gw.backends.some(bk => ips.some(ip => bk.includes(ip))) : undefined,
+    filter: gw => gw.backends.some(bk => ips.some(ip => bk.includes(ip))),
   });
+
   for (const gateway of gateways) {
     try {
       if (gateway.type.includes("name")) {
@@ -135,7 +130,28 @@ async function deleteVmGateways(grid: GridClient, ips?: string[]) {
         await grid.gateway.delete_fqdn(gateway);
       }
     } catch (error) {
-      console.log("Error while deleting vm gateway", error);
+      console.error(`Error while deleting gateway:`, error);
     }
+  }
+}
+
+async function deleteVmGateways(grid: GridClient, ips?: string[]) {
+  if (!ips || ips.length === 0) return;
+  await deleteGatewaysByIps(grid, ips);
+}
+
+async function deleteK8sGateways(grid: GridClient, deploymentName: string) {
+  try {
+    const k8sDeployment = await grid.k8s.getObj(deploymentName);
+
+    // Collect IPs from all cluster nodes (masters and workers)
+    const deploymentIps = [
+      ...(k8sDeployment.masters?.flatMap(getDeploymentIps) ?? []),
+      ...(k8sDeployment.workers?.flatMap(getDeploymentIps) ?? []),
+    ];
+
+    await deleteGatewaysByIps(grid, deploymentIps);
+  } catch (error) {
+    console.error("Error while loading K8s deployment for gateway deletion:", error);
   }
 }
