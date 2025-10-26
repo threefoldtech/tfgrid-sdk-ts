@@ -155,7 +155,7 @@ class BaseModule {
       if (!contract.contractType.nodeContract) continue;
       BaseModule.newContracts.push({
         contractID: String(contract.contractId),
-        createdAt: Date.now().toString(),
+        createdAt: Math.floor(Date.now() / 1000).toString(),
         updatedAt: Date.now().toString(),
         deploymentData: contract.contractType.nodeContract.deploymentData,
         deploymentHash: contract.contractType.nodeContract.deploymentHash,

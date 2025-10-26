@@ -799,7 +799,7 @@ PersistentKeepalive = 25\nEndpoint = ${endpoint}`;
     if (AddedContract?.contractType.nodeContract)
       Network.newContracts.push({
         contractID: String(AddedContract.contractId),
-        createdAt: Date.now().toString(),
+        createdAt: Math.floor(Date.now() / 1000).toString(),
         updatedAt: Date.now().toString(),
         deploymentData: AddedContract.contractType.nodeContract.deploymentData,
         deploymentHash: AddedContract.contractType.nodeContract.deploymentHash,
