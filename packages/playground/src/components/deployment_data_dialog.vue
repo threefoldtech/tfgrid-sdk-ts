@@ -71,7 +71,7 @@
               <CopyReadonlyInput
                 v-for="disk of contract.mounts"
                 :key="disk.name"
-                :label="getDiskLabel(disk)"
+                :label="`Disk ${disk.name}`"
                 :data="Math.ceil(disk.size / (1024 * 1024 * 1024))"
               />
               <CopyReadonlyInput
@@ -305,10 +305,6 @@ function getType(key: string): string {
   }
 
   return "text";
-}
-
-function getDiskLabel(disk: any) {
-  return `Disk ${disk.name}`;
 }
 
 function getMetadata(contract: DeploymentContract): { type: string; projectName: string } {
