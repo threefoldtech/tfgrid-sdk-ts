@@ -546,11 +546,19 @@ async function onDelete(k8s = false) {
             item[0].workloads[0].name as string,
           );
         } else {
+          // For K8s, collect IPs from all masters and workers
+          let deploymentIps: string[] = [];
+          if (k8s && item.masters && item.workers) {
+            deploymentIps = [...item.masters.flatMap(getDeploymentIps), ...item.workers.flatMap(getDeploymentIps)];
+          } else {
+            deploymentIps = getDeploymentIps(item);
+          }
+
           await deleteDeployment(updateGrid(grid!, { projectName: item.projectName }), {
             deploymentName: item.deploymentName,
             name: k8s ? item.deploymentName : item.name,
             projectName: item.projectName,
-            ip: getDeploymentIps(item),
+            ip: deploymentIps,
             k8s,
             isCaprover: item.projectName?.toLowerCase().includes(ProjectName.Caprover.toLowerCase()),
           });
