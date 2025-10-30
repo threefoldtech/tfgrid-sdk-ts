@@ -38,7 +38,7 @@
             tooltip-text="Mycelium is an IPv6 overlay network. Each node that joins the overlay network will receive an overlay network IP."
             label="Mycelium"
             :value="$props.mycelium"
-            :emit-function="undefined"
+            :emit-function="$attrs['onUpdate:mycelium']"
           />
 
           <NetworkItem
