@@ -59,20 +59,20 @@ class MachinesModule extends BaseModule {
       // Sets the network and contractMetadata based on the node's zos version
       const nodeTwinId = await this.capacity.getNodeTwinId(machine.node_id);
       const features = await this.rmb.request([nodeTwinId], "zos.system.node_features_get", "", 20, 3);
-      if (features.some(item => item.includes(Features.zmachinelight) || item.includes(Features.networklight))) {
-        network = new ZNetworkLight(options.network.name, options.network.ip_range, this.config);
+      if (features.includes(Features.wireguard)) {
+        network = new Network(options.network.name, options.network.ip_range, this.config);
         await network.load();
         contractMetadata = JSON.stringify({
-          version: 4,
+          version: 3,
           type: "vm",
           name: options.name,
           projectName: this.config.projectName || `vm/${options.name}`,
         });
       } else {
-        network = new Network(options.network.name, options.network.ip_range, this.config);
+        network = new ZNetworkLight(options.network.name, options.network.ip_range, this.config);
         await network.load();
         contractMetadata = JSON.stringify({
-          version: 3,
+          version: 4,
           type: "vm",
           name: options.name,
           projectName: this.config.projectName || `vm/${options.name}`,

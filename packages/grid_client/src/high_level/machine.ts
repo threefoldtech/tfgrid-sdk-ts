@@ -214,7 +214,7 @@ class VMHL extends HighLevelBase {
     }
     // Set networkContractMetadata based on node's zos version
     let networkContractMetadata;
-    if (nodeFeatures.includes(Features.network)) {
+    if (nodeFeatures.includes(Features.wireguard)) {
       networkContractMetadata = JSON.stringify({
         version: 3,
         type: "network",
@@ -292,7 +292,7 @@ class VMHL extends HighLevelBase {
         const d = await deploymentFactory.fromObj(deployment);
         for (const workload of d["workloads"]) {
           if (
-            workload.type !== WorkloadTypes.network ||
+            ![WorkloadTypes.network, WorkloadTypes.networklight].includes(workload.type) ||
             !Addr(network.ipRange).contains(Addr(workload.data["subnet"]))
           ) {
             continue;

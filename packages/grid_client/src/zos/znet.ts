@@ -27,6 +27,17 @@ class Peer {
 class Mycelium {
   @Expose() @IsString() @IsNotEmpty() hex_key: string;
   @Expose() @IsOptional() @IsString({ each: true }) peers?: string[];
+
+  challenge(): string {
+    let out = "";
+    out += this.hex_key || "";
+    if (this.peers) {
+      for (let i = 0; i < this.peers.length; i++) {
+        out += this.peers[i];
+      }
+    }
+    return out;
+  }
 }
 
 @ValidateMembers()
@@ -37,7 +48,7 @@ class Znet extends WorkloadData {
   @Expose() @IsString() @IsNotEmpty() wireguard_private_key: string;
   @Expose() @IsInt() @IsNotEmpty() wireguard_listen_port: number;
   @Expose() @Type(() => Peer) @ValidateNested({ each: true }) peers: Peer[];
-  @Expose() @Type(() => Mycelium) @ValidateNested() mycelium: Mycelium;
+  @Expose() @IsOptional() @Type(() => Mycelium) @ValidateNested() mycelium?: Mycelium;
 
   challenge(): string {
     let out = "";
@@ -49,10 +60,7 @@ class Znet extends WorkloadData {
     for (let i = 0; i < this.peers.length; i++) {
       out += this.peers[i].challenge();
     }
-    out += this.mycelium?.hex_key || "";
-    for (let i = 0; i < this.mycelium?.peers?.length; i++) {
-      out += this.mycelium?.peers[i] || "";
-    }
+    out += this.mycelium?.challenge();
     return out;
   }
 }

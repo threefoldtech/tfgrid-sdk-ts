@@ -954,7 +954,9 @@ class BaseModule {
         if (
           oldDeployment.workloads.filter(
             workload =>
-              (workload.type === WorkloadTypes.ip && workload.data["v4"]) || workload.type === WorkloadTypes.network,
+              (workload.type === WorkloadTypes.ip && workload.data["v4"]) ||
+              workload.type === WorkloadTypes.network ||
+              workload.type === WorkloadTypes.networklight,
           ).length > 0
         ) {
           continue;

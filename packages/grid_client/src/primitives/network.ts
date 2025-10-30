@@ -11,6 +11,7 @@ import { RMB } from "../clients/rmb/client";
 import { TFClient } from "../clients/tf-grid/client";
 import { GqlNodeContract } from "../clients/tf-grid/contracts";
 import { GridClientConfig } from "../config";
+import { Features } from "../helpers";
 import { events } from "../helpers/events";
 import { formatErrorMessage, generateRandomHexSeed, getRandomNumber, randomChoice } from "../helpers/utils";
 import { validateHexSeed } from "../helpers/validator";
@@ -256,10 +257,13 @@ class Network {
     this.updateNetworkDeployments();
     znet = this.getUpdatedNetwork(znet);
 
+    const nodeFeatures = (await this.capacity.getNode(nodeId)).features;
+    const networkType = nodeFeatures.includes(Features.network) ? Features.network : Features.networklight;
+
     const znet_workload = new Workload();
     znet_workload.version = 0;
     znet_workload.name = this.name;
-    znet_workload.type = WorkloadTypes.network;
+    znet_workload.type = networkType == Features.network ? WorkloadTypes.network : WorkloadTypes.networklight;
     znet_workload.data = znet;
     znet_workload.metadata = "";
     znet_workload.description = description;
@@ -305,9 +309,9 @@ class Network {
   updateNetworkDeployments(): void {
     for (const net of this.networks) {
       for (const deployment of this.deployments) {
-        const workloads = deployment["workloads"];
+        const workloads = deployment.workloads;
         for (const workload of workloads) {
-          if (workload["type"] !== WorkloadTypes.network) {
+          if (![WorkloadTypes.network, WorkloadTypes.networklight].includes(workload.type)) {
             continue;
           }
           if (net.subnet === workload["data"]["subnet"]) {
@@ -315,7 +319,7 @@ class Network {
             break;
           }
         }
-        deployment["workloads"] = workloads;
+        deployment.workloads = workloads;
       }
     }
   }
@@ -352,7 +356,7 @@ class Network {
         res["node_id"] = node.node_id;
         for (const workload of res["workloads"]) {
           if (
-            workload["type"] !== WorkloadTypes.network ||
+            ![WorkloadTypes.network, WorkloadTypes.networklight].includes(workload.type) ||
             !Addr(this.ipRange).contains(Addr(workload["data"]["subnet"]))
           ) {
             continue;
@@ -388,7 +392,10 @@ class Network {
       res["node_id"] = contract.nodeID;
       for (const workload of res.workloads) {
         const data = workload.data as Znet;
-        if (workload.type !== WorkloadTypes.network || workload.name !== this.name) {
+        if (
+          ![WorkloadTypes.network, WorkloadTypes.networklight].includes(workload.type) ||
+          workload.name !== this.name
+        ) {
           continue;
         }
         if (workload.result.state === "deleted") {
