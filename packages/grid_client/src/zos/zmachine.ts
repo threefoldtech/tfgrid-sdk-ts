@@ -32,7 +32,7 @@ class ZmachineNetwork {
   @Expose() @IsString() @IsDefined() public_ip: string;
   @Expose() @Type(() => ZNetworkInterface) @ValidateNested({ each: true }) interfaces: ZNetworkInterface[];
   @Expose() @IsBoolean() planetary: boolean;
-  @Expose() @Type(() => MyceliumIP) @ValidateNested() mycelium: MyceliumIP;
+  @Expose() @IsOptional() @Type(() => MyceliumIP) @ValidateNested() mycelium?: MyceliumIP;
 
   challenge(): string {
     let out = "";
@@ -79,8 +79,10 @@ class Zmachine extends WorkloadData {
     out += this.network.challenge();
     out += this.size || "0";
     out += this.compute_capacity.challenge();
-    for (let i = 0; i < this.mounts.length; i++) {
-      out += this.mounts[i].challenge();
+    if (this.mounts) {
+      for (let i = 0; i < this.mounts.length; i++) {
+        out += this.mounts[i].challenge();
+      }
     }
     out += this.entrypoint;
     for (const key of Object.keys(this.env).sort()) {
