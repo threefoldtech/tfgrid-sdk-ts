@@ -216,7 +216,12 @@ class TFContracts extends Contracts {
       }
 
       if (options.projectName) {
-        filterQuery += `{ deploymentData_contains: \"\\\"projectName\\\":\\\"${options.projectName}\" }`;
+        // Match projectName with slash (new format) OR closing brace (old format)
+        // Prevents substring false positives: "vm" won't match "fullvm" or misnamed contracts
+        filterQuery += `{ OR: [
+          { deploymentData_contains: \"\\\"projectName\\\":\\\"${options.projectName}/\" },
+          { deploymentData_contains: \"\\\"projectName\\\":\\\"${options.projectName}\\\"}\" }
+        ]}`;
       }
 
       filterQuery += "]";
