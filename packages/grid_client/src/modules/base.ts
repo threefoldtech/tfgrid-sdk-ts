@@ -270,8 +270,10 @@ class BaseModule {
       const alreadyFetchedContracts: GqlNodeContract[] = [];
 
       for (const contract of BaseModule.newContracts) {
-        if (!contract.parsedDeploymentData?.projectName.includes(this.projectName)) continue;
-        if (contract.parsedDeploymentData.type !== moduleName) continue;
+        if (this.projectName) {
+          if (!contract.parsedDeploymentData?.projectName?.startsWith(this.projectName)) continue;
+        }
+        if (contract.parsedDeploymentData?.type !== moduleName) continue;
 
         const filteredContract = contracts.filter(c => c.contractID === contract.contractID);
 
