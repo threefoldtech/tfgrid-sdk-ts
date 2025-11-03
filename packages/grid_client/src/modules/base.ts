@@ -271,7 +271,7 @@ class BaseModule {
 
       for (const contract of BaseModule.newContracts) {
         if (this.projectName) {
-          if (!contract.parsedDeploymentData?.projectName?.startsWith(this.projectName + "/")) continue;
+          if (!contract.parsedDeploymentData?.projectName?.startsWith(this.projectName)) continue;
         }
         if (contract.parsedDeploymentData?.type !== moduleName) continue;
 
