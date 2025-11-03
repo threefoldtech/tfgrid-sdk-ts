@@ -271,9 +271,7 @@ class BaseModule {
 
       for (const contract of BaseModule.newContracts) {
         if (this.projectName) {
-          const pName = contract.parsedDeploymentData?.projectName;
-          // Match exact OR prefix with slash (prevents "vm" from matching "fullvm")
-          if (pName !== this.projectName && !pName?.startsWith(this.projectName + "/")) continue;
+          if (!contract.parsedDeploymentData?.projectName?.startsWith(this.projectName + "/")) continue;
         }
         if (contract.parsedDeploymentData?.type !== moduleName) continue;
 
