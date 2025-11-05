@@ -33,20 +33,6 @@ While you're creating a new release you also have to create a new tag the same a
 
 Once you release, Publish workflow will start and will push the new released version to npm and build containers for the released projects.
 
-## Create a new issue on [tf_operations](https://github.com/threefoldtech/tf_operations)
+## Edit The [toml file](https://github.com/threefoldtech/home/blob/master/wiki/products/v3/tfgrid_3.18.toml)
 
-Create a new issue for each project of type `Update Request` (Playground & Stats) and mention the following:
-
-- **Release link**
-
-  Make sure to change the '<tag>' in the link with the required tag
-
-- **Charts directory link**
-
-  Links will differ as the per the package:
-
-  - [playground-charts](https://github.com/threefoldtech/tfgrid-sdk-ts/tree/<tag>/packages/playground/playground-charts/)
-
-Newly created issue should look like this:
-
-![image](https://user-images.githubusercontent.com/40770501/214016988-96a378a6-cb8b-4e15-aeb2-2c44576f9133.png)
+You should edit the toml file with the new release
