@@ -165,6 +165,12 @@ class Nodes {
     return tfclient.contracts
       .get({ id: contractId })
       .then(contract => {
+        if (!contract) {
+          throw new ValidationError(`Contract with ID ${contractId} not found or has been deleted.`);
+        }
+        if (!contract.contractType) {
+          throw new ValidationError(`Contract with ID ${contractId} has no contract type.`);
+        }
         if (contract.contractType.nameContract)
           throw new ValidationError(`Couldn't get node id for this contract ${contractId}. It's a name contract.`);
         return contract.contractType?.nodeContract?.nodeId || contract.contractType?.rentContract?.nodeId;
