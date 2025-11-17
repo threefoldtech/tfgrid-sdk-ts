@@ -48,7 +48,7 @@ export default {
   setup() {
     const priceTask = useAsync<number, string>(
       async () => {
-        const [price, error] = await resolveAsync(queryClient.tftPrice.get());
+        const [price, error] = await resolveAsync(queryClient.tftPrice.getTFTBillingRate());
         if (!price || error) {
           throw `Failed to load TFT price. Please click to reload.`;
         }

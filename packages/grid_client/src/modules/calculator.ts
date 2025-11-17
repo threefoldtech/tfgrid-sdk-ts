@@ -149,7 +149,7 @@ class Calculator {
   @expose
   @validateInput
   async tftPrice(): Promise<number> {
-    const pricing = await this.client.tftPrice.get();
+    const pricing = await this.client.tftPrice.getTFTBillingRate();
     return this.client instanceof TFClient ? pricing : pricing / 1000;
   }
 

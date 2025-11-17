@@ -387,7 +387,7 @@ class TFContracts extends Contracts {
    */
   private async convertToTFT(USD: Decimal) {
     try {
-      const tftPrice = (await this.client.tftPrice.get()) ?? 0;
+      const tftPrice = (await this.client.tftPrice.getTFTBillingRate()) ?? 0;
       const tft = new currency(tftPrice, 15).convertUSDtoTFT({ amount: USD.toNumber() });
       return new Decimal(tft);
     } catch (error) {
