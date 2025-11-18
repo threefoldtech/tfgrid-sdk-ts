@@ -2,7 +2,7 @@
   <input-tooltip :tooltip="$props.tooltip as string" :disabled="insetTooltip">
     <VAutocomplete
       v-model:menu="menuOpened"
-      v-model:search.trim="searchQuery"
+      :search="searchQuery"
       label="Farm Name"
       placeholder="Select a farm"
       class="w-100 mb-1"
@@ -15,6 +15,7 @@
       prepend-inner-icon="mdi-magnify"
       :focused="focused"
       spellcheck="false"
+      no-filter
       :hint="
         !validFilters
           ? 'Please provide valid data.'
@@ -35,7 +36,7 @@
       @update:model-value="bindModelValue"
       @click:clear="onClear()"
       @update:focused="updateFocused($event)"
-      @keyup="searchForFarms"
+      @update:search="handleSearchUpdate"
     >
       <template v-if="searchTask.loading" #no-data>
         <div class="d-flex pa-2">
@@ -78,7 +79,7 @@
 
 <script lang="ts">
 import type { FarmInfo } from "@threefold/grid_client";
-import { computed, nextTick, onUnmounted, type PropType, ref } from "vue";
+import { computed, nextTick, onUnmounted, type PropType, ref, watch } from "vue";
 
 import { useAsync, usePagination, useWatchDeep } from "../../hooks";
 import { useGrid } from "../../stores";
@@ -164,48 +165,64 @@ export default {
 
     /* Load farms with search */
     const searchTask = useAsync(searchFarms, { shouldRun: () => props.validFilters });
-    let oldSearchQuery = "";
     const searchQuery = ref("");
+    let isClearing = false;
 
     const menuOpened = ref(false);
     const focused = ref(false);
-    async function updateFocused(focus: boolean) {
+
+    watch(
+      () => props.modelValue,
+      (newVal, oldVal) => {
+        if (!newVal && oldVal) onClear();
+      },
+    );
+    function updateFocused(focus: boolean) {
       focused.value = focus;
-      if (focus) {
-        await nextTick();
-        searchQuery.value = oldSearchQuery;
+    }
+
+    function handleSearchUpdate(value: string) {
+      if (isClearing) return;
+
+      const trimmedValue = value?.trim() || "";
+
+      if (trimmedValue === "All Farms") return;
+      if (trimmedValue === "" && searchQuery.value !== "" && menuOpened.value) return;
+
+      if (searchQuery.value !== trimmedValue) {
+        searchQuery.value = trimmedValue;
+        searchForFarms();
       }
     }
 
     function searchForFarms() {
-      if (oldSearchQuery === searchQuery.value) {
-        return;
-      }
-
-      oldSearchQuery = searchQuery.value;
-
-      if (!oldSearchQuery) {
+      if (!searchQuery.value) {
         return searchTask.value.reset();
       }
 
-      return searchTask.value.run(oldSearchQuery);
+      return searchTask.value.run(searchQuery.value);
     }
 
     function onClear() {
-      bindModelValue();
+      if (isClearing) return;
+
+      isClearing = true;
       searchTask.value.reset();
-      oldSearchQuery = "";
+      searchQuery.value = "";
+      ctx.emit("update:model-value", undefined);
+
+      setTimeout(() => {
+        isClearing = false;
+      }, 100);
     }
 
     /* Farms to be shown */
     const farms = computed(() => {
-      const res = [_defaultFarm];
-
       if ((focused.value || menuOpened.value) && searchTask.value.initialized) {
-        return res.concat(searchTask.value.data || []);
+        const searchResults = searchTask.value.data || [];
+        return searchResults.length > 0 ? [_defaultFarm, ...searchResults] : searchResults;
       }
-
-      return res.concat(loadedFarms.value);
+      return [_defaultFarm, ...loadedFarms.value];
     });
 
     onUnmounted(bindModelValue);
@@ -225,6 +242,7 @@ export default {
       focused,
       updateFocused,
       searchQuery,
+      handleSearchUpdate,
       searchForFarms,
 
       onClear,
