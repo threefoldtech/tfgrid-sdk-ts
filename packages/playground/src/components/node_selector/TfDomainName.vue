@@ -104,7 +104,7 @@
 
 <script lang="ts">
 import { type FarmInfo, Features, type FilterOptions, type NodeInfo } from "@threefold/grid_client";
-import { noop } from "lodash";
+import noop from "lodash/fp/noop.js";
 import { computed, getCurrentInstance, nextTick, onMounted, onUnmounted, type PropType, ref, watch } from "vue";
 
 import { type InputValidatorService, useInputRef } from "@/hooks/input_validator";
@@ -114,7 +114,7 @@ import { useForm, useFormRef, ValidatorStatus } from "../../hooks/form_validator
 import { useWatchDeep } from "../../hooks/useWatchDeep";
 import { useGrid } from "../../stores";
 import type { DomainInfo, NetworkFeatures, SelectionDetailsFilters } from "../../types/nodeSelector";
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- Used in template
 import type { INode } from "../../utils/filter_nodes";
 import { getNodePageCount, loadNodes } from "../../utils/nodeSelector";
 

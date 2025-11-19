@@ -235,7 +235,7 @@
 <script lang="ts">
 import { QueryClient } from "@threefold/tfchain_client";
 import { computed, ref, watch } from "vue";
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- Used in template
 import type { VForm } from "vuetify/components/VForm";
 
 import { manual } from "@/utils/manual";
