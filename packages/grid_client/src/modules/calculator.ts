@@ -149,8 +149,12 @@ class Calculator {
   @expose
   @validateInput
   async tftPrice(): Promise<number> {
-    const pricing = await this.client.tftPrice.getTFTBillingRate();
-    return this.client instanceof TFClient ? pricing : pricing / 1000;
+    if (this.client instanceof TFClient) {
+      return await this.client.tftPrice.getTFTBillingRateUSD();
+    } else {
+      const pricing = await this.client.tftPrice.getTFTBillingRateMUSD();
+      return pricing / 1000;
+    }
   }
 
   /**

@@ -514,7 +514,7 @@ async function getTotalCost() {
     loadingTotalCost.value = true;
     const res = await gridProxyClient.twins.getConsumption(profileManager.profile!.twinId);
     totalTFT.value = +(res.last_hour_consumption || 0).toFixed(3);
-    const tftPrice = await queryClient.tftPrice.getTFTBillingRate();
+    const tftPrice = await queryClient.tftPrice.getTFTBillingRateMUSD();
     totalCostUSD.value = +(totalTFT.value * (tftPrice / 1000)).toFixed(3);
   } catch (error: any) {
     totalTFT.value = 0;
