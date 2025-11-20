@@ -306,6 +306,7 @@ class Capacity {
       options.hddDisks,
       options.rootfsDisks,
       options.nodeId,
+      options.nodeTwinId,
     );
   }
 

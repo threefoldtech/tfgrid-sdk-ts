@@ -603,17 +603,16 @@ class Nodes {
     hddDisks: number[],
     rootFileSystemDisks: number[],
     nodeId: number,
+    nodeTwinId?: number,
   ): Promise<boolean> {
     const ssdPools: number[] = [];
     const hddPools: number[] = [];
 
     try {
-      const nodeTwinId = await this.getNodeTwinId(nodeId);
-      ((await this.rmb.request([nodeTwinId], "zos.storage.pools", "")) as StoragePool[]).forEach(
-        (disk: StoragePool) => {
-          disk.type === DiskTypes.SSD ? ssdPools.push(disk.size - disk.used) : hddPools.push(disk.size - disk.used);
-        },
-      );
+      const twinId = nodeTwinId ?? (await this.getNodeTwinId(nodeId));
+      ((await this.rmb.request([twinId], "zos.storage.pools", "")) as StoragePool[]).forEach((disk: StoragePool) => {
+        disk.type === DiskTypes.SSD ? ssdPools.push(disk.size - disk.used) : hddPools.push(disk.size - disk.used);
+      });
     } catch (e) {
       (e as Error).message = formatErrorMessage(`Error getting node ${nodeId}`, e);
       throw e;

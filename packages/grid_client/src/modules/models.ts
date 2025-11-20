@@ -605,6 +605,7 @@ class CapacityPoolCheckModel {
   @Expose() @IsInt({ each: true }) @Min(0, { each: true }) rootfsDisks: number[]; //Byte
   @Expose() @IsInt({ each: true }) @Min(250 * 1024 ** 2, { each: true }) ssdDisks: number[]; //Byte
   @Expose() @IsInt({ each: true }) @Min(250 * 1024 ** 2, { each: true }) hddDisks: number[]; //Byte
+  @Expose() @IsOptional() @IsInt() @Min(1) nodeTwinId?: number;
 }
 
 class PingNodeOptionsModel {
