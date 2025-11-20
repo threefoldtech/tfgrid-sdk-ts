@@ -33,6 +33,6 @@ While you're creating a new release you also have to create a new tag the same a
 
 Once you release, Publish workflow will start and will push the new released version to npm and build containers for the released projects.
 
-## Edit The [toml file](https://github.com/threefoldtech/home/blob/master/wiki/products/v3/tfgrid_3.18.toml)
+## Edit The [toml file](https://github.com/threefoldtech/home/blob/master/wiki/products/v3)
 
-You should edit the toml file with the new release
+Create a new toml file with the new release in v3 directory
