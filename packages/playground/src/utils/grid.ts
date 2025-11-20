@@ -90,7 +90,7 @@ export async function loadBalance(grid: GridClient): Promise<Balance> {
 export async function loadProfile(grid: GridClient): Promise<Profile> {
   return {
     mnemonic: grid.clientOptions!.mnemonic,
-    ssh: await readSSH(grid),
+    ssh: (await readSSH(grid)) ?? [],
     twinId: grid!.twinId,
     address: grid.tfclient.address,
     relay: grid.getDefaultUrls(network).relay.slice(6),
