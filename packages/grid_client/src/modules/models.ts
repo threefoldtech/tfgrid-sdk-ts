@@ -591,6 +591,7 @@ class ContractState {
 
 class NodeFreeResourcesModel {
   @Expose() @IsInt() @Min(1) nodeId: number;
+  @Expose() @IsOptional() @IsInt() @Min(1) nodeTwinId?: number;
 }
 
 class FarmIdFromFarmNameModel {
