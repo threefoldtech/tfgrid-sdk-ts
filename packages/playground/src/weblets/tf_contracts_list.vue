@@ -308,7 +308,7 @@ const password = ref("");
 const isValidForm = ref<boolean>(false);
 
 const panel = ref<number[]>([0, 1, 2]);
-const nodeInfo: Ref<{ [nodeId: number]: { status: NodeStatus; farmId: number } }> = ref({});
+const nodeInfo: Ref<{ [nodeId: number]: { status: NodeStatus } }> = ref({});
 const unlockContractLoading = ref<boolean>(false);
 const contractsTable = ref<(typeof ContractsTable)[]>([]);
 const loadingLockDetails = ref(false);
