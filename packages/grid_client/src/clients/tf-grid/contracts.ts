@@ -107,6 +107,11 @@ export interface GetConsumptionOptions {
   graphqlURL: string;
   id: number;
 }
+export interface GetConsumptionsOptions {
+  graphqlURL: string;
+  contractIds: number[];
+  contractCreatedAt: Map<number, number>;
+}
 export interface Consumption {
   amountBilled: number;
   discountReceived: DiscountLevel;
@@ -338,6 +343,95 @@ class TFContracts extends Contracts {
       }
     } catch (err) {
       (err as Error).message = formatErrorMessage(`Error getting consumption for contract ${options.id}.`, err);
+      throw err;
+    }
+  }
+
+  private calculateConsumption(
+    reports: GqlContractBillReports[],
+    contractId: number,
+    contractCreatedAt: Map<number, number>,
+  ): Consumption {
+    if (reports.length === 0) {
+      return { amountBilled: 0, discountReceived: "None" };
+    }
+
+    let duration = 1;
+    const amountBilled = new Decimal(reports[0].amountBilled);
+
+    if (reports.length === 2) {
+      duration = (reports[0].timestamp - reports[1].timestamp) / 3600; // one hour
+    } else {
+      const createdAt = contractCreatedAt.get(contractId);
+      if (createdAt) {
+        duration = (reports[0].timestamp - createdAt) / 3600;
+      }
+    }
+
+    return {
+      amountBilled: amountBilled
+        .div(duration || 1)
+        .div(10 ** 7)
+        .toNumber(),
+      discountReceived: reports[0].discountReceived,
+    };
+  }
+
+  /**
+   * Get consumption details for multiple contracts at once.
+   * This reduces the number of GraphQL queries by fetching all billing reports in a single request.
+   *
+   * @param {GetConsumptionsOptions} options
+   * @returns {Promise<Map<number, Consumption>>} A map of contract ID to consumption details
+   */
+  async getConsumptions(options: GetConsumptionsOptions): Promise<Map<number, Consumption>> {
+    if (options.contractIds.length === 0) {
+      return new Map();
+    }
+
+    const gqlClient = new Graphql(options.graphqlURL);
+    const contractIds = options.contractIds.map(id => id.toString());
+    const whereClause = `{contractID_in: [${contractIds.join(", ")}]}`;
+    const body = `query getConsumptions {
+            contractBillReports(where: ${whereClause}, orderBy: timestamp_DESC) {
+                contractID
+                amountBilled
+                timestamp
+                discountReceived
+            }
+          }`;
+
+    try {
+      const response = await gqlClient.query(body);
+      const billReports: GqlContractBillReports[] = (
+        response["data"] as { contractBillReports: GqlContractBillReports[] }
+      ).contractBillReports;
+
+      // Group reports by contract ID, keeping only the latest 2 per contract
+      const reportsByContract = new Map<number, GqlContractBillReports[]>();
+      for (const report of billReports) {
+        const contractId = +report.contractID;
+        const reports = reportsByContract.get(contractId) || [];
+        if (reports.length < 2) {
+          reports.push(report);
+          reportsByContract.set(contractId, reports);
+        }
+      }
+
+      // Calculate consumption for each contract
+      const consumptions = new Map<number, Consumption>();
+      for (const contractId of options.contractIds) {
+        const reports = reportsByContract.get(contractId) || [];
+        const consumption = this.calculateConsumption(reports, contractId, options.contractCreatedAt);
+        consumptions.set(contractId, consumption);
+      }
+
+      return consumptions;
+    } catch (err) {
+      (err as Error).message = formatErrorMessage(
+        `Error getting consumptions for contracts [${options.contractIds.join(", ")}].`,
+        err,
+      );
       throw err;
     }
   }

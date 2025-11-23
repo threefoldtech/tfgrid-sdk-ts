@@ -33,6 +33,7 @@ import {
   BatchCancelContractsModel,
   ContractCancelModel,
   ContractConsumption,
+  ContractConsumptions,
   ContractDiscountPackage,
   ContractGetByNodeIdAndHashModel,
   ContractGetModel,
@@ -553,6 +554,30 @@ class Contracts {
   @validateInput
   async getConsumption(options: ContractConsumption): Promise<Consumption> {
     return this.client.contracts.getConsumption({ id: options.id, graphqlURL: this.config.graphqlURL });
+  }
+
+  /**
+   * Get consumption details for multiple contracts at once.
+   * This reduces the number of GraphQL queries by fetching all billing reports in a single request.
+   *
+   * @param {ContractConsumptions} options - The options containing contract IDs and their creation timestamps
+   * @returns {Promise<Map<number, Consumption>>} A map of contract ID to consumption details
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   */
+  @expose
+  @validateInput
+  async getConsumptions(options: ContractConsumptions): Promise<Map<number, Consumption>> {
+    const contractCreatedAt = new Map<number, number>();
+    Object.entries(options.contractCreatedAt).forEach(([key, value]) => {
+      contractCreatedAt.set(+key, value);
+    });
+    return this.client.contracts.getConsumptions({
+      graphqlURL: this.config.graphqlURL,
+      contractIds: options.contractIds,
+      contractCreatedAt,
+    });
   }
 
   /**

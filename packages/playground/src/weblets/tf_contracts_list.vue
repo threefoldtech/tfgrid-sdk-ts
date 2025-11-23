@@ -60,7 +60,7 @@
         :disabled="loadingContracts || loadingTotalCost"
         @click="
           contractsTable.forEach(t => t.reset());
-          loadContracts();
+          loadContracts(undefined, undefined, true);
         "
       >
         refresh
@@ -253,7 +253,7 @@
 </template>
 
 <script lang="ts" setup>
-import type { ContractsOverdue, GridClient } from "@threefold/grid_client";
+import type { Consumption, ContractsOverdue, GridClient } from "@threefold/grid_client";
 import { type Contract, ContractState, NodeStatus, SortByContracts, SortOrder } from "@threefold/gridproxy_client";
 import { DeploymentKeyDeletionError } from "@threefold/types";
 import { computed, defineComponent, onMounted, type Ref, ref } from "vue";
@@ -318,9 +318,22 @@ const nodeIDs = computed(() => {
 });
 // To avoid multiple requests
 const cachedNodeIDs = ref<number[]>([]);
+// Cache to store consumption data (updates hourly, cache for 5 minutes)
+const CONSUMPTION_CACHE: { [key: number]: { consumption: Consumption; timestamp: number } } = {};
+const CONSUMPTION_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+let CONSUMPTION_CACHE_LOADED = false;
+
 onMounted(() => {
   loadContracts();
 });
+
+function getConsumptionFromCache(contractId: number): Consumption | undefined {
+  const cached = CONSUMPTION_CACHE[contractId];
+  if (cached && Date.now() - cached.timestamp <= CONSUMPTION_CACHE_TTL) {
+    return cached.consumption;
+  }
+  return undefined;
+}
 
 async function _normalizeContracts(
   contracts: Contract[],
@@ -329,13 +342,57 @@ async function _normalizeContracts(
   const normalizedContracts = await Promise.all(
     contracts.map(async contract => {
       try {
-        return await normalizeContract(grid, contract, contractType);
+        const id = Number(contract.contract_id);
+        const consumption = getConsumptionFromCache(id);
+        return await normalizeContract(grid, contract, contractType, consumption);
       } catch (error) {
         failedContracts.value.push(contract.contract_id);
       }
     }),
   );
   return normalizedContracts.filter(Boolean) as NormalizedContract[];
+}
+
+function extractContractData(contracts: any[]): { ids: number[]; createdAt: Record<string, number> } {
+  const ids: number[] = [];
+  const createdAt: Record<string, number> = {};
+  for (const contract of contracts) {
+    const id = Number(contract.contractID);
+    ids.push(id);
+    createdAt[id.toString()] = +contract.createdAt;
+  }
+  return { ids, createdAt };
+}
+
+async function loadAllConsumptions() {
+  try {
+    const allContracts = await grid.contracts.listMyContracts();
+    const allContractIds: number[] = [];
+    const allContractCreatedAt: Record<string, number> = {};
+
+    // Collect contract IDs from all types
+    const nameData = extractContractData(allContracts.nameContracts || []);
+    const nodeData = extractContractData(allContracts.nodeContracts || []);
+    const rentData = extractContractData(allContracts.rentContracts || []);
+
+    allContractIds.push(...nameData.ids, ...nodeData.ids, ...rentData.ids);
+    Object.assign(allContractCreatedAt, nameData.createdAt, nodeData.createdAt, rentData.createdAt);
+
+    if (allContractIds.length > 0) {
+      const consumptions = await grid.contracts.getConsumptions({
+        contractIds: allContractIds,
+        contractCreatedAt: allContractCreatedAt,
+      });
+
+      const now = Date.now();
+      for (const [contractId, consumption] of consumptions.entries()) {
+        CONSUMPTION_CACHE[contractId] = { consumption, timestamp: now };
+      }
+      CONSUMPTION_CACHE_LOADED = true;
+    }
+  } catch (error) {
+    console.warn("Failed to preload all consumptions", error);
+  }
 }
 
 async function loadContractsByType(
@@ -373,7 +430,11 @@ async function loadContractsByType(
   }
 }
 
-async function loadContracts(type?: ContractType, options?: { sort: { key: string; order: "asc" | "desc" }[] }) {
+async function loadContracts(
+  type?: ContractType,
+  options?: { sort: { key: string; order: "asc" | "desc" }[] },
+  clearCache = false,
+) {
   loadingContracts.value = true;
   if (!type) {
     lockedContracts.value = undefined;
@@ -384,26 +445,28 @@ async function loadContracts(type?: ContractType, options?: { sort: { key: strin
   contracts.value = [];
   cachedNodeIDs.value = [];
   failedContracts.value = [];
+
+  // Clear consumption cache on manual refresh
+  if (clearCache) {
+    Object.keys(CONSUMPTION_CACHE).forEach(key => delete CONSUMPTION_CACHE[+key]);
+    CONSUMPTION_CACHE_LOADED = false;
+  }
+
   try {
     if (type) {
-      switch (type) {
-        case ContractType.Name:
-          await loadContractsByType(ContractType.Name, nameContracts, options);
-          break;
-        case ContractType.Node:
-          await loadContractsByType(ContractType.Node, nodeContracts, options);
-          break;
-        case ContractType.Rent:
-          await loadContractsByType(ContractType.Rent, rentContracts, options);
-          break;
-      }
+      const table = contractsTables.find(t => t.type === type);
+      if (table) await loadContractsByType(type, table.contracts, options);
     } else {
-      await Promise.all([
-        loadContractsByType(ContractType.Name, nameContracts, options),
-        loadContractsByType(ContractType.Node, nodeContracts, options),
-        loadContractsByType(ContractType.Rent, rentContracts, options),
-      ]);
+      if (!CONSUMPTION_CACHE_LOADED) {
+        await loadAllConsumptions();
+      }
+      await Promise.all(
+        contractsTables.map(async table => {
+          await loadContractsByType(table.type, table.contracts);
+        }),
+      );
     }
+
     const failedContractsLength = failedContracts.value.length;
     if (failedContractsLength > 0)
       loadingErrorMessage.value = `Failed to load details of the following contract${

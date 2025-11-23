@@ -36,6 +36,7 @@ export async function normalizeContract(
   grid: GridClient,
   c: { [key: string]: any },
   type: ContractType,
+  consumption?: Consumption,
 ): Promise<NormalizedContract> {
   const id = +c.contract_id;
 
@@ -53,11 +54,15 @@ export async function normalizeContract(
     expiration = new Date(exp).toLocaleString();
   }
 
-  let consumption: Consumption;
-  try {
-    consumption = await grid.contracts.getConsumption({ id });
-  } catch {
-    consumption = { amountBilled: 0, discountReceived: "None" };
+  let contractConsumption: Consumption;
+  if (consumption) {
+    contractConsumption = consumption;
+  } else {
+    try {
+      contractConsumption = await grid.contracts.getConsumption({ id });
+    } catch {
+      contractConsumption = { amountBilled: 0, discountReceived: "None" };
+    }
   }
 
   return {
@@ -75,8 +80,8 @@ export async function normalizeContract(
     solutionName: data.name || "-",
     solutionType: data.projectName || data.type || "-",
     expiration,
-    consumption: consumption.amountBilled,
-    discountPackage: consumption.discountReceived,
+    consumption: contractConsumption.amountBilled,
+    discountPackage: contractConsumption.discountReceived,
   };
 }
 
