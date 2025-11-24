@@ -262,7 +262,7 @@ watch(
       balance.value = undefined;
     }
   },
-  { immediate: true, deep: true },
+  { immediate: true },
 );
 
 function logout() {

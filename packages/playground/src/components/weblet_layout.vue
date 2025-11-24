@@ -344,18 +344,15 @@ const onlyIPV4TftPrice = ref<number>();
 const onlyIPV4UsdPrice = ref<number>();
 
 watch(
-  () => [props.cpu, props.memory, props.disk, props.ipv4, props.dedicated, props.selectedNode],
-  debounce((value, oldValue) => {
-    if (
-      oldValue &&
-      value[0] === oldValue[0] &&
-      value[1] === oldValue[1] &&
-      value[2] === oldValue[2] &&
-      value[3] === oldValue[3] &&
-      value[4] === oldValue[4] &&
-      value[5] === oldValue[5]
-    )
-      return;
+  [
+    () => props.cpu,
+    () => props.memory,
+    () => props.disk,
+    () => props.ipv4,
+    () => props.dedicated,
+    () => props.selectedNode,
+  ],
+  debounce(() => {
     shouldUpdateCost.value = true;
   }, 500),
   { immediate: true },
