@@ -322,6 +322,7 @@ import { type Contract, ContractState, type NodeStatus } from "@threefold/gridpr
 import { TFChainError } from "@threefold/tfchain_client";
 import { DeploymentKeyDeletionError } from "@threefold/types";
 import { capitalize, computed, defineComponent, onUnmounted, type PropType, type Ref, ref, watch } from "vue";
+import { useDocumentVisibility } from "@vueuse/core";
 
 import { useProfileManagerController } from "@/components/profile_manager_controller.vue";
 import type { VDataTableHeader } from "@/types";
@@ -423,6 +424,8 @@ const freeBalance = computed(() => balance.value?.free ?? 0);
 const unlockContractLoading = ref(false);
 const unlockDialog = ref(false);
 const rentContracts = ref<{ [key: number]: number }>({}); // to store the node id with its rent contract
+const visibility = useDocumentVisibility();
+const isVisible = computed(() => visibility.value === "visible");
 const timeouts: ReturnType<typeof setTimeout>[] = [];
 const selectedLockedContracts = computed(() => {
   if (selectedContracts.value.length == 0) return false;
@@ -616,8 +619,11 @@ async function unlockContract(contractId: number[]) {
       `Your request to unlock contract ${contractId} has been processed successfully. Changes may take a few minutes to reflect`,
       ToastType.info,
     );
-    const timeoutId = setTimeout(() => emits("update:unlock-contracts"), 30000);
-    timeouts.push(timeoutId);
+    // Only schedule refresh if tab is visible
+    if (isVisible.value) {
+      const timeoutId = setTimeout(() => emits("update:unlock-contracts"), 30000);
+      timeouts.push(timeoutId);
+    }
     contractStateDialog.value = false;
     unlockDialog.value = false;
     selectedContracts.value = [];
@@ -630,6 +636,14 @@ async function unlockContract(contractId: number[]) {
 }
 watch(contractStateDialog, contractStateDialog => {
   if (!contractStateDialog) selectedItem.value = undefined;
+});
+
+// Cleanup timeouts when tab becomes inactive
+watch(isVisible, visible => {
+  if (!visible) {
+    timeouts.forEach(timeout => clearTimeout(timeout));
+    timeouts.length = 0;
+  }
 });
 
 onUnmounted(() => {

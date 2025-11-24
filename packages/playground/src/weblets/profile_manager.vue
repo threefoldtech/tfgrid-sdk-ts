@@ -164,6 +164,7 @@
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { nextTick } from "vue";
 import { useTheme } from "vuetify";
+import { useDocumentVisibility } from "@vueuse/core";
 
 import router from "@/router";
 import { AppThemeSelection } from "@/utils/app_theme";
@@ -247,29 +248,56 @@ const profileManagerController = useProfileManagerController();
 const balance = profileManagerController.balance;
 const freeBalance = computed(() => balance.value?.free ?? 0);
 const kyc = useKYC();
+const visibility = useDocumentVisibility();
+const isVisible = computed(() => visibility.value === "visible");
 let interval: ReturnType<typeof setInterval> | null = null;
 const timeouts: ReturnType<typeof setTimeout>[] = [];
+const BALANCE_POLL_INTERVAL = 1000 * 60 * 2; // 2 minutes
+
+function startBalancePolling(profile: Profile) {
+  stopBalancePolling();
+  __loadBalance(profile);
+  interval = setInterval(() => __loadBalance(profile), BALANCE_POLL_INTERVAL);
+}
+
+function stopBalancePolling() {
+  if (!interval) return;
+  clearInterval(interval);
+  interval = null;
+}
 
 watch(
   () => profileManager.profile,
   profile => {
-    if (profile) {
-      __loadBalance(profile);
-      if (interval) clearInterval(interval);
-      interval = setInterval(__loadBalance.bind(undefined, profile), 1000 * 60 * 2);
-      kyc.init(profile, window.env.KYC_URL);
-    } else {
+    if (!profile) {
       kyc.clear();
-      if (interval) clearInterval(interval);
-      interval = null;
+      stopBalancePolling();
       // Clear all pending timeouts
       timeouts.forEach(timeout => clearTimeout(timeout));
       timeouts.length = 0;
       balance.value = undefined;
+      return;
     }
+
+    startBalancePolling(profile);
+    kyc.init(profile, window.env.KYC_URL);
   },
   { immediate: true, deep: true },
 );
+
+// Pause/resume polling based on page visibility
+watch(isVisible, visible => {
+  if (!profileManager.profile) return;
+
+  if (!visible) {
+    stopBalancePolling();
+    return;
+  }
+
+  // Tab is active - resume polling if not already running
+  if (interval) return;
+  startBalancePolling(profileManager.profile);
+});
 
 function logout() {
   sessionStorage.removeItem("password");
@@ -305,6 +333,12 @@ async function __loadBalance(profile?: Profile, tries = 1) {
   profile = profile || profileManager.profile!;
   if (!profile) return;
 
+  // Don't retry if tab is inactive
+  if (!isVisible.value && tries > 1) {
+    loadingBalance.value = false;
+    return;
+  }
+
   try {
     loadingBalance.value = true;
     const grid = await getGrid(profile);
@@ -322,8 +356,13 @@ async function __loadBalance(profile?: Profile, tries = 1) {
       return;
     }
 
-    const timeoutId = setTimeout(() => __loadBalance(profile, tries + 1), Math.floor(Math.exp(tries) * 1_000));
-    timeouts.push(timeoutId);
+    // Only schedule retry if tab is visible
+    if (isVisible.value) {
+      const timeoutId = setTimeout(() => __loadBalance(profile, tries + 1), Math.floor(Math.exp(tries) * 1_000));
+      timeouts.push(timeoutId);
+    } else {
+      loadingBalance.value = false;
+    }
   }
 }
 profileManagerController.set({ loadBalance: __loadBalance });
