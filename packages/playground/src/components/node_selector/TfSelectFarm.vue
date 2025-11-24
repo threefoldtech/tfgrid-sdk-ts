@@ -80,6 +80,7 @@
 <script lang="ts">
 import type { FarmInfo } from "@threefold/grid_client";
 import { computed, nextTick, onUnmounted, type PropType, ref, watch } from "vue";
+import { useDocumentVisibility } from "@vueuse/core";
 
 import { useAsync, usePagination, useWatchDeep } from "../../hooks";
 import { useGrid } from "../../stores";
@@ -112,6 +113,8 @@ export default {
   },
   setup(props, ctx) {
     const gridStore = useGrid();
+    const visibility = useDocumentVisibility();
+    const isVisible = computed(() => visibility.value === "visible");
 
     /* Load farms with filters */
     const loadedFarms = ref<FarmInfo[]>([]);
@@ -153,6 +156,8 @@ export default {
     useWatchDeep(
       filters,
       async filters => {
+        // Skip expensive API calls if tab is not visible
+        if (!isVisible.value) return;
         farmsTask.value.reset();
         await pageCountTask.value.run(gridStore, filters);
         pagination.value.reset(pageCountTask.value.data as number);

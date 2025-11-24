@@ -151,6 +151,7 @@ import { RequestError } from "@threefold/types";
 import type AwaitLock from "await-lock";
 import equals from "lodash/fp/equals.js";
 import { computed, nextTick, onMounted, onUnmounted, onUpdated, type PropType, ref } from "vue";
+import { useDocumentVisibility } from "@vueuse/core";
 
 import { useAsync, usePagination, useWatchDeep } from "../../hooks";
 import { ValidatorStatus } from "../../hooks/form_validator";
@@ -195,6 +196,8 @@ export default {
   },
   setup(props, ctx) {
     const gridStore = useGrid();
+    const visibility = useDocumentVisibility();
+    const isVisible = computed(() => visibility.value === "visible");
     const _loadedNodes = ref<NodeInfo[]>([]);
     const visibleAlert = ref(true);
     onUpdated(() => (visibleAlert.value = true));
@@ -271,6 +274,9 @@ export default {
         if (!initialized) {
           return;
         }
+
+        // Skip expensive operations if tab is not visible
+        if (!isVisible.value) return;
 
         if (baseFilters.value) {
           if (equals(filters, baseFilters.value)) {

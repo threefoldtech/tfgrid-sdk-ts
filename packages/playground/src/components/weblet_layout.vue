@@ -111,6 +111,7 @@ import { events, type GridClient, type NodeInfo } from "@threefold/grid_client";
 import debounce from "lodash/debounce.js";
 import { computed, ref, watch } from "vue";
 import { useTheme } from "vuetify";
+import { useDocumentVisibility } from "@vueuse/core";
 
 import { manual } from "@/utils/manual";
 import {
@@ -162,6 +163,8 @@ const emits = defineEmits<{ (event: "mount"): void; (event: "back"): void }>();
 const baseUrl = import.meta.env.BASE_URL;
 const profileManager = useProfileManager();
 const theme = useTheme();
+const visibility = useDocumentVisibility();
+const isVisible = computed(() => visibility.value === "visible");
 const webletLayoutContainer = ref<VCard>();
 const status = ref<WebletStatus>();
 const message = ref<string>();
@@ -346,6 +349,9 @@ const onlyIPV4UsdPrice = ref<number>();
 watch(
   () => [props.cpu, props.memory, props.disk, props.ipv4, props.dedicated, props.selectedNode],
   debounce((value, oldValue) => {
+    // Skip expensive calculations if tab is not visible
+    if (!isVisible.value) return;
+
     if (
       oldValue &&
       value[0] === oldValue[0] &&
@@ -365,6 +371,8 @@ watch(
   () => [profileManager.profile, costLoading.value, shouldUpdateCost.value] as const,
   ([profile, loading, shouldUpdate]) => {
     if (!profile || loading || !shouldUpdate) return;
+    // Skip expensive API calls if tab is not visible
+    if (!isVisible.value) return;
     shouldUpdateCost.value = false;
     loadCost(profile);
   },
