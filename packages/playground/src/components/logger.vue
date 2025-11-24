@@ -155,6 +155,7 @@ export default {
 
         _interceptorQueue.forEach(interceptMessage);
         _interceptorQueue = [];
+        if (logQueue.length > 0) flushLogQueue();
       },
     });
 
@@ -207,59 +208,79 @@ export default {
 
     interceptor.on(interceptMessage);
 
-    // This should be used if db failed to connect to be synced later
     let _interceptorQueue: LI[] = [];
+    const logQueue: LI[] = [];
+    let flushTimeout: ReturnType<typeof setTimeout> | null = null;
+    const BATCH_SIZE = 50;
+    const FLUSH_DELAY = 500;
 
-    async function interceptMessage(instance: LI) {
+    function scheduleFlush() {
+      if (flushTimeout) return;
+      flushTimeout = setTimeout(flushLogQueue, FLUSH_DELAY);
+    }
+
+    async function flushLogQueue() {
+      if (logQueue.length === 0 || !connectDB?.value?.data) return;
+
+      const batch = logQueue.splice(0, BATCH_SIZE);
+      const items: Indexed<LoggerInstance>[] = [];
+
+      for (const instance of batch) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { logger: _, date: __, ...log } = instance;
+
+        const isViteDebug =
+          import.meta.env.DEV && log.type === "debug" && log.messages.map(String).join().includes("vite");
+        if (isViteDebug) continue;
+
+        try {
+          items.push(
+            await logsDBClient.write({
+              type: log.type,
+              timestamp: log.timestamp,
+              message: log.messages.map(IndexedDBClient.serializer.serialize).join(" ").replace(/\n\s/g, "\n"),
+            }),
+          );
+        } catch (error) {
+          console.error("Failed to write log to IndexedDB:", error);
+        }
+      }
+
+      if (items.length > 0 && logs.value) {
+        logs.value.push(...items);
+        scrollToBottom();
+      }
+
+      flushTimeout = logQueue.length > 0 ? setTimeout(flushLogQueue, FLUSH_DELAY) : null;
+    }
+
+    function interceptMessage(instance: LI) {
       if (connectDB?.value?.error) {
         _interceptorQueue.push(instance);
         return;
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { logger: _, date: __, ...log } = instance;
+      if (!connectDB?.value?.data) return;
 
-      if (import.meta.env.DEV) {
-        if (
-          log.messages
-            .map(v => {
-              try {
-                return String(v);
-              } catch {
-                return "{ [[null proto]] }";
-              }
-            })
-            .join()
-            .includes("vite") &&
-          log.type === "debug"
-        ) {
-          return;
-        }
+      logQueue.push(instance);
+
+      if (logQueue.length >= BATCH_SIZE) {
+        flushTimeout && clearTimeout(flushTimeout);
+        flushTimeout = null;
+        return flushLogQueue();
       }
-      if (connectDB && connectDB.value.data) {
-        const item = await logsDBClient.write({
-          type: log.type,
-          timestamp: log.timestamp,
-          message: log.messages.map(IndexedDBClient.serializer.serialize).join(" ").replace(/\n\s/g, "\n"),
-        });
-        if (logs.value) {
-          logs.value.push(item);
-          scrollToBottom();
-        }
-      }
+
+      scheduleFlush();
     }
 
     let _init_scroll = false;
     function scrollToBottom() {
       const el = scroller.value?.$el;
-      if (!el || el.scrollHeight === 0 || el.offsetHeight === 0) {
-        return;
-      }
+      if (!el || el.scrollHeight === 0 || el.offsetHeight === 0) return;
+      if (_init_scroll && el.scrollTop !== el.scrollHeight - el.offsetHeight) return;
 
-      if (!_init_scroll || el.scrollTop === el.scrollHeight - el.offsetHeight) {
-        _init_scroll = true;
-        scroller.value?.scrollToBottom();
-      }
+      _init_scroll = true;
+      scroller.value?.scrollToBottom();
     }
 
     async function downloadLogs() {
@@ -281,6 +302,10 @@ export default {
 
     onBeforeUnmount(() => {
       document.removeEventListener("click", handleClickOutside);
+      if (flushTimeout) {
+        clearTimeout(flushTimeout);
+        flushLogQueue();
+      }
     });
 
     const handleClickOutside = (event: MouseEvent) => {
