@@ -161,7 +161,7 @@
   </VDialog>
 </template>
 <script lang="ts" setup>
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { nextTick } from "vue";
 import { useTheme } from "vuetify";
 
@@ -247,7 +247,9 @@ const profileManagerController = useProfileManagerController();
 const balance = profileManagerController.balance;
 const freeBalance = computed(() => balance.value?.free ?? 0);
 const kyc = useKYC();
-let interval: any;
+let interval: ReturnType<typeof setInterval> | null = null;
+const timeouts: ReturnType<typeof setTimeout>[] = [];
+
 watch(
   () => profileManager.profile,
   profile => {
@@ -259,6 +261,10 @@ watch(
     } else {
       kyc.clear();
       if (interval) clearInterval(interval);
+      interval = null;
+      // Clear all pending timeouts
+      timeouts.forEach(timeout => clearTimeout(timeout));
+      timeouts.length = 0;
       balance.value = undefined;
     }
   },
@@ -276,6 +282,16 @@ function logout() {
 
 onMounted(async () => {
   await mounted();
+});
+
+onUnmounted(() => {
+  if (interval) {
+    clearInterval(interval);
+    interval = null;
+  }
+  // Clear all pending timeouts
+  timeouts.forEach(timeout => clearTimeout(timeout));
+  timeouts.length = 0;
 });
 
 async function handleProfileDialog(value: boolean) {
@@ -306,7 +322,8 @@ async function __loadBalance(profile?: Profile, tries = 1) {
       return;
     }
 
-    setTimeout(() => __loadBalance(profile, tries + 1), Math.floor(Math.exp(tries) * 1_000));
+    const timeoutId = setTimeout(() => __loadBalance(profile, tries + 1), Math.floor(Math.exp(tries) * 1_000));
+    timeouts.push(timeoutId);
   }
 }
 profileManagerController.set({ loadBalance: __loadBalance });
