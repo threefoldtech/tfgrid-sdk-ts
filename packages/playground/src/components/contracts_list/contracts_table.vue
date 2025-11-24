@@ -321,7 +321,7 @@ import { ContractStates, type GridClient, type OverdueDetails } from "@threefold
 import { type Contract, ContractState, type NodeStatus } from "@threefold/gridproxy_client";
 import { TFChainError } from "@threefold/tfchain_client";
 import { DeploymentKeyDeletionError } from "@threefold/types";
-import { capitalize, computed, defineComponent, type PropType, type Ref, ref, watch } from "vue";
+import { capitalize, computed, defineComponent, onUnmounted, type PropType, type Ref, ref, watch } from "vue";
 
 import { useProfileManagerController } from "@/components/profile_manager_controller.vue";
 import type { VDataTableHeader } from "@/types";
@@ -423,6 +423,7 @@ const freeBalance = computed(() => balance.value?.free ?? 0);
 const unlockContractLoading = ref(false);
 const unlockDialog = ref(false);
 const rentContracts = ref<{ [key: number]: number }>({}); // to store the node id with its rent contract
+const timeouts: ReturnType<typeof setTimeout>[] = [];
 const selectedLockedContracts = computed(() => {
   if (selectedContracts.value.length == 0) return false;
   for (const contract of selectedContracts.value) {
@@ -615,7 +616,8 @@ async function unlockContract(contractId: number[]) {
       `Your request to unlock contract ${contractId} has been processed successfully. Changes may take a few minutes to reflect`,
       ToastType.info,
     );
-    setTimeout(() => emits("update:unlock-contracts"), 30000);
+    const timeoutId = setTimeout(() => emits("update:unlock-contracts"), 30000);
+    timeouts.push(timeoutId);
     contractStateDialog.value = false;
     unlockDialog.value = false;
     selectedContracts.value = [];
@@ -629,6 +631,12 @@ async function unlockContract(contractId: number[]) {
 watch(contractStateDialog, contractStateDialog => {
   if (!contractStateDialog) selectedItem.value = undefined;
 });
+
+onUnmounted(() => {
+  timeouts.forEach(timeout => clearTimeout(timeout));
+  timeouts.length = 0;
+});
+
 defineExpose({
   reset() {
     rentContracts.value = {};
