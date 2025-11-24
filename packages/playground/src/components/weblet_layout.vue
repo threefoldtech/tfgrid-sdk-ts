@@ -109,7 +109,7 @@
 <script lang="ts" setup>
 import { events, type GridClient, type NodeInfo } from "@threefold/grid_client";
 import debounce from "lodash/debounce.js";
-import { computed, ref, watch } from "vue";
+import { computed, onUnmounted, ref, watch } from "vue";
 import { useTheme } from "vuetify";
 
 import { manual } from "@/utils/manual";
@@ -178,6 +178,11 @@ function onLogMessage(msg: string) {
 watch(status, s => {
   if (s === "deploy") events.addListener("logs", onLogMessage);
   else events.removeListener("logs", onLogMessage);
+});
+
+// Ensure cleanup on component unmount
+onUnmounted(() => {
+  events.removeListener("logs", onLogMessage);
 });
 const alertType = computed(() => {
   if (status.value === "deploy") return "info";

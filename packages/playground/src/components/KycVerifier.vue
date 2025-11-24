@@ -24,14 +24,12 @@
       <v-card>
         <v-card-title class="bg-primary d-flex align-center">
           <v-icon icon="mdi-security" />
-          <div class="pl-2">
-            Terms & Conditions
-          </div>
+          <div class="pl-2">Terms & Conditions</div>
         </v-card-title>
 
         <v-card-text class="pb-0">
           We use iDenfy to verify your identity.
-          <br>
+          <br />
           Please ensure you review iDenfy’s <span class="font-weight-bold">Security and Compliance</span>, which
           includes their <span class="font-weight-bold">Terms & Conditions, Privacy Policy</span>, and other relevant
           documents.
@@ -46,12 +44,8 @@
           </v-checkbox>
         </v-card-text>
         <v-card-actions class="justify-end my-1 mr-2">
-          <v-btn color="anchor" @click="handleAgreementDialog(false)">
-            Cancel
-          </v-btn>
-          <v-btn :disabled="!agreedCheckbox" @click="handleAgreementDialog(true)">
-            Continue
-          </v-btn>
+          <v-btn color="anchor" @click="handleAgreementDialog(false)"> Cancel </v-btn>
+          <v-btn :disabled="!agreedCheckbox" @click="handleAgreementDialog(true)"> Continue </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -85,6 +79,10 @@ export default {
     const agreed = ref(false);
     const agreedCheckbox = ref(false);
     const handleUpdateDialog = (event: boolean) => {
+      // Clean up listener when dialog closes
+      if (!event) {
+        window.removeEventListener("message", handleReceiveMessage, false);
+      }
       emit("update:moduleValue", event);
     };
     const handleAgreementDialog = (agreed: boolean) => {
@@ -103,10 +101,14 @@ export default {
         agreed.value = true;
         if (!kyc.client) throw new Error("KYC client is not initialized");
         token.value = await kyc.client.getToken();
+        // Remove any existing listener before adding a new one to prevent duplicates
+        window.removeEventListener("message", handleReceiveMessage, false);
         window.addEventListener("message", handleReceiveMessage, false);
         kycDialog.value = true;
       } catch (e) {
         handleUpdateDialog(false);
+        // Clean up listener on error
+        window.removeEventListener("message", handleReceiveMessage, false);
         if (e instanceof KycErrors.AlreadyVerified) {
           kyc.updateStatus();
           createCustomToast("Already verified", ToastType.info);
