@@ -117,8 +117,7 @@ watch(
 function customCpuValidation(validators: Validators) {
   return (value: string) => {
     const min = getMinCapacity(props.network, props.type);
-    const maybeError = validators.min(`CPU min is ${min.cpu} cores.`, min.cpu)(value);
-    return maybeError ? maybeError : validators.max("CPU max is 32 cores.", 32)(value);
+    return validators.min(`CPU min is ${min.cpu} cores.`, min.cpu)(value);
   };
 }
 
