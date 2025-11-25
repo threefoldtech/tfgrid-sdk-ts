@@ -21,6 +21,7 @@ class K8sModule extends BaseModule {
   moduleName = "kubernetes";
   workloadTypes = [
     WorkloadTypes.zmachine,
+    WorkloadTypes.zmachinelight,
     WorkloadTypes.zmount,
     WorkloadTypes.volume,
     WorkloadTypes.qsfs,
@@ -49,7 +50,7 @@ class K8sModule extends BaseModule {
   /**
    * Get the master workloads for a specific deployment.
    *
-   * This method iterates through the deployments and retrieves the workloads that are of type `zmachine` and have an empty `K3S_URL` environment variable.
+   * This method iterates through the deployments and retrieves the workloads that are of type `zmachine` or `zmachinelight` and have an empty `K3S_URL` environment variable.
    * It assigns the `contract ID` and `node ID` to each workload and adds it to the list of master workloads.
    *
    * @param {string} deploymentName - The name of the deployment to get master workloads for.
@@ -63,7 +64,10 @@ class K8sModule extends BaseModule {
       const d = deployment instanceof TwinDeployment ? deployment.deployment : deployment;
 
       for (const workload of d.workloads) {
-        if (workload.type === WorkloadTypes.zmachine && workload.data["env"]["K3S_URL"] === "") {
+        if (
+          (workload.type === WorkloadTypes.zmachine || workload.type === WorkloadTypes.zmachinelight) &&
+          workload.data["env"]["K3S_URL"] === ""
+        ) {
           workload["contractId"] = d.contract_id;
           workload["nodeId"] = await this._getNodeIdFromContractId(deploymentName, d.contract_id);
           workload["contractCreatedAt"] = d["contractCreatedAt"];
