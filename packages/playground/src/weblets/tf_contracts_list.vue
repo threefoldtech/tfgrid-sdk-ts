@@ -172,8 +172,8 @@
         <div>You are about to permanently delete all contracts. This action cannot be reversed!</div>
       </v-alert>
       <v-card-actions class="justify-end my-1 mr-2">
-        <v-btn color="anchor" @click="deleteDialog = false"> Cancel </v-btn>
-        <v-btn color="error" @click="confirmPassword"> Delete </v-btn>
+        <v-btn color="anchor" :disabled="deleting" @click="deleteDialog = false"> Cancel </v-btn>
+        <v-btn color="error" :disabled="deleting" @click="confirmPassword"> Delete </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -194,8 +194,10 @@
           <WalletPassword v-model="password" mode="Login" />
         </v-card-item>
         <v-card-actions class="justify-end my-1 mr-2">
-          <v-btn color="anchor" @click="confirmPasswordDialog = false"> Cancel </v-btn>
-          <v-btn color="error" :disabled="!isValidForm" @click="deleteAll"> Confirm </v-btn>
+          <v-btn color="anchor" :disabled="deleting" @click="confirmPasswordDialog = false"> Cancel </v-btn>
+          <v-btn color="error" :disabled="!isValidForm || deleting" :loading="deleting" @click="deleteAll">
+            Confirm
+          </v-btn>
         </v-card-actions>
       </FormValidator>
     </v-card>
