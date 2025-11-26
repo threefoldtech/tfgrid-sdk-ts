@@ -37,12 +37,12 @@ if (window.env.ENABLE_TELEMETRY) {
     integrations: [Sentry.browserTracingIntegration(), Sentry.replayIntegration()],
     release: process.env.VERSION,
     // Performance Monitoring
-    tracesSampleRate: 1.0, //  Capture 100% of the transactions
+    tracesSampleRate: import.meta.env.PROD ? 0.1 : 1.0, // 10% in production, 100% in development
     // Set 'tracePropagationTargets' to control for which URLs distributed tracing should be enabled
     tracePropagationTargets: ["localhost", /^https:\/\/yourserver\.io\/api/],
     // Session Replay
-    replaysSessionSampleRate: 0.1, // This sets the sample rate at 10%. You may want to change it to 100% while in development and then sample at a lower rate in production.
-    replaysOnErrorSampleRate: 1.0, // If you're not already sampling the entire session, change the sample rate to 100% when sampling sessions where errors occur.
+    replaysSessionSampleRate: import.meta.env.PROD ? 0.01 : 0.1, // 1% in production, 10% in development
+    replaysOnErrorSampleRate: import.meta.env.PROD ? 0.5 : 1.0, // 50% in production, 100% in development
   });
 }
 
