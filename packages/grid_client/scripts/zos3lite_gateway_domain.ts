@@ -34,9 +34,16 @@ async function main() {
     farmName: "LiriaFarm",
   };
 
+  const gatewayNodes = await grid3.capacity.filterNodes(gatewayQueryOptions);
+  if (gatewayNodes.length === 0) {
+    log("No nodes found for gateway. Skipping test.");
+    await grid3.disconnect();
+    return;
+  }
+
   const gw: GatewayNameModel = {
     name: gatewayName,
-    node_id: +(await grid3.capacity.filterNodes(gatewayQueryOptions))[0].nodeId,
+    node_id: +gatewayNodes[0].nodeId,
     tls_passthrough: false,
     // the backends have to be in this format `http://ip:port` or `https://ip:port`, and the `ip` pingable from the node so using the ygg ip or public ip if available.
     backends: ["http://185.206.122.35:8000"],
