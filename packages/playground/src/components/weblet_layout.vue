@@ -122,6 +122,7 @@ import {
 import { useGrid, useProfileManager } from "../stores";
 import { loadBalance, updateGrid } from "../utils/grid";
 import { normalizeBalance } from "../utils/helpers";
+import { normalizePrice } from "../utils/pricing_calculator";
 
 const props = defineProps({
   disableAlerts: {
@@ -399,8 +400,10 @@ async function loadCost(profile: { mnemonic: string }) {
     certified: props.selectedNode?.certificationType === "Certified",
   });
   await getIPv1Price(grid!);
-  usd.value = props.dedicated ? dedicatedPrice : sharedPrice;
-  tft.value = parseFloat((usd.value / (await grid!.calculator.tftPrice())).toFixed(2));
+  const basePrice = props.dedicated ? dedicatedPrice : sharedPrice;
+  usd.value = normalizePrice(basePrice);
+  const tftPrice = await grid!.calculator.tftPrice();
+  tft.value = normalizePrice(usd.value / tftPrice);
   costLoading.value = false;
 }
 </script>
