@@ -220,7 +220,7 @@ export default {
           "Deploy a Bitcoin Node on the ThreeFold Grid. Run your own Bitcoin full node to participate in the Bitcoin network, validate transactions, and maintain a complete copy of the blockchain.",
         icon: "BTC_Node.png",
         route: DashboardRoutes.Applications.BTCNode,
-        releaseDate: new Date("2025-10-16"),
+        releaseDate: new Date("2025-11-4"),
       },
     ];
     app_cards = app_cards.sort((a, b) => a.title.localeCompare(b.title));
