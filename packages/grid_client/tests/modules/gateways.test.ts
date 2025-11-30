@@ -63,15 +63,11 @@ async function testGateway(gateway: GatewayNameModel) {
   const domain = "https://" + gatewayResult[0].domain;
 
   if (await waitForGateway(domain)) {
-    axios.get(domain).then(res => {
-      log(res.data);
-      expect(res.status).toBe(200);
-      expect(res.statusText).toBe("OK");
-      expect(res.data).toContain("Directory listing for /");
-      expect(res.data).toContain("bin/");
-      expect(res.data).toContain("dev/");
-      expect(res.data).toContain("etc/");
-    });
+    const res = await axios.get(domain);
+    log(res.data);
+    expect(res.status).toBe(200);
+    expect(res.statusText).toBe("OK");
+    expect(res.data).toContain("Mattermost");
   } else {
     throw new Error("Gateway is unreachable after multiple retries");
   }
@@ -108,16 +104,17 @@ test("TC1237 - Gateways: Expose a VM Over Gateway", async () => {
   let cpu = generateInt(1, 4);
   let memory = generateInt(256, 4096);
   let rootfsSize = generateInt(2, 5);
+  const diskSize = 15;
   const networkName = generateString(15);
   const vmName = generateString(15);
-  const disks = [];
+  const diskName = generateString(15);
+  const mountPoint = "/var/lib/docker";
   const ipRangeClassA = "10." + generateInt(1, 255) + ".0.0/16";
   const ipRangeClassB = "172." + generateInt(16, 31) + ".0.0/16";
   const ipRangeClassC = "192.168.0.0/16";
   const ipRange = randomChoice([ipRangeClassA, ipRangeClassB, ipRangeClassC]);
   const metadata = "{'deploymentType': 'vm'}";
   const description = "test deploying VMs via ts grid3 client";
-  const envVarValue = generateString(30);
 
   //GatewayNode Selection
   const gatewayNodes = await gridClient.capacity.filterNodes({
@@ -129,13 +126,18 @@ test("TC1237 - Gateways: Expose a VM Over Gateway", async () => {
   const gatewayNodeId = await getOnlineNode(gatewayNodes);
   if (gatewayNodeId == -1) throw new Error("no nodes available to complete this test");
 
+  // Get gateway node for domain
+  const gatewayNode = gatewayNodes.find(n => n.nodeId === gatewayNodeId);
+  if (!gatewayNode) throw new Error("gateway node not found");
+  const domain = name + "." + gatewayNode.publicConfig.domain;
+
   //Node Selection
   let nodes;
   try {
     nodes = await gridClient.capacity.filterNodes({
       cru: cpu,
       mru: memory / 1024,
-      sru: rootfsSize,
+      sru: rootfsSize + diskSize,
       farmId: 1,
       availableFor: await gridClient.twins.get_my_twin_id(),
     } as FilterOptions);
@@ -153,7 +155,7 @@ test("TC1237 - Gateways: Expose a VM Over Gateway", async () => {
     nodes = await gridClient.capacity.filterNodes({
       cru: cpu,
       mru: memory / 1024,
-      sru: rootfsSize,
+      sru: rootfsSize + diskSize,
       farmId: 1,
       availableFor: await gridClient.twins.get_my_twin_id(),
     } as FilterOptions);
@@ -176,16 +178,25 @@ test("TC1237 - Gateways: Expose a VM Over Gateway", async () => {
         cpu: cpu,
         memory: memory,
         rootfs_size: rootfsSize,
-        disks: disks,
-        flist: FLISTS.MICROVMS_UBUNTU_24.flist,
-        entrypoint: FLISTS.MICROVMS_UBUNTU_24.entryPoint,
+        disks: [
+          {
+            name: diskName,
+            size: diskSize,
+            mountpoint: mountPoint,
+          },
+        ],
+        flist: FLISTS.MATTERMOST.value,
+        entrypoint: FLISTS.MATTERMOST.entryPoint,
         public_ip: true,
         public_ip6: true,
         planetary: true,
         mycelium: true,
         env: {
           SSH_KEY: config.ssh_key,
-          Test_KEY: envVarValue,
+          MATTERMOST_DOMAIN: domain,
+          SITE_URL: "https://" + domain,
+          DJANGO_SUPERUSER_EMAIL: "admin123@matter.most",
+          DB_PASSWORD: "admin123",
         },
         solutionProviderId: undefined,
       },
@@ -216,7 +227,7 @@ test("TC1237 - Gateways: Expose a VM Over Gateway", async () => {
   expect(result[0].status).toBe("ok");
   expect(result[0].flist).toBe(vms.machines[0].flist);
   expect(result[0].entrypoint).toBe(vms.machines[0].entrypoint);
-  expect(result[0].mounts).toHaveLength(0);
+  expect(result[0].mounts).toHaveLength(1);
   expect(result[0].interfaces[0]["network"]).toBe(vms.network.name);
   expect(result[0].interfaces[0]["ip"]).toContain(splitIP(vms.network.ip_range));
   expect(result[0].interfaces[0]["ip"]).toMatch(ipRegex);
