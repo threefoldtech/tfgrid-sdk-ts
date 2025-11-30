@@ -63,15 +63,14 @@ async function testGateway(gateway: GatewayNameModel) {
   const domain = "https://" + gatewayResult[0].domain;
 
   if (await waitForGateway(domain)) {
-    axios.get(domain).then(res => {
-      log(res.data);
-      expect(res.status).toBe(200);
-      expect(res.statusText).toBe("OK");
-      expect(res.data).toContain("Directory listing for /");
-      expect(res.data).toContain("bin/");
-      expect(res.data).toContain("dev/");
-      expect(res.data).toContain("etc/");
-    });
+    const res = await axios.get(domain);
+    log(res.data);
+    expect(res.status).toBe(200);
+    expect(res.statusText).toBe("OK");
+    expect(res.data).toContain("Directory listing for /");
+    expect(res.data).toContain("bin/");
+    expect(res.data).toContain("dev/");
+    expect(res.data).toContain("etc/");
   } else {
     throw new Error("Gateway is unreachable after multiple retries");
   }
@@ -177,8 +176,8 @@ test("TC1237 - Gateways: Expose a VM Over Gateway", async () => {
         memory: memory,
         rootfs_size: rootfsSize,
         disks: disks,
-        flist: FLISTS.GATEWAY.flist,
-        entrypoint: FLISTS.GATEWAY.entrypoint,
+        flist: FLISTS.MICROVMS_UBUNTU_24.flist,
+        entrypoint: "/bin/sh -c 'cd / && exec python3 -m http.server --bind :: 8000'",
         public_ip: true,
         public_ip6: true,
         planetary: true,
