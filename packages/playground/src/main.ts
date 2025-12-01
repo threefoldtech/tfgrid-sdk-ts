@@ -11,6 +11,10 @@ import { defineGlobals } from "./config";
 import Monitor from "./Monitor.vue";
 import router from "./router";
 import { normalizeError } from "./utils/helpers";
+import { setupMapCache } from "./utils/mapCache";
+
+setupMapCache();
+
 const app = createApp(Monitor);
 
 app.config.errorHandler = error => {
