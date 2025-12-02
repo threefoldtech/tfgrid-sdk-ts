@@ -140,6 +140,32 @@ export class IndexedDBClient {
     return res;
   }
 
+  public async deleteRange(startId: number, endId: number): Promise<void> {
+    await this._lock.acquireAsync();
+
+    return new Promise((res, rej) => {
+      const store = this._createStore();
+      const range = IDBKeyRange.bound(startId, endId);
+      const query = store.openCursor(range);
+
+      query.onsuccess = () => {
+        const cursor = query.result;
+        if (cursor) {
+          cursor.delete();
+          cursor.continue();
+        } else {
+          this._lock.release();
+          res();
+        }
+      };
+
+      query.onerror = e => {
+        this._lock.release();
+        rej(e);
+      };
+    });
+  }
+
   public disconnect() {
     const db = this._assertConnection();
     db.close();

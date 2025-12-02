@@ -230,6 +230,8 @@ export default {
     }
 
     const MAX_VISIBLE_LOGS = 2000;
+    const MAX_STORED_LOGS = 10000;
+    const ROTATION_BUFFER = 1000;
 
     async function flushLogQueue() {
       if (logQueue.length === 0 || !connectDB?.value?.data) return;
@@ -263,13 +265,28 @@ export default {
         scrollToBottom();
       }
 
+      // Rotate old logs if count exceeds limit
+      const currentCount = await logsDBClient.count();
+      if (currentCount > MAX_STORED_LOGS) {
+        const toDelete = currentCount - MAX_STORED_LOGS + ROTATION_BUFFER;
+        try {
+          await logsDBClient.deleteRange(1, toDelete);
+          count.value = await logsDBClient.count();
+        } catch (error) {
+          originalConsoleError("Failed to rotate logs:", error);
+        }
+      }
+
       flushTimeout = logQueue.length > 0 ? setTimeout(flushLogQueue, FLUSH_DELAY) : null;
     }
 
     function interceptMessage(instance: LI) {
       // Drop very noisy categories early to avoid unnecessary work.
       const payload = instance.messages.map(String).join().toLowerCase();
-      if (import.meta.env.DEV && (payload.includes("vite") || payload.includes("hmr"))) {
+      if (
+        instance.type === "warn" &&
+        (payload.includes("vue") || payload.includes("vite") || payload.includes("hmr"))
+      ) {
         return;
       }
 
