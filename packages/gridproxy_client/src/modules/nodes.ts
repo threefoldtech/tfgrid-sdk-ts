@@ -1,4 +1,5 @@
 import { NodesBuilder, type NodesQuery } from "../builders/nodes";
+import { NodeStatus } from "../builders/public_api";
 import { resolvePaginator } from "../utils";
 import { AbstractClient } from "./abstract_client";
 import type { Farm, FarmsClient } from "./farms";
@@ -9,6 +10,10 @@ export interface NodesExtractOptions {
   loadFarm?: boolean;
   loadTwin?: boolean;
   loadStats?: boolean;
+}
+
+export interface NodeStatusInfo {
+  status: NodeStatus;
 }
 
 export class NodesClient extends AbstractClient<NodesBuilder, NodesQuery> {
@@ -86,6 +91,11 @@ export class NodesClient extends AbstractClient<NodesBuilder, NodesQuery> {
 
   public async statsById(nodeId: number): Promise<NodeStats> {
     const res = await this.builder({}).build(`/nodes/${nodeId}/statistics`);
+    return res.json();
+  }
+
+  public async statusById(nodeId: number): Promise<NodeStatusInfo> {
+    const res = await this.builder({}).build(`/nodes/${nodeId}/status`);
     return res.json();
   }
 
