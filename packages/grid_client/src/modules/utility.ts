@@ -46,6 +46,21 @@ class Utility {
   async batchAll<T>(options: BatchModel<T>): Promise<T[]> {
     return await this.client.utility.batchAll(options.extrinsics);
   }
+
+  /**
+   * Executes a force batch operation for all provided extrinsics.
+   * This uses Substrate's `utility.force_batch`, which attempts to
+   * execute all calls and only reverts the ones that fail.
+   *
+   * @param {BatchModel<T>} options - The options for the force batch operation, including the extrinsics to be executed.
+   * @returns {Promise<T[]>} A promise that resolves with the result of the force batch operation.
+   */
+  @expose
+  @checkBalance
+  async forceBatch<T>(options: BatchModel<T>): Promise<T[]> {
+    // Cast to any until @threefold/tfchain_client Utility type exposes forceBatch in its typings
+    return await (this.client.utility as any).forceBatch(options.extrinsics);
+  }
 }
 
 export { Utility as utility };

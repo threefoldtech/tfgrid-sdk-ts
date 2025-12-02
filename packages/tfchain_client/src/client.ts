@@ -407,8 +407,13 @@ class Client extends QueryClient {
     }
     return result;
   }
+
   async applyAllExtrinsics<T>(extrinsics: ExtrinsicResult<T>[]) {
     return this.utility.batchAll<T>(extrinsics);
+  }
+
+  async applyForceBatchExtrinsics<T>(extrinsics: ExtrinsicResult<T>[]) {
+    return this.utility.forceBatch<T>(extrinsics);
   }
 
   patchExtrinsic<R>(extrinsic: Extrinsic, options: PatchExtrinsicOptions<R> = {}): ExtrinsicResult<R> {
