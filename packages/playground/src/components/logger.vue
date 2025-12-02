@@ -269,7 +269,7 @@ export default {
     function interceptMessage(instance: LI) {
       // Drop very noisy categories early to avoid unnecessary work.
       const payload = instance.messages.map(String).join().toLowerCase();
-      if (import.meta.env.DEV && (payload.includes("vite") || payload.includes("hmr") || payload.includes("webpack"))) {
+      if (import.meta.env.DEV && (payload.includes("vite") || payload.includes("hmr"))) {
         return;
       }
 
