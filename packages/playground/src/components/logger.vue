@@ -140,6 +140,14 @@ export default {
     }
 
     const logs = ref<Indexed<LoggerInstance>[]>([]);
+
+    /**
+     * Keep a reference to the original console.error so that internal
+     * logger failures don't recursively go through the interceptor and
+     * generate more log entries.
+     */
+    const originalConsoleError = console.error.bind(console);
+
     const interceptor = new LoggerInterceptor(console);
 
     const logsDBClient = new IndexedDBClient("TF_LOGGER_DB", VERSION, KEY);
@@ -147,6 +155,8 @@ export default {
       init: true,
       async onAfterTask({ error }) {
         if (error) {
+          // Stop intercepting entirely on persistent DB failure.
+          interceptor.dispose();
           return;
         }
 
@@ -219,6 +229,8 @@ export default {
       flushTimeout = setTimeout(flushLogQueue, FLUSH_DELAY);
     }
 
+    const MAX_VISIBLE_LOGS = 2000;
+
     async function flushLogQueue() {
       if (logQueue.length === 0 || !connectDB?.value?.data) return;
 
@@ -229,10 +241,6 @@ export default {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { logger: _, date: __, ...log } = instance;
 
-        const isViteDebug =
-          import.meta.env.DEV && log.type === "debug" && log.messages.map(String).join().includes("vite");
-        if (isViteDebug) continue;
-
         try {
           items.push(
             await logsDBClient.write({
@@ -242,12 +250,16 @@ export default {
             }),
           );
         } catch (error) {
-          console.error("Failed to write log to IndexedDB:", error);
+          // Use the original console.error to avoid re-interception.
+          originalConsoleError("Failed to write log to IndexedDB:", error);
         }
       }
 
       if (items.length > 0 && logs.value) {
         logs.value.push(...items);
+        if (logs.value.length > MAX_VISIBLE_LOGS) {
+          logs.value.splice(0, logs.value.length - MAX_VISIBLE_LOGS);
+        }
         scrollToBottom();
       }
 
@@ -255,6 +267,12 @@ export default {
     }
 
     function interceptMessage(instance: LI) {
+      // Drop very noisy categories early to avoid unnecessary work.
+      const payload = instance.messages.map(String).join().toLowerCase();
+      if (import.meta.env.DEV && (payload.includes("vite") || payload.includes("hmr") || payload.includes("webpack"))) {
+        return;
+      }
+
       if (connectDB?.value?.error) {
         _interceptorQueue.push(instance);
         return;
