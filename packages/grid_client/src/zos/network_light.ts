@@ -27,7 +27,7 @@ class NetworkLight extends WorkloadData {
         out += this.peers[i].challenge();
       }
     }
-    out += this.mycelium?.challenge();
+    out += this.mycelium?.challenge() || "";
     return out;
   }
 }
