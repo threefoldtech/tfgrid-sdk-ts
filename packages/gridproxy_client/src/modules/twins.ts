@@ -21,8 +21,8 @@ export class TwinsClient extends AbstractClient<TwinsBuilder, TwinsQuery> {
     });
   }
 
-  public async list(queries: Partial<TwinsQuery> = {}) {
-    const res = await this.builder(queries).build("/twins");
+  public async list(queries: Partial<TwinsQuery> = {}, signal?: AbortSignal) {
+    const res = await this.builder(queries).build("/twins", 10000, signal);
     return resolvePaginator<Twin[]>(res);
   }
 

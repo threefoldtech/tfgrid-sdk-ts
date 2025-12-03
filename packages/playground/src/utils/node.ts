@@ -276,45 +276,44 @@ export async function generateReceipt(doc: jsPDF, node: NodeInterface) {
   return doc;
 }
 
-export async function getNodeMintingFixupReceipts(nodeId: number) {
+export async function getNodeMintingFixupReceipts(nodeId: number, signal?: AbortSignal) {
   let nodeReceipts: receiptInterface[] = [];
-  await axios.get(`${window.env.MINTING_URL}/api/v1/node/${nodeId}`).then(res =>
-    res.data.map(
-      (rec: {
-        hash: any;
-        receipt: {
-          Minting: Minting;
-          Fixup: Fixup;
-        };
-      }) => {
-        if (rec.receipt.Minting) {
-          nodeReceipts.push({
-            type: "MINTING",
-            hash: rec.hash,
-            cloud_units: rec.receipt.Minting.cloud_units,
-            mintingStart: rec.receipt.Minting.period.start * 1000,
-            mintingEnd: rec.receipt.Minting.period.end * 1000,
-            tft: rec.receipt.Minting.reward.tft / 1e7,
-            startPeriodTimestamp: rec.receipt.Minting.period.start,
-            endPeriodTimestamp: rec.receipt.Minting.period.end,
-          });
-        } else {
-          nodeReceipts.push({
-            type: "FIXUP",
-            hash: rec.hash,
-            cloud_units: rec.receipt.Fixup.minted_cloud_units,
-            fixup_cloud_units: rec.receipt.Fixup.fixup_cloud_units,
-            correct_cloud_units: rec.receipt.Fixup.correct_cloud_units,
-            fixupStart: rec.receipt.Fixup.period.start * 1000 || 0,
-            fixupEnd: rec.receipt.Fixup.period.end * 1000 || 0,
-            startPeriodTimestamp: rec.receipt.Fixup.period.start,
-            endPeriodTimestamp: rec.receipt.Fixup.period.end,
-            tft: rec.receipt.Fixup.minted_reward.tft / 1e7,
-            fixupReward: rec.receipt.Fixup.fixup_reward.tft / 1e7,
-          });
-        }
-      },
-    ),
+  const res = await axios.get(`${window.env.MINTING_URL}/api/v1/node/${nodeId}`, { signal });
+  res.data.map(
+    (rec: {
+      hash: any;
+      receipt: {
+        Minting: Minting;
+        Fixup: Fixup;
+      };
+    }) => {
+      if (rec.receipt.Minting) {
+        nodeReceipts.push({
+          type: "MINTING",
+          hash: rec.hash,
+          cloud_units: rec.receipt.Minting.cloud_units,
+          mintingStart: rec.receipt.Minting.period.start * 1000,
+          mintingEnd: rec.receipt.Minting.period.end * 1000,
+          tft: rec.receipt.Minting.reward.tft / 1e7,
+          startPeriodTimestamp: rec.receipt.Minting.period.start,
+          endPeriodTimestamp: rec.receipt.Minting.period.end,
+        });
+      } else {
+        nodeReceipts.push({
+          type: "FIXUP",
+          hash: rec.hash,
+          cloud_units: rec.receipt.Fixup.minted_cloud_units,
+          fixup_cloud_units: rec.receipt.Fixup.fixup_cloud_units,
+          correct_cloud_units: rec.receipt.Fixup.correct_cloud_units,
+          fixupStart: rec.receipt.Fixup.period.start * 1000 || 0,
+          fixupEnd: rec.receipt.Fixup.period.end * 1000 || 0,
+          startPeriodTimestamp: rec.receipt.Fixup.period.start,
+          endPeriodTimestamp: rec.receipt.Fixup.period.end,
+          tft: rec.receipt.Fixup.minted_reward.tft / 1e7,
+          fixupReward: rec.receipt.Fixup.fixup_reward.tft / 1e7,
+        });
+      }
+    },
   );
 
   // sort based on the start date

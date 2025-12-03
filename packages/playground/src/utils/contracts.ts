@@ -107,8 +107,7 @@ export function formatConsumption(value: number): string {
   return normalizeBalance(value) + " TFT/hour";
 }
 
-export async function getNodeInfo(nodeIDs: number[], requestedNodes: number[]) {
-  // Ensure we have unique node IDs
+export async function getNodeInfo(nodeIDs: number[], requestedNodes: number[], signal?: AbortSignal) {
   const uniqueNodeIDs = Array.from(new Set(nodeIDs));
   const uniqueRequestedNodes = new Set(requestedNodes);
 
@@ -118,8 +117,7 @@ export async function getNodeInfo(nodeIDs: number[], requestedNodes: number[]) {
 
   const resultPromises = nodeIDsToRequest.map(async nodeId => {
     if (typeof nodeId !== "number") return {};
-    const nodeInfo = await gridProxyClient.nodes.byId(nodeId);
-    // Store result in cache
+    const nodeInfo = await gridProxyClient.nodes.byId(nodeId, {}, signal);
     NODE_INFO_CACHE[nodeId] = { status: nodeInfo.status, farmId: nodeInfo.farmId };
     return { [nodeId]: NODE_INFO_CACHE[nodeId] };
   });

@@ -260,6 +260,8 @@ import { type Contract, ContractState, NodeStatus, SortByContracts, SortOrder } 
 import { DeploymentKeyDeletionError } from "@threefold/types";
 import { computed, defineComponent, onMounted, type Ref, ref } from "vue";
 
+import { isAbortError, useWithAbortSignal } from "@/hooks/useAbortController";
+
 import ContractsTable from "@/components/contracts_list/contracts_table.vue";
 import { useProfileManagerController } from "@/components/profile_manager_controller.vue";
 import { useProfileManager } from "@/stores/profile_manager";
@@ -320,6 +322,8 @@ const nodeIDs = computed(() => {
 });
 // To avoid multiple requests
 const cachedNodeIDs = ref<number[]>([]);
+const getNodeInfoWithAbort = useWithAbortSignal(getNodeInfo);
+
 onMounted(() => {
   loadContracts();
 });
@@ -415,9 +419,10 @@ async function loadContracts(type?: ContractType, options?: { sort: { key: strin
     contracts.value = [...nodeContracts.value, ...nameContracts.value, ...rentContracts.value];
     if (!type) await getTotalCost();
     // Get the node info e.g. node status.
-    nodeInfo.value = await getNodeInfo(nodeIDs.value, cachedNodeIDs.value);
+    nodeInfo.value = await getNodeInfoWithAbort(nodeIDs.value, cachedNodeIDs.value);
     cachedNodeIDs.value.push(...nodeIDs.value);
   } catch (error: any) {
+    if (isAbortError(error)) return;
     loadingErrorMessage.value = `Error while loading contracts: ${error.message}`;
     createCustomToast(loadingErrorMessage.value, ToastType.danger, {});
   } finally {

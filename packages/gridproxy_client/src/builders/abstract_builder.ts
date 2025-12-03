@@ -40,12 +40,22 @@ export abstract class AbstractBuilder<T> {
     }
   }
 
-  public async build(path: string, timeout = 10000): Promise<Response> {
+  public async build(path: string, timeout = 10000, signal?: AbortSignal): Promise<Response> {
     assertString(path);
     assertPattern(path, /^\//);
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+    // Combine external signal with timeout signal
+    if (signal) {
+      // If signal is already aborted, abort immediately
+      if (signal.aborted) {
+        controller.abort();
+      } else {
+        signal.addEventListener("abort", () => controller.abort());
+      }
+    }
 
     try {
       const out: string[] = [];

@@ -27,9 +27,7 @@
 
       <v-divider class="mb-2" />
       <v-card-actions class="d-flex justify-end">
-        <v-btn color="anchor" class="mr-2 my-1" @click="setOpenInfo(false)">
-          Close
-        </v-btn>
+        <v-btn color="anchor" class="mr-2 my-1" @click="setOpenInfo(false)"> Close </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -41,6 +39,7 @@ import { marked } from "marked";
 import { computed, type ComputedRef, ref } from "vue";
 import { useRoute } from "vue-router";
 
+import { isAbortError, useFetch } from "../hooks/useAbortController";
 import type { InfoMeta } from "../router";
 
 export interface InfoFileMeta {
@@ -59,22 +58,29 @@ export default {
     const title = ref("");
     const subtitle = ref("");
     const html = ref("");
+    const fetchWithAbort = useFetch();
 
     async function setOpenInfo(value: boolean) {
       openInfo.value = value;
 
       if (value) {
         loading.value = true;
-        const res = await fetch(import.meta.env.BASE_URL + info.value.page);
-        const markdown = await res.text();
+        try {
+          const res = await fetchWithAbort(import.meta.env.BASE_URL + info.value.page);
+          const markdown = await res.text();
 
-        const { attributes, body } = fm<InfoFileMeta>(markdown);
+          const { attributes, body } = fm<InfoFileMeta>(markdown);
 
-        title.value = attributes.title || "";
-        subtitle.value = attributes.subtitle || "";
-        html.value = await marked.parse(body);
+          title.value = attributes.title || "";
+          subtitle.value = attributes.subtitle || "";
+          html.value = await marked.parse(body);
 
-        loading.value = false;
+          loading.value = false;
+        } catch (error) {
+          if (isAbortError(error)) return;
+          loading.value = false;
+          throw error;
+        }
       }
     }
 

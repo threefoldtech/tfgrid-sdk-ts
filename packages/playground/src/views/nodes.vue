@@ -487,6 +487,7 @@ import NodeDetails from "@/components/node_details.vue";
 import NodesTable from "@/components/nodes_table.vue";
 import router from "@/router";
 import { useProfileManager } from "@/stores";
+import { isAbortError, useWithAbortSignal } from "@/hooks/useAbortController";
 import { requestNodes } from "@/utils/get_nodes";
 import { convertToBytes } from "@/utils/get_nodes";
 
@@ -523,6 +524,7 @@ export default {
   },
   setup() {
     const profileManager = useProfileManager();
+    const requestNodesWithAbort = useWithAbortSignal(requestNodes);
     const size = ref(window.env.PAGE_SIZE);
     const error = ref(false);
     const page = ref(1);
@@ -592,7 +594,7 @@ export default {
       error.value = false;
       if (retCount) page.value = 1;
       try {
-        const { count, data } = await requestNodes(
+        const { count, data } = await requestNodesWithAbort(
           {
             page: page.value,
             size: size.value,
@@ -632,6 +634,8 @@ export default {
         _nodes.value = data;
         if (retCount) nodesCount.value = count ?? 0;
       } catch (err) {
+        // Ignore abort errors - component unmounted
+        if (isAbortError(err)) return;
         console.log(err);
         error.value = true;
       } finally {

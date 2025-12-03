@@ -1,9 +1,7 @@
 <template v-if="nodes">
   <div class="my-6">
     <v-card color="primary rounded-0">
-      <v-card-title class="py-1 text-subtitle-1 text-center">
-        Your Nodes
-      </v-card-title>
+      <v-card-title class="py-1 text-subtitle-1 text-center"> Your Nodes </v-card-title>
     </v-card>
     <v-data-table-server
       v-model:page="page"
@@ -46,9 +44,7 @@
 
             <v-card class="mt-4">
               <v-alert class="pa-5" style="height: 20px">
-                <h4 class="text-center font-weight-medium">
-                  Resource Units Reserved
-                </h4>
+                <h4 class="text-center font-weight-medium">Resource Units Reserved</h4>
               </v-alert>
               <v-card-text class="pb-8">
                 <NodeResources :node="item" />
@@ -57,9 +53,7 @@
 
             <v-card v-if="network == 'main'" class="mt-4" focusable single model-value>
               <v-alert class="pa-5" style="height: 20px">
-                <h4 class="text-center font-weight-medium">
-                  Node Statistics
-                </h4>
+                <h4 class="text-center font-weight-medium">Node Statistics</h4>
               </v-alert>
               <v-card-item>
                 <NodeMintingDetails :node="item" />
@@ -107,6 +101,7 @@ import CardDetails from "@/components/node_details_cards/card_details.vue";
 import { useProfileManager } from "@/stores";
 import type { NodeDetailsCard } from "@/types";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
+import { useAbortController, useWithAbortSignal } from "@/hooks/useAbortController";
 import { getNodeStatusColor } from "@/utils/get_nodes";
 import { calculateUptime, getNodeAvailability, getNodeMintingFixupReceipts, type NodeInterface } from "@/utils/node";
 
@@ -126,6 +121,8 @@ export default {
   },
   setup() {
     const profileManager = useProfileManager();
+    const getReceiptsWithAbort = useWithAbortSignal(getNodeMintingFixupReceipts);
+    const signal = useAbortController();
     const loading = ref(false);
     const page = ref<number>(1);
     const pageSize = ref(10);
@@ -187,12 +184,16 @@ export default {
         loading.value = true;
         const twinId = profileManager.profile!.twinId;
 
-        const { data, count } = await gridProxyClient.nodes.list({
-          retCount: true,
-          page: page.value,
-          size: pageSize.value,
-          ownedBy: twinId as number,
-        });
+        const { data, count } = await gridProxyClient.nodes.list(
+          {
+            retCount: true,
+            page: page.value,
+            size: pageSize.value,
+            ownedBy: twinId as number,
+          },
+          {},
+          signal,
+        );
 
         const _nodes = data as unknown as NodeInterface[];
         nodesCount.value = count ?? 0;
@@ -201,7 +202,7 @@ export default {
             const network = process.env.NETWORK || (window as any).env.NETWORK;
             node.receipts = [];
             try {
-              if (network == "main") node.receipts = await getNodeMintingFixupReceipts(node.nodeId);
+              if (network == "main") node.receipts = await getReceiptsWithAbort(node.nodeId);
             } catch {
               createCustomToast(`Failed to get node ${node.nodeId} minting receipts!`, ToastType.danger);
             }

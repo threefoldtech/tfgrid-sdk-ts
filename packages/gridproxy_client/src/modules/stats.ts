@@ -28,8 +28,8 @@ export class StatsClient extends AbstractClient<StatsBuilder, StatsQuery> {
     });
   }
 
-  public async get(queries: Partial<StatsQuery> = {}): Promise<Stats> {
-    const res = await this.builder(queries).build("/stats");
+  public async get(queries: Partial<StatsQuery> = {}, signal?: AbortSignal): Promise<Stats> {
+    const res = await this.builder(queries).build("/stats", 10000, signal);
     return res.json();
   }
 }

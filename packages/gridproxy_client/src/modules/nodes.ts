@@ -32,22 +32,28 @@ export class NodesClient extends AbstractClient<NodesBuilder, NodesQuery> {
     this.setTwin = this.setTwin.bind(this);
   }
 
-  public async list(queries: Partial<NodesQuery> = {}, extraOptions: NodesExtractOptions = {}) {
-    const res = await this.builder(queries).build("/nodes");
+  public async list(queries: Partial<NodesQuery> = {}, extraOptions: NodesExtractOptions = {}, signal?: AbortSignal) {
+    const res = await this.builder(queries).build("/nodes", 10000, signal);
     const nodes = await resolvePaginator<GridNode[]>(res);
 
     if (extraOptions.loadFarm) {
-      await this.loadFarms(nodes.data.map(n => n.farmId));
+      await this.loadFarms(
+        nodes.data.map(n => n.farmId),
+        signal,
+      );
       nodes.data = nodes.data.map(this.setFarm);
     }
 
     if (extraOptions.loadTwin) {
-      await this.loadTwins(nodes.data.map(n => n.twinId));
+      await this.loadTwins(
+        nodes.data.map(n => n.twinId),
+        signal,
+      );
       nodes.data = nodes.data.map(this.setTwin);
     }
 
     if (extraOptions.loadStats) {
-      const nodesStats = await Promise.all(nodes.data.map(n => this.statsById(n.nodeId)));
+      const nodesStats = await Promise.all(nodes.data.map(n => this.statsById(n.nodeId, signal)));
       nodes.data = nodes.data.map((n, index) => {
         n.stats = nodesStats[index];
         return n;
@@ -57,8 +63,8 @@ export class NodesClient extends AbstractClient<NodesBuilder, NodesQuery> {
     return nodes;
   }
 
-  public async byId(nodeId: number, extraOptions: NodesExtractOptions = {}): Promise<GridNode> {
-    const res = await this.builder({}).build(`/nodes/${nodeId}`);
+  public async byId(nodeId: number, extraOptions: NodesExtractOptions = {}, signal?: AbortSignal): Promise<GridNode> {
+    const res = await this.builder({}).build(`/nodes/${nodeId}`, 10000, signal);
     let node: GridNode = await res.json();
 
     const capacity = Reflect.get(node, "capacity");
@@ -68,37 +74,37 @@ export class NodesClient extends AbstractClient<NodesBuilder, NodesQuery> {
     }
 
     if (extraOptions.loadFarm && node) {
-      await this.loadFarms([node.farmId]);
+      await this.loadFarms([node.farmId], signal);
       node = this.setFarm(node);
     }
 
     if (extraOptions.loadTwin) {
-      await this.loadTwins([node.twinId]);
+      await this.loadTwins([node.twinId], signal);
       node = this.setTwin(node);
     }
 
     if (extraOptions.loadStats) {
-      node.stats = await this.statsById(node.nodeId);
+      node.stats = await this.statsById(node.nodeId, signal);
     }
 
     return node;
   }
 
-  public async statsById(nodeId: number): Promise<NodeStats> {
-    const res = await this.builder({}).build(`/nodes/${nodeId}/statistics`);
+  public async statsById(nodeId: number, signal?: AbortSignal): Promise<NodeStats> {
+    const res = await this.builder({}).build(`/nodes/${nodeId}/statistics`, 10000, signal);
     return res.json();
   }
 
-  public async gpuById(nodeId: number): Promise<GPUCard[] | null | { error: string }> {
-    const res = await this.builder({}).build(`/nodes/${nodeId}/gpu`);
+  public async gpuById(nodeId: number, signal?: AbortSignal): Promise<GPUCard[] | null | { error: string }> {
+    const res = await this.builder({}).build(`/nodes/${nodeId}/gpu`, 10000, signal);
     return res.json();
   }
 
-  private async loadFarms(farmIds: number[]): Promise<void> {
+  private async loadFarms(farmIds: number[], signal?: AbortSignal): Promise<void> {
     farmIds = farmIds.filter(id => !this.farms.has(id));
     const ids = Array.from(new Set(farmIds));
     if (!ids.length) return;
-    const farms = await Promise.all(ids.map(farmId => this.__farmsClient.list({ farmId })));
+    const farms = await Promise.all(ids.map(farmId => this.__farmsClient.list({ farmId }, signal)));
     for (const { data } of farms) {
       const [farm] = data;
       this.farms = this.farms.set(farm.farmId, farm);
@@ -124,11 +130,11 @@ export class NodesClient extends AbstractClient<NodesBuilder, NodesQuery> {
     };
   }
 
-  private async loadTwins(twinIds: number[]): Promise<void> {
+  private async loadTwins(twinIds: number[], signal?: AbortSignal): Promise<void> {
     twinIds = twinIds.filter(id => !this.twins.has(id));
     const ids = Array.from(new Set(twinIds));
     if (!ids.length) return;
-    const twins = await Promise.all(ids.map(twinId => this.__twinsClient.list({ twinId })));
+    const twins = await Promise.all(ids.map(twinId => this.__twinsClient.list({ twinId }, signal)));
     for (const { data } of twins) {
       const [twin] = data;
       this.twins = this.twins.set(twin.twinId, twin);

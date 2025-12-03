@@ -46,18 +46,10 @@ export interface Fixup extends Receipt {
   minted_reward: Reward;
 }
 
-export async function getMintingData(hash: number) {
-  const mintingURL = window.env.MINTING_URL ? window.env.MINTING_URL : "https://alpha.minting.tfchain.grid.tf";
-  const hashReceipts = await fetch(`${mintingURL}/api/v1/receipt/${hash}`).then(async res => {
-    if (res.ok) {
-      const receipt = await res.json();
-      if (receipt.Minting) {
-        return receipt as unknown as Minting;
-      } else {
-        return receipt as unknown as Fixup;
-      }
-    } else throw new Error(`Receipt with hash  "${hash}" not found`);
-  });
-
-  return hashReceipts;
+export async function getMintingData(hash: number, signal?: AbortSignal) {
+  const mintingURL = window.env.MINTING_URL || "https://alpha.minting.tfchain.grid.tf";
+  const res = await fetch(`${mintingURL}/api/v1/receipt/${hash}`, { signal });
+  if (!res.ok) throw new Error(`Receipt with hash "${hash}" not found`);
+  const receipt = await res.json();
+  return receipt.Minting ? (receipt as unknown as Minting) : (receipt as unknown as Fixup);
 }

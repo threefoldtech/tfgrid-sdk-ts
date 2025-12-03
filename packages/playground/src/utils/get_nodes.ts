@@ -11,6 +11,7 @@ import { byCountry } from "country-code-lookup";
 import { ref } from "vue";
 
 import { gridProxyClient } from "@/clients";
+import { isAbortError } from "@/hooks/useAbortController";
 import type { NodeHealthColor, NodeStatusColor, NodeTypeColor } from "@/types";
 const requestPageNumber = ref<number>(1);
 const offlineNodes = ref<NodeInfo[]>([]);
@@ -137,10 +138,10 @@ export const getNodeHealthColor = (health: string): NodeHealthColor => {
 export async function requestNodes(
   options: Partial<NodesQuery>,
   config: NodesExtractOptions,
+  signal?: AbortSignal,
 ): Promise<Pagination<GridNode[]>> {
   try {
-    const nodes: Pagination<GridNode[]> = await gridProxyClient.nodes.list(options, config);
-    return nodes;
+    return await gridProxyClient.nodes.list(options, config, signal);
   } catch (error) {
     console.error("An error occurred while requesting nodes:", error);
     throw error;
@@ -152,16 +153,15 @@ export async function requestNodes(
  * @param {number} nodeId - The node id.
  * @returns {Promise<NodeStats>} - A promise that resolves to an object containing the node stats details.
  */
-export async function getNodeStates(nodeId: number): Promise<NodeStats> {
+export async function getNodeStates(nodeId: number, signal?: AbortSignal): Promise<NodeStats> {
   if (typeof nodeId !== "number" || isNaN(nodeId)) {
     throw new Error("Invalid nodeId");
   }
-  const nodeStats: NodeStats = await gridProxyClient.nodes.statsById(nodeId);
-  if (nodeStats.system) {
-    return nodeStats;
-  } else {
+  const nodeStats: NodeStats = await gridProxyClient.nodes.statsById(nodeId, signal);
+  if (!nodeStats.system) {
     throw new Error(`Failed to retrieve node stats`);
   }
+  return nodeStats;
 }
 
 /**
@@ -170,7 +170,7 @@ export async function getNodeStates(nodeId: number): Promise<NodeStats> {
  * @param {NodesExtractOptions} config - The configuration for the node request.
  * @returns {Promise<GridNode>} - A promise that resolves to an object containing the node details.
  */
-export async function getNode(nodeId: number, config?: NodesExtractOptions): Promise<GridNode> {
+export async function getNode(nodeId: number, config?: NodesExtractOptions, signal?: AbortSignal): Promise<GridNode> {
   if (typeof nodeId !== "number" || nodeId <= 0) {
     throw new Error("Invalid nodeId. Expected a positive integer.");
   }
@@ -180,9 +180,9 @@ export async function getNode(nodeId: number, config?: NodesExtractOptions): Pro
   }
 
   try {
-    const node: GridNode = await gridProxyClient.nodes.byId(nodeId, config);
-    return node;
+    return await gridProxyClient.nodes.byId(nodeId, config, signal);
   } catch (error: any) {
+    if (isAbortError(error)) throw error;
     throw new Error(`Failed to get node: ${error.message}`);
   }
 }

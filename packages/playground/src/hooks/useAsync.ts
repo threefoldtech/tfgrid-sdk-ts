@@ -1,6 +1,8 @@
 import noop from "lodash/fp/noop.js";
 import { computed, type ComputedRef, onMounted, type Ref, ref } from "vue";
 
+import { isAbortError } from "./useAbortController";
+
 export type AsyncTask<T, A extends any[]> = (...args: A) => Promise<T>;
 export interface TaskResult<T, E, A extends any[]> {
   run(...args: A): Promise<void>;
@@ -103,6 +105,10 @@ export function useAsync<T, E = Error, A extends any[] = []>(
       }
       return true;
     } catch (err) {
+      // Ignore abort errors - component unmounted
+      if (isAbortError(err)) {
+        return false;
+      }
       if (taskId === taskIdCounter) {
         data.value = _options.default;
         error.value = err as E;
