@@ -29,5 +29,9 @@
   "lint-staged": {
     "*.{js,jsx,ts,tsx,css,scss,svelte,vue}": "eslint --fix",
     "*.{js,ts,css,scss,md,svelte,vue,yaml}": "prettier .prettierrc --write"
+  },
+  "resolutions": {
+    "axios": "^1.12.0",
+    "@babel/runtime": "^7.26.10"
   }
 }

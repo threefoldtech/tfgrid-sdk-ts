@@ -18,7 +18,7 @@
       show-select
       return-object
       @update:options="
-        (options: any ) => {
+        (options: any) => {
           page = options.page;
           pageSize = options.itemsPerPage;
           getFarmPublicIp(true, { page, size: pageSize });
@@ -27,9 +27,7 @@
     >
       <template #top>
         <v-alert>
-          <h4 class="text-center font-weight-medium">
-            Public IPs
-          </h4>
+          <h4 class="text-center font-weight-medium">Public IPs</h4>
         </v-alert>
       </template>
       <template #[`item.ip`]="{ item }">
@@ -70,9 +68,7 @@
           <v-divider />
         </v-card-text>
         <v-card-actions class="justify-end mb-1 mr-2">
-          <v-btn color="anchor" @click="showDialogue = false">
-            Close
-          </v-btn>
+          <v-btn color="anchor" @click="showDialogue = false"> Close </v-btn>
           <v-btn
             text="Delete"
             :loading="isRemoving"
@@ -91,7 +87,8 @@ import { RemoveFarmIPModel } from "@threefold/grid_client";
 import { plainToInstance } from "class-transformer";
 import type { PublicIp } from "@threefold/gridproxy_client";
 import * as ip from "ip";
-import { ref, watch } from "vue";
+import { computed, onUnmounted, ref, watch } from "vue";
+import { useDocumentVisibility } from "@vueuse/core";
 
 import { gridProxyClient } from "@/clients";
 import { useGrid } from "@/stores";
@@ -148,6 +145,9 @@ export default {
     const items = ref<RemoveFarmIPModel[]>([]);
     const page = ref<number>(1);
     const pageSize = ref(5);
+    const visibility = useDocumentVisibility();
+    const isVisible = computed(() => visibility.value === "visible");
+    const timeouts: ReturnType<typeof setTimeout>[] = [];
 
     async function getFarmPublicIp(retCount = false, options = { page: 1, size: 10 }) {
       try {
@@ -186,12 +186,18 @@ export default {
           farmId: props.farmId,
         }));
         const modelItems = items.value.map(item => plainToInstance(RemoveFarmIPModel, item));
-        await gridStore.grid.farms.removeFarmIps({ips:modelItems});
-        setTimeout(async () => {
-          await getFarmPublicIp(true, { page: page.value, size: pageSize.value });
-          createCustomToast("IP is deleted successfully!", ToastType.success);
+        await gridStore.grid.farms.removeFarmIps({ ips: modelItems });
+        // Only schedule refresh if tab is visible
+        if (isVisible.value) {
+          const timeoutId = setTimeout(async () => {
+            await getFarmPublicIp(true, { page: page.value, size: pageSize.value });
+            createCustomToast("IP is deleted successfully!", ToastType.success);
+            loading.value = false;
+          }, 20000);
+          timeouts.push(timeoutId);
+        } else {
           loading.value = false;
-        }, 20000);
+        }
       } catch (error) {
         console.log(error);
         createCustomToast("Failed to delete IP!", ToastType.danger);
@@ -205,12 +211,31 @@ export default {
       () => props.refreshPublicIPs,
       () => {
         loading.value = true;
-        setTimeout(async () => {
-          await getFarmPublicIp(true, { page: page.value, size: pageSize.value });
-        }, 20000);
+        // Only schedule refresh if tab is visible
+        if (isVisible.value) {
+          const timeoutId = setTimeout(async () => {
+            await getFarmPublicIp(true, { page: page.value, size: pageSize.value });
+          }, 20000);
+          timeouts.push(timeoutId);
+        } else {
+          loading.value = false;
+        }
       },
       { deep: true },
     );
+
+    // Cleanup timeouts when tab becomes inactive
+    watch(isVisible, visible => {
+      if (!visible) {
+        timeouts.forEach(timeout => clearTimeout(timeout));
+        timeouts.length = 0;
+      }
+    });
+
+    onUnmounted(() => {
+      timeouts.forEach(timeout => clearTimeout(timeout));
+      timeouts.length = 0;
+    });
     return {
       gridStore,
       headers,
