@@ -59,7 +59,7 @@ class Utility {
   @checkBalance
   async forceBatch<T>(options: BatchModel<T>): Promise<T[]> {
     // Cast to any until @threefold/tfchain_client Utility type exposes forceBatch in its typings
-    return await (this.client.utility as any).forceBatch(options.extrinsics);
+    return await this.client.utility.forceBatch(options.extrinsics);
   }
 }
 
