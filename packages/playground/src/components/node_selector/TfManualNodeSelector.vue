@@ -25,10 +25,7 @@
       "
     />
 
-    <input-tooltip
-      tooltip="Node ID to deploy on."
-      align-center
-    >
+    <input-tooltip tooltip="Node ID to deploy on." align-center>
       <VTextField
         v-model.number="nodeId"
         label="Node ID"
@@ -40,9 +37,9 @@
         :disabled="!validFilters"
         :persistent-hint="
           (nodeId && !validationTask.initialized) ||
-            !validFilters ||
-            validationTask.loading ||
-            (validationTask.initialized && validationTask.data === true)
+          !validFilters ||
+          validationTask.loading ||
+          (validationTask.initialized && validationTask.data === true)
         "
         :hint="
           !validFilters
@@ -199,7 +196,7 @@ export default {
             } Feature${missingFeatures.length > 1 ? "s" : ""}. Please check compatibility or upgrade the node.`;
         }
 
-        const args = [nodeId, "proxy", gridStore.client.config.proxyURL] as const;
+        const args = [nodeId, "proxy", gridStore.client.config.proxyURL, node.twinId] as const;
         const [resources, e2] = await resolveAsync(gridStore.client.capacity.nodes.getNodeFreeResources(...args));
         if (e2) {
           throw normalizeError(e2, _defaultError);

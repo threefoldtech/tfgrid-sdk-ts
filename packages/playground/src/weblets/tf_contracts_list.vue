@@ -310,14 +310,19 @@ const password = ref("");
 const isValidForm = ref<boolean>(false);
 
 const panel = ref<number[]>([0, 1, 2]);
-const nodeInfo: Ref<{ [nodeId: number]: { status: NodeStatus; farmId: number } }> = ref({});
+const nodeInfo: Ref<{ [nodeId: number]: { status: NodeStatus } }> = ref({});
 const unlockContractLoading = ref<boolean>(false);
 const contractsTable = ref<(typeof ContractsTable)[]>([]);
 const loadingLockDetails = ref(false);
-// Computed property to get unique node IDs from contracts
-const nodeIDs = computed(() => {
-  return [...new Set(contracts.value.map(contract => contract.details.nodeId) || [])];
+const nodeIDs = computed<number[]>(() => {
+  const ids = new Set<number>();
+  for (const contract of contracts.value) {
+    ids.add(contract.details.nodeId);
+  }
+
+  return Array.from(ids);
 });
+
 // To avoid multiple requests
 const cachedNodeIDs = ref<number[]>([]);
 onMounted(() => {

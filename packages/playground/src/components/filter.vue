@@ -78,7 +78,8 @@
 
 <script lang="ts" setup>
 import type { NodeStatus } from "@threefold/gridproxy_client";
-import { cloneDeep, isEmpty } from "lodash";
+import cloneDeep from "lodash/cloneDeep.js";
+import isEmpty from "lodash/isEmpty.js";
 import equals from "lodash/fp/equals.js";
 import { computed, defineComponent, nextTick, onMounted, type PropType, ref, watch } from "vue";
 import { type LocationQueryRaw, useRoute } from "vue-router";

@@ -54,7 +54,6 @@ export async function getAllNodes(grid: GridClient | null, options?: NodeFilters
   } else {
     const offNodes: NodeInfo[] = await grid!.nodes.filter({
       ...options,
-      // status: NodeStatus.down,
       page: requestPageNumber.value,
     });
 
@@ -192,11 +191,11 @@ export async function getNode(nodeId: number, config?: NodesExtractOptions): Pro
  * @param {number} resource - The resource in GB.
  * @returns {number} - The resource in Bytes.
  */
-export const toBytes = (resource: number | undefined): number => {
+const toBytes = (resource: number | undefined): number => {
   return resource ? resource * 1024 * 1024 * 1024 : 0;
 };
 
-export function convert(value: string | undefined) {
+function convert(value: string | undefined) {
   return value ? Math.ceil(toBytes(+value)) : undefined;
 }
 

@@ -38,7 +38,7 @@
 
 <script lang="ts">
 import type { GPUCardInfo, NodeInfo } from "@threefold/grid_client";
-import { noop } from "lodash";
+import noop from "lodash/fp/noop.js";
 import { getCurrentInstance, onMounted, onUnmounted, type PropType, ref } from "vue";
 
 import type { InputValidatorService } from "@/hooks/input_validator";

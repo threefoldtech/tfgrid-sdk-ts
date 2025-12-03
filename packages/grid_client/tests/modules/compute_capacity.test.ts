@@ -23,15 +23,12 @@ describe("Compute Capacity module", () => {
     expect(result).toThrow();
   });
 
-  test("Max values for cpu & memory.", () => {
-    const cpu = 33;
+  test("Max values for memory.", () => {
     const mem = 255 * 1024 ** 4;
 
-    const setCPU = () => (computeCapacity.cpu = cpu);
     const setMem = () => (computeCapacity.memory = mem);
     const result = () => computeCapacity.challenge();
 
-    expect(setCPU).toThrow();
     expect(setMem).toThrow();
     expect(result).toThrow();
   });

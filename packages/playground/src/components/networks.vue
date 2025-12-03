@@ -62,7 +62,7 @@
 </template>
 
 <script lang="ts">
-import { noop } from "lodash";
+import noop from "lodash/fp/noop.js";
 import { computed, getCurrentInstance, onMounted, onUnmounted, ref, watch } from "vue";
 
 import { useForm, ValidatorStatus } from "@/hooks/form_validator";

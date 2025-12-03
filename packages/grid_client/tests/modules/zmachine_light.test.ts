@@ -18,6 +18,7 @@ const networkInterface = new ZNetworkInterface();
 const disks = new Mount();
 
 beforeEach(() => {
+  zmachineLight = new ZmachineLight();
   computeCapacity.cpu = 1;
   computeCapacity.memory = 256 * 1024 ** 2;
 
@@ -36,7 +37,8 @@ beforeEach(() => {
   disks.name = "zdisk";
   disks.mountpoint = "/mnt/data";
 
-  flist: FLISTS.MICROVMS_UBUNTU_22.flist, (zmachineLight.network = network);
+  zmachineLight.flist = FLISTS.MICROVMS_UBUNTU_22.flist;
+  zmachineLight.network = network;
   zmachineLight.size = rootfs_size * 1024 ** 3;
   zmachineLight.mounts = [disks];
   zmachineLight.entrypoint = FLISTS.MICROVMS_UBUNTU_24.entryPoint;

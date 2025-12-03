@@ -267,7 +267,7 @@ class Capacity {
   @expose
   @validateInput
   async getNodeFreeResources(options?: NodeFreeResourcesModel): Promise<NodeResources> {
-    return await this.nodes.getNodeFreeResources(options!.nodeId);
+    return await this.nodes.getNodeFreeResources(options!.nodeId, "proxy", "", options?.nodeTwinId);
   }
 
   /**
@@ -306,6 +306,7 @@ class Capacity {
       options.hddDisks,
       options.rootfsDisks,
       options.nodeId,
+      options.nodeTwinId,
     );
   }
 

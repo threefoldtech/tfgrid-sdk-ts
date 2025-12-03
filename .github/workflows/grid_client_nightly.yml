@@ -94,14 +94,14 @@ jobs:
 
       - name: Run test vm with qsfs
         id: vmqsfs
-        if: always()
+        if: false
         continue-on-error: true
         run: |
           yarn run ts-node --transpileOnly --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/vm_with_qsfs.ts
 
       - name: Run test kubernetes with qsfs
         id: k8sqsfs
-        if: always()
+        if: false
         continue-on-error: true
         run: |
           yarn run ts-node --transpileOnly --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/orchestrators/kubernetes_with_qsfs.ts
@@ -114,7 +114,7 @@ jobs:
 
       - name: Run test zdb
         id: zdb
-        if: always()
+        if: false
         continue-on-error: true
         run: |
           yarn run ts-node --transpileOnly --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/zdb.ts

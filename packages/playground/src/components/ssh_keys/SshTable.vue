@@ -93,8 +93,6 @@
       </v-data-table>
     </v-card-text>
 
-    <!-- <v-divider /> -->
-
     <v-card-actions class="justify-end my-1 mr-2">
       <v-tooltip location="bottom" text="Export all selected keys.">
         <template #activator="{ props }">

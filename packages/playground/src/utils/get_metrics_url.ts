@@ -3,12 +3,6 @@ import type { GridNode, TwinsQuery } from "@threefold/gridproxy_client";
 
 import { gridProxyClient } from "@/clients";
 
-export interface IGrafanaArgs {
-  farmID: number;
-  twinID: number;
-  accountID: string;
-}
-
 export class GrafanaStatistics {
   private client: GridProxyClient;
   private network: string;

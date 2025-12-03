@@ -287,12 +287,17 @@ class Nodes {
       });
   }
 
-  async getNodeFreeResources(nodeId: number, source: "proxy" | "zos" = "proxy", url = ""): Promise<NodeResources> {
+  async getNodeFreeResources(
+    nodeId: number,
+    source: "proxy" | "zos" = "proxy",
+    url = "",
+    nodeTwinId?: number,
+  ): Promise<NodeResources> {
     if (source == "zos") {
-      const node_twin_id = await this.getNodeTwinId(nodeId);
+      const twinId = nodeTwinId ?? (await this.getNodeTwinId(nodeId));
 
       return this.rmb
-        .request([node_twin_id], "zos.statistics.get", "")
+        .request([twinId], "zos.statistics.get", "")
         .then(res => {
           const node: RMBNodeCapacity = res;
           const ret: NodeResources = {
@@ -519,8 +524,8 @@ class Nodes {
     return convertObjectToQueryString(params);
   }
 
-  async nodeHasResources(nodeId: number, options: FilterOptions): Promise<boolean> {
-    const resources = await this.getNodeFreeResources(nodeId, "zos");
+  async nodeHasResources(nodeId: number, options: FilterOptions, nodeTwinId?: number): Promise<boolean> {
+    const resources = await this.getNodeFreeResources(nodeId, "zos", "", nodeTwinId);
     if (
       (options.mru && options.mru > 0 && resources.mru < this._g2b(options.mru)) ||
       (options.sru && options.sru > 0 && resources.sru < this._g2b(options.sru)) ||
@@ -609,17 +614,16 @@ class Nodes {
     hddDisks: number[],
     rootFileSystemDisks: number[],
     nodeId: number,
+    nodeTwinId?: number,
   ): Promise<boolean> {
     const ssdPools: number[] = [];
     const hddPools: number[] = [];
 
     try {
-      const nodeTwinId = await this.getNodeTwinId(nodeId);
-      ((await this.rmb.request([nodeTwinId], "zos.storage.pools", "")) as StoragePool[]).forEach(
-        (disk: StoragePool) => {
-          disk.type === DiskTypes.SSD ? ssdPools.push(disk.size - disk.used) : hddPools.push(disk.size - disk.used);
-        },
-      );
+      const twinId = nodeTwinId ?? (await this.getNodeTwinId(nodeId));
+      ((await this.rmb.request([twinId], "zos.storage.pools", "")) as StoragePool[]).forEach((disk: StoragePool) => {
+        disk.type === DiskTypes.SSD ? ssdPools.push(disk.size - disk.used) : hddPools.push(disk.size - disk.used);
+      });
     } catch (e) {
       (e as Error).message = formatErrorMessage(`Error getting node ${nodeId}`, e);
       throw e;

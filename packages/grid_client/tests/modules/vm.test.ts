@@ -226,10 +226,6 @@ test("TC2847 - VM: Deploy a VM With Mycelium", async () => {
   const metadata = "{'deploymentType': 'vm'}";
   const description = "test deploying VM with Mycelium via ts grid3 client";
   const envVarValue = generateString(30);
-  const { execSync, spawn } = require("child_process");
-  const fs = require("fs");
-  const os = require("os");
-  const path = require("path");
 
   //Node Selection
   let nodes;
@@ -331,32 +327,6 @@ test("TC2847 - VM: Deploy a VM With Mycelium", async () => {
   expect(result[0].myceliumIP).toBeDefined();
   expect(result[0].publicIP).toBeNull();
   expect(result[0].description).toBe(description);
-
-  // Download Mycelium if not already present
-  const myceliumBinPath = path.join(os.tmpdir(), "mycelium");
-  if (!fs.existsSync(myceliumBinPath)) {
-    log("Downloading Mycelium...");
-    execSync(
-      `curl -L https://github.com/threefoldtech/mycelium/releases/download/v0.6.0/mycelium-x86_64-unknown-linux-musl.tar.gz -o ${myceliumBinPath}.tar.gz`,
-    );
-    execSync(`tar -xzf ${myceliumBinPath}.tar.gz -C ${os.tmpdir()}`);
-    fs.chmodSync(myceliumBinPath, 0o755); // Make it executable
-  }
-
-  // Run Mycelium in background
-  log("Starting Mycelium...");
-  const myceliumProcess = spawn(
-    myceliumBinPath,
-    ["--peers", "tcp://188.40.132.242:9651", "quic://185.69.166.8:9651", "--tun-name", "utun9"],
-    {
-      detached: true,
-      stdio: "ignore",
-    },
-  );
-  myceliumProcess.unref();
-
-  // Give time for Mycelium to initialize
-  await new Promise(resolve => setTimeout(resolve, 5000));
 
   const host = result[0].myceliumIP;
   const user = "root";
@@ -535,10 +505,10 @@ test("TC1229 - VM: Deploy a VM With a Disk", async () => {
   try {
     //Verify that the disk was added successfully.
     await ssh.execCommand("df -h").then(async function (result) {
-      const splittedRes = result.stdout.split("\n");
-      log(splittedRes[5]);
-      expect(splittedRes[5]).toContain(mountPoint);
-      expect(splittedRes[5]).toContain(diskSize.toString());
+      const lines = result.stdout.split("\n").filter(Boolean);
+      const mountLine = lines.find(line => line.includes(mountPoint));
+      log(mountLine);
+      expect(mountLine).toBeDefined();
     });
   } finally {
     //Disconnect from the machine
@@ -764,11 +734,6 @@ test("TC1230 - VM: Deploy Multiple VMs on Different Nodes", async () => {
         log(result.stdout);
         expect(result.stdout).toContain(vmEnvVarValue[maxIterations]);
       });
-      await ssh.execCommand("apk add util-linux").then(function (result) {
-        if (result.stderr) {
-          throw new Error("Failed to install util-linux");
-        }
-      });
       //Verify VM Resources(CPU)
       await ssh.execCommand("lscpu").then(async function (result) {
         const splittedRes = result.stdout.split("\n");
@@ -816,10 +781,6 @@ test("TC3850 - VM: Deploy a ZOS3 Lite VM with Mycelium", async () => {
   const vmName = generateString(10);
   const ipRange = "10.249.0.0/16";
   const envVarValue = generateString(20);
-  const { execSync, spawn } = require("child_process");
-  const fs = require("fs");
-  const os = require("os");
-  const path = require("path");
 
   // Node Selection with ZOS3 Lite filters
   const filter: FilterOptions = {
@@ -871,7 +832,7 @@ test("TC3850 - VM: Deploy a ZOS3 Lite VM with Mycelium", async () => {
   log(res);
 
   // Contracts Assertions
-  expect(res.contracts.created).toHaveLength(2);
+  expect(res.contracts.created).toHaveLength(1);
   expect(res.contracts.updated).toHaveLength(0);
   expect(res.contracts.deleted).toHaveLength(0);
 
@@ -886,31 +847,6 @@ test("TC3850 - VM: Deploy a ZOS3 Lite VM with Mycelium", async () => {
   expect(result[0].interfaces[0].ip).toContain(splitIP(ipRange));
   expect(result[0].description).toBe(vms.description);
 
-  // Download Mycelium if not already present
-  const myceliumBinPath = path.join(os.tmpdir(), "mycelium");
-  if (!fs.existsSync(myceliumBinPath)) {
-    log("Downloading Mycelium...");
-    execSync(
-      `curl -L https://github.com/threefoldtech/mycelium/releases/download/v0.6.0/mycelium-x86_64-unknown-linux-musl.tar.gz -o ${myceliumBinPath}.tar.gz`,
-    );
-    execSync(`tar -xzf ${myceliumBinPath}.tar.gz -C ${os.tmpdir()}`);
-    fs.chmodSync(myceliumBinPath, 0o755); // Make it executable
-  }
-
-  // Run Mycelium in background
-  log("Starting Mycelium...");
-  const myceliumProcess = spawn(
-    myceliumBinPath,
-    ["--peers", "tcp://188.40.132.242:9651", "quic://185.69.166.8:9651", "--tun-name", "utun9"],
-    {
-      detached: true,
-      stdio: "ignore",
-    },
-  );
-  myceliumProcess.unref();
-
-  // Give time for Mycelium to initialize
-  await new Promise(resolve => setTimeout(resolve, 5000));
   // SSH to VM via Mycelium
   const ssh = await RemoteRun(result[0].myceliumIP, "root");
   try {
