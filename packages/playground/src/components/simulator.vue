@@ -139,9 +139,7 @@
           <v-row v-if="!isAdvanced" class="mt-1 px-4">
             <div class="d-flex align-center">
               <label class="label mr-2 mb-0">Net Profit</label>
-              <!-- <v-switch hide-details color="primary" v-model="isProfit" inset disabled /> -->
               <span class="slider" />
-              <!-- <label class="label ml-2">Return On Investment</label> -->
             </div>
           </v-row>
           <v-row v-show="!isAdvanced">
@@ -167,7 +165,6 @@
                 />
               </input-validator>
 
-              <!-- <v-text-field disabled label="Return On Investment" v-model.number="ROI" /> -->
               <v-text-field v-model.number="netProfit" disabled label="Net Profit" type="number" />
               <v-text-field v-model.number="grossProfit" disabled label="Gross Profit" type="number" />
               <v-text-field v-model.number="totalCosts" disabled label="Total Costs" type="number" />

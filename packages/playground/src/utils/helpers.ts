@@ -64,17 +64,6 @@ export function normalizeBalance(num: number | string | undefined, floor = false
   return (+num).toFixed(3).replace(/\.0+$/g, "");
 }
 
-export function isEnoughBalance(balance: any, min = 0.001): boolean {
-  return balance?.free > min ? true : false;
-}
-
-export function getDashboardURL(network: string) {
-  if (network === "main") {
-    return "https://dashboard.grid.tf";
-  }
-  return `https://dashboard.${network}.grid.tf`;
-}
-
 export function getCardName(card: NodeGPUCardType): string {
   return card.vendor + " - " + card.device;
 }
