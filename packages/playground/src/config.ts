@@ -29,7 +29,19 @@ const GLOBAL_COMPONENTS: { [key: string]: Component } = {
 };
 
 const SERVICE_URLS_CACHE_KEY = "service_urls_cache";
-const SERVICE_URLS_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+const SERVICE_URLS_CACHE_TTL = 60 * 60 * 1000; // 1 hour
+
+/**
+ * Invalidates the service URLs cache.
+ * Should be called when service connection fails to ensure fresh URLs are fetched on next attempt.
+ */
+export function invalidateServiceUrlsCache() {
+  try {
+    sessionStorage.removeItem(SERVICE_URLS_CACHE_KEY);
+  } catch (error) {
+    console.warn("[invalidateServiceUrlsCache] Failed to invalidate service URLs cache", error);
+  }
+}
 
 export function defineGlobals(app: App<Element>): void {
   defineGlobalComponents(app);
@@ -123,6 +135,7 @@ export async function setGlobalEnv() {
   const result = await urlManger.getAvailableServicesStack();
 
   if (Object.values(result).includes(null)) {
+    invalidateServiceUrlsCache();
     window.$$showMonitorError(result);
     return false;
   }
