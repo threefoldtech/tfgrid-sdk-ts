@@ -18,7 +18,7 @@
       show-select
       return-object
       @update:options="
-        (options: any ) => {
+        (options: any) => {
           page = options.page;
           pageSize = options.itemsPerPage;
           getFarmPublicIp(true, { page, size: pageSize });
@@ -27,9 +27,7 @@
     >
       <template #top>
         <v-alert>
-          <h4 class="text-center font-weight-medium">
-            Public IPs
-          </h4>
+          <h4 class="text-center font-weight-medium">Public IPs</h4>
         </v-alert>
       </template>
       <template #[`item.ip`]="{ item }">
@@ -70,9 +68,7 @@
           <v-divider />
         </v-card-text>
         <v-card-actions class="justify-end mb-1 mr-2">
-          <v-btn color="anchor" @click="showDialogue = false">
-            Close
-          </v-btn>
+          <v-btn color="anchor" @click="showDialogue = false"> Close </v-btn>
           <v-btn
             text="Delete"
             :loading="isRemoving"
@@ -186,7 +182,7 @@ export default {
           farmId: props.farmId,
         }));
         const modelItems = items.value.map(item => plainToInstance(RemoveFarmIPModel, item));
-        await gridStore.grid.farms.removeFarmIps({ips:modelItems});
+        await gridStore.grid.farms.removeFarmIps({ ips: modelItems });
         setTimeout(async () => {
           await getFarmPublicIp(true, { page: page.value, size: pageSize.value });
           createCustomToast("IP is deleted successfully!", ToastType.success);
@@ -209,7 +205,6 @@ export default {
           await getFarmPublicIp(true, { page: page.value, size: pageSize.value });
         }, 20000);
       },
-      { deep: true },
     );
     return {
       gridStore,
