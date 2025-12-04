@@ -4,6 +4,7 @@ import { markRaw } from "vue";
 
 import type { SSHKeyData } from "@/types";
 
+import { invalidateServiceUrlsCache } from "../config";
 import type { Profile } from "../stores/profile_manager";
 const network = (process.env.NETWORK as NetworkEnv) || window.env.NETWORK;
 export async function getGrid(
@@ -29,7 +30,11 @@ export async function getGrid(
   try {
     await grid.connect();
   } catch (e) {
-    if (!(e instanceof InsufficientBalanceError)) throw e;
+    if (!(e instanceof InsufficientBalanceError)) {
+      // Invalidate cache if connect fails (except for insufficient balance)
+      invalidateServiceUrlsCache();
+      throw e;
+    }
   }
   return grid;
 }
@@ -90,7 +95,7 @@ export async function loadBalance(grid: GridClient): Promise<Balance> {
 export async function loadProfile(grid: GridClient): Promise<Profile> {
   return {
     mnemonic: grid.clientOptions!.mnemonic,
-    ssh: await readSSH(grid),
+    ssh: (await readSSH(grid)) ?? [],
     twinId: grid!.twinId,
     address: grid.tfclient.address,
     relay: grid.getDefaultUrls(network).relay.slice(6),

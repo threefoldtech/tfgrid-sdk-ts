@@ -479,7 +479,7 @@
 
 <script lang="ts">
 import { type GridNode, SortBy, SortOrder, UnifiedNodeStatus } from "@threefold/gridproxy_client";
-import { sortBy } from "lodash";
+import sortBy from "lodash/sortBy.js";
 import { computed, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 

@@ -172,8 +172,8 @@
         <div>You are about to permanently delete all contracts. This action cannot be reversed!</div>
       </v-alert>
       <v-card-actions class="justify-end my-1 mr-2">
-        <v-btn color="anchor" @click="deleteDialog = false"> Cancel </v-btn>
-        <v-btn color="error" @click="confirmPassword"> Delete </v-btn>
+        <v-btn color="anchor" :disabled="deleting" @click="deleteDialog = false"> Cancel </v-btn>
+        <v-btn color="error" :disabled="deleting" @click="confirmPassword"> Delete </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -194,8 +194,10 @@
           <WalletPassword v-model="password" mode="Login" />
         </v-card-item>
         <v-card-actions class="justify-end my-1 mr-2">
-          <v-btn color="anchor" @click="confirmPasswordDialog = false"> Cancel </v-btn>
-          <v-btn color="error" :disabled="!isValidForm" @click="deleteAll"> Confirm </v-btn>
+          <v-btn color="anchor" :disabled="deleting" @click="confirmPasswordDialog = false"> Cancel </v-btn>
+          <v-btn color="error" :disabled="!isValidForm || deleting" :loading="deleting" @click="deleteAll">
+            Confirm
+          </v-btn>
         </v-card-actions>
       </FormValidator>
     </v-card>
@@ -308,15 +310,20 @@ const password = ref("");
 const isValidForm = ref<boolean>(false);
 
 const panel = ref<number[]>([0, 1, 2]);
-const nodeInfo: Ref<{ [nodeId: number]: { status: NodeStatus; farmId: number } }> = ref({});
+const nodeInfo: Ref<{ [nodeId: number]: { status: NodeStatus } }> = ref({});
 const unlockContractLoading = ref<boolean>(false);
 const contractsTable = ref<(typeof ContractsTable)[]>([]);
 const loadingLockDetails = ref(false);
 const timeouts: ReturnType<typeof setTimeout>[] = [];
-// Computed property to get unique node IDs from contracts
-const nodeIDs = computed(() => {
-  return [...new Set(contracts.value.map(contract => contract.details.nodeId) || [])];
+const nodeIDs = computed<number[]>(() => {
+  const ids = new Set<number>();
+  for (const contract of contracts.value) {
+    ids.add(contract.details.nodeId);
+  }
+
+  return Array.from(ids);
 });
+
 // To avoid multiple requests
 const cachedNodeIDs = ref<number[]>([]);
 onMounted(() => {

@@ -23,7 +23,6 @@
         validators.required('CPU is required.'),
         validators.isInt('CPU must be a valid integer.'),
         validators.min('CPU min is 1 cores.', 1),
-        validators.max('CPU max is 32 cores.', 32),
       ]"
       #="{ props }"
     >

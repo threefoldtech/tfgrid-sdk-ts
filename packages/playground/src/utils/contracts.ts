@@ -8,7 +8,7 @@ import { solutionType, type VDataTableHeader } from "@/types";
 import { normalizeBalance } from "./helpers";
 
 // Cache to store results of `getNodeInfo` requests
-const NODE_INFO_CACHE: { [key: number]: { status: NodeStatus; farmId: number } } = {};
+const NODE_INFO_CACHE: { [key: number]: { status: NodeStatus } } = {};
 
 export async function getUserContracts(grid: GridClient) {
   const res: any = await grid!.contracts.listMyContracts();
@@ -118,9 +118,9 @@ export async function getNodeInfo(nodeIDs: number[], requestedNodes: number[]) {
 
   const resultPromises = nodeIDsToRequest.map(async nodeId => {
     if (typeof nodeId !== "number") return {};
-    const nodeInfo = await gridProxyClient.nodes.byId(nodeId);
+    const nodeStatusInfo = await gridProxyClient.nodes.statusById(nodeId);
     // Store result in cache
-    NODE_INFO_CACHE[nodeId] = { status: nodeInfo.status, farmId: nodeInfo.farmId };
+    NODE_INFO_CACHE[nodeId] = { status: nodeStatusInfo.status };
     return { [nodeId]: NODE_INFO_CACHE[nodeId] };
   });
 

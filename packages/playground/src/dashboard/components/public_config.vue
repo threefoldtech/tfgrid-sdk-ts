@@ -160,11 +160,11 @@
 import type { PublicConfig } from "@threefold/grid_client";
 import { ValidationError } from "@threefold/types";
 import CidrTools from "cidr-tools";
-import { isEqual } from "lodash";
+import isEqual from "lodash/isEqual.js";
 import { default as PrivateIp } from "private-ip";
 import { onMounted, ref, watch } from "vue";
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- Used in template
 import type { RuleReturn } from "@/components/input_validator.vue";
 import { useFormRef } from "@/hooks/form_validator";
 import { useGrid } from "@/stores";

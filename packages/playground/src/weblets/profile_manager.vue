@@ -143,7 +143,6 @@
           </v-col>
         </v-row>
       </template>
-      <!-- <v-divider horizontal></v-divider> -->
       <div class="d-flex justify-end mt-4 mb-2">
         <VBtn v-if="profileManager.profile" color="anchor" @click="$emit('update:modelValue', false)"> Close </VBtn>
         <VBtn
@@ -268,7 +267,7 @@ watch(
       balance.value = undefined;
     }
   },
-  { immediate: true, deep: true },
+  { immediate: true },
 );
 
 function logout() {

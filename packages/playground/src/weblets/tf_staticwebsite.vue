@@ -226,6 +226,7 @@ async function deploy() {
   if (domain.value) {
     if (!selectionDetails.value?.domain?.enableSelectedDomain) {
       vm[0].customDomain = selectionDetails.value?.domain?.customDomain;
+      finalize(vm);
       return;
     }
 
@@ -239,11 +240,13 @@ async function deploy() {
         network: vm[0].interfaces[0].network,
       });
       finalize(vm);
+      return;
     } catch (e) {
       layout.value.setStatus("deploy", "Rollbacking back due to fail to deploy gateway...");
 
       await rollbackDeployment(grid!, name.value);
       layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Static Website instance."));
+      return;
     }
   }
   finalize(vm);

@@ -109,7 +109,7 @@
 <script lang="ts" setup>
 import { events, type GridClient, type NodeInfo } from "@threefold/grid_client";
 import debounce from "lodash/debounce.js";
-import { computed, ref, watch } from "vue";
+import { computed, onUnmounted, ref, watch } from "vue";
 import { useTheme } from "vuetify";
 
 import { manual } from "@/utils/manual";
@@ -122,6 +122,7 @@ import {
 import { useGrid, useProfileManager } from "../stores";
 import { loadBalance, updateGrid } from "../utils/grid";
 import { normalizeBalance } from "../utils/helpers";
+import { normalizePrice } from "../utils/pricing_calculator";
 
 const props = defineProps({
   disableAlerts: {
@@ -178,6 +179,11 @@ function onLogMessage(msg: string) {
 watch(status, s => {
   if (s === "deploy") events.addListener("logs", onLogMessage);
   else events.removeListener("logs", onLogMessage);
+});
+
+// Ensure cleanup on component unmount
+onUnmounted(() => {
+  events.removeListener("logs", onLogMessage);
 });
 const alertType = computed(() => {
   if (status.value === "deploy") return "info";
@@ -333,9 +339,12 @@ watch(
 );
 
 /* Calculate Price */
-const showPrice = computed(
-  () => props.validFilters && !!profileManager.profile && props.cpu && props.memory && props.disk,
+const hasProfile = computed(() => !!profileManager.profile);
+const hasResources = computed(
+  () => typeof props.cpu === "number" && typeof props.memory === "number" && typeof props.disk === "number",
 );
+
+const showPrice = computed(() => props.validFilters && hasProfile.value && hasResources.value);
 const usd = ref<number>();
 const tft = ref<number>();
 const costLoading = ref(false);
@@ -344,18 +353,15 @@ const onlyIPV4TftPrice = ref<number>();
 const onlyIPV4UsdPrice = ref<number>();
 
 watch(
-  () => [props.cpu, props.memory, props.disk, props.ipv4, props.dedicated, props.selectedNode],
-  debounce((value, oldValue) => {
-    if (
-      oldValue &&
-      value[0] === oldValue[0] &&
-      value[1] === oldValue[1] &&
-      value[2] === oldValue[2] &&
-      value[3] === oldValue[3] &&
-      value[4] === oldValue[4] &&
-      value[5] === oldValue[5]
-    )
-      return;
+  [
+    () => props.cpu,
+    () => props.memory,
+    () => props.disk,
+    () => props.ipv4,
+    () => props.dedicated,
+    () => props.selectedNode,
+  ],
+  debounce(() => {
     shouldUpdateCost.value = true;
   }, 500),
   { immediate: true },
@@ -399,8 +405,10 @@ async function loadCost(profile: { mnemonic: string }) {
     certified: props.selectedNode?.certificationType === "Certified",
   });
   await getIPv1Price(grid!);
-  usd.value = props.dedicated ? dedicatedPrice : sharedPrice;
-  tft.value = parseFloat((usd.value / (await grid!.calculator.tftPrice())).toFixed(2));
+  const basePrice = props.dedicated ? dedicatedPrice : sharedPrice;
+  usd.value = normalizePrice(basePrice);
+  const tftPrice = await grid!.calculator.tftPrice();
+  tft.value = normalizePrice(usd.value / tftPrice);
   costLoading.value = false;
 }
 </script>

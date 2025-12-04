@@ -37,14 +37,15 @@ class SSHKeysManagement {
   ];
 
   /**
-   * Can be a string (legacy), SSHKeyData[] (current), or undefined.
+   * Can be a string (legacy) or SSHKeyData[] (current).
    * The string type is only for migration and should be removed after migration is complete.
+   * For new accounts without SSH keys, this is initialized to an empty array [].
    */
-  private oldKeys: string | SSHKeyData[] | undefined;
+  private oldKeys: string | SSHKeyData[];
 
   constructor() {
     const profileManager = useProfileManager();
-    this.oldKeys = profileManager.profile?.ssh;
+    this.oldKeys = profileManager.profile?.ssh ?? [];
   }
 
   /**
@@ -55,6 +56,7 @@ class SSHKeysManagement {
     if (this.migrated()) {
       return this.oldKeys as SSHKeyData[];
     }
+    if (typeof this.oldKeys !== "string") return [];
     const userKeys: SSHKeyData[] = [];
 
     let keyName = "";
@@ -103,7 +105,7 @@ class SSHKeysManagement {
 
     await storeSSH(grid!, copiedKeys);
     profileManager.updateSSH(copiedKeys);
-    this.oldKeys = profileManager.profile?.ssh;
+    this.oldKeys = profileManager.profile?.ssh ?? [];
   }
 
   /**
@@ -196,23 +198,15 @@ class SSHKeysManagement {
    * @returns An array of formatted SSHKeyData.
    */
   list(): SSHKeyData[] {
-    let keys: SSHKeyData[] = [];
+    if (!this.migrated()) return [];
 
-    if (this.migrated()) {
-      keys = this.oldKeys as unknown as SSHKeyData[];
-    }
+    const keys = this.oldKeys as SSHKeyData[];
+    if (keys.length === 0) return [];
 
-    // Profile created for the first time.
-    if (!keys) {
-      return [];
-    }
-
-    keys = keys.map(key => ({
+    return keys.map(key => ({
       ...key,
       fingerPrint: this.calculateFingerprint(key.publicKey),
     }));
-
-    return keys;
   }
 
   /**
@@ -253,8 +247,9 @@ class SSHKeysManagement {
   }
   needsDefaultNameAssignment(keys?: SSHKeyData[]): boolean {
     if (!keys) {
-      keys = this.oldKeys as SSHKeyData[];
+      keys = this.migrated() ? (this.oldKeys as SSHKeyData[]) : [];
     }
+    if (keys.length === 0) return false;
     return keys.some(key => isAlphanumericWithSpace("Invalid name")(key.name) !== true);
   }
 
@@ -266,8 +261,9 @@ class SSHKeysManagement {
    */
   assignDefaultNames(keys?: SSHKeyData[]): SSHKeyData[] {
     if (!keys) {
-      keys = this.oldKeys as SSHKeyData[];
+      keys = this.migrated() ? (this.oldKeys as SSHKeyData[]) : [];
     }
+    if (keys.length === 0) return [];
     const existingValidNames = new Set(
       keys.map(k => k.name).filter(name => name && isAlphanumericWithSpace("Invalid name")(name) === true),
     );
