@@ -7,9 +7,7 @@
       @update:model-value="closeDialog"
     >
       <v-card>
-        <VCardTitle class="bg-primary">
-          Deposit TFT
-        </VCardTitle>
+        <VCardTitle class="bg-primary"> Deposit TFT </VCardTitle>
         <v-card-text>
           <v-container>
             <v-row class="py-2">
@@ -20,9 +18,7 @@
                     {{ selectedName ? selectedName.charAt(0).toUpperCase() + selectedName.slice(1) : "" }}
                     transaction.
                   </p>
-                  <p class="mt-1 mb-8 text-secondary text-sm-subtitle-2 font-weight-bold">
-                    Deposit fee is 1 TFT
-                  </p>
+                  <p class="mt-1 mb-8 text-secondary text-sm-subtitle-2 font-weight-bold">Deposit fee is 1 TFT</p>
                 </div>
                 <input-tooltip
                   v-if="selectedName == 'stellar'"
@@ -53,9 +49,7 @@
               <v-col>
                 <QRPlayStore :qr="qrCodeText">
                   <b> OR </b>
-                  <p class="mb-3">
-                    Use ThreeFold Connect to scan this QRcode:
-                  </p>
+                  <p class="mb-3">Use ThreeFold Connect to scan this QRcode:</p>
                 </QRPlayStore>
               </v-col>
             </v-row>
@@ -63,9 +57,7 @@
           <v-divider />
         </v-card-text>
         <v-card-actions class="justify-end my-1 mr-2">
-          <v-btn color="anchor" @click="closeDialog">
-            Close
-          </v-btn>
+          <v-btn color="anchor" @click="closeDialog"> Close </v-btn>
           <v-btn color="secondary" :href="manual.tft_bridges" target="_blank" text="Learn more?" />
         </v-card-actions>
       </v-card>
@@ -157,6 +149,10 @@ const closeDialog = () => {
 
 onBeforeUnmount(() => {
   destroyed = true;
+  if (interval.value !== null) {
+    window.clearInterval(interval.value);
+    interval.value = null;
+  }
 });
 </script>
 <script lang="ts">

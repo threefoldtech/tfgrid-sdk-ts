@@ -13,7 +13,7 @@
 </template>
 
 <script lang="ts">
-import { computed, ref, type StyleValue, watch } from "vue";
+import { computed, onUnmounted, ref, type StyleValue, watch } from "vue";
 
 import { useNavigationStatus, useOnline } from "../hooks";
 
@@ -70,6 +70,10 @@ export default {
         transition: "transform 0.3s linear, opacity 0.3s linear 0.6s",
         transform: `scaleX(${navigationStatus.value === "Success" ? 1 : 0})`,
       };
+    });
+
+    onUnmounted(() => {
+      clear();
     });
 
     return { loadingValue, style };

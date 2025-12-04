@@ -10,16 +10,14 @@
       </VCardText>
 
       <VCardActions v-if="failed" class="d-flex justify-center mb-4">
-        <VBtn prepend-icon="mdi-reload" variant="outlined" color="secondary" @click="reload">
-          Reload Now
-        </VBtn>
+        <VBtn prepend-icon="mdi-reload" variant="outlined" color="secondary" @click="reload"> Reload Now </VBtn>
       </VCardActions>
     </VCard>
   </VDialog>
 </template>
 
 <script lang="ts">
-import { computed, ref, watch } from "vue";
+import { computed, onUnmounted, ref, watch } from "vue";
 
 import { useOffline } from "../hooks";
 
@@ -79,6 +77,13 @@ export default {
 
       return `We're attempting to automatically reconnect you to dashboard. If your internet connection is ok. otherwise you
           can reload instantly.`;
+    });
+
+    onUnmounted(() => {
+      if (interval) {
+        clearInterval(interval);
+        interval = null;
+      }
     });
 
     return { offline, failed, reload, dotCount, title, description };
