@@ -2,6 +2,7 @@ import { ExtrinsicResult } from "@threefold/tfchain_client";
 import { default as AlgoSdk } from "algosdk";
 import { Expose, Transform, Type } from "class-transformer";
 import {
+  ArrayMinSize,
   ArrayNotEmpty,
   IsAlphanumeric,
   IsArray,
@@ -12,6 +13,7 @@ import {
   IsIP,
   IsNotEmpty,
   IsNumber,
+  IsObject,
   IsOptional,
   IsString,
   IsUrl,
@@ -388,6 +390,11 @@ class ContractsByAddress {
 
 class ContractConsumption {
   @Expose() @IsInt() @Min(1) id: number;
+}
+
+class ContractConsumptions {
+  @Expose() @IsArray() @ArrayMinSize(0) contractIds: number[];
+  @Expose() @IsObject() contractCreatedAt: Record<string, number>;
 }
 
 class ContractDiscountPackage {
@@ -990,6 +997,7 @@ export {
   ContractsByTwinId,
   ContractsByAddress,
   ContractConsumption,
+  ContractConsumptions,
   ContractDiscountPackage,
   ContractLockModel,
   TwinCreateModel,
