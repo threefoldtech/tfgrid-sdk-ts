@@ -455,7 +455,7 @@ function normalizeFiltersValidators(
     cpu: normalizeNumericValidator(validators.cpu, {
       type: "int",
       min: 1,
-      max: 32,
+      max: Number.MAX_SAFE_INTEGER,
     }),
     memory: normalizeNumericValidator(validators.memory, {
       type: "int",
