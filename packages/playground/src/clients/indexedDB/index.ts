@@ -140,18 +140,20 @@ export class IndexedDBClient {
     return res;
   }
 
-  public async deleteRange(startId: number, endId: number): Promise<void> {
+  public async deleteOldestRecords(count: number): Promise<void> {
     await this._lock.acquireAsync();
 
     return new Promise((res, rej) => {
       const store = this._createStore();
-      const range = IDBKeyRange.bound(startId, endId);
-      const query = store.openCursor(range);
+      const query = store.openCursor();
+
+      let deleted = 0;
 
       query.onsuccess = () => {
         const cursor = query.result;
-        if (cursor) {
+        if (cursor && deleted < count) {
           cursor.delete();
+          deleted++;
           cursor.continue();
         } else {
           this._lock.release();

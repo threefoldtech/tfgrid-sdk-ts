@@ -221,6 +221,7 @@ export default {
     let _interceptorQueue: LI[] = [];
     const logQueue: LI[] = [];
     let flushTimeout: ReturnType<typeof setTimeout> | null = null;
+    let rotationPromise: Promise<void> | null = null; // Prevent concurrent rotations
     const BATCH_SIZE = 50;
     const FLUSH_DELAY = 500;
 
@@ -266,15 +267,22 @@ export default {
       }
 
       // Rotate old logs if count exceeds limit
-      const currentCount = await logsDBClient.count();
-      if (currentCount > MAX_STORED_LOGS) {
-        const toDelete = currentCount - MAX_STORED_LOGS + ROTATION_BUFFER;
-        try {
-          await logsDBClient.deleteRange(1, toDelete);
-          count.value = await logsDBClient.count();
-        } catch (error) {
-          originalConsoleError("Failed to rotate logs:", error);
-        }
+      if (!rotationPromise) {
+        rotationPromise = (async () => {
+          try {
+            const currentCount = await logsDBClient.count();
+            if (currentCount > MAX_STORED_LOGS) {
+              const toDelete = currentCount - MAX_STORED_LOGS + ROTATION_BUFFER;
+              await logsDBClient.deleteOldestRecords(toDelete);
+              const afterCount = await logsDBClient.count();
+              count.value = afterCount;
+            }
+          } catch (error) {
+            originalConsoleError("Failed to rotate logs:", error);
+          } finally {
+            rotationPromise = null;
+          }
+        })();
       }
 
       flushTimeout = logQueue.length > 0 ? setTimeout(flushLogQueue, FLUSH_DELAY) : null;
