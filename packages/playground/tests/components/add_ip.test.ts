@@ -1,9 +1,9 @@
 import CidrTools from "cidr-tools";
 import { getIPRange } from "get-ip-range";
-import * as ip from "ip";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ipToLong, longToIp } from "../../src/utils/ip";
+import { gatewayCheck, validateIPRange, validateRangeIPs } from "../../src/utils/ip_range_validation";
 import { IPType } from "../../src/utils/types";
 
 // Mock dependencies
@@ -18,97 +18,6 @@ vi.mock("get-ip-range", () => ({
 }));
 
 describe("Add IP Range Validation", () => {
-  // Replicate the validateIPRange function logic for testing
-  const validateIPRange = (
-    publicIP: string,
-    toPublicIP: string,
-    field: "from" | "to",
-  ): { message: string } | undefined => {
-    if (!publicIP || !toPublicIP) return;
-
-    const [fromIP, fromSubnet] = publicIP.split("/");
-    const [toIP, toSubnet] = toPublicIP.split("/");
-
-    if (fromSubnet !== toSubnet) return { message: "Subnet is different." };
-
-    try {
-      const fromCIDR = ip.cidrSubnet(publicIP);
-      const toCIDR = ip.cidrSubnet(toPublicIP);
-
-      if (fromCIDR.networkAddress !== toCIDR.networkAddress) {
-        return { message: "IPs are not in the same network." };
-      }
-
-      const fromLong = ip.toLong(fromIP);
-      const toLong = ip.toLong(toIP);
-      const rangeSize = toLong - fromLong + 1;
-
-      if (field === "from" && fromLong >= toLong) {
-        return { message: "From IP must be smaller than To IP." };
-      }
-      if (field === "to" && toLong <= fromLong) {
-        return { message: "To IP must be bigger than From IP." };
-      }
-      if (rangeSize > 16) {
-        return { message: "Range must not exceed 16." };
-      }
-    } catch {
-      return;
-    }
-  };
-
-  // Replicate the gatewayCheck function logic
-  const gatewayCheck = (
-    gateway: string,
-    publicIP: string,
-    toPublicIP: string | undefined,
-    type: IPType,
-  ): { message: string } | undefined => {
-    if (!gateway || !publicIP) {
-      return;
-    }
-
-    const firstIP = publicIP?.split("/")[0];
-    const lastIP = toPublicIP?.split("/")[0];
-    let isRange = false;
-
-    try {
-      isRange = CidrTools.containsCidr(publicIP, gateway);
-    } catch {
-      isRange = false;
-    }
-
-    if (!isRange) {
-      return {
-        message: "Gateway IP not in the provided IP range.",
-      };
-    }
-
-    if (firstIP === gateway || (lastIP && lastIP === gateway)) {
-      return {
-        message: "IPs cannot be the same.",
-      };
-    }
-
-    if (type !== IPType.single && lastIP) {
-      try {
-        const range = getIPRange(firstIP, lastIP);
-        if (range.includes(gateway)) {
-          return {
-            message: "The gateway IP shouldn't be in the IPs range.",
-          };
-        }
-      } catch (error: any) {
-        return {
-          message: error.message,
-        };
-      }
-    }
-
-    return undefined;
-  };
-
-  // Replicate generateIpTable function
   const generateIpTable = (startIp: string, endIp: string, sub: number) => {
     const startLong = ipToLong(startIp);
     const endLong = ipToLong(endIp);
@@ -173,7 +82,6 @@ describe("Add IP Range Validation", () => {
 
       invalidIPs.forEach(invalidIP => {
         const result = validateIPRange(invalidIP, "192.168.1.5/24", "from");
-        // Should return undefined or appropriate error, not throw
         expect(result === undefined || typeof result === "object").toBe(true);
       });
     });
@@ -185,7 +93,19 @@ describe("Add IP Range Validation", () => {
       vi.mocked(getIPRange).mockReturnValue(["192.168.1.1", "192.168.1.2", "192.168.1.3"]);
     });
 
-    it("should return undefined for valid gateway", () => {
+    it("should return undefined for valid gateway (in CIDR but not in IP range)", () => {
+      vi.mocked(getIPRange).mockReturnValue([
+        "192.168.1.1",
+        "192.168.1.2",
+        "192.168.1.3",
+        "192.168.1.4",
+        "192.168.1.5",
+        "192.168.1.6",
+        "192.168.1.7",
+        "192.168.1.8",
+        "192.168.1.9",
+        "192.168.1.10",
+      ]);
       const result = gatewayCheck("192.168.1.254", "192.168.1.1/24", "192.168.1.10/24", IPType.range);
       expect(result).toBeUndefined();
     });
@@ -221,7 +141,7 @@ describe("Add IP Range Validation", () => {
       vi.mocked(CidrTools.containsCidr).mockImplementation(() => {
         throw new Error("Invalid CIDR");
       });
-      const result = gatewayCheck("192.168.1.254", "192.168.1.1/24", undefined, IPType.single);
+      const result = gatewayCheck("192.168.2.254", "192.168.1.1/24", undefined, IPType.single);
       expect(result).toEqual({ message: "Gateway IP not in the provided IP range." });
     });
   });
@@ -257,41 +177,6 @@ describe("Add IP Range Validation", () => {
       expect(() => generateIpTable("192.168.256.1", "192.168.1.5", 24)).toThrow();
     });
   });
-
-  // Replicate validateRangeIPs function for testing
-  const validateRangeIPs = async (
-    publicIP: string,
-    toPublicIP: string,
-    type: IPType,
-    mockIpExistsCheck: (ip: string) => Promise<boolean>,
-  ) => {
-    if (type !== IPType.range || !publicIP || !toPublicIP) return;
-
-    // Early return if either IP is invalid - prevents hanging on invalid IPs
-    const validator = await import("validator");
-    if (!validator.default.isIPRange(publicIP, 4) || !validator.default.isIPRange(toPublicIP, 4)) {
-      return;
-    }
-
-    try {
-      const [start, sub] = publicIP.split("/");
-      const [end] = toPublicIP.split("/");
-
-      // Validate that start and end are valid IPs before calling getIPRange
-      if (!validator.default.isIP(start, 4) || !validator.default.isIP(end, 4)) {
-        return;
-      }
-
-      const rangeIPs = getIPRange(start, end).map(ip => `${ip}/${sub}`);
-      const existingCount = (await Promise.all(rangeIPs.map(mockIpExistsCheck))).filter(Boolean).length;
-      if (existingCount > 0) {
-        return { message: `${existingCount} IP(s) in range already exist in another farm.` };
-      }
-    } catch {
-      // If getIPRange throws an error (e.g., invalid IP format), return early
-      return;
-    }
-  };
 
   describe("validateRangeIPs - Bug Fix", () => {
     it("should return early when From IP is invalid (negative octet) without hanging", async () => {

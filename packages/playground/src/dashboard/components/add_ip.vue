@@ -143,14 +143,16 @@
 
 <script lang="ts">
 import { TFChainError } from "@threefold/tfchain_client";
-import CidrTools from "cidr-tools";
 import { getIPRange } from "get-ip-range";
-import * as ip from "ip";
-import validator from "validator";
 import { ref, watch } from "vue";
 
 import { gqlClient } from "@/clients";
 import { ipToLong, longToIp } from "@/utils/ip";
+import {
+  gatewayCheck as gatewayCheckUtil,
+  validateIPRange,
+  validateRangeIPs as validateRangeIPsUtil,
+} from "@/utils/ip_range_validation";
 import { IPType } from "@/utils/types";
 
 import { useGrid } from "../../stores";
@@ -217,115 +219,14 @@ export default {
     }
 
     async function validateRangeIPs() {
-      if (type.value !== IPType.range || !publicIP.value || !toPublicIP.value) return;
-
-      // Early return if either IP is invalid - prevents hanging on invalid IPs
-      if (!validator.isIPRange(publicIP.value, 4) || !validator.isIPRange(toPublicIP.value, 4)) {
-        return;
-      }
-
-      try {
-        const [start, sub] = publicIP.value.split("/");
-        const [end] = toPublicIP.value.split("/");
-
-        // Validate that start and end are valid IPs before calling getIPRange
-        if (!validator.isIP(start, 4) || !validator.isIP(end, 4)) {
-          return;
-        }
-
-        const rangeIPs = getIPRange(start, end).map(ip => `${ip}/${sub}`);
-        const existingCount = (await Promise.all(rangeIPs.map(IpExistsCheck))).filter(Boolean).length;
-        if (existingCount > 0) {
-          return { message: `${existingCount} IP(s) in range already exist in another farm.` };
-        }
-      } catch {
-        // If getIPRange throws an error (e.g., invalid IP format), return early
-        // This prevents the async validation from hanging
-        return;
-      }
+      return await validateRangeIPsUtil(publicIP.value, toPublicIP.value, type.value, IpExistsCheck);
     }
 
-    // Cross-field IP range validation
-    const validateIPRange = (field: "from" | "to") => {
-      if (!publicIP.value || !toPublicIP.value) return;
-
-      const [fromIP, fromSubnet] = publicIP.value.split("/");
-      const [toIP, toSubnet] = toPublicIP.value.split("/");
-
-      if (fromSubnet !== toSubnet) return { message: "Subnet is different." };
-
-      try {
-        const fromCIDR = ip.cidrSubnet(publicIP.value);
-        const toCIDR = ip.cidrSubnet(toPublicIP.value);
-
-        if (fromCIDR.networkAddress !== toCIDR.networkAddress) {
-          return { message: "IPs are not in the same network." };
-        }
-
-        const fromLong = ip.toLong(fromIP);
-        const toLong = ip.toLong(toIP);
-        const rangeSize = toLong - fromLong + 1;
-
-        if (field === "from" && fromLong >= toLong) {
-          return { message: "From IP must be smaller than To IP." };
-        }
-        if (field === "to" && toLong <= fromLong) {
-          return { message: "To IP must be bigger than From IP." };
-        }
-        if (rangeSize > 16) {
-          return { message: "Range must not exceed 16." };
-        }
-      } catch {
-        return;
-      }
-    };
-
-    const fromIpCheck = () => validateIPRange("from");
-    const toIpCheck = () => validateIPRange("to");
+    const fromIpCheck = () => validateIPRange(publicIP.value, toPublicIP.value, "from");
+    const toIpCheck = () => validateIPRange(publicIP.value, toPublicIP.value, "to");
 
     function gatewayCheck() {
-      if (!gateway.value || !publicIP.value) {
-        return;
-      }
-
-      const firstIP = publicIP?.value.split("/")[0];
-      const lastIP = toPublicIP?.value.split("/")[0];
-      let isRange = false;
-
-      try {
-        isRange = CidrTools.containsCidr(publicIP.value, gateway.value);
-      } catch {
-        isRange = false;
-      }
-
-      if (!isRange) {
-        return {
-          message: "Gateway IP not in the provided IP range.",
-        };
-      }
-
-      if (firstIP === gateway.value || (lastIP && lastIP === gateway.value)) {
-        return {
-          message: "IPs cannot be the same.",
-        };
-      }
-
-      if (type.value !== IPType.single && lastIP) {
-        try {
-          const range = getIPRange(firstIP, lastIP);
-          if (range.includes(gateway.value)) {
-            return {
-              message: "The gateway IP shouldn't be in the IPs range.",
-            };
-          }
-        } catch (error: any) {
-          return {
-            message: error.message,
-          };
-        }
-      }
-
-      return undefined;
+      return gatewayCheckUtil(gateway.value, publicIP.value, toPublicIP.value, type.value);
     }
 
     function showRange() {
