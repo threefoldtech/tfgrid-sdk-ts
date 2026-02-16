@@ -84,7 +84,7 @@
 
 <script setup lang="ts">
 import type { GridNode } from "@threefold/gridproxy_client";
-import { onMounted, type PropType, ref } from "vue";
+import { onMounted, onUnmounted, type PropType, ref } from "vue";
 
 import { gridProxyClient } from "@/clients";
 import type { NodeDetailsCard } from "@/types";
@@ -202,6 +202,13 @@ function loadingDots() {
     dots.value += ".";
   }
 }
+
+onUnmounted(() => {
+  if (interval.value !== null) {
+    window.clearInterval(interval.value);
+    interval.value = null;
+  }
+});
 </script>
 
 <script lang="ts">
@@ -209,7 +216,6 @@ import CardDetails from "@/components/node_details_cards/card_details.vue";
 import GPUDetailsCard from "@/components/node_details_cards/gpu_details_card.vue";
 
 export default {
-   
   name: "NodeDetails",
   components: {
     CardDetails,

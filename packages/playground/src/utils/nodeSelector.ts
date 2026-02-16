@@ -455,7 +455,7 @@ function normalizeFiltersValidators(
     cpu: normalizeNumericValidator(validators.cpu, {
       type: "int",
       min: 1,
-      max: 32,
+      max: Number.MAX_SAFE_INTEGER,
     }),
     memory: normalizeNumericValidator(validators.memory, {
       type: "int",
@@ -530,6 +530,7 @@ export async function checkNodeCapacityPool(
       ssdDisks: [filters.solutionDisk ?? 0, ...(filters.ssdDisks || [])].filter(Boolean).map(disk => disk * 1024 ** 3),
       rootfsDisks: [(filters.rootFilesystemSize ?? 0) * 1024 ** 3],
       hddDisks: filters.hddDisks || [],
+      nodeTwinId: node.twinId,
     });
     return true;
   } catch (error) {

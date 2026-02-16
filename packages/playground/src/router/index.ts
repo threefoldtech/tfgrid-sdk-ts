@@ -1,6 +1,5 @@
 import { createRouter, createWebHashHistory, type RouteRecordRaw } from "vue-router";
 
-import LoggedInLanding from "@/components/logged_in_landing.vue";
 import { DashboardRoutes } from "@/router/routes";
 
 export interface InfoMeta {
@@ -898,7 +897,7 @@ const mainRoutes: RouteRecordRaw[] = [
   {
     name: "landing",
     path: DashboardRoutes.Other.HomePage,
-    component: LoggedInLanding,
+    component: () => import("@/components/logged_in_landing.vue"),
     meta: { title: "Landing Page" },
   },
   // TFGrid Routes

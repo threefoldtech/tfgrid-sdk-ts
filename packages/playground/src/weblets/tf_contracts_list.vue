@@ -172,8 +172,8 @@
         <div>You are about to permanently delete all contracts. This action cannot be reversed!</div>
       </v-alert>
       <v-card-actions class="justify-end my-1 mr-2">
-        <v-btn color="anchor" @click="deleteDialog = false"> Cancel </v-btn>
-        <v-btn color="error" @click="confirmPassword"> Delete </v-btn>
+        <v-btn color="anchor" :disabled="deleting" @click="deleteDialog = false"> Cancel </v-btn>
+        <v-btn color="error" :disabled="deleting" @click="confirmPassword"> Delete </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -194,8 +194,10 @@
           <WalletPassword v-model="password" mode="Login" />
         </v-card-item>
         <v-card-actions class="justify-end my-1 mr-2">
-          <v-btn color="anchor" @click="confirmPasswordDialog = false"> Cancel </v-btn>
-          <v-btn color="error" :disabled="!isValidForm" @click="deleteAll"> Confirm </v-btn>
+          <v-btn color="anchor" :disabled="deleting" @click="confirmPasswordDialog = false"> Cancel </v-btn>
+          <v-btn color="error" :disabled="!isValidForm || deleting" :loading="deleting" @click="deleteAll">
+            Confirm
+          </v-btn>
         </v-card-actions>
       </FormValidator>
     </v-card>
@@ -256,7 +258,7 @@
 import type { ContractsOverdue, GridClient } from "@threefold/grid_client";
 import { type Contract, ContractState, NodeStatus, SortByContracts, SortOrder } from "@threefold/gridproxy_client";
 import { DeploymentKeyDeletionError } from "@threefold/types";
-import { computed, defineComponent, onMounted, type Ref, ref } from "vue";
+import { computed, defineComponent, onMounted, onUnmounted, type Ref, ref } from "vue";
 
 import ContractsTable from "@/components/contracts_list/contracts_table.vue";
 import { useProfileManagerController } from "@/components/profile_manager_controller.vue";
@@ -308,18 +310,29 @@ const password = ref("");
 const isValidForm = ref<boolean>(false);
 
 const panel = ref<number[]>([0, 1, 2]);
-const nodeInfo: Ref<{ [nodeId: number]: { status: NodeStatus; farmId: number } }> = ref({});
+const nodeInfo: Ref<{ [nodeId: number]: { status: NodeStatus } }> = ref({});
 const unlockContractLoading = ref<boolean>(false);
 const contractsTable = ref<(typeof ContractsTable)[]>([]);
 const loadingLockDetails = ref(false);
-// Computed property to get unique node IDs from contracts
-const nodeIDs = computed(() => {
-  return [...new Set(contracts.value.map(contract => contract.details.nodeId) || [])];
+const timeouts: ReturnType<typeof setTimeout>[] = [];
+const nodeIDs = computed<number[]>(() => {
+  const ids = new Set<number>();
+  for (const contract of contracts.value) {
+    ids.add(contract.details.nodeId);
+  }
+
+  return Array.from(ids);
 });
+
 // To avoid multiple requests
 const cachedNodeIDs = ref<number[]>([]);
 onMounted(() => {
   loadContracts();
+});
+
+onUnmounted(() => {
+  timeouts.forEach(timeout => clearTimeout(timeout));
+  timeouts.length = 0;
 });
 
 async function _normalizeContracts(
@@ -444,10 +457,11 @@ async function unlockAllContracts() {
     loadingTablesMessage.value =
       "Your request to unlock your contracts has been processed successfully. Changes may take a few minutes to reflect";
     createCustomToast(loadingTablesMessage.value, ToastType.info);
-    setTimeout(() => {
+    const timeoutId = setTimeout(() => {
       loadContracts();
       loadingTablesMessage.value = undefined;
     }, 30000);
+    timeouts.push(timeoutId);
     unlockDialog.value = false;
   } catch (e) {
     loadingErrorMessage.value = `Failed to unlock contract your contracts`;
@@ -472,10 +486,11 @@ async function deleteAll() {
     loadingTablesMessage.value =
       "The contracts have been successfully deleted. Please note that all tables will be reloaded in 30 seconds.";
     createCustomToast(loadingTablesMessage.value, ToastType.info);
-    setTimeout(() => {
+    const timeoutId = setTimeout(() => {
       loadContracts();
       loadingTablesMessage.value = undefined;
     }, 30000);
+    timeouts.push(timeoutId);
   } catch (e) {
     if (e instanceof DeploymentKeyDeletionError) {
       createCustomToast("Failed to delete some keys, You don't have enough tokens", ToastType.danger);
@@ -544,10 +559,11 @@ async function onDeletedContracts(_contracts: NormalizedContract[]) {
   loadingTablesMessage.value =
     "The contracts have been successfully deleted. Please note that all tables will be reloaded in 30 seconds.";
   createCustomToast(loadingTablesMessage.value, ToastType.info);
-  setTimeout(() => {
+  const timeoutId = setTimeout(() => {
     loadContracts();
     loadingTablesMessage.value = undefined;
   }, 30000);
+  timeouts.push(timeoutId);
   contracts.value = [...rentContracts.value, ...nameContracts.value, ...nodeContracts.value];
 }
 async function getContractsLockDetails() {

@@ -28,6 +28,21 @@ const GLOBAL_COMPONENTS: { [key: string]: Component } = {
   TfSelectCountry: defineAsyncComponent(() => import("./components/node_selector/select_location_internals/TfSelectCountry.vue")), // prettier-ignore
 };
 
+const SERVICE_URLS_CACHE_KEY = "service_urls_cache";
+const SERVICE_URLS_CACHE_TTL = 60 * 60 * 1000; // 1 hour
+
+/**
+ * Invalidates the service URLs cache.
+ * Should be called when service connection fails to ensure fresh URLs are fetched on next attempt.
+ */
+export function invalidateServiceUrlsCache() {
+  try {
+    sessionStorage.removeItem(SERVICE_URLS_CACHE_KEY);
+  } catch (error) {
+    console.warn("[invalidateServiceUrlsCache] Failed to invalidate service URLs cache", error);
+  }
+}
+
 export function defineGlobals(app: App<Element>): void {
   defineGlobalComponents(app);
   defineGlobalProps(app);
@@ -81,6 +96,20 @@ function defineGlobalProps(app: App<Element>) {
  * @returns A promise that resolves to `true` if all service URLs are successfully set, or `false` if any service URL is missing.
  */
 export async function setGlobalEnv() {
+  try {
+    const cachedRaw = sessionStorage.getItem(SERVICE_URLS_CACHE_KEY);
+    if (cachedRaw) {
+      const cached = JSON.parse(cachedRaw) as { urls: Record<string, string>; timestamp: number };
+      if (Date.now() - cached.timestamp < SERVICE_URLS_CACHE_TTL) {
+        Object.assign(window.env, cached.urls);
+        return true;
+      }
+    }
+  } catch (error) {
+    // Ignore cache errors and fall back to live checks
+    console.warn("[setGlobalEnv] Failed to read service URLs cache", error);
+  }
+
   const {
     GRIDPROXY_STACKS,
     GRAPHQL_STACKS,
@@ -106,6 +135,7 @@ export async function setGlobalEnv() {
   const result = await urlManger.getAvailableServicesStack();
 
   if (Object.values(result).includes(null)) {
+    invalidateServiceUrlsCache();
     window.$$showMonitorError(result);
     return false;
   }
@@ -118,5 +148,26 @@ export async function setGlobalEnv() {
   window.env.ACTIVATION_SERVICE_URL = Activation!;
   window.env.RELAY_DOMAIN = RMB!;
   window.env.KYC_URL = KYC!;
+
+  try {
+    sessionStorage.setItem(
+      SERVICE_URLS_CACHE_KEY,
+      JSON.stringify({
+        urls: {
+          GRIDPROXY_URL: window.env.GRIDPROXY_URL,
+          STATS_URL: window.env.STATS_URL,
+          GRAPHQL_URL: window.env.GRAPHQL_URL,
+          SUBSTRATE_URL: window.env.SUBSTRATE_URL,
+          ACTIVATION_SERVICE_URL: window.env.ACTIVATION_SERVICE_URL,
+          RELAY_DOMAIN: window.env.RELAY_DOMAIN,
+          KYC_URL: window.env.KYC_URL,
+        },
+        timestamp: Date.now(),
+      }),
+    );
+  } catch (error) {
+    console.warn("[setGlobalEnv] Failed to write service URLs cache", error);
+  }
+
   return true;
 }

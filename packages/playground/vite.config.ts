@@ -9,6 +9,39 @@ import vueDevTools from "vite-plugin-vue-devtools";
 export default defineConfig({
   build: {
     outDir: "dist",
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Split large vendor libraries into separate chunks
+          vuetify: ["vuetify"],
+          "threefold-sdk": [
+            "@threefold/grid_client",
+            "@threefold/gridproxy_client",
+            "@threefold/graphql_client",
+            "@threefold/types",
+          ],
+          chart: ["chart.js", "vue-chartjs"],
+          // Note: lodash is NOT included here to allow Vite to handle tree-shaking automatically
+          // This prevents chunk loading issues in development mode
+          utils: ["moment", "marked"],
+        },
+      },
+    },
+    chunkSizeWarningLimit: 1000, // Increase limit to 1MB
+  },
+  optimizeDeps: {
+    // Pre-bundle lodash sub-modules to prevent reload prompts in development
+    include: [
+      "lodash/isEqual.js",
+      "lodash/cloneDeep.js",
+      "lodash/isEmpty.js",
+      "lodash/debounce.js",
+      "lodash/sortBy.js",
+      "lodash/fp/noop.js",
+      "lodash/fp/shuffle.js",
+      "lodash/fp/equals.js",
+      "lodash/fp/uniq.js",
+    ],
   },
   base: "/",
   plugins: [vue(), nodePolyfills(), vueDevTools()],

@@ -12,32 +12,31 @@ class Utility {
 
   @checkConnection
   async batch<T>(extrinsics: ExtrinsicResult<T>[]): Promise<T[]> {
-    extrinsics = extrinsics.filter(Boolean);
-    if (extrinsics.length > 0) {
-      let result: T[] = [];
-      for (let i = 0; i < extrinsics.length; i += BATCH_SIZE) {
-        const batch = extrinsics.slice(i, i + BATCH_SIZE);
-        const { resultSections, resultEvents, map } = this.extractResultSectionsAndEvents(batch);
-        const batchExtrinsic = await this.client.api.tx.utility.batch(batch);
-        const res = await this.client.applyExtrinsic<T>(batchExtrinsic, resultSections, resultEvents, map);
-        result = result.concat(res);
-      }
-
-      return result;
-    }
-    return [];
+    return this.applyBatch(extrinsics, batch => this.client.api.tx.utility.batch(batch));
   }
 
   @checkConnection
   async batchAll<T>(extrinsics: ExtrinsicResult<T>[]): Promise<T[]> {
+    return this.applyBatch(extrinsics, batch => this.client.api.tx.utility.batchAll(batch));
+  }
+
+  @checkConnection
+  async forceBatch<T>(extrinsics: ExtrinsicResult<T>[]): Promise<T[]> {
+    return this.applyBatch(extrinsics, batch => this.client.api.tx.utility.forceBatch(batch));
+  }
+
+  private async applyBatch<T>(
+    extrinsics: ExtrinsicResult<T>[],
+    buildExtrinsic: (batch: ExtrinsicResult<T>[]) => any,
+  ): Promise<T[]> {
     extrinsics = extrinsics.filter(Boolean);
     if (extrinsics.length > 0) {
       let result: T[] = [];
       for (let i = 0; i < extrinsics.length; i += BATCH_SIZE) {
         const batch = extrinsics.slice(i, i + BATCH_SIZE);
         const { resultSections, resultEvents, map } = this.extractResultSectionsAndEvents(batch);
-        const batchAllExtrinsic = await this.client.api.tx.utility.batchAll(batch);
-        const res = await this.client.applyExtrinsic<T>(batchAllExtrinsic, resultSections, resultEvents, map);
+        const extrinsic = await buildExtrinsic(batch);
+        const res = await this.client.applyExtrinsic<T>(extrinsic, resultSections, resultEvents, map);
         result = result.concat(res);
       }
 

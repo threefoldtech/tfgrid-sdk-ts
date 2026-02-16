@@ -69,14 +69,25 @@ export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
       }
       return res;
     });
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
     const timeoutPromise = new Promise((resolve, reject) => {
-      setTimeout(() => {
+      timeoutId = setTimeout(() => {
         reject(new Error("Timeout"));
       }, window.env.TIMEOUT);
     });
 
     try {
-      const result = await Promise.race([machinePromise, timeoutPromise]);
+      const result = await Promise.race([
+        machinePromise.finally(() => {
+          if (timeoutId !== null) {
+            clearTimeout(timeoutId);
+            timeoutId = null;
+          }
+        }),
+        timeoutPromise.finally(() => {
+          timeoutId = null;
+        }),
+      ]);
       if (result instanceof Error && result.message === "Timeout") {
         console.error(`Timeout loading deployment with name ${name}`);
         return null;
@@ -84,6 +95,10 @@ export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
         return result;
       }
     } catch (e) {
+      if (timeoutId !== null) {
+        clearTimeout(timeoutId);
+        timeoutId = null;
+      }
       console.error(`Failed to load deployment with name ${name}:\n${normalizeError(e, "No errors were provided.")}`);
       failedDeployments.push({ name, nodes: nodeIds, contracts: contracts });
     }
@@ -188,13 +203,26 @@ export async function loadK8s(grid: GridClient) {
 
         return res;
       });
+      let timeoutId: ReturnType<typeof setTimeout> | null = null;
       const timeoutPromise = new Promise((resolve, reject) => {
-        setTimeout(() => {
+        timeoutId = setTimeout(() => {
           reject(new Error("Timeout"));
         }, window.env.TIMEOUT);
       });
 
-      const result = await Promise.race([clusterPromise, timeoutPromise]);
+      const result = await Promise.race([
+        clusterPromise.finally(() => {
+          // Clear timeout if main promise resolves/rejects first
+          if (timeoutId !== null) {
+            clearTimeout(timeoutId);
+            timeoutId = null;
+          }
+        }),
+        timeoutPromise.finally(() => {
+          // Clear timeout reference when timeout promise resolves/rejects
+          timeoutId = null;
+        }),
+      ]);
       if (result instanceof Error && result.message === "Timeout") {
         console.error(`Timeout loading deployment with name ${name}`);
         return null;

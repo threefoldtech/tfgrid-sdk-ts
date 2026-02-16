@@ -22,7 +22,7 @@
                   validators.isIPRange('Not a valid IP'),
                   validators.isPublicIP(),
                 ]"
-                :async-rules="[isExistingIp]"
+                :async-rules="type === IPType.range ? [isExistingIp, validateRangeIPs] : [isExistingIp]"
                 #="{ props }"
               >
                 <input-tooltip tooltip="IP address in CIDR format xxx.xxx.xxx.xxx/xx">
@@ -46,7 +46,7 @@
                   validators.isPublicIP(),
                   toIpCheck,
                 ]"
-                :async-rules="[isExistingIp]"
+                :async-rules="[isExistingIp, validateRangeIPs]"
                 #="{ props }"
               >
                 <input-tooltip tooltip="IP address in CIDR format xxx.xxx.xxx.xxx/xx">
@@ -125,7 +125,9 @@
           <v-card-actions class="justify-end mb-1 mr-2">
             <v-btn color="anchor" @click="showDialogue = false"> Close </v-btn>
 
-            <v-btn :disabled="!valid || type === IPType.single || !toPublicIP" @click="showRange"> Show IPs Range </v-btn>
+            <v-btn :disabled="!valid || type === IPType.single || !toPublicIP" @click="showRange">
+              Show IPs Range
+            </v-btn>
             <v-btn color="secondary" :loading="isAdding" :disabled="isAdding || !valid" @click="handleAddFarmIp">
               Add
             </v-btn>
@@ -195,6 +197,17 @@ export default {
         };
       }
       return undefined;
+    }
+
+    async function validateRangeIPs() {
+      if (type.value !== IPType.range || !publicIP.value || !toPublicIP.value) return;
+      const [start, sub] = publicIP.value.split("/");
+      const [end] = toPublicIP.value.split("/");
+      const rangeIPs = getIPRange(start, end).map(ip => `${ip}/${sub}`);
+      const existingCount = (await Promise.all(rangeIPs.map(IpExistsCheck))).filter(Boolean).length;
+      if (existingCount > 0) {
+        return { message: `${existingCount} IP(s) in range already exist in another farm.` };
+      }
     }
     function toIpCheck() {
       if (!publicIP.value || !toPublicIP.value) {
@@ -395,6 +408,7 @@ export default {
       handleAddFarmIp,
       addFarmIp,
       isExistingIp,
+      validateRangeIPs,
       toIpCheck,
       gatewayCheck,
     };
