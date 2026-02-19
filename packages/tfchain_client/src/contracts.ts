@@ -331,6 +331,10 @@ export interface SetDedicatedNodeExtraFeesOptions {
   extraFee: number;
 }
 
+export interface OptOutV3BillingOptions {
+  nodeId: number;
+}
+
 export interface GetDedicatedNodePriceOptions {
   nodeId: number;
 }
@@ -579,6 +583,23 @@ class Contracts extends QueryContracts {
   @checkConnection
   async setDedicatedNodeExtraFee(options: SetDedicatedNodeExtraFeesOptions): Promise<ExtrinsicResult<number>> {
     const extrinsic = this.client.api.tx.smartContractModule.setDedicatedNodeExtraFee(options.nodeId, options.extraFee);
+    return this.client.patchExtrinsic<number>(extrinsic);
+  }
+
+  /**
+   * Opts out of billing for a v3 node.
+   *
+   * This method allows farmers to stop billing flows for a specific v3 node.
+   * After opting out, only Threefold admins will be able to create contracts on that node.
+   *
+   * @param {OptOutV3BillingOptions} options - The options object containing the nodeId to opt out of billing.
+   * @returns {Promise<ExtrinsicResult<number>>} A promise that resolves to the extrinsic `node ID` for opting out of billing.
+   */
+  @checkConnection
+  async optOutV3Billing(options: OptOutV3BillingOptions): Promise<ExtrinsicResult<number>> {
+    // Using type assertion since the method may not be in generated types yet
+    const tfgridModule = this.client.api.tx.tfgridModule as any;
+    const extrinsic = tfgridModule.optOutOfV3Billing(options.nodeId);
     return this.client.patchExtrinsic<number>(extrinsic);
   }
 

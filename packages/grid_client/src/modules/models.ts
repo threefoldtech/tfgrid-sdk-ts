@@ -861,6 +861,10 @@ class SetDedicatedNodeExtraFeesModel {
   @Expose() @IsNumber() @IsNotEmpty() @Min(0) extraFee: number;
 }
 
+class OptOutV3BillingModel {
+  @Expose() @IsInt() @IsNotEmpty() @Min(1) nodeId: number;
+}
+
 class GetDedicatedNodePriceModel {
   @Expose() @IsInt() @IsNotEmpty() @Min(1) nodeId: number;
 }
@@ -1067,6 +1071,7 @@ export {
   NetworkGetModel,
   NodeGetModel,
   SetDedicatedNodeExtraFeesModel,
+  OptOutV3BillingModel,
   GetDedicatedNodePriceModel,
   SwapToStellarModel,
   ListenToMintCompletedModel,

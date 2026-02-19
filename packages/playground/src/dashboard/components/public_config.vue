@@ -1,14 +1,14 @@
 <template>
   <span>
     <v-tooltip location="bottom" text="Add a public config">
-      <template #activator="{ props }">
+      <template #activator="{ props: tooltipProps }">
         <v-icon
           class="mx-1"
-          v-bind="props"
+          v-bind="tooltipProps"
           size="large"
           :disabled="isAdding"
           :loading="isAdding"
-          @click="showDialogue = true"
+          @click.stop="showDialogue = true"
         >
           mdi-earth
         </v-icon>

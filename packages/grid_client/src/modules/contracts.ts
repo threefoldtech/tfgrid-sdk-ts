@@ -47,6 +47,7 @@ import {
   NameContractGetModel,
   NodeContractCreateModel,
   NodeContractUpdateModel,
+  OptOutV3BillingModel,
   RentContractCreateModel,
   RentContractGetModel,
   ServiceContractApproveModel,
@@ -526,6 +527,27 @@ class Contracts {
   async setDedicatedNodeExtraFee(options: SetDedicatedNodeExtraFeesModel) {
     return (await this.client.contracts.setDedicatedNodeExtraFee(options)).apply();
   }
+
+  /**
+   * Opts out of billing for a v3 node.
+   *
+   * This method allows farmers to stop billing flows for a specific v3 node.
+   * After opting out, only Threefold admins will be able to create contracts on that node.
+   *
+   * @param {OptOutV3BillingModel} options - The options object containing the nodeId to opt out of billing.
+   * @returns {Promise<number>} A promise that resolves to the node ID for opting out of billing.
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   * - `@checkBalance`: Checks the balance before proceeding.
+   */
+  @expose
+  @validateInput
+  @checkBalance
+  async optOutV3Billing(options: OptOutV3BillingModel) {
+    return (await this.client.contracts.optOutV3Billing(options)).apply();
+  }
+
   /**
    * Get contract discount package
    * @param {ContractDiscountPackage} options

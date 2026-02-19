@@ -12,6 +12,7 @@ import {
   ExtrinsicResult,
   GetDedicatedNodePriceOptions,
   NodeContractUsedResources,
+  OptOutV3BillingOptions,
   SetDedicatedNodeExtraFeesOptions,
 } from "@threefold/tfchain_client";
 import { GridClientError } from "@threefold/types";
@@ -705,6 +706,12 @@ class TFContracts extends Contracts {
     return await super.setDedicatedNodeExtraFee({
       nodeId: options.nodeId,
       extraFee: feeUSD,
+    });
+  }
+
+  async optOutV3Billing(options: OptOutV3BillingOptions) {
+    return await super.optOutV3Billing({
+      nodeId: options.nodeId,
     });
   }
 }
