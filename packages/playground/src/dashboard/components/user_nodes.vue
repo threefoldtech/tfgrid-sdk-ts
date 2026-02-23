@@ -70,15 +70,12 @@
       </template>
 
       <template #[`item.actions`]="{ item }">
-        <PublicConfig
-          class="me-2"
+        <NodeActions
           :node-id="item.nodeId"
           :farm-id="item.farmId"
           @remove-config="config => toggleConfig(item, config)"
           @add-config="config => toggleConfig(item, config)"
         />
-        <SetExtraFee class="me-2" :node-id="item.nodeId" />
-        <OptOutV3Billing class="me-2" :node-id="item.nodeId" />
       </template>
 
       <template #[`item.country`]="{ item }">
@@ -107,18 +104,14 @@ import { calculateUptime, getNodeAvailability, getNodeMintingFixupReceipts, type
 
 import NodeResources from "../../components/node_resources.vue";
 import NodeMintingDetails from "./NodeMintingDetails.vue";
-import OptOutV3Billing from "./opt_out_v3_billing.vue";
-import PublicConfig from "./public_config.vue";
-import SetExtraFee from "./set_extra_fee.vue";
+import NodeActions from "./node_actions.vue";
 
 export default {
   name: "UserNodes",
   components: {
-    NodeMintingDetails,
-    OptOutV3Billing,
-    PublicConfig,
-    SetExtraFee,
     CardDetails,
+    NodeActions,
+    NodeMintingDetails,
     NodeResources,
   },
   setup() {

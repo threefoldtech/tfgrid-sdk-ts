@@ -43,6 +43,7 @@ import {
   GetActiveContractsModel,
   GetDedicatedNodePriceModel,
   GetServiceContractModel,
+  IsNodeOptedOutOfV3BillingModel,
   NameContractCreateModel,
   NameContractGetModel,
   NodeContractCreateModel,
@@ -214,6 +215,13 @@ class Contracts {
   @validateInput
   async getDedicatedNodeExtraFee(options: GetDedicatedNodePriceModel): Promise<number> {
     return await this.client.contracts.getDedicatedNodeExtraFee(options);
+  }
+
+  /** Returns whether the node has opted out of v3 billing. */
+  @expose
+  @validateInput
+  async isNodeOptedOutOfV3Billing(options: IsNodeOptedOutOfV3BillingModel): Promise<boolean> {
+    return await this.client.contracts.isNodeOptedOutOfV3Billing(options);
   }
 
   /**

@@ -869,6 +869,10 @@ class GetDedicatedNodePriceModel {
   @Expose() @IsInt() @IsNotEmpty() @Min(1) nodeId: number;
 }
 
+class IsNodeOptedOutOfV3BillingModel {
+  @Expose() @IsInt() @IsNotEmpty() @Min(1) nodeId: number;
+}
+
 class SwapToStellarModel {
   @Expose() @IsNotEmpty() @IsString() target: string;
   @Expose() @IsNotEmpty() @Min(1) amount: number;
@@ -1073,6 +1077,7 @@ export {
   SetDedicatedNodeExtraFeesModel,
   OptOutV3BillingModel,
   GetDedicatedNodePriceModel,
+  IsNodeOptedOutOfV3BillingModel,
   SwapToStellarModel,
   ListenToMintCompletedModel,
   AddFarmIPModel,

@@ -284,6 +284,14 @@ class QueryContracts {
     const res = await this.client.api.query.smartContractModule.contractBillingInformationByID(contractId);
     return res.toPrimitive() as unknown as BillingInformation;
   }
+
+  /** Returns whether the node has opted out of v3 billing. */
+  @checkConnection
+  async isNodeOptedOutOfV3Billing(options: IsNodeOptedOutOfV3BillingOptions): Promise<boolean> {
+    const tfgridModule = this.client.api.query.tfgridModule as any;
+    const res = await tfgridModule.nodeV3BillingOptOut(options.nodeId);
+    return res ? res.isSome : false;
+  }
 }
 
 export interface CreateNodeOptions {
@@ -332,6 +340,10 @@ export interface SetDedicatedNodeExtraFeesOptions {
 }
 
 export interface OptOutV3BillingOptions {
+  nodeId: number;
+}
+
+export interface IsNodeOptedOutOfV3BillingOptions {
   nodeId: number;
 }
 
