@@ -540,6 +540,12 @@ const routes: AppRoute[] = [
         route: DashboardRoutes.TFChain.TFMintingReports,
         tooltip: "TFGrid Minting Explorer.",
       },
+      {
+        title: "Transfer Twin",
+        icon: "mdi-account-switch-outline",
+        route: DashboardRoutes.TFChain.TFTransferTwin,
+        tooltip: "Transfer twin ownership to a new secure account.",
+      },
     ],
   },
   {

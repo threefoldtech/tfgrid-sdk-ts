@@ -748,6 +748,11 @@ function createTFChainRoutes(): RouteRecordRaw[] {
           path: DashboardRoutes.TFChain.TFMintingReports,
           component: () => import("../views/minting_view.vue"),
         },
+        {
+          path: DashboardRoutes.TFChain.TFTransferTwin,
+          component: () => import("../dashboard/transfer_twin_view.vue"),
+          meta: { title: "Transfer Twin" },
+        },
       ],
     },
   ];

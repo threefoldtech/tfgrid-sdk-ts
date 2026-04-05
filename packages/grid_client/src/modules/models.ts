@@ -412,6 +412,18 @@ class TwinDeleteModel {
   @Expose() @IsInt() @Min(1) id: number;
 }
 
+class TwinRequestTransferModel {
+  @Expose() @IsString() @IsNotEmpty() newAccount: string;
+}
+
+class TwinAcceptTransferModel {
+  @Expose() @IsInt() @Min(0) requestId: number;
+}
+
+class TwinCancelTransferModel {
+  @Expose() @IsInt() @Min(0) requestId: number;
+}
+
 class KVStoreSetModel {
   @Expose() @IsString() @IsNotEmpty() key: string;
   @Expose() @IsString() @IsNotEmpty() value: string;
@@ -996,6 +1008,9 @@ export {
   TwinGetModel,
   TwinGetByAccountIdModel,
   TwinDeleteModel,
+  TwinRequestTransferModel,
+  TwinAcceptTransferModel,
+  TwinCancelTransferModel,
   KVStoreSetModel,
   KVStoreGetModel,
   KVStoreRemoveModel,

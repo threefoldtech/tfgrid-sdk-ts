@@ -12,6 +12,32 @@ interface Twin {
   pk: string;
 }
 
+interface TwinTransferRequest {
+  twinId: number;
+  from: string;
+  to: string;
+  createdAt: number;
+}
+
+interface RequestTwinTransferOptions {
+  newAccount: string;
+}
+
+interface AcceptTwinTransferOptions {
+  requestId: number;
+}
+
+interface CancelTwinTransferOptions {
+  requestId: number;
+}
+
+interface TwinTransferRequestedEvent {
+  requestId: number;
+  twinId: number;
+  from: string;
+  to: string;
+}
+
 interface QueryTwinsGetOptions {
   id: number;
 }
@@ -53,6 +79,18 @@ class QueryTwins {
   @checkConnection
   async getTwinIdByAccountId(options: QueryTwinsGetTwinByAccountIdOptions): Promise<number> {
     const res = await this.client.api.query.tfgridModule.twinIdByAccountID(options.accountId);
+    return res.toPrimitive() as number;
+  }
+
+  /**
+   * Gets the pending transfer request ID for a given twin, or 0 if none exists.
+   *
+   * @param options - The options containing the twin ID.
+   * @returns {Promise<number>} The pending request ID, or 0 if no pending transfer.
+   */
+  @checkConnection
+  async getPendingTransferByTwin(options: QueryTwinsGetOptions): Promise<number> {
+    const res = await this.client.api.query.tfgridModule.pendingTransferByTwin(options.id);
     return res.toPrimitive() as number;
   }
 }
@@ -108,6 +146,64 @@ class Twins extends QueryTwins {
   async getMyTwinId(): Promise<number> {
     return this.getTwinIdByAccountId({ accountId: this.client.address });
   }
+
+  /**
+   * Requests a twin transfer to a new account.
+   * The new account must have accepted Terms & Conditions and must not already own a twin.
+   *
+   * @param {RequestTwinTransferOptions} options - The options containing the new account address.
+   * @returns {Promise<ExtrinsicResult<TwinTransferRequestedEvent>>} A Promise that resolves to the transfer request event.
+   */
+  @checkConnection
+  async requestTransfer(options: RequestTwinTransferOptions): Promise<ExtrinsicResult<TwinTransferRequestedEvent>> {
+    const extrinsic = await this.client.api.tx.tfgridModule.requestTwinTransfer(options.newAccount);
+    return this.client.patchExtrinsic<TwinTransferRequestedEvent>(extrinsic, {
+      resultSections: ["tfgridModule"],
+      resultEvents: ["TwinTransferRequested"],
+      map: (data: any) => ({
+        requestId: data[0],
+        twinId: data[1],
+        from: data[2],
+        to: data[3],
+      }),
+    });
+  }
+
+  /**
+   * Accepts a pending twin transfer request. Must be called by the target account.
+   *
+   * @param {AcceptTwinTransferOptions} options - The options containing the request ID.
+   * @returns {Promise<ExtrinsicResult<Twin>>} A Promise that resolves to the updated twin.
+   */
+  @checkConnection
+  async acceptTransfer(options: AcceptTwinTransferOptions): Promise<ExtrinsicResult<Twin>> {
+    const extrinsic = await this.client.api.tx.tfgridModule.acceptTwinTransfer(options.requestId);
+    return this.client.patchExtrinsic<Twin>(extrinsic, {
+      resultSections: ["tfgridModule"],
+      resultEvents: ["TwinOwnershipTransferred"],
+    });
+  }
+
+  /**
+   * Cancels a pending twin transfer request. Must be called by the original owner.
+   *
+   * @param {CancelTwinTransferOptions} options - The options containing the request ID.
+   * @returns {Promise<ExtrinsicResult<void>>} A Promise that resolves when the transfer is cancelled.
+   */
+  @checkConnection
+  async cancelTransfer(options: CancelTwinTransferOptions): Promise<ExtrinsicResult<void>> {
+    const extrinsic = await this.client.api.tx.tfgridModule.cancelTwinTransfer(options.requestId);
+    return this.client.patchExtrinsic<void>(extrinsic);
+  }
 }
 
-export { Twins, QueryTwins, Twin };
+export {
+  Twins,
+  QueryTwins,
+  Twin,
+  TwinTransferRequest,
+  TwinTransferRequestedEvent,
+  RequestTwinTransferOptions,
+  AcceptTwinTransferOptions,
+  CancelTwinTransferOptions,
+};

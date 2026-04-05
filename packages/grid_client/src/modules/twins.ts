@@ -1,10 +1,17 @@
-import { Twin } from "@threefold/tfchain_client";
+import { Twin, TwinTransferRequestedEvent } from "@threefold/tfchain_client";
 
 import { TFClient } from "../clients/tf-grid/client";
 import { GridClientConfig } from "../config";
 import { expose } from "../helpers/expose";
 import { validateInput } from "../helpers/validator";
-import { TwinCreateModel, TwinGetByAccountIdModel, TwinGetModel } from "./models";
+import {
+  TwinAcceptTransferModel,
+  TwinCancelTransferModel,
+  TwinCreateModel,
+  TwinGetByAccountIdModel,
+  TwinGetModel,
+  TwinRequestTransferModel,
+} from "./models";
 import { checkBalance } from "./utils";
 
 class Twins {
@@ -110,6 +117,27 @@ class Twins {
   @validateInput
   async get_twin_id_by_account_id(options: TwinGetByAccountIdModel): Promise<number> {
     return await this.client.twins.getTwinIdByAccountId({ accountId: options.public_key });
+  }
+
+  @expose
+  @validateInput
+  @checkBalance
+  async request_transfer(options: TwinRequestTransferModel): Promise<TwinTransferRequestedEvent> {
+    return (await this.client.twins.requestTransfer({ newAccount: options.newAccount })).apply();
+  }
+
+  @expose
+  @validateInput
+  @checkBalance
+  async accept_transfer(options: TwinAcceptTransferModel): Promise<Twin> {
+    return (await this.client.twins.acceptTransfer({ requestId: options.requestId })).apply();
+  }
+
+  @expose
+  @validateInput
+  @checkBalance
+  async cancel_transfer(options: TwinCancelTransferModel): Promise<void> {
+    return (await this.client.twins.cancelTransfer({ requestId: options.requestId })).apply();
   }
 }
 
