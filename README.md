@@ -1,4 +1,4 @@
-# tfgrid-sdk-ts
+# ZOS SDK TypeScript
 
 ![Version](https://img.shields.io/github/lerna-json/v/threefoldtech/tfgrid-sdk-ts/development?color=blue&label=version)
 [![Lint](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/lint.yml/badge.svg)](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/lint.yml)
