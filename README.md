@@ -5,7 +5,7 @@
 [![Build](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/build.yml/badge.svg)](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/build.yml)
 [![Code Coverage](https://codecov.io/gh/threefoldtech/tfgrid-sdk-ts/branch/development/graph/badge.svg)](https://codecov.io/gh/threefoldtech/tfgrid-sdk-ts)
 
-This repo contains the typescript clients and projects for Threefold grid.
+This repository contains the TypeScript SDK clients and tools for interacting with the ThreeFold Grid.
 
 ## Packages
 
@@ -57,3 +57,8 @@ export NODE_OPTIONS="--max-old-space-size=8192"
 - [Configure the editor/IDE](./docs/editor_config.md)
 - [Pipelines documentation](./docs/workflows.md)
 - [Release process](./docs/release.md)
+
+## License
+
+This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
+Copyright (c) TFTech NV.
