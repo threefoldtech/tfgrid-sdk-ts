@@ -1,8 +1,8 @@
 # ZOS SDK TypeScript
 
 ![Version](https://img.shields.io/github/lerna-json/v/threefoldtech/tfgrid-sdk-ts/development?color=blue&label=version)
-[![Lint](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/lint.yml/badge.svg)](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/lint.yml)
-[![Build](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/build.yml/badge.svg)](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/build.yml)
+[![Lint](https://github.com/threefoldtech/zos_sdk_ts/actions/workflows/lint.yml/badge.svg)](https://github.com/threefoldtech/zos_sdk_ts/actions/workflows/lint.yml)
+[![Build](https://github.com/threefoldtech/zos_sdk_ts/actions/workflows/build.yml/badge.svg)](https://github.com/threefoldtech/zos_sdk_ts/actions/workflows/build.yml)
 [![Code Coverage](https://codecov.io/gh/threefoldtech/tfgrid-sdk-ts/branch/development/graph/badge.svg)](https://codecov.io/gh/threefoldtech/tfgrid-sdk-ts)
 
 TypeScript client libraries and utilities for interacting with the ThreeFold Grid from Node.js and browser environments. This SDK supports deployment management, wallet operations, peer-to-peer messaging, and grid querying through modern TypeScript APIs.
