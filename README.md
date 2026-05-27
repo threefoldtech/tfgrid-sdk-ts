@@ -77,4 +77,3 @@ export NODE_OPTIONS="--max-old-space-size=8192"
 ## License
 
 This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
-Copyright (c) TF-Tech NV.
