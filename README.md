@@ -27,7 +27,7 @@ This repository contains the official TypeScript SDK for the ThreeFold Grid. It 
 
 ## Role in the stack
 
-The SDK serves as the primary application-layer interface for JavaScript and TypeScript projects targeting the ThreeFold Grid. It wraps TFChain for on-chain operations, the grid proxy for node and contract queries, GraphQL for indexed data, and RMB for direct node communication. The packages in this repository power web-based dashboards, automation scripts, and backend Node.js services that need to provision or manage grid resources.
+The SDK serves as the primary application-layer interface for JavaScript and TypeScript projects targeting the ThreeFold Grid. It wraps Ledger Chain for on-chain operations, the grid proxy for node and contract queries, GraphQL for indexed data, and RMB for direct node communication. The packages in this repository power web-based dashboards, automation scripts, and backend Node.js services that need to provision or manage grid resources.
 
 ## Relation to ThreeFold
 
