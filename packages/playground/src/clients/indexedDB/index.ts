@@ -140,6 +140,34 @@ export class IndexedDBClient {
     return res;
   }
 
+  public async deleteOldestRecords(count: number): Promise<void> {
+    await this._lock.acquireAsync();
+
+    return new Promise((res, rej) => {
+      const store = this._createStore();
+      const query = store.openCursor();
+
+      let deleted = 0;
+
+      query.onsuccess = () => {
+        const cursor = query.result;
+        if (cursor && deleted < count) {
+          cursor.delete();
+          deleted++;
+          cursor.continue();
+        } else {
+          this._lock.release();
+          res();
+        }
+      };
+
+      query.onerror = e => {
+        this._lock.release();
+        rej(e);
+      };
+    });
+  }
+
   public disconnect() {
     const db = this._assertConnection();
     db.close();

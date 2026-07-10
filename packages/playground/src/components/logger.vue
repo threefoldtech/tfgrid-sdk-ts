@@ -140,6 +140,14 @@ export default {
     }
 
     const logs = ref<Indexed<LoggerInstance>[]>([]);
+
+    /**
+     * Keep a reference to the original console.error so that internal
+     * logger failures don't recursively go through the interceptor and
+     * generate more log entries.
+     */
+    const originalConsoleError = console.error.bind(console);
+
     const interceptor = new LoggerInterceptor(console);
 
     const logsDBClient = new IndexedDBClient("TF_LOGGER_DB", VERSION, KEY);
@@ -147,6 +155,8 @@ export default {
       init: true,
       async onAfterTask({ error }) {
         if (error) {
+          // Stop intercepting entirely on persistent DB failure.
+          interceptor.dispose();
           return;
         }
 
@@ -155,6 +165,7 @@ export default {
 
         _interceptorQueue.forEach(interceptMessage);
         _interceptorQueue = [];
+        if (logQueue.length > 0) flushLogQueue();
       },
     });
 
@@ -207,59 +218,112 @@ export default {
 
     interceptor.on(interceptMessage);
 
-    // This should be used if db failed to connect to be synced later
     let _interceptorQueue: LI[] = [];
+    const logQueue: LI[] = [];
+    let flushTimeout: ReturnType<typeof setTimeout> | null = null;
+    let rotationPromise: Promise<void> | null = null; // Prevent concurrent rotations
+    const BATCH_SIZE = 50;
+    const FLUSH_DELAY = 500;
 
-    async function interceptMessage(instance: LI) {
+    function scheduleFlush() {
+      if (flushTimeout) return;
+      flushTimeout = setTimeout(flushLogQueue, FLUSH_DELAY);
+    }
+
+    const MAX_VISIBLE_LOGS = 2000;
+    const MAX_STORED_LOGS = 10000;
+    const ROTATION_BUFFER = 1000;
+
+    async function flushLogQueue() {
+      if (logQueue.length === 0 || !connectDB?.value?.data) return;
+
+      const batch = logQueue.splice(0, BATCH_SIZE);
+      const items: Indexed<LoggerInstance>[] = [];
+
+      for (const instance of batch) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { logger: _, date: __, ...log } = instance;
+
+        try {
+          items.push(
+            await logsDBClient.write({
+              type: log.type,
+              timestamp: log.timestamp,
+              message: log.messages.map(IndexedDBClient.serializer.serialize).join(" ").replace(/\n\s/g, "\n"),
+            }),
+          );
+        } catch (error) {
+          // Use the original console.error to avoid re-interception.
+          originalConsoleError("Failed to write log to IndexedDB:", error);
+        }
+      }
+
+      if (items.length > 0 && logs.value) {
+        logs.value.push(...items);
+        if (logs.value.length > MAX_VISIBLE_LOGS) {
+          logs.value.splice(0, logs.value.length - MAX_VISIBLE_LOGS);
+        }
+        scrollToBottom();
+      }
+
+      // Rotate old logs if count exceeds limit
+      if (!rotationPromise) {
+        rotationPromise = (async () => {
+          try {
+            const currentCount = await logsDBClient.count();
+            if (currentCount > MAX_STORED_LOGS) {
+              const toDelete = currentCount - MAX_STORED_LOGS + ROTATION_BUFFER;
+              await logsDBClient.deleteOldestRecords(toDelete);
+              const afterCount = await logsDBClient.count();
+              count.value = afterCount;
+            }
+          } catch (error) {
+            originalConsoleError("Failed to rotate logs:", error);
+          } finally {
+            rotationPromise = null;
+          }
+        })();
+      }
+
+      flushTimeout = logQueue.length > 0 ? setTimeout(flushLogQueue, FLUSH_DELAY) : null;
+    }
+
+    function interceptMessage(instance: LI) {
+      // Drop very noisy categories early to avoid unnecessary work.
+      const payload = instance.messages.map(String).join().toLowerCase();
+      if (
+        instance.type === "warn" &&
+        (payload.includes("vue") || payload.includes("vite") || payload.includes("hmr"))
+      ) {
+        return;
+      }
+
       if (connectDB?.value?.error) {
         _interceptorQueue.push(instance);
         return;
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { logger: _, date: __, ...log } = instance;
+      if (!connectDB?.value?.data) return;
 
-      if (import.meta.env.DEV) {
-        if (
-          log.messages
-            .map(v => {
-              try {
-                return String(v);
-              } catch {
-                return "{ [[null proto]] }";
-              }
-            })
-            .join()
-            .includes("vite") &&
-          log.type === "debug"
-        ) {
-          return;
-        }
+      logQueue.push(instance);
+
+      if (logQueue.length >= BATCH_SIZE) {
+        flushTimeout && clearTimeout(flushTimeout);
+        flushTimeout = null;
+        return flushLogQueue();
       }
-      if (connectDB && connectDB.value.data) {
-        const item = await logsDBClient.write({
-          type: log.type,
-          timestamp: log.timestamp,
-          message: log.messages.map(IndexedDBClient.serializer.serialize).join(" ").replace(/\n\s/g, "\n"),
-        });
-        if (logs.value) {
-          logs.value.push(item);
-          scrollToBottom();
-        }
-      }
+
+      scheduleFlush();
     }
 
     let _init_scroll = false;
     function scrollToBottom() {
       const el = scroller.value?.$el;
-      if (!el || el.scrollHeight === 0 || el.offsetHeight === 0) {
-        return;
-      }
+      if (!el || el.scrollHeight === 0 || el.offsetHeight === 0) return;
+      if (_init_scroll && el.scrollTop !== el.scrollHeight - el.offsetHeight) return;
 
-      if (!_init_scroll || el.scrollTop === el.scrollHeight - el.offsetHeight) {
-        _init_scroll = true;
-        scroller.value?.scrollToBottom();
-      }
+      _init_scroll = true;
+      scroller.value?.scrollToBottom();
     }
 
     async function downloadLogs() {
@@ -281,6 +345,10 @@ export default {
 
     onBeforeUnmount(() => {
       document.removeEventListener("click", handleClickOutside);
+      if (flushTimeout) {
+        clearTimeout(flushTimeout);
+        flushLogQueue();
+      }
     });
 
     const handleClickOutside = (event: MouseEvent) => {
