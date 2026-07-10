@@ -136,7 +136,9 @@ class HighLevelBase {
       }
       if (network instanceof Network) {
         const hasAccessPoint = network.hasAccessPoint(node_id);
-        if (hasAccessPoint && network.nodes.length !== 1) {
+        // Only skip network deletion if we have access point, multiple nodes, AND remaining workloads
+        // If remainingWorkloads is 0, we're deleting the entire deployment, so delete all network contracts
+        if (hasAccessPoint && network.nodes.length !== 1 && remainingWorkloads.length !== 0) {
           console.log(
             `network ${network.name} still has access point:${hasAccessPoint} and number of nodes ${network.nodes.length}`,
           );
@@ -191,6 +193,27 @@ class HighLevelBase {
         }
       }
     }
+
+    // Final safety: if this was a full deployment delete, make sure no
+    // network-node contracts are left behind (e.g., due to access-point guards).
+    if (network instanceof Network && remainingWorkloads.length === 0) {
+      const nodesSnapshot = [...network.nodes];
+      for (const n of nodesSnapshot) {
+        if (network.getNodeReservedIps(n.node_id).length !== 0) continue;
+        const contract_id = await network.deleteNode(n.node_id);
+        for (let d of network.deployments) {
+          d = await deploymentFactory.fromObj(d);
+          if (d.contract_id !== contract_id) continue;
+          if (d.workloads.length === 1) {
+            twinDeployments.push(new TwinDeployment(d, Operations.delete, 0, 0, "", network));
+          } else {
+            d.workloads = d.workloads.filter(item => item.name !== network?.name);
+            twinDeployments.push(new TwinDeployment(d, Operations.update, 0, 0, "", network));
+          }
+        }
+      }
+    }
+
     return [twinDeployments, remainingWorkloads, deletedNodes, deletedIps, network];
   }
 
