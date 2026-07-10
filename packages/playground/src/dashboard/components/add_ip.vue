@@ -21,8 +21,10 @@
                   validators.required('IP is required.'),
                   validators.isIPRange('Not a valid IP'),
                   validators.isPublicIP(),
+                  ...(type === IPType.range ? [fromIpCheck] : []),
                 ]"
-                :async-rules="type === IPType.range ? [isExistingIp, validateRangeIPs] : [isExistingIp]"
+                :async-rules="type === IPType.range ? [isExistingIp] : [isExistingIp]"
+                input-name="fromIP"
                 #="{ props }"
               >
                 <input-tooltip tooltip="IP address in CIDR format xxx.xxx.xxx.xxx/xx">
@@ -47,6 +49,7 @@
                   toIpCheck,
                 ]"
                 :async-rules="[isExistingIp, validateRangeIPs]"
+                input-name="toIP"
                 #="{ props }"
               >
                 <input-tooltip tooltip="IP address in CIDR format xxx.xxx.xxx.xxx/xx">
@@ -140,12 +143,16 @@
 
 <script lang="ts">
 import { TFChainError } from "@threefold/tfchain_client";
-import CidrTools from "cidr-tools";
 import { getIPRange } from "get-ip-range";
 import { ref, watch } from "vue";
 
 import { gqlClient } from "@/clients";
 import { ipToLong, longToIp } from "@/utils/ip";
+import {
+  gatewayCheck as gatewayCheckUtil,
+  validateIPRange,
+  validateRangeIPs as validateRangeIPsUtil,
+} from "@/utils/ip_range_validation";
 import { IPType } from "@/utils/types";
 
 import { useGrid } from "../../stores";
@@ -186,105 +193,40 @@ export default {
       },
       { deep: true },
     );
+
+    // Sync cross-field validation: validate the other field when one changes
+    watch([publicIP, toPublicIP], ([newFrom, newTo], [oldFrom, oldTo]) => {
+      if (type.value !== IPType.range || !formValidator.value || !newFrom || !newTo) return;
+      if (oldFrom === undefined || oldTo === undefined) return;
+
+      const fromValidator = formValidator.value.get("fromIP");
+      const toValidator = formValidator.value.get("toIP");
+
+      if (newFrom !== oldFrom) toValidator?.validate();
+      if (newTo !== oldTo) fromValidator?.validate();
+    });
+
     async function IpExistsCheck(pubIp: string) {
       const ips = await gqlClient.publicIps({ ip: true }, { where: { ip_eq: pubIp } });
       return ips.length > 0;
     }
+
     async function isExistingIp(ip: string) {
       if (await IpExistsCheck(ip)) {
-        return {
-          message: "IP exists.",
-        };
+        return { message: "IP exists." };
       }
       return undefined;
     }
 
     async function validateRangeIPs() {
-      if (type.value !== IPType.range || !publicIP.value || !toPublicIP.value) return;
-      const [start, sub] = publicIP.value.split("/");
-      const [end] = toPublicIP.value.split("/");
-      const rangeIPs = getIPRange(start, end).map(ip => `${ip}/${sub}`);
-      const existingCount = (await Promise.all(rangeIPs.map(IpExistsCheck))).filter(Boolean).length;
-      if (existingCount > 0) {
-        return { message: `${existingCount} IP(s) in range already exist in another farm.` };
-      }
+      return await validateRangeIPsUtil(publicIP.value, toPublicIP.value, type.value, IpExistsCheck);
     }
-    function toIpCheck() {
-      if (!publicIP.value || !toPublicIP.value) {
-        return;
-      }
 
-      const fromParts = publicIP.value.split("/");
-      const toParts = toPublicIP.value.split("/");
-
-      if (toParts[1] !== fromParts[1]) {
-        return {
-          message: "Subnet is different.",
-        };
-      }
-
-      if (
-        toParts[0].substring(0, toParts[0].lastIndexOf(".")) != fromParts[0].substring(0, fromParts[0].lastIndexOf("."))
-      ) {
-        return {
-          message: "IPs are not in the same network.",
-        };
-      }
-      if (parseInt(toParts[0].split(".")[3]) <= parseInt(fromParts[0].split(".")[3])) {
-        return {
-          message: "To IP must be bigger than From IP.",
-        };
-      }
-      if (parseInt(toParts[0].split(".")[3]) - parseInt(fromParts[0].split(".")[3]) + 1 > 16) {
-        return {
-          message: "Range must not exceed 16.",
-        };
-      }
-    }
+    const fromIpCheck = () => validateIPRange(publicIP.value, toPublicIP.value, "from");
+    const toIpCheck = () => validateIPRange(publicIP.value, toPublicIP.value, "to");
 
     function gatewayCheck() {
-      if (!gateway.value || !publicIP.value) {
-        return;
-      }
-
-      const firstIP = publicIP?.value.split("/")[0];
-      const lastIP = toPublicIP?.value.split("/")[0];
-      let isRange = false;
-
-      try {
-        isRange = CidrTools.containsCidr(publicIP.value, gateway.value);
-      } catch {
-        isRange = false;
-      }
-
-      if (!isRange) {
-        return {
-          message: "Gateway IP not in the provided IP range.",
-        };
-      }
-
-      if (firstIP === gateway.value || (lastIP && lastIP === gateway.value)) {
-        return {
-          message: "IPs cannot be the same.",
-        };
-      }
-
-      if (type.value !== IPType.single && lastIP) {
-        try {
-          const range = getIPRange(firstIP, lastIP);
-          if (range.includes(gateway.value)) {
-            return {
-              message: "The gateway IP shouldn't be in the IPs range.",
-            };
-          }
-        } catch (error: any) {
-          return {
-            message: error.message,
-          };
-        }
-      }
-
-      return undefined;
+      return gatewayCheckUtil(gateway.value, publicIP.value, toPublicIP.value, type.value);
     }
 
     function showRange() {
@@ -409,6 +351,7 @@ export default {
       addFarmIp,
       isExistingIp,
       validateRangeIPs,
+      fromIpCheck,
       toIpCheck,
       gatewayCheck,
     };
