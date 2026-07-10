@@ -1,17 +1,17 @@
 <template>
   <span>
-    <v-tooltip text="Set Additional Fees">
-      <template #activator="{ props }">
-        <v-icon
-          class="mx-1"
-          v-bind="props"
-          size="large"
-          :disabled="isAdding"
-          :loading="isAdding"
-          @click="setupDialog()"
-        >
-          mdi-currency-usd
-        </v-icon>
+    <v-tooltip :text="tooltipText">
+      <template #activator="{ props: tooltipProps }">
+        <span class="d-inline-block mx-1" v-bind="tooltipProps">
+          <v-icon
+            size="large"
+            :disabled="isAdding || isOptedOut"
+            :loading="isAdding"
+            @click.stop="!isOptedOut && setupDialog()"
+          >
+            mdi-currency-usd
+          </v-icon>
+        </span>
       </template>
     </v-tooltip>
 
@@ -83,12 +83,16 @@ export default {
       type: Number,
       required: true,
     },
+    isOptedOut: { type: Boolean, default: false },
   },
   setup(props) {
     const showDialogue = ref(false);
     const isAdding = ref(false);
     const gridStore = useGrid();
     const valid = ref(false);
+    const tooltipText = computed(() =>
+      props.isOptedOut ? "Set Additional Fees (unavailable - node opted out of v3 billing)" : "Set Additional Fees",
+    );
     const isSetting = ref(false);
     const inputFee = ref(0);
     const isDisabled = computed(() => {
@@ -143,6 +147,7 @@ export default {
       inputFee,
       isSetting,
       isDisabled,
+      tooltipText,
       setExtraFee,
       setupDialog,
       loading,

@@ -1,9 +1,7 @@
 <template v-if="nodes">
   <div class="my-6">
     <v-card color="primary rounded-0">
-      <v-card-title class="py-1 text-subtitle-1 text-center">
-        Your Nodes
-      </v-card-title>
+      <v-card-title class="py-1 text-subtitle-1 text-center"> Your Nodes </v-card-title>
     </v-card>
     <v-data-table-server
       v-model:page="page"
@@ -46,9 +44,7 @@
 
             <v-card class="mt-4">
               <v-alert class="pa-5" style="height: 20px">
-                <h4 class="text-center font-weight-medium">
-                  Resource Units Reserved
-                </h4>
+                <h4 class="text-center font-weight-medium">Resource Units Reserved</h4>
               </v-alert>
               <v-card-text class="pb-8">
                 <NodeResources :node="item" />
@@ -57,9 +53,7 @@
 
             <v-card v-if="network == 'main'" class="mt-4" focusable single model-value>
               <v-alert class="pa-5" style="height: 20px">
-                <h4 class="text-center font-weight-medium">
-                  Node Statistics
-                </h4>
+                <h4 class="text-center font-weight-medium">Node Statistics</h4>
               </v-alert>
               <v-card-item>
                 <NodeMintingDetails :node="item" />
@@ -76,14 +70,12 @@
       </template>
 
       <template #[`item.actions`]="{ item }">
-        <PublicConfig
-          class="me-2"
+        <NodeActions
           :node-id="item.nodeId"
           :farm-id="item.farmId"
           @remove-config="config => toggleConfig(item, config)"
           @add-config="config => toggleConfig(item, config)"
         />
-        <SetExtraFee class="me-2" :node-id="item.nodeId" />
       </template>
 
       <template #[`item.country`]="{ item }">
@@ -112,16 +104,14 @@ import { calculateUptime, getNodeAvailability, getNodeMintingFixupReceipts, type
 
 import NodeResources from "../../components/node_resources.vue";
 import NodeMintingDetails from "./NodeMintingDetails.vue";
-import PublicConfig from "./public_config.vue";
-import SetExtraFee from "./set_extra_fee.vue";
+import NodeActions from "./node_actions.vue";
 
 export default {
   name: "UserNodes",
   components: {
-    NodeMintingDetails,
-    PublicConfig,
-    SetExtraFee,
     CardDetails,
+    NodeActions,
+    NodeMintingDetails,
     NodeResources,
   },
   setup() {
