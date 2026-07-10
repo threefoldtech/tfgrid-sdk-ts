@@ -35,7 +35,7 @@
     "ip": "^2.0.1",
     "jspdf": "^3.0.2",
     "jspdf-autotable": "^5.0.2",
-    "lodash": "^4.17.21",
+    "lodash": "^4.17.23",
     "logger-interceptor": "1.0.0",
     "marked": "^15.0.11",
     "md5": "^2.3.0",
