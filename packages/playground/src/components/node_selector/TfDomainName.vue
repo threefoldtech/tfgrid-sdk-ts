@@ -105,6 +105,7 @@
 <script lang="ts">
 import { type FarmInfo, Features, type FilterOptions, type NodeInfo } from "@threefold/grid_client";
 import noop from "lodash/fp/noop.js";
+import { default as PrivateIp } from "private-ip";
 import { computed, getCurrentInstance, nextTick, onMounted, onUnmounted, type PropType, ref, watch } from "vue";
 
 import { type InputValidatorService, useInputRef } from "@/hooks/input_validator";
@@ -150,7 +151,10 @@ export default {
       onAfterTask({ data }) {
         const currentPage = pagination.value.page;
         if (!loadedPages.value.has(currentPage)) {
-          loadedDomains.value = loadedDomains.value.concat(data as NodeInfo[]);
+          const validNodes = (data as NodeInfo[]).filter(
+            node => node.publicConfig?.ipv4 && PrivateIp(node.publicConfig.ipv4.split("/")[0]) === false,
+          );
+          loadedDomains.value = loadedDomains.value.concat(validNodes);
           loadedPages.value.add(currentPage);
         }
         pagination.value.next();
@@ -169,7 +173,8 @@ export default {
     const enableCustomDomain = ref(false);
     const size = ref(window.env.PAGE_SIZE);
     const filters = computed<FilterOptions>(() => ({
-      gateway: true,
+      accessNodeV4: true,
+      accessNodeV6: true,
       size: size.value,
       page: Math.max(1, pagination.value.page),
       farmId: enableCustomDomain.value ? props.farm?.farmId : undefined,
