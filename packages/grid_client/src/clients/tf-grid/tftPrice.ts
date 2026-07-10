@@ -5,6 +5,11 @@ class TFTPrice extends QueryTFTPrice {
     const priceInMili = await super.get();
     return priceInMili / 1000;
   }
+
+  async getTFTBillingRateUSD(): Promise<number> {
+    const priceInMili = await super.getTFTBillingRateMUSD();
+    return priceInMili / 1000;
+  }
 }
 
 export { TFTPrice };

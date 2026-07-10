@@ -20,6 +20,7 @@ import { Decimal } from "decimal.js";
 import { bytesToGB, formatErrorMessage } from "../../helpers";
 import { calculator, ContractStates, currency } from "../../modules";
 import { Graphql } from "../graphql/client";
+import { TFTPrice } from "./tftPrice";
 
 export type DiscountLevel = "None" | "Default" | "Bronze" | "Silver" | "Gold";
 
@@ -387,7 +388,7 @@ class TFContracts extends Contracts {
    */
   private async convertToTFT(USD: Decimal) {
     try {
-      const tftPrice = (await this.client.tftPrice.get()) ?? 0;
+      const tftPrice = await (this.client.tftPrice as TFTPrice).getTFTBillingRateUSD();
       const tft = new currency(tftPrice, 15).convertUSDtoTFT({ amount: USD.toNumber() });
       return new Decimal(tft);
     } catch (error) {

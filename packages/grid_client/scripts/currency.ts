@@ -62,7 +62,7 @@ function yearlyUSD(hourlyUSD) {
 }
 async function main() {
   const grid = await getClient();
-  const rate = await grid.tfclient.tftPrice.get();
+  const rate = await grid.tfclient.tftPrice.getTFTBillingRateUSD();
   const decimals = 3;
   currency = new TFTUSDConversionService(rate, decimals);
 
